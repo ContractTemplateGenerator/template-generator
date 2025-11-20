@@ -1,0 +1,1411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Med Spa Botched Procedure Demand Letter Generator</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            overflow-x: auto;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #6c757d;
+            transition: all 0.3s;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab:hover {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .tab.active {
+            color: #0891b2;
+            border-bottom-color: #0891b2;
+            background: white;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+            padding: 2rem;
+        }
+
+        .form-section {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .preview-section {
+            flex: 1;
+            min-width: 0;
+            position: sticky;
+            top: 2rem;
+            height: fit-content;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 0.95rem;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="date"],
+        input[type="number"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #0891b2;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: start;
+            gap: 0.5rem;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+            margin-top: 0.25rem;
+            cursor: pointer;
+        }
+
+        .checkbox-item label {
+            margin: 0;
+            font-weight: 400;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .preview-container {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 2rem;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .document-preview {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #2d3748;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(8, 145, 178, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #0891b2;
+            border: 2px solid #0891b2;
+        }
+
+        .btn-secondary:hover {
+            background: #0891b2;
+            color: white;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #10b981;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideIn 0.3s ease;
+            z-index: 1000;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .warning-box {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 4px;
+        }
+
+        .warning-box p {
+            color: #92400e;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .info-text {
+            color: #6c757d;
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        @media (max-width: 968px) {
+            .content-wrapper {
+                flex-direction: column;
+            }
+
+            .preview-section {
+                position: static;
+            }
+
+            .row {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                font-size: 0.85rem;
+            }
+
+            .tab {
+                padding: 0.75rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useMemo } = React;
+
+        function MedSpaLetterGenerator() {
+            const [activeTab, setActiveTab] = useState(0);
+            const [showToast, setShowToast] = useState(false);
+
+            const [formData, setFormData] = useState({
+                // Patient Info
+                patientName: '',
+                patientAddress: '',
+                patientCity: '',
+                patientState: '',
+                patientZip: '',
+                patientEmail: '',
+                patientPhone: '',
+
+                // Clinic Info
+                clinicName: '',
+                clinicAddress: '',
+                clinicCity: '',
+                clinicState: 'CA',
+                clinicZip: '',
+
+                // Provider & Procedure
+                providerName: '',
+                providerTitle: 'physician',
+                procedureDate: '',
+                procedureType: 'fillers',
+                procedureDescription: '',
+                productUsed: '',
+                procedureCost: '',
+                marketingClaims: '',
+                consentProcess: '',
+
+                // Informed Consent Issues
+                riskNotDisclosed: false,
+                risksNotDisclosedDetails: '',
+                noMedicalEvaluation: false,
+                marketingMisleading: false,
+
+                // Complications
+                complicationDate: '',
+                complications: '',
+                symptomsSeverity: 'moderate',
+                reportedToClinic: false,
+                clinicResponse: '',
+
+                // Corrective Care
+                soughtCorrectiveCare: false,
+                correctiveProvider: '',
+                correctiveDiagnosis: '',
+                correctiveTreatment: '',
+
+                // Evidence
+                hasMedicalRecords: false,
+                hasPhotos: false,
+                hasMarketing: false,
+                hasCommunications: false,
+                hasCorrectiveRecords: false,
+
+                // Costs & Damages
+                correctiveCosts: '',
+                relatedExpenses: '',
+                otherDamages: '',
+
+                // Legal Issues
+                scopeOfPracticeIssue: false,
+                scopeDetails: '',
+                standardOfCareIssue: false,
+                standardDetails: '',
+
+                // Demands
+                refundRequested: true,
+                correctiveCostsRequested: true,
+                relatedExpensesRequested: true,
+                openToRelease: true,
+                releaseConditions: '',
+                deadlineDays: '14',
+
+                // Regulatory
+                planBoardComplaint: false,
+                boardTypes: '',
+
+                letterDate: new Date().toISOString().split('T')[0]
+            });
+
+            const updateField = (field, value) => {
+                setFormData(prev => ({ ...prev, [field]: value }));
+            };
+
+            const procedureTypes = {
+                'fillers': 'dermal filler injections',
+                'botox': 'Botox/neurotoxin injections',
+                'laser': 'laser treatment/resurfacing',
+                'peel': 'chemical peel',
+                'microneedling': 'microneedling',
+                'threadlift': 'thread lift',
+                'prp': 'PRP treatment',
+                'other': formData.procedureDescription || 'cosmetic procedure'
+            };
+
+            const totalDemand = useMemo(() => {
+                const procedure = parseFloat(formData.procedureCost) || 0;
+                const corrective = parseFloat(formData.correctiveCosts) || 0;
+                const related = parseFloat(formData.relatedExpenses) || 0;
+                return (procedure + corrective + related).toFixed(2);
+            }, [formData.procedureCost, formData.correctiveCosts, formData.relatedExpenses]);
+
+            const documentText = useMemo(() => {
+                const today = formData.letterDate || new Date().toISOString().split('T')[0];
+                const deadline = new Date(today);
+                deadline.setDate(deadline.getDate() + parseInt(formData.deadlineDays || 14));
+                const deadlineStr = deadline.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+                let letter = `${formData.patientName || '[Your Name]'}
+${formData.patientAddress || '[Your Mailing Address]'}
+${formData.patientCity || '[City]'}, ${formData.patientState || '[State]'} ${formData.patientZip || '[ZIP]'}
+${formData.patientEmail || '[Email Address]'}
+${formData.patientPhone || '[Phone Number]'}
+
+${new Date(today).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+
+${formData.clinicName || '[Clinic or Med Spa Name]'}
+${formData.clinicAddress || '[Clinic Street Address]'}
+${formData.clinicCity || '[City]'}, ${formData.clinicState || '[State]'} ${formData.clinicZip || '[ZIP]'}
+
+Re: Botched Cosmetic Treatment on ${formData.procedureDate ? new Date(formData.procedureDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '[date]'} – Demand for Refund and Corrective Treatment Costs
+
+To Whom It May Concern:
+
+I am writing regarding cosmetic treatments I received at ${formData.clinicName || '[Clinic Name]'} on ${formData.procedureDate ? new Date(formData.procedureDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '[date]'} and the serious harm that followed. This letter sets out what occurred and demands that you refund what I paid and reimburse the cost of corrective medical care.
+
+BACKGROUND AND TREATMENT
+
+On ${formData.procedureDate ? new Date(formData.procedureDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '[date]'}, I attended your facility at ${formData.clinicAddress || '[location]'} for ${procedureTypes[formData.procedureType]}`;
+
+                if (formData.procedureDescription) {
+                    letter += ` (specifically: ${formData.procedureDescription})`;
+                }
+
+                letter += `. Before the procedure, I met with ${formData.providerName || '[name of provider]'}`;
+
+                const providerTitles = {
+                    'physician': 'who identified as a physician',
+                    'np': 'who identified as a nurse practitioner',
+                    'pa': 'who identified as a physician assistant',
+                    'rn': 'who identified as a registered nurse',
+                    'esthetician': 'who identified as an esthetician',
+                    'unknown': ''
+                };
+
+                if (formData.providerTitle && formData.providerTitle !== 'unknown') {
+                    letter += ` ${providerTitles[formData.providerTitle]}`;
+                }
+
+                if (formData.marketingClaims) {
+                    letter += `. The treatment was represented to me as ${formData.marketingClaims}`;
+                }
+
+                letter += `.
+
+`;
+
+                if (formData.consentProcess) {
+                    letter += `At the time of treatment, the consent process was as follows: ${formData.consentProcess}. `;
+                }
+
+                if (formData.riskNotDisclosed) {
+                    letter += `The risks were not meaningfully explained. ${formData.risksNotDisclosedDetails || 'I was not warned about significant risks that later materialized.'}`;
+                }
+
+                if (formData.noMedicalEvaluation) {
+                    letter += ` No one conducted a thorough medical evaluation or discussed my medical history in a way that would satisfy a proper pre-procedure medical exam.`;
+                }
+
+                letter += `\n\nThe procedure itself was performed by ${formData.providerName || '[name of practitioner]'}`;
+
+                if (formData.productUsed) {
+                    letter += `. According to your records and my recollection, ${formData.productUsed}`;
+                }
+
+                letter += `.
+
+COMPLICATIONS AND HARM
+
+`;
+
+                if (formData.complicationDate) {
+                    letter += `Shortly after the procedure, on ${new Date(formData.complicationDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}, `;
+                } else {
+                    letter += `Shortly after the procedure, `;
+                }
+
+                letter += `I experienced complications that were far beyond anything described to me as normal recovery. Specifically, I developed ${formData.complications || '[describe symptoms such as burns, blistering, hyperpigmentation, lumps, asymmetry, necrosis, severe swelling, pain, visual disturbances]'}.
+
+`;
+
+                if (formData.reportedToClinic) {
+                    letter += `I promptly contacted your office and reported these problems. ${formData.clinicResponse || 'I followed the instructions given to me.'}
+
+`;
+                }
+
+                if (formData.soughtCorrectiveCare) {
+                    letter += `Despite ${formData.reportedToClinic ? 'these efforts' : 'my attempts to address the issues'}, my condition ${formData.symptomsSeverity === 'severe' ? 'worsened significantly' : formData.symptomsSeverity === 'moderate' ? 'did not improve' : 'remained problematic'}. I sought evaluation and treatment from ${formData.correctiveProvider || '[name(s) of independent physicians or clinics]'}`;
+
+                    if (formData.correctiveDiagnosis) {
+                        letter += ` who diagnosed ${formData.correctiveDiagnosis}`;
+                    }
+
+                    letter += `. `;
+
+                    if (formData.correctiveTreatment) {
+                        letter += `${formData.correctiveTreatment}. `;
+                    }
+
+                    if (formData.hasCorrectiveRecords) {
+                        letter += `I have attached copies of relevant records and photographs for your review.`;
+                    }
+
+                    letter += `\n\n`;
+                }
+
+                letter += `LEGAL AND REGULATORY ISSUES
+
+Based on the facts above, it appears that the treatments I received at ${formData.clinicName || '[Clinic Name]'} fell below accepted standards for cosmetic medical procedures`;
+
+                if (formData.riskNotDisclosed || formData.noMedicalEvaluation) {
+                    letter += ` and were performed without adequate informed consent`;
+                }
+
+                letter += `. `;
+
+                letter += `${procedureTypes[formData.procedureType].charAt(0).toUpperCase() + procedureTypes[formData.procedureType].slice(1)} ${formData.procedureType === 'fillers' || formData.procedureType === 'botox' || formData.procedureType === 'laser' ? 'are' : 'is a'} medical ${formData.procedureType === 'fillers' || formData.procedureType === 'botox' ? 'procedures' : 'procedure'} that must be preceded by a proper medical evaluation and a full discussion of material risks and alternatives.`;
+
+                if (formData.marketingMisleading && formData.marketingClaims) {
+                    letter += ` The advertising and assurances I received about these services—particularly "${formData.marketingClaims}"—did not match the true risk profile or my actual experience.`;
+                }
+
+                if (formData.scopeOfPracticeIssue) {
+                    letter += ` In addition, ${formData.scopeDetails || 'the role of the practitioner in performing or overseeing medical-grade procedures raises concerns about compliance with applicable licensing and scope-of-practice rules'}.`;
+                }
+
+                if (formData.standardOfCareIssue) {
+                    letter += ` ${formData.standardDetails || 'The manner in which the procedure was performed appears to deviate from accepted standards of care.'}`;
+                }
+
+                letter += `\n\nDAMAGES AND LOSSES
+
+As a direct result of your treatment and its complications, I have incurred the following losses to date:
+
+`;
+
+                if (formData.procedureCost) {
+                    letter += `– The full price of the procedures performed at your clinic: $${formData.procedureCost}\n`;
+                }
+
+                if (formData.correctiveCosts) {
+                    letter += `– Corrective and follow-up medical care with independent providers: $${formData.correctiveCosts}\n`;
+                }
+
+                if (formData.relatedExpenses) {
+                    letter += `– Related expenses, including medications, dressings, and transportation: $${formData.relatedExpenses}\n`;
+                }
+
+                if (formData.otherDamages) {
+                    letter += `– ${formData.otherDamages}\n`;
+                }
+
+                if (formData.symptomsSeverity === 'severe' || formData.symptomsSeverity === 'moderate') {
+                    letter += `\nI am continuing to undergo evaluation and treatment for the injuries caused by your procedures. `;
+                    if (formData.procedureType === 'fillers' || formData.procedureType === 'botox' || formData.procedureType === 'laser' || formData.procedureType === 'peel') {
+                        letter += `My face and skin have not returned to their pre-procedure condition`;
+                    } else {
+                        letter += `My condition has not returned to its pre-procedure state`;
+                    }
+                    letter += `, and I have experienced significant pain, disruption of daily life, and emotional distress.`;
+                }
+
+                letter += `\n\nDEMAND FOR RESOLUTION
+
+To resolve this matter without formal proceedings, I demand that ${formData.clinicName || '[Clinic Name]'} do the following:
+
+`;
+
+                let demandNumber = 1;
+                if (formData.refundRequested && formData.procedureCost) {
+                    letter += `${demandNumber}. Refund in full all amounts I paid for the procedures on ${formData.procedureDate ? new Date(formData.procedureDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '[date]'}, totaling $${formData.procedureCost}\n`;
+                    demandNumber++;
+                }
+
+                if (formData.correctiveCostsRequested && formData.correctiveCosts) {
+                    letter += `${demandNumber}. Pay $${formData.correctiveCosts} toward the cost of my corrective medical care with independent providers of my choosing\n`;
+                    demandNumber++;
+                }
+
+                if (formData.relatedExpensesRequested && formData.relatedExpenses) {
+                    letter += `${demandNumber}. Reimburse $${formData.relatedExpenses} for related expenses I have incurred\n`;
+                }
+
+                letter += `\nPayment should be made by check or electronic transfer within ${formData.deadlineDays} days of your receipt of this letter.`;
+
+                if (formData.openToRelease) {
+                    letter += ` Upon satisfactory resolution of my claims and payment of the amounts above, I am prepared to discuss a reasonable written agreement addressing the scope of release and other terms. ${formData.releaseConditions || 'Any proposed release must be appropriately limited and may not require me to waive rights with respect to unknown or future serious complications arising from your treatment.'}`;
+                }
+
+                letter += `\n\nCONSEQUENCES OF NON-RESOLUTION
+
+If I do not receive a satisfactory response by ${deadlineStr}, I will consider all available options.`;
+
+                if (formData.planBoardComplaint) {
+                    letter += ` Those options include filing detailed complaints with ${formData.boardTypes || 'the appropriate state licensing boards, including the Medical Board, Nursing Board, and Board of Barbering and Cosmetology, as well as consumer protection authorities'}`;
+                }
+
+                letter += ` and pursuing my claims through the courts for the full measure of damages allowed by law. I will also continue to seek necessary medical care to address the injuries caused by your procedures.
+
+I would prefer to resolve this matter quickly and privately. Please direct all written responses to me at the address and email listed above.
+
+Sincerely,
+
+${formData.patientName || '[Your Name]'}`;
+
+                if (formData.hasMedicalRecords || formData.hasPhotos || formData.hasMarketing || formData.hasCommunications || formData.hasCorrectiveRecords) {
+                    letter += `\n\nAttachments:`;
+                    if (formData.procedureCost) letter += `\n– Copies of receipts and payment records`;
+                    if (formData.hasMedicalRecords) letter += `\n– Copies of consent forms and clinic records`;
+                    if (formData.hasPhotos) letter += `\n– Photographs documenting injuries`;
+                    if (formData.hasMarketing) letter += `\n– Screenshots of marketing materials`;
+                    if (formData.hasCommunications) letter += `\n– Copies of communications with clinic`;
+                    if (formData.hasCorrectiveRecords) letter += `\n– Records from independent medical providers`;
+                }
+
+                return letter;
+            }, [formData, totalDemand, procedureTypes]);
+
+            const copyToClipboard = () => {
+                const text = documentText;
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text)
+                        .then(() => {
+                            setShowToast(true);
+                            setTimeout(() => setShowToast(false), 3000);
+                        })
+                        .catch(() => fallbackCopy(text));
+                } else {
+                    fallbackCopy(text);
+                }
+            };
+
+            const fallbackCopy = (text) => {
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-999999px';
+                textArea.style.top = '-999999px';
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    setShowToast(true);
+                    setTimeout(() => setShowToast(false), 3000);
+                } catch (err) {
+                    alert('Please manually copy the text from the preview');
+                }
+                document.body.removeChild(textArea);
+            };
+
+            const downloadLetter = () => {
+                const blob = new Blob([documentText], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `medspa-demand-${formData.clinicName || 'letter'}-${formData.letterDate}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            };
+
+            const tabs = [
+                'Patient',
+                'Clinic',
+                'Procedure',
+                'Complications',
+                'Evidence',
+                'Demands'
+            ];
+
+            return (
+                <div className="container">
+                    <div className="card">
+                        <div className="tabs">
+                            {tabs.map((tab, index) => (
+                                <button
+                                    key={index}
+                                    className={`tab ${activeTab === index ? 'active' : ''}`}
+                                    onClick={() => setActiveTab(index)}
+                                >
+                                    {tab}
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="content-wrapper">
+                            <div className="form-section">
+                                {activeTab === 0 && (
+                                    <div>
+                                        <h2 style={{ marginBottom: '1.5rem', color: '#1a202c' }}>Your Information</h2>
+
+                                        <div className="form-group">
+                                            <label>Your Name</label>
+                                            <input
+                                                type="text"
+                                                value={formData.patientName}
+                                                onChange={(e) => updateField('patientName', e.target.value)}
+                                                placeholder="Jane Smith"
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Street Address</label>
+                                            <input
+                                                type="text"
+                                                value={formData.patientAddress}
+                                                onChange={(e) => updateField('patientAddress', e.target.value)}
+                                                placeholder="123 Main St"
+                                            />
+                                        </div>
+
+                                        <div className="row">
+                                            <div className="form-group">
+                                                <label>City</label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.patientCity}
+                                                    onChange={(e) => updateField('patientCity', e.target.value)}
+                                                    placeholder="San Francisco"
+                                                />
+                                            </div>
+
+                                            <div className="form-group">
+                                                <label>State</label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.patientState}
+                                                    onChange={(e) => updateField('patientState', e.target.value)}
+                                                    placeholder="CA"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>ZIP Code</label>
+                                            <input
+                                                type="text"
+                                                value={formData.patientZip}
+                                                onChange={(e) => updateField('patientZip', e.target.value)}
+                                                placeholder="94102"
+                                            />
+                                        </div>
+
+                                        <div className="row">
+                                            <div className="form-group">
+                                                <label>Email</label>
+                                                <input
+                                                    type="email"
+                                                    value={formData.patientEmail}
+                                                    onChange={(e) => updateField('patientEmail', e.target.value)}
+                                                    placeholder="jane@email.com"
+                                                />
+                                            </div>
+
+                                            <div className="form-group">
+                                                <label>Phone</label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.patientPhone}
+                                                    onChange={(e) => updateField('patientPhone', e.target.value)}
+                                                    placeholder="(555) 123-4567"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeTab === 1 && (
+                                    <div>
+                                        <h2 style={{ marginBottom: '1.5rem', color: '#1a202c' }}>Clinic Information</h2>
+
+                                        <div className="form-group">
+                                            <label>Clinic/Med Spa Name</label>
+                                            <input
+                                                type="text"
+                                                value={formData.clinicName}
+                                                onChange={(e) => updateField('clinicName', e.target.value)}
+                                                placeholder="Luxury Med Spa"
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Street Address</label>
+                                            <input
+                                                type="text"
+                                                value={formData.clinicAddress}
+                                                onChange={(e) => updateField('clinicAddress', e.target.value)}
+                                                placeholder="456 Beauty Blvd"
+                                            />
+                                        </div>
+
+                                        <div className="row">
+                                            <div className="form-group">
+                                                <label>City</label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.clinicCity}
+                                                    onChange={(e) => updateField('clinicCity', e.target.value)}
+                                                    placeholder="Los Angeles"
+                                                />
+                                            </div>
+
+                                            <div className="form-group">
+                                                <label>State</label>
+                                                <select
+                                                    value={formData.clinicState}
+                                                    onChange={(e) => updateField('clinicState', e.target.value)}
+                                                >
+                                                    <option value="CA">California</option>
+                                                    <option value="NY">New York</option>
+                                                    <option value="TX">Texas</option>
+                                                    <option value="FL">Florida</option>
+                                                    <option value="Other">Other State</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>ZIP Code</label>
+                                            <input
+                                                type="text"
+                                                value={formData.clinicZip}
+                                                onChange={(e) => updateField('clinicZip', e.target.value)}
+                                                placeholder="90210"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeTab === 2 && (
+                                    <div>
+                                        <h2 style={{ marginBottom: '1.5rem', color: '#1a202c' }}>Procedure Details</h2>
+
+                                        <div className="form-group">
+                                            <label>Provider Name</label>
+                                            <input
+                                                type="text"
+                                                value={formData.providerName}
+                                                onChange={(e) => updateField('providerName', e.target.value)}
+                                                placeholder="Dr. Smith or Jane Doe"
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Provider Title/Credentials</label>
+                                            <select
+                                                value={formData.providerTitle}
+                                                onChange={(e) => updateField('providerTitle', e.target.value)}
+                                            >
+                                                <option value="physician">Physician (MD/DO)</option>
+                                                <option value="np">Nurse Practitioner (NP)</option>
+                                                <option value="pa">Physician Assistant (PA)</option>
+                                                <option value="rn">Registered Nurse (RN)</option>
+                                                <option value="esthetician">Esthetician</option>
+                                                <option value="unknown">Unknown/Not Disclosed</option>
+                                            </select>
+                                            <p className="info-text">This matters for scope-of-practice issues</p>
+                                        </div>
+
+                                        <div className="row">
+                                            <div className="form-group">
+                                                <label>Procedure Date</label>
+                                                <input
+                                                    type="date"
+                                                    value={formData.procedureDate}
+                                                    onChange={(e) => updateField('procedureDate', e.target.value)}
+                                                />
+                                            </div>
+
+                                            <div className="form-group">
+                                                <label>Procedure Cost</label>
+                                                <input
+                                                    type="number"
+                                                    value={formData.procedureCost}
+                                                    onChange={(e) => updateField('procedureCost', e.target.value)}
+                                                    placeholder="1500.00"
+                                                    step="0.01"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Type of Procedure</label>
+                                            <select
+                                                value={formData.procedureType}
+                                                onChange={(e) => updateField('procedureType', e.target.value)}
+                                            >
+                                                <option value="fillers">Dermal Fillers</option>
+                                                <option value="botox">Botox/Neurotoxins</option>
+                                                <option value="laser">Laser Treatment</option>
+                                                <option value="peel">Chemical Peel</option>
+                                                <option value="microneedling">Microneedling</option>
+                                                <option value="threadlift">Thread Lift</option>
+                                                <option value="prp">PRP Treatment</option>
+                                                <option value="other">Other</option>
+                                            </select>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Detailed Procedure Description</label>
+                                            <textarea
+                                                value={formData.procedureDescription}
+                                                onChange={(e) => updateField('procedureDescription', e.target.value)}
+                                                placeholder="e.g., '1.5 mL of Juvederm Ultra Plus injected into lips and nasolabial folds' or '30% TCA peel applied to full face'"
+                                                rows="2"
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Product/Device Used (if known)</label>
+                                            <input
+                                                type="text"
+                                                value={formData.productUsed}
+                                                onChange={(e) => updateField('productUsed', e.target.value)}
+                                                placeholder="e.g., 'Juvederm,' 'Dysport,' 'Fraxel laser at X settings'"
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Marketing Claims Made</label>
+                                            <textarea
+                                                value={formData.marketingClaims}
+                                                onChange={(e) => updateField('marketingClaims', e.target.value)}
+                                                placeholder="How was the procedure marketed to you? e.g., 'simple, low risk, with little or no downtime,' 'natural results with no significant risk,' 'lunch break procedure'"
+                                                rows="2"
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Consent Process</label>
+                                            <textarea
+                                                value={formData.consentProcess}
+                                                onChange={(e) => updateField('consentProcess', e.target.value)}
+                                                placeholder="Describe how consent was obtained: e.g., 'I was asked to sign paperwork briefly in the lobby just before the procedure' or 'Forms were presented electronically with minimal explanation'"
+                                                rows="3"
+                                            />
+                                        </div>
+
+                                        <h3 style={{ fontSize: '1.1rem', margin: '1.5rem 0 1rem', color: '#4a5568' }}>Informed Consent Issues</h3>
+
+                                        <div className="checkbox-group">
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="riskNotDisclosed"
+                                                    checked={formData.riskNotDisclosed}
+                                                    onChange={(e) => updateField('riskNotDisclosed', e.target.checked)}
+                                                />
+                                                <label htmlFor="riskNotDisclosed">Key risks were not explained or disclosed</label>
+                                            </div>
+
+                                            {formData.riskNotDisclosed && (
+                                                <div className="form-group" style={{ marginLeft: '1.5rem' }}>
+                                                    <label>What risks were not disclosed?</label>
+                                                    <textarea
+                                                        value={formData.risksNotDisclosedDetails}
+                                                        onChange={(e) => updateField('risksNotDisclosedDetails', e.target.value)}
+                                                        placeholder="e.g., 'burns,' 'pigment changes on my skin type,' 'tissue necrosis,' 'asymmetry,' 'permanent scarring,' 'need for corrective procedures'"
+                                                        rows="2"
+                                                    />
+                                                </div>
+                                            )}
+
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="noMedicalEvaluation"
+                                                    checked={formData.noMedicalEvaluation}
+                                                    onChange={(e) => updateField('noMedicalEvaluation', e.target.checked)}
+                                                />
+                                                <label htmlFor="noMedicalEvaluation">No proper medical evaluation was performed before procedure</label>
+                                            </div>
+
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="marketingMisleading"
+                                                    checked={formData.marketingMisleading}
+                                                    onChange={(e) => updateField('marketingMisleading', e.target.checked)}
+                                                />
+                                                <label htmlFor="marketingMisleading">Marketing/advertising was misleading compared to actual risks</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeTab === 3 && (
+                                    <div>
+                                        <h2 style={{ marginBottom: '1.5rem', color: '#1a202c' }}>Complications & Harm</h2>
+
+                                        <div className="warning-box">
+                                            <p><strong>Be Specific:</strong> Detailed, factual descriptions of your injuries are crucial. Avoid exaggeration but don't minimize serious harm.</p>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>When did complications begin?</label>
+                                            <input
+                                                type="date"
+                                                value={formData.complicationDate}
+                                                onChange={(e) => updateField('complicationDate', e.target.value)}
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Describe Complications/Symptoms</label>
+                                            <textarea
+                                                value={formData.complications}
+                                                onChange={(e) => updateField('complications', e.target.value)}
+                                                placeholder="Be specific: e.g., 'intense burning and blistering that lasted 3 weeks,' 'dark patches of hyperpigmentation across both cheeks,' 'visible lumps and severe asymmetry in lips,' 'areas of skin that turned white then black (necrosis),' 'significant swelling and pain,' 'drooping eyelid,' 'vision changes'"
+                                                rows="4"
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Severity of Complications</label>
+                                            <select
+                                                value={formData.symptomsSeverity}
+                                                onChange={(e) => updateField('symptomsSeverity', e.target.value)}
+                                            >
+                                                <option value="mild">Mild (temporary, minor)</option>
+                                                <option value="moderate">Moderate (persistent, noticeable)</option>
+                                                <option value="severe">Severe (requiring urgent care, disfiguring, permanent)</option>
+                                            </select>
+                                        </div>
+
+                                        <div className="checkbox-item">
+                                            <input
+                                                type="checkbox"
+                                                id="reportedToClinic"
+                                                checked={formData.reportedToClinic}
+                                                onChange={(e) => updateField('reportedToClinic', e.target.checked)}
+                                            />
+                                            <label htmlFor="reportedToClinic">I reported the complications to the clinic</label>
+                                        </div>
+
+                                        {formData.reportedToClinic && (
+                                            <div className="form-group" style={{ marginTop: '1rem' }}>
+                                                <label>Clinic's Response</label>
+                                                <textarea
+                                                    value={formData.clinicResponse}
+                                                    onChange={(e) => updateField('clinicResponse', e.target.value)}
+                                                    placeholder="What did the clinic say or do? e.g., 'They told me it was normal and would resolve,' 'They offered a complimentary touch-up,' 'They refused to see me,' 'They admitted something went wrong'"
+                                                    rows="3"
+                                                />
+                                            </div>
+                                        )}
+
+                                        <h3 style={{ fontSize: '1.1rem', margin: '1.5rem 0 1rem', color: '#4a5568' }}>Corrective Care</h3>
+
+                                        <div className="checkbox-item">
+                                            <input
+                                                type="checkbox"
+                                                id="soughtCorrectiveCare"
+                                                checked={formData.soughtCorrectiveCare}
+                                                onChange={(e) => updateField('soughtCorrectiveCare', e.target.checked)}
+                                            />
+                                            <label htmlFor="soughtCorrectiveCare">I sought corrective treatment from another provider</label>
+                                        </div>
+
+                                        {formData.soughtCorrectiveCare && (
+                                            <>
+                                                <div className="form-group" style={{ marginTop: '1rem' }}>
+                                                    <label>Corrective Provider Name(s)</label>
+                                                    <input
+                                                        type="text"
+                                                        value={formData.correctiveProvider}
+                                                        onChange={(e) => updateField('correctiveProvider', e.target.value)}
+                                                        placeholder="Dr. Johnson at ABC Dermatology"
+                                                    />
+                                                </div>
+
+                                                <div className="form-group">
+                                                    <label>Diagnosis/Findings</label>
+                                                    <textarea
+                                                        value={formData.correctiveDiagnosis}
+                                                        onChange={(e) => updateField('correctiveDiagnosis', e.target.value)}
+                                                        placeholder="What did the corrective provider find? e.g., 'partial-thickness burns,' 'post-inflammatory hyperpigmentation,' 'filler migration and nodules,' 'tissue necrosis'"
+                                                        rows="2"
+                                                    />
+                                                </div>
+
+                                                <div className="form-group">
+                                                    <label>Corrective Treatment Received/Needed</label>
+                                                    <textarea
+                                                        value={formData.correctiveTreatment}
+                                                        onChange={(e) => updateField('correctiveTreatment', e.target.value)}
+                                                        placeholder="e.g., 'Hyaluronidase injections to dissolve filler,' 'Laser treatments for hyperpigmentation,' 'Scar revision surgery recommended,' 'Ongoing wound care'"
+                                                        rows="3"
+                                                    />
+                                                </div>
+                                            </>
+                                        )}
+
+                                        <h3 style={{ fontSize: '1.1rem', margin: '1.5rem 0 1rem', color: '#4a5568' }}>Legal Issues</h3>
+
+                                        <div className="checkbox-item">
+                                            <input
+                                                type="checkbox"
+                                                id="scopeOfPracticeIssue"
+                                                checked={formData.scopeOfPracticeIssue}
+                                                onChange={(e) => updateField('scopeOfPracticeIssue', e.target.checked)}
+                                            />
+                                            <label htmlFor="scopeOfPracticeIssue">Provider may have operated outside scope of practice</label>
+                                        </div>
+
+                                        {formData.scopeOfPracticeIssue && (
+                                            <div className="form-group" style={{ marginLeft: '1.5rem', marginTop: '0.5rem' }}>
+                                                <label>Scope of Practice Issue Details</label>
+                                                <textarea
+                                                    value={formData.scopeDetails}
+                                                    onChange={(e) => updateField('scopeDetails', e.target.value)}
+                                                    placeholder="e.g., 'An esthetician performed medical-grade microneedling reserved for medical professionals' or 'An RN injected fillers without physician supervision'"
+                                                    rows="2"
+                                                />
+                                            </div>
+                                        )}
+
+                                        <div className="checkbox-item" style={{ marginTop: '1rem' }}>
+                                            <input
+                                                type="checkbox"
+                                                id="standardOfCareIssue"
+                                                checked={formData.standardOfCareIssue}
+                                                onChange={(e) => updateField('standardOfCareIssue', e.target.checked)}
+                                            />
+                                            <label htmlFor="standardOfCareIssue">Procedure appears to deviate from standard of care</label>
+                                        </div>
+
+                                        {formData.standardOfCareIssue && (
+                                            <div className="form-group" style={{ marginLeft: '1.5rem', marginTop: '0.5rem' }}>
+                                                <label>Standard of Care Issue Details</label>
+                                                <textarea
+                                                    value={formData.standardDetails}
+                                                    onChange={(e) => updateField('standardDetails', e.target.value)}
+                                                    placeholder="e.g., 'Used inappropriate laser settings for my skin type' or 'Failed to recognize and treat signs of vascular compromise' or 'Injected in unsafe plane near major vessels'"
+                                                    rows="2"
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {activeTab === 4 && (
+                                    <div>
+                                        <h2 style={{ marginBottom: '1.5rem', color: '#1a202c' }}>Evidence & Documentation</h2>
+
+                                        <div className="warning-box">
+                                            <p><strong>Document Everything:</strong> Photos, medical records, and communications are crucial. Only check boxes for evidence you actually have.</p>
+                                        </div>
+
+                                        <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem', color: '#4a5568' }}>Evidence You Have</h3>
+
+                                        <div className="checkbox-group">
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="hasMedicalRecords"
+                                                    checked={formData.hasMedicalRecords}
+                                                    onChange={(e) => updateField('hasMedicalRecords', e.target.checked)}
+                                                />
+                                                <label htmlFor="hasMedicalRecords">Medical records from the clinic (chart notes, consent forms, treatment logs)</label>
+                                            </div>
+
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="hasPhotos"
+                                                    checked={formData.hasPhotos}
+                                                    onChange={(e) => updateField('hasPhotos', e.target.checked)}
+                                                />
+                                                <label htmlFor="hasPhotos">Before and after photos documenting injuries</label>
+                                            </div>
+
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="hasMarketing"
+                                                    checked={formData.hasMarketing}
+                                                    onChange={(e) => updateField('hasMarketing', e.target.checked)}
+                                                />
+                                                <label htmlFor="hasMarketing">Screenshots of clinic's marketing/ads/social media</label>
+                                            </div>
+
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="hasCommunications"
+                                                    checked={formData.hasCommunications}
+                                                    onChange={(e) => updateField('hasCommunications', e.target.checked)}
+                                                />
+                                                <label htmlFor="hasCommunications">Text messages, emails, or other communications with clinic</label>
+                                            </div>
+
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="hasCorrectiveRecords"
+                                                    checked={formData.hasCorrectiveRecords}
+                                                    onChange={(e) => updateField('hasCorrectiveRecords', e.target.checked)}
+                                                />
+                                                <label htmlFor="hasCorrectiveRecords">Records from corrective care providers</label>
+                                            </div>
+                                        </div>
+
+                                        <h3 style={{ fontSize: '1.1rem', margin: '1.5rem 0 1rem', color: '#4a5568' }}>Costs Incurred</h3>
+
+                                        <div className="form-group">
+                                            <label>Corrective Treatment Costs</label>
+                                            <input
+                                                type="number"
+                                                value={formData.correctiveCosts}
+                                                onChange={(e) => updateField('correctiveCosts', e.target.value)}
+                                                placeholder="2500.00"
+                                                step="0.01"
+                                            />
+                                            <p className="info-text">Cost of treatment with independent providers to fix the damage</p>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Related Expenses</label>
+                                            <input
+                                                type="number"
+                                                value={formData.relatedExpenses}
+                                                onChange={(e) => updateField('relatedExpenses', e.target.value)}
+                                                placeholder="350.00"
+                                                step="0.01"
+                                            />
+                                            <p className="info-text">Medications, dressings, transportation, etc.</p>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Other Damages (optional)</label>
+                                            <textarea
+                                                value={formData.otherDamages}
+                                                onChange={(e) => updateField('otherDamages', e.target.value)}
+                                                placeholder="e.g., 'Lost wages from missed work: $500' or 'Ongoing therapy costs'"
+                                                rows="2"
+                                            />
+                                        </div>
+
+                                        {totalDemand > 0 && (
+                                            <div style={{ background: '#f0f9ff', padding: '1rem', borderRadius: '8px', marginTop: '1rem' }}>
+                                                <strong>Total Amount Demanded: ${totalDemand}</strong>
+                                                <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
+                                                    Procedure refund + Corrective costs + Related expenses
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {activeTab === 5 && (
+                                    <div>
+                                        <h2 style={{ marginBottom: '1.5rem', color: '#1a202c' }}>Your Demands</h2>
+
+                                        <div className="warning-box">
+                                            <p><strong>Be Clear:</strong> Specify exactly what you want. This increases the chance of a successful resolution.</p>
+                                        </div>
+
+                                        <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem', color: '#4a5568' }}>What Are You Requesting?</h3>
+
+                                        <div className="checkbox-group">
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="refundRequested"
+                                                    checked={formData.refundRequested}
+                                                    onChange={(e) => updateField('refundRequested', e.target.checked)}
+                                                />
+                                                <label htmlFor="refundRequested">Full refund of procedure cost</label>
+                                            </div>
+
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="correctiveCostsRequested"
+                                                    checked={formData.correctiveCostsRequested}
+                                                    onChange={(e) => updateField('correctiveCostsRequested', e.target.checked)}
+                                                />
+                                                <label htmlFor="correctiveCostsRequested">Payment for corrective treatment costs</label>
+                                            </div>
+
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="relatedExpensesRequested"
+                                                    checked={formData.relatedExpensesRequested}
+                                                    onChange={(e) => updateField('relatedExpensesRequested', e.target.checked)}
+                                                />
+                                                <label htmlFor="relatedExpensesRequested">Reimbursement for related expenses</label>
+                                            </div>
+                                        </div>
+
+                                        <div className="form-group" style={{ marginTop: '1.5rem' }}>
+                                            <label>Response Deadline (days)</label>
+                                            <select
+                                                value={formData.deadlineDays}
+                                                onChange={(e) => updateField('deadlineDays', e.target.value)}
+                                            >
+                                                <option value="7">7 days</option>
+                                                <option value="10">10 days</option>
+                                                <option value="14">14 days (recommended)</option>
+                                                <option value="21">21 days</option>
+                                                <option value="30">30 days</option>
+                                            </select>
+                                        </div>
+
+                                        <h3 style={{ fontSize: '1.1rem', margin: '1.5rem 0 1rem', color: '#4a5568' }}>Settlement Terms</h3>
+
+                                        <div className="checkbox-item">
+                                            <input
+                                                type="checkbox"
+                                                id="openToRelease"
+                                                checked={formData.openToRelease}
+                                                onChange={(e) => updateField('openToRelease', e.target.checked)}
+                                            />
+                                            <label htmlFor="openToRelease">Open to discussing a written release agreement</label>
+                                        </div>
+
+                                        {formData.openToRelease && (
+                                            <div className="form-group" style={{ marginTop: '1rem' }}>
+                                                <label>Release Conditions/Limitations</label>
+                                                <textarea
+                                                    value={formData.releaseConditions}
+                                                    onChange={(e) => updateField('releaseConditions', e.target.value)}
+                                                    placeholder="e.g., 'Any release must be limited to known injuries and cannot waive rights for unknown or future serious complications' or 'I am only willing to release specific claims related to this procedure, not all potential claims'"
+                                                    rows="3"
+                                                />
+                                                <p className="info-text">Important: Be cautious about broad releases that waive future rights</p>
+                                            </div>
+                                        )}
+
+                                        <h3 style={{ fontSize: '1.1rem', margin: '1.5rem 0 1rem', color: '#4a5568' }}>Regulatory Action</h3>
+
+                                        <div className="checkbox-item">
+                                            <input
+                                                type="checkbox"
+                                                id="planBoardComplaint"
+                                                checked={formData.planBoardComplaint}
+                                                onChange={(e) => updateField('planBoardComplaint', e.target.checked)}
+                                            />
+                                            <label htmlFor="planBoardComplaint">I plan to file complaints with licensing boards if not resolved</label>
+                                        </div>
+
+                                        {formData.planBoardComplaint && (
+                                            <div className="form-group" style={{ marginTop: '1rem' }}>
+                                                <label>Which Boards?</label>
+                                                <textarea
+                                                    value={formData.boardTypes}
+                                                    onChange={(e) => updateField('boardTypes', e.target.value)}
+                                                    placeholder="e.g., 'the Medical Board of California, the Board of Registered Nursing, and the Board of Barbering and Cosmetology' or 'appropriate state licensing boards and consumer protection authorities'"
+                                                    rows="2"
+                                                />
+                                            </div>
+                                        )}
+
+                                        <div className="form-group" style={{ marginTop: '1.5rem' }}>
+                                            <label>Letter Date</label>
+                                            <input
+                                                type="date"
+                                                value={formData.letterDate}
+                                                onChange={(e) => updateField('letterDate', e.target.value)}
+                                            />
+                                        </div>
+
+                                        <div className="warning-box" style={{ background: '#fef2f2', borderColor: '#ef4444' }}>
+                                            <p style={{ color: '#7f1d1d' }}><strong>Before Sending:</strong></p>
+                                            <ul style={{ marginLeft: '1.5rem', marginTop: '0.5rem', color: '#7f1d1d' }}>
+                                                <li>Review the letter carefully for accuracy</li>
+                                                <li>Attach all referenced documentation</li>
+                                                <li>Send via certified mail with return receipt</li>
+                                                <li>Keep copies of everything</li>
+                                                <li>Consider having an attorney review for serious injuries</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="preview-section">
+                                <h3 style={{ marginBottom: '1rem', color: '#1a202c' }}>Letter Preview</h3>
+                                <div className="preview-container">
+                                    <pre className="document-preview">{documentText}</pre>
+                                </div>
+                                <div className="button-group">
+                                    <button className="btn btn-primary" onClick={copyToClipboard}>
+                                        Copy to Clipboard
+                                    </button>
+                                    <button className="btn btn-secondary" onClick={downloadLetter}>
+                                        Download Letter
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {showToast && (
+                        <div className="toast">
+                            ✓ Copied to clipboard!
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<MedSpaLetterGenerator />);
+    </script>
+</body>
+</html>
