@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attorney's Fees & Costs Analyzer - California Demand Letters</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #1e293b;
+            background: linear-gradient(135deg, #065f46 0%, #047857 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        #root {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .app-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: calc(100vh - 40px);
+        }
+        .header {
+            background: linear-gradient(135deg, #065f46 0%, #047857 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        .header-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .header-subtitle {
+            font-size: 1rem;
+            opacity: 0.95;
+        }
+        .tabs-container {
+            display: flex;
+            background: #f8fafc;
+            border-bottom: 2px solid #e2e8f0;
+            overflow-x: auto;
+            flex-shrink: 0;
+        }
+        .tab {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #64748b;
+            white-space: nowrap;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .tab:hover {
+            background: #f1f5f9;
+            color: #065f46;
+        }
+        .tab.active {
+            color: #065f46;
+            background: white;
+            border-bottom-color: #065f46;
+        }
+        .tab-icon {
+            font-size: 1.1rem;
+        }
+        .content-wrapper {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+        .content-wrapper::-webkit-scrollbar {
+            width: 10px;
+        }
+        .content-wrapper::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .content-wrapper::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 5px;
+        }
+        .content-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .section-title {
+            color: #065f46;
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .section-icon {
+            font-size: 1.5rem;
+        }
+        .info-panel {
+            background: #d1fae5;
+            border-left: 4px solid #065f46;
+            padding: 1.25rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+        }
+        .info-panel-title {
+            font-weight: 700;
+            color: #065f46;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .info-panel-content {
+            font-size: 0.9rem;
+            color: #334155;
+            line-height: 1.7;
+        }
+        .warning-panel {
+            background: #fef3c7;
+            border-left: 4px solid #d97706;
+            padding: 1.25rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+        }
+        .warning-panel-title {
+            font-weight: 700;
+            color: #92400e;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: #334155;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #065f46;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: start;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: #f8fafc;
+            border-radius: 6px;
+            margin-bottom: 0.75rem;
+            transition: background 0.2s;
+        }
+        .checkbox-group:hover {
+            background: #f0fdf4;
+        }
+        .checkbox-input {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #065f46;
+            flex-shrink: 0;
+            margin-top: 0.125rem;
+        }
+        .checkbox-label {
+            font-weight: 500;
+            color: #334155;
+            cursor: pointer;
+            flex: 1;
+        }
+        .result-box {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            border: 2px solid #065f46;
+        }
+        .result-title {
+            font-weight: 700;
+            color: #065f46;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+        .result-item {
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(6, 95, 70, 0.2);
+        }
+        .result-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .result-label {
+            font-weight: 600;
+            color: #047857;
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+        .result-value {
+            color: #1e293b;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        .fee-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.2s;
+        }
+        .fee-card:hover {
+            border-color: #065f46;
+            box-shadow: 0 4px 12px rgba(6, 95, 70, 0.15);
+        }
+        .fee-card-header {
+            font-weight: 700;
+            color: #065f46;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .fee-amount {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #065f46;
+            margin: 0.5rem 0;
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .badge-high {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .badge-medium {
+            background: #dbeafe;
+            color: #1e3a8a;
+        }
+        .badge-low {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .language-preview {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            color: #1e293b;
+            max-height: 500px;
+            overflow-y: auto;
+            user-select: text;
+        }
+        .language-preview::-webkit-scrollbar {
+            width: 8px;
+        }
+        .language-preview::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .language-preview::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #065f46 0%, #047857 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(6, 95, 70, 0.3);
+        }
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        .btn-secondary {
+            background: white;
+            color: #065f46;
+            border: 2px solid #065f46;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-left: 0.5rem;
+        }
+        .btn-secondary:hover {
+            background: #f0fdf4;
+        }
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .mechanism-list {
+            list-style: none;
+            padding: 0;
+        }
+        .mechanism-item {
+            padding: 1rem;
+            background: #f0fdf4;
+            border-left: 3px solid #065f46;
+            margin-bottom: 0.75rem;
+            border-radius: 4px;
+        }
+        .mechanism-name {
+            font-weight: 700;
+            color: #065f46;
+            margin-bottom: 0.5rem;
+        }
+        .mechanism-description {
+            font-size: 0.875rem;
+            color: #475569;
+            line-height: 1.6;
+        }
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+        .resource-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.2s;
+        }
+        .resource-card:hover {
+            border-color: #065f46;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(6, 95, 70, 0.2);
+        }
+        .resource-title {
+            font-weight: 700;
+            color: #065f46;
+            margin-bottom: 0.75rem;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .resource-description {
+            font-size: 0.875rem;
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        .resource-link {
+            color: #065f46;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+        .resource-link:hover {
+            color: #047857;
+            text-decoration: underline;
+        }
+        @media (max-width: 768px) {
+            .input-grid,
+            .resources-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useMemo } = React;
+
+        const feeStatutes = {
+            'clra': {
+                name: 'Consumer Legal Remedies Act (CLRA)',
+                citation: 'Civ. Code § 1780(e)',
+                type: 'One-Way (Plaintiff Favored)',
+                description: 'Court shall award costs and attorney\'s fees to prevailing plaintiff. Prevailing defendant may recover fees only if action not brought in good faith.',
+                presuit: 'Requires 30-day pre-suit notice under § 1782',
+                applicableTo: 'Consumer transactions with deceptive practices'
+            },
+            'pag': {
+                name: 'Private Attorney General (§ 1021.5)',
+                citation: 'CCP § 1021.5',
+                type: 'Discretionary',
+                description: 'Fees available where successful party enforced important public right, financial burden makes award appropriate, and necessity existed.',
+                presuit: 'Requires "reasonable efforts to settle" before filing for catalyst theory',
+                applicableTo: 'Public interest litigation, regulatory enforcement'
+            },
+            'feha': {
+                name: 'Fair Employment & Housing Act',
+                citation: 'Gov. Code § 12965(b)',
+                type: 'One-Way (Plaintiff Favored)',
+                description: 'Court may award prevailing plaintiff reasonable attorney\'s fees. Prevailing defendant recovers fees only if action frivolous, unreasonable, or groundless.',
+                presuit: 'No statutory pre-suit notice requirement',
+                applicableTo: 'Employment discrimination, harassment, retaliation'
+            },
+            'wage': {
+                name: 'Wage & Hour Claims',
+                citation: 'Labor Code §§ 218.5, 1194',
+                type: 'One-Way (Employee Favored)',
+                description: 'Employee prevailing in action to recover wages shall recover reasonable attorney\'s fees.',
+                presuit: 'No statutory pre-suit notice requirement',
+                applicableTo: 'Unpaid wages, overtime, minimum wage violations'
+            }
+        };
+
+        function FeesAnalyzer() {
+            const [activeTab, setActiveTab] = useState('overview');
+
+            // Fee Analysis Inputs
+            const [hasContractClause, setHasContractClause] = useState(false);
+            const [contractClauseText, setContractClauseText] = useState('');
+            const [contractSection, setContractSection] = useState('');
+            const [selectedStatutes, setSelectedStatutes] = useState({});
+            const [currentFees, setCurrentFees] = useState('');
+            const [projectedFees, setProjectedFees] = useState('');
+            const [estimatedExperts, setEstimatedExperts] = useState('');
+            const [disputeType, setDisputeType] = useState('');
+            const [claimAmount, setClaimAmount] = useState('');
+
+            // Demand Letter Customization
+            const [partyType, setPartyType] = useState('plaintiff');
+            const [includeSection998, setIncludeSection998] = useState(true);
+            const [tone, setTone] = useState('professional');
+
+            const toggleStatute = (key) => {
+                setSelectedStatutes(prev => ({
+                    ...prev,
+                    [key]: !prev[key]
+                }));
+            };
+
+            const feeAnalysis = useMemo(() => {
+                const mechanisms = [];
+                let totalExposure = 0;
+                let riskLevel = 'low';
+
+                if (hasContractClause) {
+                    mechanisms.push({
+                        type: 'Contract Fee Clause',
+                        basis: 'Civ. Code § 1717',
+                        reciprocal: true,
+                        description: 'Prevailing party on contract claims recovers reasonable fees. Both sides have equal fee exposure.'
+                    });
+                }
+
+                Object.entries(selectedStatutes).forEach(([key, selected]) => {
+                    if (selected && feeStatutes[key]) {
+                        mechanisms.push({
+                            type: feeStatutes[key].name,
+                            basis: feeStatutes[key].citation,
+                            reciprocal: feeStatutes[key].type.includes('One-Way') ? false : true,
+                            description: feeStatutes[key].description
+                        });
+                    }
+                });
+
+                const fees = parseFloat(currentFees) || 0;
+                const projected = parseFloat(projectedFees) || 0;
+                const experts = parseFloat(estimatedExperts) || 0;
+
+                totalExposure = fees + projected + experts;
+
+                if (totalExposure > 100000 || mechanisms.length >= 3) {
+                    riskLevel = 'high';
+                } else if (totalExposure > 50000 || mechanisms.length >= 2) {
+                    riskLevel = 'medium';
+                }
+
+                return {
+                    mechanisms,
+                    totalExposure,
+                    currentFees: fees,
+                    projectedFees: projected,
+                    expertCosts: experts,
+                    riskLevel,
+                    hasMultipleMechanisms: mechanisms.length > 1,
+                    hasOneWayStatute: mechanisms.some(m => !m.reciprocal)
+                };
+            }, [hasContractClause, selectedStatutes, currentFees, projectedFees, estimatedExperts]);
+
+            const demandLanguage = useMemo(() => {
+                if (feeAnalysis.mechanisms.length === 0) {
+                    return 'Please select at least one fee-shifting mechanism to generate demand letter language.';
+                }
+
+                let language = '';
+
+                // Fee Mechanism Identification Section
+                if (hasContractClause && contractSection && contractClauseText) {
+                    language += `ATTORNEY'S FEES AND COSTS\n\n`;
+                    language += `This dispute arises under [Contract Name] dated [Date]. Section ${contractSection} of that Agreement provides:\n\n`;
+                    language += `"${contractClauseText}"\n\n`;
+                    language += `Under California Civil Code Section 1717, this attorney's fees provision is reciprocal, meaning both parties have equal rights to fee recovery. The prevailing party in any action on the contract shall recover reasonable attorney's fees as determined by the court.\n\n`;
+                } else if (hasContractClause) {
+                    language += `ATTORNEY'S FEES AND COSTS\n\n`;
+                    language += `The parties' agreement contains an attorney's fees provision entitling the prevailing party to recover reasonable fees. Under California Civil Code Section 1717, this provision is reciprocal and applies equally to both parties.\n\n`;
+                }
+
+                // Statutory Fee Provisions
+                const selectedStats = Object.entries(selectedStatutes).filter(([k, v]) => v);
+                if (selectedStats.length > 0) {
+                    if (!hasContractClause) {
+                        language += `ATTORNEY'S FEES AND COSTS\n\n`;
+                    }
+
+                    selectedStats.forEach(([key]) => {
+                        const stat = feeStatutes[key];
+                        language += `Additionally, this matter involves claims under the ${stat.name}. ${stat.citation} provides that ${stat.description.toLowerCase()}\n\n`;
+                    });
+                }
+
+                // Current and Projected Fees
+                if (feeAnalysis.currentFees > 0 || feeAnalysis.projectedFees > 0) {
+                    language += `FEE EXPOSURE ANALYSIS\n\n`;
+
+                    if (feeAnalysis.currentFees > 0) {
+                        language += `As of the date of this letter, ${partyType === 'plaintiff' ? 'our client has' : 'we have'} incurred approximately $${feeAnalysis.currentFees.toLocaleString()} in attorney's fees investigating the facts, reviewing applicable contracts and documents, analyzing the legal issues, and preparing this demand.\n\n`;
+                    }
+
+                    if (feeAnalysis.projectedFees > 0) {
+                        language += `If litigation becomes necessary, we anticipate total attorney's fees through trial could exceed $${(feeAnalysis.currentFees + feeAnalysis.projectedFees).toLocaleString()}.`;
+
+                        if (feeAnalysis.expertCosts > 0) {
+                            language += ` This does not include expert witness costs, which we estimate at approximately $${feeAnalysis.expertCosts.toLocaleString()}.`;
+                        }
+
+                        language += `\n\n`;
+                    }
+
+                    language += `Under ${hasContractClause ? 'the contractual fee provision and ' : ''}California Code of Civil Procedure Sections 1032 and 1033.5, attorney's fees authorized by contract${selectedStats.length > 0 ? ' or statute' : ''} are recoverable as an element of costs by the prevailing party.\n\n`;
+                }
+
+                // Section 998 Warning
+                if (includeSection998) {
+                    language += `CODE OF CIVIL PROCEDURE SECTION 998\n\n`;
+
+                    if (partyType === 'plaintiff') {
+                        language += `If we are unable to resolve this matter and litigation becomes necessary, we will evaluate making a formal settlement offer under California Code of Civil Procedure Section 998 early in the case. Section 998 allows any party to serve a written offer to compromise. If that offer is rejected and the rejecting party fails to obtain a more favorable judgment, significant cost-shifting consequences follow.\n\n`;
+
+                        language += `Specifically, if we serve a Section 998 offer that you reject, and you then fail to obtain a judgment more favorable than our offer, you will be required to pay our post-offer costs, which can include expert witness fees that are not otherwise recoverable in California. If attorney's fees are recoverable under contract or statute (as discussed above), those fees may also be enhanced for the post-offer period.\n\n`;
+
+                        language += `We encourage you to evaluate this matter carefully in light of the fee and cost-shifting mechanisms described above. `;
+
+                        if (claimAmount) {
+                            language += `Our current settlement proposal of $${parseFloat(claimAmount).toLocaleString()} represents what we believe to be a reasonable resolution that accounts for the merits of the case while avoiding the substantial fee and cost exposure that litigation would create for both parties.`;
+                        } else {
+                            language += `Settlement now allows you to avoid the accumulation of additional fees and costs and eliminates the risk of adverse cost-shifting under Section 998.`;
+                        }
+                    } else {
+                        language += `Should litigation become necessary, we will carefully evaluate the strategic use of Code of Civil Procedure Section 998 offers to compromise. Section 998 creates substantial cost-shifting leverage that can enhance the fee recovery mechanisms discussed above.\n\n`;
+
+                        language += `We encourage reasonable settlement discussion that accounts for the reciprocal fee exposure both parties face under the contractual provisions and applicable statutes.`;
+                    }
+
+                    language += `\n\n`;
+                }
+
+                // Settlement Reasonableness
+                if (tone === 'professional') {
+                    language += `SETTLEMENT RATIONALE\n\n`;
+                    language += `This settlement proposal is based on a careful analysis of the applicable law, the strength of the claims, and the likely range of outcomes at trial. `;
+
+                    if (feeAnalysis.totalExposure > 0) {
+                        language += `When the fee and cost exposure described above is considered in addition to the principal ${partyType === 'plaintiff' ? 'damages' : 'claim'}, we believe settlement at the proposed amount represents the economically rational course for both parties.\n\n`;
+                    }
+
+                    language += `We are committed to resolving this matter efficiently and fairly. If you have questions about any of the fee provisions or cost-shifting mechanisms discussed above, or if you would like to discuss settlement terms, please contact us within [NUMBER] days of this letter.`;
+                }
+
+                return language;
+            }, [feeAnalysis, hasContractClause, contractSection, contractClauseText, selectedStatutes,
+                partyType, includeSection998, tone, claimAmount]);
+
+            const copyToClipboard = () => {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(demandLanguage).then(() => {
+                        alert('Language copied to clipboard!');
+                    }).catch(err => {
+                        fallbackCopy();
+                    });
+                } else {
+                    fallbackCopy();
+                }
+            };
+
+            const fallbackCopy = () => {
+                const textArea = document.createElement('textarea');
+                textArea.value = demandLanguage;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-999999px';
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    alert('Language copied to clipboard!');
+                } catch (err) {
+                    alert('Could not copy text. Please select and copy manually.');
+                }
+                document.body.removeChild(textArea);
+            };
+
+            return (
+                <div className="app-container">
+                    <div className="header">
+                        <div className="header-title">Attorney's Fees & Costs Analyzer</div>
+                        <div className="header-subtitle">Calculate fee exposure and generate demand letter language for California litigation</div>
+                    </div>
+
+                    <div className="tabs-container">
+                        <button className={`tab ${activeTab === 'overview' ? 'active' : ''}`} onClick={() => setActiveTab('overview')}>
+                            <span className="tab-icon">⚖️</span>
+                            Overview
+                        </button>
+                        <button className={`tab ${activeTab === 'analyzer' ? 'active' : ''}`} onClick={() => setActiveTab('analyzer')}>
+                            <span className="tab-icon">📊</span>
+                            Fee Analyzer
+                        </button>
+                        <button className={`tab ${activeTab === 'language' ? 'active' : ''}`} onClick={() => setActiveTab('language')}>
+                            <span className="tab-icon">📝</span>
+                            Demand Language
+                        </button>
+                        <button className={`tab ${activeTab === 'statutes' ? 'active' : ''}`} onClick={() => setActiveTab('statutes')}>
+                            <span className="tab-icon">📚</span>
+                            Fee Statutes
+                        </button>
+                        <button className={`tab ${activeTab === 'resources' ? 'active' : ''}`} onClick={() => setActiveTab('resources')}>
+                            <span className="tab-icon">🔗</span>
+                            Resources
+                        </button>
+                    </div>
+
+                    <div className="content-wrapper">
+                        {activeTab === 'overview' && (
+                            <>
+                                <div className="section-title">
+                                    <span className="section-icon">⚖️</span>
+                                    California Fee-Shifting Framework
+                                </div>
+
+                                <div className="info-panel">
+                                    <div className="info-panel-title">
+                                        💡 Why Fee Recovery Matters in Demand Letters
+                                    </div>
+                                    <div className="info-panel-content">
+                                        California follows the "American rule" – each party ordinarily pays its own attorney's fees. But exceptions to this rule are so common in business litigation that the rule itself is nearly meaningless. Between contractual fee clauses, statutory fee-shifting provisions, and procedural cost rules, most commercial disputes have multiple pathways to shift fees to the losing party. A properly structured demand letter identifies these mechanisms, quantifies the exposure, and creates settlement pressure by making the other side understand they're facing not just principal damages but potentially your entire legal bill.
+                                    </div>
+                                </div>
+
+                                <div className="fee-card">
+                                    <div className="fee-card-header">🔷 Pathway 1: Contractual Fee Clauses (§ 1717)</div>
+                                    <div className="info-panel-content">
+                                        <p style={{ marginBottom: '0.75rem' }}><strong>What it is:</strong> Most commercial contracts include attorney's fees provisions like "the prevailing party shall recover reasonable attorney's fees." Civil Code Section 1717 makes these clauses reciprocal – both parties can recover fees if they prevail on the contract claims, regardless of how the clause is worded.</p>
+
+                                        <p style={{ marginBottom: '0.75rem' }}><strong>Demand letter strategy:</strong> Quote the specific contract section and fee language, reference § 1717's reciprocity principle, explain that both sides face fee exposure, and quantify current and projected fees realistically.</p>
+
+                                        <p style={{ marginBottom: '0.75rem' }}><strong>Key limitation:</strong> If you settle and voluntarily dismiss the case, there's typically no "prevailing party" under § 1717, so fees must be negotiated as part of the settlement amount rather than recovered separately.</p>
+                                    </div>
+                                </div>
+
+                                <div className="fee-card">
+                                    <div className="fee-card-header">🔷 Pathway 2: Statutory Fee-Shifting</div>
+                                    <div className="info-panel-content">
+                                        <p style={{ marginBottom: '0.75rem' }}><strong>What it is:</strong> California has numerous statutes providing for fee recovery in specific types of cases. Some are one-way (favoring plaintiffs/consumers/employees), others are reciprocal.</p>
+
+                                        <p style={{ marginBottom: '0.75rem' }}><strong>Common statutes:</strong></p>
+                                        <ul style={{ marginLeft: '1.5rem', marginBottom: '0.75rem', lineHeight: '1.8' }}>
+                                            <li><strong>CLRA (§ 1780(e)):</strong> Prevailing consumer plaintiff shall recover fees; defendant only if action not in good faith</li>
+                                            <li><strong>Private AG (§ 1021.5):</strong> Discretionary fees where important public right enforced</li>
+                                            <li><strong>Employment statutes:</strong> Wage claims, FEHA, PAGA – generally one-way favoring employees</li>
+                                        </ul>
+
+                                        <p><strong>Demand letter strategy:</strong> Identify applicable statutes, cite specific provisions, explain whether fee-shifting is one-way or reciprocal, and note any pre-suit notice requirements (like CLRA's 30-day requirement).</p>
+                                    </div>
+                                </div>
+
+                                <div className="fee-card">
+                                    <div className="fee-card-header">🔷 Pathway 3: CCP §§ 1032, 1033.5, and § 998</div>
+                                    <div className="info-panel-content">
+                                        <p style={{ marginBottom: '0.75rem' }}><strong>What they are:</strong> Procedural cost-recovery rules that enhance contractual and statutory fee provisions.</p>
+
+                                        <p style={{ marginBottom: '0.75rem' }}><strong>§§ 1032-1033.5:</strong> Prevailing party recovers costs as matter of right. Attorney's fees authorized by contract or statute are recovered as an item of costs under these sections.</p>
+
+                                        <p style={{ marginBottom: '0.75rem' }}><strong>§ 998 (Offers to Compromise):</strong> After suit is filed, any party can make a formal settlement offer. If rejected, and the rejecting party doesn't beat the offer at trial, they pay the offering party's post-offer costs (including expert fees, and potentially enhanced attorney's fees).</p>
+
+                                        <p><strong>Demand letter strategy:</strong> Even though you can't serve a § 998 offer until after filing, your pre-lit demand should preview the settlement number you'll later offer in a 998, and warn that § 998's cost-shifting provisions will apply if litigation becomes necessary.</p>
+                                    </div>
+                                </div>
+
+                                <div className="warning-panel">
+                                    <div className="warning-panel-title">
+                                        ⚠️ Fee Recovery Traps to Avoid
+                                    </div>
+                                    <div className="info-panel-content">
+                                        <strong>Don't make these common mistakes:</strong><br/><br/>
+                                        • <strong>Threatening fees without a legal basis:</strong> Only cite fee recovery where contract or statute actually supports it<br/>
+                                        • <strong>Inflated demands inconsistent with later 998:</strong> Your pre-lit demand should align with what you'd offer post-filing<br/>
+                                        • <strong>Ignoring reciprocity:</strong> If you have a contract fee clause, the other side can recover fees too if they win<br/>
+                                        • <strong>Forgetting the voluntary dismissal rule:</strong> If you settle and dismiss, no prevailing party under § 1717 – build fees into settlement amount<br/>
+                                        • <strong>Tone that sounds like extortion:</strong> Explain fee exposure professionally, don't make threats
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        {activeTab === 'analyzer' && (
+                            <>
+                                <div className="section-title">
+                                    <span className="section-icon">📊</span>
+                                    Fee-Shifting Mechanism Analyzer
+                                </div>
+
+                                <div className="info-panel">
+                                    <div className="info-panel-title">
+                                        📋 Identify Your Fee Recovery Pathways
+                                    </div>
+                                    <div className="info-panel-content">
+                                        Use this analyzer to identify which fee-shifting mechanisms apply to your case and calculate total exposure. This analysis will help you draft effective demand letter language and evaluate settlement strategy.
+                                    </div>
+                                </div>
+
+                                <div className="fee-card">
+                                    <div className="fee-card-header">📄 Contractual Fee Provisions</div>
+
+                                    <div className="checkbox-group">
+                                        <input
+                                            type="checkbox"
+                                            id="has-contract"
+                                            className="checkbox-input"
+                                            checked={hasContractClause}
+                                            onChange={(e) => setHasContractClause(e.target.checked)}
+                                        />
+                                        <label htmlFor="has-contract" className="checkbox-label">
+                                            The contract governing this dispute contains an attorney's fees provision
+                                        </label>
+                                    </div>
+
+                                    {hasContractClause && (
+                                        <>
+                                            <div className="form-group">
+                                                <label className="form-label">Contract Section Number (e.g., "Section 12.3")</label>
+                                                <input
+                                                    type="text"
+                                                    className="form-input"
+                                                    value={contractSection}
+                                                    onChange={(e) => setContractSection(e.target.value)}
+                                                    placeholder="Section 12.3"
+                                                />
+                                            </div>
+
+                                            <div className="form-group">
+                                                <label className="form-label">Fee Clause Language (copy exact text from contract)</label>
+                                                <textarea
+                                                    className="form-textarea"
+                                                    value={contractClauseText}
+                                                    onChange={(e) => setContractClauseText(e.target.value)}
+                                                    placeholder="The prevailing party in any action arising out of or relating to this Agreement shall be entitled to recover reasonable attorney's fees and costs..."
+                                                />
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+
+                                <div className="fee-card">
+                                    <div className="fee-card-header">⚖️ Statutory Fee-Shifting Provisions</div>
+                                    <div style={{ marginBottom: '1rem', fontSize: '0.9rem', color: '#475569' }}>
+                                        Select all statutes that may apply to your claims:
+                                    </div>
+
+                                    {Object.entries(feeStatutes).map(([key, statute]) => (
+                                        <div key={key} className="checkbox-group">
+                                            <input
+                                                type="checkbox"
+                                                id={`statute-${key}`}
+                                                className="checkbox-input"
+                                                checked={selectedStatutes[key] || false}
+                                                onChange={() => toggleStatute(key)}
+                                            />
+                                            <div style={{ flex: 1 }}>
+                                                <label htmlFor={`statute-${key}`} className="checkbox-label">
+                                                    {statute.name} ({statute.citation})
+                                                </label>
+                                                <div style={{ fontSize: '0.875rem', color: '#64748b', marginTop: '0.25rem' }}>
+                                                    {statute.applicableTo}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <div className="fee-card">
+                                    <div className="fee-card-header">💰 Fee and Cost Quantification</div>
+
+                                    <div className="input-grid">
+                                        <div className="form-group">
+                                            <label className="form-label">Current Attorney's Fees Incurred ($)</label>
+                                            <input
+                                                type="number"
+                                                className="form-input"
+                                                value={currentFees}
+                                                onChange={(e) => setCurrentFees(e.target.value)}
+                                                placeholder="15000"
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label className="form-label">Projected Fees Through Trial ($)</label>
+                                            <input
+                                                type="number"
+                                                className="form-input"
+                                                value={projectedFees}
+                                                onChange={(e) => setProjectedFees(e.target.value)}
+                                                placeholder="75000"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label className="form-label">Estimated Expert Witness Costs ($)</label>
+                                        <input
+                                            type="number"
+                                            className="form-input"
+                                            value={estimatedExperts}
+                                            onChange={(e) => setEstimatedExperts(e.target.value)}
+                                            placeholder="25000"
+                                        />
+                                    </div>
+                                </div>
+
+                                {feeAnalysis.mechanisms.length > 0 && (
+                                    <div className="result-box">
+                                        <div className="result-title">Fee-Shifting Analysis Results</div>
+
+                                        <div className="result-item">
+                                            <div className="result-label">Total Potential Fee/Cost Exposure</div>
+                                            <div className="fee-amount">
+                                                ${feeAnalysis.totalExposure.toLocaleString()}
+                                            </div>
+                                            <span className={`badge badge-${feeAnalysis.riskLevel}`}>
+                                                {feeAnalysis.riskLevel} exposure
+                                            </span>
+                                        </div>
+
+                                        <div className="result-item">
+                                            <div className="result-label">Fee-Shifting Mechanisms Identified</div>
+                                            <ul className="mechanism-list">
+                                                {feeAnalysis.mechanisms.map((mech, idx) => (
+                                                    <li key={idx} className="mechanism-item">
+                                                        <div className="mechanism-name">
+                                                            {mech.type} – {mech.basis}
+                                                        </div>
+                                                        <div className="mechanism-description">
+                                                            {mech.description}
+                                                            {mech.reciprocal ? ' (Reciprocal – both parties can recover)' : ' (One-way or limited reciprocity)'}
+                                                        </div>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+
+                                        {feeAnalysis.hasMultipleMechanisms && (
+                                            <div className="result-item">
+                                                <div className="result-label">Strategic Advantage</div>
+                                                <div className="result-value">
+                                                    You have multiple independent fee-shifting mechanisms. This creates substantial settlement leverage because the other side faces fee exposure even if one mechanism fails. Emphasize this layered exposure in your demand letter.
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {feeAnalysis.hasOneWayStatute && (
+                                            <div className="result-item">
+                                                <div className="result-label">One-Way Fee Provision Detected</div>
+                                                <div className="result-value">
+                                                    At least one of your fee-shifting mechanisms favors one party over the other. This asymmetric exposure creates stronger settlement pressure than reciprocal provisions. Make sure your demand letter clearly explains the one-way nature of the fee provision.
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </>
+                        )}
+
+                        {activeTab === 'language' && (
+                            <>
+                                <div className="section-title">
+                                    <span className="section-icon">📝</span>
+                                    Demand Letter Language Generator
+                                </div>
+
+                                <div className="info-panel">
+                                    <div className="info-panel-title">
+                                        ✍️ Customized Fee Language for Your Demand
+                                    </div>
+                                    <div className="info-panel-content">
+                                        Based on the fee mechanisms you identified in the Analyzer tab, this tool generates professional demand letter language explaining fee exposure, quantifying costs, and referencing applicable statutes and contract provisions.
+                                    </div>
+                                </div>
+
+                                <div className="fee-card">
+                                    <div className="fee-card-header">⚙️ Customize Your Language</div>
+
+                                    <div className="form-group">
+                                        <label className="form-label">Your Role</label>
+                                        <select className="form-select" value={partyType} onChange={(e) => setPartyType(e.target.value)}>
+                                            <option value="plaintiff">Plaintiff / Claimant</option>
+                                            <option value="defendant">Defendant / Respondent</option>
+                                        </select>
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label className="form-label">Settlement Amount Being Demanded ($, optional)</label>
+                                        <input
+                                            type="number"
+                                            className="form-input"
+                                            value={claimAmount}
+                                            onChange={(e) => setClaimAmount(e.target.value)}
+                                            placeholder="75000"
+                                        />
+                                    </div>
+
+                                    <div className="checkbox-group">
+                                        <input
+                                            type="checkbox"
+                                            id="include-998"
+                                            className="checkbox-input"
+                                            checked={includeSection998}
+                                            onChange={(e) => setIncludeSection998(e.target.checked)}
+                                        />
+                                        <label htmlFor="include-998" className="checkbox-label">
+                                            Include CCP § 998 warning / preview language
+                                        </label>
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label className="form-label">Tone</label>
+                                        <select className="form-select" value={tone} onChange={(e) => setTone(e.target.value)}>
+                                            <option value="professional">Professional / Informational</option>
+                                            <option value="firm">Firm but Fair</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="fee-card">
+                                    <div className="fee-card-header">📄 Generated Demand Letter Language</div>
+
+                                    <div className="language-preview">{demandLanguage}</div>
+
+                                    <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
+                                        <button className="btn-primary" onClick={copyToClipboard}>
+                                            📋 Copy to Clipboard
+                                        </button>
+                                    </div>
+
+                                    <div style={{ marginTop: '1rem', padding: '1rem', background: '#fffbeb', borderRadius: '6px', fontSize: '0.875rem', color: '#92400e' }}>
+                                        <strong>Usage Note:</strong> This language is a template based on the information you provided. Review and customize it to match your specific facts, add party names and dates, adjust tone as needed, and ensure all citations are accurate for your jurisdiction and contract. Always have the final demand letter reviewed by an attorney licensed in California.
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        {activeTab === 'statutes' && (
+                            <>
+                                <div className="section-title">
+                                    <span className="section-icon">📚</span>
+                                    California Fee-Shifting Statutes Reference
+                                </div>
+
+                                <div className="info-panel">
+                                    <div className="info-panel-title">
+                                        ⚖️ Common Fee Statutes in Business & Consumer Litigation
+                                    </div>
+                                    <div className="info-panel-content">
+                                        This reference covers the most common statutory fee-shifting provisions relevant to commercial disputes, consumer protection, employment, and public interest litigation in California. Each statute has different triggering requirements, pre-suit notice obligations, and reciprocity rules.
+                                    </div>
+                                </div>
+
+                                {Object.entries(feeStatutes).map(([key, statute]) => (
+                                    <div key={key} className="fee-card">
+                                        <div className="fee-card-header">
+                                            {statute.name}
+                                        </div>
+
+                                        <div className="result-item">
+                                            <div className="result-label">Citation</div>
+                                            <div className="result-value">{statute.citation}</div>
+                                        </div>
+
+                                        <div className="result-item">
+                                            <div className="result-label">Fee-Shifting Type</div>
+                                            <div className="result-value">
+                                                {statute.type}
+                                                <span className={`badge ${statute.type.includes('One-Way') ? 'badge-high' : 'badge-medium'}`} style={{ marginLeft: '0.5rem' }}>
+                                                    {statute.type.includes('One-Way') ? 'Asymmetric' : 'Discretionary'}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div className="result-item">
+                                            <div className="result-label">Description</div>
+                                            <div className="result-value">{statute.description}</div>
+                                        </div>
+
+                                        <div className="result-item">
+                                            <div className="result-label">Pre-Suit Requirements</div>
+                                            <div className="result-value">{statute.presuit}</div>
+                                        </div>
+
+                                        <div className="result-item">
+                                            <div className="result-label">Applicable To</div>
+                                            <div className="result-value">{statute.applicableTo}</div>
+                                        </div>
+                                    </div>
+                                ))}
+
+                                <div className="fee-card">
+                                    <div className="fee-card-header">
+                                        Civil Code § 1717 – Contract Fee Clauses
+                                    </div>
+
+                                    <div className="result-item">
+                                        <div className="result-label">What It Does</div>
+                                        <div className="result-value">
+                                            Makes any unilateral contractual attorney's fees provision reciprocal. In any action on a contract where the contract provides that one party can recover fees, § 1717 gives both parties equal rights to fee recovery.
+                                        </div>
+                                    </div>
+
+                                    <div className="result-item">
+                                        <div className="result-label">Prevailing Party</div>
+                                        <div className="result-value">
+                                            Court determines prevailing party based on who obtained greater relief on the contract claims. Can find no prevailing party in mixed-result cases or where action is voluntarily dismissed.
+                                        </div>
+                                    </div>
+
+                                    <div className="result-item">
+                                        <div className="result-label">Voluntary Dismissal Rule (§ 1717(b)(2))</div>
+                                        <div className="result-value">
+                                            If contract action is voluntarily dismissed or dismissed pursuant to settlement, there is no prevailing party for purposes of § 1717. This means fees must be negotiated as part of settlement amount rather than recovered separately.
+                                        </div>
+                                    </div>
+
+                                    <div className="result-item">
+                                        <div className="result-label">Demand Letter Strategy</div>
+                                        <div className="result-value">
+                                            Quote the specific contract provision and section number. Reference § 1717's reciprocity principle. Explain that both parties face fee exposure. Quantify current and projected fees. Signal that fees must be factored into any settlement because voluntary dismissal eliminates separate fee recovery.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="fee-card">
+                                    <div className="fee-card-header">
+                                        CCP §§ 1032, 1033.5 – Costs and Attorney's Fees as Costs
+                                    </div>
+
+                                    <div className="result-item">
+                                        <div className="result-label">§ 1032</div>
+                                        <div className="result-value">
+                                            Prevailing party is entitled as a matter of right to recover costs in any action or proceeding. "Prevailing party" is defined based on net monetary recovery, dismissals, etc.
+                                        </div>
+                                    </div>
+
+                                    <div className="result-item">
+                                        <div className="result-label">§ 1033.5(a)(10)</div>
+                                        <div className="result-value">
+                                            Attorney's fees are an allowable item of costs when authorized by contract, statute, or law. This is how contractual and statutory fee provisions are actually implemented – fees are recovered as costs under these sections.
+                                        </div>
+                                    </div>
+
+                                    <div className="result-item">
+                                        <div className="result-label">Demand Letter Strategy</div>
+                                        <div className="result-value">
+                                            Reference these sections to show that fee recovery isn't some exotic remedy – it's a standard component of costs. "Under Code of Civil Procedure Sections 1032 and 1033.5, attorney's fees authorized by [contract/statute] are recoverable as an element of costs by the prevailing party."
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="fee-card">
+                                    <div className="fee-card-header">
+                                        CCP § 998 – Offers to Compromise
+                                    </div>
+
+                                    <div className="result-item">
+                                        <div className="result-label">What It Does</div>
+                                        <div className="result-value">
+                                            Allows any party (after suit is filed) to serve a written settlement offer. If rejected and the rejecting party fails to obtain a more favorable judgment, cost-shifting consequences follow.
+                                        </div>
+                                    </div>
+
+                                    <div className="result-item">
+                                        <div className="result-label">Cost-Shifting Consequences</div>
+                                        <div className="result-value">
+                                            Rejecting party may have to pay offering party's post-offer costs (including expert witness fees, which aren't normally recoverable). If fees are otherwise recoverable under contract/statute, those fees may be enhanced for the post-offer period.
+                                        </div>
+                                    </div>
+
+                                    <div className="result-item">
+                                        <div className="result-label">Pre-Litigation Demand Strategy</div>
+                                        <div className="result-value">
+                                            Even though § 998 offers can only be served after filing, your demand letter should preview the settlement number you'll later offer in a 998, and warn that if litigation becomes necessary, you'll use § 998's cost-shifting provisions strategically. This creates settlement pressure by making clear that rejecting your demand now will lead to enhanced cost exposure later.
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        {activeTab === 'resources' && (
+                            <>
+                                <div className="section-title">
+                                    <span className="section-icon">🔗</span>
+                                    Legal Resources & Authorities
+                                </div>
+
+                                <div className="info-panel">
+                                    <div className="info-panel-title">
+                                        📚 Authoritative Sources on California Fee-Shifting
+                                    </div>
+                                    <div className="info-panel-content">
+                                        These resources provide statutory text, case law, and practice guidance on attorney's fees and costs in California litigation. Always verify current law and consult an attorney licensed in California for specific advice.
+                                    </div>
+                                </div>
+
+                                <div className="resources-grid">
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>⚖️</span>
+                                            Civil Code § 1717
+                                        </div>
+                                        <div className="resource-description">
+                                            California Legislative Information's official text of § 1717 on attorney's fees in contract actions. Includes reciprocity provisions, prevailing party definition, and voluntary dismissal rules.
+                                        </div>
+                                        <a href="https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=1717" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Read Civil Code § 1717 →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>📜</span>
+                                            CCP § 998
+                                        </div>
+                                        <div className="resource-description">
+                                            Code of Civil Procedure Section 998 on offers to compromise. Covers requirements for valid offers, cost-shifting consequences, and interaction with other fee provisions.
+                                        </div>
+                                        <a href="https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CCP&sectionNum=998" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Read CCP § 998 →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>🏛️</span>
+                                            CLRA § 1780(e)
+                                        </div>
+                                        <div className="resource-description">
+                                            Consumer Legal Remedies Act fee provision. Court shall award costs and fees to prevailing plaintiff; defendant may recover only if action not brought in good faith.
+                                        </div>
+                                        <a href="https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=1780" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Read CLRA § 1780 →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>⚡</span>
+                                            CCP § 1021.5
+                                        </div>
+                                        <div className="resource-description">
+                                            Private attorney general statute authorizing fees where successful party enforced important public right. Includes catalyst theory allowing fee recovery without final judgment.
+                                        </div>
+                                        <a href="https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CCP&sectionNum=1021.5" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Read CCP § 1021.5 →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>📊</span>
+                                            CCP §§ 1032 & 1033.5
+                                        </div>
+                                        <div className="resource-description">
+                                            Prevailing party cost recovery provisions. § 1032 establishes right to costs; § 1033.5 lists allowable cost items including attorney's fees when authorized.
+                                        </div>
+                                        <a href="https://leginfo.legislature.ca.gov/faces/codes_displayText.xhtml?lawCode=CCP&division=&title=14.&part=&chapter=6.&article=" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Read CCP §§ 1032-1033.5 →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>⚖️</span>
+                                            Santisas v. Goodin
+                                        </div>
+                                        <div className="resource-description">
+                                            California Supreme Court decision holding defendants could not recover § 1717 fees on contract claims after voluntary dismissal. Key case on prevailing party issues and dismissals.
+                                        </div>
+                                        <a href="https://law.justia.com/cases/california/supreme-court/4th/17/599.html" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Read Santisas Opinion →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>📘</span>
+                                            California Civil Code
+                                        </div>
+                                        <div className="resource-description">
+                                            Official California Legislative Information database. Search for §§ 1021 (party autonomy for fees), 1717.5 (book account fee caps), and related provisions.
+                                        </div>
+                                        <a href="https://leginfo.legislature.ca.gov/faces/codes.xhtml" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Search Civil Code →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>📑</span>
+                                            Cornell LII (Federal & UCC)
+                                        </div>
+                                        <div className="resource-description">
+                                            Cornell Legal Information Institute's free legal encyclopedia. Useful for federal fee-shifting statutes and UCC provisions that may interact with state law.
+                                        </div>
+                                        <a href="https://www.law.cornell.edu/" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Visit Cornell LII →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>🏢</span>
+                                            State Bar Fee Guidance
+                                        </div>
+                                        <div className="resource-description">
+                                            California State Bar ethics opinions and practice guidance on fee agreements, fee-splitting, and attorney's fees in litigation. Covers ethical issues in fee recovery.
+                                        </div>
+                                        <a href="https://www.calbar.ca.gov/" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Visit State Bar →
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <div className="warning-panel" style={{ marginTop: '2rem' }}>
+                                    <div className="warning-panel-title">
+                                        ⚠️ Disclaimer
+                                    </div>
+                                    <div className="info-panel-content">
+                                        This tool provides general information about California attorney's fees and costs for educational purposes only. It is not legal advice and does not create an attorney-client relationship. Fee-shifting rules are complex, case-specific, and subject to judicial discretion. Statutes and case law change. Always consult an attorney licensed in California to evaluate fee recovery prospects in your specific case, verify current statutory provisions and case law, draft demand letters and settlement agreements, and determine litigation strategy. The language generated by this tool is a template only and must be customized, reviewed, and approved by qualified legal counsel before use.
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<FeesAnalyzer />, document.getElementById('root'));
+    </script>
+</body>
+</html>
