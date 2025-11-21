@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evidence Checklist & Tracker for Demand Letters</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #1e293b;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        #root {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .app-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: calc(100vh - 40px);
+        }
+        .header {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        .header-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .header-subtitle {
+            font-size: 1rem;
+            opacity: 0.95;
+        }
+        .tabs-container {
+            display: flex;
+            background: #f8fafc;
+            border-bottom: 2px solid #e2e8f0;
+            overflow-x: auto;
+            flex-shrink: 0;
+        }
+        .tab {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #64748b;
+            white-space: nowrap;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .tab:hover {
+            background: #f1f5f9;
+            color: #6366f1;
+        }
+        .tab.active {
+            color: #6366f1;
+            background: white;
+            border-bottom-color: #6366f1;
+        }
+        .tab-icon {
+            font-size: 1.1rem;
+        }
+        .content-wrapper {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+        .content-wrapper::-webkit-scrollbar {
+            width: 10px;
+        }
+        .content-wrapper::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .content-wrapper::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 5px;
+        }
+        .content-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .section-title {
+            color: #6366f1;
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .section-icon {
+            font-size: 1.5rem;
+        }
+        .checklist-category {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.2s;
+        }
+        .checklist-category:hover {
+            border-color: #6366f1;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+        }
+        .category-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            user-select: none;
+        }
+        .category-title {
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .category-progress {
+            font-size: 0.875rem;
+            color: #6366f1;
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            background: #f0f4ff;
+            border-radius: 12px;
+        }
+        .category-items {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .checklist-item {
+            display: flex;
+            align-items: start;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: #f8fafc;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+        .checklist-item:hover {
+            background: #f0f4ff;
+        }
+        .checklist-item.completed {
+            opacity: 0.7;
+        }
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .checkbox-input {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #6366f1;
+        }
+        .item-content {
+            flex: 1;
+        }
+        .item-label {
+            font-weight: 500;
+            color: #334155;
+            margin-bottom: 0.25rem;
+            cursor: pointer;
+        }
+        .item-description {
+            font-size: 0.875rem;
+            color: #64748b;
+            line-height: 1.5;
+        }
+        .info-panel {
+            background: #f0f9ff;
+            border-left: 4px solid #0ea5e9;
+            padding: 1.25rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+        }
+        .info-panel-title {
+            font-weight: 700;
+            color: #0369a1;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .info-panel-content {
+            font-size: 0.9rem;
+            color: #334155;
+            line-height: 1.7;
+        }
+        .warning-panel {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 1.25rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+        }
+        .warning-panel-title {
+            font-weight: 700;
+            color: #92400e;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .success-panel {
+            background: #f0fdf4;
+            border-left: 4px solid #22c55e;
+            padding: 1.25rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+        }
+        .success-panel-title {
+            font-weight: 700;
+            color: #15803d;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+        }
+        .stat-label {
+            font-size: 0.875rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        .state-law-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.25rem;
+        }
+        .state-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.25rem;
+            transition: all 0.2s;
+        }
+        .state-card:hover {
+            border-color: #6366f1;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+            transform: translateY(-2px);
+        }
+        .state-card-header {
+            font-weight: 700;
+            color: #6366f1;
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .state-card-label {
+            font-weight: 600;
+            color: #475569;
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+        .state-card-value {
+            color: #64748b;
+            font-size: 0.875rem;
+            margin-bottom: 0.75rem;
+            line-height: 1.5;
+        }
+        .consent-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+        .one-party {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .two-party {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .timeline-section {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .timeline-header {
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 1rem;
+            font-size: 1.05rem;
+        }
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: #334155;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: #6366f1;
+        }
+        .result-box {
+            background: linear-gradient(135deg, #f0f4ff 0%, #e0e7ff 100%);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            border: 2px solid #6366f1;
+        }
+        .result-title {
+            font-weight: 700;
+            color: #4338ca;
+            margin-bottom: 0.75rem;
+            font-size: 1.05rem;
+        }
+        .result-detail {
+            font-size: 0.95rem;
+            color: #475569;
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        .resource-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.2s;
+        }
+        .resource-card:hover {
+            border-color: #6366f1;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+        }
+        .resource-title {
+            font-weight: 700;
+            color: #6366f1;
+            margin-bottom: 0.75rem;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .resource-description {
+            font-size: 0.875rem;
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        .resource-link {
+            color: #6366f1;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+        .resource-link:hover {
+            color: #4f46e5;
+            text-decoration: underline;
+        }
+        .tip-box {
+            background: #fefce8;
+            border-left: 4px solid #eab308;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-top: 1rem;
+            font-size: 0.875rem;
+            color: #713f12;
+            line-height: 1.6;
+        }
+        .tip-icon {
+            margin-right: 0.5rem;
+        }
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .state-law-grid,
+            .resources-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useMemo } = React;
+
+        const stateRecordingLaws = {
+            'CA': {
+                name: 'California',
+                type: 'Two-Party Consent',
+                statute: 'Cal. Penal Code § 632',
+                summary: 'All parties must consent to recording confidential communications. Violation is a crime and civil tort.',
+                canRecord: 'Only with consent of all parties to a confidential conversation',
+                penalty: 'Criminal penalties and civil liability. Recording may be inadmissible.'
+            },
+            'FL': {
+                name: 'Florida',
+                type: 'Two-Party Consent',
+                statute: 'Fla. Stat. § 934.03',
+                summary: 'All parties must consent to recording. Florida is one of the stricter two-party consent states.',
+                canRecord: 'Only with consent of all parties',
+                penalty: 'Third-degree felony; civil damages available'
+            },
+            'PA': {
+                name: 'Pennsylvania',
+                type: 'Two-Party Consent',
+                statute: '18 Pa. Cons. Stat. § 5703',
+                summary: 'All parties must consent to recording oral communications.',
+                canRecord: 'Only with consent of all parties',
+                penalty: 'Criminal penalties; recorded conversations may be inadmissible'
+            },
+            'IL': {
+                name: 'Illinois',
+                type: 'Two-Party Consent',
+                statute: '720 ILCS 5/14-2',
+                summary: 'All parties must consent. Illinois previously had stricter rules but was reformed.',
+                canRecord: 'Only with consent of all parties',
+                penalty: 'Class 4 felony; civil liability'
+            },
+            'MA': {
+                name: 'Massachusetts',
+                type: 'Two-Party Consent',
+                statute: 'Mass. Gen. Laws ch. 272, § 99',
+                summary: 'All parties must consent to recording.',
+                canRecord: 'Only with consent of all parties',
+                penalty: 'Criminal penalties and civil damages'
+            },
+            'NY': {
+                name: 'New York',
+                type: 'One-Party Consent',
+                statute: 'N.Y. Penal Law § 250.05',
+                summary: 'One party to the conversation may record without informing others.',
+                canRecord: 'Yes, if you are a party to the conversation',
+                penalty: 'Recording without being a party is illegal'
+            },
+            'TX': {
+                name: 'Texas',
+                type: 'One-Party Consent',
+                statute: 'Tex. Penal Code § 16.02',
+                summary: 'One party consent state. You may record conversations you participate in.',
+                canRecord: 'Yes, if you are a party to the conversation',
+                penalty: 'Recording without being a party is a felony'
+            },
+            'OH': {
+                name: 'Ohio',
+                type: 'One-Party Consent',
+                statute: 'Ohio Rev. Code § 2933.52',
+                summary: 'One party consent. You may record your own conversations.',
+                canRecord: 'Yes, if you are a party to the conversation',
+                penalty: 'Illegal to record conversations you are not part of'
+            },
+            'GA': {
+                name: 'Georgia',
+                type: 'One-Party Consent',
+                statute: 'Ga. Code Ann. § 16-11-62',
+                summary: 'One party consent state.',
+                canRecord: 'Yes, if you are a party to the conversation',
+                penalty: 'Recording without being a party is a misdemeanor'
+            },
+            'Federal': {
+                name: 'Federal Law',
+                type: 'One-Party Consent',
+                statute: '18 U.S.C. § 2511',
+                summary: 'Federal wiretap law requires only one-party consent. However, state law may be more restrictive.',
+                canRecord: 'Generally yes, but always follow the stricter state law',
+                penalty: 'Follow state law where the conversation takes place'
+            }
+        };
+
+        const evidenceCategories = {
+            'contracts': {
+                icon: '📄',
+                title: 'Contracts & Agreements',
+                items: [
+                    { id: 'signed-contract', label: 'Signed written contract or agreement', description: 'Fully executed version showing all signatures and dates' },
+                    { id: 'tos-clickwrap', label: 'Terms of service or click-wrap agreement', description: 'Screenshots of acceptance flow and ToS as they appeared when you agreed' },
+                    { id: 'proposals-quotes', label: 'Proposals, quotes, or work orders', description: 'Any documents defining scope, pricing, or deliverables' },
+                    { id: 'amendments', label: 'Amendments, change orders, or addenda', description: 'Any modifications to the original agreement' },
+                    { id: 'platform-policies', label: 'Platform policies or seller agreements', description: 'Stripe, PayPal, marketplace rules that apply to your transaction' },
+                    { id: 'historical-tos', label: 'Historical version of terms (Wayback Machine)', description: 'Archived copy of ToS as they existed at the time of your agreement' }
+                ]
+            },
+            'financial': {
+                icon: '💰',
+                title: 'Financial Records',
+                items: [
+                    { id: 'invoices', label: 'Invoices showing amounts owed', description: 'Detailed invoices with dates, descriptions, and totals' },
+                    { id: 'receipts', label: 'Receipts and payment confirmations', description: 'Proof that payments were made, with transaction IDs' },
+                    { id: 'bank-statements', label: 'Bank or credit card statements', description: 'Statements showing the charges in question' },
+                    { id: 'payment-processor', label: 'Payment processor transaction history', description: 'Stripe, PayPal, Venmo, or other processor records' },
+                    { id: 'refunds-credits', label: 'Refunds, chargebacks, or credits', description: 'Documentation of any adjustments to amounts owed' },
+                    { id: 'aging-reports', label: 'Account statements or aging reports', description: 'For ongoing relationships, full payment history' }
+                ]
+            },
+            'communications': {
+                icon: '💬',
+                title: 'Communications',
+                items: [
+                    { id: 'email-threads', label: 'Complete email threads with headers', description: 'Full conversations showing From/To/Date, not just selected messages' },
+                    { id: 'text-messages', label: 'Text messages or SMS threads', description: 'Exported messages with timestamps, not just screenshots' },
+                    { id: 'platform-messages', label: 'Platform messages (Upwork, Etsy, etc.)', description: 'In-app conversations exported or captured completely' },
+                    { id: 'support-chats', label: 'Customer support chat transcripts', description: 'Live chat logs with case/ticket numbers' },
+                    { id: 'social-media-dms', label: 'Social media direct messages', description: 'Instagram, Facebook, or other platform DMs' },
+                    { id: 'voicemail', label: 'Voicemail recordings', description: 'Saved voicemail messages relevant to the dispute' }
+                ]
+            },
+            'digital': {
+                icon: '📱',
+                title: 'Screenshots & Digital Evidence',
+                items: [
+                    { id: 'product-pages', label: 'Product pages or service descriptions', description: 'As they appeared when you made your purchase' },
+                    { id: 'ads-promotions', label: 'Advertisements or promotional materials', description: 'Social media ads, marketing emails showing claims made' },
+                    { id: 'account-status', label: 'Account status or error messages', description: 'Screenshots of suspension notices, payment holds, errors' },
+                    { id: 'refund-policies', label: 'Refund, return, or warranty policies', description: 'Policy language as it existed at time of transaction' },
+                    { id: 'screen-recordings', label: 'Screen recordings of issues', description: 'Videos showing how defects or problems manifest' },
+                    { id: 'wayback-captures', label: 'Wayback Machine captures', description: 'Independent verification of what websites said at specific dates' }
+                ]
+            },
+            'calls': {
+                icon: '📞',
+                title: 'Call Records',
+                items: [
+                    { id: 'call-logs', label: 'Phone call logs', description: 'Records showing dates, times, durations, and numbers' },
+                    { id: 'call-recordings', label: 'Call recordings (if lawfully made)', description: 'Only if you complied with state recording consent laws' },
+                    { id: 'call-notes', label: 'Contemporaneous notes from calls', description: 'Written notes taken during or immediately after calls' },
+                    { id: 'followup-emails', label: 'Follow-up emails summarizing calls', description: 'Emails confirming what was discussed, sent right after calls' }
+                ]
+            },
+            'physical': {
+                icon: '📸',
+                title: 'Photos & Physical Evidence',
+                items: [
+                    { id: 'defect-photos', label: 'Photos of defects or damage', description: 'Clear photos from multiple angles with close-ups and context' },
+                    { id: 'before-after', label: 'Before and after photos', description: 'Showing condition before work began and after completion' },
+                    { id: 'video-evidence', label: 'Videos showing problems', description: 'How defects manifest in use or condition of property' },
+                    { id: 'serial-numbers', label: 'Photos of serial numbers and labels', description: 'Model numbers, batch codes, manufacturing dates' },
+                    { id: 'packaging', label: 'Product packaging', description: 'Original packaging with lot numbers and manufacturer info' },
+                    { id: 'physical-item', label: 'The physical item itself', description: 'Retain the actual defective product or broken parts' }
+                ]
+            },
+            'thirdparty': {
+                icon: '🔬',
+                title: 'Third-Party Records',
+                items: [
+                    { id: 'expert-reports', label: 'Independent expert evaluations', description: 'Reports from mechanics, contractors, or professionals' },
+                    { id: 'repair-estimates', label: 'Repair estimates or invoices', description: 'Cost to fix or replace from independent sources' },
+                    { id: 'medical-records', label: 'Medical or treatment records', description: 'For injury cases, subsequent doctor visits and diagnoses' },
+                    { id: 'warranty-records', label: 'Manufacturer warranty service records', description: 'History of repair attempts under warranty' },
+                    { id: 'recall-notices', label: 'Recall notices or safety reports', description: 'CPSC, NHTSA, or FDA public records related to your product' }
+                ]
+            },
+            'regulatory': {
+                icon: '⚖️',
+                title: 'Regulatory & Complaints',
+                items: [
+                    { id: 'bbb-complaint', label: 'BBB complaint and response', description: 'Better Business Bureau case numbers and correspondence' },
+                    { id: 'ag-complaint', label: 'Attorney General complaint', description: 'State AG consumer protection complaint filing' },
+                    { id: 'cfpb-complaint', label: 'CFPB complaint', description: 'Consumer Financial Protection Bureau complaint for financial services' },
+                    { id: 'licensing-board', label: 'Professional licensing board complaint', description: 'Complaints to contractor, medical, or professional boards' },
+                    { id: 'ftc-report', label: 'FTC or other federal agency report', description: 'Reports to Federal Trade Commission or specialized agencies' },
+                    { id: 'enforcement-actions', label: 'Public enforcement actions', description: 'Published regulatory actions against the other party' }
+                ]
+            }
+        };
+
+        function EvidenceTracker() {
+            const [activeTab, setActiveTab] = useState('overview');
+            const [checkedItems, setCheckedItems] = useState({});
+            const [preservationDate, setPreservationDate] = useState('');
+            const [selectedState, setSelectedState] = useState('CA');
+
+            const toggleItem = (itemId) => {
+                setCheckedItems(prev => ({
+                    ...prev,
+                    [itemId]: !prev[itemId]
+                }));
+            };
+
+            const stats = useMemo(() => {
+                const totalItems = Object.values(evidenceCategories).reduce((sum, cat) => sum + cat.items.length, 0);
+                const completedItems = Object.values(checkedItems).filter(Boolean).length;
+                const percentComplete = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
+
+                const categoriesStarted = Object.keys(evidenceCategories).filter(catKey => {
+                    return evidenceCategories[catKey].items.some(item => checkedItems[item.id]);
+                }).length;
+
+                return { totalItems, completedItems, percentComplete, categoriesStarted };
+            }, [checkedItems]);
+
+            const getCategoryProgress = (categoryKey) => {
+                const category = evidenceCategories[categoryKey];
+                const completed = category.items.filter(item => checkedItems[item.id]).length;
+                const total = category.items.length;
+                return { completed, total };
+            };
+
+            const preservationDeadline = useMemo(() => {
+                if (!preservationDate) return null;
+                const date = new Date(preservationDate);
+                const today = new Date();
+                const diffTime = today - date;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                return {
+                    daysAgo: diffDays,
+                    formattedDate: date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+                };
+            }, [preservationDate]);
+
+            return (
+                <div className="app-container">
+                    <div className="header">
+                        <div className="header-title">Evidence Checklist & Tracker</div>
+                        <div className="header-subtitle">Organize and track documentation before sending your demand letter</div>
+                    </div>
+
+                    <div className="tabs-container">
+                        <button className={`tab ${activeTab === 'overview' ? 'active' : ''}`} onClick={() => setActiveTab('overview')}>
+                            <span className="tab-icon">📊</span>
+                            Overview
+                        </button>
+                        <button className={`tab ${activeTab === 'checklist' ? 'active' : ''}`} onClick={() => setActiveTab('checklist')}>
+                            <span className="tab-icon">✓</span>
+                            Checklist
+                        </button>
+                        <button className={`tab ${activeTab === 'recording-laws' ? 'active' : ''}`} onClick={() => setActiveTab('recording-laws')}>
+                            <span className="tab-icon">🎙️</span>
+                            Recording Laws
+                        </button>
+                        <button className={`tab ${activeTab === 'preservation' ? 'active' : ''}`} onClick={() => setActiveTab('preservation')}>
+                            <span className="tab-icon">🔒</span>
+                            Preservation
+                        </button>
+                        <button className={`tab ${activeTab === 'authentication' ? 'active' : ''}`} onClick={() => setActiveTab('authentication')}>
+                            <span className="tab-icon">🔐</span>
+                            Authentication
+                        </button>
+                        <button className={`tab ${activeTab === 'resources' ? 'active' : ''}`} onClick={() => setActiveTab('resources')}>
+                            <span className="tab-icon">🔗</span>
+                            Resources
+                        </button>
+                    </div>
+
+                    <div className="content-wrapper">
+                        {activeTab === 'overview' && (
+                            <>
+                                <div className="section-title">
+                                    <span className="section-icon">📊</span>
+                                    Your Evidence Collection Progress
+                                </div>
+
+                                <div className="stats-grid">
+                                    <div className="stat-card">
+                                        <div className="stat-label">Items Completed</div>
+                                        <div className="stat-value">{stats.completedItems} / {stats.totalItems}</div>
+                                    </div>
+                                    <div className="stat-card">
+                                        <div className="stat-label">Percent Complete</div>
+                                        <div className="stat-value">{stats.percentComplete}%</div>
+                                    </div>
+                                    <div className="stat-card">
+                                        <div className="stat-label">Categories Started</div>
+                                        <div className="stat-value">{stats.categoriesStarted} / {Object.keys(evidenceCategories).length}</div>
+                                    </div>
+                                </div>
+
+                                <div className="info-panel">
+                                    <div className="info-panel-title">
+                                        💡 Why Evidence Matters
+                                    </div>
+                                    <div className="info-panel-content">
+                                        A demand letter is only as strong as the evidence supporting it. Well-organized documentation transforms your letter from empty threats into a credible preview of what a judge or jury will see if the dispute proceeds to litigation. This checklist helps you gather, organize, and preserve evidence that will be admissible in court and persuasive in negotiations.
+                                    </div>
+                                </div>
+
+                                <div className="warning-panel">
+                                    <div className="warning-panel-title">
+                                        ⚠️ Start Preservation Now
+                                    </div>
+                                    <div className="info-panel-content">
+                                        Once a dispute becomes serious enough to consider a demand letter, you have a legal obligation to preserve relevant evidence. Deleting text messages, clearing chat history, or factory resetting devices can lead to spoliation sanctions in later litigation. Back up everything and stop deleting communications related to the dispute.
+                                    </div>
+                                </div>
+
+                                <div className="section-title" style={{ marginTop: '2rem' }}>
+                                    <span className="section-icon">📋</span>
+                                    Category Progress
+                                </div>
+
+                                {Object.entries(evidenceCategories).map(([key, category]) => {
+                                    const progress = getCategoryProgress(key);
+                                    return (
+                                        <div key={key} className="checklist-category">
+                                            <div className="category-header" onClick={() => setActiveTab('checklist')}>
+                                                <div className="category-title">
+                                                    <span>{category.icon}</span>
+                                                    {category.title}
+                                                </div>
+                                                <div className="category-progress">
+                                                    {progress.completed} / {progress.total}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+
+                                <div className="success-panel" style={{ marginTop: '2rem' }}>
+                                    <div className="success-panel-title">
+                                        ✓ Best Practices
+                                    </div>
+                                    <div className="info-panel-content">
+                                        • <strong>Organize chronologically:</strong> Arrange evidence by date within each category<br/>
+                                        • <strong>Use descriptive file names:</strong> Label documents clearly so you can find them quickly<br/>
+                                        • <strong>Make backups:</strong> Store copies in multiple locations (computer, external drive, cloud)<br/>
+                                        • <strong>Create an evidence index:</strong> List each piece of evidence with description and location<br/>
+                                        • <strong>Preserve metadata:</strong> Don't edit photos or documents in ways that alter creation dates
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        {activeTab === 'checklist' && (
+                            <>
+                                <div className="section-title">
+                                    <span className="section-icon">✓</span>
+                                    Evidence Collection Checklist
+                                </div>
+
+                                <div className="info-panel">
+                                    <div className="info-panel-title">
+                                        📌 How to Use This Checklist
+                                    </div>
+                                    <div className="info-panel-content">
+                                        Check off items as you gather them. This checklist covers all major categories of evidence relevant to demand letters and litigation. Not every item will apply to your specific dispute - focus on categories relevant to your situation. Your progress is saved in your browser.
+                                    </div>
+                                </div>
+
+                                {Object.entries(evidenceCategories).map(([key, category]) => {
+                                    const progress = getCategoryProgress(key);
+                                    return (
+                                        <div key={key} className="checklist-category">
+                                            <div className="category-header">
+                                                <div className="category-title">
+                                                    <span>{category.icon}</span>
+                                                    {category.title}
+                                                </div>
+                                                <div className="category-progress">
+                                                    {progress.completed} / {progress.total}
+                                                </div>
+                                            </div>
+                                            <div className="category-items">
+                                                {category.items.map(item => (
+                                                    <div key={item.id} className={`checklist-item ${checkedItems[item.id] ? 'completed' : ''}`}>
+                                                        <div className="checkbox-wrapper">
+                                                            <input
+                                                                type="checkbox"
+                                                                className="checkbox-input"
+                                                                checked={checkedItems[item.id] || false}
+                                                                onChange={() => toggleItem(item.id)}
+                                                                id={item.id}
+                                                            />
+                                                        </div>
+                                                        <div className="item-content">
+                                                            <label htmlFor={item.id} className="item-label">
+                                                                {item.label}
+                                                            </label>
+                                                            <div className="item-description">
+                                                                {item.description}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </>
+                        )}
+
+                        {activeTab === 'recording-laws' && (
+                            <>
+                                <div className="section-title">
+                                    <span className="section-icon">🎙️</span>
+                                    State Call Recording Laws
+                                </div>
+
+                                <div className="warning-panel">
+                                    <div className="warning-panel-title">
+                                        ⚠️ Know Your State's Law Before Recording
+                                    </div>
+                                    <div className="info-panel-content">
+                                        States are divided between one-party and two-party consent for recording phone calls. In two-party consent states like California, recording a confidential conversation without all parties' consent is a <strong>crime</strong> and can result in civil liability. Always check your state's law before recording any conversation.
+                                    </div>
+                                </div>
+
+                                <div className="form-group" style={{ maxWidth: '400px', marginBottom: '2rem' }}>
+                                    <label className="form-label">Select Your State</label>
+                                    <select className="form-select" value={selectedState} onChange={(e) => setSelectedState(e.target.value)}>
+                                        {Object.keys(stateRecordingLaws).map(code => (
+                                            <option key={code} value={code}>{stateRecordingLaws[code].name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                {selectedState && (
+                                    <div className="result-box">
+                                        <div className="result-title">
+                                            {stateRecordingLaws[selectedState].name} Recording Law
+                                        </div>
+                                        <div className="result-detail">
+                                            <strong>Type:</strong> {stateRecordingLaws[selectedState].type}
+                                        </div>
+                                        <div className="result-detail">
+                                            <strong>Statute:</strong> {stateRecordingLaws[selectedState].statute}
+                                        </div>
+                                        <div className="result-detail">
+                                            <strong>Summary:</strong> {stateRecordingLaws[selectedState].summary}
+                                        </div>
+                                        <div className="result-detail">
+                                            <strong>Can you record your own calls?</strong> {stateRecordingLaws[selectedState].canRecord}
+                                        </div>
+                                        <div className="result-detail">
+                                            <strong>Penalty for violation:</strong> {stateRecordingLaws[selectedState].penalty}
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div style={{ marginTop: '2rem' }}>
+                                    <div className="section-title">
+                                        <span className="section-icon">🗺️</span>
+                                        State-by-State Reference
+                                    </div>
+
+                                    <div className="state-law-grid">
+                                        {Object.entries(stateRecordingLaws).map(([code, state]) => (
+                                            <div key={code} className="state-card">
+                                                <div className="state-card-header">
+                                                    {state.name}
+                                                </div>
+                                                <div className="state-card-label">Type</div>
+                                                <div className="state-card-value">{state.type}</div>
+                                                <div className="state-card-label">Statute</div>
+                                                <div className="state-card-value">{state.statute}</div>
+                                                <span className={`consent-badge ${state.type.includes('One-Party') ? 'one-party' : 'two-party'}`}>
+                                                    {state.type.includes('One-Party') ? '1-PARTY' : '2-PARTY'}
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="info-panel" style={{ marginTop: '2rem' }}>
+                                    <div className="info-panel-title">
+                                        💡 Best Practices Even in One-Party States
+                                    </div>
+                                    <div className="info-panel-content">
+                                        Even if your state allows one-party consent recording, consider informing the other party at the start of calls that you are recording. This is professional, prevents disputes about legality, and follows the practice used by customer service lines. If you cannot or choose not to record, take detailed contemporaneous notes during calls and send follow-up emails summarizing what was discussed.
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        {activeTab === 'preservation' && (
+                            <>
+                                <div className="section-title">
+                                    <span className="section-icon">🔒</span>
+                                    Evidence Preservation & Spoliation
+                                </div>
+
+                                <div className="warning-panel">
+                                    <div className="warning-panel-title">
+                                        ⚠️ Legal Duty to Preserve Evidence
+                                    </div>
+                                    <div className="info-panel-content">
+                                        Once litigation is reasonably anticipated, you have a legal obligation to preserve all potentially relevant evidence. This duty arises before a lawsuit is filed - sending or receiving a demand letter clearly triggers preservation obligations. Deliberately destroying evidence (spoliation) can result in severe sanctions including adverse inferences, monetary penalties, or even dismissal of your claims.
+                                    </div>
+                                </div>
+
+                                <div className="timeline-section">
+                                    <div className="timeline-header">When Did Your Preservation Duty Begin?</div>
+                                    <div className="info-panel-content" style={{ marginBottom: '1rem' }}>
+                                        Enter the date when you first anticipated this dispute might lead to litigation. This might be when you sent/received a demand letter, when a serious complaint arose, or when the relationship clearly broke down.
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="form-label">Date Dispute Became Serious</label>
+                                        <input
+                                            type="date"
+                                            className="form-input"
+                                            value={preservationDate}
+                                            onChange={(e) => setPreservationDate(e.target.value)}
+                                        />
+                                    </div>
+
+                                    {preservationDeadline && (
+                                        <div className="result-box">
+                                            <div className="result-title">Preservation Timeline</div>
+                                            <div className="result-detail">
+                                                <strong>Preservation duty began:</strong> {preservationDeadline.formattedDate}
+                                            </div>
+                                            <div className="result-detail">
+                                                <strong>Days since preservation duty arose:</strong> {preservationDeadline.daysAgo} days ago
+                                            </div>
+                                            <div className="result-detail" style={{ marginTop: '1rem', color: '#7c3aed', fontWeight: 600 }}>
+                                                All evidence that existed on {preservationDeadline.formattedDate} or was created since then must be preserved. Do not delete emails, texts, files, or physical evidence related to this dispute.
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="section-title" style={{ marginTop: '2rem' }}>
+                                    <span className="section-icon">✓</span>
+                                    Preservation Checklist
+                                </div>
+
+                                <div className="checklist-category">
+                                    <div className="category-title" style={{ marginBottom: '1rem' }}>
+                                        <span>💾</span>
+                                        Electronic Evidence
+                                    </div>
+                                    <div className="category-items">
+                                        <div className="checklist-item">
+                                            <div className="item-content">
+                                                <div className="item-label">Suspend auto-delete policies</div>
+                                                <div className="item-description">
+                                                    Turn off automatic deletion of emails, texts, and files. Disable auto-delete on messaging apps.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="checklist-item">
+                                            <div className="item-content">
+                                                <div className="item-label">Back up all devices</div>
+                                                <div className="item-description">
+                                                    Create complete backups of phones, computers, and tablets containing relevant communications.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="checklist-item">
+                                            <div className="item-content">
+                                                <div className="item-label">Export critical messages</div>
+                                                <div className="item-description">
+                                                    Export text messages, WhatsApp chats, and platform messages to PDF or archive formats.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="checklist-item">
+                                            <div className="item-content">
+                                                <div className="item-label">Save email threads</div>
+                                                <div className="item-description">
+                                                    Download or save complete email threads. Don't rely solely on server-side email that could be deleted.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="checklist-item">
+                                            <div className="item-content">
+                                                <div className="item-label">Preserve metadata</div>
+                                                <div className="item-description">
+                                                    Don't edit files in ways that alter creation dates. Preserve original photo and document metadata.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="checklist-category">
+                                    <div className="category-title" style={{ marginBottom: '1rem' }}>
+                                        <span>📦</span>
+                                        Physical Evidence
+                                    </div>
+                                    <div className="category-items">
+                                        <div className="checklist-item">
+                                            <div className="item-content">
+                                                <div className="item-label">Secure physical items</div>
+                                                <div className="item-description">
+                                                    Store defective products, documents, and physical evidence in secure location where they won't deteriorate or be lost.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="checklist-item">
+                                            <div className="item-content">
+                                                <div className="item-label">Document before repairs</div>
+                                                <div className="item-description">
+                                                    If emergency repairs are necessary, photograph and document extensively before making irreversible changes.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="checklist-item">
+                                            <div className="item-content">
+                                                <div className="item-label">Keep replaced parts</div>
+                                                <div className="item-description">
+                                                    If repairs are made, retain old parts and components. Request contractors save removed materials for inspection.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="info-panel" style={{ marginTop: '2rem' }}>
+                                    <div className="info-panel-title">
+                                        📱 Special Considerations for Smartphones
+                                    </div>
+                                    <div className="info-panel-content">
+                                        Smartphones present unique preservation challenges. Text messages can be deleted easily, and upgrading to a new phone or resetting a device can destroy evidence. Before any phone upgrade or reset:
+                                        <br/><br/>
+                                        • Export all text message threads related to the dispute<br/>
+                                        • Download WhatsApp/Signal/Telegram chat history<br/>
+                                        • Save voicemail recordings<br/>
+                                        • Back up photos and videos with metadata intact<br/>
+                                        • Export call logs showing numbers and durations
+                                    </div>
+                                </div>
+
+                                <div className="warning-panel" style={{ marginTop: '1.5rem' }}>
+                                    <div className="warning-panel-title">
+                                        🚫 What NOT To Do
+                                    </div>
+                                    <div className="info-panel-content">
+                                        <strong>Never:</strong><br/>
+                                        • Delete text messages, emails, or chat conversations related to the dispute<br/>
+                                        • Factory reset phones or computers without complete backups<br/>
+                                        • Clear browser history or cache containing relevant web pages<br/>
+                                        • Discard physical items without thorough documentation<br/>
+                                        • Edit or alter documents, photos, or files after the dispute arises<br/>
+                                        • Instruct others to delete or destroy evidence
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        {activeTab === 'authentication' && (
+                            <>
+                                <div className="section-title">
+                                    <span className="section-icon">🔐</span>
+                                    Authenticating Your Evidence
+                                </div>
+
+                                <div className="info-panel">
+                                    <div className="info-panel-title">
+                                        📌 What Is Authentication?
+                                    </div>
+                                    <div className="info-panel-content">
+                                        Authentication means proving that evidence is what you claim it is. For emails, it means showing these are actual messages exchanged with the other party. For photos, it means proving they accurately depict what they show and weren't manipulated. Federal Rule of Evidence 901 governs authentication and requires that you provide evidence "sufficient to support a finding that the item is what the proponent claims it is."
+                                    </div>
+                                </div>
+
+                                <div className="section-title" style={{ marginTop: '2rem' }}>
+                                    <span className="section-icon">📧</span>
+                                    Email & Electronic Messages
+                                </div>
+
+                                <div className="checklist-category">
+                                    <div className="category-items">
+                                        <div className="checklist-item">
+                                            <div className="item-content">
+                                                <div className="item-label">Preserve complete headers</div>
+                                                <div className="item-description">
+                                                    Headers showing From/To/Date/Subject help authenticate that messages are genuine. Don't crop these out.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="checklist-item">
+                                            <div className="item-content">
+                                                <div className="item-label">Show full threads, not isolated messages</div>
+                                                <div className="item-description">
+                                                    Complete conversation threads are more credible than cherry-picked individual messages. Context matters.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="checklist-item">
+                                            <div className="item-content">
+                                                <div className="item-label">Note recognizable details</div>
+                                                <div className="item-description">
+                                                    Messages that reference specific facts only the parties would know help prove authenticity.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="checklist-item">
+                                            <div className="item-content">
+                                                <div className="item-label">Match email/phone to known contacts</div>
+                                                <div className="item-description">
+                                                    Be ready to testify that the email address or phone number belongs to the other party and how you know this.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="tip-box">
+                                    <strong className="tip-icon">💡</strong>
+                                    <strong>Pro Tip:</strong> Export emails and messages to PDF using built-in tools rather than taking screenshots. PDFs preserve metadata and look more professional.
+                                </div>
+
+                                <div className="section-title" style={{ marginTop: '2rem' }}>
+                                    <span className="section-icon">📱</span>
+                                    Screenshots & Web Content
+                                </div>
+
+                                <div className="checklist-category">
+                                    <div className="category-items">
+                                        <div className="checklist-item">
+                                            <div className="item-content">
+                                                <div className="item-label">Use native screenshot functions</div>
+                                                <div className="item-description">
+                                                    Take screenshots with your device's built-in screenshot tool. Avoid cropping or editing in photo software.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="checklist-item">
+                                            <div className="item-content">
+                                                <div className="item-label">Include URL and timestamp</div>
+                                                <div className="item-description">
+                                                    Capture the full browser window showing address bar with URL and system clock/date visible.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="checklist-item">
+                                            <div className="item-content">
+                                                <div className="item-label">Use Print-to-PDF for web pages</div>
+                                                <div className="item-description">
+                                                    Browser print-to-PDF functions create documents with URL/date in headers, more reliable than screenshots.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="checklist-item">
+                                            <div className="item-content">
+                                                <div className="item-label">Corroborate with Wayback Machine</div>
+                                                <div className="item-description">
+                                                    Check archive.org Wayback Machine for independent verification that web content appeared as you claim.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="checklist-item">
+                                            <div className="item-content">
+                                                <div className="item-label">Consider timestamping services</div>
+                                                <div className="item-description">
+                                                    For high-value disputes, use blockchain or cryptographic timestamping to prove when evidence was captured.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="section-title" style={{ marginTop: '2rem' }}>
+                                    <span className="section-icon">📸</span>
+                                    Photos & Videos
+                                </div>
+
+                                <div className="checklist-category">
+                                    <div className="category-items">
+                                        <div className="checklist-item">
+                                            <div className="item-content">
+                                                <div className="item-label">Preserve photo metadata</div>
+                                                <div className="item-description">
+                                                    Digital photos contain EXIF data showing date, time, device, GPS location. Don't strip this metadata.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="checklist-item">
+                                            <div className="item-content">
+                                                <div className="item-label">Create a photo log</div>
+                                                <div className="item-description">
+                                                    Simple spreadsheet: Photo 1 - Description - Date taken - Device used - Location. Makes organization clear.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="checklist-item">
+                                            <div className="item-content">
+                                                <div className="item-label">Avoid extensive editing</div>
+                                                <div className="item-description">
+                                                    Basic cropping/brightness is OK, but heavy editing creates suspicious metadata. Keep originals.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="checklist-item">
+                                            <div className="item-content">
+                                                <div className="item-label">For videos, narrate what you're showing</div>
+                                                <div className="item-description">
+                                                    Speak during recording to explain what you're documenting and why. Makes videos self-authenticating.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="info-panel" style={{ marginTop: '2rem' }}>
+                                    <div className="info-panel-title">
+                                        ⚖️ The Legal Standard
+                                    </div>
+                                    <div className="info-panel-content">
+                                        The authentication burden is not impossibly high - you don't need to eliminate all possibility of fraud. You just need to provide enough evidence that a reasonable jury could find the item is what you claim. For most evidence types, this means:
+                                        <br/><br/>
+                                        • <strong>Witness testimony:</strong> "These are the texts I exchanged; I recognize the number; this is what happened"<br/>
+                                        • <strong>Circumstantial evidence:</strong> Messages reference facts only the parties knew; emails came from known address<br/>
+                                        • <strong>Distinctive characteristics:</strong> Content, substance, and context show the evidence is genuine<br/>
+                                        • <strong>Chain of custody:</strong> You can explain how evidence was obtained, stored, and protected from alteration
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        {activeTab === 'resources' && (
+                            <>
+                                <div className="section-title">
+                                    <span className="section-icon">🔗</span>
+                                    Evidence & Admissibility Resources
+                                </div>
+
+                                <div className="info-panel">
+                                    <div className="info-panel-title">
+                                        📚 Learning More About Evidence Law
+                                    </div>
+                                    <div className="info-panel-content">
+                                        These resources provide deeper guidance on evidence gathering, preservation, authentication, and admissibility rules. While most demand letters don't require deep evidentiary expertise, understanding these concepts helps you collect evidence that will be useful if litigation becomes necessary.
+                                    </div>
+                                </div>
+
+                                <div className="resources-grid">
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>📖</span>
+                                            Federal Rules of Evidence
+                                        </div>
+                                        <div className="resource-description">
+                                            Cornell Legal Information Institute's annotated Federal Rules of Evidence, including FRE 401-403 (relevance), FRE 801-807 (hearsay), FRE 901-903 (authentication), and FRE 1001-1008 (best evidence).
+                                        </div>
+                                        <a href="https://www.law.cornell.edu/rules/fre" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            View Federal Rules of Evidence →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>⚖️</span>
+                                            Wayback Machine (Archive.org)
+                                        </div>
+                                        <div className="resource-description">
+                                            Internet Archive's Wayback Machine captures historical snapshots of websites. Use it to prove what terms of service, product pages, or policies said at specific dates in the past.
+                                        </div>
+                                        <a href="https://archive.org/web/" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Search Wayback Machine →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>🎙️</span>
+                                            Recording Law by State (MWL)
+                                        </div>
+                                        <div className="resource-description">
+                                            Matthiesen Wickert & Lehrer's comprehensive guide to call recording laws in all 50 states, including one-party vs two-party consent requirements and statutory citations.
+                                        </div>
+                                        <a href="https://www.mwl-law.com/wp-content/uploads/2018/02/RECORDING-CONVERSATIONS-CHART.pdf" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            State Recording Laws Chart →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>💾</span>
+                                            Sedona Conference ESI Guidance
+                                        </div>
+                                        <div className="resource-description">
+                                            The Sedona Conference publishes authoritative guidance on electronic evidence preservation, litigation holds, and best practices for managing digital information in litigation.
+                                        </div>
+                                        <a href="https://thesedonaconference.org/publications" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Sedona Conference Publications →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>📱</span>
+                                            Federal Judicial Center E-Discovery
+                                        </div>
+                                        <div className="resource-description">
+                                            FJC pocket guides on managing electronic discovery, including social media evidence, text messages, and ESI preservation obligations.
+                                        </div>
+                                        <a href="https://www.fjc.gov/content/managing-discovery-e-information-pocket-guide-judges-third-edition" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            FJC E-Discovery Guide →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>🚗</span>
+                                            NHTSA Recalls & Complaints
+                                        </div>
+                                        <div className="resource-description">
+                                            National Highway Traffic Safety Administration database of vehicle recalls, defect investigations, and consumer complaints. Search by VIN or make/model.
+                                        </div>
+                                        <a href="https://www.nhtsa.gov/recalls" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            NHTSA Recalls Database →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>🛡️</span>
+                                            CPSC SaferProducts.gov
+                                        </div>
+                                        <div className="resource-description">
+                                            Consumer Product Safety Commission database of product recalls, safety reports, and consumer complaints. Search for recalls on defective products.
+                                        </div>
+                                        <a href="https://www.saferproducts.gov/" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Search Product Recalls →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>📧</span>
+                                            Authenticating Social Media Evidence
+                                        </div>
+                                        <div className="resource-description">
+                                            Berkeley Law review article on authentication standards for social media posts, text messages, and digital communications in litigation.
+                                        </div>
+                                        <a href="https://www.law.berkeley.edu/research/the-berkeley-technology-law-journal/" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Berkeley Tech Law Journal →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>🔐</span>
+                                            Digital Evidence Authentication Guide
+                                        </div>
+                                        <div className="resource-description">
+                                            Department of Justice guide on collecting and authenticating digital evidence including emails, social media, and electronic documents.
+                                        </div>
+                                        <a href="https://www.justice.gov/criminal-ccips" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            DOJ Digital Evidence Resources →
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <div className="success-panel" style={{ marginTop: '2rem' }}>
+                                    <div className="success-panel-title">
+                                        ✓ Remember: Quality Over Quantity
+                                    </div>
+                                    <div className="info-panel-content">
+                                        You don't need every piece of evidence listed in this tool to send an effective demand letter. Focus on gathering clean, well-organized evidence for your strongest claims and primary damages. A few well-documented categories are far more persuasive than massive volumes of disorganized materials. Start with contracts, key communications, payment records, and basic documentation of damages - that foundation covers most disputes effectively.
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<EvidenceTracker />, document.getElementById('root'));
+    </script>
+</body>
+</html>
