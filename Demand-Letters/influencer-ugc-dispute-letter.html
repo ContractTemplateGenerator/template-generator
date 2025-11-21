@@ -1,0 +1,2315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Influencer & UGC Dispute Demand Letter Generator</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #2d3748;
+            background: linear-gradient(135deg, #f43f5e 0%, #ec4899 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .tabs {
+            display: flex;
+            background: linear-gradient(135deg, #f43f5e 0%, #ec4899 100%);
+            padding: 1rem;
+            gap: 0.5rem;
+            overflow-x: auto;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            color: white;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .tab:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .tab.active {
+            background: white;
+            color: #e11d48;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+            padding: 2rem;
+        }
+
+        .form-section {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .preview-section {
+            flex: 1;
+            min-width: 0;
+            position: sticky;
+            top: 2rem;
+            align-self: flex-start;
+            max-height: calc(100vh - 4rem);
+            overflow: visible;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #e11d48;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="date"],
+        input[type="number"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #fecdd3;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #f43f5e;
+            box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+            margin-top: 0.25rem;
+            cursor: pointer;
+            accent-color: #f43f5e;
+        }
+
+        .checkbox-item label {
+            margin: 0;
+            font-weight: 400;
+            color: #4a5568;
+            cursor: pointer;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .radio-item input[type="radio"] {
+            width: auto;
+            cursor: pointer;
+            accent-color: #f43f5e;
+        }
+
+        .radio-item label {
+            margin: 0;
+            font-weight: 400;
+            color: #4a5568;
+            cursor: pointer;
+        }
+
+        .preview-container {
+            background: #f8f9fa;
+            border: 2px solid #fecdd3;
+            border-radius: 8px;
+            padding: 2rem;
+            max-height: calc(100vh - 12rem);
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .preview-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .preview-container::-webkit-scrollbar-track {
+            background: #fce7f3;
+            border-radius: 4px;
+        }
+
+        .preview-container::-webkit-scrollbar-thumb {
+            background: #f43f5e;
+            border-radius: 4px;
+        }
+
+        .preview-container::-webkit-scrollbar-thumb:hover {
+            background: #e11d48;
+        }
+
+        .document-preview {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #2d3748;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            user-select: text;
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+        }
+
+        .document-preview::selection {
+            background: #fecdd3;
+            color: #1a202c;
+        }
+
+        .document-preview::-moz-selection {
+            background: #fecdd3;
+            color: #1a202c;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #f43f5e 0%, #ec4899 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(244, 63, 94, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #e11d48;
+            border: 2px solid #f43f5e;
+        }
+
+        .btn-secondary:hover {
+            background: #fef2f2;
+        }
+
+        .info-box {
+            background: #fef2f2;
+            border-left: 4px solid #f43f5e;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+
+        .info-box strong {
+            color: #e11d48;
+        }
+
+        .usage-list {
+            margin-top: 1rem;
+        }
+
+        .usage-item {
+            background: #fef2f2;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 1px solid #fecdd3;
+        }
+
+        .usage-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .usage-item button {
+            background: #e11d48;
+            color: white;
+            border: none;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .add-usage-btn {
+            background: #f43f5e;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 1rem;
+            width: 100%;
+        }
+
+        .add-usage-btn:hover {
+            background: #e11d48;
+        }
+
+        .resources-section {
+            background: #fef2f2;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 2rem;
+            border: 2px solid #fecdd3;
+        }
+
+        .resources-section h3 {
+            color: #e11d48;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .resources-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .resources-section li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #fecdd3;
+        }
+
+        .resources-section li:last-child {
+            border-bottom: none;
+        }
+
+        .resources-section a {
+            color: #e11d48;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .resources-section a:hover {
+            text-decoration: underline;
+        }
+
+        .section-divider {
+            margin: 2rem 0;
+            border: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #fecdd3, transparent);
+        }
+
+        @media (max-width: 968px) {
+            .content-wrapper {
+                flex-direction: column;
+            }
+
+            .preview-section {
+                position: static;
+                max-height: 600px;
+            }
+
+            .tabs {
+                flex-wrap: nowrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useMemo } = React;
+
+        function InfluencerUGCDisputeGenerator() {
+            const [activeTab, setActiveTab] = useState('role');
+            const [formData, setFormData] = useState({
+                // Role & Info
+                role: 'influencer',
+                yourName: '',
+                yourEmail: '',
+                yourPhone: '',
+                yourAddress: '',
+                yourPlatform: '',
+                yourHandle: '',
+
+                // Other Party
+                otherPartyName: '',
+                otherPartyContact: '',
+                otherPartyEmail: '',
+                otherPartyWebsite: '',
+                otherPartyRepName: '',
+
+                // Agreement Details
+                agreementType: 'dm',
+                agreementDate: '',
+                agreementPlatform: '',
+                deliverables: '',
+                numberOfPosts: '',
+                platforms: [],
+                postingSchedule: '',
+                paymentAmount: '',
+                paymentTerms: '',
+                usageRights: '',
+                usageRightsTerm: '',
+                usageRightsMedia: [],
+                usageRightsTerritories: '',
+                exclusivityClause: false,
+                exclusivityDetails: '',
+                approvalRequired: false,
+
+                // Dispute Details
+                disputeType: [],
+                performanceDate: '',
+                performanceProof: '',
+                paymentDueDate: '',
+                amountOwed: '',
+                lateFeesInterest: '',
+
+                // Unauthorized usage tracking
+                unauthorizedUses: [],
+
+                // Brand-side issues
+                influencerFailures: [],
+                influencerFailureDetails: '',
+
+                // FTC issues
+                ftcViolations: [],
+                ftcDetails: '',
+
+                // Third-party IP issues
+                musicIssues: false,
+                musicDetails: '',
+
+                // Evidence
+                evidenceTypes: [],
+                additionalEvidence: '',
+
+                // Demands
+                demandTypes: [],
+                paymentDemandAmount: '',
+                licensingTerms: '',
+                correctiveActions: '',
+                deadlineDate: '',
+
+                // Next Steps
+                escalationOptions: [],
+                copyrightRegistered: false,
+                registrationNumber: '',
+                claimValue: '',
+                additionalNotes: ''
+            });
+
+            const [unauthorizedUseInputs, setUnauthorizedUseInputs] = useState({
+                platform: '',
+                url: '',
+                dateDiscovered: '',
+                useType: '',
+                description: ''
+            });
+
+            const handleInputChange = (field, value) => {
+                setFormData(prev => ({ ...prev, [field]: value }));
+            };
+
+            const handleCheckboxChange = (field, value) => {
+                setFormData(prev => ({
+                    ...prev,
+                    [field]: prev[field].includes(value)
+                        ? prev[field].filter(item => item !== value)
+                        : [...prev[field], value]
+                }));
+            };
+
+            const addUnauthorizedUse = () => {
+                if (unauthorizedUseInputs.platform && unauthorizedUseInputs.url) {
+                    setFormData(prev => ({
+                        ...prev,
+                        unauthorizedUses: [...prev.unauthorizedUses, { ...unauthorizedUseInputs, id: Date.now() }]
+                    }));
+                    setUnauthorizedUseInputs({
+                        platform: '',
+                        url: '',
+                        dateDiscovered: '',
+                        useType: '',
+                        description: ''
+                    });
+                }
+            };
+
+            const removeUnauthorizedUse = (id) => {
+                setFormData(prev => ({
+                    ...prev,
+                    unauthorizedUses: prev.unauthorizedUses.filter(use => use.id !== id)
+                }));
+            };
+
+            const generateLetter = useMemo(() => {
+                const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+                let letter = '';
+
+                // Header
+                if (formData.yourName) {
+                    letter += `${formData.yourName}\n`;
+                    if (formData.yourAddress) letter += `${formData.yourAddress}\n`;
+                    if (formData.yourEmail) letter += `${formData.yourEmail}\n`;
+                    if (formData.yourPhone) letter += `${formData.yourPhone}\n`;
+                    letter += `\n`;
+                }
+
+                letter += `${today}\n\n`;
+
+                if (formData.otherPartyName) {
+                    letter += `${formData.otherPartyName}\n`;
+                    if (formData.otherPartyContact) letter += `${formData.otherPartyContact}\n`;
+                    if (formData.otherPartyEmail) letter += `${formData.otherPartyEmail}\n`;
+                    letter += `\n`;
+                }
+
+                // Subject line
+                const roleLabel = formData.role === 'influencer' ? 'Influencer Collaboration' :
+                                formData.role === 'ugc' ? 'Unauthorized Use of User-Generated Content' :
+                                'Influencer Agreement Compliance';
+
+                letter += `Re: ${roleLabel}`;
+                if (formData.agreementDate) {
+                    letter += ` - Agreement dated ${formData.agreementDate}`;
+                }
+                letter += `\n\n`;
+
+                // Opening
+                if (formData.role === 'brand') {
+                    letter += `Dear ${formData.otherPartyRepName || 'Sir/Madam'},\n\n`;
+                    letter += `We are writing regarding concerns about the influencer collaboration agreement `;
+                } else {
+                    letter += `Dear ${formData.otherPartyRepName || 'Sir/Madam'},\n\n`;
+                    if (formData.role === 'ugc') {
+                        letter += `I am writing regarding your unauthorized use of my copyrighted content. `;
+                    } else {
+                        letter += `I am writing regarding the influencer collaboration `;
+                    }
+                }
+
+                // Agreement context
+                if (formData.agreementType && formData.agreementDate && formData.role !== 'ugc') {
+                    const agreementTypeLabel = {
+                        'dm': 'Instagram direct messages',
+                        'email': 'email correspondence',
+                        'formal': 'formal written agreement',
+                        'verbal': 'verbal agreement'
+                    }[formData.agreementType] || 'communications';
+
+                    letter += `between ${formData.yourName || 'myself'} and ${formData.otherPartyName || 'your company'} that was agreed upon on ${formData.agreementDate} via ${agreementTypeLabel}. `;
+                }
+
+                // Agreement terms recap
+                if (formData.deliverables && formData.role !== 'ugc') {
+                    letter += `\n\nUNDER THE AGREEMENT:\n\n`;
+                    letter += `The agreement specified the following terms:\n\n`;
+
+                    if (formData.numberOfPosts) {
+                        letter += `• Number of posts: ${formData.numberOfPosts}\n`;
+                    }
+
+                    if (formData.platforms.length > 0) {
+                        letter += `• Platforms: ${formData.platforms.join(', ')}\n`;
+                    }
+
+                    letter += `• Deliverables: ${formData.deliverables}\n`;
+
+                    if (formData.postingSchedule) {
+                        letter += `• Posting schedule: ${formData.postingSchedule}\n`;
+                    }
+
+                    if (formData.paymentAmount) {
+                        letter += `• Payment: $${formData.paymentAmount}`;
+                        if (formData.paymentTerms) {
+                            letter += ` (${formData.paymentTerms})`;
+                        }
+                        letter += `\n`;
+                    }
+
+                    if (formData.usageRights) {
+                        letter += `\nUSAGE RIGHTS GRANTED:\n\n`;
+                        letter += `${formData.usageRights}\n`;
+
+                        if (formData.usageRightsTerm) {
+                            letter += `• Term: ${formData.usageRightsTerm}\n`;
+                        }
+
+                        if (formData.usageRightsMedia.length > 0) {
+                            letter += `• Authorized media: ${formData.usageRightsMedia.join(', ')}\n`;
+                        }
+
+                        if (formData.usageRightsTerritories) {
+                            letter += `• Geographic scope: ${formData.usageRightsTerritories}\n`;
+                        }
+                    }
+
+                    if (formData.exclusivityClause && formData.exclusivityDetails) {
+                        letter += `\nEXCLUSIVITY: ${formData.exclusivityDetails}\n`;
+                    }
+                }
+
+                // Performance (influencer/UGC role)
+                if ((formData.role === 'influencer' || formData.role === 'ugc') && formData.performanceDate) {
+                    letter += `\nMY PERFORMANCE:\n\n`;
+
+                    if (formData.role === 'ugc') {
+                        letter += `I am the creator and copyright owner of the content described below. `;
+                        if (formData.performanceProof) {
+                            letter += `I created and posted this content on ${formData.performanceDate}. ${formData.performanceProof}\n`;
+                        }
+                    } else {
+                        letter += `I fulfilled all obligations under our agreement. `;
+                        if (formData.performanceProof) {
+                            letter += `${formData.performanceProof} `;
+                        }
+                        letter += `All content was created, approved ${formData.approvalRequired ? '(per the approval workflow specified)' : ''}, and posted according to the agreed schedule on ${formData.performanceDate}.\n`;
+                    }
+                }
+
+                // The problem - different by dispute type
+                letter += `\nTHE ISSUE:\n\n`;
+
+                if (formData.role === 'brand') {
+                    // Brand side issues
+                    if (formData.influencerFailures.length > 0) {
+                        letter += `The influencer has failed to meet the obligations under our agreement in the following ways:\n\n`;
+
+                        const failureLabels = {
+                            'no-post': 'Failed to post required content',
+                            'late-post': 'Posted content late, outside agreed schedule',
+                            'off-brief': 'Content did not follow creative brief or brand guidelines',
+                            'low-quality': 'Content quality below agreed standards',
+                            'exclusivity': 'Violated exclusivity clause by promoting competitor',
+                            'no-disclosure': 'Failed to include required FTC disclosures',
+                            'false-claims': 'Made false or unsubstantiated claims'
+                        };
+
+                        formData.influencerFailures.forEach(failure => {
+                            letter += `• ${failureLabels[failure] || failure}\n`;
+                        });
+
+                        if (formData.influencerFailureDetails) {
+                            letter += `\n${formData.influencerFailureDetails}\n`;
+                        }
+                    }
+
+                    if (formData.ftcViolations.length > 0) {
+                        letter += `\nFTC COMPLIANCE ISSUES:\n\n`;
+                        letter += `The following violations of FTC Endorsement Guides (16 C.F.R. Part 255) have occurred:\n\n`;
+
+                        const ftcLabels = {
+                            'no-disclosure': 'No disclosure of material connection despite paid sponsorship',
+                            'inadequate-disclosure': 'Disclosure not clear and conspicuous (buried in hashtags, etc.)',
+                            'false-claims': 'Unsubstantiated or false claims about product performance',
+                            'edited-disclosure': 'Removed or altered required disclosures after posting',
+                            'misleading': 'Posts structured in misleading way'
+                        };
+
+                        formData.ftcViolations.forEach(violation => {
+                            letter += `• ${ftcLabels[violation] || violation}\n`;
+                        });
+
+                        if (formData.ftcDetails) {
+                            letter += `\n${formData.ftcDetails}\n`;
+                        }
+
+                        letter += `\nThese violations expose both ${formData.otherPartyName || 'you'} and ${formData.yourName || 'our company'} to Federal Trade Commission enforcement action. The FTC's updated Endorsement Guides make clear that both brands and influencers can be held liable for non-compliant endorsements.\n`;
+                    }
+
+                } else {
+                    // Influencer/UGC side issues
+                    if (formData.disputeType.includes('non-payment')) {
+                        letter += `${formData.otherPartyName || 'Your company'} has failed to pay the agreed compensation. `;
+
+                        if (formData.paymentAmount && formData.paymentDueDate) {
+                            letter += `The payment of $${formData.paymentAmount} was due on ${formData.paymentDueDate}. `;
+                        } else if (formData.paymentAmount) {
+                            letter += `The agreed payment was $${formData.paymentAmount}. `;
+                        }
+
+                        if (formData.amountOwed) {
+                            letter += `The total amount currently owed is $${formData.amountOwed}`;
+                            if (formData.lateFeesInterest) {
+                                letter += ` (including ${formData.lateFeesInterest})`;
+                            }
+                            letter += `. `;
+                        }
+
+                        letter += `This constitutes a breach of our agreement.\n`;
+                    }
+
+                    if (formData.disputeType.includes('unauthorized-use') || formData.role === 'ugc') {
+                        if (formData.role === 'ugc') {
+                            letter += `You are using my copyrighted content without permission or any valid license. `;
+                        } else {
+                            letter += `\nYou are using my content beyond the scope authorized under our agreement. `;
+                        }
+
+                        letter += `I have discovered the following unauthorized uses:\n\n`;
+
+                        if (formData.unauthorizedUses.length > 0) {
+                            formData.unauthorizedUses.forEach((use, index) => {
+                                letter += `${index + 1}. ${use.platform}`;
+                                if (use.useType) letter += ` - ${use.useType}`;
+                                letter += `\n`;
+                                if (use.url) letter += `   URL: ${use.url}\n`;
+                                if (use.dateDiscovered) letter += `   Discovered: ${use.dateDiscovered}\n`;
+                                if (use.description) letter += `   Details: ${use.description}\n`;
+                                letter += `\n`;
+                            });
+                        }
+
+                        if (formData.role === 'ugc') {
+                            letter += `I did not grant ${formData.otherPartyName || 'your company'} permission to use this content. `;
+
+                            letter += `While I may have used a branded hashtag or tagged your account when posting to my social media, this does not transfer copyright ownership or grant you a broad commercial license to use my content. `;
+
+                            letter += `The Instagram and other platform terms of service grant the platforms themselves rights to host my content, but those rights do not extend to third-party brands who wish to repurpose my content for their own marketing.\n\n`;
+
+                            letter += `Your use of my content, particularly in paid advertising and commercial contexts, also implicates my right of publicity under applicable state law, as you are using my name, image, and likeness for commercial purposes without my consent.\n`;
+
+                        } else {
+                            letter += `Our agreement authorized use of the content only ${formData.usageRights || 'for organic social media posts'}`;
+                            if (formData.usageRightsTerm) letter += ` for ${formData.usageRightsTerm}`;
+                            if (formData.usageRightsMedia.length > 0) letter += ` on ${formData.usageRightsMedia.join(', ')}`;
+                            letter += `. The uses listed above exceed this scope and constitute both breach of contract and copyright infringement.\n`;
+                        }
+                    }
+
+                    if (formData.disputeType.includes('scope-creep')) {
+                        letter += `\nSPECIFIC SCOPE VIOLATIONS:\n\n`;
+                        letter += `You have used my content in ways that were never authorized:\n\n`;
+
+                        letter += `• Using content created for organic posts in paid advertising campaigns\n`;
+                        if (formData.unauthorizedUses.some(u => u.useType && u.useType.toLowerCase().includes('whitelist'))) {
+                            letter += `• "Whitelisting" or boosting content from my account without permission\n`;
+                        }
+                        if (formData.unauthorizedUses.some(u => u.platform && !formData.platforms.includes(u.platform))) {
+                            letter += `• Using content on platforms not specified in our agreement\n`;
+                        }
+                        if (formData.usageRightsTerm && formData.unauthorizedUses.some(u => u.dateDiscovered)) {
+                            letter += `• Continuing to use content after the license term expired\n`;
+                        }
+                        letter += `• Using my image and likeness in commercial contexts beyond what was agreed\n`;
+                    }
+
+                    if (formData.disputeType.includes('editing')) {
+                        letter += `\nUNAUTHORIZED EDITING:\n\n`;
+                        letter += `You have materially edited or modified my content in ways that:\n`;
+                        letter += `• Change the message or context of my endorsement\n`;
+                        letter += `• Associate me with products or claims I did not actually endorse\n`;
+                        if (formData.approvalRequired) {
+                            letter += `• Violate the approval rights specified in our agreement\n`;
+                        }
+                        letter += `• Create potential FTC compliance issues for which I may be held liable\n`;
+                        letter += `• Harm my personal brand and reputation\n`;
+                    }
+
+                    if (formData.musicIssues && formData.musicDetails) {
+                        letter += `\nTHIRD-PARTY INTELLECTUAL PROPERTY:\n\n`;
+                        letter += `${formData.musicDetails}\n\n`;
+                        letter += `Your use of content containing third-party copyrighted material (such as music) in paid advertising creates additional copyright liability. Platform licenses that allow users to add music to posts do not extend to brands that download and commercially exploit that content.\n`;
+                    }
+                }
+
+                // Legal basis
+                letter += `\nLEGAL BASIS:\n\n`;
+
+                if (formData.role === 'brand') {
+                    letter += `The failures described above constitute material breach of our influencer agreement. Under basic contract law principles, ${formData.otherPartyName || 'the influencer'} was required to perform the agreed obligations. The failure to do so entitles ${formData.yourName || 'our company'} to withhold payment, seek return of any consideration already provided, and potentially seek damages for harm caused.\n\n`;
+
+                    if (formData.ftcViolations.length > 0) {
+                        letter += `The FTC Endorsement Guides (16 C.F.R. Part 255), updated in 2023, establish clear requirements for disclosure of material connections between brands and endorsers. Both brands and influencers can face enforcement action for violations. Recent FTC enforcement demonstrates this is not theoretical risk.\n`;
+                    }
+
+                } else {
+                    letter += `COPYRIGHT: Under U.S. copyright law, I own the copyright in all content I create from the moment of creation. `;
+
+                    if (formData.role === 'ugc') {
+                        letter += `I have not transferred ownership or granted ${formData.otherPartyName || 'your company'} any license to use my content. Your unauthorized use constitutes copyright infringement under 17 U.S.C. § 101 et seq.\n\n`;
+                    } else {
+                        letter += `Payment for content creates a license to use that content according to the agreed terms, but does not transfer ownership absent a written assignment. Your use beyond the scope of our agreement constitutes copyright infringement.\n\n`;
+                    }
+
+                    letter += `RIGHT OF PUBLICITY: Under applicable state law, you cannot use my name, image, likeness, or other identifiable characteristics for commercial advertising purposes without my explicit consent. Your use of my content in paid advertising and other commercial contexts beyond what I authorized violates these rights.\n\n`;
+
+                    letter += `BREACH OF CONTRACT: `;
+                    if (formData.role === 'ugc') {
+                        letter += `If you claim that some hashtag terms or contest rules granted you a license, those terms must be clearly disclosed and the scope must be explicit. Buried terms or overly broad assertions of rights in fine print are unlikely to be enforceable.\n\n`;
+                    } else {
+                        letter += `Your failure to pay as agreed and your use of my content beyond the licensed scope both constitute material breaches of our contract. I am entitled to payment of all amounts owed plus any late fees or interest provided for in the agreement or by law.\n\n`;
+                    }
+
+                    letter += `AVAILABLE REMEDIES: Federal copyright law provides for statutory damages of up to $30,000 per work infringed, or up to $150,000 for willful infringement. I may pursue these claims in federal court or through the Copyright Claims Board established under the CASE Act. I am also entitled to seek injunctive relief stopping your continued unauthorized use.\n`;
+                }
+
+                // Evidence
+                if (formData.evidenceTypes.length > 0) {
+                    letter += `\nDOCUMENTATION:\n\n`;
+                    letter += `I have preserved comprehensive evidence supporting this claim, including:\n\n`;
+
+                    const evidenceLabels = {
+                        'agreement': 'Complete agreement documentation (messages, emails, or signed contract)',
+                        'deliverables': 'Links and screenshots of all content created and posted',
+                        'approval': 'Approval communications and timestamps',
+                        'metrics': 'Engagement metrics and performance data',
+                        'unauthorized-screenshots': 'Screenshots of unauthorized uses across all platforms',
+                        'ad-library': 'Meta Ad Library captures showing paid ad campaigns',
+                        'invoices': 'Invoices and payment communications',
+                        'timeline': 'Complete timeline of communications',
+                        'website-archive': 'Website archives and cached pages',
+                        'witness': 'Third-party witness statements'
+                    };
+
+                    formData.evidenceTypes.forEach(type => {
+                        letter += `• ${evidenceLabels[type] || type}\n`;
+                    });
+
+                    if (formData.additionalEvidence) {
+                        letter += `\nAdditional evidence: ${formData.additionalEvidence}\n`;
+                    }
+                }
+
+                // Demands
+                letter += `\nDEMANDS:\n\n`;
+
+                if (formData.role === 'brand') {
+                    letter += `To resolve this matter, we require the following:\n\n`;
+
+                    if (formData.demandTypes.includes('corrective-action')) {
+                        letter += `1. CORRECTIVE ACTION:\n`;
+                        if (formData.correctiveActions) {
+                            letter += `${formData.correctiveActions}\n`;
+                        } else {
+                            letter += `Take immediate corrective action to address the compliance issues identified above, including updating or removing non-compliant posts, adding required disclosures, and posting corrections if necessary.\n`;
+                        }
+                        letter += `\n`;
+                    }
+
+                    if (formData.demandTypes.includes('withhold-payment')) {
+                        letter += `2. PAYMENT ADJUSTMENT:\n`;
+                        if (formData.paymentDemandAmount) {
+                            letter += `Due to the material breaches described, we will be withholding $${formData.paymentDemandAmount} in payment pending cure of the breaches.\n`;
+                        } else {
+                            letter += `We are withholding payment until the issues identified are resolved to our satisfaction.\n`;
+                        }
+                        letter += `\n`;
+                    }
+
+                    if (formData.demandTypes.includes('cure-period')) {
+                        letter += `3. CURE PERIOD:\n`;
+                        letter += `You have until ${formData.deadlineDate || '[deadline]'} to cure these breaches. `;
+                        letter += `If the issues are resolved satisfactorily within this period, we are willing to proceed with the agreement as modified.\n\n`;
+                    }
+
+                    if (formData.demandTypes.includes('termination')) {
+                        letter += `4. AGREEMENT TERMINATION:\n`;
+                        letter += `If the breaches are not cured within the specified period, we will terminate the agreement and will require return of any products, payments, or other consideration provided.\n\n`;
+                    }
+
+                } else {
+                    // Influencer/UGC demands
+                    if (formData.demandTypes.includes('payment')) {
+                        letter += `1. PAYMENT:\n`;
+                        if (formData.paymentDemandAmount) {
+                            letter += `Immediate payment of $${formData.paymentDemandAmount}`;
+                            if (formData.lateFeesInterest) {
+                                letter += ` (including ${formData.lateFeesInterest})`;
+                            }
+                            letter += ` via wire transfer or certified check.\n\n`;
+                        } else if (formData.amountOwed) {
+                            letter += `Payment of the full amount owed ($${formData.amountOwed}) by ${formData.deadlineDate || '[deadline]'}.\n\n`;
+                        } else {
+                            letter += `Payment of all amounts owed under our agreement.\n\n`;
+                        }
+                    }
+
+                    if (formData.demandTypes.includes('immediate-cessation')) {
+                        letter += `2. IMMEDIATE CESSATION AND REMOVAL:\n`;
+                        letter += `Immediately cease all use of my content and remove it from:\n`;
+                        letter += `• All websites and landing pages\n`;
+                        letter += `• All paid advertising campaigns (social media, display, search, etc.)\n`;
+                        letter += `• All email marketing campaigns\n`;
+                        letter += `• All print materials, point-of-sale displays, and out-of-home advertising\n`;
+                        letter += `• Any other commercial use\n\n`;
+                        letter += `Provide written confirmation within 3 business days that all unauthorized use has ceased.\n\n`;
+                    }
+
+                    if (formData.demandTypes.includes('retroactive-license')) {
+                        letter += `3. RETROACTIVE LICENSE PAYMENT:\n`;
+                        if (formData.licensingTerms) {
+                            letter += `${formData.licensingTerms}\n\n`;
+                        } else {
+                            letter += `If you wish to retain the right to use the content that has already been published, I am willing to discuss a retroactive license. My standard rate for paid advertising usage is $[amount] per platform per month. Based on your usage to date, the retroactive licensing fee would be $[calculated amount].\n\n`;
+                        }
+                    }
+
+                    if (formData.demandTypes.includes('future-license')) {
+                        letter += `4. FUTURE LICENSE TERMS:\n`;
+                        letter += `If you wish to continue using my content going forward, we can discuss licensing terms. `;
+                        if (formData.licensingTerms) {
+                            letter += `${formData.licensingTerms}\n\n`;
+                        } else {
+                            letter += `Any future license would need to explicitly address scope (platforms, media types, paid vs organic), term, territory, and appropriate additional compensation.\n\n`;
+                        }
+                    }
+
+                    if (formData.demandTypes.includes('accounting')) {
+                        letter += `5. ACCOUNTING:\n`;
+                        letter += `Provide a complete accounting of all uses of my content, including:\n`;
+                        letter += `• All platforms and campaigns where content appeared\n`;
+                        letter += `• Date ranges for each use\n`;
+                        letter += `• Ad spend and impressions for paid campaigns\n`;
+                        letter += `• Revenue or other benefits derived from the use\n\n`;
+                    }
+
+                    if (formData.demandTypes.includes('written-confirmation')) {
+                        letter += `6. WRITTEN CONFIRMATION:\n`;
+                        letter += `Provide written confirmation that:\n`;
+                        letter += `• You acknowledge my copyright ownership and right of publicity\n`;
+                        letter += `• You will not use my content in the future without explicit written permission\n`;
+                        letter += `• You have taken steps to prevent future unauthorized use\n\n`;
+                    }
+                }
+
+                // Deadline
+                if (formData.deadlineDate) {
+                    letter += `DEADLINE: ${formData.deadlineDate}\n\n`;
+                    letter += `This matter must be resolved by ${formData.deadlineDate}. `;
+                } else {
+                    letter += `I expect a response within 14 days of the date of this letter. `;
+                }
+
+                // Escalation options
+                if (formData.escalationOptions.length > 0 && formData.role !== 'brand') {
+                    letter += `\nNEXT STEPS IF NOT RESOLVED:\n\n`;
+                    letter += `If this matter is not resolved by the deadline, I will pursue the following remedies:\n\n`;
+
+                    if (formData.escalationOptions.includes('dmca')) {
+                        letter += `• DMCA TAKEDOWN NOTICES: I will send notices under the Digital Millennium Copyright Act (17 U.S.C. § 512) to all platforms hosting the infringing content, requiring immediate removal. Platforms that receive valid DMCA notices are required to act expeditiously to remove the content.\n\n`;
+                    }
+
+                    if (formData.escalationOptions.includes('ccb')) {
+                        letter += `• COPYRIGHT CLAIMS BOARD: I will file a claim with the Copyright Claims Board (established under the CASE Act), seeking statutory damages `;
+                        if (formData.claimValue && parseInt(formData.claimValue) <= 30000) {
+                            letter += `up to $${formData.claimValue} `;
+                        } else {
+                            letter += `of up to $15,000 per work infringed `;
+                        }
+                        letter += `for your unauthorized use. The CCB provides a streamlined process for copyright claims without the expense of full federal court litigation`;
+                        if (formData.copyrightRegistered) {
+                            letter += `. My content is registered with the U.S. Copyright Office (Registration No. ${formData.registrationNumber || '[number]'}), which allows for statutory damages and attorney fees`;
+                        }
+                        letter += `.\n\n`;
+                    }
+
+                    if (formData.escalationOptions.includes('federal-court')) {
+                        letter += `• FEDERAL COURT LITIGATION: I reserve the right to file suit in federal court for copyright infringement, seeking statutory damages, injunctive relief, and attorney fees.\n\n`;
+                    }
+
+                    if (formData.escalationOptions.includes('small-claims')) {
+                        letter += `• SMALL CLAIMS COURT: For the unpaid compensation, I will file suit in small claims court in [jurisdiction] seeking the amount owed plus court costs and interest.\n\n`;
+                    }
+
+                    if (formData.escalationOptions.includes('ftc')) {
+                        letter += `• FTC COMPLAINT: I will consider filing a complaint with the Federal Trade Commission regarding deceptive endorsement practices, particularly where your unauthorized use of my content creates misleading impressions about my endorsement of your products.\n\n`;
+                    }
+
+                    if (formData.escalationOptions.includes('state-ag')) {
+                        letter += `• STATE ATTORNEY GENERAL: I will consider filing a complaint with the state Attorney General's consumer protection division regarding unfair and deceptive business practices.\n\n`;
+                    }
+
+                } else if (formData.role === 'brand' && formData.escalationOptions.length > 0) {
+                    letter += `\nCONSEQUENCES OF NON-COMPLIANCE:\n\n`;
+
+                    if (formData.escalationOptions.includes('withhold-payment')) {
+                        letter += `• We will withhold all outstanding payments and may seek return of payments already made or products provided.\n\n`;
+                    }
+
+                    if (formData.escalationOptions.includes('termination')) {
+                        letter += `• We will terminate the agreement and any future collaborations.\n\n`;
+                    }
+
+                    if (formData.escalationOptions.includes('ftc')) {
+                        letter += `• We will consider reporting FTC compliance violations to the appropriate regulatory authorities.\n\n`;
+                    }
+
+                    if (formData.escalationOptions.includes('litigation')) {
+                        letter += `• We reserve the right to pursue legal action for breach of contract and any damages caused by your violations.\n\n`;
+                    }
+                }
+
+                // Willingness to discuss
+                if (formData.role !== 'brand' && (formData.demandTypes.includes('future-license') || formData.demandTypes.includes('retroactive-license'))) {
+                    letter += `I am open to discussing a reasonable resolution that allows you to continue using content you find valuable, but that discussion must begin with acknowledgment of my rights and cease of unauthorized use.\n\n`;
+                }
+
+                // Additional notes
+                if (formData.additionalNotes) {
+                    letter += `ADDITIONAL INFORMATION:\n\n${formData.additionalNotes}\n\n`;
+                }
+
+                // Closing
+                letter += `Please contact me at ${formData.yourEmail || '[your email]'}`;
+                if (formData.yourPhone) {
+                    letter += ` or ${formData.yourPhone}`;
+                }
+                letter += ` to discuss resolution of this matter.\n\n`;
+
+                letter += `Sincerely,\n\n`;
+                letter += `${formData.yourName || '[Your Name]'}`;
+
+                return letter;
+            }, [formData]);
+
+            const copyToClipboard = async () => {
+                try {
+                    await navigator.clipboard.writeText(generateLetter);
+                    alert('Letter copied to clipboard!');
+                } catch (err) {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = generateLetter;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    try {
+                        document.execCommand('copy');
+                        alert('Letter copied to clipboard!');
+                    } catch (err) {
+                        alert('Failed to copy letter');
+                    }
+                    document.body.removeChild(textArea);
+                }
+            };
+
+            const downloadLetter = () => {
+                const element = document.createElement('a');
+                const file = new Blob([generateLetter], { type: 'text/plain' });
+                element.href = URL.createObjectURL(file);
+                const fileName = formData.role === 'brand'
+                    ? 'influencer-compliance-letter.txt'
+                    : formData.role === 'ugc'
+                    ? 'ugc-copyright-demand-letter.txt'
+                    : 'influencer-demand-letter.txt';
+                element.download = fileName;
+                document.body.appendChild(element);
+                element.click();
+                document.body.removeChild(element);
+            };
+
+            const tabs = [
+                { id: 'role', label: 'Your Role & Info' },
+                { id: 'other-party', label: 'Other Party' },
+                { id: 'agreement', label: 'Agreement Details' },
+                { id: 'dispute', label: 'Dispute Details' },
+                { id: 'evidence', label: 'Evidence' },
+                { id: 'demands', label: 'Your Demands' },
+                { id: 'next-steps', label: 'Next Steps' }
+            ];
+
+            return (
+                <div className="container">
+                    <div className="tabs">
+                        {tabs.map(tab => (
+                            <button
+                                key={tab.id}
+                                className={`tab ${activeTab === tab.id ? 'active' : ''}`}
+                                onClick={() => setActiveTab(tab.id)}
+                            >
+                                {tab.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="content-wrapper">
+                        <div className="form-section">
+                            {activeTab === 'role' && (
+                                <>
+                                    <div className="info-box">
+                                        <strong>Who is this for?</strong> This tool helps influencers demand payment or stop unauthorized content use, UGC creators protect their copyright, and brands address influencer non-compliance or FTC issues.
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>I am a:</label>
+                                        <div className="radio-group">
+                                            <div className="radio-item">
+                                                <input
+                                                    type="radio"
+                                                    id="role-influencer"
+                                                    checked={formData.role === 'influencer'}
+                                                    onChange={() => handleInputChange('role', 'influencer')}
+                                                />
+                                                <label htmlFor="role-influencer">Influencer / Content Creator</label>
+                                            </div>
+                                            <div className="radio-item">
+                                                <input
+                                                    type="radio"
+                                                    id="role-ugc"
+                                                    checked={formData.role === 'ugc'}
+                                                    onChange={() => handleInputChange('role', 'ugc')}
+                                                />
+                                                <label htmlFor="role-ugc">UGC Creator / Customer</label>
+                                            </div>
+                                            <div className="radio-item">
+                                                <input
+                                                    type="radio"
+                                                    id="role-brand"
+                                                    checked={formData.role === 'brand'}
+                                                    onChange={() => handleInputChange('role', 'brand')}
+                                                />
+                                                <label htmlFor="role-brand">Brand / Company</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Your Name / Company Name:</label>
+                                        <input
+                                            type="text"
+                                            value={formData.yourName}
+                                            onChange={(e) => handleInputChange('yourName', e.target.value)}
+                                            placeholder={formData.role === 'brand' ? 'Your Company LLC' : 'Your Full Name'}
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Your Email:</label>
+                                        <input
+                                            type="email"
+                                            value={formData.yourEmail}
+                                            onChange={(e) => handleInputChange('yourEmail', e.target.value)}
+                                            placeholder="you@example.com"
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Your Phone:</label>
+                                        <input
+                                            type="text"
+                                            value={formData.yourPhone}
+                                            onChange={(e) => handleInputChange('yourPhone', e.target.value)}
+                                            placeholder="(555) 123-4567"
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Your Address:</label>
+                                        <input
+                                            type="text"
+                                            value={formData.yourAddress}
+                                            onChange={(e) => handleInputChange('yourAddress', e.target.value)}
+                                            placeholder="Street, City, State ZIP"
+                                        />
+                                    </div>
+
+                                    {formData.role !== 'brand' && (
+                                        <>
+                                            <div className="form-group">
+                                                <label>Your Primary Platform:</label>
+                                                <select
+                                                    value={formData.yourPlatform}
+                                                    onChange={(e) => handleInputChange('yourPlatform', e.target.value)}
+                                                >
+                                                    <option value="">Select platform</option>
+                                                    <option value="Instagram">Instagram</option>
+                                                    <option value="TikTok">TikTok</option>
+                                                    <option value="YouTube">YouTube</option>
+                                                    <option value="Twitter/X">Twitter/X</option>
+                                                    <option value="Facebook">Facebook</option>
+                                                    <option value="LinkedIn">LinkedIn</option>
+                                                    <option value="Other">Other</option>
+                                                </select>
+                                            </div>
+
+                                            <div className="form-group">
+                                                <label>Your Handle / Username:</label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.yourHandle}
+                                                    onChange={(e) => handleInputChange('yourHandle', e.target.value)}
+                                                    placeholder="@yourusername"
+                                                />
+                                            </div>
+                                        </>
+                                    )}
+                                </>
+                            )}
+
+                            {activeTab === 'other-party' && (
+                                <>
+                                    <div className="form-group">
+                                        <label>{formData.role === 'brand' ? 'Influencer / Creator Name:' : 'Brand / Company Name:'}</label>
+                                        <input
+                                            type="text"
+                                            value={formData.otherPartyName}
+                                            onChange={(e) => handleInputChange('otherPartyName', e.target.value)}
+                                            placeholder={formData.role === 'brand' ? 'Influencer name' : 'Brand name'}
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Contact Person Name:</label>
+                                        <input
+                                            type="text"
+                                            value={formData.otherPartyRepName}
+                                            onChange={(e) => handleInputChange('otherPartyRepName', e.target.value)}
+                                            placeholder="Name of contact person"
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Email:</label>
+                                        <input
+                                            type="email"
+                                            value={formData.otherPartyEmail}
+                                            onChange={(e) => handleInputChange('otherPartyEmail', e.target.value)}
+                                            placeholder="contact@company.com"
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Address / Contact Info:</label>
+                                        <input
+                                            type="text"
+                                            value={formData.otherPartyContact}
+                                            onChange={(e) => handleInputChange('otherPartyContact', e.target.value)}
+                                            placeholder="Address or other contact information"
+                                        />
+                                    </div>
+
+                                    {formData.role !== 'brand' && (
+                                        <div className="form-group">
+                                            <label>Website:</label>
+                                            <input
+                                                type="text"
+                                                value={formData.otherPartyWebsite}
+                                                onChange={(e) => handleInputChange('otherPartyWebsite', e.target.value)}
+                                                placeholder="https://brandwebsite.com"
+                                            />
+                                        </div>
+                                    )}
+                                </>
+                            )}
+
+                            {activeTab === 'agreement' && (
+                                <>
+                                    {formData.role === 'ugc' ? (
+                                        <div className="info-box">
+                                            <strong>UGC Note:</strong> As a UGC creator, you may not have a formal agreement. Skip this tab if the brand used your content without ever contacting you. Proceed if you did communicate with the brand about usage.
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <div className="form-group">
+                                                <label>How was the agreement made?</label>
+                                                <select
+                                                    value={formData.agreementType}
+                                                    onChange={(e) => handleInputChange('agreementType', e.target.value)}
+                                                >
+                                                    <option value="dm">Instagram/TikTok DMs</option>
+                                                    <option value="email">Email</option>
+                                                    <option value="formal">Formal written contract</option>
+                                                    <option value="verbal">Verbal agreement</option>
+                                                </select>
+                                            </div>
+
+                                            <div className="form-group">
+                                                <label>Agreement Date:</label>
+                                                <input
+                                                    type="date"
+                                                    value={formData.agreementDate}
+                                                    onChange={(e) => handleInputChange('agreementDate', e.target.value)}
+                                                />
+                                            </div>
+
+                                            {formData.agreementType === 'dm' && (
+                                                <div className="form-group">
+                                                    <label>Platform where agreement was made:</label>
+                                                    <input
+                                                        type="text"
+                                                        value={formData.agreementPlatform}
+                                                        onChange={(e) => handleInputChange('agreementPlatform', e.target.value)}
+                                                        placeholder="e.g., Instagram, TikTok"
+                                                    />
+                                                </div>
+                                            )}
+
+                                            <div className="form-group">
+                                                <label>Number of Posts Required:</label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.numberOfPosts}
+                                                    onChange={(e) => handleInputChange('numberOfPosts', e.target.value)}
+                                                    placeholder="e.g., 3 Instagram posts, 5 TikToks"
+                                                />
+                                            </div>
+
+                                            <div className="form-group">
+                                                <label>Platforms (select all that apply):</label>
+                                                <div className="checkbox-group">
+                                                    {['Instagram', 'TikTok', 'YouTube', 'Facebook', 'Twitter/X', 'LinkedIn', 'Blog'].map(platform => (
+                                                        <div key={platform} className="checkbox-item">
+                                                            <input
+                                                                type="checkbox"
+                                                                id={`platform-${platform}`}
+                                                                checked={formData.platforms.includes(platform)}
+                                                                onChange={() => handleCheckboxChange('platforms', platform)}
+                                                            />
+                                                            <label htmlFor={`platform-${platform}`}>{platform}</label>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            <div className="form-group">
+                                                <label>Deliverables / Content Description:</label>
+                                                <textarea
+                                                    value={formData.deliverables}
+                                                    onChange={(e) => handleInputChange('deliverables', e.target.value)}
+                                                    placeholder="Describe what content was to be created (e.g., 3 Instagram Reels showing product unboxing and review)"
+                                                />
+                                            </div>
+
+                                            <div className="form-group">
+                                                <label>Posting Schedule / Dates:</label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.postingSchedule}
+                                                    onChange={(e) => handleInputChange('postingSchedule', e.target.value)}
+                                                    placeholder="e.g., March 15, 18, and 22"
+                                                />
+                                            </div>
+
+                                            <div className="form-group">
+                                                <label>Payment Amount:</label>
+                                                <input
+                                                    type="number"
+                                                    value={formData.paymentAmount}
+                                                    onChange={(e) => handleInputChange('paymentAmount', e.target.value)}
+                                                    placeholder="2000"
+                                                />
+                                            </div>
+
+                                            <div className="form-group">
+                                                <label>Payment Terms:</label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.paymentTerms}
+                                                    onChange={(e) => handleInputChange('paymentTerms', e.target.value)}
+                                                    placeholder="e.g., Net 30, due within 14 days of final post"
+                                                />
+                                            </div>
+
+                                            <hr className="section-divider" />
+
+                                            <div className="form-group">
+                                                <label>Usage Rights Granted:</label>
+                                                <textarea
+                                                    value={formData.usageRights}
+                                                    onChange={(e) => handleInputChange('usageRights', e.target.value)}
+                                                    placeholder="Describe what usage rights were granted (e.g., 'Organic social media posts only', 'Instagram and Facebook organic posts for 30 days', 'All media worldwide in perpetuity')"
+                                                />
+                                            </div>
+
+                                            <div className="form-group">
+                                                <label>Usage Term / Duration:</label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.usageRightsTerm}
+                                                    onChange={(e) => handleInputChange('usageRightsTerm', e.target.value)}
+                                                    placeholder="e.g., 30 days, 6 months, perpetual"
+                                                />
+                                            </div>
+
+                                            <div className="form-group">
+                                                <label>Media Types Authorized:</label>
+                                                <div className="checkbox-group">
+                                                    {['Organic social posts', 'Paid social ads', 'Website', 'Email marketing', 'Print', 'TV/Video', 'Out-of-home (billboards, etc.)', 'Whitelisting/boosting'].map(media => (
+                                                        <div key={media} className="checkbox-item">
+                                                            <input
+                                                                type="checkbox"
+                                                                id={`media-${media}`}
+                                                                checked={formData.usageRightsMedia.includes(media)}
+                                                                onChange={() => handleCheckboxChange('usageRightsMedia', media)}
+                                                            />
+                                                            <label htmlFor={`media-${media}`}>{media}</label>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            <div className="form-group">
+                                                <label>Geographic Scope:</label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.usageRightsTerritories}
+                                                    onChange={(e) => handleInputChange('usageRightsTerritories', e.target.value)}
+                                                    placeholder="e.g., U.S. only, North America, Worldwide"
+                                                />
+                                            </div>
+
+                                            <div className="form-group">
+                                                <div className="checkbox-item">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="exclusivity"
+                                                        checked={formData.exclusivityClause}
+                                                        onChange={(e) => handleInputChange('exclusivityClause', e.target.checked)}
+                                                    />
+                                                    <label htmlFor="exclusivity">Agreement included exclusivity clause</label>
+                                                </div>
+                                            </div>
+
+                                            {formData.exclusivityClause && (
+                                                <div className="form-group">
+                                                    <label>Exclusivity Details:</label>
+                                                    <textarea
+                                                        value={formData.exclusivityDetails}
+                                                        onChange={(e) => handleInputChange('exclusivityDetails', e.target.value)}
+                                                        placeholder="Describe the exclusivity terms (e.g., 'Cannot promote competitor skincare brands for 90 days')"
+                                                    />
+                                                </div>
+                                            )}
+
+                                            <div className="form-group">
+                                                <div className="checkbox-item">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="approval"
+                                                        checked={formData.approvalRequired}
+                                                        onChange={(e) => handleInputChange('approvalRequired', e.target.checked)}
+                                                    />
+                                                    <label htmlFor="approval">Content approval was required before posting</label>
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
+                                </>
+                            )}
+
+                            {activeTab === 'dispute' && (
+                                <>
+                                    <div className="form-group">
+                                        <label>What is the issue? (select all that apply)</label>
+                                        <div className="checkbox-group">
+                                            {formData.role === 'brand' ? (
+                                                <>
+                                                    <div className="checkbox-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="dispute-no-post"
+                                                            checked={formData.influencerFailures.includes('no-post')}
+                                                            onChange={() => handleCheckboxChange('influencerFailures', 'no-post')}
+                                                        />
+                                                        <label htmlFor="dispute-no-post">Influencer failed to post required content</label>
+                                                    </div>
+                                                    <div className="checkbox-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="dispute-late-post"
+                                                            checked={formData.influencerFailures.includes('late-post')}
+                                                            onChange={() => handleCheckboxChange('influencerFailures', 'late-post')}
+                                                        />
+                                                        <label htmlFor="dispute-late-post">Content posted late</label>
+                                                    </div>
+                                                    <div className="checkbox-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="dispute-off-brief"
+                                                            checked={formData.influencerFailures.includes('off-brief')}
+                                                            onChange={() => handleCheckboxChange('influencerFailures', 'off-brief')}
+                                                        />
+                                                        <label htmlFor="dispute-off-brief">Content didn't follow creative brief</label>
+                                                    </div>
+                                                    <div className="checkbox-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="dispute-low-quality"
+                                                            checked={formData.influencerFailures.includes('low-quality')}
+                                                            onChange={() => handleCheckboxChange('influencerFailures', 'low-quality')}
+                                                        />
+                                                        <label htmlFor="dispute-low-quality">Content quality below standards</label>
+                                                    </div>
+                                                    <div className="checkbox-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="dispute-exclusivity"
+                                                            checked={formData.influencerFailures.includes('exclusivity')}
+                                                            onChange={() => handleCheckboxChange('influencerFailures', 'exclusivity')}
+                                                        />
+                                                        <label htmlFor="dispute-exclusivity">Violated exclusivity by posting competitor content</label>
+                                                    </div>
+                                                    <div className="checkbox-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="dispute-no-disclosure"
+                                                            checked={formData.influencerFailures.includes('no-disclosure')}
+                                                            onChange={() => handleCheckboxChange('influencerFailures', 'no-disclosure')}
+                                                        />
+                                                        <label htmlFor="dispute-no-disclosure">Failed to include required FTC disclosures</label>
+                                                    </div>
+                                                    <div className="checkbox-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="dispute-false-claims"
+                                                            checked={formData.influencerFailures.includes('false-claims')}
+                                                            onChange={() => handleCheckboxChange('influencerFailures', 'false-claims')}
+                                                        />
+                                                        <label htmlFor="dispute-false-claims">Made false or unsubstantiated claims</label>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <div className="checkbox-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="dispute-non-payment"
+                                                            checked={formData.disputeType.includes('non-payment')}
+                                                            onChange={() => handleCheckboxChange('disputeType', 'non-payment')}
+                                                        />
+                                                        <label htmlFor="dispute-non-payment">Non-payment / late payment</label>
+                                                    </div>
+                                                    <div className="checkbox-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="dispute-unauthorized"
+                                                            checked={formData.disputeType.includes('unauthorized-use')}
+                                                            onChange={() => handleCheckboxChange('disputeType', 'unauthorized-use')}
+                                                        />
+                                                        <label htmlFor="dispute-unauthorized">Unauthorized use of my content</label>
+                                                    </div>
+                                                    <div className="checkbox-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="dispute-scope"
+                                                            checked={formData.disputeType.includes('scope-creep')}
+                                                            onChange={() => handleCheckboxChange('disputeType', 'scope-creep')}
+                                                        />
+                                                        <label htmlFor="dispute-scope">Using content beyond agreed scope (scope creep)</label>
+                                                    </div>
+                                                    <div className="checkbox-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="dispute-editing"
+                                                            checked={formData.disputeType.includes('editing')}
+                                                            onChange={() => handleCheckboxChange('disputeType', 'editing')}
+                                                        />
+                                                        <label htmlFor="dispute-editing">Edited my content without permission</label>
+                                                    </div>
+                                                </>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {formData.role === 'brand' && (
+                                        <div className="form-group">
+                                            <label>Details about influencer failures:</label>
+                                            <textarea
+                                                value={formData.influencerFailureDetails}
+                                                onChange={(e) => handleInputChange('influencerFailureDetails', e.target.value)}
+                                                placeholder="Provide specific details about what the influencer failed to do, including dates, communications, and how it violated the agreement"
+                                                rows="6"
+                                            />
+                                        </div>
+                                    )}
+
+                                    {formData.role !== 'brand' && (
+                                        <>
+                                            <div className="form-group">
+                                                <label>When did you complete your obligations?</label>
+                                                <input
+                                                    type="date"
+                                                    value={formData.performanceDate}
+                                                    onChange={(e) => handleInputChange('performanceDate', e.target.value)}
+                                                />
+                                            </div>
+
+                                            <div className="form-group">
+                                                <label>Proof of Performance:</label>
+                                                <textarea
+                                                    value={formData.performanceProof}
+                                                    onChange={(e) => handleInputChange('performanceProof', e.target.value)}
+                                                    placeholder="Describe how you can prove you fulfilled obligations (e.g., 'Posted content on Instagram @myhandle on March 15, 18, and 22 as agreed. All posts remain live. Links: [URLs]')"
+                                                />
+                                            </div>
+
+                                            {formData.disputeType.includes('non-payment') && (
+                                                <>
+                                                    <div className="form-group">
+                                                        <label>Payment Due Date:</label>
+                                                        <input
+                                                            type="date"
+                                                            value={formData.paymentDueDate}
+                                                            onChange={(e) => handleInputChange('paymentDueDate', e.target.value)}
+                                                        />
+                                                    </div>
+
+                                                    <div className="form-group">
+                                                        <label>Total Amount Owed:</label>
+                                                        <input
+                                                            type="number"
+                                                            value={formData.amountOwed}
+                                                            onChange={(e) => handleInputChange('amountOwed', e.target.value)}
+                                                            placeholder="2000"
+                                                        />
+                                                    </div>
+
+                                                    <div className="form-group">
+                                                        <label>Late Fees / Interest:</label>
+                                                        <input
+                                                            type="text"
+                                                            value={formData.lateFeesInterest}
+                                                            onChange={(e) => handleInputChange('lateFeesInterest', e.target.value)}
+                                                            placeholder="e.g., 10% annual interest = $167"
+                                                        />
+                                                    </div>
+                                                </>
+                                            )}
+
+                                            {(formData.disputeType.includes('unauthorized-use') || formData.disputeType.includes('scope-creep') || formData.role === 'ugc') && (
+                                                <>
+                                                    <hr className="section-divider" />
+
+                                                    <div style={{color: '#e11d48', marginBottom: '1rem', fontSize: '1.1rem', fontWeight: '600'}}>Unauthorized Uses</div>
+                                                    <p style={{marginBottom: '1rem', color: '#4a5568'}}>
+                                                        Document each place your content is being used without permission or beyond the agreed scope:
+                                                    </p>
+
+                                                    <div className="form-group">
+                                                        <label>Platform / Location:</label>
+                                                        <select
+                                                            value={unauthorizedUseInputs.platform}
+                                                            onChange={(e) => setUnauthorizedUseInputs({...unauthorizedUseInputs, platform: e.target.value})}
+                                                        >
+                                                            <option value="">Select platform</option>
+                                                            <option value="Facebook Ads">Facebook Ads</option>
+                                                            <option value="Instagram Ads">Instagram Ads</option>
+                                                            <option value="TikTok Ads">TikTok Ads</option>
+                                                            <option value="Google Display Ads">Google Display Ads</option>
+                                                            <option value="Brand Website">Brand Website</option>
+                                                            <option value="Email Marketing">Email Marketing</option>
+                                                            <option value="Print Advertising">Print Advertising</option>
+                                                            <option value="Billboard / OOH">Billboard / Out-of-Home</option>
+                                                            <option value="Product Packaging">Product Packaging</option>
+                                                            <option value="TV Commercial">TV Commercial</option>
+                                                            <option value="Other">Other</option>
+                                                        </select>
+                                                    </div>
+
+                                                    <div className="form-group">
+                                                        <label>Type of Use:</label>
+                                                        <input
+                                                            type="text"
+                                                            value={unauthorizedUseInputs.useType}
+                                                            onChange={(e) => setUnauthorizedUseInputs({...unauthorizedUseInputs, useType: e.target.value})}
+                                                            placeholder="e.g., Paid ad, Website banner, Email header"
+                                                        />
+                                                    </div>
+
+                                                    <div className="form-group">
+                                                        <label>URL / Location Details:</label>
+                                                        <input
+                                                            type="text"
+                                                            value={unauthorizedUseInputs.url}
+                                                            onChange={(e) => setUnauthorizedUseInputs({...unauthorizedUseInputs, url: e.target.value})}
+                                                            placeholder="https://example.com or specific location details"
+                                                        />
+                                                    </div>
+
+                                                    <div className="form-group">
+                                                        <label>Date Discovered:</label>
+                                                        <input
+                                                            type="date"
+                                                            value={unauthorizedUseInputs.dateDiscovered}
+                                                            onChange={(e) => setUnauthorizedUseInputs({...unauthorizedUseInputs, dateDiscovered: e.target.value})}
+                                                        />
+                                                    </div>
+
+                                                    <div className="form-group">
+                                                        <label>Additional Details:</label>
+                                                        <textarea
+                                                            value={unauthorizedUseInputs.description}
+                                                            onChange={(e) => setUnauthorizedUseInputs({...unauthorizedUseInputs, description: e.target.value})}
+                                                            placeholder="e.g., 'Running in Meta Ad Library since April 1, estimated 500k impressions', 'Homepage banner since March 15', etc."
+                                                        />
+                                                    </div>
+
+                                                    <button className="add-usage-btn" onClick={addUnauthorizedUse}>
+                                                        + Add Unauthorized Use
+                                                    </button>
+
+                                                    {formData.unauthorizedUses.length > 0 && (
+                                                        <div className="usage-list">
+                                                            <div style={{color: '#e11d48', marginBottom: '1rem', fontSize: '1rem', fontWeight: '600'}}>Documented Unauthorized Uses:</div>
+                                                            {formData.unauthorizedUses.map((use) => (
+                                                                <div key={use.id} className="usage-item">
+                                                                    <div className="usage-item-header">
+                                                                        <strong>{use.platform} - {use.useType}</strong>
+                                                                        <button onClick={() => removeUnauthorizedUse(use.id)}>Remove</button>
+                                                                    </div>
+                                                                    <div style={{fontSize: '0.9rem', color: '#4a5568'}}>
+                                                                        {use.url && <div>URL: {use.url}</div>}
+                                                                        {use.dateDiscovered && <div>Discovered: {use.dateDiscovered}</div>}
+                                                                        {use.description && <div>{use.description}</div>}
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </>
+                                            )}
+                                        </>
+                                    )}
+
+                                    <hr className="section-divider" />
+
+                                    <div style={{color: '#e11d48', marginBottom: '1rem', fontSize: '1.1rem', fontWeight: '600'}}>FTC Compliance Issues</div>
+
+                                    <div className="form-group">
+                                        <label>FTC Violations (if applicable):</label>
+                                        <div className="checkbox-group">
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="ftc-no-disclosure"
+                                                    checked={formData.ftcViolations.includes('no-disclosure')}
+                                                    onChange={() => handleCheckboxChange('ftcViolations', 'no-disclosure')}
+                                                />
+                                                <label htmlFor="ftc-no-disclosure">No disclosure of material connection</label>
+                                            </div>
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="ftc-inadequate"
+                                                    checked={formData.ftcViolations.includes('inadequate-disclosure')}
+                                                    onChange={() => handleCheckboxChange('ftcViolations', 'inadequate-disclosure')}
+                                                />
+                                                <label htmlFor="ftc-inadequate">Disclosure not clear and conspicuous</label>
+                                            </div>
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="ftc-false"
+                                                    checked={formData.ftcViolations.includes('false-claims')}
+                                                    onChange={() => handleCheckboxChange('ftcViolations', 'false-claims')}
+                                                />
+                                                <label htmlFor="ftc-false">False or unsubstantiated claims</label>
+                                            </div>
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="ftc-edited"
+                                                    checked={formData.ftcViolations.includes('edited-disclosure')}
+                                                    onChange={() => handleCheckboxChange('ftcViolations', 'edited-disclosure')}
+                                                />
+                                                <label htmlFor="ftc-edited">Brand removed or altered required disclosures</label>
+                                            </div>
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="ftc-misleading"
+                                                    checked={formData.ftcViolations.includes('misleading')}
+                                                    onChange={() => handleCheckboxChange('ftcViolations', 'misleading')}
+                                                />
+                                                <label htmlFor="ftc-misleading">Misleading endorsement representation</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {formData.ftcViolations.length > 0 && (
+                                        <div className="form-group">
+                                            <label>FTC Violation Details:</label>
+                                            <textarea
+                                                value={formData.ftcDetails}
+                                                onChange={(e) => handleInputChange('ftcDetails', e.target.value)}
+                                                placeholder="Provide specific details about FTC compliance issues"
+                                                rows="4"
+                                            />
+                                        </div>
+                                    )}
+
+                                    <hr className="section-divider" />
+
+                                    <div style={{color: '#e11d48', marginBottom: '1rem', fontSize: '1.1rem', fontWeight: '600'}}>Third-Party IP Issues</div>
+
+                                    <div className="form-group">
+                                        <div className="checkbox-item">
+                                            <input
+                                                type="checkbox"
+                                                id="music-issues"
+                                                checked={formData.musicIssues}
+                                                onChange={(e) => handleInputChange('musicIssues', e.target.checked)}
+                                            />
+                                            <label htmlFor="music-issues">Content contains third-party music or other copyrighted material</label>
+                                        </div>
+                                    </div>
+
+                                    {formData.musicIssues && (
+                                        <div className="form-group">
+                                            <label>Music / Third-Party IP Details:</label>
+                                            <textarea
+                                                value={formData.musicDetails}
+                                                onChange={(e) => handleInputChange('musicDetails', e.target.value)}
+                                                placeholder="Describe the third-party IP issue (e.g., 'The TikTok content used popular music licensed by TikTok for user posts but not for commercial advertising')"
+                                            />
+                                        </div>
+                                    )}
+                                </>
+                            )}
+
+                            {activeTab === 'evidence' && (
+                                <>
+                                    <div className="info-box">
+                                        <strong>Evidence is Critical:</strong> Before sending any demand letter, ensure you have comprehensive documentation. The more evidence you have, the stronger your position.
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Evidence You Have (select all that apply):</label>
+                                        <div className="checkbox-group">
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="evidence-agreement"
+                                                    checked={formData.evidenceTypes.includes('agreement')}
+                                                    onChange={() => handleCheckboxChange('evidenceTypes', 'agreement')}
+                                                />
+                                                <label htmlFor="evidence-agreement">Complete agreement documentation (DMs, emails, signed contract)</label>
+                                            </div>
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="evidence-deliverables"
+                                                    checked={formData.evidenceTypes.includes('deliverables')}
+                                                    onChange={() => handleCheckboxChange('evidenceTypes', 'deliverables')}
+                                                />
+                                                <label htmlFor="evidence-deliverables">Links and screenshots of content created/posted</label>
+                                            </div>
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="evidence-approval"
+                                                    checked={formData.evidenceTypes.includes('approval')}
+                                                    onChange={() => handleCheckboxChange('evidenceTypes', 'approval')}
+                                                />
+                                                <label htmlFor="evidence-approval">Approval communications and timestamps</label>
+                                            </div>
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="evidence-metrics"
+                                                    checked={formData.evidenceTypes.includes('metrics')}
+                                                    onChange={() => handleCheckboxChange('evidenceTypes', 'metrics')}
+                                                />
+                                                <label htmlFor="evidence-metrics">Engagement metrics and performance data</label>
+                                            </div>
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="evidence-unauthorized"
+                                                    checked={formData.evidenceTypes.includes('unauthorized-screenshots')}
+                                                    onChange={() => handleCheckboxChange('evidenceTypes', 'unauthorized-screenshots')}
+                                                />
+                                                <label htmlFor="evidence-unauthorized">Screenshots of unauthorized uses across platforms</label>
+                                            </div>
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="evidence-ad-library"
+                                                    checked={formData.evidenceTypes.includes('ad-library')}
+                                                    onChange={() => handleCheckboxChange('evidenceTypes', 'ad-library')}
+                                                />
+                                                <label htmlFor="evidence-ad-library">Meta Ad Library captures showing paid campaigns</label>
+                                            </div>
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="evidence-invoices"
+                                                    checked={formData.evidenceTypes.includes('invoices')}
+                                                    onChange={() => handleCheckboxChange('evidenceTypes', 'invoices')}
+                                                />
+                                                <label htmlFor="evidence-invoices">Invoices and payment communications</label>
+                                            </div>
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="evidence-timeline"
+                                                    checked={formData.evidenceTypes.includes('timeline')}
+                                                    onChange={() => handleCheckboxChange('evidenceTypes', 'timeline')}
+                                                />
+                                                <label htmlFor="evidence-timeline">Complete timeline of all communications</label>
+                                            </div>
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="evidence-archive"
+                                                    checked={formData.evidenceTypes.includes('website-archive')}
+                                                    onChange={() => handleCheckboxChange('evidenceTypes', 'website-archive')}
+                                                />
+                                                <label htmlFor="evidence-archive">Website archives and cached pages</label>
+                                            </div>
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="evidence-witness"
+                                                    checked={formData.evidenceTypes.includes('witness')}
+                                                    onChange={() => handleCheckboxChange('evidenceTypes', 'witness')}
+                                                />
+                                                <label htmlFor="evidence-witness">Third-party witness statements</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Additional Evidence Description:</label>
+                                        <textarea
+                                            value={formData.additionalEvidence}
+                                            onChange={(e) => handleInputChange('additionalEvidence', e.target.value)}
+                                            placeholder="Describe any other evidence you have, how it's organized, and where it's stored"
+                                            rows="4"
+                                        />
+                                    </div>
+
+                                    <div className="resources-section">
+                                        <div style={{color: '#e11d48', marginBottom: '1rem', fontSize: '1.1rem', fontWeight: '600'}}>Evidence Gathering Resources</div>
+                                        <ul>
+                                            <li><a href="https://www.facebook.com/ads/library" target="_blank" rel="noopener noreferrer">Meta Ad Library - Search for ads by page</a></li>
+                                            <li><a href="https://archive.org/web/" target="_blank" rel="noopener noreferrer">Internet Archive Wayback Machine - View archived web pages</a></li>
+                                            <li><strong>Platform Export Tools:</strong> Use Instagram Data Download, TikTok Download Data features to export your DMs and content</li>
+                                            <li><strong>Screenshot Tools:</strong> Use full-page screenshot tools (e.g., Full Page Screen Capture Chrome extension) for complete documentation</li>
+                                        </ul>
+                                    </div>
+                                </>
+                            )}
+
+                            {activeTab === 'demands' && (
+                                <>
+                                    <div className="form-group">
+                                        <label>What are you demanding? (select all that apply)</label>
+                                        <div className="checkbox-group">
+                                            {formData.role === 'brand' ? (
+                                                <>
+                                                    <div className="checkbox-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="demand-corrective"
+                                                            checked={formData.demandTypes.includes('corrective-action')}
+                                                            onChange={() => handleCheckboxChange('demandTypes', 'corrective-action')}
+                                                        />
+                                                        <label htmlFor="demand-corrective">Corrective action (fix disclosures, remove posts, etc.)</label>
+                                                    </div>
+                                                    <div className="checkbox-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="demand-withhold"
+                                                            checked={formData.demandTypes.includes('withhold-payment')}
+                                                            onChange={() => handleCheckboxChange('demandTypes', 'withhold-payment')}
+                                                        />
+                                                        <label htmlFor="demand-withhold">Withhold payment</label>
+                                                    </div>
+                                                    <div className="checkbox-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="demand-cure"
+                                                            checked={formData.demandTypes.includes('cure-period')}
+                                                            onChange={() => handleCheckboxChange('demandTypes', 'cure-period')}
+                                                        />
+                                                        <label htmlFor="demand-cure">Provide cure period / opportunity to fix</label>
+                                                    </div>
+                                                    <div className="checkbox-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="demand-termination"
+                                                            checked={formData.demandTypes.includes('termination')}
+                                                            onChange={() => handleCheckboxChange('demandTypes', 'termination')}
+                                                        />
+                                                        <label htmlFor="demand-termination">Terminate agreement</label>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <div className="checkbox-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="demand-payment"
+                                                            checked={formData.demandTypes.includes('payment')}
+                                                            onChange={() => handleCheckboxChange('demandTypes', 'payment')}
+                                                        />
+                                                        <label htmlFor="demand-payment">Payment of amount owed</label>
+                                                    </div>
+                                                    <div className="checkbox-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="demand-cessation"
+                                                            checked={formData.demandTypes.includes('immediate-cessation')}
+                                                            onChange={() => handleCheckboxChange('demandTypes', 'immediate-cessation')}
+                                                        />
+                                                        <label htmlFor="demand-cessation">Immediate cessation and removal of content</label>
+                                                    </div>
+                                                    <div className="checkbox-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="demand-retroactive"
+                                                            checked={formData.demandTypes.includes('retroactive-license')}
+                                                            onChange={() => handleCheckboxChange('demandTypes', 'retroactive-license')}
+                                                        />
+                                                        <label htmlFor="demand-retroactive">Retroactive license payment for past unauthorized use</label>
+                                                    </div>
+                                                    <div className="checkbox-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="demand-future"
+                                                            checked={formData.demandTypes.includes('future-license')}
+                                                            onChange={() => handleCheckboxChange('demandTypes', 'future-license')}
+                                                        />
+                                                        <label htmlFor="demand-future">Future license terms / ongoing usage rights</label>
+                                                    </div>
+                                                    <div className="checkbox-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="demand-accounting"
+                                                            checked={formData.demandTypes.includes('accounting')}
+                                                            onChange={() => handleCheckboxChange('demandTypes', 'accounting')}
+                                                        />
+                                                        <label htmlFor="demand-accounting">Complete accounting of all uses</label>
+                                                    </div>
+                                                    <div className="checkbox-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="demand-confirmation"
+                                                            checked={formData.demandTypes.includes('written-confirmation')}
+                                                            onChange={() => handleCheckboxChange('demandTypes', 'written-confirmation')}
+                                                        />
+                                                        <label htmlFor="demand-confirmation">Written confirmation of rights and future compliance</label>
+                                                    </div>
+                                                </>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {formData.demandTypes.includes('payment') && (
+                                        <div className="form-group">
+                                            <label>Payment Amount Demanded:</label>
+                                            <input
+                                                type="number"
+                                                value={formData.paymentDemandAmount}
+                                                onChange={(e) => handleInputChange('paymentDemandAmount', e.target.value)}
+                                                placeholder="Total amount including late fees, interest, or additional licensing fees"
+                                            />
+                                        </div>
+                                    )}
+
+                                    {(formData.demandTypes.includes('retroactive-license') || formData.demandTypes.includes('future-license')) && (
+                                        <div className="form-group">
+                                            <label>Licensing Terms:</label>
+                                            <textarea
+                                                value={formData.licensingTerms}
+                                                onChange={(e) => handleInputChange('licensingTerms', e.target.value)}
+                                                placeholder="Describe your licensing rates and terms (e.g., '$5,000 per month per platform for paid advertising use; $2,000 for website use; based on X months of unauthorized use, retroactive fee is $X')"
+                                                rows="4"
+                                            />
+                                        </div>
+                                    )}
+
+                                    {formData.demandTypes.includes('corrective-action') && (
+                                        <div className="form-group">
+                                            <label>Specific Corrective Actions Required:</label>
+                                            <textarea
+                                                value={formData.correctiveActions}
+                                                onChange={(e) => handleInputChange('correctiveActions', e.target.value)}
+                                                placeholder="Describe exactly what corrective actions are needed (e.g., 'Add clear and conspicuous #ad disclosure to all posts; Remove false claim about weight loss results; Post correction regarding [specific misstatement]')"
+                                                rows="4"
+                                            />
+                                        </div>
+                                    )}
+
+                                    <div className="form-group">
+                                        <label>Deadline for Response / Compliance:</label>
+                                        <input
+                                            type="date"
+                                            value={formData.deadlineDate}
+                                            onChange={(e) => handleInputChange('deadlineDate', e.target.value)}
+                                        />
+                                    </div>
+
+                                    <div className="info-box">
+                                        <strong>Setting Deadlines:</strong> For payment demands, 14-21 days is typical. For copyright infringement / unauthorized use, 7-14 days is appropriate since harm is ongoing. For FTC compliance corrections, 3-7 days may be justified.
+                                    </div>
+                                </>
+                            )}
+
+                            {activeTab === 'next-steps' && (
+                                <>
+                                    <div className="info-box">
+                                        <strong>Escalation Options:</strong> Having credible escalation paths strengthens your demand letter. Select the options you are realistically prepared to pursue if the letter doesn't resolve the matter.
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Escalation Options (select all you're willing to pursue):</label>
+                                        <div className="checkbox-group">
+                                            {formData.role === 'brand' ? (
+                                                <>
+                                                    <div className="checkbox-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="escalate-withhold"
+                                                            checked={formData.escalationOptions.includes('withhold-payment')}
+                                                            onChange={() => handleCheckboxChange('escalationOptions', 'withhold-payment')}
+                                                        />
+                                                        <label htmlFor="escalate-withhold">Withhold all outstanding payments</label>
+                                                    </div>
+                                                    <div className="checkbox-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="escalate-termination"
+                                                            checked={formData.escalationOptions.includes('termination')}
+                                                            onChange={() => handleCheckboxChange('escalationOptions', 'termination')}
+                                                        />
+                                                        <label htmlFor="escalate-termination">Terminate agreement and all future collaborations</label>
+                                                    </div>
+                                                    <div className="checkbox-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="escalate-ftc-brand"
+                                                            checked={formData.escalationOptions.includes('ftc')}
+                                                            onChange={() => handleCheckboxChange('escalationOptions', 'ftc')}
+                                                        />
+                                                        <label htmlFor="escalate-ftc-brand">Consider reporting FTC violations to appropriate agencies</label>
+                                                    </div>
+                                                    <div className="checkbox-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="escalate-litigation-brand"
+                                                            checked={formData.escalationOptions.includes('litigation')}
+                                                            onChange={() => handleCheckboxChange('escalationOptions', 'litigation')}
+                                                        />
+                                                        <label htmlFor="escalate-litigation-brand">Pursue legal action for breach of contract</label>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <div className="checkbox-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="escalate-dmca"
+                                                            checked={formData.escalationOptions.includes('dmca')}
+                                                            onChange={() => handleCheckboxChange('escalationOptions', 'dmca')}
+                                                        />
+                                                        <label htmlFor="escalate-dmca">Send DMCA takedown notices</label>
+                                                    </div>
+                                                    <div className="checkbox-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="escalate-ccb"
+                                                            checked={formData.escalationOptions.includes('ccb')}
+                                                            onChange={() => handleCheckboxChange('escalationOptions', 'ccb')}
+                                                        />
+                                                        <label htmlFor="escalate-ccb">File claim with Copyright Claims Board</label>
+                                                    </div>
+                                                    <div className="checkbox-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="escalate-federal"
+                                                            checked={formData.escalationOptions.includes('federal-court')}
+                                                            onChange={() => handleCheckboxChange('escalationOptions', 'federal-court')}
+                                                        />
+                                                        <label htmlFor="escalate-federal">File federal copyright infringement lawsuit</label>
+                                                    </div>
+                                                    <div className="checkbox-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="escalate-small-claims"
+                                                            checked={formData.escalationOptions.includes('small-claims')}
+                                                            onChange={() => handleCheckboxChange('escalationOptions', 'small-claims')}
+                                                        />
+                                                        <label htmlFor="escalate-small-claims">File in small claims court for unpaid compensation</label>
+                                                    </div>
+                                                    <div className="checkbox-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="escalate-ftc"
+                                                            checked={formData.escalationOptions.includes('ftc')}
+                                                            onChange={() => handleCheckboxChange('escalationOptions', 'ftc')}
+                                                        />
+                                                        <label htmlFor="escalate-ftc">File FTC complaint for deceptive endorsements</label>
+                                                    </div>
+                                                    <div className="checkbox-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="escalate-ag"
+                                                            checked={formData.escalationOptions.includes('state-ag')}
+                                                            onChange={() => handleCheckboxChange('escalationOptions', 'state-ag')}
+                                                        />
+                                                        <label htmlFor="escalate-ag">File complaint with State Attorney General</label>
+                                                    </div>
+                                                </>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {formData.role !== 'brand' && formData.escalationOptions.includes('ccb') && (
+                                        <>
+                                            <div className="form-group">
+                                                <div className="checkbox-item">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="copyright-registered"
+                                                        checked={formData.copyrightRegistered}
+                                                        onChange={(e) => handleInputChange('copyrightRegistered', e.target.checked)}
+                                                    />
+                                                    <label htmlFor="copyright-registered">My content is registered with U.S. Copyright Office</label>
+                                                </div>
+                                            </div>
+
+                                            {formData.copyrightRegistered && (
+                                                <div className="form-group">
+                                                    <label>Copyright Registration Number:</label>
+                                                    <input
+                                                        type="text"
+                                                        value={formData.registrationNumber}
+                                                        onChange={(e) => handleInputChange('registrationNumber', e.target.value)}
+                                                        placeholder="e.g., VA 2-123-456"
+                                                    />
+                                                </div>
+                                            )}
+
+                                            <div className="form-group">
+                                                <label>Estimated Claim Value (for CCB):</label>
+                                                <input
+                                                    type="number"
+                                                    value={formData.claimValue}
+                                                    onChange={(e) => handleInputChange('claimValue', e.target.value)}
+                                                    placeholder="Maximum $30,000 for CCB"
+                                                />
+                                            </div>
+
+                                            <div className="info-box">
+                                                <strong>Copyright Claims Board:</strong> The CCB is a "small claims" alternative to federal court for copyright disputes under $30,000. Both parties must agree to participate (it's voluntary). Provides streamlined process and lower costs than federal litigation.
+                                            </div>
+                                        </>
+                                    )}
+
+                                    <div className="form-group">
+                                        <label>Additional Notes / Special Circumstances:</label>
+                                        <textarea
+                                            value={formData.additionalNotes}
+                                            onChange={(e) => handleInputChange('additionalNotes', e.target.value)}
+                                            placeholder="Any other information that should be included in the letter"
+                                            rows="4"
+                                        />
+                                    </div>
+
+                                    <div className="resources-section">
+                                        <div style={{color: '#e11d48', marginBottom: '1rem', fontSize: '1.1rem', fontWeight: '600'}}>Important Resources & Links</div>
+                                        <ul>
+                                            <li><strong>Copyright Claims Board:</strong> <a href="https://ccb.gov" target="_blank" rel="noopener noreferrer">ccb.gov</a> - File copyright claims up to $30k</li>
+                                            <li><strong>FTC Endorsement Guides:</strong> <a href="https://www.ftc.gov/business-guidance/resources/disclosures-101-social-media-influencers" target="_blank" rel="noopener noreferrer">Disclosures 101 for Influencers</a></li>
+                                            <li><strong>DMCA Takedown Info:</strong> <a href="https://www.copyright.gov/dmca/" target="_blank" rel="noopener noreferrer">U.S. Copyright Office DMCA Page</a></li>
+                                            <li><strong>Meta Ad Library:</strong> <a href="https://www.facebook.com/ads/library" target="_blank" rel="noopener noreferrer">Search for ads by page</a></li>
+                                            <li><strong>FTC Complaint:</strong> <a href="https://reportfraud.ftc.gov/" target="_blank" rel="noopener noreferrer">Report fraud to FTC</a></li>
+                                            <li><strong>State AG Offices:</strong> <a href="https://www.naag.org/find-my-ag/" target="_blank" rel="noopener noreferrer">Find your state Attorney General</a></li>
+                                            <li><strong>Further Reading:</strong> <a href="https://terms.law" target="_blank" rel="noopener noreferrer">Terms.law - UGC Usage Rights Article</a></li>
+                                        </ul>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+
+                        <div className="preview-section">
+                            <div className="preview-container">
+                                <div className="document-preview">
+                                    {generateLetter}
+                                </div>
+                            </div>
+                            <div className="button-group">
+                                <button className="btn btn-primary" onClick={copyToClipboard}>
+                                    Copy Letter
+                                </button>
+                                <button className="btn btn-secondary" onClick={downloadLetter}>
+                                    Download
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<InfluencerUGCDisputeGenerator />);
+    </script>
+</body>
+</html>
