@@ -1,0 +1,2149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Freelancer Nonpayment Demand Letter Generator</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #2d3748;
+            background: linear-gradient(135deg, #475569 0%, #3b82f6 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .tabs {
+            display: flex;
+            background: linear-gradient(135deg, #475569 0%, #3b82f6 100%);
+            padding: 1rem;
+            gap: 0.5rem;
+            overflow-x: auto;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            color: white;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .tab:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .tab.active {
+            background: white;
+            color: #3b82f6;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+            padding: 2rem;
+        }
+
+        .form-section {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .preview-section {
+            flex: 1;
+            min-width: 0;
+            position: sticky;
+            top: 2rem;
+            align-self: flex-start;
+            max-height: calc(100vh - 4rem);
+            overflow: visible;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #3b82f6;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="date"],
+        input[type="number"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #bfdbfe;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+            margin-top: 0.25rem;
+            cursor: pointer;
+            accent-color: #3b82f6;
+        }
+
+        .checkbox-item label {
+            margin: 0;
+            font-weight: 400;
+            color: #4a5568;
+            cursor: pointer;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .radio-item input[type="radio"] {
+            width: auto;
+            cursor: pointer;
+            accent-color: #3b82f6;
+        }
+
+        .radio-item label {
+            margin: 0;
+            font-weight: 400;
+            color: #4a5568;
+            cursor: pointer;
+        }
+
+        .preview-container {
+            background: #f8f9fa;
+            border: 2px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 2rem;
+            max-height: calc(100vh - 12rem);
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .preview-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .preview-container::-webkit-scrollbar-track {
+            background: #dbeafe;
+            border-radius: 4px;
+        }
+
+        .preview-container::-webkit-scrollbar-thumb {
+            background: #3b82f6;
+            border-radius: 4px;
+        }
+
+        .preview-container::-webkit-scrollbar-thumb:hover {
+            background: #2563eb;
+        }
+
+        .document-preview {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #2d3748;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            user-select: text;
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+        }
+
+        .document-preview::selection {
+            background: #bfdbfe;
+            color: #1a202c;
+        }
+
+        .document-preview::-moz-selection {
+            background: #bfdbfe;
+            color: #1a202c;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #475569 0%, #3b82f6 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #3b82f6;
+            border: 2px solid #3b82f6;
+        }
+
+        .btn-secondary:hover {
+            background: #eff6ff;
+        }
+
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+
+        .info-box strong {
+            color: #3b82f6;
+        }
+
+        .invoice-list {
+            margin-top: 1rem;
+        }
+
+        .invoice-item {
+            background: #eff6ff;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 1px solid #bfdbfe;
+        }
+
+        .invoice-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .invoice-item button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .add-invoice-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 1rem;
+            width: 100%;
+        }
+
+        .add-invoice-btn:hover {
+            background: #2563eb;
+        }
+
+        .resources-section {
+            background: #eff6ff;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 2rem;
+            border: 2px solid #bfdbfe;
+        }
+
+        .resources-section .section-title {
+            color: #3b82f6;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .resources-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .resources-section li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #bfdbfe;
+        }
+
+        .resources-section li:last-child {
+            border-bottom: none;
+        }
+
+        .resources-section a {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .resources-section a:hover {
+            text-decoration: underline;
+        }
+
+        .calculation-box {
+            background: #f0f9ff;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            border: 1px solid #bae6fd;
+        }
+
+        .calculation-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            font-size: 0.95rem;
+        }
+
+        .calculation-row.total {
+            border-top: 2px solid #3b82f6;
+            margin-top: 0.5rem;
+            padding-top: 0.75rem;
+            font-weight: 600;
+            color: #3b82f6;
+            font-size: 1.1rem;
+        }
+
+        .section-divider {
+            margin: 2rem 0;
+            border: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #bfdbfe, transparent);
+        }
+
+        @media (max-width: 968px) {
+            .content-wrapper {
+                flex-direction: column;
+            }
+
+            .preview-section {
+                position: static;
+                max-height: 600px;
+            }
+
+            .tabs {
+                flex-wrap: nowrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useMemo } = React;
+
+        function FreelancerNonpaymentGenerator() {
+            const [activeTab, setActiveTab] = useState('your-info');
+            const [formData, setFormData] = useState({
+                // Your Info
+                yourName: '',
+                yourEmail: '',
+                yourPhone: '',
+                yourAddress: '',
+                yourBusinessName: '',
+                yourState: '',
+                workType: '',
+
+                // Client Info
+                clientName: '',
+                clientType: 'company',
+                clientContact: '',
+                clientEmail: '',
+                clientAddress: '',
+                clientState: '',
+
+                // Contract & Work
+                contractType: 'written',
+                contractDate: '',
+                projectDescription: '',
+                scopeOfWork: '',
+                deliverables: '',
+                deliveryDate: '',
+                clientAcceptance: '',
+                currentUse: '',
+
+                // Scope creep
+                scopeCreep: false,
+                scopeCreepDetails: '',
+
+                // Payment Details
+                originalAmount: '',
+                paymentTerms: 'net-30',
+                customPaymentTerms: '',
+                lateFeeRate: '',
+                interestRate: '',
+
+                // Invoices
+                invoices: [],
+
+                // Calculations
+                totalOwed: '',
+                lateFees: '',
+                interest: '',
+
+                // Jurisdictional protections
+                nyFreelanceAct: false,
+                caFreelanceAct: false,
+                promptPaymentAct: false,
+                mechanicLien: false,
+                governmentContract: false,
+
+                // Dispute type
+                disputeTypes: [],
+                clientDispute: '',
+
+                // Evidence
+                evidenceTypes: [],
+                additionalEvidence: '',
+
+                // Demands
+                tone: 'firm',
+                demandTypes: [],
+                deadline: '',
+                paymentMethod: '',
+                openToPaymentPlan: false,
+                ipLeverage: false,
+                ipLeverageDetails: '',
+
+                // Next Steps
+                escalationOptions: [],
+                smallClaimsLimit: '',
+                additionalNotes: ''
+            });
+
+            const [invoiceInputs, setInvoiceInputs] = useState({
+                invoiceNumber: '',
+                invoiceDate: '',
+                invoiceAmount: '',
+                dueDate: '',
+                description: '',
+                status: 'unpaid'
+            });
+
+            const handleInputChange = (field, value) => {
+                setFormData(prev => ({ ...prev, [field]: value }));
+            };
+
+            const handleCheckboxChange = (field, value) => {
+                setFormData(prev => ({
+                    ...prev,
+                    [field]: prev[field].includes(value)
+                        ? prev[field].filter(item => item !== value)
+                        : [...prev[field], value]
+                }));
+            };
+
+            const addInvoice = () => {
+                if (invoiceInputs.invoiceNumber && invoiceInputs.invoiceAmount) {
+                    setFormData(prev => ({
+                        ...prev,
+                        invoices: [...prev.invoices, { ...invoiceInputs, id: Date.now() }]
+                    }));
+                    setInvoiceInputs({
+                        invoiceNumber: '',
+                        invoiceDate: '',
+                        invoiceAmount: '',
+                        dueDate: '',
+                        description: '',
+                        status: 'unpaid'
+                    });
+                }
+            };
+
+            const removeInvoice = (id) => {
+                setFormData(prev => ({
+                    ...prev,
+                    invoices: prev.invoices.filter(inv => inv.id !== id)
+                }));
+            };
+
+            const calculateTotals = useMemo(() => {
+                let principal = 0;
+                formData.invoices.forEach(inv => {
+                    if (inv.status === 'unpaid' || inv.status === 'partial') {
+                        principal += parseFloat(inv.invoiceAmount) || 0;
+                    }
+                });
+
+                const lateFees = parseFloat(formData.lateFees) || 0;
+                const interest = parseFloat(formData.interest) || 0;
+                const total = principal + lateFees + interest;
+
+                return { principal, lateFees, interest, total };
+            }, [formData.invoices, formData.lateFees, formData.interest]);
+
+            const generateLetter = useMemo(() => {
+                const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+                let letter = '';
+
+                // Header
+                if (formData.yourName) {
+                    letter += `${formData.yourName}\n`;
+                    if (formData.yourBusinessName) letter += `${formData.yourBusinessName}\n`;
+                    if (formData.yourAddress) letter += `${formData.yourAddress}\n`;
+                    if (formData.yourEmail) letter += `${formData.yourEmail}\n`;
+                    if (formData.yourPhone) letter += `${formData.yourPhone}\n`;
+                    letter += `\n`;
+                }
+
+                letter += `${today}\n\n`;
+
+                if (formData.clientName) {
+                    letter += `${formData.clientName}\n`;
+                    if (formData.clientContact) letter += `Attn: ${formData.clientContact}\n`;
+                    if (formData.clientAddress) letter += `${formData.clientAddress}\n`;
+                    if (formData.clientEmail) letter += `${formData.clientEmail}\n`;
+                    letter += `\n`;
+                }
+
+                // Subject line
+                letter += `Re: `;
+                if (formData.tone === 'gentle') {
+                    letter += `Payment Reminder - `;
+                } else if (formData.tone === 'pre-litigation') {
+                    letter += `Final Demand for Payment - `;
+                } else {
+                    letter += `Demand for Payment - `;
+                }
+
+                if (formData.projectDescription) {
+                    letter += `${formData.projectDescription}`;
+                } else {
+                    letter += `Unpaid Invoice(s)`;
+                }
+                letter += `\n\n`;
+
+                // Opening - varies by tone
+                letter += `Dear ${formData.clientContact || 'Sir/Madam'},\n\n`;
+
+                if (formData.tone === 'gentle') {
+                    letter += `I am writing to follow up regarding outstanding payment for ${formData.workType || 'services'} I provided to ${formData.clientName || 'your company'}. `;
+                    letter += `I want to ensure this matter hasn't simply been overlooked and that we can resolve it quickly.\n\n`;
+                } else if (formData.tone === 'pre-litigation') {
+                    letter += `This is my final attempt to resolve this matter before taking legal action. `;
+                    letter += `Despite my previous communications, you have failed to pay for ${formData.workType || 'services'} I performed and delivered. `;
+                    letter += `I am writing to demand immediate payment and to inform you of the legal consequences if this matter is not resolved within the timeframe specified below.\n\n`;
+                } else {
+                    // Firm tone
+                    letter += `I am writing to formally demand payment for ${formData.workType || 'services'} I provided to ${formData.clientName || 'your company'}. `;
+                    letter += `Despite fulfilling all my contractual obligations, payment remains outstanding and significantly overdue. `;
+                    letter += `This letter constitutes a formal demand for immediate payment.\n\n`;
+                }
+
+                // Contract/Agreement section
+                if (formData.contractType && formData.contractDate) {
+                    letter += `THE AGREEMENT:\n\n`;
+
+                    const contractTypeLabels = {
+                        'written': 'written contract',
+                        'email': 'email agreement',
+                        'verbal': 'verbal agreement',
+                        'implied': 'implied-in-fact contract based on our course of dealing',
+                        'sow': 'Statement of Work',
+                        'platform': 'platform-based agreement'
+                    };
+
+                    letter += `On ${formData.contractDate}, we entered into a ${contractTypeLabels[formData.contractType] || 'agreement'} `;
+                    if (formData.projectDescription) {
+                        letter += `for ${formData.projectDescription}. `;
+                    } else {
+                        letter += `for me to provide ${formData.workType || 'professional services'}. `;
+                    }
+
+                    if (formData.scopeOfWork) {
+                        letter += `The agreed scope of work included:\n\n${formData.scopeOfWork}\n\n`;
+                    }
+
+                    if (formData.originalAmount) {
+                        letter += `The agreed compensation was $${formData.originalAmount}`;
+
+                        if (formData.paymentTerms === 'net-30') {
+                            letter += `, payable Net 30 days`;
+                        } else if (formData.paymentTerms === 'net-15') {
+                            letter += `, payable Net 15 days`;
+                        } else if (formData.paymentTerms === 'upon-completion') {
+                            letter += `, payable upon completion`;
+                        } else if (formData.paymentTerms === 'custom' && formData.customPaymentTerms) {
+                            letter += `, ${formData.customPaymentTerms}`;
+                        }
+                        letter += `.\n\n`;
+                    }
+
+                    if (formData.lateFeeRate || formData.interestRate) {
+                        letter += `Our agreement specified `;
+                        if (formData.lateFeeRate && formData.interestRate) {
+                            letter += `a late fee of ${formData.lateFeeRate} and interest at ${formData.interestRate}% for overdue payments.\n\n`;
+                        } else if (formData.lateFeeRate) {
+                            letter += `a late fee of ${formData.lateFeeRate} for overdue payments.\n\n`;
+                        } else {
+                            letter += `interest at ${formData.interestRate}% per annum for overdue payments.\n\n`;
+                        }
+                    }
+                }
+
+                // Performance section
+                if (formData.deliverables || formData.deliveryDate) {
+                    letter += `MY PERFORMANCE:\n\n`;
+
+                    letter += `I fully performed all obligations under our agreement. `;
+
+                    if (formData.deliverables) {
+                        letter += `I completed and delivered the following:\n\n${formData.deliverables}\n\n`;
+                    }
+
+                    if (formData.deliveryDate) {
+                        letter += `All work was completed and delivered on ${formData.deliveryDate}`;
+                        if (formData.clientAcceptance) {
+                            letter += `, and you acknowledged receipt and acceptance: "${formData.clientAcceptance}"`;
+                        }
+                        letter += `.\n\n`;
+                    }
+
+                    if (formData.currentUse) {
+                        letter += `Furthermore, you are currently using my work in your business: ${formData.currentUse}. `;
+                        letter += `Your active use of the deliverables demonstrates both that the work was received and that it met your needs.\n\n`;
+                    }
+                }
+
+                // Scope creep section
+                if (formData.scopeCreep && formData.scopeCreepDetails) {
+                    letter += `ADDITIONAL WORK BEYOND ORIGINAL SCOPE:\n\n`;
+                    letter += `During the project, you requested additional work beyond our original agreement: ${formData.scopeCreepDetails}\n\n`;
+                    letter += `This additional work was not included in the original scope or pricing. Under principles of quantum meruit and unjust enrichment, you are obligated to pay the reasonable value of these additional services, as you knowingly accepted and benefited from this extra work.\n\n`;
+                }
+
+                // Outstanding payment section
+                letter += `OUTSTANDING PAYMENT:\n\n`;
+
+                if (formData.invoices.length > 0) {
+                    letter += `The following invoice(s) remain unpaid:\n\n`;
+
+                    formData.invoices.forEach((inv, index) => {
+                        if (inv.status === 'unpaid' || inv.status === 'partial') {
+                            letter += `${index + 1}. Invoice #${inv.invoiceNumber}`;
+                            if (inv.invoiceDate) letter += ` dated ${inv.invoiceDate}`;
+                            letter += `\n   Amount: $${inv.invoiceAmount}`;
+                            if (inv.dueDate) {
+                                letter += `\n   Due date: ${inv.dueDate}`;
+                                const dueDate = new Date(inv.dueDate);
+                                const today = new Date();
+                                const daysOverdue = Math.floor((today - dueDate) / (1000 * 60 * 60 * 24));
+                                if (daysOverdue > 0) {
+                                    letter += ` (${daysOverdue} days overdue)`;
+                                }
+                            }
+                            if (inv.description) letter += `\n   Description: ${inv.description}`;
+                            letter += `\n\n`;
+                        }
+                    });
+                }
+
+                // Calculation breakdown
+                if (calculateTotals.principal > 0 || formData.totalOwed) {
+                    letter += `AMOUNT DUE:\n\n`;
+
+                    if (calculateTotals.principal > 0) {
+                        letter += `Principal (unpaid invoices):        $${calculateTotals.principal.toFixed(2)}\n`;
+                    }
+
+                    if (calculateTotals.lateFees > 0) {
+                        letter += `Late fees:                           $${calculateTotals.lateFees.toFixed(2)}\n`;
+                    }
+
+                    if (calculateTotals.interest > 0) {
+                        letter += `Interest on overdue amounts:         $${calculateTotals.interest.toFixed(2)}\n`;
+                    }
+
+                    letter += `                                     ____________\n`;
+
+                    const totalDue = formData.totalOwed || calculateTotals.total;
+                    letter += `TOTAL AMOUNT DUE:                    $${typeof totalDue === 'number' ? totalDue.toFixed(2) : totalDue}\n\n`;
+                }
+
+                // Client's disputes/excuses
+                if (formData.clientDispute) {
+                    letter += `YOUR STATED REASONS FOR NONPAYMENT:\n\n`;
+                    letter += `You have claimed: ${formData.clientDispute}\n\n`;
+
+                    letter += `This claim is without merit. `;
+                    if (formData.currentUse) {
+                        letter += `You are actively using the work product, which contradicts any assertion that the work was unacceptable or unusable. `;
+                    }
+                    if (formData.clientAcceptance) {
+                        letter += `You previously accepted the work without raising any concerns. `;
+                    }
+                    letter += `Even if there were legitimate quality concerns, that would not excuse complete nonpayment but rather would justify at most a proportional reduction corresponding to any genuine deficiency.\n\n`;
+                }
+
+                // Legal basis section
+                letter += `LEGAL BASIS FOR THIS DEMAND:\n\n`;
+
+                letter += `Your failure to pay for services rendered constitutes breach of contract. Under basic contract law, when one party performs their obligations and the other fails to pay as agreed, the non-performing party is liable for the contract price plus any stipulated late fees, interest, and contractual attorneys' fees.\n\n`;
+
+                if (formData.contractType === 'implied' || formData.contractType === 'verbal') {
+                    letter += `Even without a formal written contract, our course of dealing created an implied-in-fact contract. You requested services, I provided them, you accepted them, and you knew I expected payment. This is sufficient to create an enforceable contract.\n\n`;
+                }
+
+                if (formData.scopeCreep) {
+                    letter += `For work performed beyond our original agreement, I am entitled to recovery under quantum meruit or unjust enrichment theories. You knowingly accepted and benefited from additional services, and allowing you to retain that benefit without payment would be unjust.\n\n`;
+                }
+
+                // NY Freelance Isn't Free Act
+                if (formData.nyFreelanceAct) {
+                    letter += `NEW YORK FREELANCE ISN'T FREE ACT:\n\n`;
+
+                    letter += `Your conduct violates New York's Freelance Isn't Free Act `;
+                    letter += `(`;
+                    if (formData.clientState === 'NY-NYC' || formData.yourState === 'NY-NYC') {
+                        letter += `NYC Local Law 140 of 2016`;
+                    } else {
+                        letter += `NY General Business Law Article 44-A`;
+                    }
+                    letter += `). This statute requires:\n\n`;
+
+                    letter += `• Written contracts for freelance work compensated at $800 or more within any 120-day period\n`;
+                    letter += `• Payment by the date specified in the contract or within 30 days of completion if no date was specified\n`;
+                    letter += `• Prohibitions on retaliation against freelancers who assert their rights\n\n`;
+
+                    letter += `Your failure to pay constitutes a statutory violation exposing you to:\n\n`;
+                    letter += `• DOUBLE DAMAGES (twice the amount owed)\n`;
+                    letter += `• Statutory damages for contract violations\n`;
+                    letter += `• Mandatory payment of my attorneys' fees if I am forced to litigate\n`;
+                    letter += `• Injunctive relief\n\n`;
+
+                    if (formData.clientState === 'NY' || formData.yourState === 'NY') {
+                        letter += `Additionally, I may file a complaint with the New York Department of Labor, which has authority to investigate and seek remedies on my behalf without requiring me to retain private counsel. The DOL takes freelancer protection seriously and has successfully recovered substantial amounts for freelancers.\n\n`;
+                    }
+
+                    letter += `The fee-shifting provision means that if I pursue this matter in court, you will be required to pay both the amount owed AND all my legal fees. This dramatically changes the economics of this dispute and makes it in your interest to resolve this matter immediately.\n\n`;
+                }
+
+                // CA Freelance Worker Protection Act
+                if (formData.caFreelanceAct) {
+                    letter += `CALIFORNIA FREELANCE WORKER PROTECTION ACT:\n\n`;
+
+                    letter += `Your conduct violates California's Freelance Worker Protection Act (Business & Professions Code § 18100 et seq.), which became effective January 1, 2025. This statute requires:\n\n`;
+
+                    letter += `• Written contracts including specific terms (parties' information, itemization of services, compensation rate and method, payment due date)\n`;
+                    letter += `• Payment by the contractually agreed date or within 30 days of completion if no date was specified\n`;
+                    letter += `• Prohibitions on retaliation\n\n`;
+
+                    letter += `Your failure to pay constitutes a statutory violation exposing you to:\n\n`;
+                    letter += `• DOUBLE DAMAGES (twice the amount owed)\n`;
+                    letter += `• Statutory damages for violations\n`;
+                    letter += `• Mandatory payment of my attorneys' fees if litigation is necessary\n`;
+                    letter += `• Injunctive relief\n\n`;
+
+                    letter += `The California Attorney General has authority to investigate and prosecute repeat violators of the Freelance Worker Protection Act. While I hope to resolve this matter privately, persistent nonpayment to freelancers is exactly the type of conduct the AG's office was authorized to address.\n\n`;
+
+                    letter += `As with New York's law, the mandatory fee-shifting provision means you will pay both the debt and all my legal costs if I am forced to litigate. Immediate payment is clearly in your best interest.\n\n`;
+                }
+
+                // Prompt Payment Act
+                if (formData.promptPaymentAct) {
+                    letter += `PROMPT PAYMENT ACT VIOLATIONS:\n\n`;
+
+                    if (formData.governmentContract) {
+                        letter += `This work was performed under a government contract subject to the federal Prompt Payment Act and its implementing regulations. Federal agencies and prime contractors are required to pay valid invoices within specified timeframes, with automatic interest penalties for late payment.\n\n`;
+                    } else {
+                        letter += `This work falls under applicable state prompt payment statutes governing construction and design professional services. These statutes establish mandatory payment deadlines and provide for interest penalties and attorneys' fees for violations.\n\n`;
+                    }
+
+                    letter += `Your late payment violates these statutory requirements. Interest has been accruing `;
+                    if (formData.interestRate) {
+                        letter += `at ${formData.interestRate}% per annum `;
+                    }
+                    letter += `since the payment due date, and this interest continues to accumulate daily until payment is received.\n\n`;
+                }
+
+                // Mechanic's lien
+                if (formData.mechanicLien) {
+                    letter += `MECHANIC'S LIEN RIGHTS:\n\n`;
+
+                    letter += `As a contractor who improved real property, I have the right under state law to file a mechanic's lien against the property if I am not paid. `;
+
+                    letter += `A recorded lien will cloud the property title and must be satisfied before the property can be sold or refinanced. `;
+
+                    letter += `I am preserving my lien rights and will file a claim of lien if payment is not received within the deadline specified below.\n\n`;
+                }
+
+                // Evidence section
+                if (formData.evidenceTypes.length > 0) {
+                    letter += `DOCUMENTATION:\n\n`;
+                    letter += `I have preserved comprehensive evidence supporting this claim, including:\n\n`;
+
+                    const evidenceLabels = {
+                        'contract': 'Signed contract or written agreement',
+                        'emails': 'Email correspondence establishing terms and scope',
+                        'sow': 'Statement of Work and project documentation',
+                        'delivery': 'Proof of delivery (emails, uploads, confirmations)',
+                        'acceptance': 'Client acceptance and approval messages',
+                        'usage': 'Evidence of client\'s current use of deliverables',
+                        'invoices': 'Complete invoicing history with dates and amounts',
+                        'reminders': 'Payment reminder correspondence',
+                        'disputes': 'Client communications disputing payment',
+                        'scope-changes': 'Documentation of scope changes and expansions'
+                    };
+
+                    formData.evidenceTypes.forEach(type => {
+                        letter += `• ${evidenceLabels[type] || type}\n`;
+                    });
+
+                    if (formData.additionalEvidence) {
+                        letter += `\nAdditional evidence: ${formData.additionalEvidence}\n`;
+                    }
+
+                    letter += `\n`;
+                }
+
+                // Demands section
+                letter += `DEMAND FOR PAYMENT:\n\n`;
+
+                if (formData.tone === 'gentle') {
+                    letter += `I request payment of the full outstanding amount of $${formData.totalOwed || calculateTotals.total} `;
+                } else {
+                    letter += `I demand immediate payment of the full outstanding amount of $${formData.totalOwed || calculateTotals.total} `;
+                }
+
+                if (formData.deadline) {
+                    letter += `by ${formData.deadline}. `;
+                } else if (formData.tone === 'pre-litigation') {
+                    letter += `within 7 days of the date of this letter. `;
+                } else {
+                    letter += `within 14 days of the date of this letter. `;
+                }
+
+                if (formData.paymentMethod) {
+                    letter += `Payment must be made by ${formData.paymentMethod}. `;
+                } else if (formData.tone === 'pre-litigation' || formData.tone === 'firm') {
+                    letter += `Payment must be made by wire transfer, cashier's check, or certified check (no personal checks will be accepted at this stage). `;
+                }
+
+                letter += `\n\n`;
+
+                if (formData.openToPaymentPlan && formData.tone !== 'pre-litigation') {
+                    letter += `If you are experiencing cash flow difficulties, I am willing to discuss a reasonable payment plan. However, any payment plan must be formalized in writing with specific dates and amounts, and must include provisions accelerating the full balance if any payment is missed.\n\n`;
+                }
+
+                // IP leverage
+                if (formData.ipLeverage && formData.ipLeverageDetails) {
+                    letter += `INTELLECTUAL PROPERTY RIGHTS:\n\n`;
+                    letter += `${formData.ipLeverageDetails}\n\n`;
+                    letter += `If payment is not received by the deadline, I will exercise all rights available to me under this intellectual property provision, including withdrawing authorization for continued use and pursuing DMCA takedown notices where applicable.\n\n`;
+                }
+
+                // Alternative demands
+                if (formData.demandTypes.includes('relationship-termination')) {
+                    letter += `In addition to payment, I am terminating our working relationship effective immediately. Upon receipt of payment, I will deliver all final work product, return any confidential information, and both parties will be released from any future obligations to each other.\n\n`;
+                }
+
+                if (formData.demandTypes.includes('stop-work')) {
+                    letter += `I have ceased all work on your behalf as of this date and will not resume unless and until all outstanding amounts are paid in full.\n\n`;
+                }
+
+                // Consequences / Next steps
+                if (formData.tone === 'pre-litigation' || (formData.tone === 'firm' && formData.escalationOptions.length > 0)) {
+                    letter += `CONSEQUENCES OF NON-PAYMENT:\n\n`;
+
+                    if (formData.tone === 'pre-litigation') {
+                        letter += `This is my final communication before taking legal action. `;
+                    }
+
+                    letter += `If payment is not received by the deadline specified above, I will immediately pursue the following remedies:\n\n`;
+
+                    if (formData.escalationOptions.includes('small-claims')) {
+                        letter += `• FILE SUIT IN SMALL CLAIMS COURT: `;
+                        if (formData.smallClaimsLimit) {
+                            letter += `The amount in dispute falls within the small claims limit of $${formData.smallClaimsLimit} for this jurisdiction. `;
+                        }
+                        letter += `Small claims provides a streamlined process for recovery, and I am fully prepared to file suit immediately.\n\n`;
+                    }
+
+                    if (formData.escalationOptions.includes('civil-suit')) {
+                        letter += `• FILE CIVIL LAWSUIT: I will file a breach of contract action in `;
+                        if (formData.yourState) {
+                            letter += `${formData.yourState} `;
+                        }
+                        letter += `court seeking the full amount owed plus all contractual late fees, interest, and attorneys' fees`;
+                        if (formData.nyFreelanceAct || formData.caFreelanceAct) {
+                            letter += `, including the double damages and mandatory fee recovery provided by statute`;
+                        }
+                        letter += `.\n\n`;
+                    }
+
+                    if (formData.escalationOptions.includes('dol-complaint') && formData.nyFreelanceAct) {
+                        letter += `• FILE COMPLAINT WITH NY DEPARTMENT OF LABOR: I will file a formal complaint under the Freelance Isn't Free Act, triggering a government investigation that does not require me to hire private counsel.\n\n`;
+                    }
+
+                    if (formData.escalationOptions.includes('ag-referral') && formData.caFreelanceAct) {
+                        letter += `• REFERRAL TO CALIFORNIA ATTORNEY GENERAL: I will provide information about your nonpayment pattern to the California AG's office for potential investigation under the Freelance Worker Protection Act.\n\n`;
+                    }
+
+                    if (formData.escalationOptions.includes('collection-agency')) {
+                        letter += `• REFER TO COLLECTION AGENCY: I will assign this debt to a professional collection agency, which will report the nonpayment to credit bureaus and pursue all available collection remedies.\n\n`;
+                    }
+
+                    if (formData.escalationOptions.includes('mechanic-lien') && formData.mechanicLien) {
+                        letter += `• FILE MECHANIC'S LIEN: I will record a claim of lien against the property, which will prevent sale or refinancing until the lien is satisfied.\n\n`;
+                    }
+
+                    if (formData.escalationOptions.includes('public-record')) {
+                        letter += `• JUDGMENT BECOMES PUBLIC RECORD: Any judgment I obtain will be a matter of public record, affecting your credit rating and business reputation.\n\n`;
+                    }
+                }
+
+                // Closing tone adjustment
+                if (formData.tone === 'gentle') {
+                    letter += `I value our professional relationship and hope we can resolve this matter quickly and amicably. Please contact me immediately to arrange payment or to discuss any questions you may have.\n\n`;
+                } else if (formData.tone === 'pre-litigation') {
+                    letter += `I have exhausted all reasonable attempts to resolve this matter cooperatively. If I do not receive full payment by the deadline, I will proceed with legal action without further notice. The time for negotiation has passed.\n\n`;
+                } else {
+                    letter += `I expect this matter to be resolved promptly and professionally. If you have any legitimate questions about the amount owed or need clarification about payment methods, contact me immediately. However, further delay or evasion will result in immediate legal action.\n\n`;
+                }
+
+                // Contact info
+                letter += `Please remit payment to the address above`;
+                if (formData.yourEmail) {
+                    letter += ` or contact me at ${formData.yourEmail}`;
+                }
+                if (formData.yourPhone) {
+                    letter += ` or ${formData.yourPhone}`;
+                }
+                letter += `.\n\n`;
+
+                // Additional notes
+                if (formData.additionalNotes) {
+                    letter += `ADDITIONAL INFORMATION:\n\n${formData.additionalNotes}\n\n`;
+                }
+
+                // Signature
+                letter += `Sincerely,\n\n`;
+                letter += `${formData.yourName || '[Your Name]'}`;
+                if (formData.yourBusinessName) {
+                    letter += `\n${formData.yourBusinessName}`;
+                }
+
+                return letter;
+            }, [formData, calculateTotals]);
+
+            const copyToClipboard = async () => {
+                try {
+                    await navigator.clipboard.writeText(generateLetter);
+                    alert('Letter copied to clipboard!');
+                } catch (err) {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = generateLetter;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    try {
+                        document.execCommand('copy');
+                        alert('Letter copied to clipboard!');
+                    } catch (err) {
+                        alert('Failed to copy letter');
+                    }
+                    document.body.removeChild(textArea);
+                }
+            };
+
+            const downloadLetter = () => {
+                const element = document.createElement('a');
+                const file = new Blob([generateLetter], { type: 'text/plain' });
+                element.href = URL.createObjectURL(file);
+                element.download = 'freelancer-demand-letter.txt';
+                document.body.appendChild(element);
+                element.click();
+                document.body.removeChild(element);
+            };
+
+            const tabs = [
+                { id: 'your-info', label: 'Your Info' },
+                { id: 'client-info', label: 'Client Info' },
+                { id: 'contract', label: 'Contract & Work' },
+                { id: 'payment', label: 'Payment Details' },
+                { id: 'evidence', label: 'Evidence' },
+                { id: 'demands', label: 'Demands' },
+                { id: 'next-steps', label: 'Next Steps' }
+            ];
+
+            return (
+                <div className="container">
+                    <div className="tabs">
+                        {tabs.map(tab => (
+                            <button
+                                key={tab.id}
+                                className={`tab ${activeTab === tab.id ? 'active' : ''}`}
+                                onClick={() => setActiveTab(tab.id)}
+                            >
+                                {tab.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="content-wrapper">
+                        <div className="form-section">
+                            {activeTab === 'your-info' && (
+                                <>
+                                    <div className="info-box">
+                                        <strong>Freelancer Nonpayment Demand Letters:</strong> This tool helps freelancers, consultants, and agencies recover unpaid fees by creating professional demand letters that cite relevant contract law and special freelancer protection statutes in NY and CA.
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Your Full Name:</label>
+                                        <input
+                                            type="text"
+                                            value={formData.yourName}
+                                            onChange={(e) => handleInputChange('yourName', e.target.value)}
+                                            placeholder="Your full name"
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Business Name (if applicable):</label>
+                                        <input
+                                            type="text"
+                                            value={formData.yourBusinessName}
+                                            onChange={(e) => handleInputChange('yourBusinessName', e.target.value)}
+                                            placeholder="Your LLC, DBA, or business name"
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Your Email:</label>
+                                        <input
+                                            type="email"
+                                            value={formData.yourEmail}
+                                            onChange={(e) => handleInputChange('yourEmail', e.target.value)}
+                                            placeholder="you@example.com"
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Your Phone:</label>
+                                        <input
+                                            type="text"
+                                            value={formData.yourPhone}
+                                            onChange={(e) => handleInputChange('yourPhone', e.target.value)}
+                                            placeholder="(555) 123-4567"
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Your Address:</label>
+                                        <input
+                                            type="text"
+                                            value={formData.yourAddress}
+                                            onChange={(e) => handleInputChange('yourAddress', e.target.value)}
+                                            placeholder="Street, City, State ZIP"
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Your State / Location:</label>
+                                        <select
+                                            value={formData.yourState}
+                                            onChange={(e) => handleInputChange('yourState', e.target.value)}
+                                        >
+                                            <option value="">Select your state</option>
+                                            <option value="NY">New York (state)</option>
+                                            <option value="NY-NYC">New York City</option>
+                                            <option value="CA">California</option>
+                                            <option value="AL">Alabama</option>
+                                            <option value="AK">Alaska</option>
+                                            <option value="AZ">Arizona</option>
+                                            <option value="AR">Arkansas</option>
+                                            <option value="CO">Colorado</option>
+                                            <option value="CT">Connecticut</option>
+                                            <option value="DE">Delaware</option>
+                                            <option value="FL">Florida</option>
+                                            <option value="GA">Georgia</option>
+                                            <option value="HI">Hawaii</option>
+                                            <option value="ID">Idaho</option>
+                                            <option value="IL">Illinois</option>
+                                            <option value="IN">Indiana</option>
+                                            <option value="IA">Iowa</option>
+                                            <option value="KS">Kansas</option>
+                                            <option value="KY">Kentucky</option>
+                                            <option value="LA">Louisiana</option>
+                                            <option value="ME">Maine</option>
+                                            <option value="MD">Maryland</option>
+                                            <option value="MA">Massachusetts</option>
+                                            <option value="MI">Michigan</option>
+                                            <option value="MN">Minnesota</option>
+                                            <option value="MS">Mississippi</option>
+                                            <option value="MO">Missouri</option>
+                                            <option value="MT">Montana</option>
+                                            <option value="NE">Nebraska</option>
+                                            <option value="NV">Nevada</option>
+                                            <option value="NH">New Hampshire</option>
+                                            <option value="NJ">New Jersey</option>
+                                            <option value="NM">New Mexico</option>
+                                            <option value="NC">North Carolina</option>
+                                            <option value="ND">North Dakota</option>
+                                            <option value="OH">Ohio</option>
+                                            <option value="OK">Oklahoma</option>
+                                            <option value="OR">Oregon</option>
+                                            <option value="PA">Pennsylvania</option>
+                                            <option value="RI">Rhode Island</option>
+                                            <option value="SC">South Carolina</option>
+                                            <option value="SD">South Dakota</option>
+                                            <option value="TN">Tennessee</option>
+                                            <option value="TX">Texas</option>
+                                            <option value="UT">Utah</option>
+                                            <option value="VT">Vermont</option>
+                                            <option value="VA">Virginia</option>
+                                            <option value="WA">Washington</option>
+                                            <option value="WV">West Virginia</option>
+                                            <option value="WI">Wisconsin</option>
+                                            <option value="WY">Wyoming</option>
+                                            <option value="other">Other / International</option>
+                                        </select>
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Type of Work You Provide:</label>
+                                        <input
+                                            type="text"
+                                            value={formData.workType}
+                                            onChange={(e) => handleInputChange('workType', e.target.value)}
+                                            placeholder="e.g., web design, copywriting, software development, consulting"
+                                        />
+                                    </div>
+                                </>
+                            )}
+
+                            {activeTab === 'client-info' && (
+                                <>
+                                    <div className="form-group">
+                                        <label>Client Name / Company Name:</label>
+                                        <input
+                                            type="text"
+                                            value={formData.clientName}
+                                            onChange={(e) => handleInputChange('clientName', e.target.value)}
+                                            placeholder="ABC Company LLC"
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Client Type:</label>
+                                        <div className="radio-group">
+                                            <div className="radio-item">
+                                                <input
+                                                    type="radio"
+                                                    id="client-company"
+                                                    checked={formData.clientType === 'company'}
+                                                    onChange={() => handleInputChange('clientType', 'company')}
+                                                />
+                                                <label htmlFor="client-company">Company / LLC / Corporation</label>
+                                            </div>
+                                            <div className="radio-item">
+                                                <input
+                                                    type="radio"
+                                                    id="client-individual"
+                                                    checked={formData.clientType === 'individual'}
+                                                    onChange={() => handleInputChange('clientType', 'individual')}
+                                                />
+                                                <label htmlFor="client-individual">Individual</label>
+                                            </div>
+                                            <div className="radio-item">
+                                                <input
+                                                    type="radio"
+                                                    id="client-agency"
+                                                    checked={formData.clientType === 'agency'}
+                                                    onChange={() => handleInputChange('clientType', 'agency')}
+                                                />
+                                                <label htmlFor="client-agency">Agency / Subcontractor relationship</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Contact Person Name:</label>
+                                        <input
+                                            type="text"
+                                            value={formData.clientContact}
+                                            onChange={(e) => handleInputChange('clientContact', e.target.value)}
+                                            placeholder="Name of person you worked with"
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Client Email:</label>
+                                        <input
+                                            type="email"
+                                            value={formData.clientEmail}
+                                            onChange={(e) => handleInputChange('clientEmail', e.target.value)}
+                                            placeholder="contact@client.com"
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Client Address:</label>
+                                        <input
+                                            type="text"
+                                            value={formData.clientAddress}
+                                            onChange={(e) => handleInputChange('clientAddress', e.target.value)}
+                                            placeholder="Street, City, State ZIP"
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Client State / Location:</label>
+                                        <select
+                                            value={formData.clientState}
+                                            onChange={(e) => handleInputChange('clientState', e.target.value)}
+                                        >
+                                            <option value="">Select client's state</option>
+                                            <option value="NY">New York (state)</option>
+                                            <option value="NY-NYC">New York City</option>
+                                            <option value="CA">California</option>
+                                            <option value="AL">Alabama</option>
+                                            <option value="AK">Alaska</option>
+                                            <option value="AZ">Arizona</option>
+                                            <option value="AR">Arkansas</option>
+                                            <option value="CO">Colorado</option>
+                                            <option value="CT">Connecticut</option>
+                                            <option value="DE">Delaware</option>
+                                            <option value="FL">Florida</option>
+                                            <option value="GA">Georgia</option>
+                                            <option value="HI">Hawaii</option>
+                                            <option value="ID">Idaho</option>
+                                            <option value="IL">Illinois</option>
+                                            <option value="IN">Indiana</option>
+                                            <option value="IA">Iowa</option>
+                                            <option value="KS">Kansas</option>
+                                            <option value="KY">Kentucky</option>
+                                            <option value="LA">Louisiana</option>
+                                            <option value="ME">Maine</option>
+                                            <option value="MD">Maryland</option>
+                                            <option value="MA">Massachusetts</option>
+                                            <option value="MI">Michigan</option>
+                                            <option value="MN">Minnesota</option>
+                                            <option value="MS">Mississippi</option>
+                                            <option value="MO">Missouri</option>
+                                            <option value="MT">Montana</option>
+                                            <option value="NE">Nebraska</option>
+                                            <option value="NV">Nevada</option>
+                                            <option value="NH">New Hampshire</option>
+                                            <option value="NJ">New Jersey</option>
+                                            <option value="NM">New Mexico</option>
+                                            <option value="NC">North Carolina</option>
+                                            <option value="ND">North Dakota</option>
+                                            <option value="OH">Ohio</option>
+                                            <option value="OK">Oklahoma</option>
+                                            <option value="OR">Oregon</option>
+                                            <option value="PA">Pennsylvania</option>
+                                            <option value="RI">Rhode Island</option>
+                                            <option value="SC">South Carolina</option>
+                                            <option value="SD">South Dakota</option>
+                                            <option value="TN">Tennessee</option>
+                                            <option value="TX">Texas</option>
+                                            <option value="UT">Utah</option>
+                                            <option value="VT">Vermont</option>
+                                            <option value="VA">Virginia</option>
+                                            <option value="WA">Washington</option>
+                                            <option value="WV">West Virginia</option>
+                                            <option value="WI">Wisconsin</option>
+                                            <option value="WY">Wyoming</option>
+                                            <option value="other">Other / International</option>
+                                        </select>
+                                    </div>
+                                </>
+                            )}
+
+                            {activeTab === 'contract' && (
+                                <>
+                                    <div className="form-group">
+                                        <label>Type of Agreement:</label>
+                                        <select
+                                            value={formData.contractType}
+                                            onChange={(e) => handleInputChange('contractType', e.target.value)}
+                                        >
+                                            <option value="written">Written contract (signed)</option>
+                                            <option value="sow">Statement of Work (SOW)</option>
+                                            <option value="email">Email agreement</option>
+                                            <option value="verbal">Verbal agreement</option>
+                                            <option value="implied">Implied contract (course of dealing)</option>
+                                            <option value="platform">Platform agreement (Upwork, Fiverr, etc.)</option>
+                                        </select>
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Agreement Date:</label>
+                                        <input
+                                            type="date"
+                                            value={formData.contractDate}
+                                            onChange={(e) => handleInputChange('contractDate', e.target.value)}
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Project / Work Description:</label>
+                                        <input
+                                            type="text"
+                                            value={formData.projectDescription}
+                                            onChange={(e) => handleInputChange('projectDescription', e.target.value)}
+                                            placeholder="e.g., Website redesign for XYZ Corp, Blog writing services"
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Original Scope of Work:</label>
+                                        <textarea
+                                            value={formData.scopeOfWork}
+                                            onChange={(e) => handleInputChange('scopeOfWork', e.target.value)}
+                                            placeholder="Describe what you originally agreed to deliver (e.g., '5-page website redesign including homepage, about, services, blog, and contact pages with 2 rounds of revisions')"
+                                            rows="4"
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Deliverables You Provided:</label>
+                                        <textarea
+                                            value={formData.deliverables}
+                                            onChange={(e) => handleInputChange('deliverables', e.target.value)}
+                                            placeholder="List what you actually delivered (e.g., 'Final website files delivered via Google Drive on October 15, 2024')"
+                                            rows="4"
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Delivery / Completion Date:</label>
+                                        <input
+                                            type="date"
+                                            value={formData.deliveryDate}
+                                            onChange={(e) => handleInputChange('deliveryDate', e.target.value)}
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Client Acceptance / Approval (if any):</label>
+                                        <textarea
+                                            value={formData.clientAcceptance}
+                                            onChange={(e) => handleInputChange('clientAcceptance', e.target.value)}
+                                            placeholder="Quote any email, message, or communication where client approved or accepted your work (e.g., 'This looks great! Exactly what we needed.' - Email from Jane Doe, Oct 20)"
+                                            rows="3"
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Current Use of Your Work:</label>
+                                        <textarea
+                                            value={formData.currentUse}
+                                            onChange={(e) => handleInputChange('currentUse', e.target.value)}
+                                            placeholder="Describe how the client is currently using your deliverables (e.g., 'Website is live at clientwebsite.com', 'My content is being used in their ad campaigns')"
+                                            rows="3"
+                                        />
+                                    </div>
+
+                                    <hr className="section-divider" />
+
+                                    <div className="form-group">
+                                        <div className="checkbox-item">
+                                            <input
+                                                type="checkbox"
+                                                id="scope-creep"
+                                                checked={formData.scopeCreep}
+                                                onChange={(e) => handleInputChange('scopeCreep', e.target.checked)}
+                                            />
+                                            <label htmlFor="scope-creep">Client requested additional work beyond original scope</label>
+                                        </div>
+                                    </div>
+
+                                    {formData.scopeCreep && (
+                                        <div className="form-group">
+                                            <label>Scope Creep Details:</label>
+                                            <textarea
+                                                value={formData.scopeCreepDetails}
+                                                onChange={(e) => handleInputChange('scopeCreepDetails', e.target.value)}
+                                                placeholder="Describe the additional work beyond your original agreement (e.g., 'Client requested 3 additional pages, 5 extra rounds of revisions, and a mobile app design that was never discussed')"
+                                                rows="4"
+                                            />
+                                        </div>
+                                    )}
+                                </>
+                            )}
+
+                            {activeTab === 'payment' && (
+                                <>
+                                    <div className="form-group">
+                                        <label>Original Agreed Amount:</label>
+                                        <input
+                                            type="number"
+                                            value={formData.originalAmount}
+                                            onChange={(e) => handleInputChange('originalAmount', e.target.value)}
+                                            placeholder="5000"
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Payment Terms:</label>
+                                        <select
+                                            value={formData.paymentTerms}
+                                            onChange={(e) => handleInputChange('paymentTerms', e.target.value)}
+                                        >
+                                            <option value="net-30">Net 30</option>
+                                            <option value="net-15">Net 15</option>
+                                            <option value="upon-completion">Due upon completion</option>
+                                            <option value="50-50">50% deposit, 50% on completion</option>
+                                            <option value="milestone">Milestone-based</option>
+                                            <option value="custom">Custom terms</option>
+                                        </select>
+                                    </div>
+
+                                    {formData.paymentTerms === 'custom' && (
+                                        <div className="form-group">
+                                            <label>Custom Payment Terms:</label>
+                                            <input
+                                                type="text"
+                                                value={formData.customPaymentTerms}
+                                                onChange={(e) => handleInputChange('customPaymentTerms', e.target.value)}
+                                                placeholder="Describe your payment terms"
+                                            />
+                                        </div>
+                                    )}
+
+                                    <div className="form-group">
+                                        <label>Late Fee (if specified in contract):</label>
+                                        <input
+                                            type="text"
+                                            value={formData.lateFeeRate}
+                                            onChange={(e) => handleInputChange('lateFeeRate', e.target.value)}
+                                            placeholder="e.g., $50 or 5% of invoice amount"
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Interest Rate (if specified in contract):</label>
+                                        <input
+                                            type="number"
+                                            step="0.1"
+                                            value={formData.interestRate}
+                                            onChange={(e) => handleInputChange('interestRate', e.target.value)}
+                                            placeholder="1.5% per month or 18% annually"
+                                        />
+                                    </div>
+
+                                    <hr className="section-divider" />
+
+                                    <div style={{color: '#3b82f6', marginBottom: '1rem', fontSize: '1.1rem', fontWeight: '600'}}>Unpaid Invoices</div>
+                                    <p style={{marginBottom: '1rem', color: '#4a5568'}}>
+                                        Add each unpaid invoice separately:
+                                    </p>
+
+                                    <div className="form-group">
+                                        <label>Invoice Number:</label>
+                                        <input
+                                            type="text"
+                                            value={invoiceInputs.invoiceNumber}
+                                            onChange={(e) => setInvoiceInputs({...invoiceInputs, invoiceNumber: e.target.value})}
+                                            placeholder="INV-001"
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Invoice Date:</label>
+                                        <input
+                                            type="date"
+                                            value={invoiceInputs.invoiceDate}
+                                            onChange={(e) => setInvoiceInputs({...invoiceInputs, invoiceDate: e.target.value})}
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Invoice Amount:</label>
+                                        <input
+                                            type="number"
+                                            value={invoiceInputs.invoiceAmount}
+                                            onChange={(e) => setInvoiceInputs({...invoiceInputs, invoiceAmount: e.target.value})}
+                                            placeholder="2500"
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Due Date:</label>
+                                        <input
+                                            type="date"
+                                            value={invoiceInputs.dueDate}
+                                            onChange={(e) => setInvoiceInputs({...invoiceInputs, dueDate: e.target.value})}
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Description:</label>
+                                        <input
+                                            type="text"
+                                            value={invoiceInputs.description}
+                                            onChange={(e) => setInvoiceInputs({...invoiceInputs, description: e.target.value})}
+                                            placeholder="Phase 1 website design"
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Status:</label>
+                                        <select
+                                            value={invoiceInputs.status}
+                                            onChange={(e) => setInvoiceInputs({...invoiceInputs, status: e.target.value})}
+                                        >
+                                            <option value="unpaid">Unpaid</option>
+                                            <option value="partial">Partially paid</option>
+                                        </select>
+                                    </div>
+
+                                    <button className="add-invoice-btn" onClick={addInvoice}>
+                                        + Add Invoice
+                                    </button>
+
+                                    {formData.invoices.length > 0 && (
+                                        <div className="invoice-list">
+                                            <div style={{color: '#3b82f6', marginBottom: '1rem', fontSize: '1rem', fontWeight: '600'}}>Added Invoices:</div>
+                                            {formData.invoices.map((inv) => (
+                                                <div key={inv.id} className="invoice-item">
+                                                    <div className="invoice-item-header">
+                                                        <strong>Invoice #{inv.invoiceNumber}</strong>
+                                                        <button onClick={() => removeInvoice(inv.id)}>Remove</button>
+                                                    </div>
+                                                    <div style={{fontSize: '0.9rem', color: '#4a5568'}}>
+                                                        <div>Amount: ${inv.invoiceAmount}</div>
+                                                        {inv.invoiceDate && <div>Date: {inv.invoiceDate}</div>}
+                                                        {inv.dueDate && <div>Due: {inv.dueDate}</div>}
+                                                        {inv.description && <div>Description: {inv.description}</div>}
+                                                        <div>Status: {inv.status}</div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    <hr className="section-divider" />
+
+                                    <div className="form-group">
+                                        <label>Calculated Late Fees (if any):</label>
+                                        <input
+                                            type="number"
+                                            value={formData.lateFees}
+                                            onChange={(e) => handleInputChange('lateFees', e.target.value)}
+                                            placeholder="150"
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Calculated Interest (if any):</label>
+                                        <input
+                                            type="number"
+                                            value={formData.interest}
+                                            onChange={(e) => handleInputChange('interest', e.target.value)}
+                                            placeholder="75"
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Total Amount Owed (including all fees/interest):</label>
+                                        <input
+                                            type="number"
+                                            value={formData.totalOwed}
+                                            onChange={(e) => handleInputChange('totalOwed', e.target.value)}
+                                            placeholder={calculateTotals.total.toFixed(2)}
+                                        />
+                                    </div>
+
+                                    {(calculateTotals.principal > 0 || formData.lateFees || formData.interest) && (
+                                        <div className="calculation-box">
+                                            <div style={{fontWeight: '600', marginBottom: '0.5rem', color: '#3b82f6'}}>Amount Breakdown:</div>
+                                            {calculateTotals.principal > 0 && (
+                                                <div className="calculation-row">
+                                                    <span>Principal (unpaid invoices):</span>
+                                                    <span>${calculateTotals.principal.toFixed(2)}</span>
+                                                </div>
+                                            )}
+                                            {calculateTotals.lateFees > 0 && (
+                                                <div className="calculation-row">
+                                                    <span>Late fees:</span>
+                                                    <span>${calculateTotals.lateFees.toFixed(2)}</span>
+                                                </div>
+                                            )}
+                                            {calculateTotals.interest > 0 && (
+                                                <div className="calculation-row">
+                                                    <span>Interest:</span>
+                                                    <span>${calculateTotals.interest.toFixed(2)}</span>
+                                                </div>
+                                            )}
+                                            <div className="calculation-row total">
+                                                <span>TOTAL DUE:</span>
+                                                <span>${calculateTotals.total.toFixed(2)}</span>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <hr className="section-divider" />
+
+                                    <div style={{color: '#3b82f6', marginBottom: '1rem', fontSize: '1.1rem', fontWeight: '600'}}>Special Protections (check if applicable)</div>
+
+                                    <div className="form-group">
+                                        <div className="checkbox-item">
+                                            <input
+                                                type="checkbox"
+                                                id="ny-freelance"
+                                                checked={formData.nyFreelanceAct}
+                                                onChange={(e) => handleInputChange('nyFreelanceAct', e.target.checked)}
+                                            />
+                                            <label htmlFor="ny-freelance">NY Freelance Isn't Free Act applies (you or client in NY; work ≥$800)</label>
+                                        </div>
+                                    </div>
+
+                                    <div className="form-group">
+                                        <div className="checkbox-item">
+                                            <input
+                                                type="checkbox"
+                                                id="ca-freelance"
+                                                checked={formData.caFreelanceAct}
+                                                onChange={(e) => handleInputChange('caFreelanceAct', e.target.checked)}
+                                            />
+                                            <label htmlFor="ca-freelance">CA Freelance Worker Protection Act applies (you or client in CA; effective Jan 1, 2025)</label>
+                                        </div>
+                                    </div>
+
+                                    <div className="form-group">
+                                        <div className="checkbox-item">
+                                            <input
+                                                type="checkbox"
+                                                id="prompt-payment"
+                                                checked={formData.promptPaymentAct}
+                                                onChange={(e) => handleInputChange('promptPaymentAct', e.target.checked)}
+                                            />
+                                            <label htmlFor="prompt-payment">Prompt Payment Act applies (construction, design professional services, or government contract)</label>
+                                        </div>
+                                    </div>
+
+                                    {formData.promptPaymentAct && (
+                                        <div className="form-group">
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="govt-contract"
+                                                    checked={formData.governmentContract}
+                                                    onChange={(e) => handleInputChange('governmentContract', e.target.checked)}
+                                                />
+                                                <label htmlFor="govt-contract">This is a federal/state government contract</label>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <div className="form-group">
+                                        <div className="checkbox-item">
+                                            <input
+                                                type="checkbox"
+                                                id="mechanic-lien"
+                                                checked={formData.mechanicLien}
+                                                onChange={(e) => handleInputChange('mechanicLien', e.target.checked)}
+                                            />
+                                            <label htmlFor="mechanic-lien">I have mechanic's lien rights (construction/property improvement work)</label>
+                                        </div>
+                                    </div>
+
+                                    {(formData.nyFreelanceAct || formData.caFreelanceAct) && (
+                                        <div className="info-box">
+                                            <strong>Double Damages & Fee-Shifting:</strong> The NY and CA freelancer protection statutes allow you to recover DOUBLE the amount owed plus mandatory attorneys' fees if you win. This makes your demand letter significantly more powerful.
+                                        </div>
+                                    )}
+
+                                    <hr className="section-divider" />
+
+                                    <div className="form-group">
+                                        <label>Client's Stated Reason for Non-Payment (if any):</label>
+                                        <textarea
+                                            value={formData.clientDispute}
+                                            onChange={(e) => handleInputChange('clientDispute', e.target.value)}
+                                            placeholder="If client has given reasons for not paying, describe them here (e.g., 'Client claims work was not completed', 'Client says they never approved final version')"
+                                            rows="3"
+                                        />
+                                    </div>
+                                </>
+                            )}
+
+                            {activeTab === 'evidence' && (
+                                <>
+                                    <div className="info-box">
+                                        <strong>Documentation Matters:</strong> Strong evidence makes your demand letter credible and dramatically increases the chances of payment. Check all evidence you have available.
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Evidence You Have (select all that apply):</label>
+                                        <div className="checkbox-group">
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="evidence-contract"
+                                                    checked={formData.evidenceTypes.includes('contract')}
+                                                    onChange={() => handleCheckboxChange('evidenceTypes', 'contract')}
+                                                />
+                                                <label htmlFor="evidence-contract">Signed written contract</label>
+                                            </div>
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="evidence-emails"
+                                                    checked={formData.evidenceTypes.includes('emails')}
+                                                    onChange={() => handleCheckboxChange('evidenceTypes', 'emails')}
+                                                />
+                                                <label htmlFor="evidence-emails">Email correspondence establishing terms</label>
+                                            </div>
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="evidence-sow"
+                                                    checked={formData.evidenceTypes.includes('sow')}
+                                                    onChange={() => handleCheckboxChange('evidenceTypes', 'sow')}
+                                                />
+                                                <label htmlFor="evidence-sow">Statement of Work (SOW) or project brief</label>
+                                            </div>
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="evidence-delivery"
+                                                    checked={formData.evidenceTypes.includes('delivery')}
+                                                    onChange={() => handleCheckboxChange('evidenceTypes', 'delivery')}
+                                                />
+                                                <label htmlFor="evidence-delivery">Proof of delivery (email confirmations, upload receipts)</label>
+                                            </div>
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="evidence-acceptance"
+                                                    checked={formData.evidenceTypes.includes('acceptance')}
+                                                    onChange={() => handleCheckboxChange('evidenceTypes', 'acceptance')}
+                                                />
+                                                <label htmlFor="evidence-acceptance">Client acceptance/approval messages</label>
+                                            </div>
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="evidence-usage"
+                                                    checked={formData.evidenceTypes.includes('usage')}
+                                                    onChange={() => handleCheckboxChange('evidenceTypes', 'usage')}
+                                                />
+                                                <label htmlFor="evidence-usage">Evidence of client's current use of deliverables</label>
+                                            </div>
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="evidence-invoices"
+                                                    checked={formData.evidenceTypes.includes('invoices')}
+                                                    onChange={() => handleCheckboxChange('evidenceTypes', 'invoices')}
+                                                />
+                                                <label htmlFor="evidence-invoices">Complete invoicing history</label>
+                                            </div>
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="evidence-reminders"
+                                                    checked={formData.evidenceTypes.includes('reminders')}
+                                                    onChange={() => handleCheckboxChange('evidenceTypes', 'reminders')}
+                                                />
+                                                <label htmlFor="evidence-reminders">Previous payment reminders and correspondence</label>
+                                            </div>
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="evidence-disputes"
+                                                    checked={formData.evidenceTypes.includes('disputes')}
+                                                    onChange={() => handleCheckboxChange('evidenceTypes', 'disputes')}
+                                                />
+                                                <label htmlFor="evidence-disputes">Client communications disputing quality or payment</label>
+                                            </div>
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="evidence-scope-changes"
+                                                    checked={formData.evidenceTypes.includes('scope-changes')}
+                                                    onChange={() => handleCheckboxChange('evidenceTypes', 'scope-changes')}
+                                                />
+                                                <label htmlFor="evidence-scope-changes">Documentation of scope changes/expansions</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Additional Evidence Description:</label>
+                                        <textarea
+                                            value={formData.additionalEvidence}
+                                            onChange={(e) => handleInputChange('additionalEvidence', e.target.value)}
+                                            placeholder="Describe any other evidence you have (e.g., project management tool records, time logs, version histories, etc.)"
+                                            rows="4"
+                                        />
+                                    </div>
+
+                                    <div className="resources-section">
+                                        <div className="section-title">Evidence Organization Tips</div>
+                                        <ul>
+                                            <li><strong>Email exports:</strong> Export complete email threads as PDFs to preserve formatting and metadata</li>
+                                            <li><strong>Screenshots:</strong> Take dated screenshots of live websites or materials using your work</li>
+                                            <li><strong>Version control:</strong> Git history or file version timestamps prove when work was done</li>
+                                            <li><strong>Platform records:</strong> Download all records from Upwork, Fiverr, or other platforms</li>
+                                            <li><strong>Timeline:</strong> Create a chronological timeline document with dates of all key events</li>
+                                        </ul>
+                                    </div>
+                                </>
+                            )}
+
+                            {activeTab === 'demands' && (
+                                <>
+                                    <div className="form-group">
+                                        <label>Letter Tone:</label>
+                                        <div className="radio-group">
+                                            <div className="radio-item">
+                                                <input
+                                                    type="radio"
+                                                    id="tone-gentle"
+                                                    checked={formData.tone === 'gentle'}
+                                                    onChange={() => handleInputChange('tone', 'gentle')}
+                                                />
+                                                <label htmlFor="tone-gentle">Gentle reminder (for good-faith clients)</label>
+                                            </div>
+                                            <div className="radio-item">
+                                                <input
+                                                    type="radio"
+                                                    id="tone-firm"
+                                                    checked={formData.tone === 'firm'}
+                                                    onChange={() => handleInputChange('tone', 'firm')}
+                                                />
+                                                <label htmlFor="tone-firm">Firm business letter (standard)</label>
+                                            </div>
+                                            <div className="radio-item">
+                                                <input
+                                                    type="radio"
+                                                    id="tone-pre-lit"
+                                                    checked={formData.tone === 'pre-litigation'}
+                                                    onChange={() => handleInputChange('tone', 'pre-litigation')}
+                                                />
+                                                <label htmlFor="tone-pre-lit">Pre-litigation warning (final notice)</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="info-box">
+                                        <strong>Tone Guidance:</strong> Use gentle for first demands to organized clients. Use firm for repeat offenders or when previous reminders failed. Use pre-litigation only as your final attempt before filing suit.
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Primary Demands (select all that apply):</label>
+                                        <div className="checkbox-group">
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="demand-payment"
+                                                    checked={formData.demandTypes.includes('full-payment')}
+                                                    onChange={() => handleCheckboxChange('demandTypes', 'full-payment')}
+                                                />
+                                                <label htmlFor="demand-payment">Full payment of amount owed</label>
+                                            </div>
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="demand-termination"
+                                                    checked={formData.demandTypes.includes('relationship-termination')}
+                                                    onChange={() => handleCheckboxChange('demandTypes', 'relationship-termination')}
+                                                />
+                                                <label htmlFor="demand-termination">Termination of working relationship</label>
+                                            </div>
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="demand-stop-work"
+                                                    checked={formData.demandTypes.includes('stop-work')}
+                                                    onChange={() => handleCheckboxChange('demandTypes', 'stop-work')}
+                                                />
+                                                <label htmlFor="demand-stop-work">Stop all work immediately until paid</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Payment Deadline:</label>
+                                        <input
+                                            type="date"
+                                            value={formData.deadline}
+                                            onChange={(e) => handleInputChange('deadline', e.target.value)}
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Required Payment Method:</label>
+                                        <input
+                                            type="text"
+                                            value={formData.paymentMethod}
+                                            onChange={(e) => handleInputChange('paymentMethod', e.target.value)}
+                                            placeholder="e.g., wire transfer, cashier's check, ACH"
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <div className="checkbox-item">
+                                            <input
+                                                type="checkbox"
+                                                id="payment-plan"
+                                                checked={formData.openToPaymentPlan}
+                                                onChange={(e) => handleInputChange('openToPaymentPlan', e.target.checked)}
+                                            />
+                                            <label htmlFor="payment-plan">Open to discussing payment plan if client has cash flow issues</label>
+                                        </div>
+                                    </div>
+
+                                    <hr className="section-divider" />
+
+                                    <div className="form-group">
+                                        <div className="checkbox-item">
+                                            <input
+                                                type="checkbox"
+                                                id="ip-leverage"
+                                                checked={formData.ipLeverage}
+                                                onChange={(e) => handleInputChange('ipLeverage', e.target.checked)}
+                                            />
+                                            <label htmlFor="ip-leverage">I have intellectual property leverage (contract reserves IP rights until full payment)</label>
+                                        </div>
+                                    </div>
+
+                                    {formData.ipLeverage && (
+                                        <div className="form-group">
+                                            <label>IP Rights Details:</label>
+                                            <textarea
+                                                value={formData.ipLeverageDetails}
+                                                onChange={(e) => handleInputChange('ipLeverageDetails', e.target.value)}
+                                                placeholder="Describe the IP provision in your contract (e.g., 'Our contract specifies that all intellectual property rights remain with me until full payment is received. You have only a limited license contingent on payment.')"
+                                                rows="3"
+                                            />
+                                        </div>
+                                    )}
+                                </>
+                            )}
+
+                            {activeTab === 'next-steps' && (
+                                <>
+                                    <div className="info-box">
+                                        <strong>Escalation Options:</strong> Select the remedies you're realistically prepared to pursue if payment isn't received. Having credible next steps strengthens your demand letter.
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Escalation Options (select all you're willing to pursue):</label>
+                                        <div className="checkbox-group">
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="escalate-small-claims"
+                                                    checked={formData.escalationOptions.includes('small-claims')}
+                                                    onChange={() => handleCheckboxChange('escalationOptions', 'small-claims')}
+                                                />
+                                                <label htmlFor="escalate-small-claims">File suit in small claims court</label>
+                                            </div>
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="escalate-civil"
+                                                    checked={formData.escalationOptions.includes('civil-suit')}
+                                                    onChange={() => handleCheckboxChange('escalationOptions', 'civil-suit')}
+                                                />
+                                                <label htmlFor="escalate-civil">File civil lawsuit (breach of contract)</label>
+                                            </div>
+                                            {formData.nyFreelanceAct && (
+                                                <div className="checkbox-item">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="escalate-dol"
+                                                        checked={formData.escalationOptions.includes('dol-complaint')}
+                                                        onChange={() => handleCheckboxChange('escalationOptions', 'dol-complaint')}
+                                                    />
+                                                    <label htmlFor="escalate-dol">File complaint with NY Department of Labor</label>
+                                                </div>
+                                            )}
+                                            {formData.caFreelanceAct && (
+                                                <div className="checkbox-item">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="escalate-ag"
+                                                        checked={formData.escalationOptions.includes('ag-referral')}
+                                                        onChange={() => handleCheckboxChange('escalationOptions', 'ag-referral')}
+                                                    />
+                                                    <label htmlFor="escalate-ag">Refer to California Attorney General for investigation</label>
+                                                </div>
+                                            )}
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="escalate-collection"
+                                                    checked={formData.escalationOptions.includes('collection-agency')}
+                                                    onChange={() => handleCheckboxChange('escalationOptions', 'collection-agency')}
+                                                />
+                                                <label htmlFor="escalate-collection">Refer to collection agency</label>
+                                            </div>
+                                            {formData.mechanicLien && (
+                                                <div className="checkbox-item">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="escalate-lien"
+                                                        checked={formData.escalationOptions.includes('mechanic-lien')}
+                                                        onChange={() => handleCheckboxChange('escalationOptions', 'mechanic-lien')}
+                                                    />
+                                                    <label htmlFor="escalate-lien">File mechanic's lien against property</label>
+                                                </div>
+                                            )}
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="escalate-public"
+                                                    checked={formData.escalationOptions.includes('public-record')}
+                                                    onChange={() => handleCheckboxChange('escalationOptions', 'public-record')}
+                                                />
+                                                <label htmlFor="escalate-public">Pursue judgment (becomes public record affecting credit)</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {formData.escalationOptions.includes('small-claims') && (
+                                        <div className="form-group">
+                                            <label>Small Claims Limit in Your Jurisdiction:</label>
+                                            <input
+                                                type="number"
+                                                value={formData.smallClaimsLimit}
+                                                onChange={(e) => handleInputChange('smallClaimsLimit', e.target.value)}
+                                                placeholder="e.g., 10000 for NYC, 10000 for CA individuals"
+                                            />
+                                        </div>
+                                    )}
+
+                                    <div className="form-group">
+                                        <label>Additional Notes / Special Circumstances:</label>
+                                        <textarea
+                                            value={formData.additionalNotes}
+                                            onChange={(e) => handleInputChange('additionalNotes', e.target.value)}
+                                            placeholder="Any other information that should be included in the letter"
+                                            rows="4"
+                                        />
+                                    </div>
+
+                                    <div className="resources-section">
+                                        <div className="section-title">Important Resources & Links</div>
+                                        <ul>
+                                            <li><strong>NY Freelance Isn't Free Act:</strong> <a href="https://www.nyc.gov/site/dca/about/freelance-isnt-free-act.page" target="_blank" rel="noopener noreferrer">NYC DCWP Information</a></li>
+                                            <li><strong>NY DOL Freelance Resources:</strong> <a href="https://dol.ny.gov/freelance-isnt-free-act" target="_blank" rel="noopener noreferrer">File complaint & get model contract</a></li>
+                                            <li><strong>CA Freelance Worker Protection Act:</strong> <a href="https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202320240SB988" target="_blank" rel="noopener noreferrer">SB 988 Full Text</a></li>
+                                            <li><strong>Small Claims Info:</strong> <a href="https://www.nolo.com/legal-encyclopedia/small-claims-suits-how-much-30031.html" target="_blank" rel="noopener noreferrer">Nolo Small Claims Limits by State</a></li>
+                                            <li><strong>Collection Agencies:</strong> Research reputable agencies; typical fee is 25-50% of collected amount</li>
+                                            <li><strong>Prompt Payment Act:</strong> <a href="https://fiscal.treasury.gov/prompt-payment/" target="_blank" rel="noopener noreferrer">Federal Prompt Payment Info</a></li>
+                                            <li><strong>Contract Law Basics:</strong> <a href="https://www.nolo.com/legal-encyclopedia/contracts" target="_blank" rel="noopener noreferrer">Nolo Contract Law Guide</a></li>
+                                        </ul>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+
+                        <div className="preview-section">
+                            <div className="preview-container">
+                                <div className="document-preview">
+                                    {generateLetter}
+                                </div>
+                            </div>
+                            <div className="button-group">
+                                <button className="btn btn-primary" onClick={copyToClipboard}>
+                                    Copy Letter
+                                </button>
+                                <button className="btn btn-secondary" onClick={downloadLetter}>
+                                    Download
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<FreelancerNonpaymentGenerator />);
+    </script>
+</body>
+</html>
