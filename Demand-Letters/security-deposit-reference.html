@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Deposit Laws Reference Tool</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #2d3748;
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .tabs {
+            display: flex;
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            padding: 1rem;
+            gap: 0.5rem;
+            overflow-x: auto;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            color: white;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .tab:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .tab.active {
+            background: white;
+            color: #059669;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .content-wrapper {
+            padding: 2rem;
+        }
+
+        .info-box {
+            background: #d1fae5;
+            border-left: 4px solid #059669;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            color: #064e3b;
+        }
+
+        .info-box strong {
+            color: #059669;
+        }
+
+        .warning-box {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            color: #78350f;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #059669;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        select, input[type="text"], input[type="number"], input[type="date"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #a7f3d0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #059669;
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+        }
+
+        .state-info-card {
+            background: #f0fdf4;
+            border: 2px solid #a7f3d0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .state-info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #d1fae5;
+        }
+
+        .state-info-row:last-child {
+            border-bottom: none;
+        }
+
+        .state-info-label {
+            font-weight: 600;
+            color: #065f46;
+        }
+
+        .state-info-value {
+            color: #064e3b;
+            text-align: right;
+            max-width: 60%;
+        }
+
+        .calculator-result {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .calculator-result-amount {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 1rem 0;
+        }
+
+        .calculator-breakdown {
+            background: rgba(255,255,255,0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            text-align: left;
+        }
+
+        .breakdown-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .breakdown-row:last-child {
+            border-bottom: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-top: 0.5rem;
+            padding-top: 1rem;
+            border-top: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .checklist-section {
+            margin: 1.5rem 0;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 1rem;
+            background: #f0fdf4;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            border: 1px solid #a7f3d0;
+        }
+
+        .checklist-icon {
+            font-size: 1.5rem;
+            min-width: 24px;
+        }
+
+        .checklist-content {
+            flex: 1;
+        }
+
+        .checklist-title {
+            font-weight: 600;
+            color: #065f46;
+            margin-bottom: 0.25rem;
+        }
+
+        .checklist-description {
+            font-size: 0.9rem;
+            color: #064e3b;
+        }
+
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .resource-card {
+            background: #f0fdf4;
+            border: 2px solid #a7f3d0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .resource-card:hover {
+            border-color: #059669;
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2);
+        }
+
+        .resource-title {
+            color: #059669;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .resource-description {
+            color: #064e3b;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .resource-link {
+            color: #059669;
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #a7f3d0;
+            transition: all 0.3s ease;
+        }
+
+        .resource-link:hover {
+            background: #059669;
+            color: white;
+            border-color: #059669;
+        }
+
+        .platform-card {
+            background: #f0fdf4;
+            border-left: 4px solid #059669;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+        }
+
+        .platform-name {
+            color: #059669;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .platform-detail {
+            margin: 0.75rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .platform-detail::before {
+            content: "•";
+            position: absolute;
+            left: 0.5rem;
+            color: #059669;
+            font-weight: bold;
+        }
+
+        .timeline-calculator {
+            background: #f0fdf4;
+            border: 2px solid #a7f3d0;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+        }
+
+        .timeline-result {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            border: 2px solid #059669;
+        }
+
+        .timeline-date {
+            color: #059669;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
+
+        .section-divider {
+            margin: 2rem 0;
+            border: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #a7f3d0, transparent);
+        }
+
+        @media (max-width: 768px) {
+            .calculator-result-amount {
+                font-size: 2rem;
+            }
+
+            .resources-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .state-info-row {
+                flex-direction: column;
+            }
+
+            .state-info-value {
+                max-width: 100%;
+                text-align: left;
+                margin-top: 0.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useMemo } = React;
+
+        // State laws database
+        const stateLaws = {
+            'CA': {
+                name: 'California',
+                maxDeposit: '1× monthly rent (2× for small landlords with ≤2 properties/4 units)',
+                returnDeadline: 21,
+                interestRequired: 'No (except some local rent-control jurisdictions)',
+                escrowRequired: 'No statewide requirement',
+                penaltyMultiplier: '2× deposit for bad-faith retention',
+                statute: 'Civil Code § 1950.5',
+                agLink: 'https://oag.ca.gov/consumers/general/landlord-tenant',
+                statuteLink: 'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=1950.5',
+                notes: 'Pre-move-out inspection available upon request. Receipts required for repairs >$125.',
+                shortTermNote: 'Hotel/motel transient occupancy (subject to occupancy tax) excluded from § 1950.5'
+            },
+            'NY': {
+                name: 'New York',
+                maxDeposit: '1× monthly rent',
+                returnDeadline: 14,
+                interestRequired: 'Yes, for buildings with 6+ units',
+                escrowRequired: 'Yes, interest-bearing account for 6+ unit buildings',
+                penaltyMultiplier: 'Potential double damages; automatic forfeiture if no itemization',
+                statute: 'General Obligations Law § 7-108',
+                agLink: 'https://ag.ny.gov/consumer-frauds/landlord-tenant-issues',
+                statuteLink: 'https://www.nysenate.gov/legislation/laws/GOB/7-108',
+                notes: 'Missing 14-day deadline forfeits right to any deductions.',
+                shortTermNote: 'Standard deposit rules apply to residential leases; STR/transient hotel rules different'
+            },
+            'TX': {
+                name: 'Texas',
+                maxDeposit: 'No statutory cap',
+                returnDeadline: 30,
+                interestRequired: 'No',
+                escrowRequired: 'No',
+                penaltyMultiplier: '$100 statutory minimum + treble damages for bad faith + attorney fees',
+                statute: 'Property Code §§ 92.101-92.109',
+                agLink: 'https://www.texasattorneygeneral.gov/consumer-protection',
+                statuteLink: 'https://statutes.capitol.texas.gov/Docs/PR/htm/PR.92.htm',
+                notes: 'Tenant must provide forwarding address. Bad faith = 3× withheld amount.',
+                shortTermNote: 'Short-term rentals treated as transient lodging, not landlord-tenant'
+            },
+            'FL': {
+                name: 'Florida',
+                maxDeposit: 'No statutory cap (must be "reasonable")',
+                returnDeadline: '15 days if no claim; 30 days if claiming (with notice)',
+                interestRequired: 'Yes (5% if surety bond) OR interest-bearing account',
+                escrowRequired: 'Must hold in separate FL account, post bond, or in interest-bearing account',
+                penaltyMultiplier: 'Forfeiture of claim if procedures not followed',
+                statute: 'Fla. Stat. § 83.49',
+                agLink: 'https://www.myfloridalegal.com/consumer-protection',
+                statuteLink: 'http://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0000-0099/0083/0083.html',
+                notes: 'Complex notice requirements if landlord claims deductions.',
+                shortTermNote: 'Transient lodging governed by innkeeper laws, not § 83.49'
+            },
+            'WA': {
+                name: 'Washington',
+                maxDeposit: 'No statutory cap',
+                returnDeadline: 21,
+                interestRequired: 'No (landlord keeps interest)',
+                escrowRequired: 'Must be in trust account at financial institution',
+                penaltyMultiplier: 'Tenant can recover double the deposit wrongfully withheld',
+                statute: 'RCW 59.18.260-280',
+                agLink: 'https://www.atg.wa.gov/residential-landlord-tenant-resources',
+                statuteLink: 'https://app.leg.wa.gov/rcw/default.aspx?cite=59.18',
+                notes: 'Move-in checklist required. Must disclose deposit location.',
+                shortTermNote: 'Standard LL-tenant rules; check local STR ordinances'
+            },
+            'IL': {
+                name: 'Illinois',
+                maxDeposit: 'No statewide cap (Chicago RLTO has strict rules)',
+                returnDeadline: '45 days (30 days for itemization, then receipts)',
+                interestRequired: 'Yes for 25+ unit buildings held >6 months',
+                escrowRequired: 'Chicago requires separate interest-bearing account',
+                penaltyMultiplier: '2× deposit + deposit (Chicago RLTO)',
+                statute: '765 ILCS 710/1',
+                agLink: 'https://www.illinoisattorneygeneral.gov/consumers/landlordtenantrights.html',
+                statuteLink: 'https://www.ilga.gov/legislation/ilcs/ilcs3.asp?ActID=2202',
+                notes: 'Chicago has much stricter rules than rest of state.',
+                shortTermNote: 'Chicago regulations strict; other IL areas more flexible'
+            },
+            'MA': {
+                name: 'Massachusetts',
+                maxDeposit: '1× monthly rent',
+                returnDeadline: 30,
+                interestRequired: 'Yes, must pay annual interest to tenant',
+                escrowRequired: 'Must be in separate MA interest-bearing account',
+                penaltyMultiplier: 'Treble damages (3×) + attorney fees for violations',
+                statute: 'M.G.L. c. 186, § 15B',
+                agLink: 'https://www.mass.gov/info-details/massachusetts-law-about-tenants-security-deposits',
+                statuteLink: 'https://malegislature.gov/Laws/GeneralLaws/PartII/TitleI/Chapter186/Section15b',
+                notes: 'Very strict compliance requirements. Automatic treble damages for violations.',
+                shortTermNote: 'Standard LL-tenant protections; STR/hotel different'
+            },
+            'NJ': {
+                name: 'New Jersey',
+                maxDeposit: '1.5× monthly rent',
+                returnDeadline: 30,
+                interestRequired: 'Yes, must pay or credit annually',
+                escrowRequired: 'Must be in NJ interest-bearing account or money market',
+                penaltyMultiplier: 'Tenant can apply deposit to rent if LL fails to comply',
+                statute: 'N.J.S.A. 46:8-19',
+                agLink: 'https://www.nj.gov/dca/divisions/codes/publications/pdf_lti/sdepsit_law.pdf',
+                statuteLink: 'https://law.justia.com/codes/new-jersey/2013/title-46/section-46-8-19',
+                notes: 'Must provide receipt and account information within 30 days.',
+                shortTermNote: 'Standard residential protections apply'
+            },
+            'CO': {
+                name: 'Colorado',
+                maxDeposit: '1× monthly rent (effective Jan 1, 2026; currently 2×)',
+                returnDeadline: '30-60 days depending on lease terms',
+                interestRequired: 'No',
+                escrowRequired: 'No',
+                penaltyMultiplier: 'Treble damages (3×) for bad-faith retention + attorney fees',
+                statute: 'C.R.S. § 38-12-103',
+                agLink: 'https://coag.gov/resources/tenant-resources/',
+                statuteLink: 'https://leg.colorado.gov/sites/default/files/images/olls/crs2018-title-38.pdf',
+                notes: 'Recent legislation (HB 25-1249) reduces cap and adds requirements.',
+                shortTermNote: 'Standard LL-tenant rules'
+            },
+            'OR': {
+                name: 'Oregon',
+                maxDeposit: 'No numeric cap; increases must allow 3+ months to pay',
+                returnDeadline: 31,
+                interestRequired: 'No',
+                escrowRequired: 'No',
+                penaltyMultiplier: 'Twice the wrongfully withheld amount',
+                statute: 'ORS 90.300',
+                agLink: 'https://www.doj.state.or.us/consumer-protection/landlord-tenant-law/',
+                statuteLink: 'https://www.oregonlegislature.gov/bills_laws/ors/ors090.html',
+                notes: 'Portland has additional local protections. Carpet cleaning only if lease specifies.',
+                shortTermNote: 'Portland has strict STR regulations; check local rules'
+            },
+            'DC': {
+                name: 'District of Columbia',
+                maxDeposit: '1× monthly rent',
+                returnDeadline: 45,
+                interestRequired: 'Yes, must pay interest',
+                escrowRequired: 'Yes, interest-bearing escrow at DC financial institution',
+                penaltyMultiplier: 'Statutory damages available',
+                statute: 'D.C. Code § 42-3502.17',
+                agLink: 'https://ota.dc.gov/page/office-tenant-advocate-tenant-resources',
+                statuteLink: 'https://code.dccouncil.gov/us/dc/council/code/sections/42-3502.17',
+                notes: 'Must post notice of bank and interest rates.',
+                shortTermNote: 'Standard residential protections'
+            },
+            'AZ': {
+                name: 'Arizona',
+                maxDeposit: '1.5× monthly rent',
+                returnDeadline: '14 business days',
+                interestRequired: 'No',
+                escrowRequired: 'No',
+                penaltyMultiplier: 'Twice the wrongfully withheld amount',
+                statute: 'A.R.S. § 33-1321',
+                agLink: 'https://www.azag.gov/consumer/landlord-tenant',
+                statuteLink: 'https://www.azleg.gov/ars/33/01321.htm',
+                notes: 'Nonrefundable fees must be clearly labeled.',
+                shortTermNote: 'STRs subject to tax/zoning but not standard deposit rules'
+            },
+            'OH': {
+                name: 'Ohio',
+                maxDeposit: 'No statutory cap',
+                returnDeadline: 30,
+                interestRequired: 'Yes, 5% annual for deposits >$50 or 1 month rent if tenant stays 6+ months',
+                escrowRequired: 'No',
+                penaltyMultiplier: 'Actual damages + wrongfully withheld amount + attorney fees',
+                statute: 'R.C. 5321.16',
+                agLink: 'https://www.ohioattorneygeneral.gov/Individuals-and-Families/Consumers/Consumer-Resources',
+                statuteLink: 'https://codes.ohio.gov/ohio-revised-code/section-5321.16',
+                notes: 'Tenant must provide forwarding address.',
+                shortTermNote: 'Standard LL-tenant protections'
+            }
+        };
+
+        function SecurityDepositReference() {
+            const [activeTab, setActiveTab] = useState('lookup');
+            const [selectedState, setSelectedState] = useState('CA');
+
+            // Calculator states
+            const [depositAmount, setDepositAmount] = useState('');
+            const [moveOutDate, setMoveOutDate] = useState('');
+            const [calculatorState, setCalculatorState] = useState('CA');
+            const [violationType, setViolationType] = useState('bad-faith');
+
+            const currentStateLaw = stateLaws[selectedState];
+
+            const calculateDeadline = useMemo(() => {
+                if (!moveOutDate) return null;
+
+                const moveOut = new Date(moveOutDate);
+                const deadlineDays = stateLaws[calculatorState].returnDeadline;
+
+                const deadline = new Date(moveOut);
+                deadline.setDate(deadline.getDate() + parseInt(deadlineDays));
+
+                const today = new Date();
+                const daysOverdue = Math.floor((today - deadline) / (1000 * 60 * 60 * 24));
+
+                return {
+                    deadline: deadline.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+                    daysOverdue: daysOverdue > 0 ? daysOverdue : 0,
+                    isOverdue: daysOverdue > 0
+                };
+            }, [moveOutDate, calculatorState]);
+
+            const calculatePenalties = useMemo(() => {
+                if (!depositAmount) return null;
+
+                const deposit = parseFloat(depositAmount);
+                const state = stateLaws[calculatorState];
+                let multiplier = 1;
+                let description = '';
+
+                if (state.penaltyMultiplier.includes('3×') || state.penaltyMultiplier.includes('Treble')) {
+                    multiplier = 3;
+                    description = 'Treble damages (3× deposit)';
+                } else if (state.penaltyMultiplier.includes('2×')) {
+                    multiplier = 2;
+                    description = 'Double damages (2× deposit)';
+                } else {
+                    multiplier = 1;
+                    description = 'Actual deposit only';
+                }
+
+                const statutoryDamages = deposit * (multiplier - 1);
+                const total = deposit + statutoryDamages;
+
+                return {
+                    deposit,
+                    statutoryDamages,
+                    total,
+                    description,
+                    multiplier
+                };
+            }, [depositAmount, calculatorState]);
+
+            const tabs = [
+                { id: 'lookup', label: 'State Law Lookup' },
+                { id: 'deadline', label: 'Deadline Calculator' },
+                { id: 'penalties', label: 'Penalty Calculator' },
+                { id: 'str', label: 'Short-Term Rentals' },
+                { id: 'evidence', label: 'Evidence Checklist' },
+                { id: 'resources', label: 'Resources' }
+            ];
+
+            return (
+                <div className="container">
+                    <div className="tabs">
+                        {tabs.map(tab => (
+                            <button
+                                key={tab.id}
+                                className={`tab ${activeTab === tab.id ? 'active' : ''}`}
+                                onClick={() => setActiveTab(tab.id)}
+                            >
+                                {tab.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="content-wrapper">
+                        {activeTab === 'lookup' && (
+                            <>
+                                <div className="info-box">
+                                    <strong>State-by-State Security Deposit Laws:</strong> Select your state to see maximum deposit limits, return deadlines, interest/escrow requirements, penalty provisions, and links to official statutes and resources.
+                                </div>
+
+                                <div className="form-group">
+                                    <label>Select Your State:</label>
+                                    <select
+                                        value={selectedState}
+                                        onChange={(e) => setSelectedState(e.target.value)}
+                                        style={{fontSize: '1.1rem', padding: '1rem'}}
+                                    >
+                                        {Object.keys(stateLaws).sort((a, b) =>
+                                            stateLaws[a].name.localeCompare(stateLaws[b].name)
+                                        ).map(stateCode => (
+                                            <option key={stateCode} value={stateCode}>
+                                                {stateLaws[stateCode].name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                {currentStateLaw && (
+                                    <div className="state-info-card">
+                                        <div style={{fontSize: '1.5rem', fontWeight: '700', color: '#059669', marginBottom: '1.5rem'}}>
+                                            {currentStateLaw.name} Security Deposit Law
+                                        </div>
+
+                                        <div className="state-info-row">
+                                            <div className="state-info-label">Maximum Deposit Allowed:</div>
+                                            <div className="state-info-value">{currentStateLaw.maxDeposit}</div>
+                                        </div>
+
+                                        <div className="state-info-row">
+                                            <div className="state-info-label">Return Deadline:</div>
+                                            <div className="state-info-value">{currentStateLaw.returnDeadline} days after tenant vacates</div>
+                                        </div>
+
+                                        <div className="state-info-row">
+                                            <div className="state-info-label">Interest Required:</div>
+                                            <div className="state-info-value">{currentStateLaw.interestRequired}</div>
+                                        </div>
+
+                                        <div className="state-info-row">
+                                            <div className="state-info-label">Escrow Required:</div>
+                                            <div className="state-info-value">{currentStateLaw.escrowRequired}</div>
+                                        </div>
+
+                                        <div className="state-info-row">
+                                            <div className="state-info-label">Penalties for Violation:</div>
+                                            <div className="state-info-value">{currentStateLaw.penaltyMultiplier}</div>
+                                        </div>
+
+                                        <div className="state-info-row">
+                                            <div className="state-info-label">Governing Statute:</div>
+                                            <div className="state-info-value">{currentStateLaw.statute}</div>
+                                        </div>
+
+                                        {currentStateLaw.notes && (
+                                            <>
+                                                <hr className="section-divider" />
+                                                <div style={{background: 'white', padding: '1rem', borderRadius: '8px', marginTop: '1rem'}}>
+                                                    <div style={{fontWeight: '600', color: '#065f46', marginBottom: '0.5rem'}}>Important Notes:</div>
+                                                    <div style={{color: '#064e3b', fontSize: '0.95rem'}}>{currentStateLaw.notes}</div>
+                                                </div>
+                                            </>
+                                        )}
+
+                                        {currentStateLaw.shortTermNote && (
+                                            <div style={{background: '#fef3c7', padding: '1rem', borderRadius: '8px', marginTop: '1rem', border: '1px solid #fcd34d'}}>
+                                                <div style={{fontWeight: '600', color: '#78350f', marginBottom: '0.5rem'}}>Short-Term Rentals:</div>
+                                                <div style={{color: '#78350f', fontSize: '0.95rem'}}>{currentStateLaw.shortTermNote}</div>
+                                            </div>
+                                        )}
+
+                                        <hr className="section-divider" />
+
+                                        <div style={{display: 'flex', gap: '1rem', flexWrap: 'wrap', marginTop: '1.5rem'}}>
+                                            <a href={currentStateLaw.statuteLink} target="_blank" rel="noopener noreferrer" className="resource-link">
+                                                📜 Read Full Statute Text
+                                            </a>
+                                            <a href={currentStateLaw.agLink} target="_blank" rel="noopener noreferrer" className="resource-link">
+                                                🏛️ State Attorney General Resources
+                                            </a>
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="warning-box">
+                                    <strong>Local Variations:</strong> Many cities have additional tenant protections beyond state law (e.g., NYC, Chicago, Portland, Santa Monica, SF Bay Area). Always check local ordinances and rent control rules in your specific city.
+                                </div>
+                            </>
+                        )}
+
+                        {activeTab === 'deadline' && (
+                            <>
+                                <div className="info-box">
+                                    <strong>Calculate Deposit Return Deadline:</strong> Find out when your landlord was legally required to return your deposit and whether they've missed the deadline.
+                                </div>
+
+                                <div className="timeline-calculator">
+                                    <div className="form-group">
+                                        <label>Select State:</label>
+                                        <select
+                                            value={calculatorState}
+                                            onChange={(e) => setCalculatorState(e.target.value)}
+                                        >
+                                            {Object.keys(stateLaws).sort((a, b) =>
+                                                stateLaws[a].name.localeCompare(stateLaws[b].name)
+                                            ).map(stateCode => (
+                                                <option key={stateCode} value={stateCode}>
+                                                    {stateLaws[stateCode].name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Move-Out Date:</label>
+                                        <input
+                                            type="date"
+                                            value={moveOutDate}
+                                            onChange={(e) => setMoveOutDate(e.target.value)}
+                                        />
+                                    </div>
+
+                                    {calculateDeadline && (
+                                        <div className="timeline-result">
+                                            <div style={{fontSize: '1.1rem', color: '#064e3b', marginBottom: '0.5rem'}}>
+                                                Statutory Deadline for Return:
+                                            </div>
+                                            <div className="timeline-date">
+                                                {calculateDeadline.deadline}
+                                            </div>
+                                            <div style={{fontSize: '0.9rem', color: '#065f46', marginTop: '0.5rem'}}>
+                                                ({stateLaws[calculatorState].returnDeadline} days after {moveOutDate})
+                                            </div>
+
+                                            {calculateDeadline.isOverdue && (
+                                                <div style={{background: '#fef3c7', padding: '1rem', borderRadius: '8px', marginTop: '1rem', border: '2px solid #f59e0b'}}>
+                                                    <div style={{fontSize: '1.2rem', fontWeight: '600', color: '#78350f'}}>
+                                                        ⚠️ DEADLINE MISSED
+                                                    </div>
+                                                    <div style={{color: '#78350f', marginTop: '0.5rem'}}>
+                                                        Your landlord is <strong>{calculateDeadline.daysOverdue} days overdue</strong> in returning your deposit.
+                                                    </div>
+                                                    <div style={{color: '#78350f', marginTop: '0.5rem', fontSize: '0.9rem'}}>
+                                                        In {stateLaws[calculatorState].name}, missing the statutory deadline may result in forfeiture of the right to make deductions and/or expose the landlord to statutory penalties.
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {!calculateDeadline.isOverdue && (
+                                                <div style={{background: '#d1fae5', padding: '1rem', borderRadius: '8px', marginTop: '1rem', border: '2px solid #059669'}}>
+                                                    <div style={{color: '#065f46'}}>
+                                                        ✓ Deadline has not yet passed. Wait until after {calculateDeadline.deadline} to send a demand letter if your deposit isn't returned.
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="warning-box" style={{marginTop: '1.5rem'}}>
+                                    <strong>Important:</strong> Some states have specific rules about when the deadline starts (day you vacate, day you surrender keys, etc.). The calculation above uses your move-out date as entered. Consult your state's statute for precise definitions.
+                                </div>
+                            </>
+                        )}
+
+                        {activeTab === 'penalties' && (
+                            <>
+                                <div className="info-box">
+                                    <strong>Calculate Potential Recovery:</strong> See how much you could potentially recover if your landlord wrongfully withheld your deposit, including statutory penalties available in your state.
+                                </div>
+
+                                <div className="form-group">
+                                    <label>Select State:</label>
+                                    <select
+                                        value={calculatorState}
+                                        onChange={(e) => setCalculatorState(e.target.value)}
+                                    >
+                                        {Object.keys(stateLaws).sort((a, b) =>
+                                            stateLaws[a].name.localeCompare(stateLaws[b].name)
+                                        ).map(stateCode => (
+                                            <option key={stateCode} value={stateCode}>
+                                                {stateLaws[stateCode].name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label>Security Deposit Amount:</label>
+                                    <input
+                                        type="number"
+                                        value={depositAmount}
+                                        onChange={(e) => setDepositAmount(e.target.value)}
+                                        placeholder="2000"
+                                    />
+                                </div>
+
+                                {calculatePenalties && (
+                                    <>
+                                        <div className="calculator-result">
+                                            <div style={{fontSize: '1.2rem', opacity: 0.9}}>
+                                                Potential Total Recovery in {stateLaws[calculatorState].name}
+                                            </div>
+                                            <div className="calculator-result-amount">
+                                                ${calculatePenalties.total.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                                            </div>
+
+                                            <div className="calculator-breakdown">
+                                                <div className="breakdown-row">
+                                                    <span>Your Deposit:</span>
+                                                    <span>${calculatePenalties.deposit.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                                                </div>
+                                                <div className="breakdown-row">
+                                                    <span>Statutory Penalties:</span>
+                                                    <span>${calculatePenalties.statutoryDamages.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                                                </div>
+                                                <div className="breakdown-row">
+                                                    <span>TOTAL:</span>
+                                                    <span>${calculatePenalties.total.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                                                </div>
+                                            </div>
+
+                                            <div style={{marginTop: '1rem', fontSize: '0.9rem', opacity: 0.9}}>
+                                                {calculatePenalties.description}
+                                            </div>
+                                        </div>
+
+                                        <div className="info-box">
+                                            <strong>How Penalties Work in {stateLaws[calculatorState].name}:</strong>
+                                            <div style={{marginTop: '0.5rem'}}>
+                                                {stateLaws[calculatorState].penaltyMultiplier}
+                                            </div>
+                                            {stateLaws[calculatorState].name === 'Massachusetts' && (
+                                                <div style={{marginTop: '0.5rem', fontStyle: 'italic'}}>
+                                                    Note: MA has automatic treble damages for many violations. This is one of the strongest penalty provisions in the country.
+                                                </div>
+                                            )}
+                                            {(stateLaws[calculatorState].name === 'California' || stateLaws[calculatorState].name === 'Texas') && (
+                                                <div style={{marginTop: '0.5rem', fontStyle: 'italic'}}>
+                                                    Note: "Bad faith" generally means the landlord had no reasonable basis to withhold the deposit. Missing deadlines or failing to provide required documentation often constitutes bad faith.
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div className="warning-box">
+                                            <strong>Additional Recoveries:</strong> Beyond statutory penalties, you may also recover:
+                                            <ul style={{marginTop: '0.5rem', marginLeft: '1.5rem'}}>
+                                                <li>Court costs and filing fees</li>
+                                                <li>Attorney's fees (in many states)</li>
+                                                <li>Interest on the deposit (if required by state law)</li>
+                                                <li>Pre-judgment interest in some cases</li>
+                                            </ul>
+                                        </div>
+                                    </>
+                                )}
+                            </>
+                        )}
+
+                        {activeTab === 'str' && (
+                            <>
+                                <div className="info-box">
+                                    <strong>Short-Term Rental Damage Policies:</strong> Airbnb, Vrbo, and other platforms have their own policies for damage claims that differ from traditional landlord-tenant law.
+                                </div>
+
+                                <div className="platform-card">
+                                    <div className="platform-name">🏠 Airbnb AirCover for Hosts</div>
+
+                                    <div className="platform-detail">
+                                        <strong>Claim Filing Deadline:</strong> Hosts must file damage claims within 14 days of guest checkout or before next guest checks in, whichever comes first.
+                                    </div>
+
+                                    <div className="platform-detail">
+                                        <strong>Evidence Required:</strong> Photos showing damage (ideally with timestamps), receipts or estimates for repair/replacement, and proof damage didn't pre-exist the stay.
+                                    </div>
+
+                                    <div className="platform-detail">
+                                        <strong>Guest Response Window:</strong> Guests typically have 72 hours to respond to damage claims with counter-evidence.
+                                    </div>
+
+                                    <div className="platform-detail">
+                                        <strong>Coverage Limits:</strong> AirCover provides up to $3M in damage protection (property damage + liability), but guests are only charged for actual verified damage they caused.
+                                    </div>
+
+                                    <div className="platform-detail">
+                                        <strong>Dispute Resolution:</strong> Airbnb reviews evidence from both parties and makes a decision. Decisions can be appealed through customer service escalation.
+                                    </div>
+
+                                    <div style={{marginTop: '1rem', padding: '1rem', background: 'white', borderRadius: '8px'}}>
+                                        <div style={{fontWeight: '600', color: '#065f46', marginBottom: '0.5rem'}}>Guest Defense Strategies:</div>
+                                        <ul style={{marginLeft: '1.5rem', color: '#064e3b'}}>
+                                            <li>Take comprehensive check-in photos showing property condition before you unpack</li>
+                                            <li>Report any pre-existing damage immediately through platform messaging</li>
+                                            <li>Take check-out photos proving you left property in good condition</li>
+                                            <li>Respond to claims within the deadline with counter-evidence</li>
+                                            <li>Consider filing credit card chargeback for fraudulent charges</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div className="platform-card">
+                                    <div className="platform-name">🏖️ Vrbo Damage Protection</div>
+
+                                    <div className="platform-detail">
+                                        <strong>Claim Filing Deadline:</strong> Hosts must report damage within 14 days of guest departure.
+                                    </div>
+
+                                    <div className="platform-detail">
+                                        <strong>Evidence Standards:</strong> Similar to Airbnb - photos, receipts, and documentation that damage occurred during guest's stay.
+                                    </div>
+
+                                    <div className="platform-detail">
+                                        <strong>Security Deposits:</strong> Many Vrbo properties collect traditional security deposits (held by property manager) in addition to platform damage protection.
+                                    </div>
+
+                                    <div className="platform-detail">
+                                        <strong>Resolution Process:</strong> Vrbo mediates disputes and can charge guest payment method for verified damage.
+                                    </div>
+                                </div>
+
+                                <div className="warning-box">
+                                    <strong>Platform vs. State Law:</strong> Short-term rentals under 30 days are often classified as "transient occupancy" (like hotels) rather than residential tenancies. This means:
+                                    <ul style={{marginTop: '0.5rem', marginLeft: '1.5rem'}}>
+                                        <li>Traditional landlord-tenant deposit laws may not apply</li>
+                                        <li>Platform terms of service and general contract/consumer law govern instead</li>
+                                        <li>You have fewer statutory protections but still have rights against fraud</li>
+                                        <li>Credit card chargeback rights become more important</li>
+                                    </ul>
+                                </div>
+
+                                <div className="resources-grid" style={{marginTop: '1.5rem'}}>
+                                    <div className="resource-card">
+                                        <div className="resource-title">Airbnb Resolution Center</div>
+                                        <div className="resource-description">
+                                            Official platform for disputing damage claims and requesting refunds.
+                                        </div>
+                                        <a href="https://www.airbnb.com/resolutions" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Visit Resolution Center →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">Vrbo Help Center</div>
+                                        <div className="resource-description">
+                                            Damage claims, security deposits, and dispute resolution information.
+                                        </div>
+                                        <a href="https://help.vrbo.com/articles/How-does-damage-protection-work" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Learn About Vrbo Damage Protection →
+                                        </a>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        {activeTab === 'evidence' && (
+                            <>
+                                <div className="info-box">
+                                    <strong>Documentation Checklist:</strong> The evidence you gather before, during, and after your tenancy determines whether you'll recover your deposit. Use this checklist to ensure you have everything you need.
+                                </div>
+
+                                <div style={{fontSize: '1.3rem', fontWeight: '600', color: '#059669', margin: '1.5rem 0 1rem 0'}}>
+                                    Before Move-In
+                                </div>
+
+                                <div className="checklist-section">
+                                    <div className="checklist-item">
+                                        <div className="checklist-icon">📄</div>
+                                        <div className="checklist-content">
+                                            <div className="checklist-title">Complete Lease Documentation</div>
+                                            <div className="checklist-description">
+                                                Copy of signed lease, deposit receipt, and any addendums or house rules. Save digitally and keep physical copies.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="checklist-item">
+                                        <div className="checklist-icon">📸</div>
+                                        <div className="checklist-content">
+                                            <div className="checklist-title">Move-In Photos & Video</div>
+                                            <div className="checklist-description">
+                                                Document every room from multiple angles. Capture any pre-existing damage, stains, wear, or cleanliness issues with close-up shots. Time-stamped photos are ideal.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="checklist-item">
+                                        <div className="checklist-icon">✅</div>
+                                        <div className="checklist-content">
+                                            <div className="checklist-title">Move-In Inspection Checklist</div>
+                                            <div className="checklist-description">
+                                                Fill out any landlord-provided checklist thoroughly and honestly. If landlord doesn't provide one, create your own and email it to them.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="checklist-item">
+                                        <div className="checklist-icon">💰</div>
+                                        <div className="checklist-content">
+                                            <div className="checklist-title">Proof of Deposit Payment</div>
+                                            <div className="checklist-description">
+                                                Bank statement, canceled check, wire confirmation, or receipt showing you paid the deposit and the exact amount.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style={{fontSize: '1.3rem', fontWeight: '600', color: '#059669', margin: '1.5rem 0 1rem 0'}}>
+                                    During Tenancy
+                                </div>
+
+                                <div className="checklist-section">
+                                    <div className="checklist-item">
+                                        <div className="checklist-icon">📧</div>
+                                        <div className="checklist-content">
+                                            <div className="checklist-title">All Landlord Communications</div>
+                                            <div className="checklist-description">
+                                                Save every email, text message, and written notice. Document phone calls with date/time and summary of conversation.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="checklist-item">
+                                        <div className="checklist-icon">🔧</div>
+                                        <div className="checklist-content">
+                                            <div className="checklist-title">Maintenance Request Records</div>
+                                            <div className="checklist-description">
+                                                Document every repair request with photos of the problem, written requests to landlord, and records of whether/when repairs were made.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="checklist-item">
+                                        <div className="checklist-icon">💵</div>
+                                        <div className="checklist-content">
+                                            <div className="checklist-title">Rent Payment History</div>
+                                            <div className="checklist-description">
+                                                Keep records of all rent payments showing you consistently paid on time and fulfilled lease obligations.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style={{fontSize: '1.3rem', fontWeight: '600', color: '#059669', margin: '1.5rem 0 1rem 0'}}>
+                                    Before Move-Out
+                                </div>
+
+                                <div className="checklist-section">
+                                    <div className="checklist-item">
+                                        <div className="checklist-icon">🔍</div>
+                                        <div className="checklist-content">
+                                            <div className="checklist-title">Pre-Move-Out Inspection Request</div>
+                                            <div className="checklist-description">
+                                                In states that require it (like California), request inspection in writing at least 2 weeks before move-out to get itemized list of needed repairs.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="checklist-item">
+                                        <div className="checklist-icon">🧹</div>
+                                        <div className="checklist-content">
+                                            <div className="checklist-title">Professional Cleaning Receipts</div>
+                                            <div className="checklist-description">
+                                                If you hire cleaners, keep receipts showing property was professionally cleaned to move-in level of cleanliness.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="checklist-item">
+                                        <div className="checklist-icon">📹</div>
+                                        <div className="checklist-content">
+                                            <div className="checklist-title">Move-Out Video Walk-Through</div>
+                                            <div className="checklist-description">
+                                                Create timestamped video showing entire property clean and undamaged. Narrate what you're showing: "Here's the kitchen, counters wiped down, no stains..."
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="checklist-item">
+                                        <div className="checklist-icon">👥</div>
+                                        <div className="checklist-content">
+                                            <div className="checklist-title">Witness Documentation</div>
+                                            <div className="checklist-description">
+                                                Have roommate, friend, or family member present during final walk-through who can testify to property's condition if needed.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="checklist-item">
+                                        <div className="checklist-icon">🏠</div>
+                                        <div className="checklist-content">
+                                            <div className="checklist-title">Forwarding Address Notice</div>
+                                            <div className="checklist-description">
+                                                Provide forwarding address in writing (email counts) so landlord can't claim they didn't know where to send deposit.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style={{fontSize: '1.3rem', fontWeight: '600', color: '#059669', margin: '1.5rem 0 1rem 0'}}>
+                                    After Move-Out
+                                </div>
+
+                                <div className="checklist-section">
+                                    <div className="checklist-item">
+                                        <div className="checklist-icon">📅</div>
+                                        <div className="checklist-content">
+                                            <div className="checklist-title">Deadline Tracking</div>
+                                            <div className="checklist-description">
+                                                Calendar the statutory return deadline and follow up immediately if deposit isn't received or itemization isn't provided.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="checklist-item">
+                                        <div className="checklist-icon">📋</div>
+                                        <div className="checklist-content">
+                                            <div className="checklist-title">Landlord's Itemization Analysis</div>
+                                            <div className="checklist-description">
+                                                If landlord provides deductions, analyze each item against your move-in/move-out documentation and state law requirements.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="checklist-item">
+                                        <div className="checklist-icon">✉️</div>
+                                        <div className="checklist-content">
+                                            <div className="checklist-title">All Post-Move-Out Communications</div>
+                                            <div className="checklist-description">
+                                                Save every follow-up inquiry, landlord response, and your demand letters. This creates your paper trail for potential litigation.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="warning-box" style={{marginTop: '1.5rem'}}>
+                                    <strong>For Short-Term Rentals:</strong> The checklist is similar but compressed into a shorter timeframe:
+                                    <ul style={{marginTop: '0.5rem', marginLeft: '1.5rem'}}>
+                                        <li>Photo/video document at check-in <em>before</em> unpacking anything</li>
+                                        <li>Report any problems immediately via platform messaging (creates timestamped record)</li>
+                                        <li>Photo/video document at check-out showing property clean and undamaged</li>
+                                        <li>Screenshot all platform messages and claim notifications</li>
+                                    </ul>
+                                </div>
+                            </>
+                        )}
+
+                        {activeTab === 'resources' && (
+                            <>
+                                <div className="info-box">
+                                    <strong>Additional Resources:</strong> Official government resources, legal aid, and tools to help you recover your security deposit.
+                                </div>
+
+                                <div className="resources-grid">
+                                    <div className="resource-card">
+                                        <div className="resource-title">Nolo's State-by-State Deposit Guide</div>
+                                        <div className="resource-description">
+                                            Comprehensive chart comparing security deposit laws across all 50 states, updated regularly.
+                                        </div>
+                                        <a href="https://www.nolo.com/legal-encyclopedia/chart-deadline-returning-security-deposits-state-30041.html" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            View State Chart →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">HUD Tenant Rights</div>
+                                        <div className="resource-description">
+                                            U.S. Department of Housing and Urban Development resources on tenant rights and fair housing.
+                                        </div>
+                                        <a href="https://www.hud.gov/topics/rental_assistance/tenantrights" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            HUD Resources →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">Small Claims Court Info</div>
+                                        <div className="resource-description">
+                                            Find your local small claims court, filing fees, jurisdictional limits, and procedures.
+                                        </div>
+                                        <a href="https://www.nolo.com/legal-encyclopedia/small-claims-court" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Small Claims Guide →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">Legal Aid Directory</div>
+                                        <div className="resource-description">
+                                            Find free or low-cost legal assistance for housing issues in your area.
+                                        </div>
+                                        <a href="https://www.lsc.gov/what-legal-aid/find-legal-aid" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Find Legal Aid →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">Tenant Unions</div>
+                                        <div className="resource-description">
+                                            Connect with local tenant organizations that provide advocacy and support.
+                                        </div>
+                                        <a href="https://www.tenantstogether.org/" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Tenants Together →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">CFPB Credit Card Disputes</div>
+                                        <div className="resource-description">
+                                            Consumer Financial Protection Bureau guide to disputing credit card charges (useful for STR damage claims).
+                                        </div>
+                                        <a href="https://www.consumerfinance.gov/ask-cfpb/how-do-i-dispute-a-charge-on-my-credit-card-bill-en-314/" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Dispute Guide →
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <hr className="section-divider" />
+
+                                <div style={{fontSize: '1.3rem', fontWeight: '600', color: '#059669', margin: '1.5rem 0 1rem 0'}}>
+                                    State-Specific Resources
+                                </div>
+
+                                <div className="info-box">
+                                    <strong>Find Your State's Official Resources:</strong> Each state has specific tenant rights guides and security deposit information. Select your state in the "State Law Lookup" tab to access direct links to your state's Attorney General resources and statute text.
+                                </div>
+
+                                <div style={{background: '#f0fdf4', padding: '1.5rem', borderRadius: '8px', marginTop: '1.5rem', border: '2px solid #a7f3d0'}}>
+                                    <div style={{fontWeight: '600', color: '#065f46', marginBottom: '1rem'}}>Key State Resources Included:</div>
+                                    <ul style={{marginLeft: '1.5rem', color: '#064e3b', lineHeight: '1.8'}}>
+                                        <li>State Attorney General consumer protection offices</li>
+                                        <li>Official statute text with section-by-section analysis</li>
+                                        <li>State housing department tenant guides</li>
+                                        <li>Local rent board / housing authority contacts (where applicable)</li>
+                                        <li>State bar association landlord-tenant resources</li>
+                                    </ul>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<SecurityDepositReference />);
+    </script>
+</body>
+</html>
