@@ -1,0 +1,1744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Bill & Surprise Billing Dispute Tool</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #1e293b;
+            background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        #root {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .app-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 40px);
+            max-height: 900px;
+        }
+        .header {
+            background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .header-subtitle {
+            font-size: 0.95rem;
+            opacity: 0.95;
+        }
+        .tabs-container {
+            display: flex;
+            background: #f1f5f9;
+            border-bottom: 2px solid #cbd5e1;
+            overflow-x: auto;
+            flex-shrink: 0;
+        }
+        .tab {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #64748b;
+            white-space: nowrap;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+        }
+        .tab:hover {
+            background: #e2e8f0;
+            color: #0ea5e9;
+        }
+        .tab.active {
+            color: #0ea5e9;
+            background: white;
+            border-bottom-color: #0ea5e9;
+        }
+        .content-area {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        .form-section {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        .form-section::-webkit-scrollbar {
+            width: 8px;
+        }
+        .form-section::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .form-section::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .form-section::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .section-title {
+            color: #0ea5e9;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #334155;
+            font-size: 0.95rem;
+        }
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #0ea5e9;
+        }
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .checkbox-group label {
+            cursor: pointer;
+            font-size: 0.95rem;
+            user-select: none;
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4);
+        }
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #475569;
+        }
+        .btn-secondary:hover {
+            background: #cbd5e1;
+        }
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .radio-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .radio-option label {
+            cursor: pointer;
+            font-size: 0.95rem;
+            user-select: none;
+        }
+        .info-box {
+            background: #f0f9ff;
+            border-left: 4px solid #0ea5e9;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .info-box-title {
+            font-weight: 600;
+            color: #0369a1;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+        .info-box-content {
+            font-size: 0.9rem;
+            color: #334155;
+            line-height: 1.6;
+        }
+        .warning-box {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .warning-box-title {
+            font-weight: 600;
+            color: #92400e;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+        .success-box {
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        .success-box-title {
+            font-weight: 600;
+            color: #065f46;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+        .list-item {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 0.75rem;
+            border: 1px solid #e2e8f0;
+        }
+        .list-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 0.5rem;
+        }
+        .list-item-title {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 0.95rem;
+        }
+        .list-item-detail {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-bottom: 0.25rem;
+        }
+        .add-item-section {
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 6px;
+            border: 2px dashed #cbd5e1;
+            margin-bottom: 1.5rem;
+        }
+        .input-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .preview-section {
+            flex: 1;
+            background: #f8fafc;
+            padding: 2rem;
+            overflow-y: auto;
+            border-left: 2px solid #e2e8f0;
+        }
+        .preview-section::-webkit-scrollbar {
+            width: 8px;
+        }
+        .preview-section::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .preview-section::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .preview-section::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .letter-preview {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.8;
+            user-select: text;
+        }
+        .letter-preview::selection {
+            background: #bfdbfe;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .state-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .state-card {
+            background: white;
+            padding: 1.25rem;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.2s;
+        }
+        .state-card:hover {
+            border-color: #0ea5e9;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.1);
+        }
+        .state-card-title {
+            font-weight: 700;
+            color: #0ea5e9;
+            margin-bottom: 0.75rem;
+            font-size: 1.05rem;
+        }
+        .state-card-detail {
+            font-size: 0.875rem;
+            color: #475569;
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+        }
+        .state-card-label {
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .calculator-result {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            border: 2px solid #0ea5e9;
+        }
+        .calculator-amount {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0ea5e9;
+            margin-bottom: 0.5rem;
+        }
+        .calculator-breakdown {
+            font-size: 0.95rem;
+            color: #475569;
+            line-height: 1.8;
+        }
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        .resource-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.2s;
+        }
+        .resource-card:hover {
+            border-color: #0ea5e9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);
+        }
+        .resource-title {
+            font-weight: 700;
+            color: #0ea5e9;
+            margin-bottom: 0.75rem;
+            font-size: 1.05rem;
+        }
+        .resource-description {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+        .resource-link {
+            display: inline-block;
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+        .resource-link:hover {
+            color: #0ea5e9;
+            text-decoration: underline;
+        }
+        @media (max-width: 768px) {
+            .content-area {
+                flex-direction: column;
+            }
+            .preview-section {
+                border-left: none;
+                border-top: 2px solid #e2e8f0;
+            }
+            .input-group {
+                grid-template-columns: 1fr;
+            }
+            .state-grid,
+            .resources-grid {
+                grid-template-columns: 1fr;
+            }
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useMemo } = React;
+
+        const stateProtections = {
+            'CA': {
+                name: 'California',
+                surpriseBillingLaw: 'AB 72 (2016) and related statutes',
+                emergencyCoverage: 'Yes - no balance billing for emergency services',
+                nonEmergencyCoverage: 'Yes - at in-network facility with out-of-network provider without consent',
+                financialAssistance: 'Hospital Fair Pricing Act - full charity care up to 400% FPL',
+                regulator: 'CA Dept of Insurance / DMHC',
+                regulatorLink: 'https://www.insurance.ca.gov/01-consumers/110-health/60-resources/nosuprisebills.cfm',
+                hcaiLink: 'https://hcai.ca.gov/affordability/hospital-fair-billing-program/',
+                notes: 'Strong state protections pre-dating NSA; HCAI complaint process for charity care'
+            },
+            'NY': {
+                name: 'New York',
+                surpriseBillingLaw: 'NY Financial Services Law § 606',
+                emergencyCoverage: 'Yes - comprehensive emergency protection',
+                nonEmergencyCoverage: 'Yes - including out-of-network at in-network facility',
+                financialAssistance: 'Charity care required for non-profit hospitals',
+                regulator: 'NY Dept of Financial Services',
+                regulatorLink: 'https://www.dfs.ny.gov/consumers/health_insurance/surprise_medical_bills',
+                notes: 'Established surprise billing protections before NSA'
+            },
+            'TX': {
+                name: 'Texas',
+                surpriseBillingLaw: 'TX Insurance Code Ch. 1467',
+                emergencyCoverage: 'Yes - emergency services protection',
+                nonEmergencyCoverage: 'Limited - facility-based providers at in-network facility',
+                financialAssistance: 'Required for non-profit hospitals',
+                regulator: 'TX Dept of Insurance',
+                regulatorLink: 'https://www.tdi.texas.gov/consumer/balancebilling.html',
+                notes: 'State law supplements NSA protections'
+            },
+            'FL': {
+                name: 'Florida',
+                surpriseBillingLaw: 'FL Statutes § 395.301 (emergency), § 627.64194 (HMOs)',
+                emergencyCoverage: 'Yes - emergency services at in-network cost-sharing',
+                nonEmergencyCoverage: 'Limited protections',
+                financialAssistance: 'Required for non-profit hospitals',
+                regulator: 'FL Office of Insurance Regulation',
+                regulatorLink: 'https://www.floir.com/consumers',
+                notes: 'Primarily emergency services protection'
+            },
+            'IL': {
+                name: 'Illinois',
+                surpriseBillingLaw: 'HFS Medical Assistance and IL Insurance Code',
+                emergencyCoverage: 'Yes',
+                nonEmergencyCoverage: 'Limited',
+                financialAssistance: 'Hospital uninsured patient discount act',
+                regulator: 'IL Dept of Insurance',
+                regulatorLink: 'https://www2.illinois.gov/sites/Insurance/',
+                notes: 'Hospital uninsured discount requirements'
+            },
+            'Other': {
+                name: 'Other State',
+                surpriseBillingLaw: 'Check your state insurance department',
+                emergencyCoverage: 'NSA protections apply (federal)',
+                nonEmergencyCoverage: 'NSA protections apply (federal)',
+                financialAssistance: 'Section 501(r) applies to non-profit hospitals',
+                regulator: 'State Insurance Department',
+                regulatorLink: 'https://content.naic.org/state-insurance-departments',
+                notes: 'Federal NSA protections apply regardless of state'
+            }
+        };
+
+        function MedicalBillingTool() {
+            const [activeTab, setActiveTab] = useState('nsa-checker');
+            const [formData, setFormData] = useState({
+                // NSA Checker
+                state: 'CA',
+                insuranceType: 'group-individual',
+                serviceType: 'emergency',
+                facilityNetwork: 'out-of-network',
+                providerNetwork: 'out-of-network',
+                noticeReceived: 'no',
+                dateOfService: '',
+                billAmount: '',
+                eobAmount: '',
+                costSharing: '',
+
+                // Financial Assistance
+                hospitalName: '',
+                hospitalState: 'CA',
+                hospitalTaxExempt: 'yes',
+                patientInsuranceStatus: 'uninsured',
+                householdIncome: '',
+                householdSize: '1',
+                collectionStatus: 'in-house-billing',
+                creditReported: 'no',
+                fapProvided: 'no',
+                fapApplied: 'no',
+
+                // Billing Errors
+                billingIssueType: 'duplicate',
+                disputedAmount: '',
+                billingErrors: [],
+
+                // Demand Letter
+                letterType: 'nsa-violation',
+                yourName: '',
+                yourAddress: '',
+                yourCity: '',
+                yourState: 'CA',
+                yourZip: '',
+                yourPhone: '',
+                yourEmail: '',
+
+                providerName: '',
+                providerAddress: '',
+                providerCity: '',
+                providerState: 'CA',
+                providerZip: '',
+
+                accountNumber: '',
+                totalBilled: '',
+                amountDisputed: '',
+
+                violationDescription: '',
+                demandRelief: '',
+                deadline: '30'
+            });
+
+            const [billingErrorInput, setBillingErrorInput] = useState({
+                date: '',
+                description: '',
+                cptCode: '',
+                billedAmount: '',
+                reason: ''
+            });
+
+            const updateFormData = (field, value) => {
+                setFormData(prev => ({ ...prev, [field]: value }));
+            };
+
+            const addBillingError = () => {
+                if (billingErrorInput.description && billingErrorInput.billedAmount) {
+                    setFormData(prev => ({
+                        ...prev,
+                        billingErrors: [...prev.billingErrors, { ...billingErrorInput, id: Date.now() }]
+                    }));
+                    setBillingErrorInput({
+                        date: '',
+                        description: '',
+                        cptCode: '',
+                        billedAmount: '',
+                        reason: ''
+                    });
+                }
+            };
+
+            const removeBillingError = (id) => {
+                setFormData(prev => ({
+                    ...prev,
+                    billingErrors: prev.billingErrors.filter(err => err.id !== id)
+                }));
+            };
+
+            const nsaAnalysis = useMemo(() => {
+                if (formData.insuranceType === 'medicare' || formData.insuranceType === 'medicaid') {
+                    return {
+                        protected: false,
+                        reason: 'The No Surprises Act does not apply to Medicare or Medicaid. These programs have their own balance billing protections.',
+                        recommendation: 'Contact Medicare/Medicaid or file a complaint with CMS if you believe you were improperly billed.'
+                    };
+                }
+
+                if (formData.insuranceType === 'uninsured') {
+                    return {
+                        protected: false,
+                        reason: 'The No Surprises Act balance billing protections apply to insured patients. However, you may be entitled to Good Faith Estimates and financial assistance.',
+                        recommendation: 'Focus on hospital financial assistance (Section 501(r)) and Good Faith Estimate violations if the final bill exceeds the estimate by more than $400.'
+                    };
+                }
+
+                if (formData.serviceType === 'emergency') {
+                    return {
+                        protected: true,
+                        reason: 'Emergency services are protected under the No Surprises Act regardless of network status. You cannot be balance billed.',
+                        recommendation: 'Send a demand letter to the provider stating you received emergency services and are protected under NSA. You owe only in-network cost-sharing.',
+                        statute: '42 U.S.C. § 300gg-111 (NSA emergency services protection)'
+                    };
+                }
+
+                if (formData.serviceType === 'scheduled' && formData.facilityNetwork === 'in-network' && formData.providerNetwork === 'out-of-network') {
+                    if (formData.noticeReceived === 'no' || formData.noticeReceived === 'inadequate') {
+                        return {
+                            protected: true,
+                            reason: 'You received care at an in-network facility from an out-of-network provider without proper notice and consent. The NSA prohibits balance billing in this scenario.',
+                            recommendation: 'Send a demand letter stating you selected an in-network facility and received no adequate advance notice (72+ hours) regarding out-of-network providers. You owe only in-network cost-sharing.',
+                            statute: '42 U.S.C. § 300gg-132 (NSA notice and consent requirements)'
+                        };
+                    } else {
+                        return {
+                            protected: false,
+                            reason: 'If you received adequate notice (72+ hours before service) and signed a consent form acknowledging higher out-of-network charges, NSA protections may not apply.',
+                            recommendation: 'Review the notice and consent form carefully. Valid consent must be voluntary, in plain language, and include a good faith estimate. If the form was unclear or you felt pressured, you may still challenge it.'
+                        };
+                    }
+                }
+
+                if (formData.serviceType === 'air-ambulance') {
+                    return {
+                        protected: true,
+                        reason: 'Air ambulance services are protected under the No Surprises Act. You cannot be balance billed regardless of the air ambulance provider\'s network status.',
+                        recommendation: 'Send a demand letter citing NSA air ambulance protections. You owe only in-network cost-sharing.',
+                        statute: '42 U.S.C. § 300gg-112 (NSA air ambulance protection)'
+                    };
+                }
+
+                return {
+                    protected: false,
+                    reason: 'Based on the information provided, NSA protections may not clearly apply. However, state law may provide additional protections.',
+                    recommendation: 'Check your state\'s surprise billing laws and consider other challenges like billing errors or financial assistance eligibility.'
+                };
+            }, [formData.insuranceType, formData.serviceType, formData.facilityNetwork, formData.providerNetwork, formData.noticeReceived]);
+
+            const financialAssistanceAnalysis = useMemo(() => {
+                if (formData.hospitalTaxExempt === 'no') {
+                    return {
+                        eligible: false,
+                        reason: 'Section 501(r) requirements apply only to tax-exempt hospitals. For-profit hospitals may have financial assistance programs but are not required by federal law to provide them.'
+                    };
+                }
+
+                const income = parseFloat(formData.householdIncome) || 0;
+                const size = parseInt(formData.householdSize) || 1;
+
+                // 2024 Federal Poverty Levels (approximate)
+                const fpl2024Base = 15060;
+                const fplPerPerson = 5380;
+                const fplForSize = fpl2024Base + (fplPerPerson * (size - 1));
+                const fplPercent = (income / fplForSize) * 100;
+
+                let eligibilityLevel = '';
+                let recommendation = '';
+
+                if (formData.hospitalState === 'CA') {
+                    if (fplPercent <= 400) {
+                        eligibilityLevel = 'Full charity care (100% discount)';
+                        recommendation = 'Under California\'s Hospital Fair Pricing Act, you qualify for full charity care. The hospital must provide free care.';
+                    } else if (fplPercent <= 600) {
+                        eligibilityLevel = 'Partial discount required';
+                        recommendation = 'Under California law, you qualify for a discount. The hospital must provide at least a partial reduction.';
+                    } else {
+                        eligibilityLevel = 'Above CA statutory threshold, but hospital policy may still provide assistance';
+                        recommendation = 'Review the hospital\'s specific Financial Assistance Policy. Many hospitals provide assistance above 600% FPL.';
+                    }
+                } else {
+                    if (fplPercent <= 200) {
+                        eligibilityLevel = 'Likely eligible for full or substantial charity care';
+                        recommendation = 'Most hospitals provide full charity care to patients below 200% FPL. Apply immediately.';
+                    } else if (fplPercent <= 400) {
+                        eligibilityLevel = 'Likely eligible for partial charity care or discounts';
+                        recommendation = 'Many hospitals provide discounts to patients between 200-400% FPL. Review the hospital\'s FAP and apply.';
+                    } else {
+                        eligibilityLevel = 'Check hospital\'s specific Financial Assistance Policy';
+                        recommendation = 'Some hospitals provide assistance above 400% FPL. Review the hospital\'s published FAP for eligibility criteria.';
+                    }
+                }
+
+                const section501rViolations = [];
+                if (formData.fapProvided === 'no') {
+                    section501rViolations.push('Hospital failed to provide notice of Financial Assistance Policy (501(r)(4) violation)');
+                }
+                if (formData.collectionStatus !== 'in-house-billing' && formData.fapApplied === 'no') {
+                    section501rViolations.push('Hospital engaged in extraordinary collection actions without screening for FAP eligibility (501(r)(6) violation)');
+                }
+                if (formData.creditReported === 'yes' && formData.fapApplied === 'no') {
+                    section501rViolations.push('Credit reporting is an extraordinary collection action prohibited before FAP screening (501(r)(6))');
+                }
+
+                return {
+                    eligible: true,
+                    fplPercent: fplPercent.toFixed(0),
+                    eligibilityLevel,
+                    recommendation,
+                    section501rViolations
+                };
+            }, [formData.hospitalTaxExempt, formData.hospitalState, formData.householdIncome, formData.householdSize, formData.fapProvided, formData.fapApplied, formData.collectionStatus, formData.creditReported]);
+
+            const generateLetter = () => {
+                const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                let letter = '';
+
+                letter += `${formData.yourName}\n`;
+                letter += `${formData.yourAddress}\n`;
+                letter += `${formData.yourCity}, ${formData.yourState} ${formData.yourZip}\n`;
+                if (formData.yourEmail) letter += `Email: ${formData.yourEmail}\n`;
+                if (formData.yourPhone) letter += `Phone: ${formData.yourPhone}\n`;
+                letter += `\n${today}\n\n`;
+
+                letter += `${formData.providerName}\n`;
+                letter += `${formData.providerAddress}\n`;
+                letter += `${formData.providerCity}, ${formData.providerState} ${formData.providerZip}\n\n`;
+
+                letter += `RE: Dispute of Medical Bill – Account #${formData.accountNumber || '[Account Number]'}\n`;
+                letter += `     Date of Service: ${formData.dateOfService || '[Date]'}\n`;
+                letter += `     Amount Billed: $${formData.totalBilled || '[Amount]'}\n`;
+                letter += `     Amount Disputed: $${formData.amountDisputed || '[Amount]'}\n\n`;
+
+                if (formData.letterType === 'nsa-violation') {
+                    letter += `Dear Billing Department:\n\n`;
+                    letter += `I am writing to dispute the medical bill referenced above on the grounds that it violates the federal No Surprises Act, 42 U.S.C. §§ 300gg-111 et seq., which prohibits balance billing in specific circumstances.\n\n`;
+
+                    if (formData.serviceType === 'emergency') {
+                        letter += `FEDERAL NO SURPRISES ACT VIOLATION:\n\n`;
+                        letter += `I received emergency services on ${formData.dateOfService || '[date]'}. Under the No Surprises Act, patients who receive emergency services cannot be balance billed regardless of the network status of the facility or providers. I am protected under 42 U.S.C. § 300gg-111, which requires that:\n\n`;
+                        letter += `• I may only be charged in-network cost-sharing amounts (deductible, copay, coinsurance) even though the facility/providers were out-of-network;\n`;
+                        letter += `• The provider and my health plan must resolve any payment disputes through the Federal Independent Dispute Resolution process, without involving me.\n\n`;
+                        letter += `The bill I received appears to include balance billing above my in-network cost-sharing responsibility, which is prohibited by federal law.\n\n`;
+                    } else if (formData.serviceType === 'scheduled' && formData.facilityNetwork === 'in-network' && formData.providerNetwork === 'out-of-network') {
+                        letter += `FEDERAL NO SURPRISES ACT VIOLATION:\n\n`;
+                        letter += `I scheduled care at an in-network facility and was treated by an out-of-network provider without receiving adequate advance notice or providing informed consent as required by 42 U.S.C. § 300gg-132.\n\n`;
+                        letter += `Specifically:\n`;
+                        letter += `• I selected an in-network facility: ${formData.facilityNetwork === 'in-network' ? 'Yes' : 'No'}\n`;
+                        letter += `• I received 72+ hours advance written notice of out-of-network charges: ${formData.noticeReceived === 'yes' ? 'Yes' : 'No'}\n`;
+                        letter += `• I was given a good faith estimate and voluntarily consented to waive balance billing protections: ${formData.noticeReceived === 'yes' ? 'Yes' : 'No'}\n\n`;
+                        letter += `Because I did not receive proper notice and consent, I cannot be balance billed. I am only responsible for in-network cost-sharing amounts.\n\n`;
+                    } else if (formData.serviceType === 'air-ambulance') {
+                        letter += `FEDERAL NO SURPRISES ACT VIOLATION - AIR AMBULANCE:\n\n`;
+                        letter += `I was transported by air ambulance on ${formData.dateOfService || '[date]'}. Under 42 U.S.C. § 300gg-112, air ambulance services are protected from balance billing. I can only be charged in-network cost-sharing amounts regardless of whether the air ambulance provider participates in my insurance network.\n\n`;
+                    }
+
+                    const stateInfo = stateProtections[formData.state] || stateProtections['Other'];
+                    if (formData.state !== 'Other' && stateInfo.surpriseBillingLaw) {
+                        letter += `STATE LAW ADDITIONAL PROTECTIONS:\n\n`;
+                        letter += `In addition to federal NSA protections, ${stateInfo.name} law provides additional surprise billing protections under ${stateInfo.surpriseBillingLaw}. ${stateInfo.notes}\n\n`;
+                    }
+
+                    letter += `DEMAND FOR CORRECTION:\n\n`;
+                    letter += `I demand that you:\n\n`;
+                    letter += `1. Immediately recalculate my patient responsibility to reflect only in-network cost-sharing amounts;\n`;
+                    letter += `2. Issue a corrected billing statement showing the proper amount owed;\n`;
+                    letter += `3. Withdraw this account from any collection activity;\n`;
+                    letter += `4. Correct any adverse credit reporting related to the disputed balance billing amount;\n`;
+                    letter += `5. Provide written confirmation of these corrections within ${formData.deadline} days of the date of this letter.\n\n`;
+
+                    letter += `The balance billing amount of $${formData.amountDisputed || '[amount]'} is disputed and not owed under federal law. If you do not resolve this matter within ${formData.deadline} days, I will file formal complaints with:\n\n`;
+                    letter += `• The federal No Surprises Help Desk (1-800-985-3059 / CMS NoSurprises complaint portal)\n`;
+                    letter += `• ${stateInfo.regulator}\n`;
+                    letter += `• The Consumer Financial Protection Bureau regarding any collection activity on disputed medical debt\n\n`;
+                    letter += `I may also pursue my rights through litigation and external review processes available under federal and state law.\n\n`;
+
+                } else if (formData.letterType === 'financial-assistance') {
+                    letter += `Dear Patient Financial Services:\n\n`;
+                    letter += `I am writing to request financial assistance under your hospital's Financial Assistance Policy and to dispute collection activity that appears to violate federal law.\n\n`;
+
+                    letter += `SECTION 501(r) REQUIREMENTS:\n\n`;
+                    letter += `${formData.hospitalName} operates as a tax-exempt hospital under Section 501(c)(3) of the Internal Revenue Code and is therefore required to comply with Section 501(r), which includes:\n\n`;
+                    letter += `• Maintaining a written Financial Assistance Policy (FAP) and providing it to patients (§ 501(r)(4));\n`;
+                    letter += `• Limiting charges for FAP-eligible patients to amounts generally billed to insured patients, not gross chargemaster rates (§ 501(r)(5));\n`;
+                    letter += `• Making reasonable efforts to determine FAP eligibility before engaging in extraordinary collection actions (ECAs) such as selling debt, credit reporting, lawsuits, or wage garnishment (§ 501(r)(6)).\n\n`;
+
+                    if (formData.hospitalState === 'CA') {
+                        letter += `CALIFORNIA HOSPITAL FAIR PRICING ACT:\n\n`;
+                        letter += `In addition to federal requirements, California law imposes additional obligations through the Hospital Fair Pricing Act and Hospital Fair Billing Program (Health & Safety Code §§ 127400 et seq.), administered by the California Department of Health Care Access and Information (HCAI).\n\n`;
+                        letter += `Under California law, hospitals must:\n`;
+                        letter += `• Provide full charity care to patients with household incomes up to 400% of the federal poverty level;\n`;
+                        letter += `• Provide discounts to patients between 400-600% FPL;\n`;
+                        letter += `• Complete enhanced screening and provide applications before any collection activity;\n`;
+                        letter += `• Limit interest and fees on medical debt.\n\n`;
+                    }
+
+                    letter += `MY FINANCIAL CIRCUMSTANCES:\n\n`;
+                    letter += `• Household size: ${formData.householdSize} person(s)\n`;
+                    letter += `• Annual household income: $${formData.householdIncome || '[income]'}\n`;
+                    letter += `• Insurance status: ${formData.patientInsuranceStatus === 'uninsured' ? 'Uninsured' : formData.patientInsuranceStatus === 'underinsured' ? 'Underinsured' : 'Insured but high cost-sharing'}\n`;
+                    if (financialAssistanceAnalysis.eligible) {
+                        letter += `• Estimated income as % of Federal Poverty Level: ${financialAssistanceAnalysis.fplPercent}%\n\n`;
+                        letter += `Based on these figures, I appear to qualify for ${financialAssistanceAnalysis.eligibilityLevel}.\n\n`;
+                    }
+
+                    if (financialAssistanceAnalysis.section501rViolations && financialAssistanceAnalysis.section501rViolations.length > 0) {
+                        letter += `APPARENT VIOLATIONS OF SECTION 501(r):\n\n`;
+                        financialAssistanceAnalysis.section501rViolations.forEach((violation, index) => {
+                            letter += `${index + 1}. ${violation}\n`;
+                        });
+                        letter += `\n`;
+                        letter += `These violations put the hospital's tax-exempt status at risk and may subject the hospital to excise taxes under IRC § 4959.\n\n`;
+                    }
+
+                    letter += `DEMAND FOR IMMEDIATE ACTION:\n\n`;
+                    letter += `I demand that ${formData.hospitalName} immediately:\n\n`;
+                    letter += `1. SUSPEND all collection activity on this account, including any third-party collection agencies;\n`;
+                    letter += `2. PROVIDE a Financial Assistance Policy and application if not already provided;\n`;
+                    letter += `3. EVALUATE my eligibility for financial assistance based on the income and household information provided;\n`;
+                    letter += `4. ADJUST charges to amounts generally billed (AGB) if I qualify for financial assistance, eliminating gross chargemaster pricing;\n`;
+                    letter += `5. REVERSE any extraordinary collection actions already taken, including:\n`;
+                    letter += `   • Withdrawal of accounts from third-party collectors\n`;
+                    letter += `   • Deletion of adverse credit reporting\n`;
+                    letter += `   • Dismissal of any pending lawsuits or liens\n`;
+                    letter += `6. PROVIDE written confirmation of the FAP determination and corrected billing statement within ${formData.deadline} days.\n\n`;
+
+                    letter += `If ${formData.hospitalName} does not respond appropriately within ${formData.deadline} days, I will file formal complaints with:\n\n`;
+                    letter += `• The Internal Revenue Service (Form 13909 - Tax-Exempt Organization Complaint);\n`;
+                    if (formData.hospitalState === 'CA') {
+                        letter += `• California Department of Health Care Access and Information (HCAI) Hospital Fair Billing Program complaint portal;\n`;
+                    }
+                    letter += `• The Consumer Financial Protection Bureau regarding improper medical debt collection practices;\n`;
+                    letter += `• The state attorney general's office.\n\n`;
+                    letter += `I may also pursue litigation to enforce my rights under Section 501(r) and state law.\n\n`;
+
+                } else if (formData.letterType === 'billing-error') {
+                    letter += `Dear Billing Department:\n\n`;
+                    letter += `I am writing to dispute specific charges on the medical bill referenced above. After careful review of the itemized bill and my medical records, I have identified the following errors:\n\n`;
+
+                    letter += `DISPUTED CHARGES:\n\n`;
+                    if (formData.billingErrors.length > 0) {
+                        formData.billingErrors.forEach((error, index) => {
+                            letter += `${index + 1}. Date: ${error.date}\n`;
+                            letter += `   Description: ${error.description}\n`;
+                            if (error.cptCode) letter += `   CPT/Procedure Code: ${error.cptCode}\n`;
+                            letter += `   Amount Billed: $${error.billedAmount}\n`;
+                            letter += `   Reason for Dispute: ${error.reason}\n\n`;
+                        });
+                    } else {
+                        letter += `1. [Describe first disputed charge, including date, description, procedure code if known, amount, and reason for dispute]\n\n`;
+                        letter += `2. [Describe second disputed charge if applicable]\n\n`;
+                    }
+
+                    letter += `TOTAL AMOUNT DISPUTED: $${formData.amountDisputed || '[calculate total]'}\n\n`;
+
+                    letter += `DEMAND FOR INVESTIGATION:\n\n`;
+                    letter += `I request that you:\n\n`;
+                    letter += `1. INVESTIGATE each disputed charge listed above;\n`;
+                    letter += `2. PROVIDE documentation supporting each disputed line item, including:\n`;
+                    letter += `   • Medical records showing the service was actually provided\n`;
+                    letter += `   • Explanation of why the specific procedure code and charge level were appropriate\n`;
+                    letter += `   • Itemized breakdown of any supplies or medications charged\n`;
+                    letter += `3. CORRECT any errors and issue a revised billing statement;\n`;
+                    letter += `4. PROVIDE an updated Explanation of Benefits (EOB) from my insurance company if applicable;\n`;
+                    letter += `5. RESPOND in writing within ${formData.deadline} days of this letter.\n\n`;
+
+                    letter += `SUSPENSION OF COLLECTION ACTIVITY:\n\n`;
+                    letter += `Until this dispute is resolved, I request that you suspend all collection activity on the disputed amount. Under the Fair Debt Collection Practices Act, 15 U.S.C. § 1692g, collection of a disputed debt must be paused until verification is provided. If you have transferred this account to a third-party collector, please notify them immediately that the debt is in good faith dispute.\n\n`;
+
+                    letter += `Any continued collection activity on the disputed charges, including credit reporting, may constitute:\n`;
+                    letter += `• Misrepresentation of the amount of the debt in violation of the FDCPA;\n`;
+                    letter += `• Unfair or deceptive practices under state consumer protection laws;\n`;
+                    letter += `• Violation of CFPB regulations on medical debt collection.\n\n`;
+
+                    letter += `If you cannot adequately document the disputed charges within ${formData.deadline} days, I expect the charges to be removed from my account and any amounts already paid to be refunded.\n\n`;
+
+                } else if (formData.letterType === 'collector') {
+                    letter += `Dear Sir or Madam:\n\n`;
+                    letter += `This letter is sent pursuant to the Fair Debt Collection Practices Act, 15 U.S.C. § 1692g, to dispute the medical debt referenced above and to request verification.\n\n`;
+
+                    letter += `DEBT DISPUTE AND VERIFICATION REQUEST:\n\n`;
+                    letter += `I dispute the validity of this debt and request that you provide verification including:\n\n`;
+                    letter += `1. The name and address of the original creditor;\n`;
+                    letter += `2. The date(s) of service giving rise to the debt;\n`;
+                    letter += `3. An itemized statement of charges with procedure codes;\n`;
+                    letter += `4. Documentation showing that you have the legal right to collect this debt (assignment, purchase agreement, or chain of custody from original creditor);\n`;
+                    letter += `5. Documentation showing that the amount claimed is accurate and not subject to legal protections or defenses.\n\n`;
+
+                    letter += `GROUNDS FOR DISPUTE:\n\n`;
+                    if (formData.letterType === 'collector') {
+                        letter += `This debt is disputed on the following grounds:\n\n`;
+                        letter += `${formData.violationDescription || '• [Describe why debt may not be owed - e.g., NSA violation, financial assistance eligibility, billing errors, improper collection without FAP screening]'}\n\n`;
+                    }
+
+                    letter += `PROHIBITED COLLECTION PRACTICES:\n\n`;
+                    letter += `Under the Fair Debt Collection Practices Act and Consumer Financial Protection Bureau Regulation F, you are prohibited from:\n\n`;
+                    letter += `• Misrepresenting the amount or legal status of the debt;\n`;
+                    letter += `• Continuing collection activity on a disputed debt without providing adequate verification;\n`;
+                    letter += `• Threatening actions you cannot legally take;\n`;
+                    letter += `• Reporting disputed medical debt to credit bureaus while the dispute is pending.\n\n`;
+
+                    letter += `The Consumer Financial Protection Bureau issued an advisory opinion in November 2024 specifically addressing deceptive and unfair collection of medical debt, emphasizing that collectors must respect consumer disputes and cannot ignore explanations that debts may be protected under the No Surprises Act, Section 501(r), or state law.\n\n`;
+
+                    if (formData.creditReported === 'yes') {
+                        letter += `CREDIT REPORTING DISPUTE:\n\n`;
+                        letter += `I understand this debt has been reported to one or more credit bureaus. I demand that you immediately:\n\n`;
+                        letter += `1. CORRECT the credit reporting to reflect that this debt is disputed;\n`;
+                        letter += `2. DELETE the adverse credit reporting if you cannot adequately verify the debt;\n`;
+                        letter += `3. PROVIDE copies of all credit reporting related to this account.\n\n`;
+                        letter += `Continuing to report an unverified or disputed medical debt may constitute unfair and deceptive practices under the FDCPA and FCRA.\n\n`;
+                    }
+
+                    letter += `DEADLINE FOR RESPONSE:\n\n`;
+                    letter += `You must respond to this verification request within ${formData.deadline} days. If you cannot adequately verify:\n\n`;
+                    letter += `• The validity of the debt,\n`;
+                    letter += `• Your legal right to collect it, and\n`;
+                    letter += `• The accuracy of the amount claimed,\n\n`;
+                    letter += `then you must cease all collection activity and delete any credit reporting.\n\n`;
+
+                    letter += `NOTICE OF INTENT TO PURSUE LEGAL REMEDIES:\n\n`;
+                    letter += `If you fail to provide adequate verification or continue collection activity in violation of the FDCPA, I will:\n\n`;
+                    letter += `• File formal complaints with the Consumer Financial Protection Bureau and state attorney general;\n`;
+                    letter += `• Pursue private litigation under the FDCPA, which provides for statutory damages up to $1,000 plus actual damages and attorney's fees for violations.\n\n`;
+                    letter += `I also reserve the right to notify the original creditor (if a tax-exempt hospital) of potential Section 501(r) violations for engaging in extraordinary collection actions without proper financial assistance screening.\n\n`;
+                }
+
+                letter += `Please direct all correspondence regarding this matter to the address listed above. I do not consent to contact by telephone.\n\n`;
+                letter += `Sincerely,\n\n`;
+                letter += `${formData.yourName || '[Your Name]'}\n`;
+                letter += `\nEnclosures: [List any documents you are attaching, such as billing statements, EOBs, medical records, etc.]`;
+
+                return letter;
+            };
+
+            const generatedLetter = useMemo(() => {
+                if (activeTab === 'demand-letter') {
+                    return generateLetter();
+                }
+                return '';
+            }, [activeTab, formData, financialAssistanceAnalysis]);
+
+            const copyToClipboard = async () => {
+                try {
+                    if (navigator.clipboard && window.isSecureContext) {
+                        await navigator.clipboard.writeText(generatedLetter);
+                        alert('Letter copied to clipboard!');
+                    } else {
+                        const textArea = document.createElement('textarea');
+                        textArea.value = generatedLetter;
+                        textArea.style.position = 'fixed';
+                        textArea.style.left = '-999999px';
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        try {
+                            document.execCommand('copy');
+                            alert('Letter copied to clipboard!');
+                        } catch (err) {
+                            alert('Failed to copy. Please select and copy the text manually.');
+                        }
+                        document.body.removeChild(textArea);
+                    }
+                } catch (err) {
+                    alert('Failed to copy. Please select and copy the text manually.');
+                }
+            };
+
+            const downloadLetter = () => {
+                const blob = new Blob([generatedLetter], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `medical-bill-dispute-letter-${Date.now()}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            };
+
+            return (
+                <div className="app-container">
+                    <div className="header">
+                        <div className="header-title">Medical Bill & Surprise Billing Dispute Tool</div>
+                        <div className="header-subtitle">Challenge hospital bills, balance billing, and collection practices under federal and state law</div>
+                    </div>
+
+                    <div className="tabs-container">
+                        <button className={`tab ${activeTab === 'nsa-checker' ? 'active' : ''}`} onClick={() => setActiveTab('nsa-checker')}>NSA Checker</button>
+                        <button className={`tab ${activeTab === 'financial-assistance' ? 'active' : ''}`} onClick={() => setActiveTab('financial-assistance')}>Financial Assistance</button>
+                        <button className={`tab ${activeTab === 'billing-errors' ? 'active' : ''}`} onClick={() => setActiveTab('billing-errors')}>Billing Errors</button>
+                        <button className={`tab ${activeTab === 'state-laws' ? 'active' : ''}`} onClick={() => setActiveTab('state-laws')}>State Laws</button>
+                        <button className={`tab ${activeTab === 'demand-letter' ? 'active' : ''}`} onClick={() => setActiveTab('demand-letter')}>Demand Letter</button>
+                        <button className={`tab ${activeTab === 'resources' ? 'active' : ''}`} onClick={() => setActiveTab('resources')}>Resources</button>
+                    </div>
+
+                    <div className="content-area">
+                        {activeTab === 'nsa-checker' && (
+                            <div className="form-section">
+                                <div className="section-title">No Surprises Act Protection Checker</div>
+                                <p style={{ marginBottom: '1.5rem', color: '#475569' }}>
+                                    Determine if your medical bill violates the federal No Surprises Act, which protects insured patients from balance billing in emergency situations and certain scheduled care scenarios.
+                                </p>
+
+                                <div className="form-group">
+                                    <label className="form-label">Your State</label>
+                                    <select className="form-select" value={formData.state} onChange={(e) => updateFormData('state', e.target.value)}>
+                                        <option value="CA">California</option>
+                                        <option value="NY">New York</option>
+                                        <option value="TX">Texas</option>
+                                        <option value="FL">Florida</option>
+                                        <option value="IL">Illinois</option>
+                                        <option value="Other">Other State</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Your Insurance Type</label>
+                                    <select className="form-select" value={formData.insuranceType} onChange={(e) => updateFormData('insuranceType', e.target.value)}>
+                                        <option value="group-individual">Group or Individual Health Insurance</option>
+                                        <option value="medicare">Medicare</option>
+                                        <option value="medicaid">Medicaid</option>
+                                        <option value="uninsured">Uninsured / Self-Pay</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Type of Service</label>
+                                    <select className="form-select" value={formData.serviceType} onChange={(e) => updateFormData('serviceType', e.target.value)}>
+                                        <option value="emergency">Emergency Services (ER, urgent condition)</option>
+                                        <option value="scheduled">Scheduled / Non-Emergency Care</option>
+                                        <option value="air-ambulance">Air Ambulance Transport</option>
+                                    </select>
+                                </div>
+
+                                {formData.serviceType === 'scheduled' && (
+                                    <>
+                                        <div className="form-group">
+                                            <label className="form-label">Was the Facility In-Network?</label>
+                                            <select className="form-select" value={formData.facilityNetwork} onChange={(e) => updateFormData('facilityNetwork', e.target.value)}>
+                                                <option value="in-network">Yes - In-Network</option>
+                                                <option value="out-of-network">No - Out-of-Network</option>
+                                                <option value="unknown">Unknown</option>
+                                            </select>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label className="form-label">Was the Provider/Doctor In-Network?</label>
+                                            <select className="form-select" value={formData.providerNetwork} onChange={(e) => updateFormData('providerNetwork', e.target.value)}>
+                                                <option value="in-network">Yes - In-Network</option>
+                                                <option value="out-of-network">No - Out-of-Network</option>
+                                                <option value="unknown">Unknown</option>
+                                            </select>
+                                        </div>
+
+                                        {formData.facilityNetwork === 'in-network' && formData.providerNetwork === 'out-of-network' && (
+                                            <div className="form-group">
+                                                <label className="form-label">Did You Receive Adequate Notice (72+ hours before service) and Sign Consent to Waive Balance Billing Protections?</label>
+                                                <select className="form-select" value={formData.noticeReceived} onChange={(e) => updateFormData('noticeReceived', e.target.value)}>
+                                                    <option value="no">No - No notice or consent received</option>
+                                                    <option value="inadequate">Notice was provided but inadequate (less than 72 hours, unclear, or felt pressured)</option>
+                                                    <option value="yes">Yes - Received clear notice 72+ hours in advance and voluntarily signed consent</option>
+                                                </select>
+                                            </div>
+                                        )}
+                                    </>
+                                )}
+
+                                <div className="form-group">
+                                    <label className="form-label">Date of Service</label>
+                                    <input type="date" className="form-input" value={formData.dateOfService} onChange={(e) => updateFormData('dateOfService', e.target.value)} />
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Total Amount Billed</label>
+                                    <input type="number" className="form-input" placeholder="e.g., 15000" value={formData.billAmount} onChange={(e) => updateFormData('billAmount', e.target.value)} />
+                                </div>
+
+                                {nsaAnalysis && (
+                                    <div className={nsaAnalysis.protected ? 'success-box' : 'info-box'}>
+                                        <div className={nsaAnalysis.protected ? 'success-box-title' : 'info-box-title'}>
+                                            {nsaAnalysis.protected ? '✓ NSA PROTECTIONS LIKELY APPLY' : 'NSA ANALYSIS'}
+                                        </div>
+                                        <div className="info-box-content">
+                                            <p style={{ marginBottom: '0.75rem' }}><strong>Analysis:</strong> {nsaAnalysis.reason}</p>
+                                            {nsaAnalysis.statute && (
+                                                <p style={{ marginBottom: '0.75rem', fontFamily: 'monospace', fontSize: '0.85rem' }}><strong>Legal Citation:</strong> {nsaAnalysis.statute}</p>
+                                            )}
+                                            <p><strong>Recommendation:</strong> {nsaAnalysis.recommendation}</p>
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="info-box">
+                                    <div className="info-box-title">How to Use This Analysis</div>
+                                    <div className="info-box-content">
+                                        If the NSA protections apply to your situation, you should send a demand letter to the provider stating that the bill violates federal law and you owe only in-network cost-sharing. If the provider does not correct the bill, file a complaint with the federal No Surprises Help Desk at 1-800-985-3059 or via the CMS online complaint portal.
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'financial-assistance' && (
+                            <div className="form-section">
+                                <div className="section-title">Hospital Financial Assistance Eligibility</div>
+                                <p style={{ marginBottom: '1.5rem', color: '#475569' }}>
+                                    Determine if you qualify for charity care or discounts under federal Section 501(r) requirements for tax-exempt hospitals and state financial assistance laws.
+                                </p>
+
+                                <div className="form-group">
+                                    <label className="form-label">Hospital Name</label>
+                                    <input type="text" className="form-input" placeholder="e.g., Memorial Hospital" value={formData.hospitalName} onChange={(e) => updateFormData('hospitalName', e.target.value)} />
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Hospital State</label>
+                                    <select className="form-select" value={formData.hospitalState} onChange={(e) => updateFormData('hospitalState', e.target.value)}>
+                                        <option value="CA">California</option>
+                                        <option value="NY">New York</option>
+                                        <option value="TX">Texas</option>
+                                        <option value="FL">Florida</option>
+                                        <option value="IL">Illinois</option>
+                                        <option value="Other">Other State</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Is This a Tax-Exempt (Non-Profit) Hospital?</label>
+                                    <select className="form-select" value={formData.hospitalTaxExempt} onChange={(e) => updateFormData('hospitalTaxExempt', e.target.value)}>
+                                        <option value="yes">Yes - Non-profit/tax-exempt (most hospitals)</option>
+                                        <option value="no">No - For-profit hospital</option>
+                                        <option value="unknown">Unknown</option>
+                                    </select>
+                                    <p style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '0.5rem' }}>
+                                        Most major hospital systems operate as 501(c)(3) tax-exempt organizations. You can check the IRS Tax Exempt Organization Search tool or ask the billing department.
+                                    </p>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Your Insurance Status</label>
+                                    <select className="form-select" value={formData.patientInsuranceStatus} onChange={(e) => updateFormData('patientInsuranceStatus', e.target.value)}>
+                                        <option value="uninsured">Uninsured</option>
+                                        <option value="underinsured">Underinsured (high deductible / cost-sharing)</option>
+                                        <option value="insured">Insured</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Annual Household Income</label>
+                                    <input type="number" className="form-input" placeholder="e.g., 35000" value={formData.householdIncome} onChange={(e) => updateFormData('householdIncome', e.target.value)} />
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Household Size</label>
+                                    <input type="number" className="form-input" placeholder="Number of people in household" value={formData.householdSize} onChange={(e) => updateFormData('householdSize', e.target.value)} />
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Current Collection Status</label>
+                                    <select className="form-select" value={formData.collectionStatus} onChange={(e) => updateFormData('collectionStatus', e.target.value)}>
+                                        <option value="in-house-billing">Still with hospital billing department</option>
+                                        <option value="collection-agency">Sent to third-party collection agency</option>
+                                        <option value="lawsuit">Lawsuit filed or threatened</option>
+                                        <option value="wage-garnishment">Wage garnishment or lien</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Has the Debt Been Reported to Credit Bureaus?</label>
+                                    <select className="form-select" value={formData.creditReported} onChange={(e) => updateFormData('creditReported', e.target.value)}>
+                                        <option value="no">No</option>
+                                        <option value="yes">Yes</option>
+                                        <option value="unknown">Unknown</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Did the Hospital Provide Notice of Financial Assistance Policy?</label>
+                                    <select className="form-select" value={formData.fapProvided} onChange={(e) => updateFormData('fapProvided', e.target.value)}>
+                                        <option value="no">No - Never mentioned</option>
+                                        <option value="yes">Yes - Provided notice and application</option>
+                                        <option value="unclear">Unclear / buried in paperwork</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Have You Applied for Financial Assistance?</label>
+                                    <select className="form-select" value={formData.fapApplied} onChange={(e) => updateFormData('fapApplied', e.target.value)}>
+                                        <option value="no">No</option>
+                                        <option value="yes-pending">Yes - Application pending</option>
+                                        <option value="yes-denied">Yes - Denied</option>
+                                        <option value="yes-approved">Yes - Approved</option>
+                                    </select>
+                                </div>
+
+                                {financialAssistanceAnalysis && financialAssistanceAnalysis.eligible && (
+                                    <>
+                                        <div className="success-box">
+                                            <div className="success-box-title">✓ LIKELY ELIGIBLE FOR FINANCIAL ASSISTANCE</div>
+                                            <div className="info-box-content">
+                                                <p style={{ marginBottom: '0.75rem' }}>
+                                                    <strong>Your income level:</strong> Approximately {financialAssistanceAnalysis.fplPercent}% of Federal Poverty Level
+                                                </p>
+                                                <p style={{ marginBottom: '0.75rem' }}>
+                                                    <strong>Eligibility:</strong> {financialAssistanceAnalysis.eligibilityLevel}
+                                                </p>
+                                                <p><strong>Recommendation:</strong> {financialAssistanceAnalysis.recommendation}</p>
+                                            </div>
+                                        </div>
+
+                                        {financialAssistanceAnalysis.section501rViolations && financialAssistanceAnalysis.section501rViolations.length > 0 && (
+                                            <div className="warning-box">
+                                                <div className="warning-box-title">⚠ POTENTIAL SECTION 501(r) VIOLATIONS</div>
+                                                <div className="info-box-content">
+                                                    <p style={{ marginBottom: '0.75rem' }}>Based on the information provided, the hospital may have violated federal tax law requirements:</p>
+                                                    <ul style={{ marginLeft: '1.5rem', marginTop: '0.5rem' }}>
+                                                        {financialAssistanceAnalysis.section501rViolations.map((violation, index) => (
+                                                            <li key={index} style={{ marginBottom: '0.5rem' }}>{violation}</li>
+                                                        ))}
+                                                    </ul>
+                                                    <p style={{ marginTop: '0.75rem' }}>
+                                                        These violations can be grounds for demanding suspension of collection activity and proper FAP screening. If the hospital does not respond, you can file complaints with the IRS and {formData.hospitalState === 'CA' ? 'HCAI' : 'state regulators'}.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </>
+                                )}
+
+                                {!financialAssistanceAnalysis.eligible && (
+                                    <div className="info-box">
+                                        <div className="info-box-title">Financial Assistance Information</div>
+                                        <div className="info-box-content">
+                                            {financialAssistanceAnalysis.reason}
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="info-box" style={{ marginTop: '1.5rem' }}>
+                                    <div className="info-box-title">Next Steps</div>
+                                    <div className="info-box-content">
+                                        <p style={{ marginBottom: '0.75rem' }}>1. Download the hospital's Financial Assistance Policy and application from their website or request it from the billing department.</p>
+                                        <p style={{ marginBottom: '0.75rem' }}>2. Complete and submit the application with income documentation (pay stubs, tax returns).</p>
+                                        <p style={{ marginBottom: '0.75rem' }}>3. Send a demand letter citing Section 501(r) and requesting suspension of collections while the FAP application is processed.</p>
+                                        <p>4. If the hospital denies assistance improperly or continues collection, file complaints with the IRS (Form 13909) and {formData.hospitalState === 'CA' ? 'HCAI\'s Hospital Fair Billing Program' : 'your state health department'}.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'billing-errors' && (
+                            <div className="form-section">
+                                <div className="section-title">Billing Errors & Upcoding Tracker</div>
+                                <p style={{ marginBottom: '1.5rem', color: '#475569' }}>
+                                    Document specific billing errors, duplicate charges, incorrect procedure codes, or services you never received. This creates a line-item dispute for your demand letter.
+                                </p>
+
+                                <div className="add-item-section">
+                                    <div style={{ fontWeight: 600, marginBottom: '1rem', color: '#1e293b' }}>Add Disputed Charge</div>
+
+                                    <div className="input-group">
+                                        <div>
+                                            <label className="form-label">Date of Service</label>
+                                            <input
+                                                type="date"
+                                                className="form-input"
+                                                value={billingErrorInput.date}
+                                                onChange={(e) => setBillingErrorInput({...billingErrorInput, date: e.target.value})}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="form-label">CPT / Procedure Code (if known)</label>
+                                            <input
+                                                type="text"
+                                                className="form-input"
+                                                placeholder="e.g., 99285"
+                                                value={billingErrorInput.cptCode}
+                                                onChange={(e) => setBillingErrorInput({...billingErrorInput, cptCode: e.target.value})}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label className="form-label">Charge Description</label>
+                                        <input
+                                            type="text"
+                                            className="form-input"
+                                            placeholder="e.g., Emergency Room Visit - Level 5"
+                                            value={billingErrorInput.description}
+                                            onChange={(e) => setBillingErrorInput({...billingErrorInput, description: e.target.value})}
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label className="form-label">Amount Billed</label>
+                                        <input
+                                            type="number"
+                                            className="form-input"
+                                            placeholder="e.g., 2500"
+                                            value={billingErrorInput.billedAmount}
+                                            onChange={(e) => setBillingErrorInput({...billingErrorInput, billedAmount: e.target.value})}
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label className="form-label">Reason for Dispute</label>
+                                        <textarea
+                                            className="form-textarea"
+                                            placeholder="e.g., Duplicate charge - same service billed twice on same date. OR Service never received - not documented in medical records. OR Upcoding - visit was minor but billed as highest level emergency."
+                                            value={billingErrorInput.reason}
+                                            onChange={(e) => setBillingErrorInput({...billingErrorInput, reason: e.target.value})}
+                                        />
+                                    </div>
+
+                                    <button className="btn btn-primary" onClick={addBillingError}>Add Disputed Charge</button>
+                                </div>
+
+                                {formData.billingErrors.length > 0 && (
+                                    <>
+                                        <div style={{ fontWeight: 600, marginBottom: '1rem', color: '#1e293b', marginTop: '2rem' }}>Disputed Charges ({formData.billingErrors.length})</div>
+                                        {formData.billingErrors.map(error => (
+                                            <div key={error.id} className="list-item">
+                                                <div className="list-item-header">
+                                                    <div>
+                                                        <div className="list-item-title">{error.description}</div>
+                                                        {error.date && <div className="list-item-detail">Date: {error.date}</div>}
+                                                        {error.cptCode && <div className="list-item-detail">Code: {error.cptCode}</div>}
+                                                        <div className="list-item-detail">Amount: ${error.billedAmount}</div>
+                                                    </div>
+                                                    <button className="btn btn-danger btn-small" onClick={() => removeBillingError(error.id)}>Remove</button>
+                                                </div>
+                                                <div style={{ marginTop: '0.75rem', padding: '0.75rem', background: 'white', borderRadius: '4px', fontSize: '0.875rem' }}>
+                                                    <strong>Dispute reason:</strong> {error.reason}
+                                                </div>
+                                            </div>
+                                        ))}
+
+                                        <div className="calculator-result">
+                                            <div className="calculator-amount">
+                                                ${formData.billingErrors.reduce((sum, error) => sum + (parseFloat(error.billedAmount) || 0), 0).toFixed(2)}
+                                            </div>
+                                            <div className="calculator-breakdown">Total disputed amount across all charges</div>
+                                        </div>
+                                    </>
+                                )}
+
+                                <div className="info-box" style={{ marginTop: '2rem' }}>
+                                    <div className="info-box-title">Common Billing Errors to Look For</div>
+                                    <div className="info-box-content">
+                                        <p style={{ marginBottom: '0.5rem' }}><strong>Duplicate billing:</strong> Same service charged multiple times on same date</p>
+                                        <p style={{ marginBottom: '0.5rem' }}><strong>Upcoding:</strong> Billing a higher level of service than documented (e.g., ER Level 5 for minor complaint)</p>
+                                        <p style={{ marginBottom: '0.5rem' }}><strong>Unbundling:</strong> Separately billing services that should be billed together at lower rate</p>
+                                        <p style={{ marginBottom: '0.5rem' }}><strong>Services not received:</strong> Charges for procedures, tests, or supplies not documented in medical records</p>
+                                        <p><strong>Facility fees:</strong> Questionable "facility fees" for outpatient visits at hospital-owned clinics</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'state-laws' && (
+                            <div className="form-section">
+                                <div className="section-title">State Surprise Billing Laws</div>
+                                <p style={{ marginBottom: '1.5rem', color: '#475569' }}>
+                                    State laws often provide additional protections beyond the federal No Surprises Act, especially for fully insured plans and state-regulated providers. Select your state to see specific protections and where to file complaints.
+                                </p>
+
+                                <div className="state-grid">
+                                    {Object.entries(stateProtections).map(([code, state]) => (
+                                        <div key={code} className="state-card">
+                                            <div className="state-card-title">{state.name}</div>
+                                            <div className="state-card-detail">
+                                                <span className="state-card-label">State Law:</span> {state.surpriseBillingLaw}
+                                            </div>
+                                            <div className="state-card-detail">
+                                                <span className="state-card-label">Emergency Coverage:</span> {state.emergencyCoverage}
+                                            </div>
+                                            <div className="state-card-detail">
+                                                <span className="state-card-label">Non-Emergency Coverage:</span> {state.nonEmergencyCoverage}
+                                            </div>
+                                            <div className="state-card-detail">
+                                                <span className="state-card-label">Financial Assistance:</span> {state.financialAssistance}
+                                            </div>
+                                            <div className="state-card-detail" style={{ marginTop: '0.75rem' }}>
+                                                <span className="state-card-label">Regulator:</span> {state.regulator}
+                                            </div>
+                                            {state.regulatorLink && (
+                                                <a href={state.regulatorLink} target="_blank" rel="noopener noreferrer" className="resource-link" style={{ marginTop: '0.5rem', display: 'inline-block' }}>
+                                                    Visit Regulator Website →
+                                                </a>
+                                            )}
+                                            {state.hcaiLink && (
+                                                <a href={state.hcaiLink} target="_blank" rel="noopener noreferrer" className="resource-link" style={{ marginTop: '0.5rem', display: 'block' }}>
+                                                    HCAI Fair Billing Program →
+                                                </a>
+                                            )}
+                                            {state.notes && (
+                                                <div style={{ marginTop: '0.75rem', padding: '0.75rem', background: '#f0f9ff', borderRadius: '4px', fontSize: '0.85rem', color: '#0369a1' }}>
+                                                    {state.notes}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <div className="info-box" style={{ marginTop: '2rem' }}>
+                                    <div className="info-box-title">Federal vs State Protections</div>
+                                    <div className="info-box-content">
+                                        <p style={{ marginBottom: '0.75rem' }}>
+                                            The federal No Surprises Act establishes a nationwide floor of protection for insured patients. State laws often provide additional protections that apply on top of federal law.
+                                        </p>
+                                        <p style={{ marginBottom: '0.75rem' }}>
+                                            <strong>When federal law applies:</strong> Group and individual health insurance plans (not Medicare/Medicaid/uninsured)
+                                        </p>
+                                        <p>
+                                            <strong>When state law matters:</strong> Fully insured state-regulated plans, specific provider types, and scenarios not fully addressed by NSA
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'demand-letter' && (
+                            <>
+                                <div className="form-section">
+                                    <div className="section-title">Generate Demand Letter</div>
+
+                                    <div className="form-group">
+                                        <label className="form-label">Letter Type</label>
+                                        <select className="form-select" value={formData.letterType} onChange={(e) => updateFormData('letterType', e.target.value)}>
+                                            <option value="nsa-violation">NSA / Surprise Billing Violation</option>
+                                            <option value="financial-assistance">Hospital Financial Assistance / 501(r)</option>
+                                            <option value="billing-error">Billing Errors / Coding Disputes</option>
+                                            <option value="collector">Debt Collector / Credit Reporting</option>
+                                        </select>
+                                    </div>
+
+                                    <div style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '2px solid #e2e8f0' }}>
+                                        <div style={{ fontWeight: 600, marginBottom: '1rem', color: '#1e293b' }}>Your Information</div>
+
+                                        <div className="form-group">
+                                            <label className="form-label">Your Full Name</label>
+                                            <input type="text" className="form-input" value={formData.yourName} onChange={(e) => updateFormData('yourName', e.target.value)} />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label className="form-label">Your Address</label>
+                                            <input type="text" className="form-input" placeholder="Street address" value={formData.yourAddress} onChange={(e) => updateFormData('yourAddress', e.target.value)} />
+                                        </div>
+
+                                        <div className="input-group">
+                                            <div>
+                                                <label className="form-label">City</label>
+                                                <input type="text" className="form-input" value={formData.yourCity} onChange={(e) => updateFormData('yourCity', e.target.value)} />
+                                            </div>
+                                            <div>
+                                                <label className="form-label">State</label>
+                                                <select className="form-select" value={formData.yourState} onChange={(e) => updateFormData('yourState', e.target.value)}>
+                                                    <option value="CA">CA</option>
+                                                    <option value="NY">NY</option>
+                                                    <option value="TX">TX</option>
+                                                    <option value="FL">FL</option>
+                                                    <option value="IL">IL</option>
+                                                    <option value="Other">Other</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div className="input-group">
+                                            <div>
+                                                <label className="form-label">ZIP Code</label>
+                                                <input type="text" className="form-input" value={formData.yourZip} onChange={(e) => updateFormData('yourZip', e.target.value)} />
+                                            </div>
+                                            <div>
+                                                <label className="form-label">Phone (optional)</label>
+                                                <input type="tel" className="form-input" value={formData.yourPhone} onChange={(e) => updateFormData('yourPhone', e.target.value)} />
+                                            </div>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label className="form-label">Email (optional)</label>
+                                            <input type="email" className="form-input" value={formData.yourEmail} onChange={(e) => updateFormData('yourEmail', e.target.value)} />
+                                        </div>
+                                    </div>
+
+                                    <div style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '2px solid #e2e8f0' }}>
+                                        <div style={{ fontWeight: 600, marginBottom: '1rem', color: '#1e293b' }}>
+                                            {formData.letterType === 'collector' ? 'Collection Agency Information' : 'Provider/Hospital Information'}
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label className="form-label">Name</label>
+                                            <input type="text" className="form-input" placeholder="Provider, hospital, or collection agency name" value={formData.providerName} onChange={(e) => updateFormData('providerName', e.target.value)} />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label className="form-label">Address</label>
+                                            <input type="text" className="form-input" placeholder="Street address" value={formData.providerAddress} onChange={(e) => updateFormData('providerAddress', e.target.value)} />
+                                        </div>
+
+                                        <div className="input-group">
+                                            <div>
+                                                <label className="form-label">City</label>
+                                                <input type="text" className="form-input" value={formData.providerCity} onChange={(e) => updateFormData('providerCity', e.target.value)} />
+                                            </div>
+                                            <div>
+                                                <label className="form-label">State</label>
+                                                <select className="form-select" value={formData.providerState} onChange={(e) => updateFormData('providerState', e.target.value)}>
+                                                    <option value="CA">CA</option>
+                                                    <option value="NY">NY</option>
+                                                    <option value="TX">TX</option>
+                                                    <option value="FL">FL</option>
+                                                    <option value="IL">IL</option>
+                                                    <option value="Other">Other</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label className="form-label">ZIP Code</label>
+                                            <input type="text" className="form-input" value={formData.providerZip} onChange={(e) => updateFormData('providerZip', e.target.value)} />
+                                        </div>
+                                    </div>
+
+                                    <div style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '2px solid #e2e8f0' }}>
+                                        <div style={{ fontWeight: 600, marginBottom: '1rem', color: '#1e293b' }}>Bill Details</div>
+
+                                        <div className="form-group">
+                                            <label className="form-label">Account Number</label>
+                                            <input type="text" className="form-input" value={formData.accountNumber} onChange={(e) => updateFormData('accountNumber', e.target.value)} />
+                                        </div>
+
+                                        <div className="input-group">
+                                            <div>
+                                                <label className="form-label">Total Amount Billed</label>
+                                                <input type="number" className="form-input" value={formData.totalBilled} onChange={(e) => updateFormData('totalBilled', e.target.value)} />
+                                            </div>
+                                            <div>
+                                                <label className="form-label">Amount Disputed</label>
+                                                <input type="number" className="form-input" value={formData.amountDisputed} onChange={(e) => updateFormData('amountDisputed', e.target.value)} />
+                                            </div>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label className="form-label">Response Deadline (days)</label>
+                                            <input type="number" className="form-input" value={formData.deadline} onChange={(e) => updateFormData('deadline', e.target.value)} />
+                                        </div>
+                                    </div>
+
+                                    <div className="info-box" style={{ marginTop: '2rem' }}>
+                                        <div className="info-box-title">Tip: Complete Other Tabs First</div>
+                                        <div className="info-box-content">
+                                            For best results, complete the NSA Checker, Financial Assistance, or Billing Errors tabs before generating your letter. The information you enter there will help you understand your strongest arguments.
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="preview-section">
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                                        <div style={{ fontWeight: 600, color: '#1e293b' }}>Letter Preview</div>
+                                        <div className="action-buttons">
+                                            <button className="btn btn-primary btn-small" onClick={copyToClipboard}>
+                                                Copy to Clipboard
+                                            </button>
+                                            <button className="btn btn-secondary btn-small" onClick={downloadLetter}>
+                                                Download
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div className="letter-preview">{generatedLetter}</div>
+                                </div>
+                            </>
+                        )}
+
+                        {activeTab === 'resources' && (
+                            <div className="form-section">
+                                <div className="section-title">Resources & External Links</div>
+                                <p style={{ marginBottom: '2rem', color: '#475569' }}>
+                                    Official government resources, complaint portals, and guidance for challenging medical bills and surprise billing.
+                                </p>
+
+                                <div className="resources-grid">
+                                    <div className="resource-card">
+                                        <div className="resource-title">Federal No Surprises Act</div>
+                                        <div className="resource-description">
+                                            Official CMS website explaining NSA protections, patient rights, and how to file complaints about balance billing violations.
+                                        </div>
+                                        <a href="https://www.cms.gov/nosurprises" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Visit CMS NoSurprises Portal →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">No Surprises Help Desk</div>
+                                        <div className="resource-description">
+                                            Federal helpline for questions and complaints about surprise medical bills. Call 1-800-985-3059 to speak with a representative.
+                                        </div>
+                                        <a href="https://www.cms.gov/nosurprises/policies-and-resources/overview-of-rules-fact-sheets" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            NSA Fact Sheets & Overview →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">IRS Section 501(r)</div>
+                                        <div className="resource-description">
+                                            IRS guidance on hospital financial assistance policies, billing and collection requirements, and compliance with Section 501(r).
+                                        </div>
+                                        <a href="https://www.irs.gov/charities-non-profits/financial-assistance-policies-faps" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            IRS Financial Assistance Policies →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">IRS Form 13909</div>
+                                        <div className="resource-description">
+                                            Form to file complaints about tax-exempt hospitals that violate Section 501(r) requirements by engaging in improper collection practices.
+                                        </div>
+                                        <a href="https://www.irs.gov/charities-non-profits/irs-complaint-process-tax-exempt-organizations" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            File IRS Hospital Complaint →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">CA - No Surprise Bills (DOI)</div>
+                                        <div className="resource-description">
+                                            California Department of Insurance resource page on surprise billing protections under AB 72 and how to file complaints.
+                                        </div>
+                                        <a href="https://www.insurance.ca.gov/01-consumers/110-health/60-resources/nosuprisebills.cfm" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            CA DOI Surprise Bills →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">CA - Hospital Fair Billing (HCAI)</div>
+                                        <div className="resource-description">
+                                            California HCAI program for hospital charity care and financial assistance complaints. Enforces Fair Pricing Act and Fair Billing requirements.
+                                        </div>
+                                        <a href="https://hcai.ca.gov/affordability/hospital-fair-billing-program/" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            HCAI Fair Billing Program →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">CFPB Medical Debt Complaints</div>
+                                        <div className="resource-description">
+                                            Consumer Financial Protection Bureau portal for filing complaints about medical debt collection practices and credit reporting issues.
+                                        </div>
+                                        <a href="https://www.consumerfinance.gov/complaint/" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            File CFPB Complaint →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">CFPB Medical Debt Advisory</div>
+                                        <div className="resource-description">
+                                            November 2024 CFPB advisory opinion on deceptive and unfair collection of medical debt under the FDCPA and Regulation F.
+                                        </div>
+                                        <a href="https://files.consumerfinance.gov/f/documents/cfpb_medical-debt-collection-advisory-opinion_2024-10.pdf" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Read CFPB Advisory (PDF) →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">State Insurance Departments</div>
+                                        <div className="resource-description">
+                                            Directory of all state insurance departments. File complaints about health plan denials, surprise billing, and network adequacy.
+                                        </div>
+                                        <a href="https://content.naic.org/state-insurance-departments" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Find Your State Regulator →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">Patient Advocate Foundation</div>
+                                        <div className="resource-description">
+                                            Non-profit providing free case management for patients facing medical billing issues, insurance denials, and collection problems.
+                                        </div>
+                                        <a href="https://www.patientadvocate.org/" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Patient Advocate Foundation →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">Dollar For</div>
+                                        <div className="resource-description">
+                                            Free tool to search hospital financial assistance policies and determine eligibility. Helps patients apply for charity care.
+                                        </div>
+                                        <a href="https://www.dollarfor.org/" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Search Hospital Policies →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">NY Dept of Financial Services</div>
+                                        <div className="resource-description">
+                                            New York state regulator for surprise billing complaints and health insurance disputes. NY has strong pre-NSA protections.
+                                        </div>
+                                        <a href="https://www.dfs.ny.gov/consumers/health_insurance/surprise_medical_bills" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            NY Surprise Bill Help →
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <div className="info-box" style={{ marginTop: '2rem' }}>
+                                    <div className="info-box-title">Escalation Strategy</div>
+                                    <div className="info-box-content">
+                                        <p style={{ marginBottom: '0.75rem' }}>
+                                            <strong>Step 1:</strong> Send a written demand letter to the provider/hospital/collector giving them 30 days to respond.
+                                        </p>
+                                        <p style={{ marginBottom: '0.75rem' }}>
+                                            <strong>Step 2:</strong> If no adequate response, file administrative complaints with federal and state regulators (NSA Help Desk, state insurance department, HCAI, IRS, CFPB as applicable).
+                                        </p>
+                                        <p style={{ marginBottom: '0.75rem' }}>
+                                            <strong>Step 3:</strong> Consider small claims court for modest amounts or consultation with consumer protection attorney for larger disputes with clear violations.
+                                        </p>
+                                        <p>
+                                            <strong>Throughout:</strong> Document everything - keep copies of all letters, emails, bills, EOBs, and notes from phone calls.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<MedicalBillingTool />, document.getElementById('root'));
+    </script>
+</body>
+</html>
