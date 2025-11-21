@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upwork Non-Payment Guide - When Demand Letters Work</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #1e293b;
+            background: linear-gradient(135deg, #d97706 0%, #ea580c 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        #root {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .app-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: calc(100vh - 40px);
+        }
+        .header {
+            background: linear-gradient(135deg, #d97706 0%, #ea580c 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        .header-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .header-subtitle {
+            font-size: 1rem;
+            opacity: 0.95;
+        }
+        .tabs-container {
+            display: flex;
+            background: #f8fafc;
+            border-bottom: 2px solid #e2e8f0;
+            overflow-x: auto;
+            flex-shrink: 0;
+        }
+        .tab {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #64748b;
+            white-space: nowrap;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .tab:hover {
+            background: #f1f5f9;
+            color: #d97706;
+        }
+        .tab.active {
+            color: #d97706;
+            background: white;
+            border-bottom-color: #d97706;
+        }
+        .tab-icon {
+            font-size: 1.1rem;
+        }
+        .content-wrapper {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+        .content-wrapper::-webkit-scrollbar {
+            width: 10px;
+        }
+        .content-wrapper::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .content-wrapper::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 5px;
+        }
+        .content-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .section-title {
+            color: #d97706;
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .section-icon {
+            font-size: 1.5rem;
+        }
+        .info-panel {
+            background: #fef3c7;
+            border-left: 4px solid #d97706;
+            padding: 1.25rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+        }
+        .info-panel-title {
+            font-weight: 700;
+            color: #92400e;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .info-panel-content {
+            font-size: 0.9rem;
+            color: #334155;
+            line-height: 1.7;
+        }
+        .success-panel {
+            background: #d1fae5;
+            border-left: 4px solid #059669;
+            padding: 1.25rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+        }
+        .success-panel-title {
+            font-weight: 700;
+            color: #065f46;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .warning-panel {
+            background: #fee2e2;
+            border-left: 4px solid #dc2626;
+            padding: 1.25rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+        }
+        .warning-panel-title {
+            font-weight: 700;
+            color: #991b1b;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.2s;
+        }
+        .card:hover {
+            border-color: #d97706;
+            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.15);
+        }
+        .card-header {
+            font-weight: 700;
+            color: #d97706;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .card-content {
+            font-size: 0.9rem;
+            color: #475569;
+            line-height: 1.7;
+        }
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .platform-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.2s;
+        }
+        .platform-card:hover {
+            border-color: #d97706;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.2);
+        }
+        .platform-name {
+            font-weight: 700;
+            color: #d97706;
+            font-size: 1.15rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .platform-detail {
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .platform-detail:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .detail-label {
+            font-weight: 600;
+            color: #475569;
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+        .detail-value {
+            color: #1e293b;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .checklist-item {
+            display: flex;
+            align-items: start;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: #f8fafc;
+            border-radius: 6px;
+            margin-bottom: 0.75rem;
+            transition: background 0.2s;
+        }
+        .checklist-item:hover {
+            background: #fef3c7;
+        }
+        .checklist-icon {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+        .checklist-content {
+            flex: 1;
+        }
+        .checklist-title {
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 0.25rem;
+        }
+        .checklist-description {
+            font-size: 0.875rem;
+            color: #64748b;
+            line-height: 1.5;
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .badge-strong {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .badge-weak {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .badge-platform {
+            background: #dbeafe;
+            color: #1e3a8a;
+        }
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+        .resource-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.2s;
+        }
+        .resource-card:hover {
+            border-color: #d97706;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.2);
+        }
+        .resource-title {
+            font-weight: 700;
+            color: #d97706;
+            margin-bottom: 0.75rem;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .resource-description {
+            font-size: 0.875rem;
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        .resource-link {
+            color: #d97706;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+        .resource-link:hover {
+            color: #ea580c;
+            text-decoration: underline;
+        }
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+        .timeline-item {
+            position: relative;
+            padding-bottom: 2rem;
+        }
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2rem;
+            top: 0;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #d97706;
+            border: 3px solid #fef3c7;
+        }
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: -1.6875rem;
+            top: 12px;
+            width: 2px;
+            height: calc(100% - 12px);
+            background: #fed7aa;
+        }
+        .timeline-item:last-child::after {
+            display: none;
+        }
+        .timeline-title {
+            font-weight: 700;
+            color: #d97706;
+            margin-bottom: 0.5rem;
+        }
+        .timeline-description {
+            font-size: 0.9rem;
+            color: #475569;
+            line-height: 1.6;
+        }
+        @media (max-width: 768px) {
+            .comparison-grid,
+            .resources-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        function UpworkGuide() {
+            const [activeTab, setActiveTab] = useState('overview');
+
+            return (
+                <div className="app-container">
+                    <div className="header">
+                        <div className="header-title">Upwork Non-Payment Guide</div>
+                        <div className="header-subtitle">When demand letters work, when they don't, and what to try first</div>
+                    </div>
+
+                    <div className="tabs-container">
+                        <button className={`tab ${activeTab === 'overview' ? 'active' : ''}`} onClick={() => setActiveTab('overview')}>
+                            <span className="tab-icon">📋</span>
+                            Overview
+                        </button>
+                        <button className={`tab ${activeTab === 'platforms' ? 'active' : ''}`} onClick={() => setActiveTab('platforms')}>
+                            <span className="tab-icon">🏢</span>
+                            Platform Comparison
+                        </button>
+                        <button className={`tab ${activeTab === 'strong' ? 'active' : ''}`} onClick={() => setActiveTab('strong')}>
+                            <span className="tab-icon">✅</span>
+                            When Letters Work
+                        </button>
+                        <button className={`tab ${activeTab === 'weak' ? 'active' : ''}`} onClick={() => setActiveTab('weak')}>
+                            <span className="tab-icon">❌</span>
+                            When They Don't
+                        </button>
+                        <button className={`tab ${activeTab === 'process' ? 'active' : ''}`} onClick={() => setActiveTab('process')}>
+                            <span className="tab-icon">⚙️</span>
+                            Internal Remedies
+                        </button>
+                        <button className={`tab ${activeTab === 'resources' ? 'active' : ''}`} onClick={() => setActiveTab('resources')}>
+                            <span className="tab-icon">🔗</span>
+                            Resources
+                        </button>
+                    </div>
+
+                    <div className="content-wrapper">
+                        {activeTab === 'overview' && (
+                            <>
+                                <div className="section-title">
+                                    <span className="section-icon">📋</span>
+                                    The Freelance Non-Payment Problem
+                                </div>
+
+                                <div className="info-panel">
+                                    <div className="info-panel-title">
+                                        💡 Key Insight
+                                    </div>
+                                    <div className="info-panel-content">
+                                        With approximately <strong>1.57 billion freelancers worldwide</strong> and platforms like Upwork processing over <strong>$4 billion annually</strong>, even a small percentage of payment disputes affects thousands of professionals. The question isn't whether non-payment happens—it's when external legal intervention makes sense versus when platform remedies are more effective.
+                                    </div>
+                                </div>
+
+                                <div className="card">
+                                    <div className="card-header">🏗️ Understanding the Legal Structure</div>
+                                    <div className="card-content">
+                                        <p style={{ marginBottom: '1rem' }}><strong>Critical point most freelancers miss:</strong> Platforms like Upwork, Fiverr, and Freelancer.com are <em>marketplaces</em>, not parties to your service contract with clients.</p>
+
+                                        <p style={{ marginBottom: '1rem' }}>This three-party structure means:</p>
+
+                                        <ul style={{ marginLeft: '1.5rem', marginBottom: '1rem', lineHeight: '1.8' }}>
+                                            <li>Your contractual relationship for services is <strong>directly with the client</strong>, not with the platform</li>
+                                            <li>The platform provides payment processing, dispute tools, and escrow services</li>
+                                            <li>When a client refuses to pay, your primary legal claim is <strong>against the client entity</strong></li>
+                                            <li>Platform dispute mechanisms should be exhausted first, but they have limits</li>
+                                        </ul>
+
+                                        <p>This structure determines who you can sue, what remedies are available, and whether the platform will help or hinder your collection efforts.</p>
+                                    </div>
+                                </div>
+
+                                <div className="card">
+                                    <div className="card-header">⚖️ The Demand Letter Question</div>
+                                    <div className="card-content">
+                                        <p style={{ marginBottom: '1rem' }}>A lawyer's demand letter can be highly effective in specific scenarios, but it's <strong>not always the right first step</strong>.</p>
+
+                                        <div style={{ background: '#d1fae5', padding: '1rem', borderRadius: '6px', marginBottom: '1rem' }}>
+                                            <strong style={{ color: '#065f46' }}>✓ Demand letters work best when:</strong>
+                                            <ul style={{ marginLeft: '1.5rem', marginTop: '0.5rem', color: '#334155' }}>
+                                                <li>Platform dispute mechanisms are exhausted or don't apply</li>
+                                                <li>You have strong documentation of completed work</li>
+                                                <li>The amount justifies legal fees (typically $1,500+ minimum)</li>
+                                                <li>Client has identifiable assets or cares about legal pressure</li>
+                                            </ul>
+                                        </div>
+
+                                        <div style={{ background: '#fee2e2', padding: '1rem', borderRadius: '6px' }}>
+                                            <strong style={{ color: '#991b1b' }}>✗ Demand letters often backfire when:</strong>
+                                            <ul style={{ marginLeft: '1.5rem', marginTop: '0.5rem', color: '#334155' }}>
+                                                <li>Platform Payment Protection or escrow dispute would resolve faster</li>
+                                                <li>Your documentation is weak or scope was genuinely ambiguous</li>
+                                                <li>The disputed amount is under $1,000</li>
+                                                <li>Client is international with no enforceable assets</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="warning-panel">
+                                    <div className="warning-panel-title">
+                                        ⚠️ Platform Ban Risk
+                                    </div>
+                                    <div className="info-panel-content">
+                                        <strong>Critical consideration:</strong> Pursuing external collection can risk platform sanctions if your unpaid work involved off-platform arrangements that violated non-circumvention rules. Even when legally justified, sending a demand letter that documents platform violations may cost you account access. Factor this into your cost-benefit analysis—is the unpaid amount worth more than your future earning potential on the platform?
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        {activeTab === 'platforms' && (
+                            <>
+                                <div className="section-title">
+                                    <span className="section-icon">🏢</span>
+                                    Platform Dispute Systems Comparison
+                                </div>
+
+                                <div className="info-panel">
+                                    <div className="info-panel-title">
+                                        📊 Why This Matters
+                                    </div>
+                                    <div className="info-panel-content">
+                                        Each platform has different internal dispute mechanisms, deadlines, and protection programs. Understanding these systems is essential because bypassing available platform remedies makes you look unreasonable in any subsequent legal proceeding and may waste money on attorney fees when free platform tools would work better.
+                                    </div>
+                                </div>
+
+                                <div className="comparison-grid">
+                                    <div className="platform-card">
+                                        <div className="platform-name">
+                                            💼 Upwork
+                                        </div>
+
+                                        <div className="platform-detail">
+                                            <div className="detail-label">Hourly Protection</div>
+                                            <div className="detail-value">
+                                                Hourly Payment Protection covers qualifying hours logged with Desktop App, adequate activity levels, and proper memo text. Protected hours are paid even if client disputes.
+                                            </div>
+                                        </div>
+
+                                        <div className="platform-detail">
+                                            <div className="detail-label">Fixed-Price Disputes</div>
+                                            <div className="detail-value">
+                                                Milestone-based escrow with 7-day dispute deadline after refund request. Mediation followed by optional binding arbitration through Brief (fee required).
+                                            </div>
+                                        </div>
+
+                                        <div className="platform-detail">
+                                            <div className="detail-label">Key Deadlines</div>
+                                            <div className="detail-value">
+                                                <strong>3 days</strong> to respond to hourly disputes<br/>
+                                                <strong>7 days</strong> to file fixed-price dispute after refund request<br/>
+                                                <strong>14 days</strong> auto-release if client doesn't act on milestone
+                                            </div>
+                                        </div>
+
+                                        <div className="platform-detail">
+                                            <div className="detail-label">Chargeback Policy</div>
+                                            <div className="detail-value">
+                                                Explicitly prohibited in ToS. Client accounts suspended until chargeback repaid. Strong basis for demand letters when clients violate this rule.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="platform-card">
+                                        <div className="platform-name">
+                                            🎨 Fiverr
+                                        </div>
+
+                                        <div className="platform-detail">
+                                            <div className="detail-label">Dispute System</div>
+                                            <div className="detail-value">
+                                                Resolution Center for order updates, cancellations, and delivery changes. Less formalized than Upwork's structured process.
+                                            </div>
+                                        </div>
+
+                                        <div className="platform-detail">
+                                            <div className="detail-label">Order Protection</div>
+                                            <div className="detail-value">
+                                                No formal "Payment Protection" program like Upwork. Relies on customer support review and discretionary determinations.
+                                            </div>
+                                        </div>
+
+                                        <div className="platform-detail">
+                                            <div className="detail-label">Arbitration</div>
+                                            <div className="detail-value">
+                                                Arbitration clause covers disputes with Fiverr itself, not buyer-seller disputes over order quality/payment.
+                                            </div>
+                                        </div>
+
+                                        <div className="platform-detail">
+                                            <div className="detail-label">Demand Letter Timing</div>
+                                            <div className="detail-value">
+                                                Less clear procedural exhaustion path. External letters may be appropriate sooner when Resolution Center tools fail to resolve.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="platform-card">
+                                        <div className="platform-name">
+                                            🌐 Freelancer.com
+                                        </div>
+
+                                        <div className="platform-detail">
+                                            <div className="detail-label">Milestone System</div>
+                                            <div className="detail-value">
+                                                Milestone Payment® system similar to Upwork's escrow. Funds held until work accepted or disputed.
+                                            </div>
+                                        </div>
+
+                                        <div className="platform-detail">
+                                            <div className="detail-label">Dispute Resolution</div>
+                                            <div className="detail-value">
+                                                Internal Dispute Resolution Service. Either party can pay arbitration fee for platform's "Dispute Team" to arbitrate binding decision.
+                                            </div>
+                                        </div>
+
+                                        <div className="platform-detail">
+                                            <div className="detail-label">Fee Structure</div>
+                                            <div className="detail-value">
+                                                Arbitration fees vary by disputed amount. Similar model to Upwork's Brief arbitration.
+                                            </div>
+                                        </div>
+
+                                        <div className="platform-detail">
+                                            <div className="detail-label">External Action</div>
+                                            <div className="detail-value">
+                                                Demand letters appropriate after internal arbitration concludes or when milestones never funded properly.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="success-panel">
+                                    <div className="success-panel-title">
+                                        💡 Pattern Recognition
+                                    </div>
+                                    <div className="info-panel-content">
+                                        <strong>Common pattern across all platforms:</strong><br/><br/>
+                                        • Platform provides some form of internal dispute/mediation tools<br/>
+                                        • Platform-tied arbitration or dispute team for escalation (with fees)<br/>
+                                        • These internal tools should be your <strong>first resort</strong> (faster, cheaper, designed for platform context)<br/>
+                                        • External demand letters become rational <strong>after</strong> internal mechanisms fail or don't apply<br/><br/>
+
+                                        The decision point: Has the platform's dispute system genuinely been exhausted, or are you skipping available remedies?
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        {activeTab === 'strong' && (
+                            <>
+                                <div className="section-title">
+                                    <span className="section-icon">✅</span>
+                                    Strong Demand Letter Scenarios
+                                </div>
+
+                                <div className="info-panel">
+                                    <div className="info-panel-title">
+                                        🎯 When Legal Intervention Works
+                                    </div>
+                                    <div className="info-panel-content">
+                                        These scenarios present the highest probability of successful collection through attorney demand letters. Each involves situations where platform remedies are exhausted, unavailable, or insufficient.
+                                    </div>
+                                </div>
+
+                                <div className="card">
+                                    <div className="card-header">
+                                        💰 Scenario 1: Unfunded or Refunded Escrow
+                                        <span className="badge badge-strong">Strong Case</span>
+                                    </div>
+                                    <div className="card-content">
+                                        <p style={{ marginBottom: '1rem' }}><strong>Situation:</strong> Fixed-price contract where work was clearly delivered and documented, but funds were never deposited in escrow OR funds were refunded to client after you missed the 7-day dispute deadline.</p>
+
+                                        <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '6px', marginBottom: '1rem' }}>
+                                            <strong>Why demand letters work here:</strong>
+                                            <ul style={{ marginLeft: '1.5rem', marginTop: '0.5rem', lineHeight: '1.8' }}>
+                                                <li>Platform dispute tools are useless (no money in system to dispute)</li>
+                                                <li>Straightforward breach of contract—work performed, payment refused</li>
+                                                <li>Client has both completed work product and their money back (unjust enrichment)</li>
+                                                <li>Your contract claim exists independently of platform procedures</li>
+                                            </ul>
+                                        </div>
+
+                                        <p style={{ fontSize: '0.875rem', color: '#64748b', fontStyle: 'italic' }}>
+                                            <strong>Letter emphasis:</strong> Client received completed deliverables and documentation shows acceptance. Their legal obligation to pay exists regardless of missed platform deadlines or escrow procedural issues.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="card">
+                                    <div className="card-header">
+                                        ⏱️ Scenario 2: Manual Time / Beyond-Cap Hours
+                                        <span className="badge badge-strong">Strong Case</span>
+                                    </div>
+                                    <div className="card-content">
+                                        <p style={{ marginBottom: '1rem' }}><strong>Situation:</strong> Hourly contract with substantial work logged as manual time entries or performed beyond weekly hour cap, now disputed by client.</p>
+
+                                        <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '6px', marginBottom: '1rem' }}>
+                                            <strong>Why demand letters work here:</strong>
+                                            <ul style={{ marginLeft: '1.5rem', marginTop: '0.5rem', lineHeight: '1.8' }}>
+                                                <li>Falls outside Upwork's Payment Protection (not auto-tracked hours)</li>
+                                                <li>But work was legitimately performed (emergency work, planning, non-screen tasks)</li>
+                                                <li>Client agreed to or accepted the work time</li>
+                                                <li>Contract claim exists for value delivered even without platform protection</li>
+                                            </ul>
+                                        </div>
+
+                                        <p style={{ fontSize: '0.875rem', color: '#64748b', fontStyle: 'italic' }}>
+                                            <strong>Letter emphasis:</strong> Contemporaneous documentation (messages, work product) proving work was performed and client requested or accepted it. Lack of Payment Protection doesn't negate contractual payment obligation.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="card">
+                                    <div className="card-header">
+                                        🚫 Scenario 3: Improper Chargebacks
+                                        <span className="badge badge-strong">Strongest Case</span>
+                                    </div>
+                                    <div className="card-content">
+                                        <p style={{ marginBottom: '1rem' }}><strong>Situation:</strong> Client initiated credit card chargeback in violation of platform ToS, and you weren't fully protected by Payment Protection or Upwork's chargeback fight with the bank.</p>
+
+                                        <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '6px', marginBottom: '1rem' }}>
+                                            <strong>Why demand letters work here:</strong>
+                                            <ul style={{ marginLeft: '1.5rem', marginTop: '0.5rem', lineHeight: '1.8' }}>
+                                                <li>Client simultaneously breached contract AND violated platform terms</li>
+                                                <li>Chargebacks are explicitly prohibited in Upwork ToS Section 6.5</li>
+                                                <li>Client caused direct financial harm through banking system</li>
+                                                <li>Documentary evidence (chargeback records) proves improper conduct</li>
+                                                <li>Potential for damages beyond original contract price</li>
+                                            </ul>
+                                        </div>
+
+                                        <p style={{ fontSize: '0.875rem', color: '#64748b', fontStyle: 'italic' }}>
+                                            <strong>Letter emphasis:</strong> Detailed documentation of work delivered, chargeback transaction details, violation of platform prohibition on chargebacks, damages suffered (fees, lost access to funds, reputation harm).
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="card">
+                                    <div className="card-header">
+                                        🌐 Scenario 4: Off-Platform Hybrid Arrangements
+                                        <span className="badge badge-platform">High Risk / High Reward</span>
+                                    </div>
+                                    <div className="card-content">
+                                        <p style={{ marginBottom: '1rem' }}><strong>Situation:</strong> Client pushed part of work off-platform to "save fees," you performed the off-platform work, client now refuses to pay for that portion.</p>
+
+                                        <div style={{ background: '#fee2e2', padding: '1rem', borderRadius: '6px', marginBottom: '1rem' }}>
+                                            <strong style={{ color: '#991b1b' }}>⚠️ Platform ban risk:</strong> Pursuing this claim may cost you Upwork account access even though your legal claim is valid. Client may forward your letter to platform support as defense. Calculate: Is unpaid amount worth more than future platform earnings?
+                                        </div>
+
+                                        <div style={{ background: '#d1fae5', padding: '1rem', borderRadius: '6px', marginTop: '1rem' }}>
+                                            <strong style={{ color: '#065f46' }}>Why demand letters can still work:</strong>
+                                            <ul style={{ marginLeft: '1.5rem', marginTop: '0.5rem', lineHeight: '1.8' }}>
+                                                <li>Clear legal claim under general contract law / quantum meruit</li>
+                                                <li>Services performed, value received, payment refused</li>
+                                                <li>For substantial amounts ($3,000+), may justify platform access trade-off</li>
+                                            </ul>
+                                        </div>
+
+                                        <p style={{ fontSize: '0.875rem', color: '#64748b', fontStyle: 'italic', marginTop: '1rem' }}>
+                                            <strong>Letter drafting:</strong> Focus on work performed and value delivered. Avoid unnecessary detail about how off-platform arrangement originated. Letter is about contract enforcement, not confessing platform violations.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="card">
+                                    <div className="card-header">
+                                        👻 Scenario 5: Client Ghosted / Left Platform
+                                        <span className="badge badge-strong">Strong Case</span>
+                                    </div>
+                                    <div className="card-content">
+                                        <p style={{ marginBottom: '1rem' }}><strong>Situation:</strong> Client closed contracts, deleted Upwork profile, or disappeared from platform while owing money.</p>
+
+                                        <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '6px', marginBottom: '1rem' }}>
+                                            <strong>Why demand letters work here:</strong>
+                                            <ul style={{ marginLeft: '1.5rem', marginTop: '0.5rem', lineHeight: '1.8' }}>
+                                                <li>Platform dispute tools effectively useless (can't dispute closed/deleted profiles)</li>
+                                                <li>Client clearly doesn't care about platform reputation (already abandoned account)</li>
+                                                <li>Platform pressure won't work—need external legal action</li>
+                                                <li>Letter to business address or registered agent becomes primary contact method</li>
+                                            </ul>
+                                        </div>
+
+                                        <p style={{ fontSize: '0.875rem', color: '#64748b', fontStyle: 'italic' }}>
+                                            <strong>Challenge:</strong> Obtaining accurate contact information. May need state business registry searches, skip-tracing, or attorney resources to locate defendant. Adds cost but often only path forward for significant amounts.
+                                        </p>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        {activeTab === 'weak' && (
+                            <>
+                                <div className="section-title">
+                                    <span className="section-icon">❌</span>
+                                    When Demand Letters Don't Work
+                                </div>
+
+                                <div className="warning-panel">
+                                    <div className="warning-panel-title">
+                                        ⚠️ Recognizing Lost Causes
+                                    </div>
+                                    <div className="info-panel-content">
+                                        Sending demand letters in these scenarios often wastes attorney fees, creates unnecessary conflict, or makes you look unreasonable. Better alternatives exist—either through platform tools or by cutting your losses and moving on.
+                                    </div>
+                                </div>
+
+                                <div className="card">
+                                    <div className="card-header">
+                                        🛡️ Scenario 1: Qualifying Payment Protection Hours
+                                        <span className="badge badge-weak">Weak Case</span>
+                                    </div>
+                                    <div className="card-content">
+                                        <p style={{ marginBottom: '1rem' }}><strong>Situation:</strong> Unpaid hourly work clearly qualifies for Upwork's Payment Protection—properly tracked with Desktop App, adequate screenshots, activity levels, memo text, within weekly limits.</p>
+
+                                        <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '6px', marginBottom: '1rem' }}>
+                                            <strong>Why external demand letters are premature:</strong>
+                                            <ul style={{ marginLeft: '1.5rem', marginTop: '0.5rem', lineHeight: '1.8' }}>
+                                                <li>Upwork's Payment Protection is robust when technical requirements met</li>
+                                                <li>Platform has financial incentive to enforce protection (justifies fees, attracts freelancers)</li>
+                                                <li>Internal system faster and cheaper than attorney intervention</li>
+                                                <li>Proper 3-day dispute response should trigger automatic payment</li>
+                                            </ul>
+                                        </div>
+
+                                        <p style={{ fontSize: '0.875rem', color: '#059669', fontStyle: 'italic' }}>
+                                            <strong>Better approach:</strong> Respond properly to client's dispute within 3-day window with detailed evidence. Let Upwork's system work. Only escalate externally if Upwork improperly denies protection—then your claim may be against Upwork for breach of payment protection promise, not directly against client.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="card">
+                                    <div className="card-header">
+                                        💰 Scenario 2: Funded Escrow Within Dispute Window
+                                        <span className="badge badge-weak">Weak Case</span>
+                                    </div>
+                                    <div className="card-content">
+                                        <p style={{ marginBottom: '1rem' }}><strong>Situation:</strong> Fixed-price milestone funds properly held in escrow, you're within the 7-day dispute filing deadline.</p>
+
+                                        <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '6px', marginBottom: '1rem' }}>
+                                            <strong>Why external demand letters don't make sense:</strong>
+                                            <ul style={{ marginLeft: '1.5rem', marginTop: '0.5rem', lineHeight: '1.8' }}>
+                                                <li>Money already set aside in escrow—fastest path is internal dispute</li>
+                                                <li>Upwork's mediation team will review evidence</li>
+                                                <li>Client can't access funds without releasing or winning dispute</li>
+                                                <li>Jumping to demand letter signals you don't understand available processes</li>
+                                                <li>Wastes attorney fees when free platform tools would work</li>
+                                            </ul>
+                                        </div>
+
+                                        <p style={{ fontSize: '0.875rem', color: '#059669', fontStyle: 'italic' }}>
+                                            <strong>Better approach:</strong> File platform dispute within 7-day deadline, provide comprehensive evidence, participate in mediation. Consider Brief arbitration if mediation fails. Only pursue external letter if both parties decline arbitration and funds released to client.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="card">
+                                    <div className="card-header">
+                                        📄 Scenario 3: Weak Claims / Poor Documentation
+                                        <span className="badge badge-weak">Dangerous Case</span>
+                                    </div>
+                                    <div className="card-content">
+                                        <p style={{ marginBottom: '1rem' }}><strong>Situation:</strong> Scope genuinely ambiguous, legitimate quality disputes, poor documentation, missed deadlines, or can't prove what was agreed upon.</p>
+
+                                        <div style={{ background: '#fee2e2', padding: '1rem', borderRadius: '6px', marginBottom: '1rem' }}>
+                                            <strong style={{ color: '#991b1b' }}>Why demand letters can backfire:</strong>
+                                            <ul style={{ marginLeft: '1.5rem', marginTop: '0.5rem', lineHeight: '1.8' }}>
+                                                <li>Client responds with their own attorney citing your breaches</li>
+                                                <li>Triggers counter-claims that create new legal exposure</li>
+                                                <li>May lead to bar complaints for improper demand tactics</li>
+                                                <li>Turns potential negotiated partial payment into complete loss</li>
+                                                <li>Attorney who sent weak demand looks incompetent or unethical</li>
+                                            </ul>
+                                        </div>
+
+                                        <p style={{ fontSize: '0.875rem', color: '#dc2626', fontStyle: 'italic' }}>
+                                            <strong>Self-assessment required:</strong> Do you have clear written scope? Messages showing client accepted deliverables? Evidence of timely performance? If your case relies on verbal understandings or work product is admittedly incomplete, demand letter creates more problems than it solves. Consider compromise settlement instead.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="card">
+                                    <div className="card-header">
+                                        💵 Scenario 4: Small Dollar Amounts
+                                        <span className="badge badge-weak">Economics Don't Work</span>
+                                    </div>
+                                    <div className="card-content">
+                                        <p style={{ marginBottom: '1rem' }}><strong>Situation:</strong> Disputed amount is under $1,000-$1,500 (varies by attorney's minimum threshold).</p>
+
+                                        <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '6px', marginBottom: '1rem' }}>
+                                            <strong>The math problem:</strong>
+                                            <ul style={{ marginLeft: '1.5rem', marginTop: '0.5rem', lineHeight: '1.8' }}>
+                                                <li>Attorney demand letter: $500-$2,000 depending on complexity</li>
+                                                <li>Small claims filing fees: $30-$100</li>
+                                                <li>Service of process: $50-$150</li>
+                                                <li>Your time attending hearing: 4-8 hours</li>
+                                                <li><strong>Total investment may exceed recovery even if you win</strong></li>
+                                            </ul>
+                                        </div>
+
+                                        <p style={{ fontSize: '0.875rem', color: '#059669', fontStyle: 'italic', marginBottom: '1rem' }}>
+                                            <strong>Better approaches for small amounts:</strong>
+                                        </p>
+
+                                        <ul style={{ marginLeft: '1.5rem', fontSize: '0.875rem', color: '#475569', lineHeight: '1.8' }}>
+                                            <li><strong>Platform dispute tools:</strong> Free, designed for small-dollar cases</li>
+                                            <li><strong>DIY small claims:</strong> If client is locatable, file yourself without attorney</li>
+                                            <li><strong>Write it off:</strong> Business expense / learning cost, focus on profitable work</li>
+                                            <li><strong>Improve processes:</strong> Better client vetting, milestone payments, clearer contracts going forward</li>
+                                        </ul>
+
+                                        <p style={{ fontSize: '0.875rem', color: '#64748b', fontStyle: 'italic', marginTop: '1rem' }}>
+                                            Unless aggravating circumstances (chargeback fraud, principle over economics), spending more on collection than you could recover is rarely rational.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="card">
+                                    <div className="card-header">
+                                        🌍 Scenario 5: International Clients / Judgment-Proof Defendants
+                                        <span className="badge badge-weak">Practically Uncollectible</span>
+                                    </div>
+                                    <div className="card-content">
+                                        <p style={{ marginBottom: '1rem' }}><strong>Situation:</strong> Client located in different country with weak enforcement, or client has no attachable assets (judgment-proof).</p>
+
+                                        <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '6px', marginBottom: '1rem' }}>
+                                            <strong>The enforcement problem:</strong>
+                                            <ul style={{ marginLeft: '1.5rem', marginTop: '0.5rem', lineHeight: '1.8' }}>
+                                                <li>Winning judgment across international borders requires treaty reciprocity (often absent)</li>
+                                                <li>Enforcement costs often exceed value of underlying debt</li>
+                                                <li>Client in judgment-proof status (no regular wages, no property, minimal bank balances)</li>
+                                                <li>Collection tools (levies, liens, garnishment) unavailable or impractical</li>
+                                            </ul>
+                                        </div>
+
+                                        <p style={{ fontSize: '0.875rem', color: '#dc2626', fontStyle: 'italic' }}>
+                                            <strong>Reality check:</strong> You may have valid legal claim and even win judgment, but collecting across difficult borders or from judgment-proof defendants exceeds value for most freelance disputes. Factor enforcement reality into initial decision—$5,000 invoice from Romanian client may be legally valid but practically uncollectible for less than collection cost. Better client vetting upfront prevents these situations.
+                                        </p>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        {activeTab === 'process' && (
+                            <>
+                                <div className="section-title">
+                                    <span className="section-icon">⚙️</span>
+                                    Internal Remedies: What to Try First
+                                </div>
+
+                                <div className="info-panel">
+                                    <div className="info-panel-title">
+                                        📋 Exhaust Platform Tools First
+                                    </div>
+                                    <div className="info-panel-content">
+                                        Before spending money on attorney demand letters, work through the platform's internal dispute mechanisms. These tools are free, faster than litigation, and designed specifically for platform context. Courts and arbitrators look unfavorably on parties who skip available remedies and escalate prematurely.
+                                    </div>
+                                </div>
+
+                                <div className="card">
+                                    <div className="card-header">⏱️ Upwork Hourly Contracts: Payment Protection Process</div>
+                                    <div className="card-content">
+                                        <div className="timeline">
+                                            <div className="timeline-item">
+                                                <div className="timeline-title">Step 1: Qualify for Protection</div>
+                                                <div className="timeline-description">
+                                                    Ensure hours meet Payment Protection criteria: logged with Desktop App, screenshots show contract work, adequate memo text, sufficient activity levels, within weekly limit, verified identity/billing method.
+                                                </div>
+                                            </div>
+
+                                            <div className="timeline-item">
+                                                <div className="timeline-title">Step 2: Client Disputes Hours</div>
+                                                <div className="timeline-description">
+                                                    Upwork pauses contract when client files dispute. You receive notification with 3-day response window. Act quickly.
+                                                </div>
+                                            </div>
+
+                                            <div className="timeline-item">
+                                                <div className="timeline-title">Step 3: Respond Within 3 Days</div>
+                                                <div className="timeline-description">
+                                                    Submit detailed evidence: work diary screenshots, specific tasks completed, why activity levels were appropriate, how work relates to contract. Reference project messages confirming assignments.
+                                                </div>
+                                            </div>
+
+                                            <div className="timeline-item">
+                                                <div className="timeline-title">Step 4: Upwork Reviews & Pays</div>
+                                                <div className="timeline-description">
+                                                    Hours meeting Protection criteria are paid automatically even if client refuses. Non-qualifying hours may be refunded to client. Review decision carefully.
+                                                </div>
+                                            </div>
+
+                                            <div className="timeline-item">
+                                                <div className="timeline-title">If Protection Denied Improperly</div>
+                                                <div className="timeline-description">
+                                                    Only then consider external action—but your claim may be against Upwork for breach of protection promise, not directly against client. Document everything about why hours should have qualified.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="card">
+                                    <div className="card-header">💰 Upwork Fixed-Price: Escrow Dispute Timeline</div>
+                                    <div className="card-content">
+                                        <div className="timeline">
+                                            <div className="timeline-item">
+                                                <div className="timeline-title">Milestone Funded in Escrow</div>
+                                                <div className="timeline-description">
+                                                    Client funds milestone before work begins. Money held by Upwork Escrow Inc. Client cannot withdraw without your consent or winning dispute.
+                                                </div>
+                                            </div>
+
+                                            <div className="timeline-item">
+                                                <div className="timeline-title">Submit Work for Review</div>
+                                                <div className="timeline-description">
+                                                    Mark milestone complete. Client has 14 days to review. If no action, funds auto-release to you on day 14.
+                                                </div>
+                                            </div>
+
+                                            <div className="timeline-item">
+                                                <div className="timeline-title">Client Requests Refund OR Refuses Release</div>
+                                                <div className="timeline-description">
+                                                    <strong>Critical deadline:</strong> You have 7 calendar days from system notification to file dispute. Miss this and funds go back to client automatically.
+                                                </div>
+                                            </div>
+
+                                            <div className="timeline-item">
+                                                <div className="timeline-title">File Dispute Within 7 Days</div>
+                                                <div className="timeline-description">
+                                                    Click "Dispute" button, provide detailed explanation, upload supporting documents (work product files, acceptance messages, scope documentation).
+                                                </div>
+                                            </div>
+
+                                            <div className="timeline-item">
+                                                <div className="timeline-title">Client Has 5 Days to Respond</div>
+                                                <div className="timeline-description">
+                                                    Client can: (a) Accept your claim → funds release to you, (b) Ignore → funds typically auto-release, (c) Decline → triggers Upwork mediation.
+                                                </div>
+                                            </div>
+
+                                            <div className="timeline-item">
+                                                <div className="timeline-title">Upwork Mediation (Non-Binding)</div>
+                                                <div className="timeline-description">
+                                                    Upwork team reviews evidence from both sides, issues non-binding recommendation within ~2 business days. Either party can accept or reject.
+                                                </div>
+                                            </div>
+
+                                            <div className="timeline-item">
+                                                <div className="timeline-title">Brief Arbitration (Optional)</div>
+                                                <div className="timeline-description">
+                                                    If mediation rejected, both parties can opt into binding arbitration through Brief. Both must agree and pay arbitration fee within 7 days. If both decline, funds return to client.
+                                                </div>
+                                            </div>
+
+                                            <div className="timeline-item">
+                                                <div className="timeline-title">After Internal Remedies Exhausted</div>
+                                                <div className="timeline-description">
+                                                    Only after this process concludes (and client gets funds back) should you consider external demand letter. Document that you used all available platform tools first.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="card">
+                                    <div className="card-header">📋 Documentation Checklist for Platform Disputes</div>
+                                    <div className="card-content">
+                                        <div className="checklist-item">
+                                            <div className="checklist-icon">📄</div>
+                                            <div className="checklist-content">
+                                                <div className="checklist-title">Contract / Job Posting</div>
+                                                <div className="checklist-description">
+                                                    Screenshot or save original job description, agreed scope, milestones, payment terms. Include any formal contracts or SOWs exchanged.
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="checklist-item">
+                                            <div className="checklist-icon">💬</div>
+                                            <div className="checklist-content">
+                                                <div className="checklist-title">All Platform Messages</div>
+                                                <div className="checklist-description">
+                                                    Save complete message thread showing: scope clarifications, client requests, your responses, delivery confirmations, acceptance statements, any scope change discussions.
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="checklist-item">
+                                            <div className="checklist-icon">📦</div>
+                                            <div className="checklist-content">
+                                                <div className="checklist-title">Work Product / Deliverables</div>
+                                                <div className="checklist-description">
+                                                    Keep copies of everything delivered: files, documents, code, designs, content. Include submission timestamps showing when delivered and any version history.
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="checklist-item">
+                                            <div className="checklist-icon">✅</div>
+                                            <div className="checklist-content">
+                                                <div className="checklist-title">Acceptance Evidence</div>
+                                                <div className="checklist-description">
+                                                    Messages where client confirmed work received, said "looks good," requested minor revisions, or used deliverables in their business. Any feedback showing they reviewed and accepted.
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="checklist-item">
+                                            <div className="checklist-icon">⏱️</div>
+                                            <div className="checklist-content">
+                                                <div className="checklist-title">Time Records (Hourly)</div>
+                                                <div className="checklist-description">
+                                                    For hourly work: work diary screenshots, activity levels report, detailed memo entries for each time segment. Your own contemporaneous time log beyond platform tracking.
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="checklist-item">
+                                            <div className="checklist-icon">🔄</div>
+                                            <div className="checklist-content">
+                                                <div className="checklist-title">Scope Change Documentation</div>
+                                                <div className="checklist-description">
+                                                    Any additions to original scope with client acknowledgment. Don't rely on verbal—send follow-up messages: "Per our call today, you've requested X additional feature, I'll deliver by Y date for existing milestone."
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="checklist-item">
+                                            <div className="checklist-icon">📸</div>
+                                            <div className="checklist-content">
+                                                <div className="checklist-title">Platform Interface Screenshots</div>
+                                                <div className="checklist-description">
+                                                    Screenshot contract page, milestone funding status, work diary (if hourly), submission confirmations. Capture before client can delete or modify.
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="checklist-item">
+                                            <div className="checklist-icon">⚠️</div>
+                                            <div className="checklist-content">
+                                                <div className="checklist-title">Quality Issue Responses</div>
+                                                <div className="checklist-description">
+                                                    If client raised quality concerns during project, your responses showing: how you addressed them, any revisions delivered, client's feedback after revisions. Proves you were responsive.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="success-panel">
+                                    <div className="success-panel-title">
+                                        💡 Documentation Discipline Prevents Disputes
+                                    </div>
+                                    <div className="info-panel-content">
+                                        The difference between winning and losing payment disputes often comes down to documentation. Freelancers with contemporaneous records, clear scope agreements in writing, and evidence of client acceptance win. Freelancers relying on "they said" and verbal understandings lose. Build documentation habits during the project—it takes minimal time but becomes invaluable if disputes arise later.
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        {activeTab === 'resources' && (
+                            <>
+                                <div className="section-title">
+                                    <span className="section-icon">🔗</span>
+                                    Platform Policies & Legal Resources
+                                </div>
+
+                                <div className="info-panel">
+                                    <div className="info-panel-title">
+                                        📚 Official Sources
+                                    </div>
+                                    <div className="info-panel-content">
+                                        Direct links to platform terms of service, dispute procedures, and legal resources. Review these carefully before making decisions about external legal action—understanding the specific rules governing your situation is essential.
+                                    </div>
+                                </div>
+
+                                <div className="resources-grid">
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>📜</span>
+                                            Upwork Terms of Service
+                                        </div>
+                                        <div className="resource-description">
+                                            Complete User Agreement including payment terms, escrow instructions, non-circumvention rules (Section 7), chargeback prohibition (Section 6.5), and dispute provisions. Essential reading before pursuing collection.
+                                        </div>
+                                        <a href="https://www.upwork.com/legal" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Read Upwork Legal Center →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>🛡️</span>
+                                            Upwork Payment Protection
+                                        </div>
+                                        <div className="resource-description">
+                                            Official explanation of Hourly Payment Protection criteria and how it works. Details qualifying requirements, what's covered, and dispute response process for hourly contracts.
+                                        </div>
+                                        <a href="https://support.upwork.com/hc/en-us/articles/211068288-How-Hourly-Payment-Protection-works-for-freelancers" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            View Protection Guide →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>⚖️</span>
+                                            Upwork Fixed-Price Disputes
+                                        </div>
+                                        <div className="resource-description">
+                                            Step-by-step process for filing disputes when clients don't pay milestones. Covers 7-day deadline, evidence requirements, mediation process, and Brief arbitration option.
+                                        </div>
+                                        <a href="https://support.upwork.com/hc/en-us/articles/211068528-How-to-file-a-dispute-when-your-client-doesn-t-pay-a-milestone" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Read Dispute Guide →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>⚡</span>
+                                            Upwork Arbitration (Brief)
+                                        </div>
+                                        <div className="resource-description">
+                                            Information on binding arbitration through Brief for escalated fixed-price disputes. Covers fees, timeline, what happens if one or both parties decline arbitration.
+                                        </div>
+                                        <a href="https://support.upwork.com/hc/en-us/articles/14044146250259-Arbitration" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            View Arbitration Info →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>🚫</span>
+                                            Upwork Chargeback Policy
+                                        </div>
+                                        <div className="resource-description">
+                                            Official policy on chargebacks from both client and freelancer perspectives. Explains ToS prohibition, consequences for clients who file chargebacks, and freelancer protections.
+                                        </div>
+                                        <a href="https://support.upwork.com/hc/en-us/articles/14085353385747-Chargebacks" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Read Chargeback Policy →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>🎨</span>
+                                            Fiverr Terms of Service
+                                        </div>
+                                        <div className="resource-description">
+                                            Fiverr's complete legal terms covering marketplace structure, Resolution Center, order disputes, and arbitration provisions. Understand platform's role and limitations.
+                                        </div>
+                                        <a href="https://www.fiverr.com/legal-portal/legal-terms/terms-of-service" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Read Fiverr ToS →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>🔄</span>
+                                            Fiverr Resolution Center
+                                        </div>
+                                        <div className="resource-description">
+                                            How to use Fiverr's Resolution Center for order updates, cancellations, and disputes. Less formalized than Upwork but important to exhaust before external action.
+                                        </div>
+                                        <a href="https://help.fiverr.com/hc/en-us/articles/27274045277713-How-to-use-the-Resolution-Center" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Visit Resolution Center →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>🌐</span>
+                                            Freelancer.com User Agreement
+                                        </div>
+                                        <div className="resource-description">
+                                            Freelancer.com's legal terms establishing marketplace relationship, Milestone Payment system, and Dispute Resolution Service with internal arbitration.
+                                        </div>
+                                        <a href="https://www.freelancer.com/about/terms" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Read User Agreement →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>⚖️</span>
+                                            Freelancer.com Disputes
+                                        </div>
+                                        <div className="resource-description">
+                                            Milestone Dispute Resolution Policy and FAQ covering dispute filing, negotiation process, arbitration fees, and binding decisions by Dispute Team.
+                                        </div>
+                                        <a href="https://www.freelancer.com/page.php?p=info%2Fdispute_policy" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            View Dispute Policy →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>📋</span>
+                                            California Demand Letter Guide
+                                        </div>
+                                        <div className="resource-description">
+                                            California Courts' official self-help guide to writing demand letters before small claims suits. Free template and instructions for DIY approach to smaller disputes.
+                                        </div>
+                                        <a href="https://selfhelp.courts.ca.gov/form/demand-letter" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            View CA Court Guide →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>🏛️</span>
+                                            FTC Sample Complaint Letter
+                                        </div>
+                                        <div className="resource-description">
+                                            Federal Trade Commission's template for consumer complaint letters. Basic structure for non-lawyer correspondence requesting resolution.
+                                        </div>
+                                        <a href="https://consumer.ftc.gov/articles/sample-letter-dispute-errors-your-credit-report" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            View FTC Template →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>💼</span>
+                                            CFPB Complaint System
+                                        </div>
+                                        <div className="resource-description">
+                                            Consumer Financial Protection Bureau complaint process for payment processor and banking issues. Relevant when chargebacks or payment system problems are involved.
+                                        </div>
+                                        <a href="https://www.consumerfinance.gov/complaint/" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Submit CFPB Complaint →
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <div className="warning-panel" style={{ marginTop: '2rem' }}>
+                                    <div className="warning-panel-title">
+                                        ⚠️ Disclaimer
+                                    </div>
+                                    <div className="info-panel-content">
+                                        This widget provides general information about freelance platform payment disputes and when attorney demand letters may be appropriate. It is not legal advice and does not create an attorney-client relationship. Platform terms, policies, and procedures change frequently. Payment disputes are fact-specific and outcomes depend on documentation, jurisdiction, and individual circumstances. Always verify current platform policies, consult an attorney licensed in your jurisdiction before sending demand letters or filing lawsuits, and honestly assess the strength of your documentation before pursuing legal action. The information provided reflects general patterns and is not guaranteed to apply to your specific situation.
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<UpworkGuide />, document.getElementById('root'));
+    </script>
+</body>
+</html>
