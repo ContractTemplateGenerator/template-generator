@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scope Creep & Endless Revisions Playbook</title>
+<style>
+    :root{
+        --bg1:#1e1a38;
+        --bg2:#3c1462;
+        --card:#ffffff;
+        --accent:#ff6b6b;
+        --accent2:#ffd166;
+        --accent3:#06d6a0;
+        --muted:#4a5568;
+        --border:#e2e8f0;
+        font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    }
+    *{box-sizing:border-box;}
+    body{margin:0;background:radial-gradient(circle at top,var(--bg2),var(--bg1));padding:30px;color:#0f172a;}
+    .widget{max-width:1200px;margin:0 auto;border-radius:28px;background:var(--card);box-shadow:0 35px 80px rgba(15,6,33,.55);overflow:hidden;}
+    .intro{padding:30px 40px;border-bottom:1px solid var(--border);font-size:15px;line-height:1.7;color:#1f2933;}
+    .tabs{display:flex;flex-wrap:wrap;gap:10px;padding:20px 28px;background:#fdf6ff;border-bottom:1px solid var(--border);}    
+    .tab-btn{border:1px solid var(--border);background:#fff;border-radius:999px;padding:10px 18px;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;transition:.2s;}    
+    .tab-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 12px 24px rgba(255,107,107,.35);}    
+    .tab-panel{display:none;padding:32px 40px;line-height:1.7;color:#1f2933;}
+    .tab-panel.active{display:block;}
+    .card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;}
+    .info-card{border:1px solid var(--border);border-radius:20px;padding:18px;background:#fff;box-shadow:0 15px 35px rgba(20,10,30,.08);}    
+    .info-card h4{margin:0 0 8px;font-size:16px;color:#30134c;}
+    .info-card p{margin:0;font-size:14px;color:var(--muted);}    
+    .metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px;}
+    .metric{background:#fff7ed;border:1px solid #fed7aa;border-radius:18px;padding:16px;text-align:center;}
+    .metric strong{display:block;font-size:22px;color:#ea580c;}
+    .metric span{font-size:13px;color:#c2410c;}
+    details{border:1px solid var(--border);border-radius:16px;background:#fff;margin-bottom:12px;box-shadow:0 10px 28px rgba(30,12,40,.08);}    
+    summary{padding:14px 20px;cursor:pointer;font-weight:600;color:#311b52;display:flex;align-items:center;gap:8px;}
+    summary::-webkit-details-marker{display:none;}
+    .detail-content{padding:0 20px 18px 20px;font-size:14px;color:var(--muted);}    
+    .pill{display:flex;gap:10px;align-items:flex-start;background:#ecfccb;border:1px dashed #d9f99d;border-radius:14px;padding:14px;font-size:13px;color:#3f6212;margin-top:18px;}
+    .thermometer{background:linear-gradient(90deg,#06d6a0,#ffd166,#ff6b6b);height:12px;border-radius:999px;position:relative;margin:18px 0;}
+    .thumb{width:20px;height:20px;border-radius:50%;background:#1f2933;position:absolute;top:50%;transform:translate(-50%,-50%);border:2px solid #fff;box-shadow:0 0 0 6px rgba(0,0,0,.05);}    
+    .risk-output{font-size:20px;font-weight:700;color:#b91c1c;margin-top:12px;}
+    .decision-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:16px;}
+    .decision-card{border:1px solid var(--border);border-radius:16px;padding:16px;background:#f8fafc;font-size:13px;color:#1e293b;cursor:pointer;transition:.2s;}    
+    .decision-card.active{border-color:var(--accent3);box-shadow:0 10px 22px rgba(6,214,160,.2);}
+    .checklist{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:18px;}
+    .check-item{border:1px solid var(--border);border-radius:16px;padding:14px;background:#fff;font-size:13px;color:#475569;}
+    .resource-list{columns:2;column-gap:40px;}
+    .resource-list a{display:block;margin-bottom:10px;color:#2563eb;text-decoration:none;font-size:14px;}
+    .resource-list a:hover{text-decoration:underline;}
+    @media(max-width:768px){
+        .tab-panel{padding:24px;}
+        .resource-list{columns:1;}
+    }
+</style>
+</head>
+<body>
+<div class="widget">
+    <div class="intro">Scope creep is not “good customer service.” It is unpaid extra work that Upwork itself expects you to handle with new milestones or a new contract. Use these tabs to diagnose runaway revisions, lean on platform rules, and structure a demand letter that swaps “one more tweak” for actual payment.</div>
+    <div class="tabs">
+        <button class="tab-btn active" data-panel="snapshot">Heat Check</button>
+        <button class="tab-btn" data-panel="detector">Scope Detector</button>
+        <button class="tab-btn" data-panel="platform">Platform Playbook</button>
+        <button class="tab-btn" data-panel="legal">Legal Hooks</button>
+        <button class="tab-btn" data-panel="letter">Demand Letter Map</button>
+        <button class="tab-btn" data-panel="evidence">Evidence & Resources</button>
+    </div>
+
+    <div id="snapshot" class="tab-panel active">
+        <div class="metrics">
+            <div class="metric"><strong>2-3 rounds</strong><span>Typical revision cap freelancers quote. Past this, price and scope should reset.</span></div>
+            <div class="metric"><strong>14 days</strong><span>Fixed-price auto-release window—clients must request changes or fund new milestones.</span></div>
+            <div class="metric"><strong>Hourly ≠ Fixed</strong><span>Upwork says hourly is for evolving scope; fixed price is for defined work (Upwork resources).</span></div>
+        </div>
+        <div class="info-card" style="grid-column:1/-1;">
+            <h4>Scope Creep Thermometer</h4>
+            <p>Slide to match your situation. The label updates with the recommended move.</p>
+            <input type="range" min="1" max="3" value="2" id="thermoRange" style="width:100%;margin-top:16px;">
+            <div class="thermometer"><div class="thumb" id="thermoThumb" style="left:50%;"></div></div>
+            <div class="risk-output" id="thermoLabel">Moderate creep – negotiate new milestones or hourly pivot now.</div>
+            <p id="thermoText" style="font-size:14px;color:#475569;">Scope is drifting (extra features/revisions) but payment disputes haven’t started. Document changes and use Upwork’s “request changes to an offer” or add milestones before agreeing to more work.</p>
+        </div>
+        <div class="card-grid">
+            <div class="info-card"><h4>Hostage Pattern</h4><p>“Release more revisions or I’ll leave bad feedback.” That’s feedback manipulation—reportable plus a signal to prep a demand letter.</p></div>
+            <div class="info-card"><h4>Payment Exposure</h4><p>Extra work outside funded milestones isn’t covered by fixed-price protection. Stop before the auto-release timer lapses.</p></div>
+            <div class="info-card"><h4>Hourly Abuse</h4><p>If client limits tracked hours while piling on tasks, note that Hourly Payment Protection only covers properly logged time.</p></div>
+            <div class="info-card"><h4>Exit Trigger</h4><p>When every “revision” is a new deliverable and client refuses to fund more work, move to a formal demand + closeout plan.</p></div>
+        </div>
+    </div>
+
+    <div id="detector" class="tab-panel">
+        <h3 style="margin-top:0;color:#311b52;">Is This Out of Scope?</h3>
+        <p>Click each card that matches your situation. The detector tells you when to escalate.</p>
+        <div class="decision-cards">
+            <div class="decision-card" data-score="1">Request is a tweak to the same deliverable (copy, colours, layout).</div>
+            <div class="decision-card" data-score="2">Client asked for new deliverables (extra pages/features/emails) not in original description.</div>
+            <div class="decision-card" data-score="2">Revision count already exceeds what was promised or implied as reasonable.</div>
+            <div class="decision-card" data-score="3">Client refuses to add milestones or adjust budget but keeps adding scope.</div>
+            <div class="decision-card" data-score="3">Payment is being withheld unless you keep working for free.</div>
+            <div class="decision-card" data-score="1">You documented the change and client agreed to pay later.</div>
+        </div>
+        <div class="pill"><strong>Detector Output:</strong> <span id="detectorResult">Normal feedback – keep documenting but continue.</span></div>
+        <details open>
+            <summary>What counts as a “revision”?</summary>
+            <div class="detail-content">Upwork’s milestone guide tells clients to define how feedback and revisions will be handled before a fixed-price job begins. A revision refines the agreed deliverable; it doesn’t add a new deliverable. If the request needs extra research, code, or creative beyond the original scope, it is a scope change and should be priced or moved to an hourly phase.</div>
+        </details>
+        <details>
+            <summary>When to insist on new milestones</summary>
+            <div class="detail-content">The “Request changes to an offer” tool lets you update rate, scope, and milestones when the project shifts. Use it as soon as the client changes goals. If they decline, pause work until they fund an appropriate milestone—otherwise you are outside payment protection.</div>
+        </details>
+    </div>
+
+    <div id="platform" class="tab-panel">
+        <div class="card-grid">
+            <div class="info-card"><h4>Fixed-Price Game Plan</h4><p>Funded milestone + submit via Upwork + 14-day review. If client wants a pivot, require a new milestone before opening fresh files.</p></div>
+            <div class="info-card"><h4>Hourly Reality</h4><p>Scope changes are fine—but only hours logged with tracker, memos, and within caps are protected. Manual time has no safety net.</p></div>
+            <div class="info-card"><h4>Offer Change Requests</h4><p>Use Upwork’s change-request feature to edit scope, rate, or timeline before accepting expanded work. Declined change = pause.</p></div>
+            <div class="info-card"><h4>Dispute Timeline</h4><p>If a fixed milestone is finished and client refuses to release, open a dispute immediately. The mediator will focus on the stated milestone scope—not endless extra tasks.</p></div>
+        </div>
+        <details open>
+            <summary>Respect the funnel</summary>
+            <div class="detail-content">Start with documentation → request updated scope/fees inside Upwork → submit work formally → use disputes/payment protection. Demand letters come after these levers fail or when the client couples non-payment with reputational threats.</div>
+        </details>
+        <details>
+            <summary>Feedback leverage</summary>
+            <div class="detail-content">If the client says “do more or I tank your JSS,” report it under Upwork’s feedback manipulation policies. Attach screenshots before drafting your letter so you can say you alerted Trust & Safety.</div>
+        </details>
+        <div class="pill"><strong>Platform script:</strong> “Happy to keep improving this—let’s add a milestone for the additional features so we’re both covered.”</div>
+    </div>
+
+    <div id="legal" class="tab-panel">
+        <div class="card-grid">
+            <div class="info-card"><h4>Breach of Contract</h4><p>Original SOW/milestone promised payment for defined deliverables. Client can’t withhold funds after you met that scope.</p></div>
+            <div class="info-card"><h4>Quantum Meruit</h4><p>Even if extras weren’t written down, a client who requested and is using them owes the reasonable value of that work.</p></div>
+            <div class="info-card"><h4>Bad-Faith Feedback Threats</h4><p>Tying reviews to free work resembles feedback manipulation (platform violation) and extortionary leverage.</p></div>
+            <div class="info-card"><h4>Termination Rights</h4><p>You can stop once contracted work is done. Offering a final bounded revision while demanding payment shows reasonableness.</p></div>
+        </div>
+        <details open>
+            <summary>Contract Clauses to Reference</summary>
+            <div class="detail-content">Many freelancer contracts include scope-creep clauses: no extra work without written approval, change orders adjust schedule/price, revisions capped. Quote your proposal or message where you set limits. If none exist, cite Upwork’s own advice that fixed-price projects assume low scope-creep risk.</div>
+        </details>
+        <details>
+            <summary>Jurisdiction & Collectability</summary>
+            <div class="detail-content">Identify the client’s legal name, country, and any local presence. Demand letters carry more weight when addressed to a real entity with assets. Adjust legal references (e.g., quantum meruit) to match the governing law in your contract.</div>
+        </details>
+    </div>
+
+    <div id="letter" class="tab-panel">
+        <div class="info-card" style="grid-column:1/-1;">
+            <h4>Five-Part Demand Letter Blueprint</h4>
+            <p>1) Identify project + platform. 2) Restate original scope & revisions promised. 3) Chronicle scope creep + extra work delivered. 4) State amounts owed (milestone + extra). 5) Demand payment by a deadline, offer clean exit, reserve rights.</p>
+        </div>
+        <details open>
+            <summary>Scope Recap</summary>
+            <div class="detail-content">Quote the job post, milestone, or proposal that set expectations (“Homepage + 2 inner pages; two revision rounds”). Attach or link to the Upwork offer screenshot.</div>
+        </details>
+        <details>
+            <summary>Scope Creep Timeline</summary>
+            <div class="detail-content">Bullet the extra requests with dates (“Jan 10 – asked for blog template; Jan 18 – new product line ads; Feb 1 – complete redesign”). Note any attempts you made to add milestones or change the offer.</div>
+        </details>
+        <details>
+            <summary>Legal Framing</summary>
+            <div class="detail-content">Explain that withholding milestone funds violates the service contract, and that refusing to pay for extra delivered work unjustly enriches the client. Mention that feedback threats have been reported to Upwork if applicable.</div>
+        </details>
+        <details>
+            <summary>Demands & Exit</summary>
+            <div class="detail-content">Specify exact dollar amounts (e.g., $1,500 milestone + $600 for extra deliverables). Offer to close the contract and cease work once paid. Set a deadline (10 days) and state you will pursue platform disputes or legal remedies if ignored.</div>
+        </details>
+        <div class="pill"><strong>Email template opener:</strong> “We scoped [deliverable] for [$]. Since then you’ve asked for [extra deliverables], which I delivered. Please release the funded milestone and add [$] for the additional work by [date] so we can wrap professionally.”</div>
+    </div>
+
+    <div id="evidence" class="tab-panel">
+        <h3 style="margin-top:0;color:#311b52;">Evidence Checklist</h3>
+        <div class="checklist">
+            <div class="check-item"><strong>Original Scope</strong><br>Job post, proposal, milestone descriptions, revision limits.</div>
+            <div class="check-item"><strong>Change Requests</strong><br>Screenshots of chats where client adds features or extra deliverables.</div>
+            <div class="check-item"><strong>Work Versions</strong><br>Files showing each major revision or new deliverable delivered.</div>
+            <div class="check-item"><strong>Payment Status</strong><br>Milestone funding screenshots, unpaid invoices, dispute IDs.</div>
+            <div class="check-item"><strong>Negotiation Attempts</strong><br>Messages proposing new milestones, rate changes, or hourly switch.</div>
+            <div class="check-item"><strong>Feedback Threats</strong><br>Any “do more or bad review” statements to pair with an Upwork report.</div>
+        </div>
+        <h3 style="margin-top:32px;color:#311b52;">Resources</h3>
+        <div class="resource-list">
+            <a href="https://support.upwork.com/hc/en-us/articles/44564821903763-Understanding-milestones-on-fixed-price-contracts" target="_blank" rel="noopener">Upwork: Milestones & revision planning</a>
+            <a href="https://www.upwork.com/resources/fixed-price-vs-hourly-rate" target="_blank" rel="noopener">Upwork: Fixed vs hourly (scope guidance)</a>
+            <a href="https://support.upwork.com/hc/en-us/articles/34262508186899-Request-changes-to-an-offer" target="_blank" rel="noopener">Upwork: Request changes to an offer</a>
+            <a href="https://support.upwork.com/hc/en-us/articles/211068528-How-to-file-a-dispute-when-your-client-doesn-t-pay-a-milestone" target="_blank" rel="noopener">Upwork: Fixed-price dispute process</a>
+            <a href="https://support.upwork.com/hc/en-us/articles/211068288-How-Hourly-Payment-Protection-works-for-freelancers" target="_blank" rel="noopener">Upwork: Hourly Payment Protection</a>
+            <a href="https://johnston-legal.com/2013/11/14/essential-contract-terms-for-consultants-independent-contractors-and-freelancers-part-1-scope-of-services-clauses" target="_blank" rel="noopener">Scope-of-services clause primer</a>
+            <a href="https://www.cobrief.app/resources/contract-clause-library/scope-creep-clause-copy-customize-and-use-instantly" target="_blank" rel="noopener">Sample scope-creep clause</a>
+            <a href="https://www.upcounsel.com/quantum-meruit" target="_blank" rel="noopener">Quantum meruit overview</a>
+            <a href="https://courts.ca.gov/system/files/itc/caci-24-02.pdf" target="_blank" rel="noopener">California CACI: Quantum meruit instruction</a>
+            <a href="https://support.upwork.com/hc/en-us/articles/211063718-How-payments-for-fixed-price-contracts-work" target="_blank" rel="noopener">Upwork: Fixed-price payments</a>
+        </div>
+    </div>
+</div>
+<script>
+const tabs=document.querySelectorAll('.tab-btn');
+const panels=document.querySelectorAll('.tab-panel');
+tabs.forEach(tab=>{
+    tab.addEventListener('click',()=>{
+        tabs.forEach(btn=>btn.classList.remove('active'));
+        panels.forEach(panel=>panel.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.panel).classList.add('active');
+    });
+});
+const thermoRange=document.getElementById('thermoRange');
+const thermoThumb=document.getElementById('thermoThumb');
+const thermoLabel=document.getElementById('thermoLabel');
+const thermoText=document.getElementById('thermoText');
+const thermoMap={
+    1:{label:'Low creep – normal feedback, keep calm.',text:'Changes are tweaks within the deliverable. Keep communicating, remind client what revisions include, and log instructions in Upwork chat.'},
+    2:{label:'Moderate creep – negotiate new milestones or hourly pivot now.',text:'Scope is drifting (extra features/revisions) but payment disputes haven’t started. Document changes and use Upwork’s “request changes to an offer” or add milestones before agreeing to more work.'},
+    3:{label:'Severe creep – stop work, demand payment, prep letter.',text:'Client is withholding payments or adding major deliverables without budget. Pause work, report feedback threats, and send a demand letter for completed + extra work.'}
+};
+thermoRange.addEventListener('input',()=>{
+    const val=thermoMap[thermoRange.value];
+    const percent=((thermoRange.value-1)/2)*100;
+    thermoThumb.style.left=percent+"%";
+    thermoLabel.textContent=val.label;
+    thermoText.textContent=val.text;
+});
+const decisions=document.querySelectorAll('.decision-card');
+const detectorResult=document.getElementById('detectorResult');
+function updateDetector(){
+    let score=0;
+    decisions.forEach(card=>{if(card.classList.contains('active'))score+=Number(card.dataset.score);});
+    if(score<=2){detectorResult.textContent='Normal feedback – keep documenting but continue.';}
+    else if(score<=5){detectorResult.textContent='Borderline scope creep – insist on new milestone or rate change.';}
+    else{detectorResult.textContent='High-risk exploitation – pause work and consider a demand letter.';}
+}
+decisions.forEach(card=>{
+    card.addEventListener('click',()=>{
+        card.classList.toggle('active');
+        updateDetector();
+    });
+});
+updateDetector();
+</script>
+</body>
+</html>
