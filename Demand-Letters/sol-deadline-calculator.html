@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statute of Limitations & Deadline Calculator</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #1e293b;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        #root {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .app-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: calc(100vh - 40px);
+        }
+        .header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        .header-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .header-subtitle {
+            font-size: 1rem;
+            opacity: 0.95;
+        }
+        .tabs-container {
+            display: flex;
+            background: #f8fafc;
+            border-bottom: 2px solid #e2e8f0;
+            overflow-x: auto;
+            flex-shrink: 0;
+        }
+        .tab {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #64748b;
+            white-space: nowrap;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .tab:hover {
+            background: #f1f5f9;
+            color: #1e3a8a;
+        }
+        .tab.active {
+            color: #1e3a8a;
+            background: white;
+            border-bottom-color: #1e3a8a;
+        }
+        .tab-icon {
+            font-size: 1.1rem;
+        }
+        .content-wrapper {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+        .content-wrapper::-webkit-scrollbar {
+            width: 10px;
+        }
+        .content-wrapper::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .content-wrapper::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 5px;
+        }
+        .content-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .section-title {
+            color: #1e3a8a;
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .section-icon {
+            font-size: 1.5rem;
+        }
+        .info-panel {
+            background: #dbeafe;
+            border-left: 4px solid #1e3a8a;
+            padding: 1.25rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+        }
+        .info-panel-title {
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .info-panel-content {
+            font-size: 0.9rem;
+            color: #334155;
+            line-height: 1.7;
+        }
+        .warning-panel {
+            background: #fef3c7;
+            border-left: 4px solid #d97706;
+            padding: 1.25rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+        }
+        .warning-panel-title {
+            font-weight: 700;
+            color: #92400e;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .success-panel {
+            background: #d1fae5;
+            border-left: 4px solid #059669;
+            padding: 1.25rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+        }
+        .success-panel-title {
+            font-weight: 700;
+            color: #065f46;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+        }
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: #334155;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: #1e3a8a;
+        }
+        .state-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.25rem;
+            margin-top: 1rem;
+        }
+        .state-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.2s;
+        }
+        .state-card:hover {
+            border-color: #1e3a8a;
+            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.15);
+            transform: translateY(-2px);
+        }
+        .state-card-header {
+            font-weight: 700;
+            color: #1e3a8a;
+            font-size: 1.15rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .state-card-row {
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .state-card-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .state-card-label {
+            font-weight: 600;
+            color: #475569;
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+        .state-card-value {
+            color: #1e293b;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        .statute-link {
+            display: inline-block;
+            color: #1e3a8a;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            transition: color 0.2s;
+        }
+        .statute-link:hover {
+            color: #3730a3;
+            text-decoration: underline;
+        }
+        .sol-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+        .sol-short {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .sol-medium {
+            background: #dbeafe;
+            color: #1e3a8a;
+        }
+        .sol-long {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .calculator-section {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .calculator-header {
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 1rem;
+            font-size: 1.05rem;
+        }
+        .result-box {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            border: 2px solid #1e3a8a;
+        }
+        .result-title {
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+        .result-date {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 0.75rem;
+        }
+        .result-detail {
+            font-size: 0.95rem;
+            color: #475569;
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+        }
+        .result-warning {
+            background: #fef3c7;
+            border-left: 4px solid #d97706;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: #92400e;
+        }
+        .result-success {
+            background: #d1fae5;
+            border-left: 4px solid #059669;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: #065f46;
+        }
+        .timeline-viz {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 6px;
+        }
+        .timeline-item {
+            display: flex;
+            align-items: start;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .timeline-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .timeline-icon {
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.875rem;
+        }
+        .timeline-content {
+            flex: 1;
+        }
+        .timeline-label {
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.25rem;
+            font-size: 0.95rem;
+        }
+        .timeline-date {
+            color: #1e3a8a;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        .timeline-description {
+            color: #64748b;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        .checklist-section {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .checklist-header {
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 1rem;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .checklist-item {
+            display: flex;
+            align-items: start;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: #f8fafc;
+            border-radius: 6px;
+            margin-bottom: 0.75rem;
+            transition: background 0.2s;
+        }
+        .checklist-item:hover {
+            background: #f0f4ff;
+        }
+        .checkbox-input {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #1e3a8a;
+            flex-shrink: 0;
+            margin-top: 0.125rem;
+        }
+        .checklist-label {
+            font-weight: 500;
+            color: #334155;
+            margin-bottom: 0.25rem;
+            cursor: pointer;
+        }
+        .checklist-description {
+            font-size: 0.875rem;
+            color: #64748b;
+            line-height: 1.5;
+        }
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+        .resource-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.2s;
+        }
+        .resource-card:hover {
+            border-color: #1e3a8a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.2);
+        }
+        .resource-title {
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 0.75rem;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .resource-description {
+            font-size: 0.875rem;
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        .resource-link {
+            color: #1e3a8a;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+        .resource-link:hover {
+            color: #3730a3;
+            text-decoration: underline;
+        }
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        @media (max-width: 768px) {
+            .state-grid,
+            .resources-grid {
+                grid-template-columns: 1fr;
+            }
+            .input-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useMemo } = React;
+
+        const stateLaws = {
+            'CA': {
+                name: 'California',
+                writtenContract: 4,
+                oralContract: 2,
+                statute: 'Cal. Code Civ. Proc. § 337',
+                statuteLink: 'https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CCP&sectionNum=337',
+                accrualRule: 'Generally at breach, not discovery',
+                notes: 'UCC sale-of-goods claims also 4 years under UCC 2-725. Consumer claims (CLRA) require 30-day pre-suit notice.',
+                clraNotice: 30
+            },
+            'TX': {
+                name: 'Texas',
+                writtenContract: 4,
+                oralContract: 4,
+                statute: 'Tex. Civ. Prac. & Rem. Code § 16.004',
+                statuteLink: 'https://statutes.capitol.texas.gov/Docs/CP/htm/CP.16.htm',
+                accrualRule: 'At breach',
+                notes: 'DTPA claims require 60-day pre-suit notice. Four years applies to both written and oral contracts.',
+                dtpaNotice: 60
+            },
+            'NY': {
+                name: 'New York',
+                writtenContract: 6,
+                oralContract: 6,
+                statute: 'N.Y. C.P.L.R. § 213',
+                statuteLink: 'https://www.nysenate.gov/legislation/laws/CVP/213',
+                accrualRule: 'At breach',
+                notes: 'Six years for contract claims. Many commercial contracts choose NY law specifically for this longer period.'
+            },
+            'FL': {
+                name: 'Florida',
+                writtenContract: 5,
+                oralContract: 4,
+                statute: 'Fla. Stat. § 95.11(2)(b)',
+                statuteLink: 'http://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0000-0099/0095/0095.html',
+                accrualRule: 'At breach',
+                notes: 'Five years for written contracts, four years for oral contracts and UCC sale-of-goods claims.'
+            },
+            'IL': {
+                name: 'Illinois',
+                writtenContract: 10,
+                oralContract: 5,
+                statute: '735 Ill. Comp. Stat. 5/13-206',
+                statuteLink: 'https://www.ilga.gov/legislation/ilcs/ilcs4.asp?DocName=073500050HArt%2E+XIII+Pt%2E+2&ActID=2017&ChapterID=56&SeqStart=7900000&SeqEnd=9800000',
+                accrualRule: 'At breach',
+                notes: 'Unusually long 10-year period for written contracts. Provides substantial time for complex commercial disputes.'
+            },
+            'LA': {
+                name: 'Louisiana',
+                writtenContract: 10,
+                oralContract: 10,
+                statute: 'La. Civ. Code art. 3499',
+                statuteLink: 'https://legis.la.gov/legis/Laws_Toc.aspx?folder=75&level=Parent',
+                accrualRule: 'At breach',
+                notes: 'Ten-year period for both written and oral contracts under Louisiana Civil Code.'
+            },
+            'UCC': {
+                name: 'UCC Sale of Goods',
+                writtenContract: 4,
+                oralContract: 4,
+                statute: 'UCC § 2-725',
+                statuteLink: 'https://www.law.cornell.edu/ucc/2/2-725',
+                accrualRule: 'At tender of delivery (unless explicit future-performance warranty)',
+                notes: 'Four-year period applies nationwide for sale-of-goods transactions. Parties may shorten to not less than 1 year but cannot extend beyond 4 years.'
+            }
+        };
+
+        const noticeRequirements = {
+            'clra': {
+                name: 'California CLRA',
+                days: 30,
+                statute: 'Cal. Civ. Code § 1782(a)',
+                description: 'California Consumer Legal Remedies Act requires 30-day pre-suit written notice for damages claims.',
+                requirements: [
+                    'Describe specific CLRA violations (enumerate from § 1770 list)',
+                    'Specify actual damages suffered',
+                    'State correction, repair, replacement, or relief sought',
+                    'Can file suit first if SOL about to expire, then provide notice'
+                ]
+            },
+            'dtpa': {
+                name: 'Texas DTPA',
+                days: 60,
+                statute: 'Tex. Bus. & Com. Code § 17.505',
+                description: 'Texas Deceptive Trade Practices Act requires 60-day pre-suit notice in reasonable detail.',
+                requirements: [
+                    'Describe complaint in reasonable detail',
+                    'State amount of actual damages',
+                    'Include attorney fees incurred to date',
+                    'Exception if 60-day notice impracticable due to SOL expiration'
+                ]
+            },
+            'construction': {
+                name: 'Construction Right-to-Repair',
+                days: 'Varies',
+                statute: 'State-specific (CA, AZ, CO, NV, OR, etc.)',
+                description: 'Many states require pre-suit notice and opportunity to inspect/repair construction defects.',
+                requirements: [
+                    'Written notice describing each defect with specificity',
+                    'Allow time for inspection (varies by state)',
+                    'Allow written offer to repair or settle',
+                    'Respond to offer within specified timeframe',
+                    'Complete statutory process before filing suit'
+                ]
+            }
+        };
+
+        function SOLCalculator() {
+            const [activeTab, setActiveTab] = useState('overview');
+            const [selectedState, setSelectedState] = useState('CA');
+            const [contractType, setContractType] = useState('written');
+            const [breachDate, setBreachDate] = useState('');
+            const [demandDate, setDemandDate] = useState('');
+            const [curePeriodDays, setCurePeriodDays] = useState('30');
+            const [hasContractCure, setHasContractCure] = useState(false);
+            const [hasStatutoryNotice, setHasStatutoryNotice] = useState('none');
+
+            const solCalculation = useMemo(() => {
+                if (!breachDate) return null;
+
+                const state = stateLaws[selectedState];
+                const years = contractType === 'written' ? state.writtenContract : state.oralContract;
+
+                const breach = new Date(breachDate);
+                const solExpiration = new Date(breach);
+                solExpiration.setFullYear(solExpiration.getFullYear() + years);
+
+                const today = new Date();
+                const daysRemaining = Math.ceil((solExpiration - today) / (1000 * 60 * 60 * 24));
+                const monthsRemaining = Math.floor(daysRemaining / 30);
+
+                let status = 'good';
+                if (daysRemaining < 0) status = 'expired';
+                else if (daysRemaining < 180) status = 'urgent';
+                else if (daysRemaining < 365) status = 'warning';
+
+                return {
+                    years,
+                    breach: breach.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+                    solExpiration: solExpiration.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+                    daysRemaining,
+                    monthsRemaining,
+                    status
+                };
+            }, [selectedState, contractType, breachDate]);
+
+            const cureCalculation = useMemo(() => {
+                if (!demandDate || !hasContractCure) return null;
+
+                const demand = new Date(demandDate);
+                const cureEnd = new Date(demand);
+                cureEnd.setDate(cureEnd.getDate() + parseInt(curePeriodDays || 30));
+
+                const today = new Date();
+                const cureRemaining = Math.ceil((cureEnd - today) / (1000 * 60 * 60 * 24));
+
+                return {
+                    demandDate: demand.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+                    cureEnd: cureEnd.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+                    cureDays: parseInt(curePeriodDays || 30),
+                    cureRemaining,
+                    cureExpired: cureRemaining < 0
+                };
+            }, [demandDate, curePeriodDays, hasContractCure]);
+
+            const statutoryNoticeInfo = useMemo(() => {
+                if (hasStatutoryNotice === 'none') return null;
+                return noticeRequirements[hasStatutoryNotice];
+            }, [hasStatutoryNotice]);
+
+            return (
+                <div className="app-container">
+                    <div className="header">
+                        <div className="header-title">Statute of Limitations & Deadline Calculator</div>
+                        <div className="header-subtitle">Calculate deadlines, cure periods, and notice requirements for contract claims</div>
+                    </div>
+
+                    <div className="tabs-container">
+                        <button className={`tab ${activeTab === 'overview' ? 'active' : ''}`} onClick={() => setActiveTab('overview')}>
+                            <span className="tab-icon">⚡</span>
+                            Key Concepts
+                        </button>
+                        <button className={`tab ${activeTab === 'calculator' ? 'active' : ''}`} onClick={() => setActiveTab('calculator')}>
+                            <span className="tab-icon">📅</span>
+                            Deadline Calculator
+                        </button>
+                        <button className={`tab ${activeTab === 'state-lookup' ? 'active' : ''}`} onClick={() => setActiveTab('state-lookup')}>
+                            <span className="tab-icon">🗺️</span>
+                            State SOL Lookup
+                        </button>
+                        <button className={`tab ${activeTab === 'notice' ? 'active' : ''}`} onClick={() => setActiveTab('notice')}>
+                            <span className="tab-icon">📋</span>
+                            Notice Requirements
+                        </button>
+                        <button className={`tab ${activeTab === 'checklist' ? 'active' : ''}`} onClick={() => setActiveTab('checklist')}>
+                            <span className="tab-icon">✓</span>
+                            Compliance Checklist
+                        </button>
+                        <button className={`tab ${activeTab === 'resources' ? 'active' : ''}`} onClick={() => setActiveTab('resources')}>
+                            <span className="tab-icon">🔗</span>
+                            Resources
+                        </button>
+                    </div>
+
+                    <div className="content-wrapper">
+                        {activeTab === 'overview' && (
+                            <>
+                                <div className="section-title">
+                                    <span className="section-icon">⚡</span>
+                                    Understanding the Three Clocks
+                                </div>
+
+                                <div className="info-panel">
+                                    <div className="info-panel-title">
+                                        ⚖️ Critical Distinction
+                                    </div>
+                                    <div className="info-panel-content">
+                                        Business owners constantly confuse three different timing mechanisms that govern contract disputes. Each operates independently, serves a different purpose, and has different triggering events. Understanding which clock matters for your situation is essential to preserving your rights.
+                                    </div>
+                                </div>
+
+                                <div className="calculator-section">
+                                    <div className="calculator-header">1️⃣ Statutes of Limitation (SOL)</div>
+                                    <div className="info-panel-content">
+                                        <p style={{ marginBottom: '0.75rem' }}><strong>What it is:</strong> Absolute statutory deadline for filing a lawsuit. If you don't file before the SOL expires, your claim is permanently barred.</p>
+                                        <p style={{ marginBottom: '0.75rem' }}><strong>When it starts:</strong> Generally when the breach occurs (not when you discover it, not when you send a demand letter).</p>
+                                        <p style={{ marginBottom: '0.75rem' }}><strong>Varies by:</strong> State law, type of contract (written vs oral), and contract provisions.</p>
+                                        <p><strong>Effect of demand letter:</strong> Sending a demand letter does NOT stop, restart, or extend the statute of limitation clock.</p>
+                                    </div>
+                                </div>
+
+                                <div className="calculator-section">
+                                    <div className="calculator-header">2️⃣ Contractual Cure Periods</div>
+                                    <div className="info-panel-content">
+                                        <p style={{ marginBottom: '0.75rem' }}><strong>What it is:</strong> Private contractual requirement to provide written notice and allow time to cure before filing suit or terminating.</p>
+                                        <p style={{ marginBottom: '0.75rem' }}><strong>When it starts:</strong> When you send the compliant written notice of breach.</p>
+                                        <p style={{ marginBottom: '0.75rem' }}><strong>Typical length:</strong> 15-60 days depending on contract terms.</p>
+                                        <p><strong>Effect of demand letter:</strong> Your demand letter DOES start this clock if it properly invokes the contractual notice provision.</p>
+                                    </div>
+                                </div>
+
+                                <div className="calculator-section">
+                                    <div className="calculator-header">3️⃣ Statutory Pre-Suit Notice</div>
+                                    <div className="info-panel-content">
+                                        <p style={{ marginBottom: '0.75rem' }}><strong>What it is:</strong> Special statutory requirements for certain claim types (consumer protection, construction defects).</p>
+                                        <p style={{ marginBottom: '0.75rem' }}><strong>When it starts:</strong> When you send the statutorily-compliant notice.</p>
+                                        <p style={{ marginBottom: '0.75rem' }}><strong>Examples:</strong> California CLRA (30 days), Texas DTPA (60 days), construction right-to-repair (varies).</p>
+                                        <p><strong>Effect of demand letter:</strong> Your notice letter starts a mandatory waiting period before you can file suit.</p>
+                                    </div>
+                                </div>
+
+                                <div className="warning-panel">
+                                    <div className="warning-panel-title">
+                                        ⚠️ Most Common Mistake
+                                    </div>
+                                    <div className="info-panel-content">
+                                        Sending a demand letter and assuming that's when your statute of limitation starts. For ordinary breach of contract claims, the SOL clock started running when the breach occurred, not when you decided to do something about it. Calculate your filing deadline from the breach date, not the demand date.
+                                    </div>
+                                </div>
+
+                                <div className="success-panel">
+                                    <div className="success-panel-title">
+                                        ✓ When Demand Letters DO Start Clocks
+                                    </div>
+                                    <div className="info-panel-content">
+                                        <strong>Demand letters genuinely start timing for:</strong><br/><br/>
+                                        • Contractual cure periods (when contract requires notice-and-cure)<br/>
+                                        • Statutory pre-suit notice waiting periods (CLRA, DTPA, right-to-repair)<br/>
+                                        • Demand notes and demand-dependent obligations (UCC 3-118)<br/>
+                                        • Certain government claim deadlines<br/><br/>
+                                        But they do NOT restart or extend the underlying statute of limitation for ordinary contract claims.
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        {activeTab === 'calculator' && (
+                            <>
+                                <div className="section-title">
+                                    <span className="section-icon">📅</span>
+                                    Deadline Calculator
+                                </div>
+
+                                <div className="info-panel">
+                                    <div className="info-panel-title">
+                                        📌 How to Use This Calculator
+                                    </div>
+                                    <div className="info-panel-content">
+                                        Enter your breach date and other relevant information to calculate your statute of limitation deadline, contractual cure periods, and statutory notice requirements. This calculator uses verified state law information for accurate deadline calculations.
+                                    </div>
+                                </div>
+
+                                <div className="calculator-section">
+                                    <div className="calculator-header">Basic Information</div>
+
+                                    <div className="input-grid">
+                                        <div className="form-group">
+                                            <label className="form-label">State / Jurisdiction</label>
+                                            <select className="form-select" value={selectedState} onChange={(e) => setSelectedState(e.target.value)}>
+                                                <option value="CA">California</option>
+                                                <option value="TX">Texas</option>
+                                                <option value="NY">New York</option>
+                                                <option value="FL">Florida</option>
+                                                <option value="IL">Illinois</option>
+                                                <option value="LA">Louisiana</option>
+                                                <option value="UCC">UCC Sale of Goods (any state)</option>
+                                            </select>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label className="form-label">Contract Type</label>
+                                            <select className="form-select" value={contractType} onChange={(e) => setContractType(e.target.value)}>
+                                                <option value="written">Written Contract</option>
+                                                <option value="oral">Oral Contract</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label className="form-label">Date of Breach (when breach occurred, not when you discovered it)</label>
+                                        <input
+                                            type="date"
+                                            className="form-input"
+                                            value={breachDate}
+                                            onChange={(e) => setBreachDate(e.target.value)}
+                                        />
+                                    </div>
+
+                                    {solCalculation && (
+                                        <div className="result-box">
+                                            <div className="result-title">Statute of Limitation Analysis</div>
+                                            <div className="result-detail">
+                                                <strong>Breach Date:</strong> {solCalculation.breach}
+                                            </div>
+                                            <div className="result-detail">
+                                                <strong>Applicable SOL Period:</strong> {solCalculation.years} years ({stateLaws[selectedState].statute})
+                                            </div>
+                                            <div className="result-date">{solCalculation.solExpiration}</div>
+                                            <div className="result-detail" style={{ fontSize: '0.875rem', marginBottom: '1rem' }}>
+                                                Statute of Limitation Deadline
+                                            </div>
+
+                                            {solCalculation.status === 'expired' && (
+                                                <div className="result-warning">
+                                                    ⚠️ <strong>WARNING:</strong> The statute of limitation appears to have expired. Your claim may be time-barred. Consult an attorney immediately about tolling doctrines, discovery rules, or other exceptions.
+                                                </div>
+                                            )}
+
+                                            {solCalculation.status === 'urgent' && (
+                                                <div className="result-warning">
+                                                    ⚠️ <strong>URGENT:</strong> You have approximately {solCalculation.daysRemaining} days ({solCalculation.monthsRemaining} months) remaining. Take immediate action. If you need cure periods or statutory notice, calculate whether you have enough time.
+                                                </div>
+                                            )}
+
+                                            {solCalculation.status === 'warning' && (
+                                                <div className="result-warning">
+                                                    ⚠️ <strong>CAUTION:</strong> You have approximately {solCalculation.monthsRemaining} months remaining. Begin preparing your case. Factor in cure periods and notice requirements when planning timing.
+                                                </div>
+                                            )}
+
+                                            {solCalculation.status === 'good' && (
+                                                <div className="result-success">
+                                                    ✓ You have approximately {solCalculation.monthsRemaining} months ({solCalculation.daysRemaining} days) remaining before the statute of limitation expires. However, don't delay unnecessarily - evidence deteriorates and witnesses' memories fade.
+                                                </div>
+                                            )}
+
+                                            <div style={{ marginTop: '1rem', padding: '1rem', background: 'rgba(255,255,255,0.5)', borderRadius: '4px', fontSize: '0.875rem', color: '#1e3a8a' }}>
+                                                <strong>Important:</strong> Sending a demand letter does NOT extend this deadline. The SOL clock started at breach and continues running during negotiations unless you have a written tolling agreement.
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="calculator-section" style={{ marginTop: '2rem' }}>
+                                    <div className="calculator-header">Contractual Cure Period (if applicable)</div>
+
+                                    <div className="form-group">
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+                                            <input
+                                                type="checkbox"
+                                                id="has-cure"
+                                                className="checkbox-input"
+                                                checked={hasContractCure}
+                                                onChange={(e) => setHasContractCure(e.target.checked)}
+                                            />
+                                            <label htmlFor="has-cure" className="checklist-label">
+                                                My contract requires notice and an opportunity to cure before I can file suit
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    {hasContractCure && (
+                                        <>
+                                            <div className="input-grid">
+                                                <div className="form-group">
+                                                    <label className="form-label">Date You Sent Written Notice of Breach</label>
+                                                    <input
+                                                        type="date"
+                                                        className="form-input"
+                                                        value={demandDate}
+                                                        onChange={(e) => setDemandDate(e.target.value)}
+                                                    />
+                                                </div>
+
+                                                <div className="form-group">
+                                                    <label className="form-label">Cure Period Length (days)</label>
+                                                    <input
+                                                        type="number"
+                                                        className="form-input"
+                                                        value={curePeriodDays}
+                                                        onChange={(e) => setCurePeriodDays(e.target.value)}
+                                                        placeholder="e.g., 30"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            {cureCalculation && (
+                                                <div className="result-box">
+                                                    <div className="result-title">Cure Period Analysis</div>
+                                                    <div className="result-detail">
+                                                        <strong>Notice Sent:</strong> {cureCalculation.demandDate}
+                                                    </div>
+                                                    <div className="result-detail">
+                                                        <strong>Cure Period:</strong> {cureCalculation.cureDays} days
+                                                    </div>
+                                                    <div className="result-date">{cureCalculation.cureEnd}</div>
+                                                    <div className="result-detail" style={{ fontSize: '0.875rem', marginBottom: '1rem' }}>
+                                                        Earliest Date to File Suit
+                                                    </div>
+
+                                                    {cureCalculation.cureExpired ? (
+                                                        <div className="result-success">
+                                                            ✓ The cure period has expired. You may now file suit if the breach has not been cured. Filing before the cure period expires could result in dismissal for failure to satisfy a condition precedent.
+                                                        </div>
+                                                    ) : (
+                                                        <div className="result-warning">
+                                                            ⚠️ The cure period expires in {cureCalculation.cureRemaining} days. You cannot file suit until after this date unless you want to risk dismissal for premature filing.
+                                                        </div>
+                                                    )}
+
+                                                    {solCalculation && (
+                                                        <div style={{ marginTop: '1rem', padding: '1rem', background: 'rgba(255,255,255,0.5)', borderRadius: '4px', fontSize: '0.875rem', color: '#1e3a8a' }}>
+                                                            <strong>Timeline Check:</strong> Your statute of limitation expires on {solCalculation.solExpiration}. Make sure the cure period completes well before that deadline, or consider proposing a tolling agreement.
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </>
+                                    )}
+                                </div>
+
+                                <div className="calculator-section" style={{ marginTop: '2rem' }}>
+                                    <div className="calculator-header">Statutory Pre-Suit Notice (if applicable)</div>
+
+                                    <div className="form-group">
+                                        <label className="form-label">Does a statutory notice requirement apply?</label>
+                                        <select className="form-select" value={hasStatutoryNotice} onChange={(e) => setHasStatutoryNotice(e.target.value)}>
+                                            <option value="none">None / Not Sure</option>
+                                            <option value="clra">California CLRA (30 days)</option>
+                                            <option value="dtpa">Texas DTPA (60 days)</option>
+                                            <option value="construction">Construction Right-to-Repair (varies by state)</option>
+                                        </select>
+                                    </div>
+
+                                    {statutoryNoticeInfo && (
+                                        <div className="result-box">
+                                            <div className="result-title">{statutoryNoticeInfo.name}</div>
+                                            <div className="result-detail">
+                                                <strong>Statute:</strong> {statutoryNoticeInfo.statute}
+                                            </div>
+                                            <div className="result-detail">
+                                                <strong>Required Waiting Period:</strong> {statutoryNoticeInfo.days} days
+                                            </div>
+                                            <div className="result-detail" style={{ marginTop: '1rem' }}>
+                                                <strong>Description:</strong> {statutoryNoticeInfo.description}
+                                            </div>
+                                            <div style={{ marginTop: '1rem' }}>
+                                                <strong>Requirements for Compliant Notice:</strong>
+                                                <ul style={{ marginLeft: '1.5rem', marginTop: '0.5rem', lineHeight: '1.8' }}>
+                                                    {statutoryNoticeInfo.requirements.map((req, idx) => (
+                                                        <li key={idx}>{req}</li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {solCalculation && (hasContractCure || hasStatutoryNotice !== 'none') && (
+                                    <div className="timeline-viz">
+                                        <div style={{ fontWeight: 700, marginBottom: '1rem', color: '#1e3a8a' }}>Timeline Visualization</div>
+
+                                        <div className="timeline-item">
+                                            <div className="timeline-icon">1</div>
+                                            <div className="timeline-content">
+                                                <div className="timeline-label">Breach Occurred</div>
+                                                <div className="timeline-date">{solCalculation.breach}</div>
+                                                <div className="timeline-description">SOL clock started running (not paused by demand letters or negotiations)</div>
+                                            </div>
+                                        </div>
+
+                                        {demandDate && hasContractCure && cureCalculation && (
+                                            <div className="timeline-item">
+                                                <div className="timeline-icon">2</div>
+                                                <div className="timeline-content">
+                                                    <div className="timeline-label">Notice Sent / Cure Period Started</div>
+                                                    <div className="timeline-date">{cureCalculation.demandDate}</div>
+                                                    <div className="timeline-description">Contractual {cureCalculation.cureDays}-day cure period began</div>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {demandDate && hasContractCure && cureCalculation && (
+                                            <div className="timeline-item">
+                                                <div className="timeline-icon">3</div>
+                                                <div className="timeline-content">
+                                                    <div className="timeline-label">Cure Period Expires</div>
+                                                    <div className="timeline-date">{cureCalculation.cureEnd}</div>
+                                                    <div className="timeline-description">Earliest date you can file suit without premature-filing risk</div>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        <div className="timeline-item">
+                                            <div className="timeline-icon">⚠️</div>
+                                            <div className="timeline-content">
+                                                <div className="timeline-label">Statute of Limitation Deadline</div>
+                                                <div className="timeline-date">{solCalculation.solExpiration}</div>
+                                                <div className="timeline-description">Absolute deadline to file lawsuit - claim permanently barred after this date</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </>
+                        )}
+
+                        {activeTab === 'state-lookup' && (
+                            <>
+                                <div className="section-title">
+                                    <span className="section-icon">🗺️</span>
+                                    State-by-State SOL Reference
+                                </div>
+
+                                <div className="info-panel">
+                                    <div className="info-panel-title">
+                                        📚 Verified State Law Information
+                                    </div>
+                                    <div className="info-panel-content">
+                                        This reference includes only states with verified statute of limitation information and direct statutory citations. For states not listed, consult your state's civil procedure code or an attorney licensed in that jurisdiction. SOL periods can vary based on specific contract types and circumstances.
+                                    </div>
+                                </div>
+
+                                <div className="state-grid">
+                                    {Object.entries(stateLaws).map(([code, state]) => (
+                                        <div key={code} className="state-card">
+                                            <div className="state-card-header">
+                                                {state.name}
+                                            </div>
+
+                                            <div className="state-card-row">
+                                                <div className="state-card-label">Written Contracts</div>
+                                                <div className="state-card-value">
+                                                    {state.writtenContract} years
+                                                    <span className={`sol-badge ${state.writtenContract <= 4 ? 'sol-short' : state.writtenContract <= 6 ? 'sol-medium' : 'sol-long'}`}>
+                                                        {state.writtenContract}-YEAR
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <div className="state-card-row">
+                                                <div className="state-card-label">Oral Contracts</div>
+                                                <div className="state-card-value">{state.oralContract} years</div>
+                                            </div>
+
+                                            <div className="state-card-row">
+                                                <div className="state-card-label">Accrual Rule</div>
+                                                <div className="state-card-value">{state.accrualRule}</div>
+                                            </div>
+
+                                            <div className="state-card-row">
+                                                <div className="state-card-label">Statute</div>
+                                                <div className="state-card-value">
+                                                    {state.statute}
+                                                    {state.statuteLink && (
+                                                        <a href={state.statuteLink} target="_blank" rel="noopener noreferrer" className="statute-link" style={{ display: 'block', marginTop: '0.5rem' }}>
+                                                            Read Full Statute →
+                                                        </a>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            {state.notes && (
+                                                <div style={{ marginTop: '1rem', padding: '0.75rem', background: '#f0f9ff', borderRadius: '4px', fontSize: '0.875rem', color: '#0369a1' }}>
+                                                    <strong>Notes:</strong> {state.notes}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <div className="warning-panel" style={{ marginTop: '2rem' }}>
+                                    <div className="warning-panel-title">
+                                        ⚠️ Important Limitations
+                                    </div>
+                                    <div className="info-panel-content">
+                                        <strong>This tool includes only verified state law information.</strong> Many states are not included because statute of limitation periods vary based on specific contract types, dates of execution, and other factors. Always verify the applicable SOL for your specific situation:
+                                        <br/><br/>
+                                        • Check your contract for choice-of-law provisions<br/>
+                                        • Look for contractual shortening of the SOL (common in UCC contracts and vendor agreements)<br/>
+                                        • Consider whether discovery rules or tolling doctrines apply<br/>
+                                        • Consult an attorney licensed in the relevant jurisdiction<br/><br/>
+                                        For comprehensive state-by-state charts, see Resources tab for links to Gordon Rees and MWL 50-state compilations.
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        {activeTab === 'notice' && (
+                            <>
+                                <div className="section-title">
+                                    <span className="section-icon">📋</span>
+                                    Statutory Notice Requirements
+                                </div>
+
+                                <div className="info-panel">
+                                    <div className="info-panel-title">
+                                        📌 Pre-Suit Notice vs. Statute of Limitation
+                                    </div>
+                                    <div className="info-panel-content">
+                                        Certain types of claims require statutory pre-suit notice before you can file a lawsuit. These notice requirements create mandatory waiting periods but do NOT extend the underlying statute of limitation. If you're close to the SOL deadline, you may need to file suit first and then provide notice, or obtain a tolling agreement.
+                                    </div>
+                                </div>
+
+                                {Object.entries(noticeRequirements).map(([key, notice]) => (
+                                    <div key={key} className="calculator-section">
+                                        <div className="calculator-header">{notice.name}</div>
+
+                                        <div className="state-card-row">
+                                            <div className="state-card-label">Statute</div>
+                                            <div className="state-card-value">{notice.statute}</div>
+                                        </div>
+
+                                        <div className="state-card-row">
+                                            <div className="state-card-label">Waiting Period</div>
+                                            <div className="state-card-value">
+                                                {notice.days} {typeof notice.days === 'number' ? 'days' : ''}
+                                            </div>
+                                        </div>
+
+                                        <div style={{ marginTop: '1rem', marginBottom: '1rem', color: '#475569', fontSize: '0.95rem' }}>
+                                            {notice.description}
+                                        </div>
+
+                                        <div style={{ background: '#f0f9ff', padding: '1rem', borderRadius: '6px' }}>
+                                            <div style={{ fontWeight: 600, marginBottom: '0.75rem', color: '#1e3a8a' }}>
+                                                Requirements for Compliant Notice:
+                                            </div>
+                                            <ul style={{ marginLeft: '1.5rem', lineHeight: '1.8', fontSize: '0.9rem', color: '#334155' }}>
+                                                {notice.requirements.map((req, idx) => (
+                                                    <li key={idx}>{req}</li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                ))}
+
+                                <div className="warning-panel">
+                                    <div className="warning-panel-title">
+                                        ⚠️ SOL Near Expiration?
+                                    </div>
+                                    <div className="info-panel-content">
+                                        If your statute of limitation is about to expire and you don't have time to wait out the statutory notice period:
+                                        <br/><br/>
+                                        • <strong>CLRA:</strong> Cal. Civ. Code § 1782 allows filing before 30 days expires if SOL about to run<br/>
+                                        • <strong>DTPA:</strong> Tex. Bus. & Com. Code § 17.505 allows filing first if 60-day notice "impracticable" due to SOL<br/>
+                                        • <strong>Construction:</strong> Check your state's right-to-repair statute for exceptions<br/><br/>
+                                        Consult an attorney about the proper procedure for filing before completing statutory notice when the SOL is tight.
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        {activeTab === 'checklist' && (
+                            <>
+                                <div className="section-title">
+                                    <span className="section-icon">✓</span>
+                                    Demand Letter Compliance Checklist
+                                </div>
+
+                                <div className="info-panel">
+                                    <div className="info-panel-title">
+                                        📋 Before You Send a Demand Letter
+                                    </div>
+                                    <div className="info-panel-content">
+                                        Use this checklist to ensure your demand letter satisfies all relevant timing requirements and preserves your rights under statutes of limitation, contractual cure provisions, and statutory notice obligations.
+                                    </div>
+                                </div>
+
+                                <div className="checklist-section">
+                                    <div className="checklist-header">
+                                        ⚖️ Statute of Limitation Review
+                                    </div>
+                                    <div className="checklist-item">
+                                        <input type="checkbox" className="checkbox-input" id="check-1" />
+                                        <div>
+                                            <label htmlFor="check-1" className="checklist-label">
+                                                Identified the date of breach (when breach occurred, not when discovered)
+                                            </label>
+                                            <div className="checklist-description">
+                                                SOL clock generally starts at breach, not discovery or demand. Determine the exact breach date.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="checklist-item">
+                                        <input type="checkbox" className="checkbox-input" id="check-2" />
+                                        <div>
+                                            <label htmlFor="check-2" className="checklist-label">
+                                                Determined applicable state law and SOL period
+                                            </label>
+                                            <div className="checklist-description">
+                                                Check contract choice-of-law provision. Verify SOL for your state and claim type.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="checklist-item">
+                                        <input type="checkbox" className="checkbox-input" id="check-3" />
+                                        <div>
+                                            <label htmlFor="check-3" className="checklist-label">
+                                                Checked contract for shortened SOL provisions
+                                            </label>
+                                            <div className="checklist-description">
+                                                Many contracts shorten SOL to 1-2 years. UCC 2-725 allows shortening to not less than 1 year.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="checklist-item">
+                                        <input type="checkbox" className="checkbox-input" id="check-4" />
+                                        <div>
+                                            <label htmlFor="check-4" className="checklist-label">
+                                                Calculated SOL expiration date and confirmed adequate time remains
+                                            </label>
+                                            <div className="checklist-description">
+                                                Factor in cure periods and statutory notice requirements. Consider tolling agreement if tight.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="checklist-section">
+                                    <div className="checklist-header">
+                                        📄 Contractual Requirements Review
+                                    </div>
+                                    <div className="checklist-item">
+                                        <input type="checkbox" className="checkbox-input" id="check-5" />
+                                        <div>
+                                            <label htmlFor="check-5" className="checklist-label">
+                                                Reviewed contract for notice-and-cure provisions
+                                            </label>
+                                            <div className="checklist-description">
+                                                Search for "notice", "cure", "default", "condition precedent" language in contract.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="checklist-item">
+                                        <input type="checkbox" className="checkbox-input" id="check-6" />
+                                        <div>
+                                            <label htmlFor="check-6" className="checklist-label">
+                                                Identified required notice format and delivery method
+                                            </label>
+                                            <div className="checklist-description">
+                                                Written notice? Certified mail? Email? Specific address? Check contractual requirements.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="checklist-item">
+                                        <input type="checkbox" className="checkbox-input" id="check-7" />
+                                        <div>
+                                            <label htmlFor="check-7" className="checklist-label">
+                                                Determined cure period length and calculated expiration
+                                            </label>
+                                            <div className="checklist-description">
+                                                Common periods: 15, 30, 60 days. Note whether it's from sending or receipt of notice.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="checklist-item">
+                                        <input type="checkbox" className="checkbox-input" id="check-8" />
+                                        <div>
+                                            <label htmlFor="check-8" className="checklist-label">
+                                                Drafted letter to explicitly invoke contractual notice provision
+                                            </label>
+                                            <div className="checklist-description">
+                                                Reference section number and quote or paraphrase the clause. Make clear this starts cure period.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="checklist-section">
+                                    <div className="checklist-header">
+                                        📋 Statutory Notice Requirements
+                                    </div>
+                                    <div className="checklist-item">
+                                        <input type="checkbox" className="checkbox-input" id="check-9" />
+                                        <div>
+                                            <label htmlFor="check-9" className="checklist-label">
+                                                Determined whether statutory pre-suit notice applies
+                                            </label>
+                                            <div className="checklist-description">
+                                                CLRA (CA - 30 days), DTPA (TX - 60 days), construction right-to-repair, insurance bad faith, etc.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="checklist-item">
+                                        <input type="checkbox" className="checkbox-input" id="check-10" />
+                                        <div>
+                                            <label htmlFor="check-10" className="checklist-label">
+                                                Reviewed statutory requirements for compliant notice format
+                                            </label>
+                                            <div className="checklist-description">
+                                                CLRA: enumerate violations, state damages, specify relief. DTPA: reasonable detail, itemized damages.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="checklist-item">
+                                        <input type="checkbox" className="checkbox-input" id="check-11" />
+                                        <div>
+                                            <label htmlFor="check-11" className="checklist-label">
+                                                Calculated whether statutory waiting period fits within SOL deadline
+                                            </label>
+                                            <div className="checklist-description">
+                                                If tight, consider filing to stop SOL clock, then providing notice post-filing per statutory exception.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="checklist-section">
+                                    <div className="checklist-header">
+                                        📨 Delivery and Documentation
+                                    </div>
+                                    <div className="checklist-item">
+                                        <input type="checkbox" className="checkbox-input" id="check-12" />
+                                        <div>
+                                            <label htmlFor="check-12" className="checklist-label">
+                                                Verified correct notice address from contract
+                                            </label>
+                                            <div className="checklist-description">
+                                                Use exact address specified in contract notice provision. CC general counsel if appropriate.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="checklist-item">
+                                        <input type="checkbox" className="checkbox-input" id="check-13" />
+                                        <div>
+                                            <label htmlFor="check-13" className="checklist-label">
+                                                Selected appropriate delivery method with proof
+                                            </label>
+                                            <div className="checklist-description">
+                                                Certified mail with return receipt, courier with tracking, email with read receipt, etc.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="checklist-item">
+                                        <input type="checkbox" className="checkbox-input" id="check-14" />
+                                        <div>
+                                            <label htmlFor="check-14" className="checklist-label">
+                                                Saved complete copy of letter with all attachments
+                                            </label>
+                                            <div className="checklist-description">
+                                                PDF the final version. Save all exhibits and supporting documents referenced in letter.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="checklist-item">
+                                        <input type="checkbox" className="checkbox-input" id="check-15" />
+                                        <div>
+                                            <label htmlFor="check-15" className="checklist-label">
+                                                Documented delivery with tracking/receipt evidence
+                                            </label>
+                                            <div className="checklist-description">
+                                                Screenshot tracking, save email delivery confirmation, keep certified mail receipts.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="checklist-section">
+                                    <div className="checklist-header">
+                                        🔒 Rights Reservation and Evidence
+                                    </div>
+                                    <div className="checklist-item">
+                                        <input type="checkbox" className="checkbox-input" id="check-16" />
+                                        <div>
+                                            <label htmlFor="check-16" className="checklist-label">
+                                                Included reservation of rights language
+                                            </label>
+                                            <div className="checklist-description">
+                                                State that nothing in letter waives any rights, partial cure doesn't waive full performance, etc.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="checklist-item">
+                                        <input type="checkbox" className="checkbox-input" id="check-17" />
+                                        <div>
+                                            <label htmlFor="check-17" className="checklist-label">
+                                                Included litigation hold / document preservation paragraph
+                                            </label>
+                                            <div className="checklist-description">
+                                                Notify other party to preserve documents and ESI. Lays groundwork for spoliation arguments.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="checklist-item">
+                                        <input type="checkbox" className="checkbox-input" id="check-18" />
+                                        <div>
+                                            <label htmlFor="check-18" className="checklist-label">
+                                                Set clear deadline for response and next steps
+                                            </label>
+                                            <div className="checklist-description">
+                                                Specify response deadline. State what happens if breach not cured (file suit, terminate, etc.).
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        {activeTab === 'resources' && (
+                            <>
+                                <div className="section-title">
+                                    <span className="section-icon">🔗</span>
+                                    Legal Resources & References
+                                </div>
+
+                                <div className="info-panel">
+                                    <div className="info-panel-title">
+                                        📚 Authoritative Sources
+                                    </div>
+                                    <div className="info-panel-content">
+                                        These resources provide comprehensive state-by-state statute of limitation information, statutory notice requirements, and official legal authorities. Always verify current law for your specific jurisdiction and circumstances.
+                                    </div>
+                                </div>
+
+                                <div className="resources-grid">
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>📊</span>
+                                            Gordon Rees SOL Chart
+                                        </div>
+                                        <div className="resource-description">
+                                            Comprehensive 50-state chart of statutes of limitation for contract claims, personal injury, and property damage. Includes code citations and oral vs written contract distinctions.
+                                        </div>
+                                        <a href="https://www.grsm.com/Templates/media/files/pdf/Construction-Statute%20of%20Limitations%20Chart%202020.pdf" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            View Chart (PDF) →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>⚖️</span>
+                                            UCC Article 2 (Sale of Goods)
+                                        </div>
+                                        <div className="resource-description">
+                                            Cornell Legal Information Institute's UCC § 2-725 on statute of limitations for sale-of-goods claims. Four-year period with rules on accrual and contractual modification.
+                                        </div>
+                                        <a href="https://www.law.cornell.edu/ucc/2/2-725" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Read UCC 2-725 →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>📜</span>
+                                            UCC Article 3 (Demand Notes)
+                                        </div>
+                                        <div className="resource-description">
+                                            Cornell LII's UCC § 3-118 on statute of limitations for negotiable instruments including notes payable on demand. Six years after demand, with special rules.
+                                        </div>
+                                        <a href="https://www.law.cornell.edu/ucc/3/3-118" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Read UCC 3-118 →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>🏛️</span>
+                                            California CLRA Statute
+                                        </div>
+                                        <div className="resource-description">
+                                            California Civil Code § 1782 on pre-suit notice requirements for Consumer Legal Remedies Act claims. Thirty-day notice required before filing for damages.
+                                        </div>
+                                        <a href="https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=1782" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Read Cal. Civ. Code § 1782 →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>⚡</span>
+                                            Texas DTPA Statute
+                                        </div>
+                                        <div className="resource-description">
+                                            Texas Business and Commerce Code § 17.505 on notice requirements for Deceptive Trade Practices Act claims. Sixty-day pre-suit notice with reasonable detail required.
+                                        </div>
+                                        <a href="https://statutes.capitol.texas.gov/Docs/BC/htm/BC.17.htm" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Read Tex. Bus. & Com. Code § 17.505 →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>🏗️</span>
+                                            Construction Right-to-Repair Overview
+                                        </div>
+                                        <div className="resource-description">
+                                            Smith Freed Eberhard overview of state construction defect right-to-repair statutes. Covers pre-suit notice requirements for residential construction claims across multiple states.
+                                        </div>
+                                        <a href="https://www.smithfreed.com/legal-updates/statutes-of-limitations-the-importance-of-knowing-when-a-cause-of-action-accrues/" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Read Overview →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>📘</span>
+                                            California Code of Civil Procedure
+                                        </div>
+                                        <div className="resource-description">
+                                            California Legislative Information official statute database. Search for statutes of limitation (§§ 312-366) and procedural requirements for different claim types.
+                                        </div>
+                                        <a href="https://leginfo.legislature.ca.gov/faces/codes.xhtml" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Search CA Statutes →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>🗽</span>
+                                            New York Civil Practice Law
+                                        </div>
+                                        <div className="resource-description">
+                                            NY Senate official database of Civil Practice Law and Rules. Section 213 covers six-year statute of limitation for contract claims.
+                                        </div>
+                                        <a href="https://www.nysenate.gov/legislation/laws/CVP" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Search NY CPLR →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>📑</span>
+                                            Cornell Legal Information Institute
+                                        </div>
+                                        <div className="resource-description">
+                                            Free legal encyclopedia covering federal statutes, UCC, Federal Rules of Evidence, and legal topics. Excellent resource for understanding accrual rules and limitations.
+                                        </div>
+                                        <a href="https://www.law.cornell.edu/" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Visit Cornell LII →
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <div className="warning-panel" style={{ marginTop: '2rem' }}>
+                                    <div className="warning-panel-title">
+                                        ⚠️ Disclaimer
+                                    </div>
+                                    <div className="info-panel-content">
+                                        This tool provides general information based on verified statutory sources. It is not a substitute for legal advice. Statutes of limitation vary by state, claim type, and specific circumstances. Always consult an attorney licensed in your jurisdiction to determine the applicable limitation period and requirements for your specific situation. The information in this tool may not reflect recent statutory amendments or court decisions.
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<SOLCalculator />, document.getElementById('root'));
+    </script>
+</body>
+</html>
