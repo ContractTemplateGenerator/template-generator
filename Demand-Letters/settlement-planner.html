@@ -1,0 +1,2127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settlement Agreement Planner</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #1e293b;
+            background: linear-gradient(135deg, #047857 0%, #059669 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        #root {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .app-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: calc(100vh - 40px);
+        }
+        .header {
+            background: linear-gradient(135deg, #047857 0%, #059669 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        .header-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .header-subtitle {
+            font-size: 1rem;
+            opacity: 0.95;
+        }
+        .tabs-container {
+            display: flex;
+            background: #f8fafc;
+            border-bottom: 2px solid #e2e8f0;
+            overflow-x: auto;
+            flex-shrink: 0;
+        }
+        .tab {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #64748b;
+            white-space: nowrap;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .tab:hover {
+            background: #f1f5f9;
+            color: #047857;
+        }
+        .tab.active {
+            color: #047857;
+            background: white;
+            border-bottom-color: #047857;
+        }
+        .tab-icon {
+            font-size: 1.1rem;
+        }
+        .content-wrapper {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+        .content-wrapper::-webkit-scrollbar {
+            width: 10px;
+        }
+        .content-wrapper::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .content-wrapper::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 5px;
+        }
+        .content-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .section-title {
+            color: #047857;
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .section-icon {
+            font-size: 1.5rem;
+        }
+        .info-panel {
+            background: #d1fae5;
+            border-left: 4px solid #047857;
+            padding: 1.25rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+        }
+        .info-panel-title {
+            font-weight: 700;
+            color: #065f46;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .info-panel-content {
+            font-size: 0.9rem;
+            color: #334155;
+            line-height: 1.7;
+        }
+        .warning-panel {
+            background: #fef3c7;
+            border-left: 4px solid #d97706;
+            padding: 1.25rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+        }
+        .warning-panel-title {
+            font-weight: 700;
+            color: #92400e;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .success-panel {
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+            padding: 1.25rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+        }
+        .success-panel-title {
+            font-weight: 700;
+            color: #065f46;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+        }
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: #334155;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #047857;
+        }
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: start;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+        .checkbox-input {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #047857;
+            flex-shrink: 0;
+            margin-top: 0.125rem;
+        }
+        .checkbox-label {
+            cursor: pointer;
+            font-size: 0.95rem;
+            user-select: none;
+        }
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .radio-option {
+            display: flex;
+            align-items: start;
+            gap: 0.75rem;
+        }
+        .radio-input {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #047857;
+            flex-shrink: 0;
+            margin-top: 0.125rem;
+        }
+        .analysis-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.2s;
+        }
+        .analysis-card:hover {
+            border-color: #047857;
+            box-shadow: 0 4px 12px rgba(4, 120, 87, 0.1);
+        }
+        .analysis-header {
+            font-weight: 700;
+            color: #047857;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .analysis-content {
+            font-size: 0.95rem;
+            color: #475569;
+            line-height: 1.7;
+        }
+        .strategy-box {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            border: 2px solid #047857;
+        }
+        .strategy-title {
+            font-weight: 700;
+            color: #047857;
+            margin-bottom: 1rem;
+            font-size: 1.05rem;
+        }
+        .strategy-item {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+        .strategy-icon {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            background: #047857;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.75rem;
+        }
+        .strategy-text {
+            flex: 1;
+            font-size: 0.9rem;
+            color: #334155;
+            line-height: 1.6;
+        }
+        .term-sheet-preview {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-top: 1.5rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            user-select: text;
+        }
+        .term-sheet-preview::selection {
+            background: #a7f3d0;
+        }
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .enforcement-option {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            transition: all 0.2s;
+        }
+        .enforcement-option:hover {
+            border-color: #047857;
+            background: #f0fdf4;
+        }
+        .enforcement-option.selected {
+            border-color: #047857;
+            background: #d1fae5;
+        }
+        .enforcement-title {
+            font-weight: 700;
+            color: #047857;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+        .enforcement-description {
+            font-size: 0.875rem;
+            color: #64748b;
+            line-height: 1.6;
+        }
+        .checklist-section {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .checklist-header {
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 1rem;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .checklist-item {
+            display: flex;
+            align-items: start;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: #f8fafc;
+            border-radius: 6px;
+            margin-bottom: 0.75rem;
+            transition: background 0.2s;
+        }
+        .checklist-item:hover {
+            background: #f0fdf4;
+        }
+        .checklist-label {
+            font-weight: 500;
+            color: #334155;
+            margin-bottom: 0.25rem;
+            cursor: pointer;
+        }
+        .checklist-description {
+            font-size: 0.875rem;
+            color: #64748b;
+            line-height: 1.5;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 32px;
+            background: #e2e8f0;
+            border-radius: 16px;
+            overflow: hidden;
+            margin: 1.5rem 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #047857 0%, #10b981 100%);
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 0.875rem;
+        }
+        .confidence-meter {
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        .confidence-meter.high {
+            background: #d1fae5;
+            border: 2px solid #10b981;
+        }
+        .confidence-meter.medium {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+        }
+        .confidence-meter.low {
+            background: #fee2e2;
+            border: 2px solid #ef4444;
+        }
+        .confidence-label {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .confidence-description {
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        .sample-language-box {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        .sample-title {
+            font-weight: 700;
+            color: #047857;
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+        }
+        .sample-text {
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            color: #334155;
+            line-height: 1.7;
+            background: white;
+            padding: 1rem;
+            border-radius: 4px;
+            border-left: 4px solid #047857;
+        }
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+        .resource-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.2s;
+        }
+        .resource-card:hover {
+            border-color: #047857;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(4, 120, 87, 0.2);
+        }
+        .resource-title {
+            font-weight: 700;
+            color: #047857;
+            margin-bottom: 0.75rem;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .resource-description {
+            font-size: 0.875rem;
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        .resource-link {
+            color: #047857;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+        .resource-link:hover {
+            color: #059669;
+            text-decoration: underline;
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #047857 0%, #059669 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(4, 120, 87, 0.4);
+        }
+        @media (max-width: 768px) {
+            .input-grid {
+                grid-template-columns: 1fr;
+            }
+            .resources-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useMemo } = React;
+
+        function SettlementPlanner() {
+            const [activeTab, setActiveTab] = useState('snapshot');
+
+            // Tab 1: Case Snapshot
+            const [disputeType, setDisputeType] = useState('contractor');
+            const [claimPosture, setClaimPosture] = useState('pre-suit');
+            const [status, setStatus] = useState('demand-sent-responded');
+            const [goals, setGoals] = useState({
+                money: true,
+                workFixed: false,
+                exitContract: false,
+                reputation: false
+            });
+
+            // Tab 2: Response Analyzer
+            const [responseType, setResponseType] = useState({
+                offeredFull: false,
+                offeredPartial: false,
+                offeredNonMonetary: false,
+                deniedButInvited: false,
+                threatenedCounter: false,
+                demandedConfidentiality: false,
+                demandedBroadRelease: false
+            });
+            const [hasLawyer, setHasLawyer] = useState('no');
+
+            // Tab 3: Term Sheet
+            const [termSheet, setTermSheet] = useState({
+                settlementAmount: '',
+                paymentType: 'lump-sum',
+                installments: '3',
+                firstPaymentDays: '5',
+                installmentInterval: '30',
+                interestRate: '10',
+                releaseType: 'mutual',
+                releaseScope: 'project-specific',
+                includeCA1542: false,
+                confidentiality: false,
+                nonDisparagement: false,
+                noAdmission: true
+            });
+
+            // Tab 4: Enforcement
+            const [enforcementMechanisms, setEnforcementMechanisms] = useState({
+                section664_6: false,
+                stipulatedJudgment: false,
+                personalGuarantee: false,
+                accelerationClause: true
+            });
+
+            // Tab 5: Checklist
+            const [checklistItems, setChecklistItems] = useState({});
+
+            const toggleGoal = (goal) => {
+                setGoals(prev => ({ ...prev, [goal]: !prev[goal] }));
+            };
+
+            const toggleResponseType = (type) => {
+                setResponseType(prev => ({ ...prev, [type]: !prev[type] }));
+            };
+
+            const updateTermSheet = (field, value) => {
+                setTermSheet(prev => ({ ...prev, [field]: value }));
+            };
+
+            const toggleEnforcement = (mechanism) => {
+                setEnforcementMechanisms(prev => ({ ...prev, [mechanism]: !prev[mechanism] }));
+            };
+
+            const toggleChecklistItem = (item) => {
+                setChecklistItems(prev => ({ ...prev, [item]: !prev[item] }));
+            };
+
+            const responseAnalysis = useMemo(() => {
+                const responseCount = Object.values(responseType).filter(Boolean).length;
+
+                if (responseType.offeredFull && responseCount === 1) {
+                    return {
+                        category: 'Full Capitulation',
+                        icon: '✓',
+                        color: '#10b981',
+                        description: 'They\'re offering everything you requested. This is the best-case scenario but requires discipline.',
+                        leverage: 'High - They want this resolved quickly',
+                        nextSteps: [
+                            'Don\'t over-negotiate and kill the deal',
+                            'Move quickly to formal settlement agreement',
+                            'Focus on enforcement mechanisms rather than increasing demands',
+                            'Ensure release scope is appropriate (not too broad)',
+                            'Include clear payment terms and security if installments'
+                        ]
+                    };
+                }
+
+                if (responseType.deniedButInvited || (responseType.offeredPartial && !responseType.threatenedCounter)) {
+                    return {
+                        category: 'Soft Interest in Compromise',
+                        icon: '🤝',
+                        color: '#047857',
+                        description: 'They acknowledge some validity but dispute key elements. This is favorable and common.',
+                        leverage: 'Moderate - Genuine willingness to negotiate',
+                        nextSteps: [
+                            'Schedule a call to outline key issues',
+                            'Create joint issues list (what\'s agreed, what\'s disputed)',
+                            'Establish timeline for exchanging proposals',
+                            'Propose structured process with clear milestones',
+                            'Listen for whether they\'re focused on business pragmatism or disputing facts'
+                        ]
+                    };
+                }
+
+                if (responseType.threatenedCounter || responseType.demandedBroadRelease) {
+                    return {
+                        category: 'Hardball Counterdemands',
+                        icon: '⚔️',
+                        color: '#d97706',
+                        description: 'They\'re testing your resolve with aggressive counterdemands. Don\'t be intimidated.',
+                        leverage: 'Variable - They may be posturing',
+                        nextSteps: [
+                            'Separate reasonable elements from unreasonable demands',
+                            'Identify what concerns them (reputation, regulatory exposure)',
+                            'Respond firmly to unreasonable elements',
+                            'Propose narrower versions of reasonable requests',
+                            'Schedule call to discuss factual basis rather than positions'
+                        ]
+                    };
+                }
+
+                return {
+                    category: 'Mixed Signals',
+                    icon: '❓',
+                    color: '#64748b',
+                    description: 'The response contains mixed signals. Analyze each element independently.',
+                    leverage: 'Unclear - Need more information',
+                    nextSteps: [
+                        'Respond to each element of their proposal separately',
+                        'Identify areas of potential agreement',
+                        'Firmly reject unreasonable demands',
+                        'Propose structured process to address disputed issues'
+                    ]
+                };
+            }, [responseType]);
+
+            const termSheetPreview = useMemo(() => {
+                if (!termSheet.settlementAmount) return 'Enter settlement amount to generate preview...';
+
+                let preview = 'SETTLEMENT TERM SHEET\n';
+                preview += '(For Discussion Purposes Only - Subject to Execution of Formal Settlement Agreement)\n\n';
+                preview += `Date: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}\n\n`;
+
+                preview += '1. PARTIES\n';
+                preview += '   [Your Name/Entity] ("Claimant")\n';
+                preview += '   [Opposing Party Name/Entity] ("Respondent")\n\n';
+
+                preview += '2. SETTLEMENT PAYMENT\n';
+                if (termSheet.paymentType === 'lump-sum') {
+                    preview += `   Respondent shall pay Claimant $${termSheet.settlementAmount} as a lump sum\n`;
+                    preview += `   within ${termSheet.firstPaymentDays} business days of execution of the Settlement Agreement.\n\n`;
+                } else {
+                    const amount = parseFloat(termSheet.settlementAmount) || 0;
+                    const installmentCount = parseInt(termSheet.installments) || 3;
+                    const installmentAmount = (amount / installmentCount).toFixed(2);
+
+                    preview += `   Total Amount: $${termSheet.settlementAmount}\n`;
+                    preview += `   Payment Schedule:\n`;
+                    preview += `   - $${installmentAmount} due within ${termSheet.firstPaymentDays} business days of execution\n`;
+                    for (let i = 1; i < installmentCount; i++) {
+                        const days = parseInt(termSheet.firstPaymentDays) + (i * parseInt(termSheet.installmentInterval));
+                        preview += `   - $${installmentAmount} due ${days} days after execution\n`;
+                    }
+                    preview += `\n   Late Payment: Any payment more than 5 business days late shall accrue\n`;
+                    preview += `   interest at ${termSheet.interestRate}% per annum from the due date.\n\n`;
+
+                    if (enforcementMechanisms.accelerationClause) {
+                        preview += `   Acceleration: If any installment is more than 5 business days late,\n`;
+                        preview += `   Claimant may declare the entire unpaid balance immediately due and payable.\n\n`;
+                    }
+                }
+
+                preview += '3. RELEASES\n';
+                if (termSheet.releaseType === 'mutual') {
+                    preview += '   Mutual Release:\n';
+                    preview += '   Each party releases the other from ';
+                } else {
+                    preview += '   Claimant releases Respondent from ';
+                }
+
+                if (termSheet.releaseScope === 'project-specific') {
+                    preview += 'any and all claims, known or unknown,\n';
+                    preview += '   arising out of or relating to [the Project/Contract/Transaction], including\n';
+                    preview += '   any claims that were asserted or could have been asserted relating to\n';
+                    preview += '   [the Project/Contract/Transaction].\n\n';
+                } else {
+                    preview += 'any and all claims, known or unknown,\n';
+                    preview += '   that the releasing party ever had, has, or may have against the released party.\n\n';
+                }
+
+                if (termSheet.includeCA1542) {
+                    preview += '   California Civil Code § 1542 Waiver:\n';
+                    preview += '   The parties expressly waive the provisions of California Civil Code § 1542,\n';
+                    preview += '   which provides: "A general release does not extend to claims that the creditor\n';
+                    preview += '   or releasing party does not know or suspect to exist in his or her favor at the\n';
+                    preview += '   time of executing the release and that, if known by him or her, would have\n';
+                    preview += '   materially affected his or her settlement with the debtor or released party."\n\n';
+                }
+
+                if (termSheet.confidentiality) {
+                    preview += '4. CONFIDENTIALITY\n';
+                    preview += '   The existence and terms of this Settlement Agreement shall remain confidential.\n';
+                    preview += '   Exceptions: discussions with immediate family, attorneys, accountants, tax advisors,\n';
+                    preview += '   response to court orders/subpoenas, cooperation with regulatory/law enforcement\n';
+                    preview += '   investigations, and disclosure required by law.\n\n';
+                }
+
+                if (termSheet.nonDisparagement) {
+                    const section = termSheet.confidentiality ? '5' : '4';
+                    preview += `${section}. NON-DISPARAGEMENT\n`;
+                    preview += '   Neither party shall make false or misleading statements about the other or the dispute.\n';
+                    preview += '   Exceptions: truthful testimony under oath, cooperation with government investigations,\n';
+                    preview += '   discussions with close family and professional advisors, and statements protected by law.\n\n';
+                }
+
+                if (termSheet.noAdmission) {
+                    const section = termSheet.confidentiality && termSheet.nonDisparagement ? '6' :
+                                  termSheet.confidentiality || termSheet.nonDisparagement ? '5' : '4';
+                    preview += `${section}. NO ADMISSION OF LIABILITY\n`;
+                    preview += '   This Settlement Agreement is entered into for compromise purposes only and does not\n';
+                    preview += '   constitute an admission of liability, wrongdoing, or validity of any claims.\n';
+                    preview += '   Respondent expressly denies all claims and allegations.\n\n';
+                }
+
+                preview += 'ENFORCEMENT MECHANISMS:\n';
+                if (claimPosture === 'in-litigation' && enforcementMechanisms.section664_6) {
+                    preview += '   ✓ Court retains jurisdiction under Cal. CCP § 664.6\n';
+                }
+                if (enforcementMechanisms.stipulatedJudgment) {
+                    preview += '   ✓ Stipulated judgment on default\n';
+                }
+                if (enforcementMechanisms.personalGuarantee) {
+                    preview += '   ✓ Personal guarantee from [Principal Name]\n';
+                }
+                if (enforcementMechanisms.accelerationClause && termSheet.paymentType === 'installments') {
+                    preview += '   ✓ Acceleration clause for installment defaults\n';
+                }
+
+                preview += '\n---\n';
+                preview += 'This term sheet is for discussion purposes only and is inadmissible under\n';
+                preview += 'Federal Rule of Evidence 408 and California Evidence Code § 1152.';
+
+                return preview;
+            }, [termSheet, enforcementMechanisms, claimPosture]);
+
+            const checklistProgress = useMemo(() => {
+                const totalItems = 18;
+                const completedItems = Object.values(checklistItems).filter(Boolean).length;
+                const percentage = Math.round((completedItems / totalItems) * 100);
+
+                let confidence = 'low';
+                if (percentage >= 80) confidence = 'high';
+                else if (percentage >= 50) confidence = 'medium';
+
+                return { completedItems, totalItems, percentage, confidence };
+            }, [checklistItems]);
+
+            return (
+                <div className="app-container">
+                    <div className="header">
+                        <div className="header-title">Settlement Agreement Planner</div>
+                        <div className="header-subtitle">Turn your demand letter response into an enforceable settlement agreement</div>
+                    </div>
+
+                    <div className="tabs-container">
+                        <button className={`tab ${activeTab === 'snapshot' ? 'active' : ''}`} onClick={() => setActiveTab('snapshot')}>
+                            <span className="tab-icon">📋</span>
+                            Case Snapshot
+                        </button>
+                        <button className={`tab ${activeTab === 'response' ? 'active' : ''}`} onClick={() => setActiveTab('response')}>
+                            <span className="tab-icon">📨</span>
+                            Response Analyzer
+                        </button>
+                        <button className={`tab ${activeTab === 'termsheet' ? 'active' : ''}`} onClick={() => setActiveTab('termsheet')}>
+                            <span className="tab-icon">📄</span>
+                            Term Sheet
+                        </button>
+                        <button className={`tab ${activeTab === 'enforcement' ? 'active' : ''}`} onClick={() => setActiveTab('enforcement')}>
+                            <span className="tab-icon">⚖️</span>
+                            Enforcement
+                        </button>
+                        <button className={`tab ${activeTab === 'checklist' ? 'active' : ''}`} onClick={() => setActiveTab('checklist')}>
+                            <span className="tab-icon">✓</span>
+                            Checklist
+                        </button>
+                        <button className={`tab ${activeTab === 'resources' ? 'active' : ''}`} onClick={() => setActiveTab('resources')}>
+                            <span className="tab-icon">🔗</span>
+                            Resources
+                        </button>
+                    </div>
+
+                    <div className="content-wrapper">
+                        {activeTab === 'snapshot' && (
+                            <>
+                                <div className="section-title">
+                                    <span className="section-icon">📋</span>
+                                    Case Snapshot & Settlement Goals
+                                </div>
+
+                                <div className="info-panel">
+                                    <div className="info-panel-title">
+                                        🎯 Define Your Position
+                                    </div>
+                                    <div className="info-panel-content">
+                                        Understanding where you are in the negotiation process and what you're trying to achieve helps structure an effective settlement strategy. This snapshot informs the approach for all subsequent tabs.
+                                    </div>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Dispute Type</label>
+                                    <select className="form-select" value={disputeType} onChange={(e) => setDisputeType(e.target.value)}>
+                                        <option value="contractor">Construction / Contractor Dispute</option>
+                                        <option value="payment-processor">Payment Processor / Stripe Hold</option>
+                                        <option value="med-spa">Medical / Med Spa Services</option>
+                                        <option value="creative">Creative / Consulting Services</option>
+                                        <option value="saas">SaaS / Technology Contract</option>
+                                        <option value="other">Other Business Dispute</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Claim Posture</label>
+                                    <div className="radio-group">
+                                        <div className="radio-option">
+                                            <input
+                                                type="radio"
+                                                className="radio-input"
+                                                checked={claimPosture === 'pre-suit'}
+                                                onChange={() => setClaimPosture('pre-suit')}
+                                                id="posture-presuit"
+                                            />
+                                            <label htmlFor="posture-presuit" className="checkbox-label">
+                                                <strong>Pre-litigation</strong> - No lawsuit filed yet
+                                            </label>
+                                        </div>
+                                        <div className="radio-option">
+                                            <input
+                                                type="radio"
+                                                className="radio-input"
+                                                checked={claimPosture === 'in-litigation'}
+                                                onChange={() => setClaimPosture('in-litigation')}
+                                                id="posture-litigation"
+                                            />
+                                            <label htmlFor="posture-litigation" className="checkbox-label">
+                                                <strong>In litigation</strong> - Lawsuit already filed
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Current Status</label>
+                                    <select className="form-select" value={status} onChange={(e) => setStatus(e.target.value)}>
+                                        <option value="demand-sent-no-response">Demand sent, no response yet</option>
+                                        <option value="demand-sent-responded">Demand sent, they responded positively</option>
+                                        <option value="active-negotiation">In active settlement negotiation</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Your Settlement Goals (select all that apply)</label>
+                                    <div className="checkbox-group">
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox-input"
+                                            checked={goals.money}
+                                            onChange={() => toggleGoal('money')}
+                                            id="goal-money"
+                                        />
+                                        <label htmlFor="goal-money" className="checkbox-label">
+                                            <strong>Get paid money</strong> - Recovery of damages, payment owed, or compensation
+                                        </label>
+                                    </div>
+                                    <div className="checkbox-group">
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox-input"
+                                            checked={goals.workFixed}
+                                            onChange={() => toggleGoal('workFixed')}
+                                            id="goal-work"
+                                        />
+                                        <label htmlFor="goal-work" className="checkbox-label">
+                                            <strong>Get work finished/fixed</strong> - Completion of deliverables or correction of defects
+                                        </label>
+                                    </div>
+                                    <div className="checkbox-group">
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox-input"
+                                            checked={goals.exitContract}
+                                            onChange={() => toggleGoal('exitContract')}
+                                            id="goal-exit"
+                                        />
+                                        <label htmlFor="goal-exit" className="checkbox-label">
+                                            <strong>Get out of contract</strong> - Termination without penalty or ongoing obligations
+                                        </label>
+                                    </div>
+                                    <div className="checkbox-group">
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox-input"
+                                            checked={goals.reputation}
+                                            onChange={() => toggleGoal('reputation')}
+                                            id="goal-reputation"
+                                        />
+                                        <label htmlFor="goal-reputation" className="checkbox-label">
+                                            <strong>Clean up reputation</strong> - Remove content, retraction, or non-disparagement
+                                        </label>
+                                    </div>
+                                </div>
+
+                                {status === 'demand-sent-responded' || status === 'active-negotiation' ? (
+                                    <div className="success-panel">
+                                        <div className="success-panel-title">
+                                            ✓ Good Progress
+                                        </div>
+                                        <div className="info-panel-content">
+                                            {status === 'demand-sent-responded' && (
+                                                <>They've responded positively to your demand letter. You're ready to analyze their response and move toward structuring a settlement. Complete the Response Analyzer tab next.</>
+                                            )}
+                                            {status === 'active-negotiation' && (
+                                                <>You're in active negotiations. Use the Term Sheet and Enforcement tabs to structure an enforceable agreement. Don't let negotiations drag on indefinitely without documenting agreed terms.</>
+                                            )}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="info-panel">
+                                        <div className="info-panel-title">
+                                            ⏳ Waiting for Response
+                                        </div>
+                                        <div className="info-panel-content">
+                                            You're waiting for their response to your demand. Use this tool to prepare for different response scenarios so you can move quickly when they reply. Review the Response Analyzer tab to understand what different types of responses mean.
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="warning-panel" style={{ marginTop: '2rem' }}>
+                                    <div className="warning-panel-title">
+                                        ⚖️ Settlement Communications Protection
+                                    </div>
+                                    <div className="info-panel-content">
+                                        <strong>Federal Rule of Evidence 408 and California Evidence Code § 1152:</strong> Settlement offers and statements made during compromise negotiations are generally not admissible to prove liability or amount of claim. Label your communications "For settlement purposes only; inadmissible under FRE 408 / Evidence Code § 1152." This doesn't create absolute privilege, but protects candid negotiation.
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        {activeTab === 'response' && (
+                            <>
+                                <div className="section-title">
+                                    <span className="section-icon">📨</span>
+                                    Response Analyzer
+                                </div>
+
+                                <div className="info-panel">
+                                    <div className="info-panel-title">
+                                        🔍 Decode Their Response
+                                    </div>
+                                    <div className="info-panel-content">
+                                        Not all positive responses are created equal. Understanding what kind of counterparty you're dealing with helps you structure the right negotiation approach and set appropriate expectations.
+                                    </div>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">What did they say? (Select all that apply)</label>
+
+                                    <div className="checkbox-group">
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox-input"
+                                            checked={responseType.offeredFull}
+                                            onChange={() => toggleResponseType('offeredFull')}
+                                            id="resp-full"
+                                        />
+                                        <label htmlFor="resp-full" className="checkbox-label">
+                                            Offered full amount requested
+                                        </label>
+                                    </div>
+
+                                    <div className="checkbox-group">
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox-input"
+                                            checked={responseType.offeredPartial}
+                                            onChange={() => toggleResponseType('offeredPartial')}
+                                            id="resp-partial"
+                                        />
+                                        <label htmlFor="resp-partial" className="checkbox-label">
+                                            Offered partial amount or compromise
+                                        </label>
+                                    </div>
+
+                                    <div className="checkbox-group">
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox-input"
+                                            checked={responseType.offeredNonMonetary}
+                                            onChange={() => toggleResponseType('offeredNonMonetary')}
+                                            id="resp-nonmon"
+                                        />
+                                        <label htmlFor="resp-nonmon" className="checkbox-label">
+                                            Offered non-monetary solution (fix work, remove content, etc.)
+                                        </label>
+                                    </div>
+
+                                    <div className="checkbox-group">
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox-input"
+                                            checked={responseType.deniedButInvited}
+                                            onChange={() => toggleResponseType('deniedButInvited')}
+                                            id="resp-invited"
+                                        />
+                                        <label htmlFor="resp-invited" className="checkbox-label">
+                                            Denied liability but invited "business solution"
+                                        </label>
+                                    </div>
+
+                                    <div className="checkbox-group">
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox-input"
+                                            checked={responseType.threatenedCounter}
+                                            onChange={() => toggleResponseType('threatenedCounter')}
+                                            id="resp-counter"
+                                        />
+                                        <label htmlFor="resp-counter" className="checkbox-label">
+                                            Threatened counterclaims or aggressive counterdemands
+                                        </label>
+                                    </div>
+
+                                    <div className="checkbox-group">
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox-input"
+                                            checked={responseType.demandedConfidentiality}
+                                            onChange={() => toggleResponseType('demandedConfidentiality')}
+                                            id="resp-confid"
+                                        />
+                                        <label htmlFor="resp-confid" className="checkbox-label">
+                                            Demanded strict confidentiality / non-disparagement
+                                        </label>
+                                    </div>
+
+                                    <div className="checkbox-group">
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox-input"
+                                            checked={responseType.demandedBroadRelease}
+                                            onChange={() => toggleResponseType('demandedBroadRelease')}
+                                            id="resp-release"
+                                        />
+                                        <label htmlFor="resp-release" className="checkbox-label">
+                                            Demanded overly broad release of all claims
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Have they hired a lawyer?</label>
+                                    <div className="radio-group">
+                                        <div className="radio-option">
+                                            <input
+                                                type="radio"
+                                                className="radio-input"
+                                                checked={hasLawyer === 'yes'}
+                                                onChange={() => setHasLawyer('yes')}
+                                                id="lawyer-yes"
+                                            />
+                                            <label htmlFor="lawyer-yes" className="checkbox-label">
+                                                Yes - They're represented by counsel
+                                            </label>
+                                        </div>
+                                        <div className="radio-option">
+                                            <input
+                                                type="radio"
+                                                className="radio-input"
+                                                checked={hasLawyer === 'no'}
+                                                onChange={() => setHasLawyer('no')}
+                                                id="lawyer-no"
+                                            />
+                                            <label htmlFor="lawyer-no" className="checkbox-label">
+                                                No - They're unrepresented
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="analysis-card">
+                                    <div className="analysis-header" style={{ color: responseAnalysis.color }}>
+                                        <span style={{ fontSize: '1.5rem' }}>{responseAnalysis.icon}</span>
+                                        {responseAnalysis.category}
+                                    </div>
+                                    <div className="analysis-content">
+                                        <p style={{ marginBottom: '1rem' }}><strong>Assessment:</strong> {responseAnalysis.description}</p>
+                                        <p style={{ marginBottom: '1rem' }}><strong>Your Leverage:</strong> {responseAnalysis.leverage}</p>
+                                    </div>
+
+                                    <div className="strategy-box">
+                                        <div className="strategy-title">Recommended Next Steps</div>
+                                        {responseAnalysis.nextSteps.map((step, idx) => (
+                                            <div key={idx} className="strategy-item">
+                                                <div className="strategy-icon">{idx + 1}</div>
+                                                <div className="strategy-text">{step}</div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {hasLawyer === 'no' && (
+                                    <div className="warning-panel">
+                                        <div className="warning-panel-title">
+                                            ⚠️ Dealing with Unrepresented Party
+                                        </div>
+                                        <div className="info-panel-content">
+                                            <strong>Ethical Obligations (ABA Model Rule 4.3 / CA RPC 4.3):</strong><br/><br/>
+                                            • You must not state or imply that you're disinterested or neutral<br/>
+                                            • You must make reasonable efforts to correct any misunderstanding about your role<br/>
+                                            • You cannot give them legal advice (beyond suggesting they get a lawyer)<br/>
+                                            • You CAN state your client's position and the terms your client will accept<br/><br/>
+                                            <strong>Recommended approach:</strong> Be explicitly clear: "I represent only [Client's] interests. I'm not your lawyer and can't advise you about whether this settlement is in your best interest. You should consider consulting your own lawyer before signing any settlement agreement."
+                                        </div>
+                                    </div>
+                                )}
+
+                                {responseAnalysis.category === 'Hardball Counterdemands' && (
+                                    <div className="info-panel">
+                                        <div className="info-panel-title">
+                                            💡 Responding to Hardball Tactics
+                                        </div>
+                                        <div className="info-panel-content">
+                                            Separate the reasonable from unreasonable. Often there are legitimate concerns buried in aggressive packaging. Your response should:<br/><br/>
+                                            • Identify areas of potential agreement (e.g., mutual releases limited to this project)<br/>
+                                            • Firmly reject unreasonable elements (e.g., not characterizing defective work as satisfactory)<br/>
+                                            • Propose narrower versions of reasonable requests<br/>
+                                            • Schedule a call to discuss factual basis rather than trading position papers<br/><br/>
+                                            Don't be intimidated, but recognize they've told you what concerns them and what they think your weak points are.
+                                        </div>
+                                    </div>
+                                )}
+                            </>
+                        )}
+
+                        {activeTab === 'termsheet' && (
+                            <>
+                                <div className="section-title">
+                                    <span className="section-icon">📄</span>
+                                    Term Sheet Builder
+                                </div>
+
+                                <div className="info-panel">
+                                    <div className="info-panel-title">
+                                        📋 Capture All Material Terms
+                                    </div>
+                                    <div className="info-panel-content">
+                                        The term sheet bridges loose conversations and enforceable agreement. Under California law (Weddington Productions), if material terms aren't agreed, there's no enforceable settlement. This tool helps ensure you've resolved all essential elements.
+                                    </div>
+                                </div>
+
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+                                    <div>
+                                        <div style={{ fontWeight: 700, marginBottom: '1rem', color: '#047857', fontSize: '1.1rem' }}>
+                                            Settlement Terms
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label className="form-label">Settlement Amount ($)</label>
+                                            <input
+                                                type="number"
+                                                className="form-input"
+                                                placeholder="e.g., 75000"
+                                                value={termSheet.settlementAmount}
+                                                onChange={(e) => updateTermSheet('settlementAmount', e.target.value)}
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label className="form-label">Payment Structure</label>
+                                            <select
+                                                className="form-select"
+                                                value={termSheet.paymentType}
+                                                onChange={(e) => updateTermSheet('paymentType', e.target.value)}
+                                            >
+                                                <option value="lump-sum">Lump sum payment</option>
+                                                <option value="installments">Installment payments</option>
+                                            </select>
+                                        </div>
+
+                                        {termSheet.paymentType === 'lump-sum' ? (
+                                            <div className="form-group">
+                                                <label className="form-label">Due within (business days)</label>
+                                                <input
+                                                    type="number"
+                                                    className="form-input"
+                                                    value={termSheet.firstPaymentDays}
+                                                    onChange={(e) => updateTermSheet('firstPaymentDays', e.target.value)}
+                                                />
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <div className="input-grid">
+                                                    <div className="form-group">
+                                                        <label className="form-label">Number of Installments</label>
+                                                        <input
+                                                            type="number"
+                                                            className="form-input"
+                                                            value={termSheet.installments}
+                                                            onChange={(e) => updateTermSheet('installments', e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div className="form-group">
+                                                        <label className="form-label">First Payment (days)</label>
+                                                        <input
+                                                            type="number"
+                                                            className="form-input"
+                                                            value={termSheet.firstPaymentDays}
+                                                            onChange={(e) => updateTermSheet('firstPaymentDays', e.target.value)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="input-grid">
+                                                    <div className="form-group">
+                                                        <label className="form-label">Interval Between Payments (days)</label>
+                                                        <input
+                                                            type="number"
+                                                            className="form-input"
+                                                            value={termSheet.installmentInterval}
+                                                            onChange={(e) => updateTermSheet('installmentInterval', e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div className="form-group">
+                                                        <label className="form-label">Late Payment Interest (%)</label>
+                                                        <input
+                                                            type="number"
+                                                            className="form-input"
+                                                            value={termSheet.interestRate}
+                                                            onChange={(e) => updateTermSheet('interestRate', e.target.value)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </>
+                                        )}
+
+                                        <div className="form-group">
+                                            <label className="form-label">Release Type</label>
+                                            <select
+                                                className="form-select"
+                                                value={termSheet.releaseType}
+                                                onChange={(e) => updateTermSheet('releaseType', e.target.value)}
+                                            >
+                                                <option value="mutual">Mutual (both parties release each other)</option>
+                                                <option value="unilateral">Unilateral (I release them only)</option>
+                                            </select>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label className="form-label">Release Scope</label>
+                                            <select
+                                                className="form-select"
+                                                value={termSheet.releaseScope}
+                                                onChange={(e) => updateTermSheet('releaseScope', e.target.value)}
+                                            >
+                                                <option value="project-specific">Project-specific (claims arising from this transaction only)</option>
+                                                <option value="broad">Broad (all claims whatsoever, known or unknown)</option>
+                                            </select>
+                                        </div>
+
+                                        <div className="checkbox-group">
+                                            <input
+                                                type="checkbox"
+                                                className="checkbox-input"
+                                                checked={termSheet.includeCA1542}
+                                                onChange={() => updateTermSheet('includeCA1542', !termSheet.includeCA1542)}
+                                                id="ca1542"
+                                            />
+                                            <label htmlFor="ca1542" className="checkbox-label">
+                                                Include California Civil Code § 1542 waiver (releases unknown claims)
+                                            </label>
+                                        </div>
+
+                                        {termSheet.includeCA1542 && (
+                                            <div className="warning-panel" style={{ marginTop: '0.5rem' }}>
+                                                <div className="warning-panel-title">
+                                                    ⚠️ § 1542 Waiver Significance
+                                                </div>
+                                                <div className="info-panel-content">
+                                                    Waiving § 1542 means you're releasing claims you don't even know about yet. CA Civil Code § 1542 normally protects unknown claims from general releases. This waiver is standard in commercial settlements but is a significant concession.
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        <div className="checkbox-group">
+                                            <input
+                                                type="checkbox"
+                                                className="checkbox-input"
+                                                checked={termSheet.confidentiality}
+                                                onChange={() => updateTermSheet('confidentiality', !termSheet.confidentiality)}
+                                                id="confidential"
+                                            />
+                                            <label htmlFor="confidential" className="checkbox-label">
+                                                Include confidentiality provision
+                                            </label>
+                                        </div>
+
+                                        <div className="checkbox-group">
+                                            <input
+                                                type="checkbox"
+                                                className="checkbox-input"
+                                                checked={termSheet.nonDisparagement}
+                                                onChange={() => updateTermSheet('nonDisparagement', !termSheet.nonDisparagement)}
+                                                id="nondispar"
+                                            />
+                                            <label htmlFor="nondispar" className="checkbox-label">
+                                                Include mutual non-disparagement
+                                            </label>
+                                        </div>
+
+                                        <div className="checkbox-group">
+                                            <input
+                                                type="checkbox"
+                                                className="checkbox-input"
+                                                checked={termSheet.noAdmission}
+                                                onChange={() => updateTermSheet('noAdmission', !termSheet.noAdmission)}
+                                                id="noadmit"
+                                            />
+                                            <label htmlFor="noadmit" className="checkbox-label">
+                                                Include "no admission of liability" clause
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div style={{ fontWeight: 700, marginBottom: '1rem', color: '#047857', fontSize: '1.1rem' }}>
+                                            Preview
+                                        </div>
+                                        <div className="term-sheet-preview">
+                                            {termSheetPreview}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="warning-panel" style={{ marginTop: '2rem' }}>
+                                    <div className="warning-panel-title">
+                                        ⚠️ The Weddington Problem
+                                    </div>
+                                    <div className="info-panel-content">
+                                        <strong>Weddington Productions, Inc. v. Flick:</strong> If material terms aren't agreed, there's no enforceable settlement. "Defendant will pay a reasonable amount to be determined later" is NOT enforceable. All material terms (amount, timing, scope of release, conditions, ongoing obligations) must be resolved or have a clear mechanism for resolution.
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        {activeTab === 'enforcement' && (
+                            <>
+                                <div className="section-title">
+                                    <span className="section-icon">⚖️</span>
+                                    Enforcement Mechanisms
+                                </div>
+
+                                <div className="info-panel">
+                                    <div className="info-panel-title">
+                                        🔒 Make Your Settlement Stick
+                                    </div>
+                                    <div className="info-panel-content">
+                                        An enforceable term sheet isn't enough. You need enforcement mechanisms that make it faster and cheaper to enforce than relitigating the original dispute. Otherwise, you've just traded one potential lawsuit for another.
+                                    </div>
+                                </div>
+
+                                {claimPosture === 'in-litigation' && (
+                                    <div
+                                        className={`enforcement-option ${enforcementMechanisms.section664_6 ? 'selected' : ''}`}
+                                        onClick={() => toggleEnforcement('section664_6')}
+                                    >
+                                        <div className="enforcement-title">
+                                            <input
+                                                type="checkbox"
+                                                checked={enforcementMechanisms.section664_6}
+                                                onChange={() => {}}
+                                                style={{ marginRight: '0.5rem' }}
+                                            />
+                                            California CCP § 664.6 Retained Jurisdiction
+                                        </div>
+                                        <div className="enforcement-description">
+                                            <strong>When to use:</strong> Settling a case already in California litigation<br/><br/>
+                                            <strong>How it works:</strong> Court retains jurisdiction to enforce settlement. If defendant defaults, file motion under § 664.6 to enter judgment. No need for new lawsuit.<br/><br/>
+                                            <strong>Requirements:</strong> Written stipulation signed by parties (or oral stipulation on record) explicitly stating court retains jurisdiction. Must be done BEFORE dismissal.<br/><br/>
+                                            <strong>Advantage:</strong> Fast enforcement through existing case. Court doesn't relitigate merits, only whether valid settlement exists and whether defendant breached.<br/><br/>
+                                            <strong>Note:</strong> Many sophisticated settlements delay dismissal until all payments made, to preserve § 664.6 enforcement option.
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div
+                                    className={`enforcement-option ${enforcementMechanisms.stipulatedJudgment ? 'selected' : ''}`}
+                                    onClick={() => toggleEnforcement('stipulatedJudgment')}
+                                >
+                                    <div className="enforcement-title">
+                                        <input
+                                            type="checkbox"
+                                            checked={enforcementMechanisms.stipulatedJudgment}
+                                            onChange={() => {}}
+                                            style={{ marginRight: '0.5rem' }}
+                                        />
+                                        Stipulated Judgment on Default
+                                    </div>
+                                    <div className="enforcement-description">
+                                        <strong>When to use:</strong> Cases in litigation where you want immediate enforcement power<br/><br/>
+                                        <strong>How it works:</strong> Draft agreed judgment for full settlement amount plus interest/fees. File with court but stipulate it only becomes effective upon default. If defendant pays, judgment never enters. If defendant defaults, simple motion enters judgment immediately.<br/><br/>
+                                        <strong>What constitutes default:</strong> Must be crystal clear. "Default occurs if any installment not received within 5 business days of due date."<br/><br/>
+                                        <strong>Advantage:</strong> Once judgment entered, immediate collection proceedings (wage garnishment, bank levies, property liens) without new lawsuit.<br/><br/>
+                                        <strong>Limitation:</strong> Requires existing lawsuit. If settling pre-litigation, would need to file suit to use this mechanism.
+                                    </div>
+                                </div>
+
+                                <div
+                                    className={`enforcement-option ${enforcementMechanisms.personalGuarantee ? 'selected' : ''}`}
+                                    onClick={() => toggleEnforcement('personalGuarantee')}
+                                >
+                                    <div className="enforcement-title">
+                                        <input
+                                            type="checkbox"
+                                            checked={enforcementMechanisms.personalGuarantee}
+                                            onChange={() => {}}
+                                            style={{ marginRight: '0.5rem' }}
+                                        />
+                                        Personal Guarantee from Principal
+                                    </div>
+                                    <div className="enforcement-description">
+                                        <strong>When to use:</strong> Settling with corporate defendant when concerned about ability to pay<br/><br/>
+                                        <strong>How it works:</strong> Individual (typically owner/principal) personally guarantees corporate settlement obligations. Makes individual personally liable without needing to pierce corporate veil.<br/><br/>
+                                        <strong>Implementation:</strong> Include in settlement agreement, not separate document. Add signature block: "Personally Guaranteed By: [Name], individually."<br/><br/>
+                                        <strong>Advantage:</strong> Can pursue individual's personal assets if corporation defaults. Particularly valuable in small business disputes where company has limited assets but owner has personal wealth.<br/><br/>
+                                        <strong>Consideration:</strong> In California, guarantee affecting community property may require both spouses' signatures depending on circumstances.
+                                    </div>
+                                </div>
+
+                                <div
+                                    className={`enforcement-option ${enforcementMechanisms.accelerationClause ? 'selected' : ''}`}
+                                    onClick={() => toggleEnforcement('accelerationClause')}
+                                >
+                                    <div className="enforcement-title">
+                                        <input
+                                            type="checkbox"
+                                            checked={enforcementMechanisms.accelerationClause}
+                                            onChange={() => {}}
+                                            style={{ marginRight: '0.5rem' }}
+                                        />
+                                        Acceleration Clause (for installments)
+                                    </div>
+                                    <div className="enforcement-description">
+                                        <strong>When to use:</strong> Any installment payment settlement<br/><br/>
+                                        <strong>How it works:</strong> If any installment more than specified days late (typically 5-10 business days), entire unpaid balance becomes immediately due at plaintiff's option.<br/><br/>
+                                        <strong>Sample language:</strong> "If Defendant fails to make any installment payment within 5 business days of due date, Plaintiff may, at sole option, declare entire unpaid balance immediately due and payable and may immediately seek enforcement including entry of judgment."<br/><br/>
+                                        <strong>Advantage:</strong> Without acceleration clause, you'd need to wait for each payment to become due before enforcing that specific payment. Acceleration allows enforcing full remaining amount after first default.<br/><br/>
+                                        <strong>Also include:</strong> Default interest (higher rate on late payments) and provision that defaulting party pays attorney's fees for enforcement.
+                                    </div>
+                                </div>
+
+                                <div className="warning-panel">
+                                    <div className="warning-panel-title">
+                                        ⚠️ Confessions of Judgment: Proceed with Caution
+                                    </div>
+                                    <div className="info-panel-content">
+                                        <strong>What they are:</strong> Debtor authorizes creditor to obtain judgment without notice or hearing.<br/><br/>
+                                        <strong>Status:</strong> California has effectively eliminated them (CCP § 1132 amendments). New York has imposed restrictions. Maryland bans them in consumer contracts. Many states prohibit or restrict them.<br/><br/>
+                                        <strong>General advice:</strong> Use stipulated judgments or § 664.6 retained jurisdiction instead. Confessions of judgment create enforceability problems and are particularly problematic in consumer contexts or where there's power imbalance.
+                                    </div>
+                                </div>
+
+                                <div className="info-panel">
+                                    <div className="info-panel-title">
+                                        💡 Default Enforcement Method
+                                    </div>
+                                    <div className="info-panel-content">
+                                        Without special enforcement mechanisms, your remedy for settlement default is to sue for breach of the settlement agreement. This is better than relitigating the original dispute (simpler facts, liquidated damages) but still expensive and time-consuming. For settlements under $50k, cost of new breach-of-contract action often makes enforcement impractical, which reduces other side's incentive to comply.
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        {activeTab === 'checklist' && (
+                            <>
+                                <div className="section-title">
+                                    <span className="section-icon">✓</span>
+                                    Make-It-Stick Checklist
+                                </div>
+
+                                <div className="info-panel">
+                                    <div className="info-panel-title">
+                                        📋 Enforceability Checklist
+                                    </div>
+                                    <div className="info-panel-content">
+                                        Use this checklist to ensure your settlement agreement will be enforceable and that you haven't overlooked critical elements. Check off items as you complete them.
+                                    </div>
+                                </div>
+
+                                <div className="progress-bar">
+                                    <div className="progress-fill" style={{ width: `${checklistProgress.percentage}%` }}>
+                                        {checklistProgress.percentage}% Complete
+                                    </div>
+                                </div>
+
+                                <div style={{ textAlign: 'center', marginBottom: '2rem', color: '#64748b', fontSize: '0.95rem' }}>
+                                    {checklistProgress.completedItems} of {checklistProgress.totalItems} items completed
+                                </div>
+
+                                <div className={`confidence-meter ${checklistProgress.confidence}`}>
+                                    <div className="confidence-label">
+                                        {checklistProgress.confidence === 'high' && '✓ High Enforceability Confidence'}
+                                        {checklistProgress.confidence === 'medium' && '⚠️ Medium Enforceability Confidence'}
+                                        {checklistProgress.confidence === 'low' && '⚠️ Low Enforceability Confidence'}
+                                    </div>
+                                    <div className="confidence-description">
+                                        {checklistProgress.confidence === 'high' && 'Your settlement agreement appears to have all essential elements for enforceability. Review one final time before execution.'}
+                                        {checklistProgress.confidence === 'medium' && 'You\'re making good progress, but several important items remain. Complete remaining checklist items before finalizing settlement.'}
+                                        {checklistProgress.confidence === 'low' && 'Multiple critical elements are missing. Address these issues to ensure you have an enforceable settlement agreement.'}
+                                    </div>
+                                </div>
+
+                                <div className="checklist-section">
+                                    <div className="checklist-header">
+                                        📄 Material Terms
+                                    </div>
+
+                                    <div className="checklist-item">
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox-input"
+                                            checked={checklistItems.term1 || false}
+                                            onChange={() => toggleChecklistItem('term1')}
+                                            id="term1"
+                                        />
+                                        <div>
+                                            <label htmlFor="term1" className="checklist-label">
+                                                All monetary terms are specific (amount, currency, payment dates)
+                                            </label>
+                                            <div className="checklist-description">
+                                                No "reasonable amount" or "to be determined later" language. Exact dollar amounts and dates specified.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="checklist-item">
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox-input"
+                                            checked={checklistItems.term2 || false}
+                                            onChange={() => toggleChecklistItem('term2')}
+                                            id="term2"
+                                        />
+                                        <div>
+                                            <label htmlFor="term2" className="checklist-label">
+                                                Scope of release is clearly defined
+                                            </label>
+                                            <div className="checklist-description">
+                                                Project-specific vs. broad release is specified. Parties clearly identified (individuals, entities, affiliates).
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="checklist-item">
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox-input"
+                                            checked={checklistItems.term3 || false}
+                                            onChange={() => toggleChecklistItem('term3')}
+                                            id="term3"
+                                        />
+                                        <div>
+                                            <label htmlFor="term3" className="checklist-label">
+                                                Any non-monetary obligations are specific and measurable
+                                            </label>
+                                            <div className="checklist-description">
+                                                "Complete punch list items in Exhibit A within 30 days" not "finish work in reasonable time."
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="checklist-item">
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox-input"
+                                            checked={checklistItems.term4 || false}
+                                            onChange={() => toggleChecklistItem('term4')}
+                                            id="term4"
+                                        />
+                                        <div>
+                                            <label htmlFor="term4" className="checklist-label">
+                                                No "agree to agree later" placeholders for core issues
+                                            </label>
+                                            <div className="checklist-description">
+                                                License scope, IP ownership, payment terms all resolved now, not deferred to future negotiation.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="checklist-section">
+                                    <div className="checklist-header">
+                                        ✍️ Signature & Execution
+                                    </div>
+
+                                    <div className="checklist-item">
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox-input"
+                                            checked={checklistItems.sig1 || false}
+                                            onChange={() => toggleChecklistItem('sig1')}
+                                            id="sig1"
+                                        />
+                                        <div>
+                                            <label htmlFor="sig1" className="checklist-label">
+                                                Both sides (not just lawyers) will sign final agreement
+                                            </label>
+                                            <div className="checklist-description">
+                                                Parties themselves must sign for enforceability. Counsel signatures alone insufficient.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="checklist-item">
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox-input"
+                                            checked={checklistItems.sig2 || false}
+                                            onChange={() => toggleChecklistItem('sig2')}
+                                            id="sig2"
+                                        />
+                                        <div>
+                                            <label htmlFor="sig2" className="checklist-label">
+                                                Signatories have authority to bind their entities
+                                            </label>
+                                            <div className="checklist-description">
+                                                Officers/owners with authority signing. Include representation that signatory authorized to bind.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="checklist-item">
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox-input"
+                                            checked={checklistItems.sig3 || false}
+                                            onChange={() => toggleChecklistItem('sig3')}
+                                            id="sig3"
+                                        />
+                                        <div>
+                                            <label htmlFor="sig3" className="checklist-label">
+                                                If personal guarantee required, principal will sign individually
+                                            </label>
+                                            <div className="checklist-description">
+                                                Separate signature block for personal guarantor, clearly labeled "individually" not just corporate capacity.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="checklist-section">
+                                    <div className="checklist-header">
+                                        ⚖️ Enforcement Architecture
+                                    </div>
+
+                                    <div className="checklist-item">
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox-input"
+                                            checked={checklistItems.enf1 || false}
+                                            onChange={() => toggleChecklistItem('enf1')}
+                                            id="enf1"
+                                        />
+                                        <div>
+                                            <label htmlFor="enf1" className="checklist-label">
+                                                Chosen appropriate enforcement mechanism(s)
+                                            </label>
+                                            <div className="checklist-description">
+                                                § 664.6 if in CA litigation, stipulated judgment, personal guarantee, or at minimum acceleration clause.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="checklist-item">
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox-input"
+                                            checked={checklistItems.enf2 || false}
+                                            onChange={() => toggleChecklistItem('enf2')}
+                                            id="enf2"
+                                        />
+                                        <div>
+                                            <label htmlFor="enf2" className="checklist-label">
+                                                If using § 664.6, will have stipulation before dismissal
+                                            </label>
+                                            <div className="checklist-description">
+                                                Written stipulation signed by parties or oral stipulation on record BEFORE case dismissed.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="checklist-item">
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox-input"
+                                            checked={checklistItems.enf3 || false}
+                                            onChange={() => toggleChecklistItem('enf3')}
+                                            id="enf3"
+                                        />
+                                        <div>
+                                            <label htmlFor="enf3" className="checklist-label">
+                                                If installments, includes acceleration clause for defaults
+                                            </label>
+                                            <div className="checklist-description">
+                                                Can declare entire unpaid balance immediately due after first default. Don't have to wait for each payment.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="checklist-item">
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox-input"
+                                            checked={checklistItems.enf4 || false}
+                                            onChange={() => toggleChecklistItem('enf4')}
+                                            id="enf4"
+                                        />
+                                        <div>
+                                            <label htmlFor="enf4" className="checklist-label">
+                                                Attorney's fees provision for enforcement
+                                            </label>
+                                            <div className="checklist-description">
+                                                Prevailing party in action to enforce settlement recovers attorney's fees. Creates incentive for compliance.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="checklist-section">
+                                    <div className="checklist-header">
+                                        🔒 Protective Provisions
+                                    </div>
+
+                                    <div className="checklist-item">
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox-input"
+                                            checked={checklistItems.prot1 || false}
+                                            onChange={() => toggleChecklistItem('prot1')}
+                                            id="prot1"
+                                        />
+                                        <div>
+                                            <label htmlFor="prot1" className="checklist-label">
+                                                Release scope matches what you intend to give up
+                                            </label>
+                                            <div className="checklist-description">
+                                                If releasing only project-specific claims, language clearly limits scope. Not inadvertently releasing unrelated claims.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="checklist-item">
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox-input"
+                                            checked={checklistItems.prot2 || false}
+                                            onChange={() => toggleChecklistItem('prot2')}
+                                            id="prot2"
+                                        />
+                                        <div>
+                                            <label htmlFor="prot2" className="checklist-label">
+                                                If waiving § 1542 (CA), understand you're releasing unknown claims
+                                            </label>
+                                            <div className="checklist-description">
+                                                Significant concession. Standard in commercial deals but means giving up claims you don't know about.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="checklist-item">
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox-input"
+                                            checked={checklistItems.prot3 || false}
+                                            onChange={() => toggleChecklistItem('prot3')}
+                                            id="prot3"
+                                        />
+                                        <div>
+                                            <label htmlFor="prot3" className="checklist-label">
+                                                Confidentiality has proper carve-outs
+                                            </label>
+                                            <div className="checklist-description">
+                                                Permits: discussions with family/advisors, response to subpoenas, regulatory cooperation, disclosures required by law.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="checklist-item">
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox-input"
+                                            checked={checklistItems.prot4 || false}
+                                            onChange={() => toggleChecklistItem('prot4')}
+                                            id="prot4"
+                                        />
+                                        <div>
+                                            <label htmlFor="prot4" className="checklist-label">
+                                                Non-disparagement is mutual and has appropriate exceptions
+                                            </label>
+                                            <div className="checklist-description">
+                                                Both parties have same obligations. Permits truthful testimony, regulatory cooperation, discussions with advisors.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="checklist-section">
+                                    <div className="checklist-header">
+                                        📋 Boilerplate That Matters
+                                    </div>
+
+                                    <div className="checklist-item">
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox-input"
+                                            checked={checklistItems.boil1 || false}
+                                            onChange={() => toggleChecklistItem('boil1')}
+                                            id="boil1"
+                                        />
+                                        <div>
+                                            <label htmlFor="boil1" className="checklist-label">
+                                                Entire agreement / integration clause
+                                            </label>
+                                            <div className="checklist-description">
+                                                Settlement constitutes entire agreement and supersedes all prior negotiations and understandings.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="checklist-item">
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox-input"
+                                            checked={checklistItems.boil2 || false}
+                                            onChange={() => toggleChecklistItem('boil2')}
+                                            id="boil2"
+                                        />
+                                        <div>
+                                            <label htmlFor="boil2" className="checklist-label">
+                                                Governing law and forum for enforcement specified
+                                            </label>
+                                            <div className="checklist-description">
+                                                Which state's law governs. Where you'd sue to enforce (if differs from original contract/litigation venue).
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="checklist-item">
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox-input"
+                                            checked={checklistItems.boil3 || false}
+                                            onChange={() => toggleChecklistItem('boil3')}
+                                            id="boil3"
+                                        />
+                                        <div>
+                                            <label htmlFor="boil3" className="checklist-label">
+                                                Counterparts and e-signature provision if needed
+                                            </label>
+                                            <div className="checklist-description">
+                                                Parties can sign separate signature pages. Electronic signatures as valid as wet signatures.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="checklist-item">
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox-input"
+                                            checked={checklistItems.boil4 || false}
+                                            onChange={() => toggleChecklistItem('boil4')}
+                                            id="boil4"
+                                        />
+                                        <div>
+                                            <label htmlFor="boil4" className="checklist-label">
+                                                Severability clause
+                                            </label>
+                                            <div className="checklist-description">
+                                                If one provision unenforceable, remainder of agreement remains valid.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="checklist-section">
+                                    <div className="checklist-header">
+                                        ⚠️ Risk Mitigation
+                                    </div>
+
+                                    <div className="checklist-item">
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox-input"
+                                            checked={checklistItems.risk1 || false}
+                                            onChange={() => toggleChecklistItem('risk1')}
+                                            id="risk1"
+                                        />
+                                        <div>
+                                            <label htmlFor="risk1" className="checklist-label">
+                                                If other side unrepresented, gave proper warnings
+                                            </label>
+                                            <div className="checklist-description">
+                                                Explicitly stated you don't represent them, can't advise about fairness, they should get lawyer (Rule 4.3).
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="checklist-item">
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox-input"
+                                            checked={checklistItems.risk2 || false}
+                                            onChange={() => toggleChecklistItem('risk2')}
+                                            id="risk2"
+                                        />
+                                        <div>
+                                            <label htmlFor="risk2" className="checklist-label">
+                                                No provisions blocking regulatory cooperation
+                                            </label>
+                                            <div className="checklist-description">
+                                                Cannot lawfully prevent filing complaints with agencies or cooperating with investigations.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
+                        {activeTab === 'resources' && (
+                            <>
+                                <div className="section-title">
+                                    <span className="section-icon">🔗</span>
+                                    Resources & Sample Language
+                                </div>
+
+                                <div className="info-panel">
+                                    <div className="info-panel-title">
+                                        📚 Settlement Agreement Resources
+                                    </div>
+                                    <div className="info-panel-content">
+                                        These resources provide detailed guidance on settlement negotiations, enforcement mechanisms, and common pitfalls. Always consult with an attorney for your specific situation.
+                                    </div>
+                                </div>
+
+                                <div style={{ fontWeight: 700, marginBottom: '1rem', color: '#047857', fontSize: '1.15rem' }}>
+                                    Legal Authorities & References
+                                </div>
+
+                                <div className="resources-grid">
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>⚖️</span>
+                                            Federal Rule of Evidence 408
+                                        </div>
+                                        <div className="resource-description">
+                                            Cornell Legal Information Institute's analysis of FRE 408 on admissibility of settlement offers and compromise negotiations. Explains what's protected and what's not.
+                                        </div>
+                                        <a href="https://www.law.cornell.edu/rules/fre/rule_408" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Read FRE 408 →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>📖</span>
+                                            California Evidence Code §§ 1152, 1154
+                                        </div>
+                                        <div className="resource-description">
+                                            California's parallel rules protecting settlement negotiations and offers to compromise. Slightly different from federal rules in scope and application.
+                                        </div>
+                                        <a href="https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=EVID&sectionNum=1152" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Read Evidence Code § 1152 →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>⚡</span>
+                                            California CCP § 664.6
+                                        </div>
+                                        <div className="resource-description">
+                                            Code of Civil Procedure Section 664.6 on court retention of jurisdiction to enforce settlements. Critical enforcement mechanism for California litigation.
+                                        </div>
+                                        <a href="https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CCP&sectionNum=664.6" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Read CCP § 664.6 →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>📜</span>
+                                            California Civil Code § 1542
+                                        </div>
+                                        <div className="resource-description">
+                                            California statute protecting unknown claims from general releases unless explicitly waived. Understanding this statute is critical for California settlements.
+                                        </div>
+                                        <a href="https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=1542" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Read Civil Code § 1542 →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>⚖️</span>
+                                            ABA Model Rule 4.3
+                                        </div>
+                                        <div className="resource-description">
+                                            Ethics rule governing dealings with unrepresented persons. Essential guidance when negotiating with parties who don't have lawyers.
+                                        </div>
+                                        <a href="https://www.americanbar.org/groups/professional_responsibility/publications/model_rules_of_professional_conduct/rule_4_3_dealing_with_unrepresented_person/" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Read Model Rule 4.3 →
+                                        </a>
+                                    </div>
+
+                                    <div className="resource-card">
+                                        <div className="resource-title">
+                                            <span>📘</span>
+                                            Weddington Productions v. Flick
+                                        </div>
+                                        <div className="resource-description">
+                                            Leading California case on when settlement agreements are enforceable. Material terms must be agreed or there's no meeting of minds.
+                                        </div>
+                                        <a href="https://scholar.google.com/" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                            Search Case Law →
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <div style={{ fontWeight: 700, marginTop: '3rem', marginBottom: '1rem', color: '#047857', fontSize: '1.15rem' }}>
+                                    Sample Communication Language
+                                </div>
+
+                                <div className="sample-language-box">
+                                    <div className="sample-title">Email Subject Line - Settlement Discussions</div>
+                                    <div className="sample-text">
+Subject: Settlement Discussion – [Case Name] – For Settlement Purposes Only, Fed. R. Evid. 408 / Cal. Evid. Code § 1152
+                                    </div>
+                                </div>
+
+                                <div className="sample-language-box">
+                                    <div className="sample-title">Opening Paragraph - Protecting Settlement Talks</div>
+                                    <div className="sample-text">
+This communication is for settlement purposes only and is inadmissible under Federal Rule of Evidence 408, California Evidence Code Section 1152, and similar provisions. Nothing in this communication shall be construed as an admission of liability or as waiving any rights or defenses.
+                                    </div>
+                                </div>
+
+                                <div className="sample-language-box">
+                                    <div className="sample-title">Moving to Term Sheet Discussion</div>
+                                    <div className="sample-text">
+Based on our productive conversations, I suggest we reduce our understanding to writing in a term sheet format. If we are able to agree on the points below, I suggest we reduce them to a full settlement agreement with mutual releases. Please review and let me know if these terms accurately reflect our discussion or if you have corrections.
+                                    </div>
+                                </div>
+
+                                <div className="sample-language-box">
+                                    <div className="sample-title">Dealing with Unrepresented Party</div>
+                                    <div className="sample-text">
+I represent [Client Name] and only [Client's] interests in this matter. I am not your lawyer and I cannot advise you about whether this settlement proposal is in your best interest or what rights you may be giving up. You should consider consulting your own lawyer before signing any settlement agreement. I can explain what my client is proposing and what my client's legal position is, but I cannot provide you with legal advice about your options or rights.
+                                    </div>
+                                </div>
+
+                                <div className="sample-language-box">
+                                    <div className="sample-title">Acceleration Clause (Installments)</div>
+                                    <div className="sample-text">
+If [Defendant/Respondent] fails to make any installment payment within five (5) business days of the due date, [Plaintiff/Claimant] may, at its sole option, declare the entire unpaid balance immediately due and payable and may immediately seek enforcement of this Agreement including entry of judgment under the stipulated judgment provision herein.
+                                    </div>
+                                </div>
+
+                                <div className="warning-panel" style={{ marginTop: '2rem' }}>
+                                    <div className="warning-panel-title">
+                                        ⚠️ Disclaimer
+                                    </div>
+                                    <div className="info-panel-content">
+                                        <strong>These sample phrases are for educational purposes only and do not constitute legal advice.</strong> Every settlement situation is different and requires customization based on specific facts, applicable law, and strategic considerations. Always consult with an attorney licensed in your jurisdiction before finalizing settlement agreements. Sample language should be adapted to your specific circumstances and reviewed for compliance with local rules and recent case law.
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<SettlementPlanner />, document.getElementById('root'));
+    </script>
+</body>
+</html>
