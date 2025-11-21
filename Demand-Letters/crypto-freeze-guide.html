@@ -1,0 +1,1498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Exchange Fund Freeze Analyzer</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #1e293b;
+            background: linear-gradient(135deg, #0c4a6e 0%, #0891b2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        #root {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .widget-header {
+            background: linear-gradient(135deg, #0c4a6e 0%, #0891b2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .widget-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .widget-subtitle {
+            font-size: 16px;
+            opacity: 0.95;
+            font-weight: 400;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f1f5f9;
+            border-bottom: 2px solid #e2e8f0;
+            overflow-x: auto;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 16px 24px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            font-size: 15px;
+            font-weight: 500;
+            color: #64748b;
+            transition: all 0.2s;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab:hover {
+            background: #e2e8f0;
+            color: #0c4a6e;
+        }
+
+        .tab.active {
+            color: #0c4a6e;
+            background: white;
+            border-bottom-color: #0891b2;
+        }
+
+        .tab-content {
+            padding: 30px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #0c4a6e;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #0891b2;
+        }
+
+        .section-subtitle {
+            font-size: 18px;
+            font-weight: 600;
+            color: #0f172a;
+            margin: 25px 0 15px 0;
+        }
+
+        .info-text {
+            color: #475569;
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1e293b;
+            font-size: 14px;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #0891b2;
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            cursor: pointer;
+            font-weight: 500;
+            color: #334155;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0c4a6e 0%, #0891b2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(8, 145, 178, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #0c4a6e;
+            border: 2px solid #0891b2;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .result-box {
+            background: #f0f9ff;
+            border: 2px solid #0891b2;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .result-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0c4a6e;
+            margin-bottom: 15px;
+        }
+
+        .risk-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .risk-low {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .risk-medium {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .risk-high {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .exchange-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.2s;
+        }
+
+        .exchange-card:hover {
+            border-color: #0891b2;
+            box-shadow: 0 4px 12px rgba(8, 145, 178, 0.15);
+        }
+
+        .exchange-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0c4a6e;
+            margin-bottom: 10px;
+        }
+
+        .exchange-detail {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .exchange-detail:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .detail-value {
+            color: #1e293b;
+            font-weight: 500;
+            text-align: right;
+        }
+
+        .letter-output {
+            background: #f8fafc;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            max-height: 600px;
+            overflow-y: auto;
+            line-height: 1.8;
+        }
+
+        .letter-output::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .letter-output::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+
+        .letter-output::-webkit-scrollbar-thumb {
+            background: #0891b2;
+            border-radius: 10px;
+        }
+
+        .timeline-item {
+            border-left: 3px solid #0891b2;
+            padding-left: 20px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .timeline-item:before {
+            content: '';
+            width: 12px;
+            height: 12px;
+            background: #0891b2;
+            border: 3px solid white;
+            border-radius: 50%;
+            position: absolute;
+            left: -8px;
+            top: 0;
+        }
+
+        .timeline-title {
+            font-weight: 700;
+            color: #0c4a6e;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .timeline-description {
+            color: #475569;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .resource-link {
+            display: block;
+            padding: 15px;
+            background: #f0f9ff;
+            border-left: 4px solid #0891b2;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            color: #0c4a6e;
+            text-decoration: none;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .resource-link:hover {
+            background: #e0f2fe;
+            padding-left: 20px;
+        }
+
+        .alert {
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            border-color: #3b82f6;
+            color: #1e40af;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            border-color: #f59e0b;
+            color: #92400e;
+        }
+
+        .alert-danger {
+            background: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+
+        .slider-container {
+            margin: 20px 0;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #e2e8f0;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #0891b2;
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #0891b2;
+            cursor: pointer;
+            border: none;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .widget-title {
+                font-size: 22px;
+            }
+
+            .tab {
+                padding: 12px 16px;
+                font-size: 14px;
+            }
+
+            .tab-content {
+                padding: 20px;
+            }
+
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useMemo } = React;
+
+        const CryptoFreezeWidget = () => {
+            const [activeTab, setActiveTab] = useState('overview');
+
+            // Triage wizard state
+            const [exchange, setExchange] = useState('coinbase');
+            const [accountType, setAccountType] = useState('individual');
+            const [amountFrozen, setAmountFrozen] = useState('');
+            const [daysFrozen, setDaysFrozen] = useState('');
+            const [kycCompleted, setKycCompleted] = useState(true);
+            const [lawEnforcementContact, setLawEnforcementContact] = useState(false);
+            const [usedMixers, setUsedMixers] = useState(false);
+            const [depositMethod, setDepositMethod] = useState('wire');
+            const [providedDocs, setProvidedDocs] = useState(true);
+
+            // Demand letter generator state
+            const [letterExchange, setLetterExchange] = useState('coinbase');
+            const [fullName, setFullName] = useState('');
+            const [accountEmail, setAccountEmail] = useState('');
+            const [freezeDate, setFreezeDate] = useState('');
+            const [frozenAmount, setFrozenAmount] = useState('');
+            const [incidentDescription, setIncidentDescription] = useState('');
+
+            // Timeline calculator state
+            const [noticeDate, setNoticeDate] = useState('');
+            const [firstComplaintDate, setFirstComplaintDate] = useState('');
+
+            // Risk assessment state
+            const [riskAmount, setRiskAmount] = useState(50000);
+            const [riskDuration, setRiskDuration] = useState(30);
+            const [riskResponsiveness, setRiskResponsiveness] = useState(5);
+            const [riskFlags, setRiskFlags] = useState(3);
+
+            const exchangeData = {
+                coinbase: {
+                    name: 'Coinbase',
+                    fullName: 'Coinbase, Inc.',
+                    address: '100 Pine Street, Suite 1250',
+                    city: 'San Francisco, CA 94111',
+                    disputeEmail: 'disputes@coinbase.com',
+                    noticeRequirement: 'Written Notice of Dispute per User Agreement Appendix 5',
+                    waitingPeriod: '60 days',
+                    arbitrationForum: 'AAA Consumer Rules',
+                    complaintRate: 'High',
+                    regulatoryHistory: 'SEC civil action dismissed 2025',
+                    userAgreementUrl: 'https://www.coinbase.com/legal/user_agreement/united_states'
+                },
+                kraken: {
+                    name: 'Kraken',
+                    fullName: 'Payward, Inc. (Kraken)',
+                    address: '237 Kearny St. #102',
+                    city: 'San Francisco, CA 94108',
+                    disputeEmail: 'legal@kraken.com',
+                    noticeRequirement: 'Written Notice of Dispute per Global Terms of Service',
+                    waitingPeriod: '60 days',
+                    arbitrationForum: 'AAA or JAMS Consumer Rules',
+                    complaintRate: 'Medium',
+                    regulatoryHistory: 'SEC civil action dismissed 2025',
+                    userAgreementUrl: 'https://www.kraken.com/legal/global-terms'
+                },
+                binanceus: {
+                    name: 'Binance.US',
+                    fullName: 'BAM Trading Services Inc.',
+                    address: 'One Letterman Drive, Building C, Suite 200',
+                    city: 'San Francisco, CA 94129',
+                    disputeEmail: 'disputes@binance.us',
+                    noticeRequirement: 'Written Notice of Dispute per Terms of Use',
+                    waitingPeriod: '60 days',
+                    arbitrationForum: 'AAA Consumer Rules',
+                    complaintRate: 'Medium-High',
+                    regulatoryHistory: 'Global Binance FinCEN consent order 2023',
+                    userAgreementUrl: 'https://www.binance.us/terms-of-use'
+                }
+            };
+
+            const triageAnalysis = useMemo(() => {
+                let riskLevel = 'low';
+                let issues = [];
+                let recommendations = [];
+
+                if (lawEnforcementContact) {
+                    riskLevel = 'high';
+                    issues.push('Law enforcement involvement significantly limits options');
+                    recommendations.push('Demand letter should focus on disclosure and clarity, not immediate release');
+                    recommendations.push('Consider criminal defense counsel before responding to law enforcement');
+                }
+
+                if (usedMixers) {
+                    riskLevel = 'high';
+                    issues.push('Mixer usage gives exchange legitimate grounds for extended hold');
+                    recommendations.push('Focus on segregating non-mixer funds if possible');
+                    recommendations.push('Provide extensive documentation of pre-mixer sources');
+                }
+
+                if (!kycCompleted) {
+                    if (riskLevel === 'low') riskLevel = 'medium';
+                    issues.push('Incomplete KYC verification weakens your position');
+                    recommendations.push('Complete all verification steps before sending demand letter');
+                }
+
+                if (!providedDocs) {
+                    if (riskLevel === 'low') riskLevel = 'medium';
+                    issues.push('Missing documentation reduces leverage');
+                    recommendations.push('Gather comprehensive evidence file before escalating');
+                }
+
+                const days = parseInt(daysFrozen) || 0;
+                if (days > 60 && riskLevel === 'low') {
+                    riskLevel = 'medium';
+                    issues.push('Extended hold duration (60+ days) suggests deeper review');
+                }
+
+                if (days > 90) {
+                    issues.push('Hold exceeds reasonable investigation period');
+                    recommendations.push('Strong grounds for formal Notice of Dispute');
+                }
+
+                if (days < 14 && riskLevel === 'low') {
+                    recommendations.push('May be routine review; wait 14-21 days before formal escalation');
+                }
+
+                if (depositMethod === 'ach' || depositMethod === 'card') {
+                    issues.push('ACH/card deposits have reversal risk; this may explain hold');
+                    recommendations.push('Wait for ACH settlement period (5-7 business days) before escalating');
+                }
+
+                if (riskLevel === 'low' && days > 21) {
+                    recommendations.push('Send contract-compliant Notice of Dispute');
+                    recommendations.push('File CFPB complaint if no response within 45-60 days');
+                }
+
+                if (riskLevel === 'low' || riskLevel === 'medium') {
+                    recommendations.push('Document all support ticket interactions with timeline spreadsheet');
+                    recommendations.push('Prepare source-of-funds documentation');
+                }
+
+                const amount = parseFloat(amountFrozen) || 0;
+                if (amount > 25000) {
+                    recommendations.push('Consider consulting attorney given amount in dispute');
+                }
+
+                if (issues.length === 0) {
+                    issues.push('No obvious red flags identified');
+                }
+
+                return { riskLevel, issues, recommendations };
+            }, [exchange, accountType, amountFrozen, daysFrozen, kycCompleted, lawEnforcementContact, usedMixers, depositMethod, providedDocs]);
+
+            const generateDemandLetter = () => {
+                const ex = exchangeData[letterExchange];
+                const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+                return `FORMAL NOTICE OF DISPUTE
+${ex.name} Account Freeze/Restriction
+
+VIA EMAIL AND CERTIFIED MAIL
+
+Date: ${today}
+
+To: ${ex.fullName}
+Attn: Dispute Resolution
+${ex.address}
+${ex.city}
+Email: ${ex.disputeEmail}
+
+RE: Formal Notice of Dispute - Account ${accountEmail || '[Your Account Email]'}
+
+This letter serves as formal notice of a dispute pursuant to the ${ex.name} User Agreement/Terms of Service, and requests immediate resolution of the issues described below.
+
+I. ACCOUNT INFORMATION
+
+Full Name: ${fullName || '[Your Full Legal Name]'}
+Account Email: ${accountEmail || '[Your Account Email]'}
+Account Creation Date: [Approximate date]
+Verification Status: [Fully verified / Level 2 verified / etc.]
+
+Contact Information for Resolution:
+Phone: [Your Phone Number]
+Email: ${accountEmail || '[Your Email]'}
+Mailing Address: [Your Full Address]
+
+II. DESCRIPTION OF THE DISPUTE
+
+On ${freezeDate || '[date]'}, my ${ex.name} account was frozen/restricted without adequate prior notice or explanation.
+
+${incidentDescription || '[Detailed description of what happened, timeline of events, support tickets submitted, and current status]'}
+
+Current Status: As of this notice, ${frozenAmount || '$[amount]'} in cryptocurrency/USD remains inaccessible in my account.
+
+III. GROUNDS FOR RELEASE OF FUNDS
+
+I am a legitimate, verified customer with a documented history of compliant use of ${ex.name} services. The restriction on my account is either unjustified or has continued beyond any reasonable investigation period.
+
+[Expand with your specific documentation of compliance, source of funds, business justification, and absence of prohibited activity]
+
+IV. LEGAL AND CONTRACTUAL BASIS FOR RELIEF
+
+Your Terms of Service grant ${ex.name} discretion to restrict accounts for compliance purposes, but that discretion is not unlimited. The hold must be tied to specific legal requirements, regulatory obligations, or Terms violations.
+
+I have not violated any Terms of Service provisions. If ${ex.name} believes there is a violation, I request immediate specification of which provision was violated and supporting evidence.
+
+V. REGULATORY CONSIDERATIONS
+
+If this matter is not resolved within the informal resolution period (${ex.waitingPeriod}), I will pursue:
+
+• CFPB complaint documenting the timeline and lack of resolution
+• State regulator complaint regarding money-transmitter license obligations
+• Banking partner escalation with factual documentation
+
+VI. ARBITRATION NOTICE
+
+This constitutes the required Notice of Dispute per your User Agreement. ${ex.name} has ${ex.waitingPeriod} from receipt to investigate and attempt informal resolution.
+
+If not resolved within that period, I will proceed to file for binding arbitration with the ${ex.arbitrationForum}.
+
+VII. REQUESTED RELIEF
+
+Primary Request: Full restoration of account access and withdrawal capabilities.
+
+Alternative: If specific compliance concerns exist, provide:
+1. Clear explanation of the legal/regulatory requirement preventing release
+2. Identification of transactions/activity that triggered the hold
+3. Defined list of additional documentation needed
+4. Reasonable, specific timeframe for resolution
+
+VIII. TIMEFRAME FOR RESPONSE
+
+I request a substantive response within 10 business days, with meaningful progress toward resolution within the ${ex.waitingPeriod} informal resolution period.
+
+IX. GOOD FAITH RESOLUTION
+
+I believe this situation results from compliance protocols flagging legitimate activity. I am committed to providing any additional information needed and believe resolution is possible without arbitration.
+
+X. PRESERVATION OF RIGHTS
+
+Nothing in this letter waives any rights I have under the User Agreement, applicable law, or equity.
+
+Respectfully,
+
+${fullName || '[Your Full Name]'}
+[Your Signature if sending hard copy]
+${today}
+
+Enclosures:
+- Account verification documentation
+- Transaction history showing source of funds
+- [List other supporting documents]`;
+            };
+
+            const copyToClipboard = (text) => {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('Copied to clipboard!');
+                }).catch(() => {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = text;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    alert('Copied to clipboard!');
+                });
+            };
+
+            const calculateDeadlines = () => {
+                if (!noticeDate) return null;
+
+                const notice = new Date(noticeDate);
+                const informalEnd = new Date(notice);
+                informalEnd.setDate(informalEnd.getDate() + 60);
+
+                const arbitrationEligible = new Date(informalEnd);
+                arbitrationEligible.setDate(arbitrationEligible.getDate() + 1);
+
+                const today = new Date();
+                const daysElapsed = Math.floor((today - notice) / (1000 * 60 * 60 * 24));
+                const daysRemaining = Math.max(0, 60 - daysElapsed);
+
+                return {
+                    informalEndDate: informalEnd.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+                    arbitrationDate: arbitrationEligible.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+                    daysElapsed,
+                    daysRemaining
+                };
+            };
+
+            const riskAssessment = useMemo(() => {
+                let score = 0;
+                let level = 'low';
+                let actions = [];
+
+                // Amount factor
+                if (riskAmount > 100000) {
+                    score += 3;
+                    actions.push('Amount exceeds $100k - strongly consider legal counsel');
+                } else if (riskAmount > 50000) {
+                    score += 2;
+                    actions.push('Amount exceeds $50k - legal counsel recommended');
+                } else if (riskAmount > 25000) {
+                    score += 1;
+                }
+
+                // Duration factor
+                if (riskDuration > 90) {
+                    score += 3;
+                    actions.push('90+ day hold - proceed immediately to formal Notice of Dispute');
+                } else if (riskDuration > 60) {
+                    score += 2;
+                    actions.push('60+ day hold - send Notice of Dispute if not already sent');
+                } else if (riskDuration > 30) {
+                    score += 1;
+                    actions.push('30+ day hold - prepare formal demand letter');
+                }
+
+                // Responsiveness factor
+                if (riskResponsiveness <= 2) {
+                    score += 3;
+                    actions.push('Minimal support response - escalate to dispute resolution process');
+                } else if (riskResponsiveness <= 5) {
+                    score += 2;
+                    actions.push('Poor support engagement - formal escalation warranted');
+                } else if (riskResponsiveness <= 7) {
+                    score += 1;
+                }
+
+                // Risk flags factor
+                if (riskFlags >= 8) {
+                    score += 3;
+                    actions.push('Multiple risk flags - expect extended review, focus on documentation');
+                } else if (riskFlags >= 5) {
+                    score += 2;
+                    actions.push('Some risk factors present - strong documentation critical');
+                } else if (riskFlags >= 3) {
+                    score += 1;
+                }
+
+                // Determine level
+                if (score >= 8) {
+                    level = 'high';
+                    actions.push('High-risk situation - arbitration may be necessary');
+                    actions.push('File CFPB complaint to create public record');
+                    actions.push('Contact state regulator if licensed in your state');
+                } else if (score >= 5) {
+                    level = 'medium';
+                    actions.push('Moderate risk - structured escalation strategy needed');
+                    actions.push('Send contract-compliant Notice of Dispute');
+                    actions.push('Prepare CFPB complaint for filing at 45-60 day mark');
+                } else {
+                    level = 'low';
+                    actions.push('Lower risk - compliance hold may resolve with documentation');
+                    actions.push('Continue documenting support interactions');
+                    actions.push('Prepare evidence file before formal escalation');
+                }
+
+                // Economic analysis
+                if (riskAmount < 5000) {
+                    actions.push('Amount may not justify arbitration costs - consider ceiling for escalation');
+                }
+
+                return { level, score, actions };
+            }, [riskAmount, riskDuration, riskResponsiveness, riskFlags]);
+
+            const deadlines = calculateDeadlines();
+
+            return (
+                <>
+                    <div className="widget-header">
+                        <div className="widget-title">Crypto Exchange Fund Freeze Analyzer</div>
+                        <div className="widget-subtitle">Strategic escalation tools for Coinbase, Kraken & Binance.US account freezes</div>
+                    </div>
+
+                    <div className="tabs">
+                        <button className={`tab ${activeTab === 'overview' ? 'active' : ''}`} onClick={() => setActiveTab('overview')}>Overview</button>
+                        <button className={`tab ${activeTab === 'triage' ? 'active' : ''}`} onClick={() => setActiveTab('triage')}>Freeze Triage</button>
+                        <button className={`tab ${activeTab === 'generator' ? 'active' : ''}`} onClick={() => setActiveTab('generator')}>Demand Letter</button>
+                        <button className={`tab ${activeTab === 'timeline' ? 'active' : ''}`} onClick={() => setActiveTab('timeline')}>Timeline Calculator</button>
+                        <button className={`tab ${activeTab === 'risk' ? 'active' : ''}`} onClick={() => setActiveTab('risk')}>Risk Assessment</button>
+                        <button className={`tab ${activeTab === 'comparison' ? 'active' : ''}`} onClick={() => setActiveTab('comparison')}>Exchange Comparison</button>
+                        <button className={`tab ${activeTab === 'resources' ? 'active' : ''}`} onClick={() => setActiveTab('resources')}>Resources</button>
+                    </div>
+
+                    <div className="tab-content">
+                        {activeTab === 'overview' && (
+                            <div>
+                                <div className="section-title">Understanding Crypto Exchange Fund Freezes</div>
+                                <div className="info-text">
+                                    When Coinbase, Kraken, or Binance.US freezes your account, you're not powerless—but you need to understand what leverage you actually have. These exchanges operate as Money Services Businesses (MSBs) with serious regulatory obligations, and they've built arbitration-heavy dispute resolution systems that make traditional litigation difficult.
+                                </div>
+                                <div className="info-text">
+                                    This tool helps you navigate the escalation process strategically: from understanding why your account was frozen, to crafting contract-compliant demand letters, to calculating deadlines for arbitration, to assessing whether formal escalation makes economic sense.
+                                </div>
+
+                                <div className="section-subtitle">Common Freeze Scenarios</div>
+                                <div className="timeline-item">
+                                    <div className="timeline-title">Regulatory Compliance Holds</div>
+                                    <div className="timeline-description">
+                                        Your activity triggered AML transaction monitoring, sanctions screening, or SAR filing requirements. These can be legitimate but often drag on unreasonably long. Focus: documentation timeline and reasonableness of duration.
+                                    </div>
+                                </div>
+                                <div className="timeline-item">
+                                    <div className="timeline-title">Internal Risk Policy Holds</div>
+                                    <div className="timeline-description">
+                                        Exchange risk team flagged your activity based on their own policies (mixers, gambling sites, high-risk jurisdictions). More negotiable than regulatory holds. Focus: business justification and source-of-funds documentation.
+                                    </div>
+                                </div>
+                                <div className="timeline-item">
+                                    <div className="timeline-title">Payment/Chargeback Risk</div>
+                                    <div className="timeline-description">
+                                        ACH, card, or wire funding with reversal concerns. Exchanges hold withdrawals until funding settles. Usually resolves in 5-10 business days. Focus: wait for settlement period before escalating.
+                                    </div>
+                                </div>
+                                <div className="timeline-item">
+                                    <div className="timeline-title">Security Incident Investigations</div>
+                                    <div className="timeline-description">
+                                        Unauthorized access concerns, SIM-swap patterns, or suspicious withdrawal attempts. Sometimes protective, sometimes overkill. Focus: verification cooperation and timeline reasonableness.
+                                    </div>
+                                </div>
+                                <div className="timeline-item">
+                                    <div className="timeline-title">Law Enforcement Holds</div>
+                                    <div className="timeline-description">
+                                        Subpoena, seizure warrant, or formal legal process. Exchange cannot release funds. Limited demand letter utility. Focus: disclosure requests and potential asset forfeiture defense.
+                                    </div>
+                                </div>
+
+                                <div className="alert alert-info">
+                                    <strong>Key Insight:</strong> All three exchanges require formal "Notice of Dispute" before arbitration, with 60-day informal resolution periods. Your demand letter should simultaneously escalate support issues AND satisfy contractual pre-arbitration requirements.
+                                </div>
+
+                                <div className="section-subtitle">Strategic Escalation Ladder</div>
+                                <div className="info-text">
+                                    <strong>Weeks 1-3:</strong> Document everything. Build evidence file with transaction history, source-of-funds documentation, support ticket timeline, and KYC compliance proof.
+                                </div>
+                                <div className="info-text">
+                                    <strong>Weeks 3-4:</strong> Send formal Notice of Dispute that satisfies contract requirements and creates regulatory pressure. Use exchange-specific templates from this tool.
+                                </div>
+                                <div className="info-text">
+                                    <strong>Weeks 5-8:</strong> File CFPB complaint if no substantive response. Prepare state regulator complaint if exchange is licensed in your state. Monitor 60-day informal resolution deadline.
+                                </div>
+                                <div className="info-text">
+                                    <strong>Week 8+:</strong> Decide arbitration vs walking away based on amount in dispute, legal costs, and likelihood of success. Filing for AAA/JAMS arbitration often produces settlement discussions.
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'triage' && (
+                            <div>
+                                <div className="section-title">Account Freeze Triage Tool</div>
+                                <div className="info-text">
+                                    Answer these questions to get a risk assessment and specific recommendations for your situation.
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Which exchange?</label>
+                                    <select className="form-select" value={exchange} onChange={(e) => setExchange(e.target.value)}>
+                                        <option value="coinbase">Coinbase</option>
+                                        <option value="kraken">Kraken</option>
+                                        <option value="binanceus">Binance.US</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Account type</label>
+                                    <select className="form-select" value={accountType} onChange={(e) => setAccountType(e.target.value)}>
+                                        <option value="individual">Individual</option>
+                                        <option value="business">Business / Entity</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Approximate amount frozen (USD)</label>
+                                    <input type="number" className="form-input" value={amountFrozen} onChange={(e) => setAmountFrozen(e.target.value)} placeholder="50000" />
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">How many days has your account been frozen?</label>
+                                    <input type="number" className="form-input" value={daysFrozen} onChange={(e) => setDaysFrozen(e.target.value)} placeholder="45" />
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Primary deposit method</label>
+                                    <select className="form-select" value={depositMethod} onChange={(e) => setDepositMethod(e.target.value)}>
+                                        <option value="wire">Wire transfer</option>
+                                        <option value="ach">ACH</option>
+                                        <option value="card">Debit/credit card</option>
+                                        <option value="crypto">Crypto deposit</option>
+                                    </select>
+                                </div>
+
+                                <div className="checkbox-group">
+                                    <input type="checkbox" id="kyc" checked={kycCompleted} onChange={(e) => setKycCompleted(e.target.checked)} />
+                                    <label htmlFor="kyc">I completed all KYC/identity verification</label>
+                                </div>
+
+                                <div className="checkbox-group">
+                                    <input type="checkbox" id="docs" checked={providedDocs} onChange={(e) => setProvidedDocs(e.target.checked)} />
+                                    <label htmlFor="docs">I provided all documentation they requested</label>
+                                </div>
+
+                                <div className="checkbox-group">
+                                    <input type="checkbox" id="law" checked={lawEnforcementContact} onChange={(e) => setLawEnforcementContact(e.target.checked)} />
+                                    <label htmlFor="law">I've been contacted by law enforcement about this account</label>
+                                </div>
+
+                                <div className="checkbox-group">
+                                    <input type="checkbox" id="mixers" checked={usedMixers} onChange={(e) => setUsedMixers(e.target.checked)} />
+                                    <label htmlFor="mixers">I used mixers, tumblers, or privacy coin conversions</label>
+                                </div>
+
+                                <div className="result-box">
+                                    <div className="result-title">Triage Assessment</div>
+                                    <div style={{marginBottom: '15px'}}>
+                                        <strong>Risk Level: </strong>
+                                        <span className={`risk-badge risk-${triageAnalysis.riskLevel}`}>
+                                            {triageAnalysis.riskLevel}
+                                        </span>
+                                    </div>
+
+                                    <div className="section-subtitle">Key Issues Identified</div>
+                                    {triageAnalysis.issues.map((issue, idx) => (
+                                        <div key={idx} style={{padding: '8px 0', borderBottom: '1px solid #e2e8f0'}}>
+                                            • {issue}
+                                        </div>
+                                    ))}
+
+                                    <div className="section-subtitle">Recommended Actions</div>
+                                    {triageAnalysis.recommendations.map((rec, idx) => (
+                                        <div key={idx} style={{padding: '8px 0', borderBottom: '1px solid #e2e8f0'}}>
+                                            {idx + 1}. {rec}
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <div className="alert alert-warning" style={{marginTop: '20px'}}>
+                                    <strong>Important:</strong> This triage tool provides general guidance based on common patterns. Every situation has unique factors. If the amount exceeds $25,000 or involves complex legal issues, consult an attorney before proceeding.
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'generator' && (
+                            <div>
+                                <div className="section-title">Notice of Dispute / Demand Letter Generator</div>
+                                <div className="info-text">
+                                    Generate a contract-compliant Notice of Dispute tailored to your exchange. This letter satisfies pre-arbitration requirements while creating pressure for resolution.
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Select exchange</label>
+                                    <select className="form-select" value={letterExchange} onChange={(e) => setLetterExchange(e.target.value)}>
+                                        <option value="coinbase">Coinbase</option>
+                                        <option value="kraken">Kraken</option>
+                                        <option value="binanceus">Binance.US</option>
+                                    </select>
+                                </div>
+
+                                <div className="alert alert-info">
+                                    <strong>Sending Instructions:</strong> Send via both email to {exchangeData[letterExchange].disputeEmail} and certified mail with return receipt to prove delivery. The {exchangeData[letterExchange].waitingPeriod} informal resolution period begins when they receive this notice.
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Your full legal name</label>
+                                    <input type="text" className="form-input" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="John Smith" />
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Account email address</label>
+                                    <input type="email" className="form-input" value={accountEmail} onChange={(e) => setAccountEmail(e.target.value)} placeholder="john@example.com" />
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Date account was frozen</label>
+                                    <input type="date" className="form-input" value={freezeDate} onChange={(e) => setFreezeDate(e.target.value)} />
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Amount frozen</label>
+                                    <input type="text" className="form-input" value={frozenAmount} onChange={(e) => setFrozenAmount(e.target.value)} placeholder="$45,000 in Bitcoin" />
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Detailed incident description</label>
+                                    <textarea
+                                        className="form-textarea"
+                                        value={incidentDescription}
+                                        onChange={(e) => setIncidentDescription(e.target.value)}
+                                        placeholder="Provide chronological timeline: dates, what happened, support tickets submitted (with ticket numbers), documentation provided, responses received or lack of response. Be specific and factual."
+                                        style={{minHeight: '150px'}}
+                                    />
+                                </div>
+
+                                <button className="btn btn-primary" onClick={() => {
+                                    const letter = generateDemandLetter();
+                                    const output = document.getElementById('letter-output');
+                                    output.textContent = letter;
+                                }}>
+                                    Generate Letter
+                                </button>
+
+                                <div className="result-box" style={{marginTop: '20px'}}>
+                                    <div className="result-title">Generated Notice of Dispute</div>
+                                    <div className="letter-output" id="letter-output">
+                                        Click "Generate Letter" to create your customized Notice of Dispute based on the information above.
+                                    </div>
+                                    <button
+                                        className="btn btn-secondary"
+                                        style={{marginTop: '15px'}}
+                                        onClick={() => {
+                                            const output = document.getElementById('letter-output');
+                                            copyToClipboard(output.textContent);
+                                        }}
+                                    >
+                                        📋 Copy to Clipboard
+                                    </button>
+                                </div>
+
+                                <div className="alert alert-warning" style={{marginTop: '20px'}}>
+                                    <strong>Customize Before Sending:</strong> This is a template. You must complete all bracketed sections, expand Section III with your specific compliance documentation, and add relevant exhibits. Review the full article for detailed guidance on each section.
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'timeline' && (
+                            <div>
+                                <div className="section-title">60-Day Deadline Calculator</div>
+                                <div className="info-text">
+                                    Track key deadlines for your informal resolution period and arbitration eligibility. All three exchanges use 60-day waiting periods from Notice of Dispute receipt.
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Date you sent Notice of Dispute</label>
+                                    <input type="date" className="form-input" value={noticeDate} onChange={(e) => setNoticeDate(e.target.value)} />
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Date of your first support complaint (optional)</label>
+                                    <input type="date" className="form-input" value={firstComplaintDate} onChange={(e) => setFirstComplaintDate(e.target.value)} />
+                                </div>
+
+                                {deadlines && (
+                                    <div className="result-box">
+                                        <div className="result-title">Your Deadlines</div>
+
+                                        <div className="exchange-detail">
+                                            <div className="detail-label">Notice Sent</div>
+                                            <div className="detail-value">{new Date(noticeDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+                                        </div>
+
+                                        <div className="exchange-detail">
+                                            <div className="detail-label">60-Day Period Ends</div>
+                                            <div className="detail-value">{deadlines.informalEndDate}</div>
+                                        </div>
+
+                                        <div className="exchange-detail">
+                                            <div className="detail-label">Arbitration Eligible</div>
+                                            <div className="detail-value">{deadlines.arbitrationDate}</div>
+                                        </div>
+
+                                        <div className="exchange-detail">
+                                            <div className="detail-label">Days Elapsed</div>
+                                            <div className="detail-value">{deadlines.daysElapsed} days</div>
+                                        </div>
+
+                                        <div className="exchange-detail">
+                                            <div className="detail-label">Days Remaining</div>
+                                            <div className="detail-value">
+                                                {deadlines.daysRemaining} days
+                                                {deadlines.daysRemaining === 0 && ' (Period expired - eligible for arbitration)'}
+                                            </div>
+                                        </div>
+
+                                        <div className="section-subtitle">Timeline Recommendations</div>
+                                        {deadlines.daysRemaining > 45 && (
+                                            <div className="info-text">
+                                                • Early in resolution period. Exchange should be actively investigating.
+                                                <br/>• Follow up weekly requesting status updates.
+                                                <br/>• Begin preparing CFPB complaint but don't file yet.
+                                            </div>
+                                        )}
+                                        {deadlines.daysRemaining <= 45 && deadlines.daysRemaining > 15 && (
+                                            <div className="info-text">
+                                                • Midpoint of resolution period. Time for increased pressure.
+                                                <br/>• Send follow-up email noting approaching deadline.
+                                                <br/>• Finalize CFPB complaint for filing if no substantive response by day 45-50.
+                                                <br/>• Research state regulator complaint process.
+                                            </div>
+                                        )}
+                                        {deadlines.daysRemaining <= 15 && deadlines.daysRemaining > 0 && (
+                                            <div className="info-text">
+                                                • Final weeks of resolution period.
+                                                <br/>• File CFPB complaint if not already filed.
+                                                <br/>• Send final notice email referencing approaching arbitration eligibility.
+                                                <br/>• Decide whether to proceed with AAA/JAMS arbitration.
+                                                <br/>• Consult attorney if amount justifies legal costs.
+                                            </div>
+                                        )}
+                                        {deadlines.daysRemaining === 0 && (
+                                            <div className="alert alert-danger">
+                                                <strong>Resolution Period Expired:</strong> You are now eligible to file for binding arbitration with AAA or JAMS under consumer rules. Filing typically costs $200-400. Consider whether arbitration makes economic sense given the amount in dispute and legal costs. Many cases settle after arbitration filing but before hearing.
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {!deadlines && (
+                                    <div className="alert alert-info">
+                                        Enter the date you sent your Notice of Dispute to calculate your deadlines.
+                                    </div>
+                                )}
+
+                                <div className="section-subtitle">Escalation Timeline Strategy</div>
+                                <div className="timeline-item">
+                                    <div className="timeline-title">Days 1-7: Confirmation</div>
+                                    <div className="timeline-description">
+                                        Send brief follow-up email one week after confirmed delivery asking for acknowledgment and expected timeline. Document any response.
+                                    </div>
+                                </div>
+                                <div className="timeline-item">
+                                    <div className="timeline-title">Days 20-30: CFPB Preparation</div>
+                                    <div className="timeline-description">
+                                        Draft CFPB complaint but don't file yet. Include detailed timeline, ticket numbers, documentation provided, and lack of substantive response.
+                                    </div>
+                                </div>
+                                <div className="timeline-item">
+                                    <div className="timeline-title">Days 45-50: Strategic Pressure</div>
+                                    <div className="timeline-description">
+                                        File CFPB complaint if no meaningful engagement. Prepare state regulator complaint if exchange is licensed in your state. Send email noting approaching arbitration eligibility.
+                                    </div>
+                                </div>
+                                <div className="timeline-item">
+                                    <div className="timeline-title">Days 60+: Arbitration Decision</div>
+                                    <div className="timeline-description">
+                                        Decide whether to file for AAA/JAMS arbitration based on amount in dispute, likelihood of success, and whether you'll represent yourself or hire counsel.
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'risk' && (
+                            <div>
+                                <div className="section-title">Complaint & Arbitration Risk Gauge</div>
+                                <div className="info-text">
+                                    Assess whether formal escalation makes sense based on your situation. This tool evaluates both the strength of your position and the economic viability of pursuing arbitration.
+                                </div>
+
+                                <div className="slider-container">
+                                    <label className="form-label">Amount frozen: ${riskAmount.toLocaleString()}</label>
+                                    <input
+                                        type="range"
+                                        className="slider"
+                                        min="1000"
+                                        max="250000"
+                                        step="1000"
+                                        value={riskAmount}
+                                        onChange={(e) => setRiskAmount(parseInt(e.target.value))}
+                                    />
+                                    <div className="slider-label">
+                                        <span>$1k</span>
+                                        <span>$250k</span>
+                                    </div>
+                                </div>
+
+                                <div className="slider-container">
+                                    <label className="form-label">Days account has been frozen: {riskDuration}</label>
+                                    <input
+                                        type="range"
+                                        className="slider"
+                                        min="1"
+                                        max="180"
+                                        value={riskDuration}
+                                        onChange={(e) => setRiskDuration(parseInt(e.target.value))}
+                                    />
+                                    <div className="slider-label">
+                                        <span>1 day</span>
+                                        <span>180 days</span>
+                                    </div>
+                                </div>
+
+                                <div className="slider-container">
+                                    <label className="form-label">Support responsiveness (1=no response, 10=very responsive): {riskResponsiveness}</label>
+                                    <input
+                                        type="range"
+                                        className="slider"
+                                        min="1"
+                                        max="10"
+                                        value={riskResponsiveness}
+                                        onChange={(e) => setRiskResponsiveness(parseInt(e.target.value))}
+                                    />
+                                    <div className="slider-label">
+                                        <span>No response</span>
+                                        <span>Very responsive</span>
+                                    </div>
+                                </div>
+
+                                <div className="slider-container">
+                                    <label className="form-label">Potential risk flags (1=none, 10=many): {riskFlags}</label>
+                                    <input
+                                        type="range"
+                                        className="slider"
+                                        min="1"
+                                        max="10"
+                                        value={riskFlags}
+                                        onChange={(e) => setRiskFlags(parseInt(e.target.value))}
+                                    />
+                                    <div className="slider-label">
+                                        <span>Clean history</span>
+                                        <span>Multiple flags</span>
+                                    </div>
+                                    <div className="info-text" style={{fontSize: '13px', marginTop: '5px'}}>
+                                        Examples of risk flags: mixers, gambling sites, high-risk jurisdictions, large sudden deposits, incomplete KYC, multiple addresses, suspicious withdrawal patterns
+                                    </div>
+                                </div>
+
+                                <div className="result-box" style={{marginTop: '30px'}}>
+                                    <div className="result-title">Risk Assessment Results</div>
+                                    <div style={{marginBottom: '15px'}}>
+                                        <strong>Overall Risk Level: </strong>
+                                        <span className={`risk-badge risk-${riskAssessment.level}`}>
+                                            {riskAssessment.level}
+                                        </span>
+                                        <span style={{marginLeft: '10px', color: '#64748b'}}>
+                                            (Score: {riskAssessment.score}/12)
+                                        </span>
+                                    </div>
+
+                                    <div className="section-subtitle">Recommended Actions</div>
+                                    {riskAssessment.actions.map((action, idx) => (
+                                        <div key={idx} style={{padding: '10px 0', borderBottom: '1px solid #e2e8f0'}}>
+                                            {idx + 1}. {action}
+                                        </div>
+                                    ))}
+
+                                    <div className="section-subtitle">Economic Analysis</div>
+                                    <div className="info-text">
+                                        <strong>AAA/JAMS Filing Fee:</strong> $200-$400 (consumer arbitration rules)
+                                        <br/>
+                                        <strong>Attorney Costs (if hired):</strong> $5,000-$15,000+ depending on complexity
+                                        <br/>
+                                        <strong>Time Investment (pro se):</strong> 20-40 hours for document preparation, discovery, hearing
+                                    </div>
+
+                                    {riskAmount < 5000 && (
+                                        <div className="alert alert-warning">
+                                            <strong>Economic Concern:</strong> Amount frozen is under $5,000. Arbitration with counsel likely exceeds dispute value. Consider pro se arbitration or setting a walk-away threshold.
+                                        </div>
+                                    )}
+
+                                    {riskAmount >= 5000 && riskAmount < 25000 && (
+                                        <div className="alert alert-info">
+                                            <strong>Middle Ground:</strong> Amount justifies formal escalation but may not justify full legal representation. Consider pro se arbitration or limited-scope counsel for brief writing only.
+                                        </div>
+                                    )}
+
+                                    {riskAmount >= 25000 && (
+                                        <div className="alert alert-info">
+                                            <strong>Legal Counsel Recommended:</strong> Amount exceeds $25,000, justifying attorney representation. Investment in legal counsel typically produces better outcomes and faster resolution at this threshold.
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'comparison' && (
+                            <div>
+                                <div className="section-title">Exchange Comparison: Dispute Resolution Structures</div>
+                                <div className="info-text">
+                                    Compare how Coinbase, Kraken, and Binance.US handle fund freezes and dispute resolution. Understanding these differences helps you tailor your escalation strategy.
+                                </div>
+
+                                <div className="comparison-grid">
+                                    {Object.entries(exchangeData).map(([key, ex]) => (
+                                        <div key={key} className="exchange-card">
+                                            <div className="exchange-name">{ex.name}</div>
+
+                                            <div className="exchange-detail">
+                                                <div className="detail-label">Full Legal Name</div>
+                                                <div className="detail-value">{ex.fullName}</div>
+                                            </div>
+
+                                            <div className="exchange-detail">
+                                                <div className="detail-label">Dispute Address</div>
+                                                <div className="detail-value">
+                                                    {ex.address}<br/>
+                                                    {ex.city}
+                                                </div>
+                                            </div>
+
+                                            <div className="exchange-detail">
+                                                <div className="detail-label">Dispute Email</div>
+                                                <div className="detail-value">{ex.disputeEmail}</div>
+                                            </div>
+
+                                            <div className="exchange-detail">
+                                                <div className="detail-label">Notice Requirement</div>
+                                                <div className="detail-value">{ex.noticeRequirement}</div>
+                                            </div>
+
+                                            <div className="exchange-detail">
+                                                <div className="detail-label">Waiting Period</div>
+                                                <div className="detail-value">{ex.waitingPeriod}</div>
+                                            </div>
+
+                                            <div className="exchange-detail">
+                                                <div className="detail-label">Arbitration Forum</div>
+                                                <div className="detail-value">{ex.arbitrationForum}</div>
+                                            </div>
+
+                                            <div className="exchange-detail">
+                                                <div className="detail-label">CFPB Complaint Rate</div>
+                                                <div className="detail-value">
+                                                    <span className={`risk-badge ${ex.complaintRate === 'High' ? 'risk-high' : ex.complaintRate === 'Medium' ? 'risk-medium' : 'risk-low'}`}>
+                                                        {ex.complaintRate}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <div className="exchange-detail">
+                                                <div className="detail-label">Regulatory History</div>
+                                                <div className="detail-value">{ex.regulatoryHistory}</div>
+                                            </div>
+
+                                            <a href={ex.userAgreementUrl} target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{width: '100%', marginTop: '10px', justifyContent: 'center'}}>
+                                                View User Agreement
+                                            </a>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <div className="section-subtitle">Key Differences in Practice</div>
+
+                                <div className="alert alert-info">
+                                    <strong>Coinbase:</strong> Highest complaint volume but also largest user base. Strong arbitration enforcement (Coinbase v. Bielski, 2023). Support quality issues well-documented. Best responsive to formal Notice of Dispute when paired with CFPB complaint threat.
+                                </div>
+
+                                <div className="alert alert-info">
+                                    <strong>Kraken:</strong> More conservative with scam-prevention freezes. Will explicitly state they're "protecting you" from suspected scams. Broad contractual discretion but generally responds to well-documented business justifications. Support quality slightly better than Coinbase for complex issues.
+                                </div>
+
+                                <div className="alert alert-info">
+                                    <strong>Binance.US:</strong> Operating under shadow of global Binance enforcement action, making them hypersensitive to compliance. More aggressive transaction monitoring and sanctions screening. Clear escalation ladder through support → formal complaint → Notice of Dispute. Federal courts consistently enforce arbitration clauses.
+                                </div>
+
+                                <div className="section-subtitle">Arbitration Enforcement Track Record</div>
+                                <div className="info-text">
+                                    All three exchanges have strong arbitration clause enforcement records. Courts routinely compel users into arbitration and dismiss lawsuits. The Supreme Court's 2023 decision in <em>Coinbase v. Bielski</em> (requiring courts to stay litigation pending appeals of arbitration denials) strengthened enforceability across the industry.
+                                </div>
+                                <div className="info-text">
+                                    <strong>Practical implication:</strong> Don't threaten class actions or federal court litigation in your demand letter—these threats are empty and signal you don't understand the contractual landscape. Focus on arbitration-track escalation.
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'resources' && (
+                            <div>
+                                <div className="section-title">Resources & External Links</div>
+
+                                <div className="section-subtitle">Complaint & Regulatory Resources</div>
+                                <a href="https://www.consumerfinance.gov/complaint/" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                    CFPB Consumer Complaint Database - File complaint against exchange
+                                </a>
+                                <a href="https://www.consumerfinance.gov/data-research/consumer-complaints/search/" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                    CFPB Complaint Search - Research existing complaints against exchanges
+                                </a>
+                                <a href="https://www.fincen.gov/resources/filing-information" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                    FinCEN - Understanding MSB regulations and SAR requirements
+                                </a>
+                                <a href="https://home.treasury.gov/policy-issues/financial-sanctions/specially-designated-nationals-and-blocked-persons-list-sdn-human-readable-lists" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                    OFAC Sanctions List - Check if addresses/entities are sanctioned
+                                </a>
+
+                                <div className="section-subtitle">Arbitration Resources</div>
+                                <a href="https://www.adr.org/consumer" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                    AAA Consumer Arbitration Rules - Primary forum for exchange disputes
+                                </a>
+                                <a href="https://www.jamsadr.com/consumer-arbitration/" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                    JAMS Consumer Arbitration - Alternative arbitration forum
+                                </a>
+                                <a href="https://www.supremecourt.gov/opinions/22pdf/22-105_5536.pdf" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                    Coinbase v. Bielski (U.S. Supreme Court 2023) - Key arbitration enforcement case
+                                </a>
+
+                                <div className="section-subtitle">Exchange User Agreements & Terms</div>
+                                <a href="https://www.coinbase.com/legal/user_agreement/united_states" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                    Coinbase U.S. Individual User Agreement
+                                </a>
+                                <a href="https://www.kraken.com/legal/global-terms" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                    Kraken Global Terms of Service
+                                </a>
+                                <a href="https://www.binance.us/terms-of-use" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                    Binance.US Terms of Use
+                                </a>
+
+                                <div className="section-subtitle">Exchange Help Resources</div>
+                                <a href="https://help.coinbase.com/en/coinbase/other-topics/other/does-coinbase-freeze-accounts" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                    Coinbase: Does Coinbase freeze accounts?
+                                </a>
+                                <a href="https://support.kraken.com/hc/en-us/articles/360030946991-Why-is-my-account-restricted-" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                    Kraken: Why is my account restricted?
+                                </a>
+                                <a href="https://support.binance.us/hc/en-us" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                    Binance.US Help Center
+                                </a>
+
+                                <div className="section-subtitle">Regulatory Background & Enforcement</div>
+                                <a href="https://www.fincen.gov/system/files/enforcement_action/2023-11-21/FinCEN_Consent_Order_2023-04_FINAL508.pdf" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                    FinCEN Consent Order - Binance (2023) - Shows enforcement approach to MSBs
+                                </a>
+                                <a href="https://www.fdic.gov/news/financial-institution-letters/2022/fil22035.html" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                    FDIC: Crypto assets are not FDIC insured - Clarifies insurance limits
+                                </a>
+                                <a href="https://securitiesanalytics.com/cfpb-cryptocurrency-complaints/" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                    CFPB Cryptocurrency Complaint Analysis - Patterns and data
+                                </a>
+
+                                <div className="section-subtitle">State Money Transmitter Regulators</div>
+                                <a href="https://dbo.ca.gov/file-a-complaint/" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                    California Department of Financial Protection & Innovation - File complaint
+                                </a>
+                                <a href="https://www.dfs.ny.gov/complaint" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                    New York Department of Financial Services - File complaint
+                                </a>
+                                <a href="https://www.dob.texas.gov/consumer-information/file-complaint" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                    Texas Department of Banking - File complaint
+                                </a>
+
+                                <div className="section-subtitle">Law Enforcement & Fraud Reporting</div>
+                                <a href="https://www.ic3.gov/Home/FileComplaint" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                    IC3 (FBI Internet Crime Complaint Center) - Report unauthorized access or fraud
+                                </a>
+                                <a href="https://www.ftc.gov/news-events/topics/consumer-protection/cryptocurrency" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                    FTC Cryptocurrency Consumer Protection Information
+                                </a>
+
+                                <div className="alert alert-info" style={{marginTop: '30px'}}>
+                                    <strong>Disclaimer:</strong> This tool and article provide general educational information about demand letter strategies. This is not legal advice. Every situation involves unique facts and legal issues. For specific legal guidance tailored to your circumstances, especially if the amount exceeds $25,000 or involves complex issues, consult a licensed attorney in your jurisdiction.
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<CryptoFreezeWidget />);
+    </script>
+</body>
+</html>
