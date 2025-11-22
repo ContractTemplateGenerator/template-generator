@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PayPal Fund Hold Demand Letter Generator</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        .generator-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            height: 100vh;
+            max-width: 100%;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 40px rgba(0,0,0,0.1);
+        }
+
+        .form-panel {
+            background: #f8fafc;
+            border-right: 1px solid #e2e8f0;
+            overflow-y: auto;
+            padding: 30px;
+            min-width: 0;
+        }
+
+        .preview-panel {
+            overflow-y: auto;
+            padding: 40px;
+            background: white;
+            min-width: 0;
+        }
+
+        .form-panel::-webkit-scrollbar,
+        .preview-panel::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .form-panel::-webkit-scrollbar-track,
+        .preview-panel::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        .form-panel::-webkit-scrollbar-thumb,
+        .preview-panel::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 5px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            color: white;
+            padding: 20px 30px;
+            border-bottom: 4px solid #1e3a8a;
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .header-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .form-section {
+            margin-bottom: 25px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #dbeafe;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #334155;
+            font-size: 14px;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            cursor: pointer;
+            font-size: 14px;
+            color: #475569;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .radio-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .radio-option label {
+            cursor: pointer;
+            font-size: 14px;
+            color: #475569;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #1e40af;
+            border: 2px solid #3b82f6;
+        }
+
+        .btn-secondary:hover {
+            background: #eff6ff;
+        }
+
+        .preview-document {
+            background: white;
+            padding: 60px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            font-family: 'Georgia', serif;
+            font-size: 14px;
+            line-height: 1.8;
+            color: #1e293b;
+            max-width: 850px;
+            margin: 0 auto;
+        }
+
+        .preview-document p {
+            margin-bottom: 12px;
+        }
+
+        .preview-document strong {
+            color: #1e40af;
+        }
+
+        .highlight {
+            background-color: #fef08a;
+            padding: 2px 4px;
+            border-radius: 3px;
+            animation: highlight-flash 0.6s ease-in-out;
+        }
+
+        @keyframes highlight-flash {
+            0%, 100% { background-color: #fef08a; }
+            50% { background-color: #fde047; }
+        }
+
+        .signature-section {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .signature-input {
+            border: 2px dashed #cbd5e1;
+            padding: 15px;
+            border-radius: 8px;
+            min-height: 80px;
+            font-family: 'Brush Script MT', cursive;
+            font-size: 24px;
+            text-align: center;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            border-left: 4px solid;
+            font-size: 13px;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            border-color: #3b82f6;
+            color: #1e40af;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            border-color: #f59e0b;
+            color: #92400e;
+        }
+
+        .preview-header {
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #1e40af;
+        }
+
+        @media (max-width: 1200px) {
+            .generator-container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+
+            .form-panel {
+                border-right: none;
+                border-bottom: 1px solid #e2e8f0;
+            }
+
+            .preview-document {
+                padding: 30px;
+            }
+        }
+
+        @media print {
+            .form-panel,
+            .button-group {
+                display: none;
+            }
+
+            .generator-container {
+                grid-template-columns: 1fr;
+            }
+
+            .preview-panel {
+                padding: 0;
+            }
+
+            .preview-document {
+                box-shadow: none;
+                padding: 0;
+            }
+        }
+
+        .input-hint {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 4px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const PayPalDemandGenerator = () => {
+            // Form state
+            const [accountType, setAccountType] = useState('business');
+            const [fullName, setFullName] = useState('');
+            const [email, setEmail] = useState('');
+            const [phone, setPhone] = useState('');
+            const [address, setAddress] = useState('');
+            const [state, setState] = useState('');
+
+            const [holdType, setHoldType] = useState('limited');
+            const [amountHeld, setAmountHeld] = useState('');
+            const [holdDate, setHoldDate] = useState('');
+            const [limitationType, setLimitationType] = useState('temporary');
+
+            const [reasonGiven, setReasonGiven] = useState('no_explanation');
+            const [specificReason, setSpecificReason] = useState('');
+
+            const [businessDescription, setBusinessDescription] = useState('');
+            const [chargebackCount, setChargebackCount] = useState('0');
+            const [disputeCount, setDisputeCount] = useState('0');
+            const [days180Mentioned, setDays180Mentioned] = useState(false);
+            const [days180Date, setDays180Date] = useState('');
+            const [past180Days, setPast180Days] = useState(false);
+
+            const [harmDescription, setHarmDescription] = useState('');
+            const [seekDamages, setSeekDamages] = useState(false);
+
+            const [preferredForum, setPreferredForum] = useState('aaa');
+            const [attachArbDemand, setAttachArbDemand] = useState(true);
+            const [hearingPreference, setHearingPreference] = useState('documents');
+
+            const [signature, setSignature] = useState('');
+
+            const [highlightedSection, setHighlightedSection] = useState('');
+            const previewRef = useRef(null);
+
+            const currentDate = new Date().toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            // Helper to format state/jurisdiction properly (DC is not a state)
+            const getJurisdictionPhrase = () => {
+                if (!state) return '';
+                if (state === 'District of Columbia') {
+                    return 'the District of Columbia';
+                }
+                return state;
+            };
+
+            const getStateLawPhrase = () => {
+                if (!state) return '';
+                if (state === 'District of Columbia') {
+                    return 'District of Columbia';
+                }
+                return state;
+            };
+
+            // Auto-scroll and highlight function
+            const scrollToSection = (sectionId) => {
+                setHighlightedSection(sectionId);
+                setTimeout(() => {
+                    const element = document.getElementById(sectionId);
+                    if (element && previewRef.current) {
+                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }, 100);
+                setTimeout(() => setHighlightedSection(''), 2000);
+            };
+
+            // Generate demand letter
+            const generateDemandLetter = () => {
+                const sections = [];
+
+                // Header
+                sections.push({
+                    id: 'header',
+                    content: `<div class="preview-header">
+                        <p><strong>FORMAL NOTICE OF DISPUTE</strong><br/>
+                        <strong>PayPal Account Freeze/Restriction</strong></p>
+                        <p><strong>VIA EMAIL AND CERTIFIED MAIL</strong></p>
+                        <p>Date: ${currentDate}</p>
+                    </div>`
+                });
+
+                // Address
+                sections.push({
+                    id: 'address',
+                    content: `<p>To: <strong>PayPal, Inc.</strong><br/>
+                    Attn: Legal Specialists – Notice of Dispute<br/>
+                    P.O. Box 45950<br/>
+                    Omaha, NE 68145-0950</p>
+
+                    <p><strong>RE: Formal Notice of Dispute and Demand for Release of Funds – PayPal Account ${email || '[Your Email]'}</strong></p>`
+                });
+
+                // Opening paragraph
+                sections.push({
+                    id: 'opening',
+                    content: `<p>Dear Legal Specialists,</p>
+
+                    <p>I am writing to provide PayPal, Inc. with a formal <strong>Notice of Dispute</strong> regarding the ${holdType === 'limited' ? 'limitation' : holdType === 'reserve' ? 'reserve' : 'hold'} placed on my PayPal account and the resulting hold on my funds. This notice is sent pursuant to the "Agreement to Arbitrate" and "Notices of Disputes" provisions in the PayPal User Agreement in effect for my account.</p>
+
+                    ${attachArbDemand ? `<p>For clarity and to facilitate resolution, I am attaching a <strong>draft Demand for Arbitration</strong> that I am prepared to file with the American Arbitration Association if this matter is not resolved within the contractual 45-day period.</p>` : ''}`
+                });
+
+                // Account information
+                sections.push({
+                    id: 'account-info',
+                    content: `<p><strong>I. ACCOUNT AND CONTACT INFORMATION</strong></p>
+
+                    <p>My information is as follows:</p>
+
+                    <p>
+                    • Name: <strong>${fullName || '[Your Full Name]'}</strong><br/>
+                    • Mailing address: <strong>${address || '[Your Address]'}</strong><br/>
+                    • Email associated with PayPal account: <strong>${email || '[Your Email]'}</strong><br/>
+                    • Telephone number: <strong>${phone || '[Your Phone]'}</strong><br/>
+                    • PayPal account type: <strong>${accountType === 'business' ? 'Business' : 'Personal'}</strong><br/>
+                    </p>`
+                });
+
+                // Background and description
+                const reasonText = {
+                    'aup_violation': 'alleged Acceptable Use Policy violation',
+                    'high_risk': 'designation as "high risk" activity',
+                    'unusual_activity': 'unusual or suspicious activity',
+                    'too_many_disputes': 'excessive disputes or chargebacks',
+                    'verification_needed': 'additional verification required',
+                    'no_explanation': 'no specific explanation provided'
+                }[reasonGiven];
+
+                sections.push({
+                    id: 'background',
+                    content: `<p><strong>II. BACKGROUND AND DESCRIPTION OF THE DISPUTE</strong></p>
+
+                    <p>${businessDescription ? `I operate ${businessDescription}.` : `I ${accountType === 'business' ? 'operate a business' : 'use PayPal for personal transactions'}.`} I have used PayPal to ${accountType === 'business' ? 'receive payments' : 'send and receive funds'} ${holdDate ? 'since before ' + new Date(holdDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) : 'for some time'}.</p>
+
+                    <p>On or about <strong>${holdDate ? new Date(holdDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '[Date]'}</strong>, PayPal placed a ${holdType === 'limited' ? 'limitation' : holdType === 'reserve' ? 'reserve' : 'hold'} on my account. At that time, the account balance held by PayPal was approximately <strong>${amountHeld ? '$' + parseFloat(amountHeld).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '$[Amount]'}</strong>. Since the ${holdType === 'limited' ? 'limitation' : holdType === 'reserve' ? 'reserve' : 'hold'} was imposed, I have been unable to withdraw these funds or to use my PayPal balance in the ordinary course of ${accountType === 'business' ? 'business' : 'my financial affairs'}.</p>
+
+                    <p>PayPal's communications to me about this ${holdType === 'limited' ? 'limitation' : holdType === 'reserve' ? 'reserve' : 'hold'} have indicated that the reason for this action was <strong>${reasonText}</strong>${specificReason ? ': ' + specificReason : ''}${days180Mentioned ? `, and that funds might be held for up to 180 days${days180Date ? ' (until approximately ' + new Date(days180Date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) + ')' : ''}` : ''}.</p>
+
+                    <p>Despite ${accountType === 'business' ? 'my efforts to provide documentation, respond to all requests, and explain my legitimate business model' : 'my cooperation and provision of requested information'}, my account remains ${limitationType === 'permanent' ? 'permanently limited' : 'limited'}, and PayPal continues to hold approximately ${amountHeld ? '$' + parseFloat(amountHeld).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '$[Amount]'} of my funds. I have not received a clear explanation that ties my specific facts to any particular contractual provision in the User Agreement.</p>`
+                });
+
+                // Contract framework
+                sections.push({
+                    id: 'contract',
+                    content: `<p><strong>III. APPLICABLE CONTRACT FRAMEWORK</strong></p>
+
+                    <p>I understand that my relationship with PayPal is governed by the PayPal User Agreement${accountType === 'business' ? ', PayPal Balance Terms and Conditions, and related merchant agreements' : ' and related policies'}, including the provisions regarding holds, limitations, reserves, and the Agreement to Arbitrate.</p>
+
+                    <p>I also understand that PayPal may in some circumstances place holds on funds or impose reserves in order to protect against chargebacks, reversals, fines, and other liabilities. Those powers, however, are not unlimited. They must be exercised consistently with the express terms of the User Agreement and the implied covenant of good faith and fair dealing that applies to all contracts under Delaware law.</p>
+
+                    <p>In my situation, PayPal's continuing hold and limitation are not reasonably tailored to any legitimate risk that remains, for several reasons:</p>
+
+                    <p>
+                    • The number of actual chargebacks or buyer disputes on my account is <strong>${chargebackCount || 'zero'} chargebacks and ${disputeCount || 'zero'} disputes</strong>${(parseInt(chargebackCount) === 0 && parseInt(disputeCount) === 0) ? ', which demonstrates that my account presents minimal risk' : ', which is within normal industry parameters for legitimate businesses'}.<br/>
+                    ${businessDescription ? `• My business model (${businessDescription}) is legitimate and involves ${accountType === 'business' ? 'delivery of real goods/services' : 'ordinary personal transactions'}.<br/>` : ''}
+                    ${past180Days ? `• The 180-day hold period ${days180Date ? 'referenced in PayPal\'s notice' : 'commonly applied to account limitations'} has already passed${days180Date ? ' (it ended on ' + new Date(days180Date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) + ')' : ''}, meaning any chargeback windows have effectively closed.<br/>` : ''}
+                    • ${reasonGiven === 'no_explanation' ? 'PayPal has provided no specific explanation for the hold beyond generic policy language.' : 'Any initial concern about ' + reasonText + ' has been fully addressed through the information I have provided.'}
+                    </p>
+
+                    <p>In light of these facts, an ongoing or indefinite hold on the full balance in my account is not consistent with the purposes for which the hold and reserve provisions exist in the User Agreement.</p>`
+                });
+
+                // Legal theories
+                sections.push({
+                    id: 'legal-theories',
+                    content: `<p><strong>IV. LEGAL THEORIES AND NATURE OF MY CLAIMS</strong></p>
+
+                    <p>Without limiting any additional rights, I believe PayPal's conduct gives rise to the following claims:</p>
+
+                    <p><strong>1. Breach of contract</strong>, because PayPal has continued to hold funds and maintain a limitation in a manner that is inconsistent with the language and purpose of the hold, limitation, and reserve provisions in the User Agreement${accountType === 'business' ? ', Balance Terms, and Online Payment Services Agreement' : ''}, and has failed to release unrestricted funds once any reasonable risk of chargebacks or reversals was past.</p>
+
+                    <p><strong>2. Breach of the implied covenant of good faith and fair dealing</strong> under Delaware law, because PayPal has exercised its contractual discretion to impose and maintain a hold in a way that is arbitrary and that frustrates my reasonable expectations${accountType === 'business' ? ' of being paid for delivered goods or services' : ''}. Those expectations include timely access to funds that have already been paid${accountType === 'business' ? ' by my customers' : ''} and that are no longer subject to meaningful risk of reversal.</p>
+
+                    <p><strong>3. Unjust enrichment and related restitutionary theories</strong>, to the extent allowed by applicable law, because PayPal has continued to benefit from the use of my funds and from the fees paid on the underlying transactions while depriving me of the ability to use those funds for my own ${accountType === 'business' ? 'business' : 'personal'} needs without a contractually legitimate basis.</p>
+
+                    ${state ? `<p><strong>4. Violations of consumer protection or unfair practices statutes</strong> under ${getStateLawPhrase()} law, to the extent those statutes apply, insofar as PayPal's communications about holds and risk management are misleading, inconsistent, or materially incomplete.</p>` : ''}`
+                });
+
+                // Harm and damages
+                sections.push({
+                    id: 'harm',
+                    content: `<p><strong>V. HARM AND DAMAGES</strong></p>
+
+                    <p>As a direct result of this limitation and hold, I have suffered significant harm, including but not limited to:</p>
+
+                    <p>
+                    • Loss of access to approximately ${amountHeld ? '$' + parseFloat(amountHeld).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '$[Amount]'} in funds that I reasonably expected to use for ${accountType === 'business' ? 'business operations, inventory, payroll, taxes, or other business needs' : 'personal expenses and obligations'}.<br/>
+                    ${harmDescription ? `• ${harmDescription}<br/>` : ''}
+                    • Time and expense spent attempting to resolve this matter through PayPal's support channels and documentation requests, as well as the need to seek legal assistance.
+                    </p>
+
+                    <p>My losses continue to grow for as long as PayPal maintains the limitation and hold.</p>`
+                });
+
+                // Relief sought
+                sections.push({
+                    id: 'relief',
+                    content: `<p><strong>VI. RELIEF SOUGHT</strong></p>
+
+                    <p>Through this Notice of Dispute and demand, I am asking PayPal to:</p>
+
+                    <p>
+                    <strong>Primary Request:</strong> Immediately remove any unjustified limitation or reserve on my account and promptly release the full balance of my available funds, currently approximately ${amountHeld ? '$' + parseFloat(amountHeld).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '$[Amount]'}, to me by withdrawal to my linked bank account or other agreed method.
+                    </p>
+
+                    <p>
+                    <strong>Alternative Resolution:</strong> If PayPal believes that only a partial release is appropriate, I request a detailed explanation of the specific risk being covered, the exact amount retained for that purpose, and the contractual justification for that figure, along with a specific timeline for release of the retained portion.
+                    </p>
+
+                    <p>
+                    <strong>Minimum Acceptable Resolution:</strong> At minimum, if funds cannot be immediately released, I require a substantive response explaining the specific basis for the continued hold, what regulatory authority requires it, and what concrete steps would lead to release.
+                    </p>
+
+                    ${seekDamages ? `<p><strong>Additional Relief:</strong> Compensation for documented consequential damages, including lost business opportunities, emergency financing costs, and other economic harm caused by the improper withholding of my funds, to the extent allowed by applicable law and the arbitrator's discretion.</p>` : ''}`
+                });
+
+                // Notice of intent to arbitrate
+                sections.push({
+                    id: 'arbitration-notice',
+                    content: `<p><strong>VII. NOTICE OF INTENT TO ARBITRATE OR PROCEED IN SMALL CLAIMS</strong></p>
+
+                    <p>This letter is intended to fully satisfy the Notice of Dispute requirements in the Agreement to Arbitrate section of the PayPal User Agreement. It includes my contact information, account information, a description of the nature and basis of the claims, a statement of the specific relief sought, and identifies relevant documents that I am prepared to provide in support of my position.</p>
+
+                    <p>If PayPal does not resolve this dispute within forty-five (45) days after receiving this Notice of Dispute, I intend to pursue my claims ${preferredForum === 'aaa' ? 'in binding arbitration administered by the American Arbitration Association under the AAA Consumer Arbitration Rules' : preferredForum === 'small_claims' ? 'in small claims court of competent jurisdiction, if my claim qualifies under that court\'s rules' : 'either in AAA arbitration or small claims court, depending on which forum is most appropriate given the amount and nature of my claims'}.</p>
+
+                    ${attachArbDemand && preferredForum === 'aaa' ? `<p>The attached draft Demand for Arbitration reflects how I currently expect to present my claims if arbitration becomes necessary. It is provided now to encourage an informed and efficient discussion and is not a waiver of any rights.</p>` : ''}`
+                });
+
+                // Documents available
+                sections.push({
+                    id: 'documents',
+                    content: `<p><strong>VIII. DOCUMENTS AND INFORMATION AVAILABLE</strong></p>
+
+                    <p>In support of my position, I am prepared to provide, and in many cases have already provided through the PayPal Resolution Center, documents that include:</p>
+
+                    <p>
+                    • Screenshots of my PayPal account history showing the limitation and the amounts held<br/>
+                    • Transaction records${accountType === 'business' ? ' and invoices' : ''} for the payments at issue<br/>
+                    ${accountType === 'business' ? '• Business formation documents and tax records demonstrating legitimate business operations<br/>' : ''}
+                    • Communications with ${accountType === 'business' ? 'customers and any' : 'any'} dispute or chargeback documentation<br/>
+                    • Prior correspondence with PayPal support and the Resolution Center
+                    </p>
+
+                    <p>If additional documents or clarifications would assist in resolving this matter promptly, I am willing to provide them upon request.</p>
+
+                    <p>Please direct all written responses regarding this Notice of Dispute to the mailing address and email listed at the beginning of this letter.</p>
+
+                    <p>I look forward to a prompt and good faith response.</p>`
+                });
+
+                // Signature
+                sections.push({
+                    id: 'signature',
+                    content: `<div class="signature-section">
+                        <p>Sincerely,</p>
+                        ${signature ? `<p class="signature-input" style="text-align: left; border: none; padding: 10px 0; font-size: 28px;">${signature}</p>` : '<p>[Signature]</p>'}
+                        <p>
+                        <strong>${fullName || '[Your Name]'}</strong><br/>
+                        ${address || '[Your Address]'}<br/>
+                        ${email || '[Your Email]'}<br/>
+                        ${phone || '[Your Phone]'}
+                        </p>
+
+                        ${attachArbDemand ? `<p><strong>Enclosure:</strong> Draft Demand for Arbitration</p>` : ''}
+                    </div>`
+                });
+
+                return sections;
+            };
+
+            // Generate arbitration demand
+            const generateArbDemand = () => {
+                if (!attachArbDemand) return null;
+
+                return `<div style="page-break-before: always; margin-top: 60px; padding-top: 40px; border-top: 4px solid #1e40af;">
+                    <p style="text-align: center;"><strong style="font-size: 18px;">DRAFT DEMAND FOR ARBITRATION</strong></p>
+                    <p style="text-align: center;"><strong>(For Filing with AAA if Dispute Not Resolved)</strong></p>
+
+                    <p><strong>In the Matter of the Arbitration Between</strong></p>
+
+                    <p>
+                    <strong>${fullName || '[Your Name]'}</strong>,<br/>
+                    Claimant,
+                    </p>
+
+                    <p>and</p>
+
+                    <p>
+                    <strong>PayPal, Inc.</strong>,<br/>
+                    Respondent.
+                    </p>
+
+                    <p><strong>DEMAND FOR ARBITRATION</strong></p>
+
+                    <p>Claimant, ${fullName || '[Your Name]'}, demands arbitration of the dispute described below against PayPal, Inc., pursuant to the Agreement to Arbitrate in the PayPal User Agreement and the applicable American Arbitration Association rules.</p>
+
+                    <p><strong>1. PARTIES AND CONTACT INFORMATION</strong></p>
+
+                    <p>
+                    <strong>Claimant:</strong><br/>
+                    Name: ${fullName || '[Your Full Name]'}<br/>
+                    Mailing address: ${address || '[Your Address]'}<br/>
+                    Telephone: ${phone || '[Your Phone]'}<br/>
+                    Email: ${email || '[Your Email]'}
+                    </p>
+
+                    <p>
+                    <strong>Respondent:</strong><br/>
+                    PayPal, Inc.<br/>
+                    2211 North First Street<br/>
+                    San Jose, California 95131
+                    </p>
+
+                    <p><strong>2. ARBITRATION AGREEMENT AND APPLICABLE RULES</strong></p>
+
+                    <p>This dispute arises out of and relates to claimant's use of PayPal's services under the PayPal User Agreement. That agreement contains an Agreement to Arbitrate that requires most disputes between claimant and PayPal to be resolved through binding arbitration or in small claims court.</p>
+
+                    <p>Claimant has elected to proceed in arbitration.</p>
+
+                    <p>Because the value of the relief sought is ${amountHeld && parseFloat(amountHeld) <= 10000 ? 'ten thousand dollars ($10,000) or less' : 'more than ten thousand dollars ($10,000)'}, claimant requests that the AAA apply the <strong>Consumer Arbitration Rules</strong> to this dispute as provided in the PayPal User Agreement.</p>
+
+                    <p>To the extent applicable, claimant also invokes the Federal Arbitration Act as the law governing the arbitration agreement.</p>
+
+                    <p><strong>3. COMPLIANCE WITH THE NOTICE OF DISPUTE REQUIREMENT</strong></p>
+
+                    <p>On ${currentDate}, claimant sent PayPal a written Notice of Dispute by certified mail to the address specified in the PayPal User Agreement (P.O. Box 45950, Omaha, NE 68145-0950), describing the nature and basis of the claims, the relief sought, and attaching supporting documents.</p>
+
+                    <p>More than forty-five (45) days have passed since PayPal received that notice, and the dispute has not been resolved. Claimant has therefore satisfied the contractual pre-arbitration notice requirement and is entitled to initiate this arbitration.</p>
+
+                    <p><strong>4. NATURE OF THE DISPUTE AND FACTUAL BACKGROUND</strong></p>
+
+                    <p>${businessDescription ? `Claimant operates ${businessDescription} and` : `Claimant`} has used PayPal to ${accountType === 'business' ? 'receive payments' : 'send and receive funds'} ${holdDate ? 'since before ' + new Date(holdDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) : 'for some time'}.</p>
+
+                    <p>On or about ${holdDate ? new Date(holdDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '[Date]'}, PayPal placed a ${holdType === 'limited' ? 'limitation' : holdType === 'reserve' ? 'reserve' : 'hold'} on claimant's account and began holding approximately ${amountHeld ? '$' + parseFloat(amountHeld).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '$[Amount]'} in funds that had already been received from ${accountType === 'business' ? 'customers' : 'other parties'}.</p>
+
+                    <p>PayPal's explanation for this action was ${(() => {
+                        const reasons = {
+                            'aup_violation': 'alleged violation of the Acceptable Use Policy',
+                            'high_risk': 'designation of claimant\'s activity as "high risk"',
+                            'unusual_activity': 'alleged unusual or suspicious activity',
+                            'too_many_disputes': 'alleged excessive disputes or chargebacks',
+                            'verification_needed': 'need for additional verification',
+                            'no_explanation': 'not clearly explained; PayPal provided only generic policy language'
+                        };
+                        return reasons[reasonGiven] || 'not clearly explained';
+                    })()}${specificReason ? ': ' + specificReason : ''}. Claimant has consistently ${reasonGiven === 'aup_violation' ? 'denied any violation of the Acceptable Use Policy and has' : ''} provided documentation to show that the underlying transactions were legitimate${accountType === 'business' ? ' and that goods or services were delivered' : ''}.</p>
+
+                    <p>Since the limitation or hold began, claimant has responded to all requests for documentation, provided ${accountType === 'business' ? 'invoices, tracking numbers, customer communications,' : ''} and other evidence, and attempted to communicate with PayPal support multiple times without receiving a clear, individualized explanation or path to resolution.</p>
+
+                    <p>Despite these efforts, PayPal has continued to hold claimant's funds${past180Days ? ', even after the 180-day period mentioned in PayPal\'s communications has expired' : days180Mentioned ? ' and has cited a standard period of up to 180 days without addressing why such a long hold is actually necessary given the transaction history' : ' without providing a specific timeline for release'}.</p>
+
+                    <p><strong>5. CLAIMS</strong></p>
+
+                    <p>Without limiting any additional claims that may be recognized in claimant's jurisdiction, claimant asserts the following causes of action against PayPal:</p>
+
+                    <p><strong>1. Breach of contract</strong> for failing to administer the limitation and fund hold in conformity with the PayPal User Agreement${accountType === 'business' ? ', Balance Terms, and Online Payment Services Agreement' : ''}, including failing to release unrestricted funds in a timely manner once any legitimate risk of chargebacks, reversals, or regulatory exposure passed.</p>
+
+                    <p><strong>2. Breach of the implied covenant of good faith and fair dealing</strong> under Delaware law for exercising contractual discretion to restrict claimant's access to funds in an arbitrary and unreasonable manner that undermines the basic purpose of the agreement and claimant's reasonable expectations${accountType === 'business' ? ' of being paid for delivered goods or services' : ''}.</p>
+
+                    <p><strong>3. Unjust enrichment and related restitutionary theories</strong>, because PayPal has retained the benefit of claimant's funds and of the transaction fees while depriving claimant of the use of those funds without a legitimate contractual justification.</p>
+
+                    ${state ? `<p><strong>4. Violations of applicable consumer protection or unfair practices statutes</strong> under ${getStateLawPhrase()} law, to the extent applicable, based on misleading, opaque, or unfair practices in the way PayPal has handled claimant's account and maintained its limitation.</p>` : ''}
+
+                    <p>Claimant reserves the right to clarify, refine, or supplement these legal theories as the arbitration proceeds, consistent with the applicable rules.</p>
+
+                    <p><strong>6. AMOUNT IN CONTROVERSY</strong></p>
+
+                    <p>The amount in controversy consists of:</p>
+
+                    <p>
+                    • The principal sum of funds held, currently approximately ${amountHeld ? '$' + parseFloat(amountHeld).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '$[Amount]'}, plus<br/>
+                    • Interest on that amount from the date the hold was imposed until the date of release or award, and<br/>
+                    ${seekDamages ? '• Additional consequential damages to the extent allowed by the arbitrator, such as lost profits, costs incurred in mitigating harm, and expenses associated with attempting to resolve the dispute.<br/>' : ''}
+                    </p>
+
+                    <p>For AAA administrative purposes, claimant estimates the value of the claim at approximately ${amountHeld ? '$' + parseFloat(amountHeld).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '$[Amount]'}.</p>
+
+                    <p><strong>7. RELIEF REQUESTED</strong></p>
+
+                    <p>Claimant requests that the arbitrator enter an award that includes the following relief:</p>
+
+                    <p>
+                    1. A declaration that PayPal's hold, limitation, or reserve as applied to claimant's account was not justified under the PayPal User Agreement, or that its duration and scope were unreasonable given the facts.<br/>
+                    <br/>
+                    2. An order requiring PayPal to immediately release all funds currently held in connection with claimant's account, together with any accrued interest where appropriate.<br/>
+                    <br/>
+                    3. An award of money damages, in an amount to be proven, to compensate claimant for ${accountType === 'business' ? 'business losses' : 'economic harm'}, out-of-pocket expenses, and other harm caused by PayPal's actions.<br/>
+                    <br/>
+                    4. An award of claimant's arbitration filing fee and any other costs that the arbitrator determines should be shifted to PayPal, to the extent consistent with applicable law and the AAA Consumer Arbitration Rules.<br/>
+                    <br/>
+                    5. Any other relief that the arbitrator deems just and appropriate under the circumstances.
+                    </p>
+
+                    <p><strong>8. FEES AND REQUESTED ALLOCATION</strong></p>
+
+                    <p>Because the amount of relief sought is ${amountHeld && parseFloat(amountHeld) <= 10000 ? 'ten thousand dollars ($10,000) or less' : 'more than ten thousand dollars ($10,000)'}, claimant requests that the AAA and the arbitrator apply the fee allocation provisions in the PayPal User Agreement and the AAA Consumer Arbitration Rules.</p>
+
+                    ${amountHeld && parseFloat(amountHeld) <= 10000 ? `<p>For claims of ten thousand dollars ($10,000) or less, claimant specifically requests that PayPal be required to pay all AAA filing, administration, and arbitrator fees directly to the AAA, consistent with the promise in its arbitration agreement.</p>` : `<p>Claimant requests that PayPal be required to pay at least that portion of the AAA fees that is necessary to prevent the cost of arbitration from becoming prohibitive compared to small claims or other court proceedings.</p>`}
+
+                    <p><strong>9. LOCALE AND HEARING FORMAT</strong></p>
+
+                    <p>Claimant resides in ${state ? getJurisdictionPhrase() : '[State]'} and requests that the arbitration locale be set in ${state ? getJurisdictionPhrase() : '[location]'} in accordance with the PayPal User Agreement${state ? ' and AAA rules providing for hearings in the county where the consumer resides' : ''}.</p>
+
+                    <p>Given the size of the dispute and the nature of the issues, claimant requests that the matter be decided ${hearingPreference === 'documents' ? 'on written submissions only, without an in-person hearing' : hearingPreference === 'remote' ? 'via telephonic or video conference hearing' : 'with an in-person hearing in ' + (state ? getJurisdictionPhrase() : '[claimant\'s location]')}${hearingPreference === 'documents' ? ', consistent with AAA Consumer Rules providing for documents-only resolution of claims under $25,000' : ''}.</p>
+
+                    <p><strong>10. RESERVATION OF RIGHTS</strong></p>
+
+                    <p>Claimant reserves the right to supplement or amend this Demand for Arbitration as additional facts or legal issues emerge and as permitted by the AAA rules and the arbitrator's orders.</p>
+
+                    <p style="margin-top: 40px;">
+                    Date: ${currentDate}
+                    </p>
+
+                    ${signature ? `<p class="signature-input" style="text-align: left; border: none; padding: 10px 0; font-size: 28px;">${signature}</p>` : '<p>[Signature]</p>'}
+
+                    <p>
+                    <strong>${fullName || '[Your Name]'}</strong><br/>
+                    Claimant
+                    </p>
+                </div>`;
+            };
+
+            const demandSections = generateDemandLetter();
+            const arbDemand = generateArbDemand();
+
+            const copyToClipboard = () => {
+                const content = demandSections.map(s => s.content).join('\n\n') + (arbDemand || '');
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = content;
+                const text = tempDiv.innerText;
+
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('Copied to clipboard!');
+                }).catch(() => {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = text;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    alert('Copied to clipboard!');
+                });
+            };
+
+            const handleESignature = async () => {
+                // Validate required fields
+                if (!fullName || !email) {
+                    alert('❌ Missing Required Information\n\nPlease provide:\n• Full Legal Name\n• Email Address\n\nThese fields are required for eSignature.');
+                    return;
+                }
+
+                const confirmSend = confirm(
+                    `📧 Send for Electronic Signature?\n\n` +
+                    `This will create a legally binding eSignature request.\n\n` +
+                    `Document will be sent to:\n` +
+                    `Name: ${fullName}\n` +
+                    `Email: ${email}\n\n` +
+                    `Click OK to proceed with eSignature creation.`
+                );
+
+                if (!confirmSend) return;
+
+                try {
+                    // Generate full document text
+                    const demandLetterText = demandSections.map(s => {
+                        const div = document.createElement('div');
+                        div.innerHTML = s.content;
+                        return div.innerText;
+                    }).join('\n\n');
+
+                    const arbDemandText = arbDemand ? (() => {
+                        const div = document.createElement('div');
+                        div.innerHTML = arbDemand;
+                        return div.innerText;
+                    })() : '';
+
+                    const finalDocumentText = demandLetterText + (arbDemandText ? '\n\n' + '='.repeat(80) + '\nARBITRATION DEMAND (ATTACHMENT)\n' + '='.repeat(80) + '\n\n' + arbDemandText : '');
+
+                    const documentTitle = attachArbDemand ? 'PayPal Demand Letter with Arbitration Demand' : 'PayPal Demand Letter';
+
+                    const apiData = {
+                        test: "no",
+                        template: {
+                            title: documentTitle,
+                            content: finalDocumentText,
+                            content_type: "text"
+                        },
+                        signers: [{
+                            email: email,
+                            name: fullName,
+                            role: "signer"
+                        }]
+                    };
+
+                    console.log('Sending to eSignature API:', apiData);
+
+                    // Try Node.js proxy
+                    const response = await fetch('http://localhost:3001/esign-proxy', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(apiData)
+                    });
+
+                    const result = await response.json();
+                    console.log('eSignature API response:', result);
+
+                    if (response.ok && result.status === 'success' && result.data?.signing_url) {
+                        // Open signing URL in new window
+                        window.open(result.data.signing_url, '_blank', 'width=1000,height=800,scrollbars=yes,resizable=yes');
+                        alert(`✅ eSignature Document Created!\n\nContract ID: ${result.data.contract_id}\n\nA new window has opened with your document ready for signature.\n\nAn email has also been sent to ${email} with the signing link.`);
+                    } else {
+                        throw new Error(result.error || 'eSignature creation failed');
+                    }
+
+                } catch (error) {
+                    console.error('eSignature error:', error);
+                    alert(`❌ eSignature Service Unavailable\n\nThe eSignature service is currently unavailable.\n\nError: ${error.message}\n\nPlease try:\n1. Using the "Copy to Clipboard" button to save your document\n2. Using the "Print" button to create a PDF\n3. Contacting support if you need eSignature assistance`);
+                }
+            };
+
+            return (
+                <>
+                    <div className="header">
+                        <div className="header-title">PayPal Fund Hold Demand Letter Generator</div>
+                        <div className="header-subtitle">Generate a contract-compliant Notice of Dispute with optional AAA Arbitration Demand</div>
+                    </div>
+
+                    <div className="generator-container">
+                        <div className="form-panel">
+                            <div className="form-section">
+                                <div className="section-title">Account Information</div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Account Type</label>
+                                    <div className="radio-group">
+                                        <div className="radio-option">
+                                            <input type="radio" id="business" name="accountType" value="business" checked={accountType === 'business'} onChange={(e) => { setAccountType(e.target.value); scrollToSection('account-info'); }} />
+                                            <label htmlFor="business">Business Account</label>
+                                        </div>
+                                        <div className="radio-option">
+                                            <input type="radio" id="personal" name="accountType" value="personal" checked={accountType === 'personal'} onChange={(e) => { setAccountType(e.target.value); scrollToSection('account-info'); }} />
+                                            <label htmlFor="personal">Personal Account</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Full Legal Name</label>
+                                    <input type="text" className="form-input" value={fullName} onChange={(e) => { setFullName(e.target.value); scrollToSection('account-info'); }} placeholder="John Smith" />
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Email Address (PayPal account)</label>
+                                    <input type="email" className="form-input" value={email} onChange={(e) => { setEmail(e.target.value); scrollToSection('account-info'); }} placeholder="john@example.com" />
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Phone Number</label>
+                                    <input type="tel" className="form-input" value={phone} onChange={(e) => { setPhone(e.target.value); scrollToSection('account-info'); }} placeholder="(555) 123-4567" />
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Mailing Address</label>
+                                    <input type="text" className="form-input" value={address} onChange={(e) => { setAddress(e.target.value); scrollToSection('account-info'); }} placeholder="123 Main St, City, State ZIP" />
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">State of Residence</label>
+                                    <select className="form-select" value={state} onChange={(e) => { setState(e.target.value); scrollToSection('legal-theories'); }}>
+                                        <option value="">Select State</option>
+                                        <option value="Alabama">Alabama</option>
+                                        <option value="Alaska">Alaska</option>
+                                        <option value="Arizona">Arizona</option>
+                                        <option value="Arkansas">Arkansas</option>
+                                        <option value="California">California</option>
+                                        <option value="Colorado">Colorado</option>
+                                        <option value="Connecticut">Connecticut</option>
+                                        <option value="Delaware">Delaware</option>
+                                        <option value="District of Columbia">District of Columbia</option>
+                                        <option value="Florida">Florida</option>
+                                        <option value="Georgia">Georgia</option>
+                                        <option value="Hawaii">Hawaii</option>
+                                        <option value="Idaho">Idaho</option>
+                                        <option value="Illinois">Illinois</option>
+                                        <option value="Indiana">Indiana</option>
+                                        <option value="Iowa">Iowa</option>
+                                        <option value="Kansas">Kansas</option>
+                                        <option value="Kentucky">Kentucky</option>
+                                        <option value="Louisiana">Louisiana</option>
+                                        <option value="Maine">Maine</option>
+                                        <option value="Maryland">Maryland</option>
+                                        <option value="Massachusetts">Massachusetts</option>
+                                        <option value="Michigan">Michigan</option>
+                                        <option value="Minnesota">Minnesota</option>
+                                        <option value="Mississippi">Mississippi</option>
+                                        <option value="Missouri">Missouri</option>
+                                        <option value="Montana">Montana</option>
+                                        <option value="Nebraska">Nebraska</option>
+                                        <option value="Nevada">Nevada</option>
+                                        <option value="New Hampshire">New Hampshire</option>
+                                        <option value="New Jersey">New Jersey</option>
+                                        <option value="New Mexico">New Mexico</option>
+                                        <option value="New York">New York</option>
+                                        <option value="North Carolina">North Carolina</option>
+                                        <option value="North Dakota">North Dakota</option>
+                                        <option value="Ohio">Ohio</option>
+                                        <option value="Oklahoma">Oklahoma</option>
+                                        <option value="Oregon">Oregon</option>
+                                        <option value="Pennsylvania">Pennsylvania</option>
+                                        <option value="Rhode Island">Rhode Island</option>
+                                        <option value="South Carolina">South Carolina</option>
+                                        <option value="South Dakota">South Dakota</option>
+                                        <option value="Tennessee">Tennessee</option>
+                                        <option value="Texas">Texas</option>
+                                        <option value="Utah">Utah</option>
+                                        <option value="Vermont">Vermont</option>
+                                        <option value="Virginia">Virginia</option>
+                                        <option value="Washington">Washington</option>
+                                        <option value="West Virginia">West Virginia</option>
+                                        <option value="Wisconsin">Wisconsin</option>
+                                        <option value="Wyoming">Wyoming</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div className="form-section">
+                                <div className="section-title">Hold Details</div>
+
+                                <div className="form-group">
+                                    <label className="form-label">What happened to your account?</label>
+                                    <div className="radio-group">
+                                        <div className="radio-option">
+                                            <input type="radio" id="limited" name="holdType" value="limited" checked={holdType === 'limited'} onChange={(e) => { setHoldType(e.target.value); scrollToSection('background'); }} />
+                                            <label htmlFor="limited">Account is limited, cannot withdraw</label>
+                                        </div>
+                                        <div className="radio-option">
+                                            <input type="radio" id="closed" name="holdType" value="closed" checked={holdType === 'closed'} onChange={(e) => { setHoldType(e.target.value); scrollToSection('background'); }} />
+                                            <label htmlFor="closed">Account closed, 180-day hold</label>
+                                        </div>
+                                        <div className="radio-option">
+                                            <input type="radio" id="reserve" name="holdType" value="reserve" checked={holdType === 'reserve'} onChange={(e) => { setHoldType(e.target.value); scrollToSection('background'); }} />
+                                            <label htmlFor="reserve">Reserve imposed</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Limitation Type</label>
+                                    <div className="radio-group">
+                                        <div className="radio-option">
+                                            <input type="radio" id="temporary" name="limitationType" value="temporary" checked={limitationType === 'temporary'} onChange={(e) => { setLimitationType(e.target.value); scrollToSection('background'); }} />
+                                            <label htmlFor="temporary">Temporary Limitation</label>
+                                        </div>
+                                        <div className="radio-option">
+                                            <input type="radio" id="permanent" name="limitationType" value="permanent" checked={limitationType === 'permanent'} onChange={(e) => { setLimitationType(e.target.value); scrollToSection('background'); }} />
+                                            <label htmlFor="permanent">Permanent Limitation</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Amount Currently Held</label>
+                                    <input type="number" className="form-input" value={amountHeld} onChange={(e) => { setAmountHeld(e.target.value); scrollToSection('background'); }} placeholder="5000.00" step="0.01" />
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Date Hold/Limitation Imposed</label>
+                                    <input type="date" className="form-input" value={holdDate} onChange={(e) => { setHoldDate(e.target.value); scrollToSection('background'); }} />
+                                </div>
+
+                                <div className="checkbox-group">
+                                    <input type="checkbox" id="days180" checked={days180Mentioned} onChange={(e) => { setDays180Mentioned(e.target.checked); scrollToSection('background'); }} />
+                                    <label htmlFor="days180">PayPal mentioned "180 days"</label>
+                                </div>
+
+                                {days180Mentioned && (
+                                    <div className="form-group">
+                                        <label className="form-label">Expected 180-Day End Date</label>
+                                        <input type="date" className="form-input" value={days180Date} onChange={(e) => { setDays180Date(e.target.value); scrollToSection('background'); }} />
+                                    </div>
+                                )}
+
+                                <div className="checkbox-group">
+                                    <input type="checkbox" id="past180" checked={past180Days} onChange={(e) => { setPast180Days(e.target.checked); scrollToSection('contract'); }} />
+                                    <label htmlFor="past180">180-day period has already passed</label>
+                                </div>
+                            </div>
+
+                            <div className="form-section">
+                                <div className="section-title">Reason Given by PayPal</div>
+
+                                <div className="form-group">
+                                    <label className="form-label">What reason did PayPal give?</label>
+                                    <select className="form-select" value={reasonGiven} onChange={(e) => { setReasonGiven(e.target.value); scrollToSection('background'); }}>
+                                        <option value="no_explanation">No specific explanation</option>
+                                        <option value="aup_violation">Acceptable Use Policy violation</option>
+                                        <option value="high_risk">High risk designation</option>
+                                        <option value="unusual_activity">Unusual or suspicious activity</option>
+                                        <option value="too_many_disputes">Too many disputes/chargebacks</option>
+                                        <option value="verification_needed">Additional verification needed</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Additional details about reason (optional)</label>
+                                    <textarea className="form-textarea" value={specificReason} onChange={(e) => { setSpecificReason(e.target.value); scrollToSection('background'); }} placeholder="Any specific language from PayPal emails..."></textarea>
+                                </div>
+                            </div>
+
+                            <div className="form-section">
+                                <div className="section-title">Business & Transaction History</div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Business Description</label>
+                                    <textarea className="form-textarea" value={businessDescription} onChange={(e) => { setBusinessDescription(e.target.value); scrollToSection('background'); }} placeholder="Brief description of your business or how you use PayPal (e.g., 'a small ecommerce store selling handmade jewelry')"></textarea>
+                                    <div className="input-hint">Helps establish legitimacy of your transactions</div>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Number of Chargebacks (last 6-12 months)</label>
+                                    <input type="number" className="form-input" value={chargebackCount} onChange={(e) => { setChargebackCount(e.target.value); scrollToSection('contract'); }} placeholder="0" />
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Number of Disputes (last 6-12 months)</label>
+                                    <input type="number" className="form-input" value={disputeCount} onChange={(e) => { setDisputeCount(e.target.value); scrollToSection('contract'); }} placeholder="0" />
+                                </div>
+                            </div>
+
+                            <div className="form-section">
+                                <div className="section-title">Harm & Damages</div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Describe the harm caused by this hold</label>
+                                    <textarea className="form-textarea" value={harmDescription} onChange={(e) => { setHarmDescription(e.target.value); scrollToSection('harm'); }} placeholder="e.g., 'Unable to pay suppliers, missed rent payment, had to take emergency loan at high interest rate'"></textarea>
+                                </div>
+
+                                <div className="checkbox-group">
+                                    <input type="checkbox" id="seekDamages" checked={seekDamages} onChange={(e) => { setSeekDamages(e.target.checked); scrollToSection('relief'); }} />
+                                    <label htmlFor="seekDamages">I want to seek additional damages in arbitration (not just fund release)</label>
+                                </div>
+                            </div>
+
+                            <div className="form-section">
+                                <div className="section-title">Dispute Resolution Preferences</div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Preferred forum if not resolved</label>
+                                    <div className="radio-group">
+                                        <div className="radio-option">
+                                            <input type="radio" id="aaa" name="preferredForum" value="aaa" checked={preferredForum === 'aaa'} onChange={(e) => { setPreferredForum(e.target.value); scrollToSection('arbitration-notice'); }} />
+                                            <label htmlFor="aaa">AAA Arbitration (recommended for most cases)</label>
+                                        </div>
+                                        <div className="radio-option">
+                                            <input type="radio" id="small_claims" name="preferredForum" value="small_claims" checked={preferredForum === 'small_claims'} onChange={(e) => { setPreferredForum(e.target.value); scrollToSection('arbitration-notice'); }} />
+                                            <label htmlFor="small_claims">Small Claims Court</label>
+                                        </div>
+                                        <div className="radio-option">
+                                            <input type="radio" id="either" name="preferredForum" value="either" checked={preferredForum === 'either'} onChange={(e) => { setPreferredForum(e.target.value); scrollToSection('arbitration-notice'); }} />
+                                            <label htmlFor="either">Either (will decide later)</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="checkbox-group">
+                                    <input type="checkbox" id="attachArb" checked={attachArbDemand} onChange={(e) => setAttachArbDemand(e.target.checked)} />
+                                    <label htmlFor="attachArb">Attach draft AAA Arbitration Demand to this letter</label>
+                                </div>
+
+                                {attachArbDemand && preferredForum === 'aaa' && (
+                                    <div className="form-group">
+                                        <label className="form-label">Hearing preference</label>
+                                        <div className="radio-group">
+                                            <div className="radio-option">
+                                                <input type="radio" id="documents" name="hearingPreference" value="documents" checked={hearingPreference === 'documents'} onChange={(e) => setHearingPreference(e.target.value)} />
+                                                <label htmlFor="documents">Documents only (faster/cheaper)</label>
+                                            </div>
+                                            <div className="radio-option">
+                                                <input type="radio" id="remote" name="hearingPreference" value="remote" checked={hearingPreference === 'remote'} onChange={(e) => setHearingPreference(e.target.value)} />
+                                                <label htmlFor="remote">Remote hearing (phone/video)</label>
+                                            </div>
+                                            <div className="radio-option">
+                                                <input type="radio" id="in_person" name="hearingPreference" value="in_person" checked={hearingPreference === 'in_person'} onChange={(e) => setHearingPreference(e.target.value)} />
+                                                <label htmlFor="in_person">In-person hearing</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="form-section">
+                                <div className="section-title">E-Signature</div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Type your name to sign (optional)</label>
+                                    <input type="text" className="signature-input" value={signature} onChange={(e) => { setSignature(e.target.value); scrollToSection('signature'); }} placeholder="Your signature" />
+                                    <div className="input-hint">Leave blank if printing to sign by hand</div>
+                                </div>
+                            </div>
+
+                            <div className="button-group">
+                                <button className="btn btn-primary" onClick={copyToClipboard}>
+                                    📋 Copy to Clipboard
+                                </button>
+                                <button className="btn btn-primary" onClick={handleESignature}>
+                                    ✍️ Send for E-Signature
+                                </button>
+                                <button className="btn btn-secondary" onClick={() => window.print()}>
+                                    🖨️ Print
+                                </button>
+                            </div>
+
+                            <div className="alert alert-warning">
+                                <strong>Important:</strong> This is a template. Review carefully and customize before sending. Send via certified mail to the Omaha address. Keep copies of everything.
+                            </div>
+                        </div>
+
+                        <div className="preview-panel" ref={previewRef}>
+                            <div className="preview-document">
+                                {demandSections.map((section) => (
+                                    <div
+                                        key={section.id}
+                                        id={section.id}
+                                        className={highlightedSection === section.id ? 'highlight' : ''}
+                                        dangerouslySetInnerHTML={{ __html: section.content }}
+                                    />
+                                ))}
+
+                                {arbDemand && (
+                                    <div dangerouslySetInnerHTML={{ __html: arbDemand }} />
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<PayPalDemandGenerator />);
+    </script>
+</body>
+</html>
