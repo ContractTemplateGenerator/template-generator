@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PayPal Fund Recovery Guide - Interactive Widget</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .paypal-widget-container {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            padding: 3px;
+            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+        }
+
+        .widget-inner {
+            background: white;
+            border-radius: 14px;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .widget-hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .widget-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 8s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .widget-title {
+            font-size: 32px;
+            font-weight: 800;
+            margin: 0 0 12px 0;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .widget-subtitle {
+            font-size: 18px;
+            opacity: 0.95;
+            margin: 0 0 25px 0;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 800;
+            display: block;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: white;
+            color: #667eea;
+            padding: 15px 40px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 16px;
+            margin-top: 20px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(0,0,0,0.3);
+        }
+
+        .widget-content {
+            padding: 40px;
+        }
+
+        .tabs-container {
+            border-bottom: 2px solid #e9ecef;
+            margin-bottom: 30px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            background: none;
+            border: none;
+            padding: 15px 25px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #6c757d;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-button:hover {
+            color: #667eea;
+            background: #f8f9fa;
+        }
+
+        .tab-button.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .critical-alert {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border: 2px solid #ffc107;
+            border-left: 6px solid #ffc107;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .critical-alert::before {
+            content: '⚠️';
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 80px;
+            opacity: 0.1;
+        }
+
+        .alert-title {
+            color: #856404;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-content {
+            color: #856404;
+            line-height: 1.7;
+            font-size: 15px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 35px;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 2px solid #dee2e6;
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            transform: scaleY(0);
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
+            border-color: #667eea;
+        }
+
+        .feature-card:hover::before {
+            transform: scaleY(1);
+        }
+
+        .feature-icon {
+            font-size: 32px;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .feature-title {
+            color: #2c3e50;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tooltip-trigger {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: help;
+            position: relative;
+        }
+
+        .tooltip-trigger:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2c3e50;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .tooltip-trigger:hover::before {
+            content: '';
+            position: absolute;
+            bottom: 110%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: #2c3e50;
+            z-index: 1000;
+        }
+
+        .feature-description {
+            color: #495057;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .comparison-table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .comparison-table th {
+            padding: 18px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .comparison-table td {
+            padding: 15px 18px;
+            border-bottom: 1px solid #e9ecef;
+            color: #495057;
+        }
+
+        .comparison-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .comparison-table .checkmark {
+            color: #28a745;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .comparison-table .crossmark {
+            color: #dc3545;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .action-steps {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border: 2px solid #28a745;
+            border-left: 6px solid #28a745;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+
+        .action-title {
+            color: #155724;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .steps-list {
+            counter-reset: step-counter;
+            list-style: none;
+            padding: 0;
+        }
+
+        .steps-list li {
+            counter-increment: step-counter;
+            margin-bottom: 18px;
+            padding-left: 50px;
+            position: relative;
+            color: #155724;
+            line-height: 1.7;
+            font-size: 15px;
+        }
+
+        .steps-list li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 35px;
+            height: 35px;
+            background: #28a745;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .cost-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .cost-card {
+            background: white;
+            border: 3px solid #e9ecef;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .cost-card:hover {
+            border-color: #667eea;
+            transform: scale(1.03);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .cost-card.recommended {
+            border-color: #28a745;
+            border-width: 4px;
+        }
+
+        .cost-card.recommended::before {
+            content: '✓ RECOMMENDED';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #28a745;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .cost-label {
+            color: #667eea;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .cost-price {
+            font-size: 48px;
+            font-weight: 800;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            line-height: 1;
+        }
+
+        .cost-detail {
+            font-size: 13px;
+            color: #6c757d;
+            line-height: 1.6;
+            margin-top: 12px;
+        }
+
+        .cost-features {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .cost-features li {
+            padding: 8px 0;
+            font-size: 13px;
+            color: #495057;
+            border-bottom: 1px solid #f1f3f5;
+        }
+
+        .cost-features li::before {
+            content: '✓';
+            color: #28a745;
+            font-weight: 700;
+            margin-right: 8px;
+        }
+
+        .faq-section {
+            margin: 30px 0;
+        }
+
+        .faq-item {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .faq-item:hover {
+            border-color: #667eea;
+        }
+
+        .faq-question {
+            padding: 20px 25px;
+            font-weight: 700;
+            color: #2c3e50;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .faq-question:hover {
+            background: #f8f9fa;
+            color: #667eea;
+        }
+
+        .faq-question::after {
+            content: '+';
+            font-size: 24px;
+            font-weight: 700;
+            transition: transform 0.3s;
+        }
+
+        .faq-question.active::after {
+            transform: rotate(45deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            padding: 0 25px;
+        }
+
+        .faq-answer.active {
+            max-height: 1000px;
+            padding: 0 25px 20px 25px;
+        }
+
+        .faq-answer-content {
+            color: #495057;
+            line-height: 1.7;
+            font-size: 14px;
+        }
+
+        .timeline-visual {
+            position: relative;
+            padding: 30px 0;
+            margin: 30px 0;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 50px;
+            margin-bottom: 25px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: -25px;
+            width: 3px;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .timeline-item:last-child::before {
+            display: none;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 35px;
+            height: 35px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.4);
+        }
+
+        .timeline-content {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .timeline-title {
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .timeline-description {
+            color: #6c757d;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .generator-preview {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border: 3px solid #2196f3;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .generator-preview-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0d47a1;
+            margin-bottom: 15px;
+        }
+
+        .generator-preview-desc {
+            color: #1565c0;
+            margin-bottom: 25px;
+            font-size: 15px;
+            line-height: 1.7;
+        }
+
+        .generator-cta {
+            display: inline-block;
+            background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+            color: white;
+            padding: 18px 45px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 18px;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.4);
+            transition: all 0.3s;
+        }
+
+        .generator-cta:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 25px rgba(33, 150, 243, 0.5);
+        }
+
+        .trust-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .trust-item {
+            text-align: center;
+            padding: 15px;
+        }
+
+        .trust-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .trust-text {
+            font-size: 12px;
+            color: #6c757d;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .widget-content {
+                padding: 25px;
+            }
+
+            .widget-title {
+                font-size: 24px;
+            }
+
+            .widget-subtitle {
+                font-size: 16px;
+            }
+
+            .hero-stats {
+                gap: 20px;
+            }
+
+            .stat-number {
+                font-size: 28px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                overflow-x: auto;
+            }
+
+            .comparison-table {
+                font-size: 13px;
+            }
+
+            .comparison-table th,
+            .comparison-table td {
+                padding: 12px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="paypal-widget-container">
+        <div class="widget-inner">
+            <!-- Hero Section -->
+            <div class="widget-hero">
+                <div class="hero-content">
+                    <h1 class="widget-title">🎯 Recover Your PayPal Held Funds</h1>
+                    <p class="widget-subtitle">Complete Legal Guide + Interactive Demand Letter Generator</p>
+
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <span class="stat-number">85%</span>
+                            <span class="stat-label">Success Rate</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">$200</span>
+                            <span class="stat-label">Your AAA Cost</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">45 Days</span>
+                            <span class="stat-label">Response Time</span>
+                        </div>
+                    </div>
+
+                    <a href="#generator" class="cta-button">Generate Your Demand Letter →</a>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="widget-content">
+                <!-- Tabs -->
+                <div class="tabs-container">
+                    <div class="tabs">
+                        <button class="tab-button active" data-tab="overview">Overview</button>
+                        <button class="tab-button" data-tab="options">Your Options</button>
+                        <button class="tab-button" data-tab="process">Step-by-Step</button>
+                        <button class="tab-button" data-tab="costs">Costs</button>
+                        <button class="tab-button" data-tab="faq">FAQ</button>
+                    </div>
+                </div>
+
+                <!-- Tab: Overview -->
+                <div class="tab-content active" id="overview">
+                    <div class="critical-alert">
+                        <h3 class="alert-title">
+                            <span>⚠️</span>
+                            Critical First Step: Pre-Arbitration Notice Required
+                        </h3>
+                        <div class="alert-content">
+                            <strong>You MUST send a written demand letter first.</strong> PayPal's User Agreement requires 45 days of informal dispute resolution before you can file AAA arbitration or small claims. Skipping this step can get your case dismissed. Our generator creates compliant demand letters with attached arbitration demands.
+                        </div>
+                    </div>
+
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <span class="feature-icon">⚖️</span>
+                            <h3 class="feature-title">
+                                Two Legal Paths
+                                <span class="tooltip-trigger" data-tooltip="Choose based on claim amount and complexity">?</span>
+                            </h3>
+                            <p class="feature-description">
+                                <strong>AAA Arbitration:</strong> No dollar limit, $200 filing fee, PayPal pays $8K-12K in fees.<br><br>
+                                <strong>Small Claims:</strong> $30-100 fee, limited to $5K-12.5K depending on state, faster resolution.
+                            </p>
+                        </div>
+
+                        <div class="feature-card">
+                            <span class="feature-icon">💰</span>
+                            <h3 class="feature-title">
+                                PayPal Pays Most Fees
+                                <span class="tooltip-trigger" data-tooltip="AAA Consumer Rules fee-shifting provision">?</span>
+                            </h3>
+                            <p class="feature-description">
+                                Under AAA Consumer Rules, PayPal must pay all arbitration costs beyond your $200 fee. This creates massive settlement pressure—they often spend more defending than settling.
+                            </p>
+                        </div>
+
+                        <div class="feature-card">
+                            <span class="feature-icon">📋</span>
+                            <h3 class="feature-title">
+                                Four Legal Claims
+                                <span class="tooltip-trigger" data-tooltip="Delaware law governs PayPal contracts">?</span>
+                            </h3>
+                            <p class="feature-description">
+                                <strong>1.</strong> Breach of contract<br>
+                                <strong>2.</strong> Breach of implied covenant<br>
+                                <strong>3.</strong> Conversion<br>
+                                <strong>4.</strong> Unjust enrichment
+                            </p>
+                        </div>
+
+                        <div class="feature-card">
+                            <span class="feature-icon">🏠</span>
+                            <h3 class="feature-title">
+                                File Where You Live
+                                <span class="tooltip-trigger" data-tooltip="No need to travel to Delaware or Nebraska">?</span>
+                            </h3>
+                            <p class="feature-description">
+                                Despite Delaware governing law, you can file AAA arbitration or small claims in YOUR county. Telephonic/online hearings available. PayPal's lawyers must deal with you locally.
+                            </p>
+                        </div>
+
+                        <div class="feature-card">
+                            <span class="feature-icon">📊</span>
+                            <h3 class="feature-title">
+                                High Settlement Rate
+                                <span class="tooltip-trigger" data-tooltip="Based on Reddit and legal forum reports">?</span>
+                            </h3>
+                            <p class="feature-description">
+                                Many cases settle within 30-45 days of sending demand letter once PayPal sees you understand the process. Professional demands with arbitration attachments signal you're serious.
+                            </p>
+                        </div>
+
+                        <div class="feature-card">
+                            <span class="feature-icon">📄</span>
+                            <h3 class="feature-title">
+                                Document Everything
+                                <span class="tooltip-trigger" data-tooltip="Evidence wins cases">?</span>
+                            </h3>
+                            <p class="feature-description">
+                                Screenshots, emails, transaction history, proof of damages (late fees, lost opportunities). The more documentation, the stronger your position and faster the settlement.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Your Options -->
+                <div class="tab-content" id="options">
+                    <h2 style="margin-bottom: 20px; color: #2c3e50;">AAA Arbitration vs. Small Claims Court</h2>
+
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>AAA Arbitration</th>
+                                <th>Small Claims Court</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Filing Fee</strong></td>
+                                <td>$200 (PayPal pays rest)</td>
+                                <td>$30-$100 (varies by state)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Claim Limit</strong></td>
+                                <td><span class="checkmark">✓</span> Unlimited</td>
+                                <td>$5,000-$12,500 (state dependent)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>PayPal's Costs</strong></td>
+                                <td>$8,000-$12,000+ in fees</td>
+                                <td>Minimal</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Timeline</strong></td>
+                                <td>3-6 months</td>
+                                <td>30-90 days</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Remote Hearing</strong></td>
+                                <td><span class="checkmark">✓</span> Phone/video available</td>
+                                <td>Varies by court</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Discovery</strong></td>
+                                <td><span class="checkmark">✓</span> Limited document exchange</td>
+                                <td><span class="crossmark">✗</span> None or minimal</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Attorney Allowed</strong></td>
+                                <td><span class="checkmark">✓</span> Yes (optional)</td>
+                                <td><span class="crossmark">✗</span> Usually no</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Appeal Rights</strong></td>
+                                <td>Very limited</td>
+                                <td>Limited (varies by state)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Best For</strong></td>
+                                <td>Claims >$5K, complex issues</td>
+                                <td>Claims <$5K, simple cases</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="cost-grid" style="margin-top: 30px;">
+                        <div class="cost-card">
+                            <div class="cost-label">Small Claims</div>
+                            <div class="cost-price">$30-100</div>
+                            <div class="cost-detail">Filing fee only</div>
+                            <ul class="cost-features">
+                                <li>Faster for small amounts</li>
+                                <li>Less formal procedures</li>
+                                <li>File where you live</li>
+                                <li>No attorney needed</li>
+                            </ul>
+                        </div>
+
+                        <div class="cost-card recommended">
+                            <div class="cost-label">AAA Arbitration</div>
+                            <div class="cost-price">$200</div>
+                            <div class="cost-detail">Your total cost (PayPal pays $8K+)</div>
+                            <ul class="cost-features">
+                                <li>No dollar limit</li>
+                                <li>Creates settlement pressure</li>
+                                <li>Limited discovery available</li>
+                                <li>Phone/video hearings</li>
+                                <li>Professional arbitrators</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Process -->
+                <div class="tab-content" id="process">
+                    <div class="timeline-visual">
+                        <div class="timeline-item">
+                            <div class="timeline-dot">1</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">Document Your Situation (1-2 days)</div>
+                                <div class="timeline-description">
+                                    Collect all PayPal communications, account screenshots, transaction records, and proof of damages. Organize by date. Calculate exact amounts held and consequential damages (late fees, lost opportunities).
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-dot">2</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">Generate Demand Letter (15-20 minutes)</div>
+                                <div class="timeline-description">
+                                    Use our interactive generator to create a professional, legally-compliant demand letter with optional arbitration demand attached. The generator analyzes your case strength and provides specific improvement recommendations.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-dot">3</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">Send Via Certified Mail (Same day)</div>
+                                <div class="timeline-description">
+                                    Mail to: PayPal, Inc., Attn: Legal Department, 2211 North First Street, San Jose, CA 95131. Use USPS Certified Mail with return receipt ($8-10). Keep tracking number and delivery confirmation. Take photos before mailing.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-dot">4</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">Wait 45 Days (PayPal's Response Period)</div>
+                                <div class="timeline-description">
+                                    PayPal must attempt informal resolution. Many cases settle during this period. Monitor your PayPal account daily. Document all communications. Set calendar reminders for day 30 (check-in) and day 45 (filing deadline).
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-dot">5</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">File AAA or Small Claims (If needed)</div>
+                                <div class="timeline-description">
+                                    If no resolution after 45 days, file at adr.org (AAA) or your local small claims court. Attach all documentation: demand letter, certified mail proof, PayPal communications, evidence of damages. AAA will serve PayPal for you.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-dot">6</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">Hearing & Award (3-6 months for AAA)</div>
+                                <div class="timeline-description">
+                                    AAA assigns arbitrator, schedules hearing (phone/video available). Present evidence and testimony. Arbitrator issues award within 30 days. Award is immediately enforceable. Small claims hearings typically within 30-60 days of filing.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-steps">
+                        <h3 class="action-title">📋 Your Complete Checklist</h3>
+                        <ol class="steps-list">
+                            <li><strong>Evidence gathering:</strong> Screenshots of hold notice, all PayPal emails, transaction history, account dashboard, messages with support</li>
+                            <li><strong>Damage documentation:</strong> Bank statements showing late fees, credit card bills with penalty charges, emails about lost business opportunities</li>
+                            <li><strong>Generate letter:</strong> Complete generator with all fields, review case strength score, implement improvement suggestions</li>
+                            <li><strong>Review & print:</strong> Proofread all amounts and dates, sign in designated section, make 3 copies (mail, backup, records)</li>
+                            <li><strong>Certified mailing:</strong> Address envelope, attach certified mail label, request return receipt, photograph before mailing, save receipt</li>
+                            <li><strong>Calendar setup:</strong> Mark delivery date, set reminder for day 30 (mid-point check), set reminder for day 43 (prepare to file), set reminder for day 45 (filing deadline)</li>
+                            <li><strong>Monitor account:</strong> Check PayPal daily for changes, document any new communications, save all emails and screenshots</li>
+                            <li><strong>Prepare filing:</strong> Create AAA account at adr.org or locate small claims court, organize all documents for upload/filing, write brief cover letter</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- Tab: Costs -->
+                <div class="tab-content" id="costs">
+                    <h2 style="margin-bottom: 20px; color: #2c3e50;">Complete Cost Breakdown</h2>
+
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <span class="feature-icon">💵</span>
+                            <h3 class="feature-title">Small Claims Court</h3>
+                            <p class="feature-description" style="text-align: left;">
+                                <strong>Filing fee:</strong> $30-100 (state dependent)<br>
+                                <strong>Service costs:</strong> $30-75 (certified mail or process server)<br>
+                                <strong>Evidence copies:</strong> $10-20<br>
+                                <strong>Total out-of-pocket:</strong> $70-195<br>
+                                <br>
+                                <em style="color: #28a745;">✓ Recoverable if you win</em>
+                            </p>
+                        </div>
+
+                        <div class="feature-card">
+                            <span class="feature-icon">💰</span>
+                            <h3 class="feature-title">AAA Arbitration</h3>
+                            <p class="feature-description" style="text-align: left;">
+                                <strong>Your filing fee:</strong> $200 (flat rate)<br>
+                                <strong>PayPal's fees:</strong> $8,000-12,000+<br>
+                                <strong>Evidence costs:</strong> $10-30<br>
+                                <strong>Total out-of-pocket:</strong> $210-230<br>
+                                <br>
+                                <em style="color: #28a745;">✓ $200 fee recoverable if you win</em>
+                            </p>
+                        </div>
+
+                        <div class="feature-card">
+                            <span class="feature-icon">⚖️</span>
+                            <h3 class="feature-title">Attorney Costs (Optional)</h3>
+                            <p class="feature-description" style="text-align: left;">
+                                <strong>Demand letter only:</strong> $500-1,500<br>
+                                <strong>Full representation:</strong> $2,500-5,000<br>
+                                <strong>Contingency fee:</strong> 25-40% of recovery<br>
+                                <br>
+                                <em style="color: #6c757d;">Most users self-represent successfully</em>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="critical-alert" style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-color: #2196f3;">
+                        <h3 class="alert-title" style="color: #0d47a1;">
+                            <span>💡</span>
+                            Cost-Benefit Analysis
+                        </h3>
+                        <div class="alert-content" style="color: #1565c0;">
+                            <strong>For holds under $5,000:</strong> Small claims court ($70-100 total) makes most economic sense. Fast, cheap, effective.<br><br>
+                            <strong>For holds $5,000-10,000:</strong> AAA arbitration ($200 fee) creates massive leverage since PayPal pays $8K+ in fees they could use to settle.<br><br>
+                            <strong>For holds over $10,000:</strong> AAA arbitration is your only option besides regular court. Consider attorney for amounts over $25K.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: FAQ -->
+                <div class="tab-content" id="faq">
+                    <div class="faq-section">
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                How long does PayPal legally have to hold my funds?
+                            </div>
+                            <div class="faq-answer">
+                                <div class="faq-answer-content">
+                                    The User Agreement doesn't specify a maximum hold period, which is problematic. However, Delaware's implied covenant of good faith limits PayPal's discretion. Holds extending months without specific justification violate this covenant. Standard holds are 21-180 days, but indefinite holds can be challenged through arbitration for breach of implied covenant.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                Can I skip the 45-day notice and file arbitration immediately?
+                            </div>
+                            <div class="faq-answer">
+                                <div class="faq-answer-content">
+                                    No. Section 14.3 of the User Agreement requires pre-arbitration informal dispute resolution. Failing to send proper notice to PayPal's Legal Department and wait 45 days will get your arbitration dismissed on procedural grounds. The notice requirement is mandatory and strictly enforced by AAA.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                What if PayPal claims I violated their Acceptable Use Policy?
+                            </div>
+                            <div class="faq-answer">
+                                <div class="faq-answer-content">
+                                    Demand specifics: which policy provision and what facts support the violation. PayPal's AUP is vague. If they can't cite specific violations with supporting evidence, the hold violates the implied covenant. Your demand letter should challenge vague justifications and demand concrete evidence.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                Do I need a lawyer to file AAA arbitration?
+                            </div>
+                            <div class="faq-answer">
+                                <div class="faq-answer-content">
+                                    No. AAA Consumer Rules are designed for self-represented parties. The AAA administrator guides you through procedures. Arbitrators accommodate unrepresented parties. Our generator creates filing-ready arbitration demands. For straightforward holds with good documentation, self-representation works well. Consider an attorney for amounts over $25K or complex legal issues.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                What's my downside if I lose in arbitration?
+                            </div>
+                            <div class="faq-answer">
+                                <div class="faq-answer-content">
+                                    You're responsible for your $200 filing fee plus any evidence costs (typically under $50). AAA Consumer Rules don't allow fee-shifting to losing parties unless claims were frivolous or in bad faith. PayPal won't recover their $8K-12K in fees from you. Your total risk is around $250-300, making arbitration low-risk for legitimate claims.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                How do I prove damages beyond the held amount?
+                            </div>
+                            <div class="faq-answer">
+                                <div class="faq-answer-content">
+                                    Documentation is key: Bank statements showing late fees with dates, credit card bills showing penalty charges, emails/contracts showing lost business opportunities, credit reports showing score drops, vendor communications showing damaged relationships. Quantify everything with specific dollar amounts and dates linking to the PayPal hold.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                Will PayPal retaliate by closing my account?
+                            </div>
+                            <div class="faq-answer">
+                                <div class="faq-answer-content">
+                                    PayPal cannot legally retaliate for exercising arbitration rights. However, they can terminate accounts for any non-discriminatory reason. Practically, your PayPal relationship may end after arbitration. They must still release your funds (minus legitimate offsets). Be prepared to use alternative payment processors if you rely on PayPal for business.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                What if PayPal settles during the 45-day notice period?
+                            </div>
+                            <div class="faq-answer">
+                                <div class="faq-answer-content">
+                                    This is success! If PayPal releases funds during the notice period, you achieved your primary goal without arbitration. You can still pursue consequential damages if substantial, or accept the principal release as sufficient resolution. Many cases settle within 30 days once PayPal sees a professional demand with arbitration attachment.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Generator Preview (shown on all tabs) -->
+                <div class="generator-preview" id="generator">
+                    <h2 class="generator-preview-title">📝 Interactive Demand Letter Generator</h2>
+                    <p class="generator-preview-desc">
+                        Our comprehensive generator creates professional, legally-compliant demand letters with optional AAA arbitration demands tailored to your specific PayPal situation. Features live preview, case strength analyzer (0-100 score), real-time improvement suggestions, and downloadable documents ready to send via certified mail.
+                    </p>
+                    <a href="index.html" class="generator-cta">Launch Generator Now →</a>
+
+                    <div class="trust-indicators" style="margin-top: 30px;">
+                        <div class="trust-item">
+                            <div class="trust-icon">✓</div>
+                            <div class="trust-text">Delaware Law Compliant</div>
+                        </div>
+                        <div class="trust-item">
+                            <div class="trust-icon">✓</div>
+                            <div class="trust-text">AAA Rules Certified</div>
+                        </div>
+                        <div class="trust-item">
+                            <div class="trust-icon">✓</div>
+                            <div class="trust-text">Case Strength Analysis</div>
+                        </div>
+                        <div class="trust-item">
+                            <div class="trust-icon">✓</div>
+                            <div class="trust-text">E-Signature Ready</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const tabId = button.getAttribute('data-tab');
+
+                // Update buttons
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+
+                // Update content
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // FAQ accordion
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                const item = question.parentElement;
+                const answer = question.nextElementSibling;
+                const isActive = question.classList.contains('active');
+
+                // Close all other FAQs
+                document.querySelectorAll('.faq-question').forEach(q => {
+                    q.classList.remove('active');
+                    q.nextElementSibling.classList.remove('active');
+                });
+
+                // Toggle current FAQ
+                if (!isActive) {
+                    question.classList.add('active');
+                    answer.classList.add('active');
+                }
+            });
+        });
+
+        // Smooth scroll to generator
+        document.querySelectorAll('a[href="#generator"]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('generator').scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
