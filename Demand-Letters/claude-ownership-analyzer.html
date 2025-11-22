@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Ownership & Risk Analyzer</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #1e293b;
+            background: linear-gradient(135deg, #581c87 0%, #7c3aed 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        #root {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .widget-header {
+            background: linear-gradient(135deg, #581c87 0%, #7c3aed 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .widget-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .widget-subtitle {
+            font-size: 16px;
+            opacity: 0.95;
+            font-weight: 400;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f1f5f9;
+            border-bottom: 2px solid #e2e8f0;
+            overflow-x: auto;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 16px 24px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            font-size: 15px;
+            font-weight: 500;
+            color: #64748b;
+            transition: all 0.2s;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab:hover {
+            background: #e2e8f0;
+            color: #581c87;
+        }
+
+        .tab.active {
+            color: #581c87;
+            background: white;
+            border-bottom-color: #7c3aed;
+        }
+
+        .tab-content {
+            padding: 30px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #581c87;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #7c3aed;
+        }
+
+        .section-subtitle {
+            font-size: 18px;
+            font-weight: 600;
+            color: #0f172a;
+            margin: 25px 0 15px 0;
+        }
+
+        .info-text {
+            color: #475569;
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1e293b;
+            font-size: 14px;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #7c3aed;
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            cursor: pointer;
+            font-weight: 500;
+            color: #334155;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .radio-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .radio-option label {
+            cursor: pointer;
+            font-weight: 500;
+            color: #334155;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #581c87 0%, #7c3aed 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #581c87;
+            border: 2px solid #7c3aed;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .result-box {
+            background: #faf5ff;
+            border: 2px solid #7c3aed;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .result-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #581c87;
+            margin-bottom: 15px;
+        }
+
+        .risk-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .risk-low {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .risk-medium {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .risk-high {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .copyright-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .copyright-strong {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .copyright-moderate {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .copyright-weak {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .clause-output {
+            background: #f8fafc;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            max-height: 600px;
+            overflow-y: auto;
+            line-height: 1.8;
+        }
+
+        .clause-output::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .clause-output::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+
+        .clause-output::-webkit-scrollbar-thumb {
+            background: #7c3aed;
+            border-radius: 10px;
+        }
+
+        .example-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.2s;
+        }
+
+        .example-card:hover {
+            border-color: #7c3aed;
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15);
+        }
+
+        .example-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #581c87;
+            margin-bottom: 10px;
+        }
+
+        .example-label {
+            font-weight: 600;
+            color: #64748b;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .example-text {
+            color: #475569;
+            margin-top: 5px;
+            line-height: 1.6;
+        }
+
+        .resource-link {
+            display: block;
+            padding: 15px;
+            background: #faf5ff;
+            border-left: 4px solid #7c3aed;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            color: #581c87;
+            text-decoration: none;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .resource-link:hover {
+            background: #f3e8ff;
+            padding-left: 20px;
+        }
+
+        .alert {
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            border-color: #3b82f6;
+            color: #1e40af;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            border-color: #f59e0b;
+            color: #92400e;
+        }
+
+        .alert-danger {
+            background: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+
+        .compliance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .compliance-item {
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+
+        .compliance-item.compliant {
+            border-color: #10b981;
+        }
+
+        .compliance-item.violation {
+            border-color: #ef4444;
+        }
+
+        .compliance-item.caution {
+            border-color: #f59e0b;
+        }
+
+        .issue-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .issue-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .issue-list li:last-child {
+            border-bottom: none;
+        }
+
+        @media (max-width: 768px) {
+            .widget-title {
+                font-size: 22px;
+            }
+
+            .tab {
+                padding: 12px 16px;
+                font-size: 14px;
+            }
+
+            .tab-content {
+                padding: 20px;
+            }
+
+            .compliance-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useMemo } = React;
+
+        const ClaudeOwnershipWidget = () => {
+            const [activeTab, setActiveTab] = useState('overview');
+
+            // Risk analyzer state
+            const [useCase, setUseCase] = useState('personal');
+            const [userType, setUserType] = useState('consumer');
+            const [outputType, setOutputType] = useState('text');
+            const [intendedUse, setIntendedUse] = useState('internal');
+            const [humanContribution, setHumanContribution] = useState('substantial');
+            const [willDisclose, setWillDisclose] = useState(true);
+            const [competingAI, setCompetingAI] = useState(false);
+            const [highRiskDomain, setHighRiskDomain] = useState(false);
+            const [trainModel, setTrainModel] = useState(false);
+            const [resellOutput, setResellOutput] = useState(false);
+
+            // Copyright checker state
+            const [generationMethod, setGenerationMethod] = useState('collaborative');
+            const [editingLevel, setEditingLevel] = useState('substantial');
+            const [originalInput, setOriginalInput] = useState('detailed');
+            const [humanCreativity, setHumanCreativity] = useState('significant');
+            const [outputComplexity, setOutputComplexity] = useState('complex');
+
+            // Contract clause generator state
+            const [clauseContext, setClauseContext] = useState('employment');
+            const [aiTools, setAiTools] = useState(['claude']);
+            const [scopeOfUse, setScopeOfUse] = useState('assist');
+            const [ownershipModel, setOwnershipModel] = useState('employer');
+            const [disclosureRequirement, setDisclosureRequirement] = useState(true);
+            const [qualityControl, setQualityControl] = useState(true);
+
+            const riskAnalysis = useMemo(() => {
+                let riskLevel = 'low';
+                let issues = [];
+                let recommendations = [];
+                let violations = [];
+
+                // Check for clear violations
+                if (competingAI) {
+                    riskLevel = 'high';
+                    violations.push('Creating competing AI service violates Anthropic\'s non-compete clause');
+                    recommendations.push('STOP: This use case is explicitly prohibited in Terms of Service');
+                }
+
+                if (trainModel) {
+                    riskLevel = 'high';
+                    violations.push('Using outputs to train another AI model is prohibited');
+                    recommendations.push('STOP: Cannot use Claude outputs for model training or development');
+                }
+
+                if (resellOutput && humanContribution === 'minimal') {
+                    if (riskLevel !== 'high') riskLevel = 'high';
+                    violations.push('Reselling unmodified Claude output violates usage policy');
+                    recommendations.push('Add substantial human contribution before commercial use');
+                }
+
+                // High-risk domain checks
+                if (highRiskDomain) {
+                    if (riskLevel === 'low') riskLevel = 'medium';
+                    issues.push('High-risk domain (legal/medical/financial) requires additional precautions');
+                    recommendations.push('Ensure qualified professional reviews all AI-generated content');
+                    recommendations.push('Disclose AI use to end-users/clients');
+                    recommendations.push('Maintain human oversight and final decision-making authority');
+                }
+
+                // Commercial use considerations
+                if (intendedUse === 'commercial' && userType === 'consumer') {
+                    if (riskLevel === 'low') riskLevel = 'medium';
+                    issues.push('Consumer license may not cover extensive commercial exploitation');
+                    recommendations.push('Consider upgrading to Claude API/Commercial license for business use');
+                }
+
+                // Disclosure checks
+                if (!willDisclose && intendedUse !== 'internal') {
+                    if (riskLevel === 'low') riskLevel = 'medium';
+                    issues.push('Lack of AI disclosure may violate transparency requirements');
+                    recommendations.push('Disclose AI assistance in published or commercial content');
+                    recommendations.push('Required disclosure in academic, professional, and high-stakes contexts');
+                }
+
+                // Human contribution assessment
+                if (humanContribution === 'minimal' && intendedUse !== 'internal') {
+                    if (riskLevel === 'low') riskLevel = 'medium';
+                    issues.push('Minimal human contribution weakens ownership and may violate policy');
+                    recommendations.push('Add substantial editing, curation, or original material');
+                    recommendations.push('Cannot publish Claude output verbatim as your own work');
+                }
+
+                // Positive compliance patterns
+                if (violations.length === 0) {
+                    if (humanContribution === 'substantial' && willDisclose) {
+                        recommendations.push('Good compliance: substantial human contribution + disclosure');
+                    }
+                    if (intendedUse === 'internal') {
+                        recommendations.push('Internal use carries lowest compliance risk');
+                    }
+                }
+
+                if (issues.length === 0 && violations.length === 0) {
+                    recommendations.push('No obvious compliance red flags identified');
+                }
+
+                return { riskLevel, issues, violations, recommendations };
+            }, [useCase, userType, outputType, intendedUse, humanContribution, willDisclose, competingAI, highRiskDomain, trainModel, resellOutput]);
+
+            const copyrightAnalysis = useMemo(() => {
+                let score = 0;
+                let strength = 'weak';
+                let factors = [];
+
+                // Generation method (0-2 points)
+                if (generationMethod === 'humanFirst') {
+                    score += 2;
+                    factors.push('✓ Human-first creation with AI assistance strengthens copyright claim');
+                } else if (generationMethod === 'collaborative') {
+                    score += 1;
+                    factors.push('~ Collaborative process: ensure significant human creative input');
+                } else {
+                    factors.push('✗ AI-first generation: weak copyright without substantial human editing');
+                }
+
+                // Editing level (0-3 points)
+                if (editingLevel === 'substantial') {
+                    score += 3;
+                    factors.push('✓ Substantial editing demonstrates human authorship');
+                } else if (editingLevel === 'moderate') {
+                    score += 2;
+                    factors.push('~ Moderate editing: consider adding more original expression');
+                } else if (editingLevel === 'light') {
+                    score += 1;
+                    factors.push('✗ Light editing insufficient for strong copyright claim');
+                } else {
+                    factors.push('✗ No editing: likely not copyrightable as human work');
+                }
+
+                // Original input (0-2 points)
+                if (originalInput === 'detailed') {
+                    score += 2;
+                    factors.push('✓ Detailed creative prompts reflect human authorship');
+                } else if (originalInput === 'moderate') {
+                    score += 1;
+                    factors.push('~ Moderate prompt specificity: could be stronger');
+                } else {
+                    factors.push('✗ Generic prompts weaken copyright claim');
+                }
+
+                // Human creativity (0-2 points)
+                if (humanCreativity === 'significant') {
+                    score += 2;
+                    factors.push('✓ Significant creative decisions by human author');
+                } else if (humanCreativity === 'some') {
+                    score += 1;
+                    factors.push('~ Some creative input: increase for stronger protection');
+                } else {
+                    factors.push('✗ Minimal creativity: may not meet originality threshold');
+                }
+
+                // Output complexity (0-1 point)
+                if (outputComplexity === 'complex') {
+                    score += 1;
+                    factors.push('✓ Complex creative work more likely copyrightable');
+                } else if (outputComplexity === 'moderate') {
+                    factors.push('~ Moderate complexity: adequate for copyright if human-authored');
+                } else {
+                    factors.push('✗ Simple/factual output may lack originality for copyright');
+                }
+
+                // Determine strength (out of 10 points)
+                if (score >= 8) {
+                    strength = 'strong';
+                } else if (score >= 5) {
+                    strength = 'moderate';
+                } else {
+                    strength = 'weak';
+                }
+
+                return { strength, score, factors };
+            }, [generationMethod, editingLevel, originalInput, humanCreativity, outputComplexity]);
+
+            const generateClause = () => {
+                const toolsList = aiTools.map(t => {
+                    const names = {
+                        claude: 'Claude (Anthropic)',
+                        chatgpt: 'ChatGPT (OpenAI)',
+                        copilot: 'GitHub Copilot',
+                        other: 'other AI tools'
+                    };
+                    return names[t] || t;
+                }).join(', ');
+
+                let clause = '';
+
+                if (clauseContext === 'employment') {
+                    clause = `AI TOOLS USAGE AND OWNERSHIP
+
+1. Permitted AI Tools
+Employee may use the following AI tools to assist in performing work duties: ${toolsList}.
+
+2. Scope of Permitted Use
+AI tools may be used to ${scopeOfUse === 'assist' ? 'assist with and enhance Employee\'s work, including drafting, research, analysis, and ideation' : scopeOfUse === 'primary' ? 'serve as a primary tool for content generation, subject to human review and editing requirements below' : 'supplement Employee\'s work on a limited basis for routine tasks'}.
+
+3. Human Authorship and Quality Control
+${qualityControl ? 'Employee must:\n   a) Exercise substantial creative judgment and editorial control over all AI-assisted work\n   b) Review, verify, and edit all AI-generated content before submission or publication\n   c) Ensure all AI-assisted work meets Company quality and accuracy standards\n   d) Add significant original human contribution to AI-generated outputs' : 'Employee is responsible for reviewing and editing AI-generated content as needed to meet Company standards.'}
+
+4. Ownership of Work Product
+${ownershipModel === 'employer' ? 'All work product created by Employee using AI tools in the course of employment, including AI-assisted works, shall be deemed works made for hire and the exclusive property of Employer. Employee hereby assigns to Employer any rights Employee may have in such work product.' : ownershipModel === 'joint' ? 'Work product created collaboratively between Employee and Employer using AI tools shall be jointly owned, with each party retaining equal rights unless otherwise agreed in writing.' : 'Employee retains ownership of work product created using AI tools, subject to a perpetual, worldwide license granted to Employer for business purposes.'}
+
+5. Disclosure Requirements
+${disclosureRequirement ? 'Employee must:\n   a) Disclose to Employer the use of AI tools in creating any work product\n   b) Maintain records of AI tool usage for significant projects\n   c) Inform external clients or end-users when AI tools were used in deliverables, where appropriate\n   d) Follow Company disclosure policies for AI-assisted content' : 'Employee should inform Employer when AI tools are used for substantial portions of deliverables.'}
+
+6. Prohibited Uses
+Employee shall not use AI tools to:
+   a) Create products or services that compete with the AI tool provider or Employer
+   b) Generate content for training other AI models or machine learning systems
+   c) Produce content that violates AI provider terms of service or usage policies
+   d) Make automated decisions in high-stakes areas (employment, credit, legal matters) without human oversight
+   e) Create deceptive, fraudulent, or illegal content
+   f) Violate third-party intellectual property rights
+
+7. Compliance with AI Provider Terms
+Employee agrees to comply with all terms of service, usage policies, and acceptable use policies of AI tool providers. Any violation of such terms may result in disciplinary action.
+
+8. Data Privacy and Confidentiality
+Employee shall not input confidential, proprietary, or sensitive personal information into AI tools without prior authorization and appropriate data protection measures.
+
+9. Professional Responsibility
+${clauseContext === 'employment' && aiTools.includes('claude') ? 'For work in regulated or high-risk domains (legal, medical, financial), Employee must:\n   a) Ensure a qualified professional reviews all AI-generated content\n   b) Maintain appropriate professional liability coverage\n   c) Comply with industry-specific ethical obligations regarding AI use\n   d) Exercise independent professional judgment in all final work product' : 'Employee maintains professional responsibility for all work product and cannot delegate final decision-making to AI tools.'}
+
+10. Right to Modify or Restrict
+Employer reserves the right to modify, restrict, or prohibit the use of specific AI tools at any time based on business needs, legal requirements, or changes in AI provider policies.`;
+
+                } else if (clauseContext === 'contractor') {
+                    clause = `INDEPENDENT CONTRACTOR AI USAGE AGREEMENT
+
+1. AI Tool Authorization
+Contractor is authorized to use ${toolsList} ("AI Tools") in performing services under this Agreement.
+
+2. Scope and Limitations
+Contractor may use AI Tools to ${scopeOfUse === 'assist' ? 'assist in completing deliverables, provided that Contractor maintains creative control and adds substantial original work' : scopeOfUse === 'primary' ? 'generate primary content, subject to Contractor\'s review, editing, and human oversight as specified below' : 'supplement Contractor\'s services on a limited basis for routine tasks'}.
+
+3. Work Product Ownership
+${ownershipModel === 'employer' ? 'All deliverables and work product created by Contractor using AI Tools shall be the exclusive property of Client. Contractor hereby assigns all right, title, and interest in such work product to Client, including any rights Contractor may have received from AI tool providers.' : ownershipModel === 'joint' ? 'Work product shall be jointly owned by Client and Contractor, with usage rights as specified in a separate licensing agreement.' : 'Contractor retains ownership of work product but grants Client an exclusive, perpetual, worldwide license to use all deliverables for Client\'s business purposes.'}
+
+4. Human Authorship Warranty
+Contractor represents and warrants that:
+   a) All deliverables contain substantial human creative input and editorial oversight
+   b) AI-generated content has been reviewed, verified, and edited by Contractor
+   c) Final work product meets professional standards for quality and accuracy
+   d) Contractor has exercised independent judgment in creating deliverables
+
+5. Disclosure Obligations
+${disclosureRequirement ? 'Contractor must:\n   a) Disclose to Client when AI Tools are used in creating deliverables\n   b) Provide details on the extent of AI assistance upon Client request\n   c) Identify AI-generated portions of work product if requested\n   d) Ensure end-users are informed of AI usage where appropriate or required' : 'Contractor should inform Client when AI Tools are used for substantial portions of deliverables.'}
+
+6. Compliance and Prohibited Uses
+Contractor agrees to:
+   a) Comply with all AI provider terms of service and usage policies
+   b) Not use AI Tools to create competing services or train other AI models
+   c) Not input Client confidential information into AI Tools without authorization
+   d) Not use AI Tools for prohibited purposes (fraud, illegal content, unauthorized automation)
+   e) Maintain human oversight for high-stakes or regulated domain work
+
+7. Indemnification for AI Use
+Contractor shall indemnify and hold harmless Client from any claims arising from:
+   a) Contractor\'s violation of AI tool provider terms of service
+   b) Copyright infringement in AI-generated content included in deliverables
+   c) Failure to comply with disclosure or human oversight requirements
+   d) Unauthorized use of AI Tools in violation of this Agreement
+
+8. Quality and Accuracy
+Contractor remains solely responsible for the quality, accuracy, and fitness for purpose of all deliverables, regardless of AI tool usage. AI Tools do not diminish Contractor\'s professional obligations.
+
+9. Client Right to Audit
+Client reserves the right to request documentation of AI tool usage, including prompts, outputs, and editing history, to verify compliance with this Agreement.
+
+10. Modification of AI Usage Rights
+Client may modify or restrict Contractor\'s use of specific AI Tools upon written notice, in which case Contractor shall have a reasonable time to adjust workflows.`;
+
+                } else if (clauseContext === 'freelance') {
+                    clause = `FREELANCE AI TOOL USAGE TERMS
+
+1. AI-Assisted Services
+Freelancer uses ${toolsList} to assist in delivering services. These tools enhance efficiency and quality while maintaining human creative oversight.
+
+2. Deliverable Ownership
+${ownershipModel === 'employer' ? 'Client owns all deliverables. Freelancer assigns any rights in AI-assisted work product to Client upon payment.' : ownershipModel === 'joint' ? 'Freelancer and Client share rights to deliverables as specified in project agreement.' : 'Freelancer retains copyright but grants Client license to use deliverables for agreed purposes.'}
+
+3. Human Creativity Standards
+All deliverables include:
+   • Substantial human creative input and decision-making
+   • Professional editing and quality control
+   • Original analysis, insights, or expression beyond AI output
+   • Verification of factual accuracy and relevance
+
+4. Transparency
+${disclosureRequirement ? 'Freelancer discloses AI tool usage in deliverables and maintains transparency about the creative process.' : 'AI usage disclosed upon client request.'}
+
+5. Professional Standards
+Freelancer:
+   • Complies with AI provider terms of service
+   • Does not use client data inappropriately in AI tools
+   • Maintains professional quality regardless of AI assistance
+   • Exercises independent professional judgment
+
+6. Prohibited Uses
+Freelancer will not:
+   • Deliver unedited AI output as finished work
+   • Use outputs to train competing AI models
+   • Violate AI provider usage policies
+   • Misrepresent AI-generated content as entirely human-created
+
+7. Client Satisfaction
+If Client is unsatisfied with AI-assisted work, Freelancer will revise deliverables or provide alternatives with different methodologies.`;
+
+                } else if (clauseContext === 'vendor') {
+                    clause = `VENDOR AI TOOLS USAGE ADDENDUM
+
+1. AI Tool Disclosure
+Vendor uses the following AI tools in providing Services: ${toolsList}.
+
+2. Service Delivery
+AI tools are used to ${scopeOfUse === 'assist' ? 'enhance service delivery efficiency while maintaining human expertise and oversight' : scopeOfUse === 'primary' ? 'generate primary service outputs, subject to human review and quality control processes' : 'supplement services on a limited basis for routine tasks'}.
+
+3. Data Privacy and Security
+Vendor shall:
+   a) Not input Customer confidential or personal data into AI tools without encryption or Customer consent
+   b) Comply with applicable data protection laws (GDPR, CCPA, etc.)
+   c) Use AI tools in accordance with Customer\'s data processing agreements
+   d) Maintain audit logs of AI tool usage involving Customer data
+
+4. Quality Assurance
+${qualityControl ? 'Vendor maintains rigorous quality control processes:\n   • Human expert review of all AI-generated outputs\n   • Verification of accuracy and completeness\n   • Testing and validation procedures\n   • Continuous improvement based on Customer feedback' : 'Vendor is responsible for ensuring AI-assisted services meet agreed quality standards.'}
+
+5. Intellectual Property
+${ownershipModel === 'employer' ? 'All work product and deliverables created for Customer are Customer\'s exclusive property. Vendor assigns any rights in AI-assisted content to Customer.' : 'Rights in deliverables are allocated per the Master Services Agreement, with Customer receiving necessary licenses for business use.'}
+
+6. Transparency and Disclosure
+${disclosureRequirement ? 'Vendor will:\n   • Disclose AI tool usage in service delivery\n   • Provide details on AI methodologies upon request\n   • Identify AI-generated content in deliverables where appropriate\n   • Maintain transparency with end-users as required' : 'Vendor discloses AI usage upon Customer request.'}
+
+7. Compliance Obligations
+Vendor warrants that its use of AI tools:
+   a) Complies with all AI provider terms of service
+   b) Does not violate third-party intellectual property rights
+   c) Adheres to industry standards and regulations
+   d) Meets professional and ethical obligations in Customer\'s industry
+
+8. Liability and Indemnification
+Vendor agrees to:
+   a) Maintain appropriate professional liability insurance
+   b) Indemnify Customer for claims arising from AI tool misuse
+   c) Take responsibility for errors in AI-assisted deliverables
+   d) Provide remedies if AI-generated content causes issues for Customer
+
+9. Audit Rights
+Customer may audit Vendor\'s AI tool usage to ensure compliance with this Addendum and applicable regulations.
+
+10. Service Level Maintenance
+Use of AI tools does not reduce Vendor\'s service level obligations or performance standards under the Agreement.`;
+                }
+
+                return clause;
+            };
+
+            const copyToClipboard = (text) => {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('Copied to clipboard!');
+                }).catch(() => {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = text;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    alert('Copied to clipboard!');
+                });
+            };
+
+            const useCaseExamples = [
+                {
+                    type: 'Legal Professional',
+                    acceptable: 'Lawyer uses Claude to draft contract clause, then extensively reviews, edits, and tailors it to client needs. Final contract is primarily lawyer\'s work.',
+                    problematic: 'Lawyer gives client a Claude-generated contract with minimal editing, or files Claude-generated brief in court as-is. Violates human-in-the-loop requirement.',
+                    tips: 'Treat Claude as draft generator. Always add substantial professional judgment. Verify all citations. Protect client confidentiality.'
+                },
+                {
+                    type: 'Creative Writer',
+                    acceptable: 'Author asks Claude for plot ideas and character descriptions, then writes novel with own voice and style. Claude used for brainstorming.',
+                    problematic: 'Writer has Claude generate entire chapters and publishes with minimal changes. Output used verbatim without human creative contribution.',
+                    tips: 'Use for overcoming writer\'s block. Infuse your own style. Consider acknowledging AI assistance in author\'s note.'
+                },
+                {
+                    type: 'Journalist',
+                    acceptable: 'Reporter uses Claude to outline key points from research, then writes article with own analysis and quotes. Claude assists research.',
+                    problematic: 'News site auto-generates articles via Claude and publishes under human byline. No fact-checking or editing. Violates disclosure policy.',
+                    tips: 'Always fact-check AI output. Maintain editorial control. Disclose AI assistance for transparency.'
+                },
+                {
+                    type: 'Academic/Student',
+                    acceptable: 'Student uses Claude to summarize papers and explain concepts, then writes literature review in own words citing original sources.',
+                    problematic: 'Student has Claude write entire essay and submits as own work. Clear plagiarism and academic dishonesty.',
+                    tips: 'Use as tutor, not cheat-sheet. Follow school honor code. Cite or acknowledge AI assistance per institutional policy.'
+                },
+                {
+                    type: 'Software Developer',
+                    acceptable: 'Developer asks Claude for code snippets, tests them, modifies for specific needs, integrates into larger project with human-written code.',
+                    problematic: 'Startup lets Claude generate entire app codebase and sells commercially without review. Insufficient human contribution for consumer license.',
+                    tips: 'Use API license for commercial code. Always test AI code. Watch for security issues. Maintain human oversight.'
+                }
+            ];
+
+            return (
+                <>
+                    <div className="widget-header">
+                        <div className="widget-title">Claude Ownership & Risk Analyzer</div>
+                        <div className="widget-subtitle">Understand your rights and obligations when using Claude's AI outputs</div>
+                    </div>
+
+                    <div className="tabs">
+                        <button className={`tab ${activeTab === 'overview' ? 'active' : ''}`} onClick={() => setActiveTab('overview')}>Overview</button>
+                        <button className={`tab ${activeTab === 'risk' ? 'active' : ''}`} onClick={() => setActiveTab('risk')}>Risk Analyzer</button>
+                        <button className={`tab ${activeTab === 'copyright' ? 'active' : ''}`} onClick={() => setActiveTab('copyright')}>Copyright Checker</button>
+                        <button className={`tab ${activeTab === 'clauses' ? 'active' : ''}`} onClick={() => setActiveTab('clauses')}>Contract Clauses</button>
+                        <button className={`tab ${activeTab === 'examples' ? 'active' : ''}`} onClick={() => setActiveTab('examples')}>Use Cases</button>
+                        <button className={`tab ${activeTab === 'resources' ? 'active' : ''}`} onClick={() => setActiveTab('resources')}>Resources</button>
+                    </div>
+
+                    <div className="tab-content">
+                        {activeTab === 'overview' && (
+                            <div>
+                                <div className="section-title">Understanding Claude Output Ownership</div>
+                                <div className="info-text">
+                                    Anthropic's Terms of Service state: <em>"Subject to your compliance with our Terms, we assign to you all of our right, title, and interest—if any—in Outputs."</em> This means you own Claude's outputs, but with important qualifications and restrictions.
+                                </div>
+
+                                <div className="section-subtitle">Key Ownership Principles</div>
+                                <div className="alert alert-info">
+                                    <strong>"If Any" Rights:</strong> Anthropic assigns you whatever rights exist, but AI-generated content may not be copyrightable without sufficient human authorship. Copyright law requires human creativity.
+                                </div>
+                                <div className="alert alert-warning">
+                                    <strong>Compliance Requirement:</strong> Ownership transfer is conditional on following Anthropic's Terms and Usage Policy. Violations can forfeit your rights to outputs.
+                                </div>
+
+                                <div className="section-subtitle">What You CAN Do</div>
+                                <div className="compliance-grid">
+                                    <div className="compliance-item compliant">
+                                        <strong>✓ Use for personal/internal projects</strong>
+                                        <div style={{fontSize: '14px', marginTop: '5px', color: '#475569'}}>
+                                            Brainstorming, drafting, research, editing within your organization
+                                        </div>
+                                    </div>
+                                    <div className="compliance-item compliant">
+                                        <strong>✓ Incorporate with your contributions</strong>
+                                        <div style={{fontSize: '14px', marginTop: '5px', color: '#475569'}}>
+                                            Add substantial human creativity to create derivative works
+                                        </div>
+                                    </div>
+                                    <div className="compliance-item compliant">
+                                        <strong>✓ Use in supervised high-risk domains</strong>
+                                        <div style={{fontSize: '14px', marginTop: '5px', color: '#475569'}}>
+                                            Legal, medical, financial work with human expert review
+                                        </div>
+                                    </div>
+                                    <div className="compliance-item compliant">
+                                        <strong>✓ Commercial use with API license</strong>
+                                        <div style={{fontSize: '14px', marginTop: '5px', color: '#475569'}}>
+                                            Business customers can integrate outputs into products/services
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="section-subtitle">What You CANNOT Do</div>
+                                <div className="compliance-grid">
+                                    <div className="compliance-item violation">
+                                        <strong>✗ Build competing AI service</strong>
+                                        <div style={{fontSize: '14px', marginTop: '5px', color: '#475569'}}>
+                                            Using outputs to train models or create AI rivals is prohibited
+                                        </div>
+                                    </div>
+                                    <div className="compliance-item violation">
+                                        <strong>✗ Publish output verbatim</strong>
+                                        <div style={{fontSize: '14px', marginTop: '5px', color: '#475569'}}>
+                                            Cannot sell/distribute Claude's raw output without adding your work
+                                        </div>
+                                    </div>
+                                    <div className="compliance-item violation">
+                                        <strong>✗ Deceive about authorship</strong>
+                                        <div style={{fontSize: '14px', marginTop: '5px', color: '#475569'}}>
+                                            Must disclose AI use in contexts where it would mislead
+                                        </div>
+                                    </div>
+                                    <div className="compliance-item violation">
+                                        <strong>✗ Illegal or harmful content</strong>
+                                        <div style={{fontSize: '14px', marginTop: '5px', color: '#475569'}}>
+                                            Fraud, deepfakes, hate speech, surveillance, prohibited
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="section-subtitle">Copyright Reality Check</div>
+                                <div className="info-text">
+                                    <strong>Human Authorship Required:</strong> U.S. Copyright Office will not register works "produced by a machine or mere mechanical process." Purely AI-generated content likely has no copyright protection.
+                                </div>
+                                <div className="info-text">
+                                    <strong>How to Strengthen Copyright:</strong> Add substantial human creative input through detailed prompts, extensive editing, curation/arrangement, critical transformation, or integration with original work.
+                                </div>
+
+                                <div className="alert alert-success">
+                                    <strong>Best Practice:</strong> View Claude as a collaborative tool. You steer creative direction, add original touches, and verify outputs. The more human contribution, the stronger your ownership and copyright claim.
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'risk' && (
+                            <div>
+                                <div className="section-title">Claude Usage Risk Analyzer</div>
+                                <div className="info-text">
+                                    Answer these questions to assess compliance risk with Anthropic's Terms of Service and Usage Policy.
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">What type of user are you?</label>
+                                    <select className="form-select" value={userType} onChange={(e) => setUserType(e.target.value)}>
+                                        <option value="consumer">Consumer (Claude.ai / Claude Pro)</option>
+                                        <option value="api">API / Commercial Customer</option>
+                                        <option value="enterprise">Enterprise Customer</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Primary use case</label>
+                                    <select className="form-select" value={useCase} onChange={(e) => setUseCase(e.target.value)}>
+                                        <option value="personal">Personal / Learning</option>
+                                        <option value="professional">Professional / Work</option>
+                                        <option value="creative">Creative / Artistic</option>
+                                        <option value="technical">Software Development</option>
+                                        <option value="academic">Academic / Research</option>
+                                        <option value="business">Business / Commercial</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Type of output generated</label>
+                                    <select className="form-select" value={outputType} onChange={(e) => setOutputType(e.target.value)}>
+                                        <option value="text">Text / Writing</option>
+                                        <option value="code">Code / Software</option>
+                                        <option value="analysis">Analysis / Research</option>
+                                        <option value="creative">Creative Content</option>
+                                        <option value="advice">Professional Advice</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Intended use of outputs</label>
+                                    <select className="form-select" value={intendedUse} onChange={(e) => setIntendedUse(e.target.value)}>
+                                        <option value="internal">Internal / Private Use</option>
+                                        <option value="published">Published / Public Content</option>
+                                        <option value="commercial">Commercial Product/Service</option>
+                                        <option value="client">Client Deliverables</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Level of human contribution</label>
+                                    <select className="form-select" value={humanContribution} onChange={(e) => setHumanContribution(e.target.value)}>
+                                        <option value="substantial">Substantial editing & original additions</option>
+                                        <option value="moderate">Moderate editing & refinement</option>
+                                        <option value="light">Light editing / minor changes</option>
+                                        <option value="minimal">Using output mostly as-is</option>
+                                    </select>
+                                </div>
+
+                                <div className="checkbox-group">
+                                    <input type="checkbox" id="disclose" checked={willDisclose} onChange={(e) => setWillDisclose(e.target.checked)} />
+                                    <label htmlFor="disclose">I will disclose AI use when publishing/sharing outputs</label>
+                                </div>
+
+                                <div className="checkbox-group">
+                                    <input type="checkbox" id="highrisk" checked={highRiskDomain} onChange={(e) => setHighRiskDomain(e.target.checked)} />
+                                    <label htmlFor="highrisk">Working in high-risk domain (legal, medical, financial)</label>
+                                </div>
+
+                                <div className="alert alert-danger" style={{marginBottom: '15px'}}>
+                                    <strong>Prohibited Activities - Check any that apply:</strong>
+                                </div>
+
+                                <div className="checkbox-group">
+                                    <input type="checkbox" id="compete" checked={competingAI} onChange={(e) => setCompetingAI(e.target.checked)} />
+                                    <label htmlFor="compete">Building competing AI service or product</label>
+                                </div>
+
+                                <div className="checkbox-group">
+                                    <input type="checkbox" id="train" checked={trainModel} onChange={(e) => setTrainModel(e.target.checked)} />
+                                    <label htmlFor="train">Using outputs to train another AI model</label>
+                                </div>
+
+                                <div className="checkbox-group">
+                                    <input type="checkbox" id="resell" checked={resellOutput} onChange={(e) => setResellOutput(e.target.checked)} />
+                                    <label htmlFor="resell">Reselling Claude's outputs as standalone product</label>
+                                </div>
+
+                                <div className="result-box">
+                                    <div className="result-title">Risk Assessment</div>
+                                    <div style={{marginBottom: '15px'}}>
+                                        <strong>Compliance Risk Level: </strong>
+                                        <span className={`risk-badge risk-${riskAnalysis.riskLevel}`}>
+                                            {riskAnalysis.riskLevel}
+                                        </span>
+                                    </div>
+
+                                    {riskAnalysis.violations.length > 0 && (
+                                        <>
+                                            <div className="section-subtitle">⚠️ Terms of Service Violations</div>
+                                            <ul className="issue-list">
+                                                {riskAnalysis.violations.map((violation, idx) => (
+                                                    <li key={idx} style={{color: '#991b1b', fontWeight: 600}}>
+                                                        ✗ {violation}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </>
+                                    )}
+
+                                    {riskAnalysis.issues.length > 0 && (
+                                        <>
+                                            <div className="section-subtitle">Issues Identified</div>
+                                            <ul className="issue-list">
+                                                {riskAnalysis.issues.map((issue, idx) => (
+                                                    <li key={idx}>• {issue}</li>
+                                                ))}
+                                            </ul>
+                                        </>
+                                    )}
+
+                                    <div className="section-subtitle">Recommendations</div>
+                                    <ul className="issue-list">
+                                        {riskAnalysis.recommendations.map((rec, idx) => (
+                                            <li key={idx}>{idx + 1}. {rec}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+
+                                <div className="alert alert-info" style={{marginTop: '20px'}}>
+                                    <strong>Need Legal Advice?</strong> This tool provides general guidance. For specific situations involving significant commercial use or complex legal questions, consult an attorney familiar with AI and IP law.
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'copyright' && (
+                            <div>
+                                <div className="section-title">Copyright Strength Assessment</div>
+                                <div className="info-text">
+                                    Evaluate how likely your Claude-assisted work is to be copyrightable. Remember: U.S. copyright requires human authorship and originality.
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">How was the work created?</label>
+                                    <div className="radio-group">
+                                        <div className="radio-option">
+                                            <input type="radio" id="humanFirst" name="generation" value="humanFirst" checked={generationMethod === 'humanFirst'} onChange={(e) => setGenerationMethod(e.target.value)} />
+                                            <label htmlFor="humanFirst">I created most content first, used Claude to enhance/refine</label>
+                                        </div>
+                                        <div className="radio-option">
+                                            <input type="radio" id="collaborative" name="generation" value="collaborative" checked={generationMethod === 'collaborative'} onChange={(e) => setGenerationMethod(e.target.value)} />
+                                            <label htmlFor="collaborative">Collaborative: significant back-and-forth with Claude</label>
+                                        </div>
+                                        <div className="radio-option">
+                                            <input type="radio" id="aiFirst" name="generation" value="aiFirst" checked={generationMethod === 'aiFirst'} onChange={(e) => setGenerationMethod(e.target.value)} />
+                                            <label htmlFor="aiFirst">Claude generated most content, I edited/curated</label>
+                                        </div>
+                                        <div className="radio-option">
+                                            <input type="radio" id="aiOnly" name="generation" value="aiOnly" checked={generationMethod === 'aiOnly'} onChange={(e) => setGenerationMethod(e.target.value)} />
+                                            <label htmlFor="aiOnly">Claude generated content with minimal human input</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">How much editing did you do?</label>
+                                    <select className="form-select" value={editingLevel} onChange={(e) => setEditingLevel(e.target.value)}>
+                                        <option value="substantial">Substantial: rewrote significantly, added new sections</option>
+                                        <option value="moderate">Moderate: refined language, reorganized, improved</option>
+                                        <option value="light">Light: fixed grammar, minor tweaks</option>
+                                        <option value="none">None: used Claude's output as-is</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">How detailed were your prompts?</label>
+                                    <select className="form-select" value={originalInput} onChange={(e) => setOriginalInput(e.target.value)}>
+                                        <option value="detailed">Detailed creative direction, specific constraints</option>
+                                        <option value="moderate">Moderate specificity with some creative input</option>
+                                        <option value="generic">Generic prompts with minimal direction</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Your creative contribution</label>
+                                    <select className="form-select" value={humanCreativity} onChange={(e) => setHumanCreativity(e.target.value)}>
+                                        <option value="significant">Significant: original ideas, analysis, structure</option>
+                                        <option value="some">Some: guided direction and made key decisions</option>
+                                        <option value="minimal">Minimal: mostly accepted Claude's suggestions</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Complexity of final work</label>
+                                    <select className="form-select" value={outputComplexity} onChange={(e) => setOutputComplexity(e.target.value)}>
+                                        <option value="complex">Complex creative or technical work</option>
+                                        <option value="moderate">Moderate complexity</option>
+                                        <option value="simple">Simple or factual content</option>
+                                    </select>
+                                </div>
+
+                                <div className="result-box">
+                                    <div className="result-title">Copyright Strength Analysis</div>
+                                    <div style={{marginBottom: '15px'}}>
+                                        <strong>Copyright Claim Strength: </strong>
+                                        <span className={`copyright-badge copyright-${copyrightAnalysis.strength}`}>
+                                            {copyrightAnalysis.strength}
+                                        </span>
+                                        <span style={{marginLeft: '10px', color: '#64748b'}}>
+                                            (Score: {copyrightAnalysis.score}/10)
+                                        </span>
+                                    </div>
+
+                                    <div className="section-subtitle">Contributing Factors</div>
+                                    <ul className="issue-list">
+                                        {copyrightAnalysis.factors.map((factor, idx) => (
+                                            <li key={idx}>{factor}</li>
+                                        ))}
+                                    </ul>
+
+                                    <div className="section-subtitle">Recommendations</div>
+                                    {copyrightAnalysis.strength === 'strong' && (
+                                        <div className="alert alert-success">
+                                            Your work shows strong human authorship. Continue documenting your creative process (save prompts, drafts, edits) to support copyright registration if needed.
+                                        </div>
+                                    )}
+                                    {copyrightAnalysis.strength === 'moderate' && (
+                                        <div className="alert alert-warning">
+                                            Copyright protection possible but not guaranteed. Consider adding more human creative input, original analysis, or transformative editing to strengthen your claim.
+                                        </div>
+                                    )}
+                                    {copyrightAnalysis.strength === 'weak' && (
+                                        <div className="alert alert-danger">
+                                            Weak copyright claim. The work may be considered AI-generated without sufficient human authorship. To improve copyrightability:
+                                            <ul style={{marginTop: '10px', marginLeft: '20px'}}>
+                                                <li>Substantially rewrite and add original expression</li>
+                                                <li>Infuse your unique voice, style, and insights</li>
+                                                <li>Add new sections with original analysis</li>
+                                                <li>Curate/arrange multiple outputs creatively</li>
+                                                <li>Use Claude as brainstorming tool, not final author</li>
+                                            </ul>
+                                        </div>
+                                    )}
+
+                                    <div className="info-text" style={{marginTop: '15px'}}>
+                                        <strong>Legal Note:</strong> Copyright registration for AI-assisted works may require disclosure of AI involvement and demonstration of human creative contribution. Document your process thoroughly.
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'clauses' && (
+                            <div>
+                                <div className="section-title">AI Usage Contract Clause Generator</div>
+                                <div className="info-text">
+                                    Generate contract language governing AI tool usage in employment, contractor, freelance, or vendor relationships.
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Contract context</label>
+                                    <select className="form-select" value={clauseContext} onChange={(e) => setClauseContext(e.target.value)}>
+                                        <option value="employment">Employment Agreement</option>
+                                        <option value="contractor">Independent Contractor Agreement</option>
+                                        <option value="freelance">Freelance Services Agreement</option>
+                                        <option value="vendor">Vendor / MSA Agreement</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">AI tools covered (select all that apply)</label>
+                                    <div style={{display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '10px'}}>
+                                        <div className="checkbox-group">
+                                            <input type="checkbox" id="claude" checked={aiTools.includes('claude')} onChange={(e) => {
+                                                if (e.target.checked) {
+                                                    setAiTools([...aiTools, 'claude']);
+                                                } else {
+                                                    setAiTools(aiTools.filter(t => t !== 'claude'));
+                                                }
+                                            }} />
+                                            <label htmlFor="claude">Claude (Anthropic)</label>
+                                        </div>
+                                        <div className="checkbox-group">
+                                            <input type="checkbox" id="chatgpt" checked={aiTools.includes('chatgpt')} onChange={(e) => {
+                                                if (e.target.checked) {
+                                                    setAiTools([...aiTools, 'chatgpt']);
+                                                } else {
+                                                    setAiTools(aiTools.filter(t => t !== 'chatgpt'));
+                                                }
+                                            }} />
+                                            <label htmlFor="chatgpt">ChatGPT (OpenAI)</label>
+                                        </div>
+                                        <div className="checkbox-group">
+                                            <input type="checkbox" id="copilot" checked={aiTools.includes('copilot')} onChange={(e) => {
+                                                if (e.target.checked) {
+                                                    setAiTools([...aiTools, 'copilot']);
+                                                } else {
+                                                    setAiTools(aiTools.filter(t => t !== 'copilot'));
+                                                }
+                                            }} />
+                                            <label htmlFor="copilot">GitHub Copilot</label>
+                                        </div>
+                                        <div className="checkbox-group">
+                                            <input type="checkbox" id="other" checked={aiTools.includes('other')} onChange={(e) => {
+                                                if (e.target.checked) {
+                                                    setAiTools([...aiTools, 'other']);
+                                                } else {
+                                                    setAiTools(aiTools.filter(t => t !== 'other'));
+                                                }
+                                            }} />
+                                            <label htmlFor="other">Other AI tools</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Scope of AI use</label>
+                                    <select className="form-select" value={scopeOfUse} onChange={(e) => setScopeOfUse(e.target.value)}>
+                                        <option value="assist">Assist / enhance human work</option>
+                                        <option value="primary">Primary content generation tool</option>
+                                        <option value="limited">Limited / supplemental use only</option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Work product ownership</label>
+                                    <select className="form-select" value={ownershipModel} onChange={(e) => setOwnershipModel(e.target.value)}>
+                                        <option value="employer">Employer/Client owns all outputs</option>
+                                        <option value="joint">Joint ownership</option>
+                                        <option value="creator">Creator retains ownership with license to Client</option>
+                                    </select>
+                                </div>
+
+                                <div className="checkbox-group">
+                                    <input type="checkbox" id="disclosure" checked={disclosureRequirement} onChange={(e) => setDisclosureRequirement(e.target.checked)} />
+                                    <label htmlFor="disclosure">Require disclosure of AI usage</label>
+                                </div>
+
+                                <div className="checkbox-group">
+                                    <input type="checkbox" id="quality" checked={qualityControl} onChange={(e) => setQualityControl(e.target.checked)} />
+                                    <label htmlFor="quality">Include quality control / human review requirements</label>
+                                </div>
+
+                                <button className="btn btn-primary" onClick={() => {
+                                    const clause = generateClause();
+                                    const output = document.getElementById('clause-output');
+                                    output.textContent = clause;
+                                }}>
+                                    Generate Contract Clause
+                                </button>
+
+                                <div className="result-box" style={{marginTop: '20px'}}>
+                                    <div className="result-title">Generated Contract Language</div>
+                                    <div className="clause-output" id="clause-output">
+                                        Click "Generate Contract Clause" to create customized AI usage terms based on your selections above.
+                                    </div>
+                                    <button
+                                        className="btn btn-secondary"
+                                        style={{marginTop: '15px'}}
+                                        onClick={() => {
+                                            const output = document.getElementById('clause-output');
+                                            copyToClipboard(output.textContent);
+                                        }}
+                                    >
+                                        📋 Copy to Clipboard
+                                    </button>
+                                </div>
+
+                                <div className="alert alert-warning" style={{marginTop: '20px'}}>
+                                    <strong>Legal Disclaimer:</strong> These are sample clauses for informational purposes. Have an attorney review and customize any contract language for your specific situation and jurisdiction.
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'examples' && (
+                            <div>
+                                <div className="section-title">Practical Use Case Examples</div>
+                                <div className="info-text">
+                                    Real-world scenarios showing acceptable vs. problematic uses of Claude across different professions.
+                                </div>
+
+                                {useCaseExamples.map((example, idx) => (
+                                    <div key={idx} className="example-card">
+                                        <div className="example-title">{example.type}</div>
+
+                                        <div className="example-label">✓ Acceptable Use</div>
+                                        <div className="example-text">{example.acceptable}</div>
+
+                                        <div className="example-label">✗ Problematic Use</div>
+                                        <div className="example-text" style={{color: '#991b1b'}}>{example.problematic}</div>
+
+                                        <div className="example-label">💡 Tips</div>
+                                        <div className="example-text">{example.tips}</div>
+                                    </div>
+                                ))}
+
+                                <div className="section-subtitle">Strategies to Strengthen Copyright & Compliance</div>
+
+                                <div className="alert alert-info">
+                                    <strong>1. Substantial Human Input:</strong> Use Claude for first drafts, then substantially modify, expand, and refine with your creative input. Rewrite significant portions with your own insights and style.
+                                </div>
+
+                                <div className="alert alert-info">
+                                    <strong>2. Creative Prompts:</strong> Craft detailed, creative prompts that reflect your unique vision. The more specific and original your prompts, the more the output reflects your creativity.
+                                </div>
+
+                                <div className="alert alert-info">
+                                    <strong>3. Curation & Arrangement:</strong> Generate multiple outputs and creatively select, arrange, and combine them. The curation process itself demonstrates human authorship.
+                                </div>
+
+                                <div className="alert alert-info">
+                                    <strong>4. Critical Editing:</strong> Don't just fix grammar—transform the content. Add metaphors, personal anecdotes, current research, and your unique perspective.
+                                </div>
+
+                                <div className="alert alert-info">
+                                    <strong>5. Integration with Original Work:</strong> Use Claude outputs as components within larger human-authored works. Ensure Claude's contributions serve your overall vision.
+                                </div>
+
+                                <div className="alert alert-info">
+                                    <strong>6. Iterative Collaboration:</strong> Engage in back-and-forth with Claude, using outputs to spark new directions. Synthesize multiple interactions into a cohesive work shaped by your decisions.
+                                </div>
+
+                                <div className="alert alert-info">
+                                    <strong>7. Cross-Medium Adaptation:</strong> Use Claude's text as inspiration for visual art, music, or other media. The transformation across media enhances originality.
+                                </div>
+
+                                <div className="section-subtitle">Documentation Best Practices</div>
+                                <div className="info-text">
+                                    To support copyright claims and demonstrate compliance:
+                                </div>
+                                <ul style={{marginLeft: '20px', color: '#475569'}}>
+                                    <li>Save original Claude outputs and your edited versions</li>
+                                    <li>Keep notes on your creative decisions and process</li>
+                                    <li>Document research and sources you consulted</li>
+                                    <li>Maintain records of substantial changes you made</li>
+                                    <li>Track your prompts to show creative direction</li>
+                                    <li>Keep evidence of human contribution for each project</li>
+                                </ul>
+                            </div>
+                        )}
+
+                        {activeTab === 'resources' && (
+                            <div>
+                                <div className="section-title">Legal Resources & References</div>
+
+                                <div className="section-subtitle">Anthropic Official Policies</div>
+                                <a href="https://www.anthropic.com/legal/consumer-terms" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                    Anthropic Consumer Terms of Service - Ownership provisions for Claude.ai users
+                                </a>
+                                <a href="https://www.anthropic.com/legal/commercial-terms" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                    Anthropic Commercial Terms - API and enterprise customer agreements
+                                </a>
+                                <a href="https://www.anthropic.com/legal/aup" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                    Anthropic Usage Policy - Comprehensive prohibited and required uses
+                                </a>
+
+                                <div className="section-subtitle">Copyright & AI Authorship</div>
+                                <a href="https://www.copyright.gov/ai/" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                    U.S. Copyright Office - AI and Copyright Initiative
+                                </a>
+                                <a href="https://www.copyright.gov/comp3/" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                    Compendium of U.S. Copyright Office Practices - Section 306 (Computer-Generated Works)
+                                </a>
+                                <a href="https://www.supremecourt.gov/opinions/18pdf/17-1118_m64o.pdf" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                    Feist Publications v. Rural Telephone - Originality threshold for copyright
+                                </a>
+
+                                <div className="section-subtitle">AI Contracts & Business Use</div>
+                                <a href="https://www.openai.com/policies/terms-of-use" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                    OpenAI Terms (ChatGPT) - Comparison with other AI provider terms
+                                </a>
+                                <a href="https://legal.microsoft.com/en-us/terms-of-use" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                    Microsoft AI Services Terms - Copilot and Azure OpenAI
+                                </a>
+                                <a href="https://policies.google.com/terms/generative-ai" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                    Google Generative AI Terms - Bard / Gemini usage policies
+                                </a>
+
+                                <div className="section-subtitle">Professional Ethics & AI</div>
+                                <a href="https://www.americanbar.org/groups/professional_responsibility/publications/model_rules_of_professional_conduct/" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                    ABA Model Rules of Professional Conduct - Lawyer duties re: AI use
+                                </a>
+                                <a href="https://www.ama-assn.org/practice-management/digital/augmented-intelligence-ai-health-care" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                    AMA AI in Healthcare Guidance - Medical professional standards
+                                </a>
+                                <a href="https://academicintegrity.org/resources/ai" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                    International Center for Academic Integrity - AI and Academic Honesty
+                                </a>
+
+                                <div className="section-subtitle">Regulatory & Enforcement</div>
+                                <a href="https://www.ftc.gov/business-guidance/blog/2023/02/keep-your-ai-claims-check" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                    FTC - AI Claims and Advertising Standards
+                                </a>
+                                <a href="https://www.ftc.gov/legal-library/browse/rules/disclosure-guides-use-endorsements-testimonials-advertising" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                    FTC Endorsement Guides - Disclosure requirements (applies to AI reviews)
+                                </a>
+                                <a href="https://www.nist.gov/itl/ai-risk-management-framework" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                    NIST AI Risk Management Framework - Best practices for AI governance
+                                </a>
+
+                                <div className="section-subtitle">Case Law & Legal Analysis</div>
+                                <a href="https://www.copyright.gov/rulings-filings/review-board/docs/a-recent-entrance-to-paradise.pdf" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                    Thaler v. Perlmutter (AI-generated art copyright denial)
+                                </a>
+                                <a href="https://www.copyright.gov/rulings-filings/review-board/docs/zarya-of-the-dawn.pdf" target="_blank" rel="noopener noreferrer" className="resource-link">
+                                    Zarya of the Dawn - Copyright Office guidance on AI-assisted comics
+                                </a>
+
+                                <div className="alert alert-info" style={{marginTop: '30px'}}>
+                                    <strong>Disclaimer:</strong> This tool provides general educational information about Claude ownership and usage rights. This is not legal advice. Laws regarding AI-generated content are rapidly evolving. For specific legal guidance tailored to your situation, consult a licensed attorney.
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<ClaudeOwnershipWidget />);
+    </script>
+</body>
+</html>
