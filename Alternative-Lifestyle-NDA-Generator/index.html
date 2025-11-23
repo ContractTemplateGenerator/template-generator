@@ -1,478 +1,1513 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Alternative Lifestyle NDA Generator</title>
-<style>
-    :root {
-        --bg: #f8f9fb;
-        --card: #ffffff;
-        --border: #d0d7e2;
-        --primary: #4b4ded;
-        --text: #1f2a37;
-        --muted: #5f6b7c;
-    }
-    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-    body { background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
-    .nda-shell { max-width: 1000px; margin: 0 auto; background: var(--card); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.08); padding: 20px; }
-    .nda-header { border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 16px; }
-    .nda-header h1 { margin: 0; font-size: 22px; }
-    .nda-flex { display: flex; gap: 20px; align-items: flex-start; }
-    .nda-form { flex: 0 0 45%; }
-    .nda-preview { flex: 1; }
-    .tab-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
-    .tab-button { padding: 8px 14px; border-radius: 999px; border: 1px solid var(--border); background: #f4f5fb; font-size: 13px; cursor: pointer; color: var(--muted); }
-    .tab-button.active { background: var(--primary); border-color: var(--primary); color: #fff; }
-    .nda-tab-panel { display: none; border: 1px solid var(--border); border-radius: 10px; padding: 14px; max-height: 70vh; overflow-y: auto; }
-    .nda-tab-panel.active { display: block; }
-    label { font-weight: 600; display: block; margin-top: 14px; margin-bottom: 6px; }
-    input[type="text"], select, textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); font-size: 14px; }
-    textarea { min-height: 80px; }
-    .inline-group { display: flex; gap: 8px; }
-    .inline-group input { flex: 1; }
-    .option-set { display: grid; gap: 8px; }
-    .option-set label { font-weight: 500; display: flex; align-items: center; gap: 8px; }
-    .preset-box { border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin-bottom: 10px; }
-    .preset-box strong { display: block; }
-    .small-note { font-size: 12px; color: var(--muted); }
-    .scope-actions { margin: 8px 0; }
-    .preview-card { border: 1px solid var(--border); border-radius: 10px; padding: 12px; background: #fff; display: flex; flex-direction: column; height: 70vh; }
-    .preview-card textarea { flex: 1; resize: none; border: 1px solid var(--border); border-radius: 8px; padding: 12px; white-space: pre-wrap; font-size: 13px; line-height: 1.4; transition: text-shadow 0.3s; }
-    .preview-card textarea.highlight { background: #fff; text-shadow: 0 0 12px rgba(250, 204, 21, 0.6); }
-    .copy-btn { margin-top: 10px; padding: 10px 14px; border-radius: 8px; border: none; background: var(--primary); color: #fff; font-weight: 600; cursor: pointer; }
-    .checklist { list-style: none; padding-left: 16px; font-size: 13px; }
-    .checklist li { margin-bottom: 4px; }
-    @media (max-width: 900px) {
-        .nda-flex { flex-direction: column; }
-        .nda-form, .nda-preview { flex: 1 1 auto; width: 100%; }
-        .nda-tab-panel, .preview-card { max-height: none; height: auto; }
-    }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alternative Lifestyle NDA Generator</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow: hidden;
+        }
+
+        .generator-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            height: 100vh;
+            max-width: 100%;
+            gap: 0;
+        }
+
+        .form-panel {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow-y: auto;
+            padding: 30px;
+        }
+
+        .form-panel::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .form-panel::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .form-panel::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+        }
+
+        .form-panel::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .preview-panel {
+            background: #f8f9fa;
+            overflow-y: auto;
+            padding: 40px;
+            border-left: 3px solid #667eea;
+        }
+
+        .preview-panel::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .preview-panel::-webkit-scrollbar-track {
+            background: #e9ecef;
+        }
+
+        .preview-panel::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 5px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+        }
+
+        .form-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tooltip-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: help;
+            position: relative;
+        }
+
+        .tooltip-icon:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 25px;
+            top: -5px;
+            background: #2d3748;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 400;
+            white-space: nowrap;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            max-width: 300px;
+            white-space: normal;
+            width: max-content;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .radio-option:hover {
+            border-color: #667eea;
+            background: #eef2ff;
+        }
+
+        .radio-option input[type="radio"] {
+            cursor: pointer;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .checkbox-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px;
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-option:hover {
+            border-color: #667eea;
+            background: #eef2ff;
+        }
+
+        .checkbox-option input[type="checkbox"] {
+            cursor: pointer;
+        }
+
+        .preset-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .preset-button {
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 13px;
+            position: relative;
+        }
+
+        .preset-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            z-index: 1001;
+        }
+
+        .preset-button:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 0;
+            top: 100%;
+            margin-top: 8px;
+            background: #2d3748;
+            color: white;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 400;
+            white-space: normal;
+            z-index: 1002;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            width: 200px;
+            line-height: 1.4;
+        }
+
+        .action-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .action-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .document-preview {
+            background: white;
+            padding: 50px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            font-family: 'Georgia', serif;
+            line-height: 1.8;
+            color: #2d3748;
+        }
+
+        .document-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: #1a202c;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .document-section {
+            margin-bottom: 25px;
+            scroll-margin-top: 20px;
+        }
+
+        .document-section.highlighted {
+            background: linear-gradient(90deg, #fef3c7 0%, transparent 100%);
+            padding: 10px;
+            margin-left: -10px;
+            margin-right: -10px;
+            border-radius: 5px;
+            animation: highlight-fade 5s ease-out;
+        }
+
+        @keyframes highlight-fade {
+            0% { background: linear-gradient(90deg, #fef3c7 0%, transparent 100%); }
+            100% { background: transparent; }
+        }
+
+        .form-select-inline {
+            display: inline-block;
+            width: auto;
+            padding: 8px 12px;
+            border: 2px solid #667eea;
+            border-radius: 6px;
+            font-size: 13px;
+            background: white;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+
+        .section-heading {
+            font-size: 18px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 12px;
+            margin-top: 20px;
+        }
+
+        .placeholder {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+            color: #92400e;
+        }
+
+        .warning-box {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 6px;
+        }
+
+        .warning-box strong {
+            color: #92400e;
+        }
+
+        .info-box {
+            background: #dbeafe;
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 6px;
+        }
+
+        .summary-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .summary-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .summary-item {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .summary-label {
+            font-weight: 600;
+            opacity: 0.9;
+            margin-bottom: 4px;
+        }
+
+        .summary-value {
+            font-weight: 700;
+        }
+
+        .strength-meter {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .strength-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .strength-bar {
+            width: 100%;
+            height: 30px;
+            background: #e2e8f0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .strength-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ef4444, #f59e0b, #10b981);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 15px;
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .strength-factors {
+            font-size: 13px;
+            color: #4a5568;
+            line-height: 1.6;
+        }
+
+        .strength-factors li {
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 1200px) {
+            .form-panel, .preview-panel {
+                padding: 20px;
+            }
+        }
+
+        @media print {
+            .generator-container {
+                display: block;
+            }
+            .form-panel {
+                display: none;
+            }
+            .preview-panel {
+                padding: 0;
+                border: none;
+            }
+        }
+    </style>
 </head>
 <body>
-<div class="nda-shell">
-    <div class="nda-header">
-        <h1>Alternative Lifestyle NDA Generator (Beta)</h1>
-        <p class="small-note">Customize party info, scope, and legal terms; preview updates in real time.</p>
-    </div>
-    <div class="nda-flex">
-        <div class="nda-form">
-            <div class="tab-row">
-                <button class="tab-button active" data-tab="basics" onclick="switchTab('basics', event)">Basics</button>
-                <button class="tab-button" data-tab="scope" onclick="switchTab('scope', event)">Scope & Media</button>
-                <button class="tab-button" data-tab="options" onclick="switchTab('options', event)">Options</button>
-                <button class="tab-button" data-tab="review" onclick="switchTab('review', event)">Review</button>
-            </div>
-            <div id="tab-basics" class="nda-tab-panel active">
-                <label>Preset Scenario</label>
-                <div class="preset-box">
-                    <label><input type="radio" name="preset" value="private_couple" checked> Private couple / dating</label>
-                    <label><input type="radio" name="preset" value="pro_provider_client"> Professional provider + client</label>
-                    <label><input type="radio" name="preset" value="event_club"> Event host + attendee</label>
-                    <label><input type="radio" name="preset" value="public_figure"> Public figure / high risk</label>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        function NDAGenerator() {
+            // Party Information
+            const [ndaType, setNdaType] = useState('mutual');
+            const [party1LegalName, setParty1LegalName] = useState('');
+            const [party1SceneName, setParty1SceneName] = useState('');
+            const [party1Email, setParty1Email] = useState('');
+            const [party2LegalName, setParty2LegalName] = useState('');
+            const [party2SceneName, setParty2SceneName] = useState('');
+            const [party2Email, setParty2Email] = useState('');
+
+            // Scenario and Context
+            const [scenario, setScenario] = useState('');
+            const [relationshipContext, setRelationshipContext] = useState('');
+
+            // Confidential Information Scope
+            const [scopeIdentity, setScopeIdentity] = useState(true);
+            const [scopeRelationship, setScopeRelationship] = useState(true);
+            const [scopeActivities, setScopeActivities] = useState(true);
+            const [scopeCommunications, setScopeCommunications] = useState(true);
+            const [scopeMedia, setScopeMedia] = useState(true);
+            const [scopeHealth, setScopeHealth] = useState(false);
+            const [scopeFinancial, setScopeFinancial] = useState(false);
+            const [scopeLocation, setScopeLocation] = useState(false);
+
+            // Media and Recording
+            const [mediaStrictness, setMediaStrictness] = useState('strict');
+            const [mediaDetails, setMediaDetails] = useState('');
+
+            // Non-Disparagement
+            const [nonDisparagement, setNonDisparagement] = useState('narrow');
+
+            // Liquidated Damages
+            const [liquidatedDamages, setLiquidatedDamages] = useState('moderate');
+            const [damagesAmount, setDamagesAmount] = useState('10000');
+
+            // Power Exchange
+            const [powerExchange, setPowerExchange] = useState(false);
+            const [powerExchangeDetails, setPowerExchangeDetails] = useState('');
+
+            // Cross-Border
+            const [crossBorder, setCrossBorder] = useState(false);
+            const [jurisdictions, setJurisdictions] = useState('');
+
+            // Permitted Disclosures
+            const [allowTherapist, setAllowTherapist] = useState(true);
+            const [allowAttorney, setAllowAttorney] = useState(true);
+            const [allowLawEnforcement, setAllowLawEnforcement] = useState(true);
+            const [allowMedical, setAllowMedical] = useState(true);
+
+            // Legal Framework
+            const [governingLaw, setGoverningLaw] = useState('california');
+            const [disputeResolution, setDisputeResolution] = useState('arbitration');
+
+            // Term
+            const [termType, setTermType] = useState('indefinite');
+            const [termYears, setTermYears] = useState('5');
+
+            // Additional Terms
+            const [additionalTerms, setAdditionalTerms] = useState('');
+
+            const previewRef = useRef(null);
+
+            const applyPreset = (presetType) => {
+                switch(presetType) {
+                    case 'private_couple':
+                        setScenario('private_couple');
+                        setRelationshipContext('a private romantic/intimate relationship');
+                        setNdaType('mutual');
+                        setScopeIdentity(true);
+                        setScopeRelationship(true);
+                        setScopeActivities(true);
+                        setScopeCommunications(true);
+                        setScopeMedia(true);
+                        setScopeHealth(false);
+                        setScopeFinancial(false);
+                        setScopeLocation(false);
+                        setMediaStrictness('strict');
+                        setNonDisparagement('narrow');
+                        setLiquidatedDamages('moderate');
+                        setDamagesAmount('10000');
+                        setPowerExchange(false);
+                        setCrossBorder(false);
+                        setTermType('indefinite');
+                        break;
+                    case 'pro_provider':
+                        setScenario('pro_provider');
+                        setRelationshipContext('a professional provider and client relationship');
+                        setNdaType('mutual');
+                        setScopeIdentity(true);
+                        setScopeRelationship(true);
+                        setScopeActivities(true);
+                        setScopeCommunications(true);
+                        setScopeMedia(true);
+                        setScopeHealth(true);
+                        setScopeFinancial(true);
+                        setScopeLocation(false);
+                        setMediaStrictness('strict');
+                        setNonDisparagement('broad');
+                        setLiquidatedDamages('high');
+                        setDamagesAmount('25000');
+                        setPowerExchange(false);
+                        setCrossBorder(false);
+                        setTermType('indefinite');
+                        break;
+                    case 'event_club':
+                        setScenario('event_club');
+                        setRelationshipContext('event or club attendance');
+                        setNdaType('one-way');
+                        setScopeIdentity(true);
+                        setScopeRelationship(false);
+                        setScopeActivities(true);
+                        setScopeCommunications(false);
+                        setScopeMedia(true);
+                        setScopeHealth(false);
+                        setScopeFinancial(false);
+                        setScopeLocation(true);
+                        setMediaStrictness('moderate');
+                        setNonDisparagement('narrow');
+                        setLiquidatedDamages('low');
+                        setDamagesAmount('5000');
+                        setPowerExchange(false);
+                        setCrossBorder(false);
+                        setTermType('fixed');
+                        setTermYears('3');
+                        break;
+                    case 'public_figure':
+                        setScenario('public_figure');
+                        setRelationshipContext('involvement with a public figure');
+                        setNdaType('one-way');
+                        setScopeIdentity(true);
+                        setScopeRelationship(true);
+                        setScopeActivities(true);
+                        setScopeCommunications(true);
+                        setScopeMedia(true);
+                        setScopeHealth(false);
+                        setScopeFinancial(true);
+                        setScopeLocation(true);
+                        setMediaStrictness('strict');
+                        setNonDisparagement('broad');
+                        setLiquidatedDamages('high');
+                        setDamagesAmount('50000');
+                        setPowerExchange(false);
+                        setCrossBorder(true);
+                        setTermType('indefinite');
+                        break;
+                }
+            };
+
+            const scrollToSection = (sectionId) => {
+                setTimeout(() => {
+                    const element = document.getElementById(sectionId);
+                    if (element) {
+                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        element.classList.add('highlighted');
+                        setTimeout(() => element.classList.remove('highlighted'), 5000);
+                    }
+                }, 100);
+            };
+
+            const getConfidentialScope = () => {
+                const scopes = [];
+                if (scopeIdentity) scopes.push('real identities, legal names, and any pseudonyms or scene names');
+                if (scopeRelationship) scopes.push('the existence and nature of the relationship between the Parties');
+                if (scopeActivities) scopes.push('any activities, practices, or lifestyle choices engaged in by the Parties');
+                if (scopeCommunications) scopes.push('all communications, whether written, verbal, or electronic');
+                if (scopeMedia) scopes.push('all photographs, videos, audio recordings, or other media');
+                if (scopeHealth) scopes.push('health information, medical conditions, or STI status');
+                if (scopeFinancial) scopes.push('financial arrangements, compensation, or monetary transactions');
+                if (scopeLocation) scopes.push('locations visited, residences, or places of meeting');
+
+                if (scopes.length === 0) return 'all information shared between the Parties';
+                if (scopes.length === 1) return scopes[0];
+                if (scopes.length === 2) return scopes.join(' and ');
+                return scopes.slice(0, -1).join(', ') + ', and ' + scopes[scopes.length - 1];
+            };
+
+            const getMediaProhibition = () => {
+                if (mediaStrictness === 'strict') {
+                    return 'The Parties agree that no photographs, videos, audio recordings, or any other form of media recording shall be created, possessed, or distributed depicting or relating to the Confidential Information, except with the prior express written consent of both Parties.';
+                } else if (mediaStrictness === 'moderate') {
+                    return 'The Parties agree that any photographs, videos, audio recordings, or other media relating to Confidential Information may only be created with the prior express consent of both Parties, and such media shall be kept strictly confidential and shall not be distributed, published, or shared with any third party.';
+                } else {
+                    return 'The Parties acknowledge that media may be created by mutual consent, subject to the confidentiality obligations herein.';
+                }
+            };
+
+            const getNonDisparagementClause = () => {
+                if (nonDisparagement === 'none') return '';
+                if (nonDisparagement === 'narrow') {
+                    return 'The Parties agree not to make any public statements, posts on social media, or communications to third parties that disparage, defame, or harm the reputation of the other Party in relation to the subject matter of this Agreement.';
+                }
+                if (nonDisparagement === 'broad') {
+                    return 'The Parties agree not to make any statements, whether public or private, written or oral, that disparage, defame, criticize, or otherwise harm the reputation, character, or business interests of the other Party, including but not limited to statements about their lifestyle, choices, character, or professional conduct.';
+                }
+            };
+
+            const getLiquidatedDamagesClause = () => {
+                if (liquidatedDamages === 'none') return '';
+
+                const amounts = {
+                    'low': '5,000',
+                    'moderate': damagesAmount ? parseInt(damagesAmount).toLocaleString() : '10,000',
+                    'high': damagesAmount ? parseInt(damagesAmount).toLocaleString() : '50,000'
+                };
+
+                const amount = amounts[liquidatedDamages] || '10,000';
+
+                return `The Parties acknowledge that a breach of this Agreement would cause irreparable harm that is difficult to quantify. Therefore, in the event of a breach, the breaching party shall pay liquidated damages in the amount of $${amount} to the non-breaching party, in addition to any other remedies available at law or in equity. The Parties agree that this amount represents a reasonable estimate of actual damages and is not a penalty.`;
+            };
+
+            const getPowerExchangeClause = () => {
+                if (!powerExchange) return '';
+
+                return `<div class="document-section" id="power-exchange">
+                    <div class="section-heading">Power Exchange Acknowledgment</div>
+                    <p>The Parties acknowledge that their relationship may involve elements of power exchange, dominance and submission, or other dynamics commonly associated with BDSM or alternative lifestyle relationships. The Parties expressly agree and acknowledge that:</p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>This Non-Disclosure Agreement is a separate legal contract that exists independently of any power exchange dynamic;</li>
+                        <li>The obligations under this Agreement are mutual legal obligations that are not affected by any power dynamic between the Parties;</li>
+                        <li>Both Parties retain full legal capacity and authority to enforce this Agreement regardless of any power exchange roles;</li>
+                        <li>This Agreement may not be modified or terminated based on commands, protocols, or dynamics arising from power exchange.</li>
+                    </ul>
+                    ${powerExchangeDetails ? `<p style="margin-top: 10px;"><strong>Additional Context:</strong> ${powerExchangeDetails}</p>` : ''}
+                </div>`;
+            };
+
+            const getPermittedDisclosures = () => {
+                const permitted = [];
+                if (allowTherapist) permitted.push('licensed mental health professionals or therapists');
+                if (allowAttorney) permitted.push('attorneys for the purpose of obtaining legal advice');
+                if (allowLawEnforcement) permitted.push('law enforcement or government officials when required by law or necessary to prevent imminent harm');
+                if (allowMedical) permitted.push('medical professionals when necessary for medical treatment');
+
+                if (permitted.length === 0) return 'No exceptions are permitted to the confidentiality obligations herein.';
+                if (permitted.length === 1) return `Disclosure to ${permitted[0]} is permitted, provided such disclosure is limited to what is necessary and the recipient is informed of the confidential nature of the information.`;
+                if (permitted.length === 2) return `Disclosure to ${permitted.join(' or ')} is permitted, provided such disclosure is limited to what is necessary and the recipient is informed of the confidential nature of the information.`;
+                return `Disclosure to ${permitted.slice(0, -1).join(', ')}, or ${permitted[permitted.length - 1]} is permitted, provided such disclosure is limited to what is necessary and the recipient is informed of the confidential nature of the information.`;
+            };
+
+            const getGoverningLawText = () => {
+                const laws = {
+                    'california': 'the State of California',
+                    'new_york': 'the State of New York',
+                    'uk': 'England and Wales',
+                    'other': 'the jurisdiction specified by the Parties'
+                };
+                return laws[governingLaw] || 'the applicable jurisdiction';
+            };
+
+            const getDisputeResolutionClause = () => {
+                if (disputeResolution === 'arbitration') {
+                    return 'Any dispute arising out of or relating to this Agreement shall be resolved by binding arbitration in accordance with the rules of the American Arbitration Association. The arbitration shall be conducted in a confidential manner, and the arbitrator\'s decision shall be final and binding.';
+                } else {
+                    return 'Any dispute arising out of or relating to this Agreement shall be resolved in the courts of the governing jurisdiction specified herein.';
+                }
+            };
+
+            const getTermText = () => {
+                if (termType === 'indefinite') {
+                    return 'This Agreement shall remain in effect indefinitely, and the confidentiality obligations shall survive termination of any underlying relationship between the Parties.';
+                } else {
+                    return `This Agreement shall remain in effect for a period of ${termYears} years from the date of execution. The confidentiality obligations shall survive the expiration of this term for an additional period of ${termYears} years.`;
+                }
+            };
+
+            const calculateStrength = () => {
+                let score = 0;
+                let maxScore = 100;
+                const factors = [];
+
+                // Factor 1: Party Information (15 points)
+                if (party1LegalName && party2LegalName && party1Email && party2Email) {
+                    score += 15;
+                    factors.push('✓ Complete party information (+15)');
+                } else {
+                    factors.push('✗ Incomplete party information (0/15)');
+                }
+
+                // Factor 2: Scope Definition (20 points)
+                const scopeCount = [scopeIdentity, scopeRelationship, scopeActivities, scopeCommunications, scopeMedia, scopeHealth, scopeFinancial, scopeLocation].filter(Boolean).length;
+                const scopePoints = Math.floor((scopeCount / 8) * 20);
+                score += scopePoints;
+                factors.push(`${scopePoints > 0 ? '✓' : '✗'} Scope coverage: ${scopeCount}/8 areas (+${scopePoints}/20)`);
+
+                // Factor 3: Enforceability Features (20 points)
+                let enforcePoints = 0;
+                if (liquidatedDamages !== 'none') enforcePoints += 10;
+                if (mediaStrictness === 'strict') enforcePoints += 5;
+                if (nonDisparagement !== 'none') enforcePoints += 5;
+                score += enforcePoints;
+                factors.push(`${enforcePoints > 10 ? '✓' : '○'} Enforceability features (+${enforcePoints}/20)`);
+
+                // Factor 4: Legal Framework (15 points)
+                if (governingLaw && disputeResolution) {
+                    score += 15;
+                    factors.push('✓ Clear legal framework (+15)');
+                } else {
+                    factors.push('✗ Incomplete legal framework (0/15)');
+                }
+
+                // Factor 5: Permitted Disclosures (10 points)
+                if (allowTherapist || allowAttorney || allowLawEnforcement || allowMedical) {
+                    score += 10;
+                    factors.push('✓ Reasonable permitted disclosures (+10)');
+                } else {
+                    factors.push('○ No permitted disclosures specified (0/10)');
+                }
+
+                // Factor 6: Context and Detail (10 points)
+                if (relationshipContext) score += 5;
+                if (scenario) score += 5;
+                const contextPoints = (relationshipContext ? 5 : 0) + (scenario ? 5 : 0);
+                factors.push(`${contextPoints > 0 ? '✓' : '✗'} Context specified (+${contextPoints}/10)`);
+
+                // Factor 7: Special Considerations (10 points)
+                let specialPoints = 0;
+                if (powerExchange && powerExchangeDetails) specialPoints += 5;
+                if (crossBorder && jurisdictions) specialPoints += 5;
+                score += specialPoints;
+                factors.push(`${specialPoints > 0 ? '✓' : '○'} Special considerations (+${specialPoints}/10)`);
+
+                return { score, factors, maxScore };
+            };
+
+            const strength = calculateStrength();
+
+            const handleCopy = () => {
+                const previewText = previewRef.current?.innerText || '';
+                navigator.clipboard.writeText(previewText);
+                alert('✓ Document copied to clipboard!');
+            };
+
+            const handlePrint = () => {
+                window.print();
+            };
+
+
+            return (
+                <div className="generator-container">
+                    <div className="form-panel">
+                        <div className="header">
+                            <h1>Alternative Lifestyle NDA Generator</h1>
+                            <p>Professional-grade confidentiality agreements for BDSM, kink, and alternative relationships</p>
+                        </div>
+
+                        <div className="summary-box">
+                            <div className="summary-title">NDA Configuration</div>
+                            <div className="summary-grid">
+                                <div className="summary-item">
+                                    <div className="summary-label">Type</div>
+                                    <div className="summary-value">{ndaType === 'mutual' ? 'Mutual' : 'One-Way'}</div>
+                                </div>
+                                <div className="summary-item">
+                                    <div className="summary-label">Scenario</div>
+                                    <div className="summary-value">{scenario ? scenario.replace('_', ' ').toUpperCase() : 'Custom'}</div>
+                                </div>
+                                <div className="summary-item">
+                                    <div className="summary-label">Scope Areas</div>
+                                    <div className="summary-value">{[scopeIdentity, scopeRelationship, scopeActivities, scopeCommunications, scopeMedia, scopeHealth, scopeFinancial, scopeLocation].filter(Boolean).length}/8</div>
+                                </div>
+                                <div className="summary-item">
+                                    <div className="summary-label">Media Protection</div>
+                                    <div className="summary-value">{mediaStrictness.charAt(0).toUpperCase() + mediaStrictness.slice(1)}</div>
+                                </div>
+                                <div className="summary-item">
+                                    <div className="summary-label">Liquidated Damages</div>
+                                    <div className="summary-value">{liquidatedDamages === 'none' ? 'None' : `$${damagesAmount ? parseInt(damagesAmount).toLocaleString() : '10,000'}`}</div>
+                                </div>
+                                <div className="summary-item">
+                                    <div className="summary-label">Term</div>
+                                    <div className="summary-value">{termType === 'indefinite' ? 'Indefinite' : `${termYears} years`}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="strength-meter">
+                            <div className="strength-title">NDA Strength Assessment</div>
+                            <div className="strength-bar">
+                                <div className="strength-fill" style={{width: `${(strength.score / strength.maxScore) * 100}%`}}>
+                                    {strength.score}/{strength.maxScore}
+                                </div>
+                            </div>
+                            <ul className="strength-factors">
+                                {strength.factors.map((factor, idx) => <li key={idx}>{factor}</li>)}
+                            </ul>
+                        </div>
+
+                        <div className="form-section">
+                            <div className="section-title">
+                                Quick Start Presets
+                                <span className="tooltip-icon" data-tooltip="Choose a preset to auto-fill common scenarios">?</span>
+                            </div>
+                            <div className="preset-buttons">
+                                <button className="preset-button" onClick={() => applyPreset('private_couple')}
+                                        data-tooltip="Mutual NDA for dating/romantic partners. Covers identity, relationship, activities. Moderate damages ($10k).">
+                                    Private Couple
+                                </button>
+                                <button className="preset-button" onClick={() => applyPreset('pro_provider')}
+                                        data-tooltip="For professional dominatrix/client. Includes health & financial info. Higher damages ($25k).">
+                                    Pro Provider/Client
+                                </button>
+                                <button className="preset-button" onClick={() => applyPreset('event_club')}
+                                        data-tooltip="One-way NDA for event attendees. 3-year term. Lower damages ($5k). Covers identity & location.">
+                                    Event/Club
+                                </button>
+                                <button className="preset-button" onClick={() => applyPreset('public_figure')}
+                                        data-tooltip="One-way for public figures. Strictest protection. Cross-border ready. Highest damages ($50k).">
+                                    Public Figure
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="form-section">
+                            <div className="section-title">
+                                NDA Type
+                                <span className="tooltip-icon" data-tooltip="Mutual = both parties bound. One-way = only receiving party bound.">?</span>
+                            </div>
+                            <div className="radio-group">
+                                <label className="radio-option">
+                                    <input type="radio" value="mutual" checked={ndaType === 'mutual'}
+                                           onChange={(e) => { setNdaType(e.target.value); scrollToSection('parties'); }} />
+                                    Mutual (Both Parties)
+                                </label>
+                                <label className="radio-option">
+                                    <input type="radio" value="one-way" checked={ndaType === 'one-way'}
+                                           onChange={(e) => { setNdaType(e.target.value); scrollToSection('parties'); }} />
+                                    One-Way (Receiving Party Only)
+                                </label>
+                            </div>
+                        </div>
+
+                        <div className="form-section">
+                            <div className="section-title">
+                                Party 1 Information
+                                <span className="tooltip-icon" data-tooltip="Legal names are required for enforceability. Scene names are optional.">?</span>
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Legal Name *</label>
+                                <input className="form-input" value={party1LegalName}
+                                       onChange={(e) => { setParty1LegalName(e.target.value); scrollToSection('parties'); }}
+                                       placeholder="John Smith" />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Scene Name / Pseudonym (Optional)</label>
+                                <input className="form-input" value={party1SceneName}
+                                       onChange={(e) => { setParty1SceneName(e.target.value); scrollToSection('parties'); }}
+                                       placeholder="Master J" />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Email Address *</label>
+                                <input className="form-input" type="email" value={party1Email}
+                                       onChange={(e) => { setParty1Email(e.target.value); }}
+                                       placeholder="john@example.com" />
+                            </div>
+                        </div>
+
+                        <div className="form-section">
+                            <div className="section-title">Party 2 Information</div>
+                            <div className="form-group">
+                                <label className="form-label">Legal Name *</label>
+                                <input className="form-input" value={party2LegalName}
+                                       onChange={(e) => { setParty2LegalName(e.target.value); scrollToSection('parties'); }}
+                                       placeholder="Jane Doe" />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Scene Name / Pseudonym (Optional)</label>
+                                <input className="form-input" value={party2SceneName}
+                                       onChange={(e) => { setParty2SceneName(e.target.value); scrollToSection('parties'); }}
+                                       placeholder="sub_jane" />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Email Address *</label>
+                                <input className="form-input" type="email" value={party2Email}
+                                       onChange={(e) => { setParty2Email(e.target.value); }}
+                                       placeholder="jane@example.com" />
+                            </div>
+                        </div>
+
+                        <div className="form-section">
+                            <div className="section-title">
+                                Relationship Context
+                                <span className="tooltip-icon" data-tooltip="Describe the nature of the relationship for context">?</span>
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label" style={{fontSize: '13px', marginBottom: '8px'}}>
+                                    Quick select:
+                                    <select className="form-select-inline"
+                                            onChange={(e) => {
+                                                if (e.target.value) {
+                                                    setRelationshipContext(e.target.value);
+                                                    scrollToSection('recitals');
+                                                }
+                                                e.target.value = '';
+                                            }}>
+                                        <option value="">Choose a template...</option>
+                                        <option value="a private romantic/intimate relationship">Private romantic/intimate relationship</option>
+                                        <option value="a professional provider and client relationship">Professional provider and client relationship</option>
+                                        <option value="a professional dominatrix and client relationship">Professional dominatrix and client relationship</option>
+                                        <option value="event or club attendance">Event or club attendance</option>
+                                        <option value="involvement with a public figure">Involvement with a public figure</option>
+                                        <option value="a consensual BDSM/kink relationship">Consensual BDSM/kink relationship</option>
+                                        <option value="participation in a lifestyle community or group">Participation in lifestyle community/group</option>
+                                        <option value="an online or long-distance alternative relationship">Online/long-distance alternative relationship</option>
+                                    </select>
+                                </label>
+                                <textarea className="form-textarea" value={relationshipContext}
+                                          onChange={(e) => { setRelationshipContext(e.target.value); scrollToSection('recitals'); }}
+                                          placeholder="e.g., a private romantic relationship, professional provider/client, event attendance, etc."></textarea>
+                            </div>
+                        </div>
+
+                        <div className="form-section">
+                            <div className="section-title">
+                                Confidential Information Scope
+                                <span className="tooltip-icon" data-tooltip="Select what information should be kept confidential">?</span>
+                            </div>
+                            <div className="checkbox-group">
+                                <label className="checkbox-option">
+                                    <input type="checkbox" checked={scopeIdentity}
+                                           onChange={(e) => { setScopeIdentity(e.target.checked); scrollToSection('scope'); }} />
+                                    Real Identities
+                                </label>
+                                <label className="checkbox-option">
+                                    <input type="checkbox" checked={scopeRelationship}
+                                           onChange={(e) => { setScopeRelationship(e.target.checked); scrollToSection('scope'); }} />
+                                    Relationship Existence
+                                </label>
+                                <label className="checkbox-option">
+                                    <input type="checkbox" checked={scopeActivities}
+                                           onChange={(e) => { setScopeActivities(e.target.checked); scrollToSection('scope'); }} />
+                                    Activities/Practices
+                                </label>
+                                <label className="checkbox-option">
+                                    <input type="checkbox" checked={scopeCommunications}
+                                           onChange={(e) => { setScopeCommunications(e.target.checked); scrollToSection('scope'); }} />
+                                    Communications
+                                </label>
+                                <label className="checkbox-option">
+                                    <input type="checkbox" checked={scopeMedia}
+                                           onChange={(e) => { setScopeMedia(e.target.checked); scrollToSection('scope'); }} />
+                                    Media/Recordings
+                                </label>
+                                <label className="checkbox-option">
+                                    <input type="checkbox" checked={scopeHealth}
+                                           onChange={(e) => { setScopeHealth(e.target.checked); scrollToSection('scope'); }} />
+                                    Health Information
+                                </label>
+                                <label className="checkbox-option">
+                                    <input type="checkbox" checked={scopeFinancial}
+                                           onChange={(e) => { setScopeFinancial(e.target.checked); scrollToSection('scope'); }} />
+                                    Financial Details
+                                </label>
+                                <label className="checkbox-option">
+                                    <input type="checkbox" checked={scopeLocation}
+                                           onChange={(e) => { setScopeLocation(e.target.checked); scrollToSection('scope'); }} />
+                                    Locations
+                                </label>
+                            </div>
+                        </div>
+
+                        <div className="form-section">
+                            <div className="section-title">
+                                Media and Recording Restrictions
+                                <span className="tooltip-icon" data-tooltip="How strictly should media creation and distribution be controlled?">?</span>
+                            </div>
+                            <div className="radio-group">
+                                <label className="radio-option">
+                                    <input type="radio" value="strict" checked={mediaStrictness === 'strict'}
+                                           onChange={(e) => { setMediaStrictness(e.target.value); scrollToSection('media'); }} />
+                                    Strict (No media without consent)
+                                </label>
+                                <label className="radio-option">
+                                    <input type="radio" value="moderate" checked={mediaStrictness === 'moderate'}
+                                           onChange={(e) => { setMediaStrictness(e.target.value); scrollToSection('media'); }} />
+                                    Moderate (Allowed with consent)
+                                </label>
+                                <label className="radio-option">
+                                    <input type="radio" value="flexible" checked={mediaStrictness === 'flexible'}
+                                           onChange={(e) => { setMediaStrictness(e.target.value); scrollToSection('media'); }} />
+                                    Flexible
+                                </label>
+                            </div>
+                            <div className="form-group" style={{marginTop: '15px'}}>
+                                <label className="form-label">Additional Media Details (Optional)</label>
+                                <textarea className="form-textarea" value={mediaDetails}
+                                          onChange={(e) => { setMediaDetails(e.target.value); scrollToSection('media'); }}
+                                          placeholder="Any specific media restrictions or permissions..."></textarea>
+                            </div>
+                        </div>
+
+                        <div className="form-section">
+                            <div className="section-title">
+                                Non-Disparagement Clause
+                                <span className="tooltip-icon" data-tooltip="Prevents parties from making negative statements about each other">?</span>
+                            </div>
+                            <div className="radio-group">
+                                <label className="radio-option">
+                                    <input type="radio" value="none" checked={nonDisparagement === 'none'}
+                                           onChange={(e) => { setNonDisparagement(e.target.value); scrollToSection('non-disparagement'); }} />
+                                    None
+                                </label>
+                                <label className="radio-option">
+                                    <input type="radio" value="narrow" checked={nonDisparagement === 'narrow'}
+                                           onChange={(e) => { setNonDisparagement(e.target.value); scrollToSection('non-disparagement'); }} />
+                                    Narrow (Public only)
+                                </label>
+                                <label className="radio-option">
+                                    <input type="radio" value="broad" checked={nonDisparagement === 'broad'}
+                                           onChange={(e) => { setNonDisparagement(e.target.value); scrollToSection('non-disparagement'); }} />
+                                    Broad (Public & private)
+                                </label>
+                            </div>
+                        </div>
+
+                        <div className="form-section">
+                            <div className="section-title">
+                                Liquidated Damages
+                                <span className="tooltip-icon" data-tooltip="Pre-determined damages for breach. Makes enforcement easier.">?</span>
+                            </div>
+                            <div className="radio-group">
+                                <label className="radio-option">
+                                    <input type="radio" value="none" checked={liquidatedDamages === 'none'}
+                                           onChange={(e) => { setLiquidatedDamages(e.target.value); scrollToSection('damages'); }} />
+                                    None
+                                </label>
+                                <label className="radio-option">
+                                    <input type="radio" value="low" checked={liquidatedDamages === 'low'}
+                                           onChange={(e) => { setLiquidatedDamages(e.target.value); scrollToSection('damages'); }} />
+                                    Low ($5,000)
+                                </label>
+                                <label className="radio-option">
+                                    <input type="radio" value="moderate" checked={liquidatedDamages === 'moderate'}
+                                           onChange={(e) => { setLiquidatedDamages(e.target.value); scrollToSection('damages'); }} />
+                                    Moderate (Custom)
+                                </label>
+                                <label className="radio-option">
+                                    <input type="radio" value="high" checked={liquidatedDamages === 'high'}
+                                           onChange={(e) => { setLiquidatedDamages(e.target.value); scrollToSection('damages'); }} />
+                                    High (Custom)
+                                </label>
+                            </div>
+                            {(liquidatedDamages === 'moderate' || liquidatedDamages === 'high') && (
+                                <div className="form-group" style={{marginTop: '15px'}}>
+                                    <label className="form-label">Damages Amount ($)</label>
+                                    <input className="form-input" type="number" value={damagesAmount}
+                                           onChange={(e) => { setDamagesAmount(e.target.value); scrollToSection('damages'); }}
+                                           placeholder="10000" />
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="form-section">
+                            <div className="section-title">
+                                Power Exchange Acknowledgment
+                                <span className="tooltip-icon" data-tooltip="Clarifies that D/s dynamics don't override legal obligations">?</span>
+                            </div>
+                            <div className="radio-group">
+                                <label className="radio-option">
+                                    <input type="checkbox" checked={powerExchange}
+                                           onChange={(e) => { setPowerExchange(e.target.checked); scrollToSection('power-exchange'); }} />
+                                    Include Power Exchange Clause
+                                </label>
+                            </div>
+                            {powerExchange && (
+                                <div className="form-group" style={{marginTop: '15px'}}>
+                                    <label className="form-label">Power Exchange Details (Optional)</label>
+                                    <textarea className="form-textarea" value={powerExchangeDetails}
+                                              onChange={(e) => { setPowerExchangeDetails(e.target.value); scrollToSection('power-exchange'); }}
+                                              placeholder="Describe the nature of the power exchange dynamic if relevant..."></textarea>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="form-section">
+                            <div className="section-title">
+                                Cross-Border Considerations
+                                <span className="tooltip-icon" data-tooltip="For parties in different countries/jurisdictions">?</span>
+                            </div>
+                            <div className="radio-group">
+                                <label className="radio-option">
+                                    <input type="checkbox" checked={crossBorder}
+                                           onChange={(e) => { setCrossBorder(e.target.checked); scrollToSection('governing-law'); }} />
+                                    Cross-Border Agreement
+                                </label>
+                            </div>
+                            {crossBorder && (
+                                <div className="form-group" style={{marginTop: '15px'}}>
+                                    <label className="form-label">Jurisdictions Involved</label>
+                                    <input className="form-input" value={jurisdictions}
+                                           onChange={(e) => { setJurisdictions(e.target.value); scrollToSection('governing-law'); }}
+                                           placeholder="e.g., USA and UK" />
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="form-section">
+                            <div className="section-title">
+                                Permitted Disclosures
+                                <span className="tooltip-icon" data-tooltip="Exceptions where disclosure is allowed for safety/legal reasons">?</span>
+                            </div>
+                            <div className="checkbox-group">
+                                <label className="checkbox-option">
+                                    <input type="checkbox" checked={allowTherapist}
+                                           onChange={(e) => { setAllowTherapist(e.target.checked); scrollToSection('permitted'); }} />
+                                    Licensed Therapists
+                                </label>
+                                <label className="checkbox-option">
+                                    <input type="checkbox" checked={allowAttorney}
+                                           onChange={(e) => { setAllowAttorney(e.target.checked); scrollToSection('permitted'); }} />
+                                    Attorneys
+                                </label>
+                                <label className="checkbox-option">
+                                    <input type="checkbox" checked={allowLawEnforcement}
+                                           onChange={(e) => { setAllowLawEnforcement(e.target.checked); scrollToSection('permitted'); }} />
+                                    Law Enforcement
+                                </label>
+                                <label className="checkbox-option">
+                                    <input type="checkbox" checked={allowMedical}
+                                           onChange={(e) => { setAllowMedical(e.target.checked); scrollToSection('permitted'); }} />
+                                    Medical Professionals
+                                </label>
+                            </div>
+                        </div>
+
+                        <div className="form-section">
+                            <div className="section-title">
+                                Governing Law
+                                <span className="tooltip-icon" data-tooltip="Which jurisdiction's laws will govern this agreement">?</span>
+                            </div>
+                            <div className="form-group">
+                                <select className="form-select" value={governingLaw}
+                                        onChange={(e) => { setGoverningLaw(e.target.value); scrollToSection('governing-law'); }}>
+                                    <option value="california">California</option>
+                                    <option value="new_york">New York</option>
+                                    <option value="uk">England and Wales (UK)</option>
+                                    <option value="other">Other (specify in additional terms)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="form-section">
+                            <div className="section-title">
+                                Dispute Resolution
+                                <span className="tooltip-icon" data-tooltip="How disputes will be resolved">?</span>
+                            </div>
+                            <div className="radio-group">
+                                <label className="radio-option">
+                                    <input type="radio" value="arbitration" checked={disputeResolution === 'arbitration'}
+                                           onChange={(e) => { setDisputeResolution(e.target.value); scrollToSection('dispute'); }} />
+                                    Binding Arbitration (Private)
+                                </label>
+                                <label className="radio-option">
+                                    <input type="radio" value="court" checked={disputeResolution === 'court'}
+                                           onChange={(e) => { setDisputeResolution(e.target.value); scrollToSection('dispute'); }} />
+                                    Court Litigation
+                                </label>
+                            </div>
+                        </div>
+
+                        <div className="form-section">
+                            <div className="section-title">
+                                Agreement Term
+                                <span className="tooltip-icon" data-tooltip="How long the confidentiality obligations last">?</span>
+                            </div>
+                            <div className="radio-group">
+                                <label className="radio-option">
+                                    <input type="radio" value="indefinite" checked={termType === 'indefinite'}
+                                           onChange={(e) => { setTermType(e.target.value); scrollToSection('term'); }} />
+                                    Indefinite
+                                </label>
+                                <label className="radio-option">
+                                    <input type="radio" value="fixed" checked={termType === 'fixed'}
+                                           onChange={(e) => { setTermType(e.target.value); scrollToSection('term'); }} />
+                                    Fixed Term
+                                </label>
+                            </div>
+                            {termType === 'fixed' && (
+                                <div className="form-group" style={{marginTop: '15px'}}>
+                                    <label className="form-label">Number of Years</label>
+                                    <input className="form-input" type="number" value={termYears}
+                                           onChange={(e) => { setTermYears(e.target.value); scrollToSection('term'); }}
+                                           placeholder="5" />
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="form-section">
+                            <div className="section-title">
+                                Additional Terms (Optional)
+                                <span className="tooltip-icon" data-tooltip="Any additional provisions or customizations">?</span>
+                            </div>
+                            <div className="form-group">
+                                <textarea className="form-textarea" value={additionalTerms}
+                                          onChange={(e) => { setAdditionalTerms(e.target.value); scrollToSection('additional'); }}
+                                          placeholder="Any additional terms, conditions, or specific provisions..."
+                                          style={{minHeight: '120px'}}></textarea>
+                            </div>
+                        </div>
+
+                        <div className="form-section">
+                            <button className="action-button" onClick={handleCopy}>
+                                📋 Copy to Clipboard
+                            </button>
+                            <button className="action-button" onClick={handlePrint}>
+                                🖨️ Print Document
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="preview-panel">
+                        <div className="document-preview" ref={previewRef}>
+                            <div className="document-title">
+                                NON-DISCLOSURE AGREEMENT<br/>
+                                ({ndaType === 'mutual' ? 'MUTUAL' : 'ONE-WAY'})
+                            </div>
+
+                            <div className="document-section" id="parties">
+                                <p>This Non-Disclosure Agreement (the "Agreement") is entered into as of <span className="placeholder">[DATE]</span>, by and between:</p>
+
+                                <p style={{marginTop: '15px'}}><strong>Party 1:</strong> {party1LegalName || <span className="placeholder">[Party 1 Legal Name]</span>}
+                                {party1SceneName && ` (also known as "${party1SceneName}")`}</p>
+
+                                <p><strong>Party 2:</strong> {party2LegalName || <span className="placeholder">[Party 2 Legal Name]</span>}
+                                {party2SceneName && ` (also known as "${party2SceneName}")`}</p>
+
+                                <p style={{marginTop: '10px'}}>Hereinafter referred to individually as a "Party" and collectively as the "Parties."</p>
+                            </div>
+
+                            <div className="document-section" id="recitals">
+                                <div className="section-heading">RECITALS</div>
+                                <p><strong>WHEREAS</strong>, the Parties are or may become involved in {relationshipContext || <span className="placeholder">[describe relationship context]</span>};</p>
+
+                                <p><strong>WHEREAS</strong>, in the course of their relationship, the Parties may share, create, or become aware of sensitive personal information;</p>
+
+                                <p><strong>WHEREAS</strong>, the Parties desire to protect the privacy and confidentiality of such information;</p>
+
+                                <p><strong>WHEREAS</strong>, the Parties acknowledge that disclosure of such information could cause significant personal, professional, or reputational harm;</p>
+
+                                <p><strong>NOW, THEREFORE</strong>, in consideration of the mutual covenants and agreements contained herein, and for other good and valuable consideration, the receipt and sufficiency of which are hereby acknowledged, the Parties agree as follows:</p>
+                            </div>
+
+                            <div className="info-box">
+                                <strong>Important Legal Note:</strong> This Agreement is designed to protect privacy in the context of consensual adult relationships and alternative lifestyle choices. It does not and cannot be used to conceal illegal activity, abuse, non-consensual acts, or to prevent legally required disclosures. Courts may refuse to enforce confidentiality provisions that violate public policy.
+                            </div>
+
+                            <div className="document-section" id="scope">
+                                <div className="section-heading">1. DEFINITION OF CONFIDENTIAL INFORMATION</div>
+                                <p>"Confidential Information" means any and all information related to the Parties' relationship and interactions, including but not limited to: {getConfidentialScope()}.</p>
+
+                                <p style={{marginTop: '10px'}}>Confidential Information shall not include information that: (a) is or becomes publicly available through no breach of this Agreement; (b) was rightfully known to the receiving Party prior to disclosure; (c) is independently developed by a Party without use of Confidential Information; or (d) is rightfully received from a third party without confidentiality restrictions.</p>
+                            </div>
+
+                            <div className="document-section" id="obligations">
+                                <div className="section-heading">2. CONFIDENTIALITY OBLIGATIONS</div>
+                                <p>{ndaType === 'mutual' ? 'Each Party agrees' : 'The Receiving Party agrees'} to:</p>
+                                <ul style={{marginLeft: '20px', marginTop: '10px'}}>
+                                    <li>Maintain the confidentiality of all Confidential Information;</li>
+                                    <li>Not disclose Confidential Information to any third party without prior written consent;</li>
+                                    <li>Not use Confidential Information for any purpose other than the relationship between the Parties;</li>
+                                    <li>Take all reasonable precautions to prevent unauthorized disclosure;</li>
+                                    <li>Immediately notify the other Party of any unauthorized disclosure or suspected breach.</li>
+                                </ul>
+                            </div>
+
+                            <div className="document-section" id="media">
+                                <div className="section-heading">3. MEDIA AND RECORDINGS</div>
+                                <p>{getMediaProhibition()}</p>
+                                {mediaDetails && <p style={{marginTop: '10px'}}><strong>Additional Media Terms:</strong> {mediaDetails}</p>}
+
+                                <p style={{marginTop: '10px'}}>Any media created in violation of this section shall be immediately destroyed, and the creating Party shall be in material breach of this Agreement.</p>
+                            </div>
+
+                            {nonDisparagement !== 'none' && (
+                                <div className="document-section" id="non-disparagement">
+                                    <div className="section-heading">4. NON-DISPARAGEMENT</div>
+                                    <p>{getNonDisparagementClause()}</p>
+                                </div>
+                            )}
+
+                            <div className="document-section" id="permitted">
+                                <div className="section-heading">{nonDisparagement !== 'none' ? '5' : '4'}. PERMITTED DISCLOSURES</div>
+                                <p>Notwithstanding the foregoing confidentiality obligations, disclosure of Confidential Information is permitted in the following limited circumstances:</p>
+                                <p style={{marginTop: '10px'}}>{getPermittedDisclosures()}</p>
+
+                                <div className="warning-box" style={{marginTop: '15px'}}>
+                                    <strong>Consent and Safety Override:</strong> Nothing in this Agreement shall prevent disclosure necessary to report abuse, non-consensual acts, illegal activity, or imminent threats to health or safety. This Agreement protects privacy in consensual relationships only and does not shield illegal or harmful conduct.
+                                </div>
+                            </div>
+
+                            {liquidatedDamages !== 'none' && (
+                                <div className="document-section" id="damages">
+                                    <div className="section-heading">{nonDisparagement !== 'none' ? '6' : '5'}. LIQUIDATED DAMAGES</div>
+                                    <p>{getLiquidatedDamagesClause()}</p>
+                                </div>
+                            )}
+
+                            {getPowerExchangeClause()}
+
+                            <div className="document-section" id="remedies">
+                                <div className="section-heading">{(() => {
+                                    let num = 4;
+                                    if (nonDisparagement !== 'none') num++;
+                                    if (liquidatedDamages !== 'none') num++;
+                                    if (powerExchange) num++;
+                                    return num;
+                                })()}. REMEDIES</div>
+                                <p>The Parties acknowledge that breach of this Agreement may cause irreparable harm for which monetary damages are an insufficient remedy. Therefore, in addition to any other remedies available at law or in equity, the non-breaching Party shall be entitled to seek injunctive relief to prevent or remedy any breach or threatened breach of this Agreement.</p>
+                            </div>
+
+                            <div className="document-section" id="governing-law">
+                                <div className="section-heading">{(() => {
+                                    let num = 5;
+                                    if (nonDisparagement !== 'none') num++;
+                                    if (liquidatedDamages !== 'none') num++;
+                                    if (powerExchange) num++;
+                                    return num;
+                                })()}. GOVERNING LAW</div>
+                                <p>This Agreement shall be governed by and construed in accordance with the laws of {getGoverningLawText()}, without regard to its conflict of laws principles.</p>
+                                {crossBorder && jurisdictions && (
+                                    <p style={{marginTop: '10px'}}><strong>Cross-Border Note:</strong> The Parties acknowledge that they are located in different jurisdictions ({jurisdictions}). This Agreement shall be enforceable in all relevant jurisdictions to the maximum extent permitted by law.</p>
+                                )}
+                            </div>
+
+                            <div className="document-section" id="dispute">
+                                <div className="section-heading">{(() => {
+                                    let num = 6;
+                                    if (nonDisparagement !== 'none') num++;
+                                    if (liquidatedDamages !== 'none') num++;
+                                    if (powerExchange) num++;
+                                    return num;
+                                })()}. DISPUTE RESOLUTION</div>
+                                <p>{getDisputeResolutionClause()}</p>
+                                {disputeResolution === 'arbitration' && (
+                                    <p style={{marginTop: '10px'}}>The confidentiality provisions of this Agreement shall apply to all arbitration proceedings, documents, and awards.</p>
+                                )}
+                            </div>
+
+                            <div className="document-section" id="term">
+                                <div className="section-heading">{(() => {
+                                    let num = 7;
+                                    if (nonDisparagement !== 'none') num++;
+                                    if (liquidatedDamages !== 'none') num++;
+                                    if (powerExchange) num++;
+                                    return num;
+                                })()}. TERM AND SURVIVAL</div>
+                                <p>{getTermText()}</p>
+                            </div>
+
+                            {additionalTerms && (
+                                <div className="document-section" id="additional">
+                                    <div className="section-heading">{(() => {
+                                        let num = 8;
+                                        if (nonDisparagement !== 'none') num++;
+                                        if (liquidatedDamages !== 'none') num++;
+                                        if (powerExchange) num++;
+                                        return num;
+                                    })()}. ADDITIONAL TERMS</div>
+                                    <p>{additionalTerms}</p>
+                                </div>
+                            )}
+
+                            <div className="document-section">
+                                <div className="section-heading">{(() => {
+                                    let num = 8;
+                                    if (nonDisparagement !== 'none') num++;
+                                    if (liquidatedDamages !== 'none') num++;
+                                    if (powerExchange) num++;
+                                    if (additionalTerms) num++;
+                                    return num;
+                                })()}. GENERAL PROVISIONS</div>
+
+                                <p><strong>Entire Agreement:</strong> This Agreement constitutes the entire agreement between the Parties concerning the subject matter hereof and supersedes all prior agreements and understandings.</p>
+
+                                <p style={{marginTop: '10px'}}><strong>Amendment:</strong> This Agreement may only be amended by a written instrument signed by both Parties.</p>
+
+                                <p style={{marginTop: '10px'}}><strong>Severability:</strong> If any provision of this Agreement is held to be invalid or unenforceable, the remaining provisions shall continue in full force and effect.</p>
+
+                                <p style={{marginTop: '10px'}}><strong>Waiver:</strong> No waiver of any provision of this Agreement shall be deemed or shall constitute a waiver of any other provision, nor shall any waiver constitute a continuing waiver.</p>
+
+                                <p style={{marginTop: '10px'}}><strong>Independent Legal Advice:</strong> Each Party acknowledges that they have had the opportunity to seek independent legal advice before signing this Agreement and that they enter into it freely and voluntarily.</p>
+                            </div>
+
+                            <div className="warning-box">
+                                <strong>Legal Validity and Enforceability:</strong> While NDAs in the alternative lifestyle context can provide meaningful privacy protection, enforceability varies by jurisdiction. Courts may refuse to enforce provisions deemed contrary to public policy, unconscionable, or that attempt to conceal illegal activity. Both parties should consult with attorneys familiar with privacy law in their jurisdiction before relying on this Agreement for significant protection.
+                            </div>
+
+                            <div className="document-section">
+                                <div className="section-heading">SIGNATURES</div>
+                                <p>IN WITNESS WHEREOF, the Parties have executed this Non-Disclosure Agreement as of the date first written above.</p>
+
+                                <div style={{marginTop: '40px'}}>
+                                    <p><strong>PARTY 1:</strong></p>
+                                    <p style={{marginTop: '30px'}}>_________________________________</p>
+                                    <p>{party1LegalName || '[Party 1 Legal Name]'}</p>
+                                    <p>Date: ____________________</p>
+                                </div>
+
+                                <div style={{marginTop: '40px'}}>
+                                    <p><strong>PARTY 2:</strong></p>
+                                    <p style={{marginTop: '30px'}}>_________________________________</p>
+                                    <p>{party2LegalName || '[Party 2 Legal Name]'}</p>
+                                    <p>Date: ____________________</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <label>Party A Legal Name</label>
-                <input type="text" id="partyAName">
-                <label>Party A Scene Name (optional)</label>
-                <input type="text" id="partyAScene">
-                <label>Party B Legal Name</label>
-                <input type="text" id="partyBName">
-                <label>Party B Scene Name (optional)</label>
-                <input type="text" id="partyBScene">
-                <label>Mutual vs One-Way</label>
-                <div class="preset-box">
-                    <label><input type="radio" name="direction" value="mutual" checked> Mutual NDA</label>
-                    <label><input type="radio" name="direction" value="a_to_b"> One-way (Party A protected)</label>
-                    <label><input type="radio" name="direction" value="b_to_a"> One-way (Party B protected)</label>
-                </div>
-                <label>Governing Law</label>
-                <select id="governingLaw">
-                    <option value="California" selected>California</option>
-                    <option value="New York">New York</option>
-                    <option value="England and Wales">England &amp; Wales</option>
-                    <option value="Other">Other (specify)</option>
-                </select>
-                <input type="text" id="customLaw" placeholder="If Other, enter jurisdiction" style="display:none;margin-top:6px;">
-                <label>Dispute Resolution</label>
-                <select id="forum">
-                    <option value="arbitration" selected>Private arbitration</option>
-                    <option value="court">Court litigation</option>
-                </select>
-            </div>
-            <div id="tab-scope" class="nda-tab-panel">
-                <label>Confidential Information Covers</label>
-                <div class="scope-actions">
-                    <button type="button" onclick="selectCommonScope()">Select common defaults</button>
-                </div>
-                <div class="option-set">
-                    <label><input type="checkbox" id="scope-identity"> Identity details</label>
-                    <label><input type="checkbox" id="scope-relationship"> Relationship nature</label>
-                    <label><input type="checkbox" id="scope-activities"> Activities / scenes</label>
-                    <label><input type="checkbox" id="scope-communications"> Communications</label>
-                    <label><input type="checkbox" id="scope-media"> Photos / recordings</label>
-                    <label><input type="checkbox" id="scope-health"> Health / finances</label>
-                </div>
-                <label>Media &amp; Recording Strictness</label>
-                <select id="mediaStrictness">
-                    <option value="basic_media">No sharing, personal reference only</option>
-                    <option value="strict_media">Strict – delete or disable access on request</option>
-                </select>
-                <label>Term / Duration</label>
-                <select id="term">
-                    <option value="3_years">3 years from end of relationship</option>
-                    <option value="5_years" selected>5 years from end of relationship</option>
-                    <option value="10_years">10 years from end of relationship</option>
-                    <option value="until_public">Until information becomes public</option>
-                </select>
-            </div>
-            <div id="tab-options" class="nda-tab-panel">
-                <label>Non-Disparagement</label>
-                <div class="option-set">
-                    <label><input type="radio" name="nonDisparagement" value="none" checked> None</label>
-                    <label><input type="radio" name="nonDisparagement" value="narrow"> Narrow – bans knowingly false statements</label>
-                    <label><input type="radio" name="nonDisparagement" value="broad"> Broad – bans public disparagement</label>
-                </div>
-                <label>Liquidated Damages</label>
-                <div class="option-set">
-                    <label><input type="radio" name="liquidatedDamages" value="none" checked> None (actual damages only)</label>
-                    <label><input type="radio" name="liquidatedDamages" value="2500"> $2,500 per breach</label>
-                    <label><input type="radio" name="liquidatedDamages" value="10000"> $10,000 per breach</label>
-                </div>
-                <p class="small-note">Liquidated damages must be reasonable to be enforceable.</p>
-                <label><input type="checkbox" id="powerExchange"> Relationship involves consensual power exchange</label>
-                <label><input type="checkbox" id="crossBorder"> Parties are in different countries</label>
-            </div>
-            <div id="tab-review" class="nda-tab-panel">
-                <p>Quick checklist:</p>
-                <ul class="checklist">
-                    <li>✔ Parties entered?</li>
-                    <li>✔ Scope selected?</li>
-                    <li>✔ Term and media rules chosen?</li>
-                    <li>✔ Options reviewed?</li>
-                </ul>
-                <p class="small-note">Adjust any tab before copying the agreement.</p>
-            </div>
-        </div>
-        <div class="nda-preview">
-            <div class="preview-card">
-                <textarea id="ndaOutput" rows="28" readonly></textarea>
-                <button class="copy-btn" onclick="copyNdaText()">Copy NDA Text</button>
-            </div>
-        </div>
-    </div>
-</div>
-<script>
-const ndaState = {
-    preset: 'private_couple',
-    partyAName: '',
-    partyAScene: '',
-    partyBName: '',
-    partyBScene: '',
-    direction: 'mutual',
-    governingLaw: 'California',
-    customLaw: '',
-    forum: 'arbitration',
-    scope: {
-        identity: true,
-        relationship: true,
-        activities: true,
-        communications: true,
-        media: true,
-        health: false
-    },
-    mediaStrictness: 'basic_media',
-    term: '5_years',
-    nonDisparagement: 'none',
-    liquidatedDamages: 'none',
-    powerExchange: false,
-    crossBorder: false
-};
+            );
+        }
 
-const presetProfiles = {
-    private_couple: {
-        direction: 'mutual',
-        scope: { identity: true, relationship: true, activities: true, communications: true, media: true, health: false },
-        mediaStrictness: 'basic_media',
-        term: '5_years',
-        nonDisparagement: 'narrow',
-        liquidatedDamages: 'none'
-    },
-    pro_provider_client: {
-        direction: 'b_to_a',
-        scope: { identity: true, relationship: true, activities: true, communications: true, media: true, health: true },
-        mediaStrictness: 'strict_media',
-        term: '5_years',
-        nonDisparagement: 'broad',
-        liquidatedDamages: '10000'
-    },
-    event_club: {
-        direction: 'mutual',
-        scope: { identity: true, relationship: true, activities: true, communications: true, media: true, health: false },
-        mediaStrictness: 'basic_media',
-        term: '3_years',
-        nonDisparagement: 'none',
-        liquidatedDamages: 'none'
-    },
-    public_figure: {
-        direction: 'a_to_b',
-        scope: { identity: true, relationship: true, activities: true, communications: true, media: true, health: true },
-        mediaStrictness: 'strict_media',
-        term: '10_years',
-        nonDisparagement: 'broad',
-        liquidatedDamages: '10000'
-    }
-};
-
-function applyPreset(preset) {
-    ndaState.preset = preset;
-    const profile = presetProfiles[preset];
-    ndaState.direction = profile.direction;
-    ndaState.scope = { ...profile.scope };
-    ndaState.mediaStrictness = profile.mediaStrictness;
-    ndaState.term = profile.term;
-    ndaState.nonDisparagement = profile.nonDisparagement;
-    ndaState.liquidatedDamages = profile.liquidatedDamages;
-    updateInputsFromState();
-    renderNda();
-}
-
-function switchTab(tabId, evt) {
-    if (evt) evt.preventDefault();
-    document.querySelectorAll('.tab-button').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.tab === tabId);
-    });
-    document.querySelectorAll('.nda-tab-panel').forEach(panel => {
-        panel.classList.toggle('active', panel.id === 'tab-' + tabId);
-    });
-}
-
-function selectCommonScope() {
-    ['identity','relationship','activities','communications','media'].forEach(key => {
-        ndaState.scope[key] = true;
-        document.getElementById('scope-' + key).checked = true;
-    });
-    renderNda();
-}
-
-function handleInputChanges() {
-    document.getElementById('partyAName').addEventListener('input', e => { ndaState.partyAName = e.target.value.trim(); renderNda(); });
-    document.getElementById('partyAScene').addEventListener('input', e => { ndaState.partyAScene = e.target.value.trim(); renderNda(); });
-    document.getElementById('partyBName').addEventListener('input', e => { ndaState.partyBName = e.target.value.trim(); renderNda(); });
-    document.getElementById('partyBScene').addEventListener('input', e => { ndaState.partyBScene = e.target.value.trim(); renderNda(); });
-
-    document.querySelectorAll('input[name="preset"]').forEach(radio => {
-        radio.addEventListener('change', e => applyPreset(e.target.value));
-    });
-
-    document.querySelectorAll('input[name="direction"]').forEach(radio => {
-        radio.addEventListener('change', e => { ndaState.direction = e.target.value; renderNda(); });
-    });
-
-    document.getElementById('governingLaw').addEventListener('change', e => {
-        const value = e.target.value;
-        ndaState.governingLaw = value;
-        document.getElementById('customLaw').style.display = value === 'Other' ? 'block' : 'none';
-        if (value !== 'Other') ndaState.customLaw = '';
-        renderNda();
-    });
-
-    document.getElementById('customLaw').addEventListener('input', e => { ndaState.customLaw = e.target.value.trim(); renderNda(); });
-    document.getElementById('forum').addEventListener('change', e => { ndaState.forum = e.target.value; renderNda(); });
-
-    ['identity','relationship','activities','communications','media','health'].forEach(key => {
-        document.getElementById('scope-' + key).addEventListener('change', e => {
-            ndaState.scope[key] = e.target.checked;
-            renderNda();
-        });
-    });
-
-    document.getElementById('mediaStrictness').addEventListener('change', e => { ndaState.mediaStrictness = e.target.value; renderNda(); });
-    document.getElementById('term').addEventListener('change', e => { ndaState.term = e.target.value; renderNda(); });
-
-    document.querySelectorAll('input[name="nonDisparagement"]').forEach(radio => {
-        radio.addEventListener('change', e => { ndaState.nonDisparagement = e.target.value; renderNda(); });
-    });
-    document.querySelectorAll('input[name="liquidatedDamages"]').forEach(radio => {
-        radio.addEventListener('change', e => { ndaState.liquidatedDamages = e.target.value; renderNda(); });
-    });
-
-    document.getElementById('powerExchange').addEventListener('change', e => { ndaState.powerExchange = e.target.checked; renderNda(); });
-    document.getElementById('crossBorder').addEventListener('change', e => { ndaState.crossBorder = e.target.checked; renderNda(); });
-}
-
-function updateInputsFromState() {
-    document.querySelectorAll('input[name="direction"]').forEach(radio => {
-        radio.checked = radio.value === ndaState.direction;
-    });
-    ['identity','relationship','activities','communications','media','health'].forEach(key => {
-        document.getElementById('scope-' + key).checked = ndaState.scope[key];
-    });
-    document.getElementById('mediaStrictness').value = ndaState.mediaStrictness;
-    document.getElementById('term').value = ndaState.term;
-    document.querySelectorAll('input[name="nonDisparagement"]').forEach(radio => {
-        radio.checked = radio.value === ndaState.nonDisparagement;
-    });
-    document.querySelectorAll('input[name="liquidatedDamages"]').forEach(radio => {
-        radio.checked = radio.value === ndaState.liquidatedDamages;
-    });
-}
-
-function getPartyLabels() {
-    const aFull = ndaState.partyAScene ? `${ndaState.partyAName} ("${ndaState.partyAScene}")` : ndaState.partyAName || 'Party A';
-    const bFull = ndaState.partyBScene ? `${ndaState.partyBName} ("${ndaState.partyBScene}")` : ndaState.partyBName || 'Party B';
-    let relationshipPhrase = 'each, a "Party" and together, the "Parties"';
-    let disclosing = 'Disclosing Party';
-    let receiving = 'Receiving Party';
-    if (ndaState.direction === 'a_to_b') {
-        relationshipPhrase = '(collectively, the "Parties")';
-        disclosing = ndaState.partyAName || 'Party A';
-        receiving = ndaState.partyBName || 'Party B';
-    } else if (ndaState.direction === 'b_to_a') {
-        relationshipPhrase = '(collectively, the "Parties")';
-        disclosing = ndaState.partyBName || 'Party B';
-        receiving = ndaState.partyAName || 'Party A';
-    }
-    return { aFull, bFull, relationshipPhrase, disclosing, receiving };
-}
-
-function buildDefinitions() {
-    const scopeLines = [];
-    if (ndaState.scope.identity) scopeLines.push('(a) the legal names, aliases, addresses, employers, and social media handles of either Party;');
-    if (ndaState.scope.relationship) scopeLines.push('(b) the existence or nature of any consensual BDSM, kink, or alternative relationship or scenes between the Parties;');
-    if (ndaState.scope.activities) scopeLines.push('(c) the specific activities, scenes, fantasies, limits, boundaries, and negotiations discussed or engaged in by the Parties;');
-    if (ndaState.scope.communications) scopeLines.push('(d) the content of communications between the Parties, including text messages, emails, direct messages, and voice notes;');
-    if (ndaState.scope.media) scopeLines.push('(e) any photographs, videos, audio recordings, screenshots, or screen recordings of either Party or their interactions;');
-    if (ndaState.scope.health) scopeLines.push('(f) any information concerning a Party’s physical or mental health, finances, immigration status, or other sensitive personal matters;');
-    scopeLines.push('(g) any other non-public personal or intimate information that a reasonable person would consider private in this context.');
-    return scopeLines.join('\n');
-}
-
-function mediaClause() {
-    if (!ndaState.scope.media) return '';
-    if (ndaState.mediaStrictness === 'basic_media') {
-        return '4. MEDIA AND RECORDINGS\nThe Parties agree that any photographs, videos, audio recordings, or similar media capturing either Party or their activities ("Media") are Confidential Information. Media shall not be posted or shared publicly and shall not be shown to third parties except as allowed in Section 5. Each Party retains ownership of their own likeness and may require that Media depicting them not be used commercially without written consent.\n';
-    }
-    return '4. MEDIA AND RECORDINGS\nThe Parties agree that any photographs, videos, audio recordings, or similar media capturing either Party or their activities ("Media") are Confidential Information subject to heightened protection. Media shall not be posted, forwarded, or shown to any third party (other than advisors permitted under Section 5). Upon written request, the other Party shall use reasonable efforts to delete or permanently disable access to Media in their possession, without prejudice to any backups that cannot feasibly be altered.\n';
-}
-
-function nonDisparagementClause() {
-    if (ndaState.nonDisparagement === 'none') return '';
-    if (ndaState.nonDisparagement === 'narrow') {
-        return '5. NON-DISPARAGEMENT\nSubject to the carve-outs in Section 5, each Party agrees not to make any knowingly false statement of fact about the other Party in any public forum that is reasonably likely to cause serious reputational harm. This clause does not limit disclosures permitted by law or Section 5.\n';
-    }
-    return '5. NON-DISPARAGEMENT\nSubject to the carve-outs in Section 5, each Party agrees not to publicly disparage or defame the other Party, including through social media. Truthful reports to authorities or disclosures permitted under Section 5 remain allowed.\n';
-}
-
-function powerExchangeClause() {
-    if (!ndaState.powerExchange) {
-        return '6. CONSENT AND SAFETY\nNothing in this Agreement obligates either Party to engage in any scene, relationship dynamic, or physical or sexual activity. Each Party may withdraw consent at any time.\n';
-    }
-    return '6. CONSENT AND POWER EXCHANGE\nIf the Parties engage in Dominant/submissive, Master/slave, or other power exchange dynamics, such power exchange is purely consensual and may be modified or ended at any time. Nothing in this Agreement requires participation in any act or waives the right to withdraw consent. This Agreement addresses confidentiality only.\n';
-}
-
-function termText() {
-    switch (ndaState.term) {
-        case '3_years': return 'This Agreement remains in effect until three (3) years after the Parties’ relationship or interactions end, or until the relevant information becomes public through no breach, whichever occurs first.';
-        case '5_years': return 'This Agreement remains in effect until five (5) years after the Parties’ relationship or interactions end, or until the relevant information becomes public through no breach, whichever occurs first.';
-        case '10_years': return 'This Agreement remains in effect until ten (10) years after the Parties’ relationship or interactions end, or until the relevant information becomes public through no breach, whichever occurs first.';
-        default: return 'This Agreement remains in effect for so long as the relevant Confidential Information remains non-public, subject to the exclusions in Section 1.';
-    }
-}
-
-function liquidatedText() {
-    if (ndaState.liquidatedDamages === 'none') {
-        return '9. REMEDIES\nEach Party acknowledges that unauthorized disclosure of Confidential Information may cause irreparable harm. The non-breaching Party may seek temporary, preliminary, and permanent injunctive relief, in addition to actual damages and other remedies available at law or equity.\n';
-    }
-    const amount = ndaState.liquidatedDamages === '2500' ? '$2,500' : '$10,000';
-    return `9. REMEDIES AND LIQUIDATED DAMAGES\nEach Party acknowledges that unauthorized disclosure of Confidential Information may cause irreparable harm. The non-breaching Party may seek temporary, preliminary, and permanent injunctive relief. In addition, if a court or arbitrator determines that a Party has materially breached this Agreement by making an unauthorized public disclosure, that Party shall pay the non-breaching Party liquidated damages of ${amount} per material breach, representing a reasonable estimate of anticipated harm. This provision does not limit injunctive relief.\n`;
-}
-
-function disputeClause(law) {
-    const location = law.includes('California') ? 'Los Angeles County, California' : 'a mutually agreed location';
-    if (ndaState.forum === 'arbitration') {
-        return `10. GOVERNING LAW AND DISPUTE RESOLUTION\nThis Agreement is governed by the laws of ${law}, without regard to conflicts-of-law rules. Any dispute arising out of or relating to this Agreement shall be resolved by confidential binding arbitration before a single neutral arbitrator in ${location}. Notwithstanding the foregoing, either Party may seek temporary or emergency injunctive relief in any court of competent jurisdiction.\n`;
-    }
-    return `10. GOVERNING LAW AND DISPUTE RESOLUTION\nThis Agreement is governed by the laws of ${law}, without regard to conflicts-of-law rules. Any dispute arising out of or relating to this Agreement shall be brought exclusively in the courts located in ${location}, and each Party consents to such jurisdiction. Either Party may still seek emergency injunctive relief as needed.\n`;
-}
-
-function crossBorderText() {
-    if (!ndaState.crossBorder) return '';
-    return 'The Parties understand that if they reside in different countries, enforcement may require recognition of this Agreement by local courts, and each Party may seek independent legal advice regarding cross-border enforcement.\n';
-}
-
-function renderNda() {
-    const { aFull, bFull, relationshipPhrase, disclosing, receiving } = getPartyLabels();
-    const law = ndaState.governingLaw === 'Other' ? (ndaState.customLaw || 'the selected jurisdiction') : ndaState.governingLaw;
-    const definitions = buildDefinitions();
-    const mediaSection = mediaClause();
-    const ndClause = nonDisparagementClause();
-    const powerClause = powerExchangeClause();
-    const termClause = termText();
-    const liquidated = liquidatedText();
-    const dispute = disputeClause(law);
-    const crossBorderClause = crossBorderText();
-
-    const intro = `CONFIDENTIALITY AND NON-DISCLOSURE AGREEMENT (ALTERNATIVE RELATIONSHIP)\n\nThis Agreement is entered into by and between ${aFull} and ${bFull} (${relationshipPhrase}), to protect the privacy of their consensual relationship and related activities.\n`;
-
-    const section1 = `1. DEFINITIONS\nConfidential Information includes:\n${definitions}\nConfidential Information does not include information that (i) becomes public through no breach, (ii) was lawfully known before disclosure, (iii) is independently developed, or (iv) is received from a third party without a duty of confidentiality.\n`;
-
-    const section2 = ndaState.direction === 'mutual'
-        ? '2. CONFIDENTIALITY OBLIGATIONS\nEach Party, as Receiving Party, shall use the other Party’s Confidential Information solely for maintaining their consensual interactions, shall not disclose it to anyone except as permitted in Section 5, and shall exercise reasonable care to protect it.\n'
-        : `2. CONFIDENTIALITY OBLIGATIONS\n${receiving} shall use ${disclosing}’s Confidential Information solely for maintaining their consensual interactions, shall not disclose it to anyone except as permitted in Section 5, and shall exercise reasonable care to protect it.\n`;
-
-    const section3 = '3. PERMITTED DISCLOSURES\nNothing in this Agreement prohibits either Party from: (a) seeking emergency assistance, medical care, or mental-health support; (b) consulting with their own attorney, therapist, or professional advisor, who must keep the information confidential; (c) reporting suspected crimes, abuse, or safety concerns to authorities, or cooperating with any subpoena or court order; or (d) making disclosures expressly required by law.\n';
-
-    const section4 = mediaSection || '4. MEDIA AND RECORDINGS\nAny Media depicting either Party shall be treated as Confidential Information and handled consistently with Section 3.\n';
-
-    const section5 = ndClause || '5. NON-DISPARAGEMENT\n(Reserved).\n';
-
-    const section6 = powerClause;
-
-    const section7 = `7. TERM\n${termClause}\n`;
-
-    const section8 = '8. SAFETY AND LEGAL RIGHTS\nNothing in this Agreement waives any Party’s right to withdraw consent at any time, to seek help, or to report unlawful conduct. This Agreement does not authorize illegal acts.\n';
-
-    const section9 = liquidated;
-
-    const section10 = dispute + crossBorderClause;
-
-    const section11 = '11. MISCELLANEOUS\nThis Agreement constitutes the entire understanding regarding confidentiality between the Parties and may be amended only in a signed writing (including electronic signatures). If any provision is held unenforceable, the remainder shall remain in effect. This Agreement may be executed in counterparts.\n\nSIGNATURES\n______________________________\n' + aFull + '\nDate: ________________________\n\n______________________________\n' + bFull + '\nDate: ________________________\n';
-
-    const fullText = [intro, section1, section2, section3, section4, section5, section6, section7, section8, section9, section10, section11].join('\n');
-    const output = document.getElementById('ndaOutput');
-    output.value = fullText.trim();
-    output.classList.add('highlight');
-    clearTimeout(renderNda.highlightTimer);
-    renderNda.highlightTimer = setTimeout(() => output.classList.remove('highlight'), 10000);
-}
-
-function copyNdaText() {
-    const text = document.getElementById('ndaOutput').value;
-    if (navigator.clipboard) {
-        navigator.clipboard.writeText(text).then(() => alert('NDA copied to clipboard.')).catch(() => fallbackCopy(text));
-    } else {
-        fallbackCopy(text);
-    }
-}
-
-function fallbackCopy(text) {
-    const textarea = document.createElement('textarea');
-    textarea.value = text;
-    document.body.appendChild(textarea);
-    textarea.select();
-    document.execCommand('copy');
-    document.body.removeChild(textarea);
-    alert('NDA copied to clipboard.');
-}
-
-function init() {
-    handleInputChanges();
-    applyPreset('private_couple');
-    renderNda();
-}
-
-document.addEventListener('DOMContentLoaded', init);
-</script>
+        ReactDOM.render(<NDAGenerator />, document.getElementById('root'));
+    </script>
 </body>
 </html>
