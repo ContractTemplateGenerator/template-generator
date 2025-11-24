@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Player - Compact</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: transparent;
+        }
+        .audio-container {
+            background: linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(185, 28, 28, 0.3);
+        }
+        .audio-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        .audio-icon {
+            font-size: 24px;
+        }
+        .audio-title {
+            flex: 1;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .audio-time {
+            font-family: monospace;
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.9);
+            background: rgba(0,0,0,0.2);
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+        .player-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .play-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            flex-shrink: 0;
+        }
+        .play-btn:hover {
+            transform: scale(1.05);
+        }
+        .progress-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .progress-container {
+            background: rgba(255,255,255,0.25);
+            height: 6px;
+            border-radius: 3px;
+            cursor: pointer;
+            position: relative;
+        }
+        .progress-bar {
+            background: white;
+            height: 100%;
+            width: 0%;
+            border-radius: 3px;
+            transition: width 0.1s linear;
+            position: relative;
+        }
+        .progress-handle {
+            position: absolute;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 12px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+        }
+        .controls-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .skip-btn {
+            background: rgba(255,255,255,0.9);
+            border: none;
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            transition: all 0.2s;
+            color: #7f1d1d;
+        }
+        .skip-btn:hover {
+            background: white;
+        }
+        .speed-select {
+            background: rgba(255,255,255,0.9);
+            border: none;
+            padding: 6px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            color: #7f1d1d;
+        }
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255,255,255,0.9);
+            padding: 6px 10px;
+            border-radius: 4px;
+        }
+        .volume-icon {
+            font-size: 14px;
+        }
+        .volume-slider {
+            width: 60px;
+            cursor: pointer;
+        }
+        .download-btn {
+            background: rgba(255,255,255,0.9);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            text-decoration: none;
+            color: #7f1d1d;
+            display: inline-block;
+            transition: all 0.2s;
+        }
+        .download-btn:hover {
+            background: white;
+        }
+        @media (max-width: 768px) {
+            .controls-row {
+                flex-wrap: wrap;
+            }
+            .volume-slider {
+                width: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="audio-container">
+        <div class="audio-header">
+            <span class="audio-icon">🎧</span>
+            <div class="audio-title">Prefer to Listen? Audio Overview</div>
+            <div class="audio-time" id="timeDisplay">0:00 / 0:00</div>
+        </div>
+
+        <audio id="audio" preload="metadata">
+            <source src="https://terms.law/wp-content/uploads/2025/11/How_to_Audit_ChatGPT_Legal_Demand_Letters.wav" type="audio/wav">
+            <source src="https://terms.law/wp-content/uploads/2025/11/How_to_Audit_ChatGPT_Legal_Demand_Letters.mp3" type="audio/mpeg">
+        </audio>
+
+        <div class="player-controls">
+            <button class="play-btn" id="playBtn">▶️</button>
+
+            <div class="progress-wrapper">
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-bar" id="progressBar">
+                        <div class="progress-handle"></div>
+                    </div>
+                </div>
+
+                <div class="controls-row">
+                    <button class="skip-btn" onclick="skip(-10)">⏪ -10s</button>
+                    <button class="skip-btn" onclick="skip(30)">+30s ⏩</button>
+
+                    <select class="speed-select" id="speedSelect">
+                        <option value="0.75">0.75x</option>
+                        <option value="1" selected>1x</option>
+                        <option value="1.25">1.25x</option>
+                        <option value="1.5">1.5x</option>
+                        <option value="2">2x</option>
+                    </select>
+
+                    <div class="volume-control">
+                        <span class="volume-icon">🔊</span>
+                        <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="100">
+                    </div>
+
+                    <a href="https://terms.law/wp-content/uploads/2025/11/How_to_Audit_ChatGPT_Legal_Demand_Letters.wav" download class="download-btn">⬇️ Download</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const audio = document.getElementById('audio');
+        const playBtn = document.getElementById('playBtn');
+        const progressBar = document.getElementById('progressBar');
+        const progressContainer = document.getElementById('progressContainer');
+        const timeDisplay = document.getElementById('timeDisplay');
+        const speedSelect = document.getElementById('speedSelect');
+        const volumeSlider = document.getElementById('volumeSlider');
+
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60);
+            const s = Math.floor(seconds % 60);
+            return `${m}:${s.toString().padStart(2, '0')}`;
+        }
+
+        playBtn.addEventListener('click', () => {
+            if (audio.paused) {
+                audio.play();
+                playBtn.textContent = '⏸️';
+            } else {
+                audio.pause();
+                playBtn.textContent = '▶️';
+            }
+        });
+
+        audio.addEventListener('timeupdate', () => {
+            const progress = (audio.currentTime / audio.duration) * 100;
+            progressBar.style.width = progress + '%';
+            timeDisplay.textContent = `${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
+        });
+
+        audio.addEventListener('loadedmetadata', () => {
+            timeDisplay.textContent = `0:00 / ${formatTime(audio.duration)}`;
+        });
+
+        progressContainer.addEventListener('click', (e) => {
+            const rect = progressContainer.getBoundingClientRect();
+            const percent = (e.clientX - rect.left) / rect.width;
+            audio.currentTime = percent * audio.duration;
+        });
+
+        speedSelect.addEventListener('change', () => {
+            audio.playbackRate = parseFloat(speedSelect.value);
+        });
+
+        volumeSlider.addEventListener('input', () => {
+            audio.volume = volumeSlider.value / 100;
+        });
+
+        function skip(seconds) {
+            audio.currentTime = Math.max(0, Math.min(audio.duration, audio.currentTime + seconds));
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            if (e.key === ' ') {
+                e.preventDefault();
+                playBtn.click();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                skip(-10);
+            } else if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                skip(30);
+            }
+        });
+    </script>
+</body>
+</html>
