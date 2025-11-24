@@ -1,0 +1,1522 @@
+<!--
+⚠️ CRITICAL NOTE FOR FUTURE WIDGETS ⚠️
+NEVER USE h1, h2, h3, h4, h5, h6 TAGS IN WIDGETS!
+WordPress automatically adds all heading tags to the Table of Contents.
+This pollutes the TOC with widget navigation items.
+Always use styled divs with classes like "widget-title", "section-title", etc.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude AI Demand Letter Analysis Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #1a202c;
+            background: #f7fafc;
+        }
+
+        .widget-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            color: white;
+            padding: 50px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-title {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 18px;
+            opacity: 0.95;
+            margin-bottom: 35px;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 35px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-number {
+            font-size: 38px;
+            font-weight: 800;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            background: #ecfdf5;
+            border-bottom: 2px solid #a7f3d0;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 16px 20px;
+            background: transparent;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+            min-width: 130px;
+        }
+
+        .tab-button:hover {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .tab-button.active {
+            color: #047857;
+            border-bottom-color: #059669;
+            background: white;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            padding: 35px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Typography - NO h1-h6 TAGS */
+        .section-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: #047857;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-subtitle {
+            font-size: 20px;
+            font-weight: 600;
+            color: #334155;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .content-text {
+            color: #475569;
+            line-height: 1.8;
+            margin-bottom: 15px;
+            font-size: 15px;
+        }
+
+        /* Alert Boxes */
+        .alert-box {
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 10px;
+            border-left: 5px solid;
+        }
+
+        .alert-danger {
+            background: #fee2e2;
+            border-color: #dc2626;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            border-color: #f59e0b;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            border-color: #10b981;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            border-color: #3b82f6;
+        }
+
+        .alert-title {
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        /* Flip Cards for Before/After */
+        .flip-card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .flip-card {
+            background-color: transparent;
+            height: 280px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: left;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .flip-card-front {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 2px solid #f59e0b;
+        }
+
+        .flip-card-back {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border: 2px solid #10b981;
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-title {
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .flip-card-content {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #1e293b;
+        }
+
+        .flip-hint {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            font-size: 11px;
+            opacity: 0.7;
+            font-weight: 600;
+        }
+
+        /* Interactive Comparison */
+        .comparison-container {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .comparison-toggle {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: white;
+            padding: 5px;
+            border-radius: 8px;
+            width: fit-content;
+        }
+
+        .comparison-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .comparison-btn.active {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            color: white;
+        }
+
+        .comparison-btn:not(.active) {
+            background: transparent;
+            color: #64748b;
+        }
+
+        .comparison-content {
+            display: none;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .comparison-content.active {
+            display: block;
+        }
+
+        /* Problem Cards */
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .problem-card {
+            background: white;
+            border: 2px solid #d1fae5;
+            border-radius: 12px;
+            padding: 22px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .problem-card:hover {
+            border-color: #059669;
+            box-shadow: 0 8px 24px rgba(5, 150, 105, 0.15);
+            transform: translateY(-3px);
+        }
+
+        .problem-card.active {
+            border-color: #059669;
+            background: #ecfdf5;
+        }
+
+        .problem-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .problem-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #047857;
+            margin-bottom: 10px;
+        }
+
+        .problem-description {
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .problem-details {
+            display: none;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #d1fae5;
+        }
+
+        .problem-card.active .problem-details {
+            display: block;
+        }
+
+        /* Hedging Detector Simulation */
+        .detector-container {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 25px 0;
+            border: 2px solid #059669;
+        }
+
+        .detector-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #047857;
+            margin-bottom: 15px;
+        }
+
+        .detector-input {
+            width: 100%;
+            min-height: 150px;
+            padding: 15px;
+            border: 2px solid #a7f3d0;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            margin-bottom: 15px;
+            resize: vertical;
+        }
+
+        .detector-button {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            color: white;
+            padding: 12px 28px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .detector-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(5, 150, 105, 0.3);
+        }
+
+        .detector-result {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .detector-result.show {
+            display: block;
+        }
+
+        .hedging-highlight {
+            background: #fef3c7;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: 600;
+            color: #92400e;
+        }
+
+        /* Checklist */
+        .checklist-container {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            background: white;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .checklist-item:hover {
+            border-color: #059669;
+        }
+
+        .checklist-item.checked {
+            background: #d1fae5;
+            border-color: #10b981;
+        }
+
+        .checklist-checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #cbd5e1;
+            border-radius: 6px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .checklist-item.checked .checklist-checkbox {
+            background: #10b981;
+            border-color: #10b981;
+        }
+
+        .checklist-checkbox::after {
+            content: '✓';
+            color: white;
+            font-weight: 700;
+            display: none;
+        }
+
+        .checklist-item.checked .checklist-checkbox::after {
+            display: block;
+        }
+
+        .checklist-text {
+            flex: 1;
+            color: #475569;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .checklist-progress {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .progress-bar-container {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #059669 0%, #047857 100%);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        /* FAQ Section */
+        .faq-container {
+            margin: 25px 0;
+        }
+
+        .faq-item {
+            margin-bottom: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+            background: white;
+        }
+
+        .faq-question {
+            width: 100%;
+            padding: 18px 20px;
+            background: #f8fafc;
+            border: none;
+            text-align: left;
+            font-size: 15px;
+            font-weight: 600;
+            color: #047857;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .faq-question:hover {
+            background: #ecfdf5;
+        }
+
+        .faq-question::after {
+            content: '+';
+            font-size: 24px;
+            font-weight: 300;
+            transition: transform 0.3s ease;
+        }
+
+        .faq-question.active::after {
+            transform: rotate(45deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background: white;
+        }
+
+        .faq-answer.active {
+            max-height: 1000px;
+        }
+
+        .faq-answer-content {
+            padding: 20px;
+            color: #475569;
+            line-height: 1.8;
+            font-size: 14px;
+        }
+
+        /* Comparison Table */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .comparison-table thead {
+            background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+            color: white;
+        }
+
+        .comparison-table th {
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .comparison-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #475569;
+            font-size: 14px;
+        }
+
+        .comparison-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 6px;
+        }
+
+        .badge-green {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-yellow {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-red {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Lists */
+        .styled-list {
+            margin: 20px 0;
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .styled-list li {
+            padding: 10px 0 10px 30px;
+            position: relative;
+            color: #475569;
+            line-height: 1.7;
+        }
+
+        .styled-list li::before {
+            content: '✗';
+            position: absolute;
+            left: 0;
+            color: #f59e0b;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .styled-list.check-marks li::before {
+            content: '✓';
+            color: #10b981;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            margin: 35px 0;
+            border-radius: 12px;
+        }
+
+        .cta-title {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .cta-description {
+            font-size: 16px;
+            margin-bottom: 25px;
+            opacity: 0.95;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 14px 35px;
+            background: white;
+            color: #047857;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero {
+                padding: 35px 20px;
+            }
+
+            .hero-title {
+                font-size: 26px;
+            }
+
+            .tab-content {
+                padding: 25px 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .flip-card-grid,
+            .problem-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .flip-card {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="widget-container">
+        <!-- Hero Section -->
+        <div class="hero">
+            <div class="hero-content">
+                <div class="hero-title">Claude AI Demand Letter Analysis</div>
+                <p class="hero-subtitle">Why your "professional" Claude-generated demand letter sounds better but works worse than ChatGPT's obvious errors</p>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-number">6</span>
+                        <span class="stat-label">Subtle Failure Modes</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">3-Pass</span>
+                        <span class="stat-label">Audit Process</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">Professional</span>
+                        <span class="stat-label">But Ineffective</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">AI-Savvy</span>
+                        <span class="stat-label">Legal Strategy</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="tab-nav">
+            <button class="tab-button active" data-tab="overview">Claude Problem</button>
+            <button class="tab-button" data-tab="problems">6 Failure Modes</button>
+            <button class="tab-button" data-tab="comparison">vs ChatGPT</button>
+            <button class="tab-button" data-tab="detector">Hedging Detector</button>
+            <button class="tab-button" data-tab="audit">Audit Process</button>
+            <button class="tab-button" data-tab="checklist">Checklist</button>
+            <button class="tab-button" data-tab="faq">FAQ</button>
+        </div>
+
+        <!-- OVERVIEW TAB -->
+        <div id="tab-overview" class="tab-content active">
+            <div class="section-title">🎯 Claude's Different Failure Mode</div>
+
+            <div class="alert-box alert-warning">
+                <div class="alert-title">The $47K Professional-Sounding Mistake</div>
+                <p>A SaaS founder used Claude (avoiding ChatGPT's errors) but included: <em>"We recognize that complex payment processing can involve operational challenges on both sides..."</em></p>
+                <p style="margin-top: 10px;"><strong>Processor's response:</strong> "Given the mutual nature of any miscommunication, we consider this matter resolved."</p>
+                <p style="margin-top: 10px;">Claude didn't cite fake statutes or threaten criminal prosecution. It did something worse: made the letter so balanced and understanding that it stopped being a demand.</p>
+            </div>
+
+            <div class="flip-card-grid">
+                <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div class="flip-card-title">
+                                <span>⚠️</span> ChatGPT Fails Loudly
+                            </div>
+                            <div class="flip-card-content">
+                                <p><strong>Example:</strong></p>
+                                <p>"Pursuant to Federal Banking Regulation 482.3(b), you must provide refund within 72 hours or face treble damages."</p>
+                                <p style="margin-top: 15px;"><strong>Problem:</strong> Statute doesn't exist. Opposing counsel spots it immediately.</p>
+                                <p style="margin-top: 10px; color: #dc2626; font-weight: 600;">But at least you know something's wrong.</p>
+                            </div>
+                            <div class="flip-hint">Click to compare →</div>
+                        </div>
+                        <div class="flip-card-back">
+                            <div class="flip-card-title">
+                                <span>🤫</span> Claude Fails Quietly
+                            </div>
+                            <div class="flip-card-content">
+                                <p><strong>Example:</strong></p>
+                                <p>"We understand you may have faced challenges. We recognize complex situations can lead to different interpretations..."</p>
+                                <p style="margin-top: 15px;"><strong>Problem:</strong> Sounds thoughtful and balanced. Concedes ground without you realizing it.</p>
+                                <p style="margin-top: 10px; color: #dc2626; font-weight: 600;">Harder to spot before sending. Damage already done when opposing counsel quotes it back.</p>
+                            </div>
+                            <div class="flip-hint">← Click to flip back</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div class="flip-card-title">
+                                <span>📣</span> ChatGPT: Obvious Errors
+                            </div>
+                            <div class="flip-card-content">
+                                <ul class="styled-list">
+                                    <li>Fake statute citations</li>
+                                    <li>Impossible remedies</li>
+                                    <li>Overly aggressive threats</li>
+                                    <li>Criminal charges for civil disputes</li>
+                                    <li>Made-up deadlines</li>
+                                </ul>
+                                <p style="margin-top: 15px; font-weight: 600; color: #047857;">Easy to catch in audit process</p>
+                            </div>
+                            <div class="flip-hint">Click to compare →</div>
+                        </div>
+                        <div class="flip-card-back">
+                            <div class="flip-card-title">
+                                <span>😌</span> Claude: Subtle Problems
+                            </div>
+                            <div class="flip-card-content">
+                                <ul class="styled-list">
+                                    <li>Hedging ("may," "appears," "could")</li>
+                                    <li>Empathetic concessions</li>
+                                    <li>Buried demands</li>
+                                    <li>Vague legal references</li>
+                                    <li>Process talk vs. consequences</li>
+                                </ul>
+                                <p style="margin-top: 15px; font-weight: 600; color: #dc2626;">Harder to spot—sounds professional!</p>
+                            </div>
+                            <div class="flip-hint">← Click to flip back</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div class="flip-card-title">
+                                <span>🚨</span> The Danger
+                            </div>
+                            <div class="flip-card-content">
+                                <p style="font-size: 15px; font-weight: 600; margin-bottom: 12px;">Claude creates a false sense of safety</p>
+                                <p>"I used Claude instead of ChatGPT because it's more reliable. It didn't cite fake statutes. It sounds reasonable. It's probably fine to send."</p>
+                                <p style="margin-top: 15px; color: #dc2626; font-weight: 600;">❌ Wrong assumption</p>
+                            </div>
+                            <div class="flip-hint">Click for why →</div>
+                        </div>
+                        <div class="flip-card-back">
+                            <div class="flip-card-title">
+                                <span>✅</span> The Reality
+                            </div>
+                            <div class="flip-card-content">
+                                <p style="font-size: 14px; margin-bottom: 10px;">Absence of hallucinations ≠ strategically sound</p>
+                                <p>A letter can be:</p>
+                                <ul class="styled-list check-marks" style="margin-top: 10px;">
+                                    <li>Perfectly grammatical</li>
+                                    <li>Logically organized</li>
+                                    <li>Professional in tone</li>
+                                    <li>Zero fake citations</li>
+                                </ul>
+                                <p style="margin-top: 10px; color: #dc2626; font-weight: 600;">...while still quietly undermining your position</p>
+                            </div>
+                            <div class="flip-hint">← Click to flip back</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert-box alert-info">
+                <div class="alert-title">About Other AI Models</div>
+                <p>While Claude and ChatGPT are the most sophisticated models, other options like <strong>Grok, Gemini</strong>, and open-source models generally produce inferior results for legal drafting.</p>
+                <p style="margin-top: 10px;"><strong>Grok:</strong> Even more aggressive than ChatGPT with similar hallucination issues</p>
+                <p><strong>Gemini:</strong> Falls between ChatGPT and Claude but less consistent quality</p>
+                <p><strong>Open-source:</strong> Vary significantly; typically lack reasoning capabilities of Claude/ChatGPT</p>
+            </div>
+        </div>
+
+        <!-- PROBLEMS TAB -->
+        <div id="tab-problems" class="tab-content">
+            <div class="section-title">🔍 The 6 Subtle Ways Claude Undermines Your Letter</div>
+            <p class="content-text">Click each problem to see detailed examples and solutions:</p>
+
+            <div class="problem-grid">
+                <div class="problem-card" onclick="toggleProblem(this)">
+                    <div class="problem-icon">📝</div>
+                    <div class="problem-title">Problem 1: Hedging</div>
+                    <div class="problem-description">Turning clear allegations into weak suggestions</div>
+                    <div class="problem-details">
+                        <div style="background: #fef3c7; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                            <div style="font-weight: 700; color: #92400e; margin-bottom: 8px;">❌ Claude's typical phrasing:</div>
+                            <div style="font-size: 13px; font-style: italic;">"It <span class="hedging-highlight">appears</span> that services delivered <span class="hedging-highlight">may not have</span> fully aligned with specifications, which <span class="hedging-highlight">could potentially</span> constitute a breach..."</div>
+                        </div>
+                        <div style="background: #d1fae5; padding: 15px; border-radius: 8px;">
+                            <div style="font-weight: 700; color: #065f46; margin-bottom: 8px;">✓ What you need:</div>
+                            <div style="font-size: 13px;">"You breached our agreement by failing to deliver the services specified in Section 3.2. Specifically, you did not provide X, Y, Z as required."</div>
+                        </div>
+                        <p style="margin-top: 15px; font-size: 13px; color: #64748b;"><strong>Watch for:</strong> "appears to be," "may constitute," "could potentially," "arguably," "seems to suggest," "might be considered"</p>
+                    </div>
+                </div>
+
+                <div class="problem-card" onclick="toggleProblem(this)">
+                    <div class="problem-icon">🤝</div>
+                    <div class="problem-title">Problem 2: False Empathy</div>
+                    <div class="problem-description">Empathy that reads as shared fault</div>
+                    <div class="problem-details">
+                        <div style="background: #fef3c7; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                            <div style="font-weight: 700; color: #92400e; margin-bottom: 8px;">❌ Dangerous phrases:</div>
+                            <ul class="styled-list" style="margin-top: 10px; font-size: 13px;">
+                                <li>"We understand you may have faced operational challenges..."</li>
+                                <li>"We recognize miscommunications may have occurred on both sides..."</li>
+                                <li>"We appreciate the services provided and value our relationship..."</li>
+                                <li>"We acknowledge complex situations can lead to different interpretations..."</li>
+                            </ul>
+                        </div>
+                        <p style="font-size: 13px; color: #64748b;"><strong>Result:</strong> Opposing counsel weaponizes these as admissions of partial fault or that dispute isn't serious.</p>
+                    </div>
+                </div>
+
+                <div class="problem-card" onclick="toggleProblem(this)">
+                    <div class="problem-icon">⚖️</div>
+                    <div class="problem-title">Problem 3: Vague Legal References</div>
+                    <div class="problem-description">Generic law talk instead of contract-based arguments</div>
+                    <div class="problem-details">
+                        <p style="margin-bottom: 12px; font-size: 14px;"><strong>Claude avoids fake citations but replaces them with meaningless phrases:</strong></p>
+                        <ul class="styled-list" style="font-size: 13px;">
+                            <li>"under applicable consumer protection laws"</li>
+                            <li>"pursuant to relevant employment regulations"</li>
+                            <li>"in accordance with established legal frameworks"</li>
+                            <li>"governed by appropriate commercial statutes"</li>
+                        </ul>
+                        <div style="background: #d1fae5; padding: 15px; border-radius: 8px; margin-top: 15px;">
+                            <div style="font-weight: 700; color: #065f46; margin-bottom: 8px;">✓ Better approach:</div>
+                            <div style="font-size: 13px;">"Your refund policy states: 'Full refunds available within 30 days.' I purchased on [date] and requested refund on [date], within the 30-day window. You must provide refund of $X by [date]."</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="problem-card" onclick="toggleProblem(this)">
+                    <div class="problem-icon">📚</div>
+                    <div class="problem-title">Problem 4: Narrative Overload</div>
+                    <div class="problem-description">Burying your demand in comprehensive storytelling</div>
+                    <div class="problem-details">
+                        <p style="margin-bottom: 12px; font-size: 14px;"><strong>Typical Claude structure (wrong):</strong></p>
+                        <div style="background: #fee2e2; padding: 12px; border-radius: 6px; font-size: 13px; margin-bottom: 15px;">
+                            ¶1: Introduction and background<br>
+                            ¶2-4: Detailed chronological narrative<br>
+                            ¶5: Discussion of agreement's purpose<br>
+                            ¶6: Analysis of what went wrong<br>
+                            ¶7: <em>Somewhere buried here – your actual demand</em><br>
+                            ¶8: Hopes for resolution
+                        </div>
+                        <p style="margin-bottom: 12px; font-size: 14px;"><strong>Effective structure:</strong></p>
+                        <div style="background: #d1fae5; padding: 12px; border-radius: 6px; font-size: 13px;">
+                            ¶1: Clear statement of problem<br>
+                            ¶2: Key facts (brief)<br>
+                            ¶3: What you demand + deadline<br>
+                            ¶4: Consequences if non-compliance
+                        </div>
+                    </div>
+                </div>
+
+                <div class="problem-card" onclick="toggleProblem(this)">
+                    <div class="problem-icon">🗣️</div>
+                    <div class="problem-title">Problem 5: Process Talk</div>
+                    <div class="problem-description">Proposing discussion instead of stating consequences</div>
+                    <div class="problem-details">
+                        <div style="background: #fef3c7; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                            <div style="font-weight: 700; color: #92400e; margin-bottom: 8px;">❌ Claude's approach:</div>
+                            <div style="font-size: 13px; font-style: italic;">"We propose discussing this further to explore mutually beneficial solutions. Perhaps we could schedule a call to review documentation and identify common ground..."</div>
+                            <p style="margin-top: 10px; font-size: 13px;"><strong>What this signals:</strong> We're not serious. We're inviting delay. No clear bottom line.</p>
+                        </div>
+                        <div style="background: #d1fae5; padding: 15px; border-radius: 8px;">
+                            <div style="font-weight: 700; color: #065f46; margin-bottom: 8px;">✓ Clear next steps:</div>
+                            <div style="font-size: 13px;">"I demand payment of $X by [date]. If I do not receive payment by that date, I will initiate arbitration under Section 12 of our agreement."</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="problem-card" onclick="toggleProblem(this)">
+                    <div class="problem-icon">😌</div>
+                    <div class="problem-title">Problem 6: False Sense of Safety</div>
+                    <div class="problem-description">Most dangerous: users skip professional review</div>
+                    <div class="problem-details">
+                        <p style="margin-bottom: 12px; font-size: 14px;"><strong>The reasoning:</strong></p>
+                        <p style="font-size: 13px; font-style: italic; background: #f8fafc; padding: 12px; border-radius: 6px; margin-bottom: 15px;">"I used Claude instead of ChatGPT because it's more reliable. It didn't cite fake statutes. Sounds professional. Probably fine to send."</p>
+                        <div class="alert-box alert-danger" style="margin: 15px 0;">
+                            <div class="alert-title" style="font-size: 14px;">The Reality</div>
+                            <p style="font-size: 13px;">Polish and apparent thoughtfulness can be MORE dangerous than ChatGPT's obvious errors—precisely because you're less likely to question it before sending.</p>
+                        </div>
+                        <p style="font-size: 13px; margin-top: 15px;"><strong>Claude doesn't hallucinate as much, but it will still:</strong></p>
+                        <ul class="styled-list" style="margin-top: 10px; font-size: 13px;">
+                            <li>Misunderstand your contractual rights</li>
+                            <li>Miss strategic opportunities</li>
+                            <li>Use balanced language that concedes ground</li>
+                            <li>Organize poorly for maximum impact</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- COMPARISON TAB -->
+        <div id="tab-comparison" class="tab-content">
+            <div class="section-title">⚔️ Claude vs ChatGPT vs Others</div>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>AI Model</th>
+                        <th>Primary Failure Mode</th>
+                        <th>Best Use Case</th>
+                        <th>Verdict</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Claude</strong></td>
+                        <td>Quiet failures: hedging, concessions, buried demands, vague legal language</td>
+                        <td>Organizing complex timelines; initial drafts that need sharpening</td>
+                        <td><span class="badge badge-yellow">Needs Heavy Editing</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>ChatGPT</strong></td>
+                        <td>Loud failures: fake citations, impossible remedies, overly aggressive</td>
+                        <td>Quick drafts when you know errors will be obvious; brainstorming</td>
+                        <td><span class="badge badge-yellow">Requires Verification</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Grok</strong></td>
+                        <td>Even more aggressive than ChatGPT; similar hallucination issues</td>
+                        <td>Not recommended for legal work</td>
+                        <td><span class="badge badge-red">Avoid</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gemini</strong></td>
+                        <td>Falls between ChatGPT/Claude but less consistent; verbose without strategy</td>
+                        <td>Research/summarization; not demand letter drafting</td>
+                        <td><span class="badge badge-red">Inferior Option</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Open-Source</strong></td>
+                        <td>Inconsistent quality; lack sophisticated reasoning; mixed-up procedures</td>
+                        <td>Experimentation only</td>
+                        <td><span class="badge badge-red">Too Risky</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="section-subtitle">When Claude Helps vs. When It Hurts</div>
+
+            <div class="comparison-container">
+                <div class="comparison-toggle">
+                    <button class="comparison-btn active" onclick="showComparison('helps')">✓ Claude is Helpful</button>
+                    <button class="comparison-btn" onclick="showComparison('hurts')">✗ Claude Needs Editing</button>
+                </div>
+
+                <div id="comp-helps" class="comparison-content active">
+                    <ul class="styled-list check-marks">
+                        <li><strong>Organizing complex timelines and documentation</strong> – Claude excels at making sense of email chains and chronologies</li>
+                        <li><strong>Creating comprehensive summaries</strong> – Great for internal documentation and analysis</li>
+                        <li><strong>Drafting initial narratives</strong> – Use as raw material that you'll then sharpen</li>
+                        <li><strong>Avoiding ChatGPT's obvious errors</strong> – Less likely to cite completely fake statutes</li>
+                        <li><strong>Long-term business relationships</strong> – Balanced tone can be starting point (with conscious editing to maintain firmness)</li>
+                        <li><strong>Internal memos</strong> – Thoroughness and balanced perspective are assets for documentation</li>
+                    </ul>
+                </div>
+
+                <div id="comp-hurts" class="comparison-content">
+                    <ul class="styled-list">
+                        <li><strong>Making clear, direct allegations</strong> – Claude hedges where you need certainty</li>
+                        <li><strong>Stating demands without hedging</strong> – Claude suggests where you need to demand</li>
+                        <li><strong>Removing empathetic concessions</strong> – Claude's empathy becomes admissions</li>
+                        <li><strong>Creating sharp, front-loaded structure</strong> – Claude buries demands in narrative</li>
+                        <li><strong>Replacing vague legal language</strong> – Claude uses "applicable laws" instead of specific contract terms</li>
+                        <li><strong>Strategic judgment about leverage</strong> – Claude can't assess what actually creates pressure</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- DETECTOR TAB -->
+        <div id="tab-detector" class="tab-content">
+            <div class="section-title">🔎 Interactive Hedging Word Detector</div>
+            <p class="content-text">Paste a paragraph from your Claude-generated letter to identify hedging words and weak language:</p>
+
+            <div class="detector-container">
+                <div class="detector-title">Hedging Language Scanner</div>
+                <textarea id="detectorInput" class="detector-input" placeholder="Paste your letter text here...
+
+Example: 'It appears that the services delivered may not have fully aligned with our agreement, which could potentially constitute a material breach...'"></textarea>
+                <button class="detector-button" onclick="detectHedging()">Scan for Hedging Words</button>
+
+                <div id="detectorResult" class="detector-result"></div>
+            </div>
+
+            <div class="alert-box alert-info">
+                <div class="alert-title">Common Hedging Words Claude Uses</div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 15px;">
+                    <div>
+                        <strong>Uncertainty:</strong><br>
+                        • appears to be<br>
+                        • seems to<br>
+                        • may constitute<br>
+                        • could potentially<br>
+                        • might be
+                    </div>
+                    <div>
+                        <strong>Qualifiers:</strong><br>
+                        • arguably<br>
+                        • possibly<br>
+                        • perhaps<br>
+                        • likely<br>
+                        • presumably
+                    </div>
+                    <div>
+                        <strong>Softeners:</strong><br>
+                        • somewhat<br>
+                        • relatively<br>
+                        • fairly<br>
+                        • rather<br>
+                        • quite
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AUDIT PROCESS TAB -->
+        <div id="tab-audit" class="tab-content">
+            <div class="section-title">📋 Three-Pass Audit Process for Claude Letters</div>
+
+            <div class="section-subtitle">Pass 1: Eliminate Hedging & Concessions</div>
+            <div class="checklist-container">
+                <ul class="styled-list check-marks">
+                    <li><strong>Highlight hedging words:</strong> Mark every "appears," "may," "might," "could," "arguably," "potentially," "seems"</li>
+                    <li><strong>Find empathetic concessions:</strong> Flag phrases acknowledging other party's perspective or difficulties</li>
+                    <li><strong>Identify mutual fault language:</strong> Remove statements suggesting shared responsibility</li>
+                    <li><strong>Remove apologetic tone:</strong> Delete overly diplomatic language that weakens position</li>
+                </ul>
+            </div>
+
+            <div style="background: #f8fafc; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                <div style="font-weight: 700; margin-bottom: 15px; color: #047857;">Example Rewrites:</div>
+                <div style="display: grid; gap: 15px;">
+                    <div>
+                        <div style="font-size: 13px; color: #92400e; margin-bottom: 5px;">Before:</div>
+                        <div style="background: #fef3c7; padding: 12px; border-radius: 6px; font-size: 14px; font-style: italic;">"It appears that the delivered services may not have fully met the contractual specifications."</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 13px; color: #065f46; margin-bottom: 5px;">After:</div>
+                        <div style="background: #d1fae5; padding: 12px; border-radius: 6px; font-size: 14px; font-weight: 600;">"You failed to deliver the services specified in Section 3.2 of our agreement."</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-subtitle">Pass 2: Front-Load Your Demand</div>
+            <div style="background: #d1fae5; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                <div style="font-weight: 700; margin-bottom: 15px; color: #047857;">Effective 4-Paragraph Structure:</div>
+                <div style="display: grid; gap: 12px; font-size: 14px;">
+                    <div style="background: white; padding: 12px; border-radius: 6px;">
+                        <strong>¶1:</strong> State problem directly: "This letter demands [specific action] regarding your breach of [agreement] dated [date]."
+                    </div>
+                    <div style="background: white; padding: 12px; border-radius: 6px;">
+                        <strong>¶2:</strong> Core facts (3-5 sentences max): Brief chronology focused only on establishing breach
+                    </div>
+                    <div style="background: white; padding: 12px; border-radius: 6px;">
+                        <strong>¶3:</strong> Specific demand + deadline: "I demand that you [action] by [date]."
+                    </div>
+                    <div style="background: white; padding: 12px; border-radius: 6px;">
+                        <strong>¶4:</strong> Consequences: "If I do not receive [demand] by [deadline], I will [specific next step]."
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-subtitle">Pass 3: Replace Vague Legal Language</div>
+            <div class="checklist-container">
+                <ul class="styled-list check-marks">
+                    <li><strong>Find vague phrases:</strong> "applicable laws," "relevant regulations," "established frameworks," "appropriate statutes"</li>
+                    <li><strong>Replace with contract language:</strong> Quote specific contractual obligations that were breached</li>
+                    <li><strong>Verify any statutory references:</strong> If citing law, verify it exists, applies, and provides claimed remedy</li>
+                    <li><strong>Delete unsupported legal claims:</strong> Remove if you can't cite specific source</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- CHECKLIST TAB -->
+        <div id="tab-checklist" class="tab-content">
+            <div class="section-title">✅ Claude Letter Audit Checklist</div>
+            <p class="content-text">Click each item as you complete your audit:</p>
+
+            <div class="checklist-container">
+                <div class="checklist-progress">
+                    <div style="font-weight: 600; color: #1e293b; margin-bottom: 5px;">Audit Progress</div>
+                    <div style="font-size: 24px; font-weight: 700; color: #059669;" id="claudeChecklistCount">0/15 Complete</div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" id="claudeProgressBar"></div>
+                    </div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleClaudeChecklist(this)">
+                    <div class="checklist-checkbox"></div>
+                    <div class="checklist-text"><strong>Hedging Removed:</strong> Eliminated all "appears," "may," "could," "potentially," "arguably"</div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleClaudeChecklist(this)">
+                    <div class="checklist-checkbox"></div>
+                    <div class="checklist-text"><strong>Empathetic Concessions Deleted:</strong> Removed understanding of "operational challenges," "both sides," "different interpretations"</div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleClaudeChecklist(this)">
+                    <div class="checklist-checkbox"></div>
+                    <div class="checklist-text"><strong>Direct Allegations:</strong> Converted hedged claims into clear statements of breach</div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleClaudeChecklist(this)">
+                    <div class="checklist-checkbox"></div>
+                    <div class="checklist-text"><strong>Front-Loaded Demand:</strong> Core demand appears in first 2-3 paragraphs, not buried</div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleClaudeChecklist(this)">
+                    <div class="checklist-checkbox"></div>
+                    <div class="checklist-text"><strong>Vague Legal Language Replaced:</strong> "Applicable laws" replaced with specific contract clauses or removed</div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleClaudeChecklist(this)">
+                    <div class="checklist-checkbox"></div>
+                    <div class="checklist-text"><strong>Contract Terms Quoted:</strong> Specific contractual language cited (not paraphrased)</div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleClaudeChecklist(this)">
+                    <div class="checklist-checkbox"></div>
+                    <div class="checklist-text"><strong>Specific Deadline Included:</strong> Exact date (not "timely fashion" or "reasonable time")</div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleClaudeChecklist(this)">
+                    <div class="checklist-checkbox"></div>
+                    <div class="checklist-text"><strong>Clear Consequences:</strong> Specific next step stated (arbitration/small claims/etc.), not "explore options"</div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleClaudeChecklist(this)">
+                    <div class="checklist-checkbox"></div>
+                    <div class="checklist-text"><strong>Narrative Condensed:</strong> Removed excessive background; kept only facts necessary to establish breach</div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleClaudeChecklist(this)">
+                    <div class="checklist-checkbox"></div>
+                    <div class="checklist-text"><strong>Process Talk Eliminated:</strong> Removed invitations to "discuss," "explore," "schedule call"</div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleClaudeChecklist(this)">
+                    <div class="checklist-checkbox"></div>
+                    <div class="checklist-text"><strong>Professional but Firm:</strong> Tone is clear and direct without being hostile</div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleClaudeChecklist(this)">
+                    <div class="checklist-checkbox"></div>
+                    <div class="checklist-text"><strong>Specific Demand Amount:</strong> Exact dollar figure, calculation provided if needed</div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleClaudeChecklist(this)">
+                    <div class="checklist-checkbox"></div>
+                    <div class="checklist-text"><strong>Supporting Docs Referenced:</strong> Attached evidence mentioned (contract, emails, invoices)</div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleClaudeChecklist(this)">
+                    <div class="checklist-checkbox"></div>
+                    <div class="checklist-text"><strong>Arbitration Clause Checked:</strong> If contract requires arbitration, letter mentions arbitration not litigation</div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleClaudeChecklist(this)">
+                    <div class="checklist-checkbox"></div>
+                    <div class="checklist-text"><strong>Red Flags Assessed:</strong> Confirmed no high-stakes factors requiring professional review</div>
+                </div>
+            </div>
+
+            <div class="alert-box alert-success" id="claudeChecklistComplete" style="display: none;">
+                <div class="alert-title">✓ Audit Complete!</div>
+                <p>You've addressed the key Claude-specific problems. Your letter should now be clearer, more direct, and strategically stronger.</p>
+                <p style="margin-top: 15px;"><strong>Remember:</strong> Claude's polish made you less likely to question it. Even after this audit, if high stakes are involved, professional review is still recommended.</p>
+            </div>
+
+            <div class="cta-section">
+                <div class="cta-title">Claude Draft Review & Strengthen</div>
+                <p class="cta-description">Send me your Claude-generated draft and supporting documents. I'll identify hedges, concessions, and strategic weaknesses, then provide a strengthened version.</p>
+                <a href="https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting" class="cta-button" target="_blank" rel="noopener">Schedule Consultation</a>
+                <p style="margin-top: 20px; font-size: 14px; opacity: 0.9;">Starting at $297 | Turnaround: 2-3 business days</p>
+            </div>
+        </div>
+
+        <!-- FAQ TAB -->
+        <div id="tab-faq" class="tab-content">
+            <div class="section-title">❓ Frequently Asked Questions</div>
+
+            <div class="faq-container">
+                <div class="faq-item">
+                    <button class="faq-question">Is Claude safer than ChatGPT for demand letters?</button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            "Safer" depends on what you mean. Claude is less likely to hallucinate specific statutes—in that narrow sense, it's safer. But Claude creates different risks: hedged language, empathetic concessions, and buried demands quietly undermine your position in ways that are harder to spot. An obviously fake statute is easy to catch before sending. A seemingly reasonable phrase that concedes shared fault is easy to miss—until opposing counsel quotes it back. From pure hallucination risk, Claude has an edge. From strategic effectiveness, both require careful human review.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">Why does my Claude letter sound weaker than my friend's ChatGPT letter?</button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            ChatGPT tends toward aggressive, confident language—even when misplaced. It demands "treble damages," threatens "immediate action," and cites specific (often fake) statutes with authority. This creates an impression of strength, even though substance may be wrong. Claude tends toward careful, balanced language. It hedges claims, acknowledges complexity, avoids absolute statements. This can read as weakness, even when underlying facts are solid. The reality: neither is optimal. ChatGPT's false confidence damages credibility when errors are spotted. Claude's excessive caution damages leverage by signaling uncertainty. You want firm without being falsely aggressive: clear allegations based on provable facts, specific demands with realistic deadlines, professional language that doesn't threaten impossibilities or hedge valid claims.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">Does Claude avoid the fake citation problem completely?</button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            No. Claude is less prone to inventing specific statute numbers than ChatGPT, but it still makes mistakes. I've seen Claude letters that cite real statutes but misstate what they provide, reference cases that don't say what Claude claims, apply statutes where they don't apply, and occasionally invent statute numbers (less frequently, but it happens). The more common Claude pattern isn't inventing specific citations—it's making vague references to "applicable consumer protection laws" or "relevant employment regulations" without specifying which ones. This avoids embarrassment of citing fake law, but fails to provide concrete legal foundation. Best practice: verify any specific legal citations independently, regardless of AI tool. If you see vague legal language without specifics, replace it with actual contract language and verified statutory references, or remove it entirely.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">Should I tell the recipient I used Claude AI?</button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            No. There is no strategic benefit and potential downsides. Disclosing AI use can signal: (1) you don't have legal representation, (2) letter may contain AI-typical errors, (3) you may not fully understand your position, (4) letter may lack serious strategic thought. Whether you use Claude, ChatGPT, a legal template, or Microsoft Word is irrelevant to the recipient. What matters is whether the final letter accurately states facts, correctly applies law, and effectively advances your interests. The letter should stand on its merits. How it was drafted is your internal process. That said, if working with a lawyer, absolutely tell them you used AI and provide original prompts and source documents.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">How does Claude compare to Grok or Gemini for demand letters?</button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            Claude and ChatGPT are currently the most sophisticated and reliable AI models for legal drafting. Other models like Grok, Gemini, and open-source alternatives generally combine less sophisticated reasoning with reliability issues. Grok tends toward even more aggressive language than ChatGPT with similar or worse hallucination tendencies. It's optimized for social media interaction, not legal contexts. Gemini falls between ChatGPT and Claude in caution but with less consistent quality—verbose without being strategically organized. Open-source models vary significantly; most lack consistency and reasoning capabilities of Claude/ChatGPT. If using AI for demand letter drafting, stick with Claude or ChatGPT. They're not perfect, but they're the best current options.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">What if I've already sent a Claude letter and now realize it had problems?</button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            Don't panic. Weaknesses in your demand letter don't doom your underlying claim—you just need to correct course. If you haven't received a response: send follow-up that clarifies/strengthens. Frame as "supplemental" or "clarifying" rather than correction: "To clarify my letter dated [date], I am demanding [specific action] by [specific date]. If I do not receive [action] by deadline, I will [consequence]." If they responded dismissively: assess whether dismissal is based on letter weaknesses or substantive merits. If facts and contract are strong but letter was poorly drafted, you may need professional help creating more effective communication. If they quoted your concessions back: clarify: "While my previous letter acknowledged [X], I am not conceding [Y]. The fact remains you breached by [specific breach] and I demand [remedy]." Best recovery depends on specific situation, what you conceded/weakened, and how they responded. For significant money or important rights, consult with lawyer about path forward.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab Navigation
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const tabId = button.getAttribute('data-tab');
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                button.classList.add('active');
+                document.getElementById(`tab-${tabId}`).classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+
+        // FAQ Accordion
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                const faqItem = question.parentElement;
+                const answer = faqItem.querySelector('.faq-answer');
+                const isActive = question.classList.contains('active');
+                document.querySelectorAll('.faq-question').forEach(q => {
+                    q.classList.remove('active');
+                    q.parentElement.querySelector('.faq-answer').classList.remove('active');
+                });
+                if (!isActive) {
+                    question.classList.add('active');
+                    answer.classList.add('active');
+                }
+            });
+        });
+
+        // Problem Card Toggle
+        function toggleProblem(card) {
+            card.classList.toggle('active');
+        }
+
+        // Comparison Toggle
+        function showComparison(type) {
+            document.querySelectorAll('.comparison-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.comparison-content').forEach(content => content.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(`comp-${type}`).classList.add('active');
+        }
+
+        // Hedging Detector
+        function detectHedging() {
+            const input = document.getElementById('detectorInput').value;
+            const resultDiv = document.getElementById('detectorResult');
+
+            if (!input.trim()) {
+                alert('Please paste some text to analyze.');
+                return;
+            }
+
+            const hedgingWords = [
+                'appears', 'appear', 'may', 'might', 'could', 'potentially', 'arguably',
+                'possibly', 'perhaps', 'seems', 'seem', 'likely', 'presumably', 'somewhat',
+                'relatively', 'fairly', 'rather', 'quite'
+            ];
+
+            let found = [];
+            let highlightedText = input;
+
+            hedgingWords.forEach(word => {
+                const regex = new RegExp('\\b' + word + '\\b', 'gi');
+                if (regex.test(input)) {
+                    found.push(word);
+                    highlightedText = highlightedText.replace(regex, '<span class="hedging-highlight">$&</span>');
+                }
+            });
+
+            if (found.length === 0) {
+                resultDiv.innerHTML = `
+                    <div style="font-weight: 700; color: #065f46; margin-bottom: 10px;">✓ Good News!</div>
+                    <p>No obvious hedging words detected. However, still check for:</p>
+                    <ul style="margin-top: 10px;">
+                        <li>Empathetic concessions ("we understand...")</li>
+                        <li>Vague legal references ("applicable laws")</li>
+                        <li>Buried demands</li>
+                    </ul>
+                `;
+            } else {
+                resultDiv.innerHTML = `
+                    <div style="font-weight: 700; color: #dc2626; margin-bottom: 10px;">⚠️ Found ${found.length} Hedging Word${found.length > 1 ? 's' : ''}</div>
+                    <div style="background: white; padding: 15px; border-radius: 8px; margin: 15px 0; line-height: 1.8;">
+                        ${highlightedText}
+                    </div>
+                    <p style="margin-top: 15px;"><strong>Detected words:</strong> ${found.join(', ')}</p>
+                    <p style="margin-top: 10px; font-size: 13px; color: #64748b;"><strong>Action:</strong> Replace hedged language with direct statements if you can prove the allegation. If you can't prove it, don't include it.</p>
+                `;
+            }
+
+            resultDiv.classList.add('show');
+        }
+
+        // Claude Checklist
+        function toggleClaudeChecklist(item) {
+            item.classList.toggle('checked');
+            updateClaudeChecklistProgress();
+        }
+
+        function updateClaudeChecklistProgress() {
+            const items = document.querySelectorAll('#tab-checklist .checklist-item');
+            const checked = document.querySelectorAll('#tab-checklist .checklist-item.checked');
+            const total = items.length;
+            const count = checked.length;
+            const percentage = (count / total) * 100;
+
+            document.getElementById('claudeChecklistCount').textContent = `${count}/${total} Complete`;
+            document.getElementById('claudeProgressBar').style.width = `${percentage}%`;
+
+            if (count === total) {
+                document.getElementById('claudeChecklistComplete').style.display = 'block';
+            } else {
+                document.getElementById('claudeChecklistComplete').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
