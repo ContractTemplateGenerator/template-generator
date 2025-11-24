@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Security Deposit Letter Analysis Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header-title {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+        .header-subtitle {
+            font-size: 16px;
+            opacity: 0.95;
+            font-weight: 400;
+        }
+        .tabs {
+            display: flex;
+            background: #fef3c7;
+            border-bottom: 2px solid #f59e0b;
+            overflow-x: auto;
+            flex-wrap: wrap;
+        }
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            font-weight: 600;
+            color: #92400e;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        .tab:hover {
+            background: rgba(245, 158, 11, 0.2);
+        }
+        .tab.active {
+            background: white;
+            color: #d97706;
+            border-bottom: 3px solid #f59e0b;
+        }
+        .tab-content {
+            display: none;
+            padding: 30px;
+            animation: fadeIn 0.3s;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 15px;
+            border-left: 4px solid #f59e0b;
+            padding-left: 15px;
+        }
+        .section-subtitle {
+            font-size: 18px;
+            font-weight: 600;
+            color: #374151;
+            margin: 20px 0 12px 0;
+        }
+        .quiz-container {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .quiz-question {
+            font-weight: 600;
+            color: #92400e;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .quiz-option {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+        .quiz-option:hover {
+            border-color: #f59e0b;
+            transform: translateX(5px);
+        }
+        .quiz-option.selected {
+            background: #f59e0b;
+            color: white;
+            border-color: #d97706;
+        }
+        .btn {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            margin-top: 15px;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+        }
+        .result-box {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+        .result-danger {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid #dc2626;
+        }
+        .result-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border-left: 4px solid #f59e0b;
+        }
+        .result-success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #059669;
+        }
+        .letter-detector {
+            margin: 20px 0;
+        }
+        .letter-input {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 13px;
+            resize: vertical;
+        }
+        .letter-input:focus {
+            outline: none;
+            border-color: #f59e0b;
+        }
+        .warning-highlight {
+            background: #fef3c7;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: 600;
+            color: #92400e;
+        }
+        .error-highlight {
+            background: #fee2e2;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: 600;
+            color: #991b1b;
+        }
+        .analysis-output {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 10px;
+            border: 1px solid #e5e7eb;
+        }
+        .problem-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 4px solid #f59e0b;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .problem-card:hover {
+            box-shadow: 0 4px 16px rgba(245, 158, 11, 0.2);
+            transform: translateY(-2px);
+        }
+        .problem-card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .problem-card-preview {
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .problem-card-details {
+            display: none;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e5e7eb;
+        }
+        .problem-card.expanded .problem-card-details {
+            display: block;
+        }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .comparison-table thead {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+        .comparison-table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        .comparison-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+        .comparison-table tr:hover {
+            background: #fef3c7;
+        }
+        .checklist-item {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 2px solid #e5e7eb;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .checklist-item:hover {
+            border-color: #f59e0b;
+        }
+        .checklist-item.checked {
+            background: #fef3c7;
+            border-color: #f59e0b;
+        }
+        .checklist-checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #d1d5db;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .checklist-item.checked .checklist-checkbox {
+            background: #f59e0b;
+            border-color: #f59e0b;
+            color: white;
+        }
+        .progress-container {
+            background: #e5e7eb;
+            height: 12px;
+            border-radius: 6px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        .progress-bar {
+            background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s;
+            border-radius: 6px;
+        }
+        .progress-text {
+            text-align: center;
+            font-weight: 600;
+            color: #6b7280;
+            margin-top: 8px;
+            font-size: 14px;
+        }
+        .faq-item {
+            background: white;
+            margin: 15px 0;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .faq-question {
+            padding: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #1f2937;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+        }
+        .faq-question:hover {
+            background: #fef3c7;
+        }
+        .faq-answer {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s;
+            color: #4b5563;
+        }
+        .faq-item.active .faq-answer {
+            padding: 0 20px 20px 20px;
+            max-height: 1000px;
+        }
+        .faq-icon {
+            font-size: 20px;
+            transition: transform 0.3s;
+        }
+        .faq-item.active .faq-icon {
+            transform: rotate(180deg);
+        }
+        .before-after {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .before-box, .after-box {
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .before-box {
+            background: #fee2e2;
+            border-left: 4px solid #dc2626;
+        }
+        .after-box {
+            background: #d1fae5;
+            border-left: 4px solid #059669;
+        }
+        .box-title {
+            font-weight: 700;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        .before-box .box-title {
+            color: #991b1b;
+        }
+        .after-box .box-title {
+            color: #065f46;
+        }
+        @media (max-width: 768px) {
+            .before-after {
+                grid-template-columns: 1fr;
+            }
+            .header-title {
+                font-size: 22px;
+            }
+            .tabs {
+                justify-content: flex-start;
+            }
+            .tab {
+                font-size: 12px;
+                padding: 12px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-title">⚠️ AI Security Deposit Letter Analysis Tool</div>
+            <div class="header-subtitle">Why that AI-generated demand letter might backfire on you</div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab(0)">Risk Assessment</button>
+            <button class="tab" onclick="switchTab(1)">Letter Analyzer</button>
+            <button class="tab" onclick="switchTab(2)">Common Mistakes</button>
+            <button class="tab" onclick="switchTab(3)">Backfire Patterns</button>
+            <button class="tab" onclick="switchTab(4)">Better Approach</button>
+            <button class="tab" onclick="switchTab(5)">Verification Checklist</button>
+            <button class="tab" onclick="switchTab(6)">FAQ</button>
+        </div>
+
+        <div id="tab0" class="tab-content active">
+            <div class="section-title">Should You Send That AI Letter?</div>
+            <p style="color: #6b7280; margin-bottom: 20px;">Answer these questions to assess the risk of sending your AI-generated demand letter without legal review.</p>
+
+            <div class="quiz-container">
+                <div class="quiz-question">1. How much money is at stake?</div>
+                <div class="quiz-options">
+                    <div class="quiz-option" data-question="q1" data-value="low" onclick="selectOption(this)">
+                        💵 Under $500 - small cleaning dispute
+                    </div>
+                    <div class="quiz-option" data-question="q1" data-value="medium" onclick="selectOption(this)">
+                        💰 $500-$2,000 - significant but manageable
+                    </div>
+                    <div class="quiz-option" data-question="q1" data-value="high" onclick="selectOption(this)">
+                        💸 Over $2,000 - major financial impact
+                    </div>
+                </div>
+            </div>
+
+            <div class="quiz-container">
+                <div class="quiz-question">2. What legal claims are you making?</div>
+                <div class="quiz-options">
+                    <div class="quiz-option" data-question="q2" data-value="low" onclick="selectOption(this)">
+                        📝 Simple accounting error or late itemization
+                    </div>
+                    <div class="quiz-option" data-question="q2" data-value="medium" onclick="selectOption(this)">
+                        ⚖️ Improper deductions but not intentional fraud
+                    </div>
+                    <div class="quiz-option" data-question="q2" data-value="high" onclick="selectOption(this)">
+                        🚨 Bad faith, fraud, harassment, or retaliation
+                    </div>
+                </div>
+            </div>
+
+            <div class="quiz-container">
+                <div class="quiz-question">3. How did you verify the legal citations in your letter?</div>
+                <div class="quiz-options">
+                    <div class="quiz-option" data-question="q3" data-value="high" onclick="selectOption(this)">
+                        🤷 I didn't - I trusted the AI output
+                    </div>
+                    <div class="quiz-option" data-question="q3" data-value="medium" onclick="selectOption(this)">
+                        🔍 I Googled them but didn't read the full statutes
+                    </div>
+                    <div class="quiz-option" data-question="q3" data-value="low" onclick="selectOption(this)">
+                        ✅ I verified every citation against official sources
+                    </div>
+                </div>
+            </div>
+
+            <div class="quiz-container">
+                <div class="quiz-question">4. How accurate are the facts in your letter?</div>
+                <div class="quiz-options">
+                    <div class="quiz-option" data-question="q4" data-value="low" onclick="selectOption(this)">
+                        📊 Every date, amount, and event is documented
+                    </div>
+                    <div class="quiz-option" data-question="q4" data-value="medium" onclick="selectOption(this)">
+                        📝 Mostly accurate but some estimates
+                    </div>
+                    <div class="quiz-option" data-question="q4" data-value="high" onclick="selectOption(this)">
+                        💭 Based on my memory and AI's interpretation
+                    </div>
+                </div>
+            </div>
+
+            <div class="quiz-container">
+                <div class="quiz-question">5. What's your relationship with the landlord?</div>
+                <div class="quiz-options">
+                    <div class="quiz-option" data-question="q5" data-value="low" onclick="selectOption(this)">
+                        😊 Professional, might resolve with conversation
+                    </div>
+                    <div class="quiz-option" data-question="q5" data-value="medium" onclick="selectOption(this)">
+                        😐 Tense but communication is still possible
+                    </div>
+                    <div class="quiz-option" data-question="q5" data-value="high" onclick="selectOption(this)">
+                        😡 Completely broken, no trust left
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn" onclick="calculateRisk()">Calculate Risk Level</button>
+
+            <div id="riskResult"></div>
+        </div>
+
+        <div id="tab1" class="tab-content">
+            <div class="section-title">AI Letter Problem Detector</div>
+            <p style="color: #6b7280; margin-bottom: 20px;">Paste your AI-generated letter below to identify common red flags and problematic patterns.</p>
+
+            <div class="letter-detector">
+                <textarea id="letterInput" class="letter-input" placeholder="Paste your AI-generated demand letter here...
+
+Example: 'Dear Landlord, Pursuant to Section 123.45 of the Landlord Tenant Act, you have utterly failed to provide any accounting whatsoever...'"></textarea>
+
+                <button class="btn" onclick="analyzeLetter()">Analyze Letter</button>
+
+                <div id="letterAnalysis"></div>
+            </div>
+        </div>
+
+        <div id="tab2" class="tab-content">
+            <div class="section-title">7 Common AI Mistakes That Hurt Your Case</div>
+
+            <div class="problem-card" onclick="toggleCard(this)">
+                <div class="problem-card-title">
+                    <span>❌</span>
+                    <span>Getting Basic Facts Wrong</span>
+                </div>
+                <div class="problem-card-preview">
+                    AI converts vague memories into firm statements that can't be supported...
+                </div>
+                <div class="problem-card-details">
+                    <div class="section-subtitle">The Problem:</div>
+                    <p>AI takes your vague inputs like "I moved out in early June" and converts them into absolute statements like "I vacated the premises on June 3rd." If your landlord has proof you left on June 8th, your credibility is damaged.</p>
+
+                    <div class="section-subtitle">Real Example:</div>
+                    <div class="before-after">
+                        <div class="before-box">
+                            <div class="box-title">❌ AI Version</div>
+                            <p>"I contacted you repeatedly over several weeks to request the deposit accounting."</p>
+                        </div>
+                        <div class="after-box">
+                            <div class="box-title">✅ Reality</div>
+                            <p>You called once and sent two texts over 10 days.</p>
+                        </div>
+                    </div>
+
+                    <div class="section-subtitle">Why It Backfires:</div>
+                    <p>When you testify under oath or the landlord produces your actual text history, these exaggerations become evidence of dishonesty rather than strengths.</p>
+                </div>
+            </div>
+
+            <div class="problem-card" onclick="toggleCard(this)">
+                <div class="problem-card-title">
+                    <span>⚖️</span>
+                    <span>Citing Laws That Don't Apply</span>
+                </div>
+                <div class="problem-card-preview">
+                    AI confidently cites statutes it has "seen" without understanding context...
+                </div>
+                <div class="problem-card-details">
+                    <div class="section-subtitle">The Problem:</div>
+                    <p>AI knows certain legal terms tend to appear near "security deposit" and will confidently cite them. But it doesn't understand that harassment statutes are for landlords trying to force tenants out, not for follow-up emails about forwarding addresses.</p>
+
+                    <div class="section-subtitle">Common Misapplied Laws:</div>
+                    <ul style="margin-left: 20px; color: #4b5563;">
+                        <li><strong>Harassment statutes</strong> - meant for intimidation, not normal follow-up</li>
+                        <li><strong>Retaliation laws</strong> - require protected activity + adverse action</li>
+                        <li><strong>Credit card regulations</strong> - don't apply to deposit disputes</li>
+                        <li><strong>Wrong jurisdiction's laws</strong> - cites another state's rules</li>
+                    </ul>
+
+                    <div class="section-subtitle">What Landlords See:</div>
+                    <p>Experienced landlords or their attorneys immediately recognize these mistakes and conclude the letter wasn't written by someone who understands housing law. Your leverage evaporates.</p>
+                </div>
+            </div>
+
+            <div class="problem-card" onclick="toggleCard(this)">
+                <div class="problem-card-title">
+                    <span>💰</span>
+                    <span>Threatening Impossible Remedies</span>
+                </div>
+                <div class="problem-card-preview">
+                    AI demands triple damages and attorney fees without checking if your situation qualifies...
+                </div>
+                <div class="problem-card-details">
+                    <div class="section-subtitle">The Problem:</div>
+                    <p>AI hears "I can get double or triple damages" and immediately demands the maximum. It doesn't know that:</p>
+                    <ul style="margin-left: 20px; color: #4b5563; margin-top: 10px;">
+                        <li>Many states require <strong>intentional</strong> or <strong>bad faith</strong> conduct for multipliers</li>
+                        <li>Small claims courts often have jurisdictional limits ($5K-$10K typically)</li>
+                        <li>Attorney fee awards require prevailing on specific statutory claims</li>
+                        <li>Judges have discretion - multipliers aren't automatic</li>
+                    </ul>
+
+                    <div class="before-after" style="margin-top: 15px;">
+                        <div class="before-box">
+                            <div class="box-title">❌ AI Threat</div>
+                            <p>"We will recover the full $2,000 deposit plus triple damages of $6,000, attorney fees, court costs, and all available remedies."</p>
+                        </div>
+                        <div class="after-box">
+                            <div class="box-title">✅ Reality</div>
+                            <p>Small claims limit is $5,000. You're pro se (no attorney fees). No evidence of intentional bad faith.</p>
+                        </div>
+                    </div>
+
+                    <p style="margin-top: 15px; color: #6b7280;">Once the landlord's counsel explains why these numbers are impossible, your credibility drops and settlement leverage weakens.</p>
+                </div>
+            </div>
+
+            <div class="problem-card" onclick="toggleCard(this)">
+                <div class="problem-card-title">
+                    <span>📱</span>
+                    <span>Turning Normal Communication Into "Harassment"</span>
+                </div>
+                <div class="problem-card-preview">
+                    Routine follow-ups become "repeated unwanted contact" in AI letters...
+                </div>
+                <div class="problem-card-details">
+                    <div class="section-subtitle">The Problem:</div>
+                    <p>Landlords need forwarding addresses. They send texts about keys. They follow up about final walk-throughs. This is normal logistical communication that happens when someone moves out.</p>
+
+                    <p style="margin-top: 10px;">AI tools trained on complaint forums interpret any contact as potential harassment. Your letter accuses the landlord of illegal conduct for doing ordinary business communication.</p>
+
+                    <div class="section-subtitle">Real Example:</div>
+                    <div class="before-after">
+                        <div class="before-box">
+                            <div class="box-title">❌ AI Accusation</div>
+                            <p>"Your repeated and unwanted attempts to contact me constitute harassment under applicable law and may give rise to additional claims."</p>
+                        </div>
+                        <div class="after-box">
+                            <div class="box-title">✅ What Actually Happened</div>
+                            <p>Landlord sent 3 texts over 2 weeks asking for your new address to mail the check.</p>
+                        </div>
+                    </div>
+
+                    <div class="section-subtitle">Why It Backfires:</div>
+                    <p>When you accuse someone of criminal harassment for asking where to send your money, they stop trying to compromise and start defending themselves aggressively.</p>
+                </div>
+            </div>
+
+            <div class="problem-card" onclick="toggleCard(this)">
+                <div class="problem-card-title">
+                    <span>🏙️</span>
+                    <span>Misusing Local Ordinances</span>
+                </div>
+                <div class="problem-card-preview">
+                    AI sees your city has tenant protections and cites provisions out of context...
+                </div>
+                <div class="problem-card-details">
+                    <div class="section-subtitle">The Problem:</div>
+                    <p>Some cities have strong tenant protection ordinances. AI may have seen excerpts but doesn't understand which sections apply to which situations. It might cite:</p>
+                    <ul style="margin-left: 20px; color: #4b5563; margin-top: 10px;">
+                        <li>Wrongful eviction provisions (you already moved out)</li>
+                        <li>Habitability requirements (not about deposits)</li>
+                        <li>Rent control rules (doesn't cover security deposits)</li>
+                        <li>Harassment ordinances meant for during tenancy, not after</li>
+                    </ul>
+
+                    <div class="section-subtitle">The Signal It Sends:</div>
+                    <p style="margin-top: 10px;">To the landlord's attorney, this looks like someone throwing everything at the wall without understanding what applies. Instead of demonstrating sophistication, it reveals the letter writer doesn't actually understand the local legal framework.</p>
+
+                    <p style="margin-top: 10px; color: #92400e; font-weight: 600;">Bottom line: Impressive-sounding local ordinance citations that don't fit your facts make you look less credible, not more.</p>
+                </div>
+            </div>
+
+            <div class="problem-card" onclick="toggleCard(this)">
+                <div class="problem-card-title">
+                    <span>🎯</span>
+                    <span>Ignoring Partial Compliance</span>
+                </div>
+                <div class="problem-card-preview">
+                    AI writes in absolutes while real disputes involve partial refunds and incomplete accounting...
+                </div>
+                <div class="problem-card-details">
+                    <div class="section-subtitle">The Problem:</div>
+                    <p>Real security deposit disputes are rarely all-or-nothing. Usually:</p>
+                    <ul style="margin-left: 20px; color: #4b5563; margin-top: 10px;">
+                        <li>Landlord returned <em>some</em> money, not zero</li>
+                        <li>Landlord sent <em>an</em> accounting, just incomplete or late</li>
+                        <li>Some deductions are legitimate, others questionable</li>
+                        <li>Communication happened but was inadequate</li>
+                    </ul>
+
+                    <p style="margin-top: 10px;">AI doesn't do nuance. It hears "they didn't give me everything" and writes "you retained the entire deposit and provided no accounting whatsoever."</p>
+
+                    <div class="section-subtitle">The Credibility Problem:</div>
+                    <div class="before-after" style="margin-top: 15px;">
+                        <div class="before-box">
+                            <div class="box-title">❌ AI's Absolute Statement</div>
+                            <p>"You have utterly failed to provide any itemization and have wrongfully retained the entire $2,000 security deposit."</p>
+                        </div>
+                        <div class="after-box">
+                            <div class="box-title">✅ Actual Facts</div>
+                            <p>Landlord sent $1,200 via Zelle with an email listing some charges. The itemization was incomplete and $800 is missing.</p>
+                        </div>
+                    </div>
+
+                    <p style="margin-top: 15px; color: #6b7280;">When the landlord produces proof of the partial refund and the email, your entire letter looks exaggerated. The legitimate issues (incomplete accounting, questionable charges) get buried under your credibility problem.</p>
+                </div>
+            </div>
+
+            <div class="problem-card" onclick="toggleCard(this)">
+                <div class="problem-card-title">
+                    <span>🎭</span>
+                    <span>Wrong Tone For Wrong Audience</span>
+                </div>
+                <div class="problem-card-preview">
+                    AI uses the same aggressive corporate litigation tone whether you're dealing with a major property manager or your former roommate's parents...
+                </div>
+                <div class="problem-card-details">
+                    <div class="section-subtitle">The Problem:</div>
+                    <p>AI doesn't know if you're writing to:</p>
+                    <ul style="margin-left: 20px; color: #4b5563; margin-top: 10px;">
+                        <li>A professional management company with legal counsel</li>
+                        <li>An individual landlord who rents out one property</li>
+                        <li>A former roommate who became the lease holder</li>
+                        <li>Someone's parents who co-signed or took over</li>
+                    </ul>
+
+                    <p style="margin-top: 10px;">It produces the same scorched-earth tone for all of them: "systemic violations," "ongoing misconduct," "established pattern of abuse."</p>
+
+                    <div class="section-subtitle">How This Backfires:</div>
+                    <p style="margin-top: 10px;"><strong>Small landlords:</strong> They feel personally attacked. What could have been resolved with a phone call becomes adversarial because you accused them of running a criminal enterprise for deducting carpet cleaning.</p>
+
+                    <p style="margin-top: 10px;"><strong>Large landlords:</strong> Their attorneys immediately recognize amateur hour. The letter wanted to sound like Big Law but revealed it came from ChatGPT. Leverage evaporates.</p>
+
+                    <div class="section-subtitle">The Better Approach:</div>
+                    <p style="margin-top: 10px; color: #065f46; font-weight: 600;">Match your tone to your audience and your actual goal. If you want your money back without a lawsuit, write like you want your money back without a lawsuit.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab3" class="tab-content">
+            <div class="section-title">How Your Letter Lands vs. How You Think It Sounds</div>
+            <p style="color: #6b7280; margin-bottom: 20px;">The gap between what AI writes and how landlords and judges actually interpret it.</p>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>What The AI Letter Says</th>
+                        <th>How Landlord/Judge Sees It</th>
+                        <th>The Problem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>"You utterly failed to provide any accounting of the deposit within the time required by law."</td>
+                        <td>"We did send something on time, even if it was imperfect. This letter is overstating things."</td>
+                        <td>Ignores partial compliance and makes everything you say seem exaggerated</td>
+                    </tr>
+                    <tr>
+                        <td>"You wrongfully retained the entire security deposit and remain in full violation of the law."</td>
+                        <td>"We already returned $1,200. If they're claiming we kept everything, what else are they lying about?"</td>
+                        <td>Easily disproven statement damages credibility on legitimate issues</td>
+                    </tr>
+                    <tr>
+                        <td>"We will obtain the full deposit, triple damages, attorney's fees, and all additional penalties in small claims court."</td>
+                        <td>"Small claims caps at $5K here, they're pro se, and there's no bad faith. They don't understand how this works."</td>
+                        <td>Impossible remedies signal you don't know the law, reducing settlement leverage</td>
+                    </tr>
+                    <tr>
+                        <td>"Your repeated attempts to contact me amount to harassment under applicable law."</td>
+                        <td>"We sent three texts asking where to mail the check. Now we're being accused of a crime for doing follow-up."</td>
+                        <td>Normal business communication reframed as illegal harassment kills compromise</td>
+                    </tr>
+                    <tr>
+                        <td>"Pursuant to Section X of [impressive code], you are in clear violation."</td>
+                        <td>"That section doesn't say what they claim. If they can't cite law correctly, this isn't a serious letter."</td>
+                        <td>Wrong or misapplied statutes expose the letter as AI-generated amateur work</td>
+                    </tr>
+                    <tr>
+                        <td>"Your systemic pattern of misconduct and ongoing violations demonstrate bad faith."</td>
+                        <td>"We're a couple who rented out our spare condo. This sounds like we're Enron."</td>
+                        <td>Wildly inappropriate tone for audience destroys any chance of reasonable dialogue</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="background: #fef3c7; padding: 20px; border-radius: 10px; margin-top: 20px; border-left: 4px solid #f59e0b;">
+                <div style="font-weight: 700; color: #92400e; margin-bottom: 10px;">💡 Key Insight:</div>
+                <p style="color: #92400e;">The more "powerful" and "official" AI makes your letter sound, the more scrutiny it receives—and the more obvious the mistakes become. Simple, accurate, factual communication is almost always more effective than AI-amplified threats.</p>
+            </div>
+        </div>
+
+        <div id="tab4" class="tab-content">
+            <div class="section-title">The Right Way To Use AI (If You Use It At All)</div>
+
+            <p style="color: #6b7280; margin-bottom: 20px;">AI isn't inherently bad for security deposit disputes. The key is knowing what it can and can't do reliably.</p>
+
+            <div class="section-subtitle">✅ Good Uses Of AI</div>
+
+            <div class="problem-card">
+                <div class="problem-card-title">
+                    <span>📅</span>
+                    <span>Building A Timeline</span>
+                </div>
+                <div class="problem-card-preview">
+                    Ask AI to organize your messy story into chronological order—then verify every date.
+                </div>
+                <div class="problem-card-details">
+                    <p><strong>Prompt example:</strong> "I moved out June 15. I emailed my forwarding address on June 18. I called on July 2 asking about my deposit. Help me organize this into a clear timeline."</p>
+                    <p style="margin-top: 10px;"><strong>What AI does well:</strong> Creates clean, chronological structure from your jumbled notes.</p>
+                    <p style="margin-top: 10px; color: #dc2626; font-weight: 600;"><strong>What you must do:</strong> Check every single date against your texts, emails, and calendar. Fix anything that's even slightly off.</p>
+                </div>
+            </div>
+
+            <div class="problem-card">
+                <div class="problem-card-title">
+                    <span>✍️</span>
+                    <span>Improving Grammar And Clarity</span>
+                </div>
+                <div class="problem-card-preview">
+                    Use AI to turn your rough notes into professional, clear prose—but keep the substance yours.
+                </div>
+                <div class="problem-card-details">
+                    <p><strong>Your draft:</strong> "so basically i moved out and they said theyd mail check but never did and now saying i owe for cleaning but place was clean"</p>
+                    <p style="margin-top: 10px;"><strong>AI's help:</strong> "I moved out on [date] and was told the deposit check would be mailed within 30 days. I have not received it. The landlord now claims I owe for cleaning, but I left the unit in clean condition."</p>
+                    <p style="margin-top: 10px; color: #059669; font-weight: 600;">This is helpful: clearer communication of your actual facts, without invented legal theories.</p>
+                </div>
+            </div>
+
+            <div class="problem-card">
+                <div class="problem-card-title">
+                    <span>💬</span>
+                    <span>Drafting Initial Polite Inquiry</span>
+                </div>
+                <div class="problem-card-preview">
+                    Before formal demands, ask AI to help write a calm, professional question.
+                </div>
+                <div class="problem-card-details">
+                    <p><strong>Better than a demand letter:</strong> Often a polite, factual email asking for clarification works better than threats.</p>
+                    <p style="margin-top: 10px;"><strong>Example prompt:</strong> "Help me write a professional email asking my landlord to explain the $400 cleaning charge since I have photos showing the unit was clean at move-out."</p>
+                    <p style="margin-top: 10px;"><strong>Why this works:</strong> You're not threatening litigation for what might be a simple misunderstanding. You're asking for information. This preserves the relationship and often gets results faster.</p>
+                </div>
+            </div>
+
+            <div class="section-subtitle" style="margin-top: 30px;">❌ Dangerous Uses Of AI</div>
+
+            <div style="background: #fee2e2; padding: 15px; border-radius: 8px; margin: 10px 0; border-left: 4px solid #dc2626;">
+                <p style="color: #991b1b; font-weight: 600;">🚫 Legal citations and statute references</p>
+                <p style="color: #7f1d1d; margin-top: 5px;">AI frequently invents or misapplies laws. Unless you personally verify every citation, remove them entirely.</p>
+            </div>
+
+            <div style="background: #fee2e2; padding: 15px; border-radius: 8px; margin: 10px 0; border-left: 4px solid #dc2626;">
+                <p style="color: #991b1b; font-weight: 600;">🚫 Damage calculations and remedy demands</p>
+                <p style="color: #7f1d1d; margin-top: 5px;">AI doesn't understand your jurisdiction's multipliers, small claims limits, or what "bad faith" actually requires.</p>
+            </div>
+
+            <div style="background: #fee2e2; padding: 15px; border-radius: 8px; margin: 10px 0; border-left: 4px solid #dc2626;">
+                <p style="color: #991b1b; font-weight: 600;">🚫 Legal conclusions about landlord's conduct</p>
+                <p style="color: #7f1d1d; margin-top: 5px;">Accusations of "fraud," "harassment," "retaliation," and "bad faith" have specific legal meanings. AI uses them casually.</p>
+            </div>
+
+            <div style="background: #fee2e2; padding: 15px; border-radius: 8px; margin: 10px 0; border-left: 4px solid #dc2626;">
+                <p style="color: #991b1b; font-weight: 600;">🚫 Threats of litigation or regulatory complaints</p>
+                <p style="color: #7f1d1d; margin-top: 5px;">Don't threaten actions you won't actually take. Empty threats destroy credibility and settlement leverage.</p>
+            </div>
+
+            <div style="background: #d1fae5; padding: 20px; border-radius: 10px; margin-top: 30px; border-left: 4px solid #059669;">
+                <div style="font-weight: 700; color: #065f46; margin-bottom: 10px; font-size: 18px;">The Healthy Division Of Labor</div>
+                <p style="color: #065f46;"><strong>AI's job:</strong> Organize facts, improve grammar, structure your story clearly.</p>
+                <p style="color: #065f46; margin-top: 8px;"><strong>Your job:</strong> Verify every fact, remove legal jargon you can't defend, decide what you actually want.</p>
+                <p style="color: #065f46; margin-top: 8px;"><strong>Lawyer's job (if needed):</strong> Assess what claims you actually have, what remedies are realistic, and whether/how to escalate.</p>
+            </div>
+        </div>
+
+        <div id="tab5" class="tab-content">
+            <div class="section-title">Pre-Send Verification Checklist</div>
+            <p style="color: #6b7280; margin-bottom: 20px;">Before sending any demand letter (AI-generated or not), verify these critical elements.</p>
+
+            <div class="progress-container">
+                <div class="progress-bar" id="checklistProgress"></div>
+            </div>
+            <div class="progress-text" id="checklistProgressText">0 of 15 verified</div>
+
+            <div style="margin-top: 20px;">
+                <div class="checklist-item" onclick="toggleChecklist(this)">
+                    <div class="checklist-checkbox"></div>
+                    <div>
+                        <strong>Every date is accurate and documented</strong>
+                        <div style="font-size: 13px; color: #6b7280; margin-top: 3px;">Move-out date, notice dates, communication dates—check against texts/emails</div>
+                    </div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleChecklist(this)">
+                    <div class="checklist-checkbox"></div>
+                    <div>
+                        <strong>Dollar amounts match your records exactly</strong>
+                        <div style="font-size: 13px; color: #6b7280; margin-top: 3px;">Original deposit, any partial refunds, amounts withheld</div>
+                    </div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleChecklist(this)">
+                    <div class="checklist-checkbox"></div>
+                    <div>
+                        <strong>You've acknowledged any partial refund or accounting received</strong>
+                        <div style="font-size: 13px; color: #6b7280; margin-top: 3px;">Don't say "entire deposit withheld" if you got $800 back</div>
+                    </div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleChecklist(this)">
+                    <div class="checklist-checkbox"></div>
+                    <div>
+                        <strong>All legal citations have been personally verified or removed</strong>
+                        <div style="font-size: 13px; color: #6b7280; margin-top: 3px;">If you can't find the statute on an official government site, delete it</div>
+                    </div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleChecklist(this)">
+                    <div class="checklist-checkbox"></div>
+                    <div>
+                        <strong>You're only citing your state's/city's actual laws</strong>
+                        <div style="font-size: 13px; color: #6b7280; margin-top: 3px;">AI sometimes mixes in statutes from other jurisdictions</div>
+                    </div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleChecklist(this)">
+                    <div class="checklist-checkbox"></div>
+                    <div>
+                        <strong>Damage calculations are realistic for your situation</strong>
+                        <div style="font-size: 13px; color: #6b7280; margin-top: 3px;">Check small claims limits, whether bad faith is provable, attorney fee requirements</div>
+                    </div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleChecklist(this)">
+                    <div class="checklist-checkbox"></div>
+                    <div>
+                        <strong>You haven't accused landlord of "harassment" for normal follow-up</strong>
+                        <div style="font-size: 13px; color: #6b7280; margin-top: 3px;">Asking for forwarding address isn't harassment</div>
+                    </div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleChecklist(this)">
+                    <div class="checklist-checkbox"></div>
+                    <div>
+                        <strong>You haven't accused landlord of "fraud" or "bad faith" without proof</strong>
+                        <div style="font-size: 13px; color: #6b7280; margin-top: 3px;">These are serious legal accusations requiring evidence of intentional wrongdoing</div>
+                    </div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleChecklist(this)">
+                    <div class="checklist-checkbox"></div>
+                    <div>
+                        <strong>Tone matches the audience and relationship</strong>
+                        <div style="font-size: 13px; color: #6b7280; margin-top: 3px;">Individual landlord vs. corporate property manager require different approaches</div>
+                    </div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleChecklist(this)">
+                    <div class="checklist-checkbox"></div>
+                    <div>
+                        <strong>You've removed phrases you couldn't say in court with a straight face</strong>
+                        <div style="font-size: 13px; color: #6b7280; margin-top: 3px;">"Hereby," "pursuant to," "at all times relevant"—these often signal AI drafting</div>
+                    </div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleChecklist(this)">
+                    <div class="checklist-checkbox"></div>
+                    <div>
+                        <strong>Every threat is something you'll actually follow through on</strong>
+                        <div style="font-size: 13px; color: #6b7280; margin-top: 3px;">Don't threaten regulators, lawsuits, or public complaints if you won't do them</div>
+                    </div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleChecklist(this)">
+                    <div class="checklist-checkbox"></div>
+                    <div>
+                        <strong>You haven't invented or embellished communications</strong>
+                        <div style="font-size: 13px; color: #6b7280; margin-top: 3px;">One call isn't "repeated attempts over several weeks"</div>
+                    </div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleChecklist(this)">
+                    <div class="checklist-checkbox"></div>
+                    <div>
+                        <strong>The letter doesn't pretend to be from a lawyer if you're not one</strong>
+                        <div style="font-size: 13px; color: #6b7280; margin-top: 3px;">Impersonating counsel is fraudulent misrepresentation</div>
+                    </div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleChecklist(this)">
+                    <div class="checklist-checkbox"></div>
+                    <div>
+                        <strong>Your lease/rental agreement supports what you're claiming</strong>
+                        <div style="font-size: 13px; color: #6b7280; margin-top: 3px;">AI might cite "standard" lease terms that aren't in your actual contract</div>
+                    </div>
+                </div>
+
+                <div class="checklist-item" onclick="toggleChecklist(this)">
+                    <div class="checklist-checkbox"></div>
+                    <div>
+                        <strong>You can defend every sentence under oath</strong>
+                        <div style="font-size: 13px; color: #6b7280; margin-top: 3px;">If you'd have to backtrack on anything during testimony, fix it now</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background: #fef3c7; padding: 20px; border-radius: 10px; margin-top: 30px; border-left: 4px solid #f59e0b;">
+                <div style="font-weight: 700; color: #92400e; margin-bottom: 10px;">⚠️ If you can't check all 15 boxes:</div>
+                <p style="color: #92400e;">Consider sending a simpler, shorter letter that focuses only on the facts you can prove. Or consult with a local tenant rights organization or attorney before sending anything that could hurt your position.</p>
+            </div>
+        </div>
+
+        <div id="tab6" class="tab-content">
+            <div class="section-title">Frequently Asked Questions</div>
+
+            <div class="faq-item" onclick="toggleFAQ(this)">
+                <div class="faq-question">
+                    <span>Is it ever safe to send an AI-generated letter without legal review?</span>
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p>For very simple, low-stakes situations (under $500, simple accounting error, no bad-faith allegations), an AI-assisted letter that you carefully audit might be acceptable. Think of AI as a word processor that helps you write clearly.</p>
+                    <p style="margin-top: 10px;">Once you're alleging intentional misconduct, citing statutes, threatening court action, or disputing significant amounts, AI alone is risky. The tool will confidently overstate your case, cite wrong laws, and damage your credibility in ways you won't spot until it's too late.</p>
+                    <p style="margin-top: 10px; font-weight: 600; color: #92400e;">Bottom line: If the dispute matters enough that you're considering legal action, it matters enough to get human legal advice.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFAQ(this)">
+                <div class="faq-question">
+                    <span>Can an AI-generated letter actually hurt my case in court?</span>
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p>Yes. Courts care about consistency. If your demand letter says one thing and your testimony says another, judges notice. If your letter claimed "you utterly failed to provide any accounting" but the landlord produces a flawed-but-existent statement, your credibility suffers.</p>
+                    <p style="margin-top: 10px;">Demand letters often get attached to complaints, responses, and settlement communications. They become part of the story about how you've behaved. A letter full of exaggerations, wrong citations, and overblown threats doesn't help that story.</p>
+                    <p style="margin-top: 10px;">Even if you never reach trial, the letter shapes how the landlord and their counsel view your case. A weak letter reduces settlement leverage rather than increasing it.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFAQ(this)">
+                <div class="faq-question">
+                    <span>What's the single biggest mistake AI makes in these letters?</span>
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p>Treating your one-sided version as settled fact. AI hears only your story, then writes as if every contested point is already resolved. It doesn't leave room for the possibility that the landlord has different documents or a different recollection.</p>
+                    <p style="margin-top: 10px;">This shows up in absolute statements about when you moved out, when keys were returned, what was agreed about cleaning, and how many times the landlord was contacted. Those are often the very issues in dispute. When your letter assumes them away, you lose credibility when the landlord produces contradictory evidence.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFAQ(this)">
+                <div class="faq-question">
+                    <span>Do AI tools really make up fake laws and cases?</span>
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p>Yes. Because the model is pattern-matching rather than researching, it sometimes generates statute numbers or case names that look plausible but don't exist. In other cases, it cites a real law but in a way that has nothing to do with your situation.</p>
+                    <p style="margin-top: 10px;">In security deposit disputes, this often means dragging in harassment statutes, credit card regulations, or local ordinances that were never meant for simple accounting fights between former tenants and landlords.</p>
+                    <p style="margin-top: 10px; font-weight: 600; color: #dc2626;">The safe move: Remove any legal citation you cannot personally verify from a trustworthy official source. If you can't find it on your state legislature's website or your city's municipal code, delete it.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFAQ(this)">
+                <div class="faq-question">
+                    <span>Can landlords tell if I used AI for my letter?</span>
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p>Experienced landlords and their attorneys often can. Certain phrases, structures, and rhythms show up repeatedly in AI output: overly formal salutations, specific stock paragraphs, mixing very general statements with oddly detailed legal jargon.</p>
+                    <p style="margin-top: 10px;">Even if they can't prove AI was used, they can usually sense when a letter wasn't written by someone with real housing law experience. Once they reach that conclusion, the persuasive power of the letter drops significantly, no matter how confident the tone.</p>
+                    <p style="margin-top: 10px;">The giveaways: "hereby demand," "pursuant to," "at all times relevant," generic threats of "all available remedies at law and in equity," and citations that don't quite fit the facts.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFAQ(this)">
+                <div class="faq-question">
+                    <span>What if I already sent the AI letter and regret it?</span>
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p>You can't un-send it, but you can decide how to move forward. If the landlord hasn't responded yet, consider sending a calmer follow-up that narrows the issues and softens overstatements.</p>
+                    <p style="margin-top: 10px;">If you later involve an attorney, be honest with them about how the letter was generated and what parts don't reflect your true understanding. They need to know what they're working with.</p>
+                    <p style="margin-top: 10px;">In many deposit disputes, there's still room for practical resolution even after a bad first letter. It may require acknowledging that some language was too strong and refocusing on concrete questions: how much was withheld, what documentation supports it, and whether a compromise is possible.</p>
+                    <p style="margin-top: 10px; font-weight: 600; color: #059669;">Many disputes that start badly can still end reasonably if both sides focus on the actual numbers and documentation rather than the initial rhetoric.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFAQ(this)">
+                <div class="faq-question">
+                    <span>Should I threaten to report the landlord to regulators or review sites?</span>
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p>AI outputs often enthusiastically suggest threatening to report landlords to housing authorities, file BBB complaints, or leave negative reviews "everywhere." These remedies exist and are sometimes appropriate, but should be used carefully.</p>
+                    <p style="margin-top: 10px;">A paragraph promising to "expose" the landlord everywhere can sound more like attempted reputation blackmail than a genuine step toward compliance.</p>
+                    <p style="margin-top: 10px;"><strong>Better approach:</strong> Before writing anything, decide whether you actually plan to contact a regulator if the dispute isn't resolved. If yes, mention it calmly and briefly. If no, don't threaten it just because AI suggested it.</p>
+                    <p style="margin-top: 10px; color: #92400e; font-weight: 600;">Threats you won't follow through on destroy credibility. Make only the threats you mean.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFAQ(this)">
+                <div class="faq-question">
+                    <span>What's the one thing I should remember before using AI for this?</span>
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p style="font-size: 16px; font-weight: 600; color: #92400e;">Don't let the tool talk you into saying something you couldn't comfortably defend later.</p>
+                    <p style="margin-top: 10px;">That goes for facts, law, tone, and threats. If you're not willing to stand in front of a judge and repeat a sentence exactly as written, that sentence doesn't belong in your letter—no matter how authoritative AI made it sound.</p>
+                    <p style="margin-top: 10px;">Security deposits are frustrating. AI makes it tempting to hit back with a polished "legal" document. The harder but more effective path is combining technological help with careful human judgment about what's true, what's fair, and what will actually move the dispute toward resolution.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let quizAnswers = {};
+
+        function switchTab(index) {
+            const tabs = document.querySelectorAll('.tab');
+            const contents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(t => t.classList.remove('active'));
+            contents.forEach(c => c.classList.remove('active'));
+
+            tabs[index].classList.add('active');
+            contents[index].classList.add('active');
+        }
+
+        function selectOption(element) {
+            const question = element.dataset.question;
+            const value = element.dataset.value;
+
+            // Deselect other options in same question
+            const siblings = element.parentElement.querySelectorAll('.quiz-option');
+            siblings.forEach(s => s.classList.remove('selected'));
+
+            element.classList.add('selected');
+            quizAnswers[question] = value;
+        }
+
+        function calculateRisk() {
+            const resultDiv = document.getElementById('riskResult');
+
+            if (Object.keys(quizAnswers).length < 5) {
+                resultDiv.innerHTML = '<div class="result-box result-warning">⚠️ Please answer all 5 questions to calculate your risk level.</div>';
+                return;
+            }
+
+            let riskScore = 0;
+            Object.values(quizAnswers).forEach(value => {
+                if (value === 'high') riskScore += 3;
+                if (value === 'medium') riskScore += 2;
+                if (value === 'low') riskScore += 1;
+            });
+
+            let resultHTML = '';
+
+            if (riskScore <= 7) {
+                resultHTML = `
+                    <div class="result-box result-success">
+                        <div style="font-size: 20px; font-weight: 700; margin-bottom: 10px;">✅ Lower Risk (Score: ${riskScore}/15)</div>
+                        <p>Your situation is relatively straightforward. If you've carefully verified all facts and removed legal jargon you can't personally defend, a simple letter might be appropriate.</p>
+                        <p style="margin-top: 10px;"><strong>Recommendation:</strong> Use AI to organize your facts and improve clarity, but keep it simple. Focus on specific dates, amounts, and what you want. Avoid accusations of fraud, harassment, or bad faith unless you have clear evidence.</p>
+                    </div>
+                `;
+            } else if (riskScore <= 11) {
+                resultHTML = `
+                    <div class="result-box result-warning">
+                        <div style="font-size: 20px; font-weight: 700; margin-bottom: 10px;">⚠️ Moderate Risk (Score: ${riskScore}/15)</div>
+                        <p>Your dispute has enough complexity that an AI-only letter could backfire. The stakes are high enough to justify getting human input.</p>
+                        <p style="margin-top: 10px;"><strong>Recommendation:</strong> Consider consulting a tenant rights organization or attorney before sending anything. If you do draft something with AI, have someone knowledgeable review it. Remove all legal citations you haven't personally verified and all threats you won't follow through on.</p>
+                    </div>
+                `;
+            } else {
+                resultHTML = `
+                    <div class="result-box result-danger">
+                        <div style="font-size: 20px; font-weight: 700; margin-bottom: 10px;">🚨 High Risk (Score: ${riskScore}/15)</div>
+                        <p>Sending an AI-generated letter in your situation is risky. The amount at stake, complexity of claims, or accuracy concerns mean mistakes could be costly.</p>
+                        <p style="margin-top: 10px;"><strong>Strong recommendation:</strong> Do not send an unreviewed AI letter. Consult with a local tenant rights attorney, legal aid organization, or tenant union before communicating. The cost of getting it wrong likely exceeds the cost of getting advice.</p>
+                        <p style="margin-top: 10px; font-weight: 600;">If you're alleging fraud, bad faith, harassment, or retaliation—or if you're relying on unverified facts—professional guidance isn't optional.</p>
+                    </div>
+                `;
+            }
+
+            resultDiv.innerHTML = resultHTML;
+        }
+
+        function analyzeLetter() {
+            const input = document.getElementById('letterInput').value;
+            const outputDiv = document.getElementById('letterAnalysis');
+
+            if (!input.trim()) {
+                outputDiv.innerHTML = '<div class="result-box result-warning">⚠️ Please paste your letter text to analyze.</div>';
+                return;
+            }
+
+            let problems = [];
+            let highlightedText = input;
+
+            // Check for absolute statements
+            const absolutes = ['utterly failed', 'completely failed', 'never provided', 'no accounting whatsoever', 'entire deposit', 'full deposit', 'zero response'];
+            absolutes.forEach(phrase => {
+                if (input.toLowerCase().includes(phrase.toLowerCase())) {
+                    problems.push({
+                        type: 'Absolute Statement',
+                        issue: `Found "${phrase}" - Are you sure there was zero partial compliance? Absolutes are easy to disprove.`
+                    });
+                    const regex = new RegExp(phrase, 'gi');
+                    highlightedText = highlightedText.replace(regex, `<span class="error-highlight">${phrase}</span>`);
+                }
+            });
+
+            // Check for harassment accusations
+            const harassmentWords = ['harassment', 'harassing', 'intimidation', 'threatening'];
+            harassmentWords.forEach(word => {
+                if (input.toLowerCase().includes(word)) {
+                    problems.push({
+                        type: 'Harassment Accusation',
+                        issue: 'Are you accusing the landlord of harassment for normal follow-up communication? This can backfire badly.'
+                    });
+                }
+            });
+
+            // Check for overblown remedies
+            if (input.includes('triple damages') || input.includes('treble damages')) {
+                problems.push({
+                    type: 'Remedy Overreach',
+                    issue: 'Triple damages typically require proof of intentional bad faith. Do you have evidence of that? Does your state even allow this?'
+                });
+            }
+
+            // Check for fake legal language
+            const legalese = ['hereby', 'pursuant to', 'at all times relevant', 'aforementioned', 'heretofore'];
+            legalese.forEach(word => {
+                if (input.toLowerCase().includes(word.toLowerCase())) {
+                    problems.push({
+                        type: 'AI Legal Jargon',
+                        issue: `"${word}" is rarely needed and signals AI drafting. Can you say this more plainly?`
+                    });
+                    const regex = new RegExp(word, 'gi');
+                    highlightedText = highlightedText.replace(regex, `<span class="warning-highlight">${word}</span>`);
+                }
+            });
+
+            // Check for vague dates
+            if (input.includes('early') || input.includes('late') || input.includes('around')) {
+                problems.push({
+                    type: 'Vague Dates',
+                    issue: 'Found approximate dates (early, late, around). Security deposit law is strict about dates. Be specific.'
+                });
+            }
+
+            // Check for fraud accusations
+            if (input.toLowerCase().includes('fraud') || input.toLowerCase().includes('bad faith')) {
+                problems.push({
+                    type: 'Serious Accusation',
+                    issue: 'You\'re accusing the landlord of fraud or bad faith. Can you prove intentional wrongdoing? This isn\'t just about mistakes or delays.'
+                });
+            }
+
+            let resultHTML = '<div class="analysis-output">';
+            resultHTML += `<div style="font-weight: 700; font-size: 18px; margin-bottom: 15px; color: #1f2937;">Analysis Results: ${problems.length} potential issues found</div>`;
+
+            if (problems.length === 0) {
+                resultHTML += '<div class="result-box result-success">✅ No obvious red flags detected. Still recommend having a human review before sending.</div>';
+            } else {
+                resultHTML += '<div style="margin-bottom: 20px;">';
+                problems.forEach((problem, index) => {
+                    resultHTML += `
+                        <div style="background: #fef3c7; padding: 15px; margin: 10px 0; border-radius: 8px; border-left: 4px solid #f59e0b;">
+                            <div style="font-weight: 700; color: #92400e; margin-bottom: 5px;">${index + 1}. ${problem.type}</div>
+                            <div style="color: #92400e;">${problem.issue}</div>
+                        </div>
+                    `;
+                });
+                resultHTML += '</div>';
+
+                resultHTML += '<div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px; border: 1px solid #e5e7eb;">';
+                resultHTML += '<div style="font-weight: 700; margin-bottom: 10px; color: #1f2937;">Your Letter (highlighted):</div>';
+                resultHTML += `<div style="line-height: 1.8; color: #374151;">${highlightedText}</div>`;
+                resultHTML += '</div>';
+            }
+
+            resultHTML += '</div>';
+            outputDiv.innerHTML = resultHTML;
+        }
+
+        function toggleCard(card) {
+            card.classList.toggle('expanded');
+        }
+
+        function toggleChecklist(item) {
+            item.classList.toggle('checked');
+            updateChecklistProgress();
+        }
+
+        function updateChecklistProgress() {
+            const items = document.querySelectorAll('.checklist-item');
+            const checked = document.querySelectorAll('.checklist-item.checked');
+            const percentage = (checked.length / items.length) * 100;
+
+            document.getElementById('checklistProgress').style.width = percentage + '%';
+            document.getElementById('checklistProgressText').textContent = `${checked.length} of ${items.length} verified`;
+
+            // Update checkboxes
+            items.forEach(item => {
+                const checkbox = item.querySelector('.checklist-checkbox');
+                if (item.classList.contains('checked')) {
+                    checkbox.textContent = '✓';
+                } else {
+                    checkbox.textContent = '';
+                }
+            });
+        }
+
+        function toggleFAQ(item) {
+            item.classList.toggle('active');
+        }
+
+        // Initialize
+        updateChecklistProgress();
+    </script>
+</body>
+</html>
