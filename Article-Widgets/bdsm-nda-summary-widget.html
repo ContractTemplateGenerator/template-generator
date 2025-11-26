@@ -1,0 +1,669 @@
+<!--
+⚠️ Reminder: Never use heading tags inside widget (h1-h6). Styled divs only.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BDSM NDA Interactive Summary Widget</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f4f6fb;
+            color: #0f172a;
+        }
+
+        .widget-shell {
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 25px 70px rgba(15, 23, 42, 0.1);
+            overflow: hidden;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .widget-top {
+            background: linear-gradient(135deg, #111827 0%, #312e81 50%, #7c3aed 100%);
+            color: #fdf4ff;
+            padding: 38px clamp(24px, 4vw, 50px) 45px;
+            position: relative;
+        }
+
+        .widget-top::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at top right, rgba(255,255,255,0.15), transparent 55%);
+            pointer-events: none;
+        }
+
+        .hero-grid {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            gap: 24px;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            align-items: center;
+        }
+
+        .hero-copy {
+            padding-right: clamp(0px, 2vw, 30px);
+        }
+
+        .hero-title {
+            font-size: clamp(26px, 4vw, 38px);
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 12px;
+        }
+
+        .hero-lede {
+            font-size: 16px;
+            opacity: 0.92;
+            margin-bottom: 20px;
+        }
+
+        .hero-note {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.12);
+            font-size: 14px;
+        }
+
+        .audio-card {
+            background: rgba(15, 23, 42, 0.55);
+            border-radius: 18px;
+            padding: 18px;
+            backdrop-filter: blur(6px);
+        }
+
+        .audio-label {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        audio {
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        .jump-link {
+            margin-top: 14px;
+            font-size: 14px;
+            color: #c4b5fd;
+        }
+
+        .jump-link a {
+            color: inherit;
+            text-decoration: underline;
+        }
+
+        .tab-nav {
+            display: flex;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #e2e8f0;
+            background: #fff;
+        }
+
+        .tab-button {
+            flex: 1;
+            min-width: 160px;
+            padding: 18px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            color: #64748b;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button:hover {
+            color: #0f172a;
+            background: #f8fafc;
+        }
+
+        .tab-button.active {
+            color: #7c3aed;
+            border-bottom: 3px solid #7c3aed;
+            background: #fdf4ff;
+        }
+
+        .tab-panel {
+            display: none;
+            padding: clamp(24px, 4vw, 40px);
+            animation: fadeUp 0.35s ease;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-title, .section-subtitle {
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            color: #0f172a;
+        }
+
+        .section-subtitle {
+            font-size: 18px;
+            color: #4338ca;
+            margin-top: 26px;
+        }
+
+        .summary-grid {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        }
+
+        .summary-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 18px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+        }
+
+        .summary-label {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            color: #7c3aed;
+            margin-bottom: 8px;
+        }
+
+        .summary-text {
+            font-size: 15px;
+            color: #0f172a;
+        }
+
+        .list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .list li {
+            position: relative;
+            padding-left: 26px;
+            margin-bottom: 12px;
+            font-size: 15px;
+            color: #1f2937;
+        }
+
+        .list li::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 10px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #7c3aed;
+            opacity: 0.85;
+        }
+
+        .callout {
+            border-left: 4px solid #c084fc;
+            padding: 18px 22px;
+            background: #f8fafc;
+            border-radius: 12px;
+            margin-top: 24px;
+            font-size: 15px;
+        }
+
+        .service-columns {
+            display: grid;
+            gap: 28px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        }
+
+        .service-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 22px;
+            background: #ffffff;
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 22px;
+            border-radius: 999px;
+            border: none;
+            background: linear-gradient(135deg, #7c3aed, #c084fc);
+            color: #fff;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+
+        .contact-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .contact-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            border-radius: 999px;
+            border: 1px solid #c7d2fe;
+            color: #4338ca;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .intake-section {
+            margin-top: 40px;
+        }
+
+        .contact-note {
+            color: #475569;
+            margin-bottom: 22px;
+            font-size: 15px;
+        }
+
+        .contact-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.9fr);
+            gap: 28px;
+        }
+
+        .intake-card,
+        .calendly-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: clamp(18px, 3vw, 28px);
+            background: #f8fafc;
+        }
+
+        .intake-form .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .intake-form .form-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .intake-form label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .intake-form input,
+        .intake-form select,
+        .intake-form textarea {
+            border-radius: 10px;
+            border: 1px solid #cbd5f5;
+            padding: 11px 12px;
+            font-size: 14px;
+            background: #fff;
+            color: #0f172a;
+            font-family: inherit;
+        }
+
+        .intake-form textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .intake-form button {
+            border: none;
+            border-radius: 999px;
+            padding: 14px 24px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+            background: linear-gradient(135deg, #4338ca, #c084fc);
+            cursor: pointer;
+            width: fit-content;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .intake-form button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.25);
+        }
+
+        .intake-form .form-footnote {
+            font-size: 13px;
+            color: #475569;
+            margin-top: 12px;
+        }
+
+        .calendly-card {
+            background: #ffffff;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+
+        .risk-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 18px;
+            margin-top: 18px;
+        }
+
+        .risk-card {
+            border-radius: 14px;
+            border: 1px solid #fde68a;
+            background: #fffbeb;
+            padding: 18px;
+        }
+
+        .risk-card strong {
+            display: block;
+            margin-bottom: 8px;
+            color: #b45309;
+        }
+
+        .micro-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 999px;
+            background: #eef2ff;
+            color: #4338ca;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            margin-bottom: 12px;
+        }
+
+        @media (max-width: 900px) {
+            .contact-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .tab-button {
+                min-width: 140px;
+                font-size: 12px;
+            }
+            .service-columns {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="widget-shell">
+    <div class="widget-top">
+        <div class="hero-grid">
+            <div class="hero-copy">
+                <div class="hero-title">BDSM Relationship NDAs: Confidentiality Without Silencing Consent</div>
+                <div class="hero-lede">Key takeaways from this deep analysis of kink-focused NDAs, relationship contracts, and privacy planning across U.S., California, UK, and EU frameworks.</div>
+                <div class="hero-note">Audio available for anyone who prefers to listen.</div>
+            </div>
+            <div class="audio-card">
+                <div class="audio-label">Play the legal analysis overview</div>
+                <audio controls preload="none" src="https://terms.law/wp-content/uploads/2024/12/Beyond_BDSM_Contracts__The_Legal_Shield_Protecting_Kink_Privacy.wav"></audio>
+                <div class="jump-link">Generator lives below—<a href="https://terms.law/2024/12/06/bdsm-relationship-contracts-and-ndas-legal-boundaries-and-best-practices/#The_Alternative_Lifestyle_NDA_Generator_Professional_Tools_for_Personal_Privacy" target="_blank" rel="noopener">click to jump to it</a>.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-nav">
+        <button class="tab-button active" data-tab="overview">Snapshot</button>
+        <button class="tab-button" data-tab="deepdive">Legal Context</button>
+        <button class="tab-button" data-tab="compliance">Compliance Guide</button>
+        <button class="tab-button" data-tab="services">Services & Contact</button>
+    </div>
+
+    <div class="tab-panel active" id="overview">
+        <div class="section-title">What matters now</div>
+        <div class="summary-grid">
+            <div class="summary-card">
+                <div class="summary-label">Reality Check</div>
+                <div class="summary-text">BDSM “slave contracts” are symbolic. Courts will never enforce a promise to submit, endure injury, or waive safewords. Their real legal value is evidentiary: documenting negotiations, limits, and consent culture.</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-label">NDA Strength</div>
+                <div class="summary-text">Relationship NDAs remain enforceable when narrowly focused on privacy (identities, media, communications) and when they expressly preserve the right to report illegality under the Speak Out Act, EFAA, and California public policy.</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-label">Jurisdiction Watch</div>
+                <div class="summary-text">California’s STAND/Silenced No More Acts, revenge-porn statutes, and the UK’s post-BEIS guidance all demand carve-outs for crime reporting, medical access, and truthful testimony. Overbroad clauses risk being void or weaponized against drafters.</div>
+            </div>
+        </div>
+        <div class="section-subtitle">Practical playbook</div>
+        <ul class="list">
+            <li>Use mutual NDAs (or tangible consideration) with crystal-clear confidentiality definitions and exclusions for information already public or independently obtained.</li>
+            <li>Layer contract protection atop statutory tools like California Penal Code §647(j)(4) and Civil Code §1708.85 for images; cite them directly inside the agreement to underscore the consequences of leaks.</li>
+            <li>Include “Consent & Safety Overrides” that encourage reporting abuse, consulting doctors, or seeking legal advice; anything less is unenforceable and signals coercion.</li>
+            <li>Right-size liquidated damages (often $5k–$25k per breach) and give parties review time plus invitation to consult counsel to avoid unconscionability attacks.</li>
+        </ul>
+        <div class="callout">Bottom line: NDAs protect consensual privacy. They cannot be used to bury sexual assault, harassment, or non-consensual conduct—and promising otherwise jeopardizes enforceability across the U.S., UK, and EU.</div>
+    </div>
+
+    <div class="tab-panel" id="deepdive">
+        <div class="section-title">Legal dynamics across jurisdictions</div>
+        <div class="section-subtitle">Federal & California overlay</div>
+        <ul class="list">
+            <li>Speak Out Act (2022) voids pre-dispute NDA language that silences sexual assault or harassment discussions—even for agreements signed before the statute.</li>
+            <li>EFAA (2022) lets survivors bypass mandatory arbitration for assault/harassment claims. Arbitration can still cover ordinary confidentiality disputes if carve-outs are disclosed.</li>
+            <li>California SB 820/SB 331 signal that courts will reject gag clauses around unlawful acts; every NDA should expressly permit disclosures to law enforcement, regulators, therapists, and attorneys.</li>
+            <li>Revenge porn statutes make unauthorized media sharing a criminal and civil issue; referencing these statutes in NDAs creates dual deterrence.</li>
+        </ul>
+        <div class="section-subtitle">UK & EU comparison</div>
+        <ul class="list">
+            <li>UK’s R v. Brown precedent means no document can authorize serious bodily harm; NDAs are enforceable only when they avoid misrepresentation about police or regulator access.</li>
+            <li>BEIS guidance and “Can’t Buy My Silence” reforms demand plain-language carve-outs and discourage presenting NDAs as waivers of statutory rights.</li>
+            <li>EU privacy regimes (GDPR plus national personality-rights laws) already penalize disclosure of sexual life data. NDAs add contract leverage but cannot conflict with public policy or human-rights balancing.</li>
+        </ul>
+        <div class="section-subtitle">Drafting levers that work in 2025</div>
+        <ul class="list">
+            <li>Detailed definitions: spell out identities, kink activities, media, communications, and health data while carving out public information and compelled disclosures.</li>
+            <li>Media governance: choose prohibition, controlled consent, or limited permissions, paired with deletion certifications and storage rules.</li>
+            <li>Power dynamics clause: acknowledge consensual D/s roles but confirm they never limit legal capacity or enforcement rights.</li>
+            <li>Dispute options: allow court injunctions for leaks, offer arbitration for everything else, and flag that EFAA overrides forced arbitration for misconduct claims.</li>
+        </ul>
+        <div class="callout">Use NDAs as mutual insurance policies. If a party feels trapped, pressured, or denied time to review, courts will spot procedural and substantive unconscionability immediately.</div>
+    </div>
+
+    <div class="tab-panel" id="compliance">
+        <div class="section-title">Risk radar and compliance checklist</div>
+        <div class="micro-tag">Red Flags</div>
+        <div class="risk-grid">
+            <div class="risk-card">
+                <strong>Timing & Process</strong>
+                Surprise NDAs on first encounters, no time for review, or refusal to allow counsel review are classic procedural unconscionability triggers.
+            </div>
+            <div class="risk-card">
+                <strong>Content Overreach</strong>
+                Clauses waiving the right to report crimes, “deny abuse if asked,” or imposing million-dollar penalties generally void the entire NDA.
+            </div>
+            <div class="risk-card">
+                <strong>Power Imbalances</strong>
+                One-sided obligations tied to housing, employment, or financial leverage can resemble coercion; include mutual promises or independent consideration.
+            </div>
+        </div>
+        <div class="section-subtitle">Ready-to-use checklist</div>
+        <ul class="list">
+            <li>☑ Explicit consent/safety override encouraging disclosures for medical, legal, or safety needs.</li>
+            <li>☑ Confidentiality definition that enumerates identities, activities, media, and communications plus standard exclusions.</li>
+            <li>☑ Media protocol referencing California Penal Code §647(j)(4) / Civil Code §1708.85 and similar statutes for the relevant jurisdiction.</li>
+            <li>☑ Liquidated damages and injunctive relief clauses calibrated to realistic reputational harm, not punitive fantasies.</li>
+            <li>☑ Governing law, venue, and arbitration sections that mention EFAA carve-outs and specify how cross-border partners will enforce awards.</li>
+            <li>☑ Execution section documenting voluntary signing, opportunity to seek counsel, and e-signature validity (ESIGN/UETA).</li>
+        </ul>
+    </div>
+
+    <div class="tab-panel" id="services">
+        <div class="section-title">Work with Sergei Tokmakov, Esq.</div>
+        <div class="service-columns">
+            <div class="service-card">
+                <div class="section-subtitle">Legal Services</div>
+                <ul class="list">
+                    <li>Tailored BDSM/privacy NDAs that respect Speak Out Act, EFAA, and California statutory carve-outs.</li>
+                    <li>Strategic review of existing relationship agreements, scene protocols, and media management policies.</li>
+                    <li>Business contracts, tech/IP agreements, dispute resolution, and global client support for alternative lifestyle ventures.</li>
+                    <li>Entity formation and cross-border privacy planning for kink-friendly platforms or professionals.</li>
+                </ul>
+            </div>
+            <div class="service-card">
+                <div class="section-subtitle">Connect Confidentially</div>
+                <div>owner@terms.law</div>
+                <div class="contact-links">
+                    <a class="contact-link" href="mailto:owner@terms.law">Email Sergei</a>
+                </div>
+            </div>
+        </div>
+        <div class="intake-section">
+            <div class="section-subtitle">Send your scenario or lock in time</div>
+            <div class="contact-note">Briefly outline your privacy goals, power dynamics, and timing. I’ll reply within one business day with next steps or a quote.</div>
+            <div class="contact-layout">
+                <div class="intake-card">
+                    <form class="intake-form" action="https://formsubmit.co/owner@terms.law" method="POST">
+                        <input type="hidden" name="_subject" value="BDSM NDA / Privacy Inquiry" />
+                        <input type="hidden" name="_template" value="table" />
+                        <input type="hidden" name="_next" value="https://terms.law/thank-you" />
+                        <div class="form-row">
+                            <div class="form-field">
+                                <label for="intake-name">Name *</label>
+                                <input type="text" id="intake-name" name="name" required placeholder="Preferred name or initials">
+                            </div>
+                            <div class="form-field">
+                                <label for="intake-email">Email *</label>
+                                <input type="email" id="intake-email" name="email" required placeholder="you@example.com">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-field">
+                                <label for="intake-phone">Phone</label>
+                                <input type="tel" id="intake-phone" name="phone" placeholder="Optional, encrypted voicemail ok">
+                            </div>
+                            <div class="form-field">
+                                <label for="intake-jurisdiction">Primary Jurisdiction *</label>
+                                <select id="intake-jurisdiction" name="jurisdiction" required>
+                                    <option value="">Select...</option>
+                                    <option value="california">California</option>
+                                    <option value="us-other">Other U.S. state</option>
+                                    <option value="uk">United Kingdom</option>
+                                    <option value="eu">European Union</option>
+                                    <option value="canada">Canada</option>
+                                    <option value="other">Other / Multi-jurisdiction</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-field">
+                                <label for="intake-role">Perspective *</label>
+                                <select id="intake-role" name="role" required>
+                                    <option value="">Select...</option>
+                                    <option value="dominant">Dominant / Top</option>
+                                    <option value="submissive">Submissive / Bottom</option>
+                                    <option value="switch">Switch / Fluid</option>
+                                    <option value="professional">Professional provider / D-type</option>
+                                    <option value="business">Business / Venue operator</option>
+                                    <option value="other">Other / Prefer not to specify</option>
+                                </select>
+                            </div>
+                            <div class="form-field">
+                                <label for="intake-timeline">Timeline</label>
+                                <select id="intake-timeline" name="timeline">
+                                    <option value="">Select...</option>
+                                    <option value="urgent">Need NDA immediately</option>
+                                    <option value="soon">Within the next month</option>
+                                    <option value="review">Need existing NDA reviewed</option>
+                                    <option value="research">Researching options / planning ahead</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-field">
+                            <label for="intake-summary">What should I know? *</label>
+                            <textarea id="intake-summary" name="summary" required placeholder="Share context (relationship structure, privacy concerns, media rules, jurisdiction mix, etc.)"></textarea>
+                        </div>
+                        <div class="form-field">
+                            <label for="intake-goals">Desired outcome</label>
+                            <textarea id="intake-goals" name="goals" placeholder="e.g., mutual NDA w/ carve-outs, Dom(me)/client safeguards, cross-border enforceability, arbitration plan"></textarea>
+                        </div>
+                        <button type="submit">Send Intake</button>
+                        <div class="form-footnote">Rather email? Contact <a href="mailto:owner@terms.law">owner@terms.law</a>.</div>
+                    </form>
+                </div>
+                <div class="calendly-card">
+                    <div class="section-subtitle" style="margin-top: 0;">Book a consultation</div>
+                    <div style="font-size: 14px; color: #475569; margin-bottom: 12px;">30-minute Zoom consult focused on confidentiality strategy, NDA drafting, or emergency leak response.</div>
+                    <div class="calendly-inline-widget" data-url="https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1" style="min-width:320px;height:650px;"></div>
+                </div>
+            </div>
+            <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+            <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+            <script type="text/javascript">
+                window.addEventListener('load', function () {
+                    if (window.Calendly && Calendly.initBadgeWidget) {
+                        Calendly.initBadgeWidget({
+                            url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting',
+                            text: 'Schedule time with me',
+                            color: '#7c3aed',
+                            textColor: '#ffffff',
+                            branding: false
+                        });
+                    }
+                });
+            </script>
+        </div>
+        <div class="callout">Need something custom? Confidential consults cover document drafting, litigation-prevention strategies, and rapid response when confidentiality is threatened.</div>
+    </div>
+</div>
+
+<script>
+    const tabs = document.querySelectorAll('.tab-button');
+    const panels = document.querySelectorAll('.tab-panel');
+
+    tabs.forEach(button => {
+        button.addEventListener('click', () => {
+            const target = button.dataset.tab;
+
+            tabs.forEach(btn => btn.classList.remove('active'));
+            panels.forEach(panel => panel.classList.remove('active'));
+
+            button.classList.add('active');
+            document.getElementById(target).classList.add('active');
+        });
+    });
+</script>
+</body>
+</html>
