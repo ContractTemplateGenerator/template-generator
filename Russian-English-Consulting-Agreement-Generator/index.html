@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Dual Language Consulting Agreement Generator (English/Russian) | terms.law</title>
+
+    <!-- Main styles -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- React and dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.1/feather.min.js"></script>
+
+    <!-- Improve performance -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://assets.calendly.com">
+
+    <!-- Mobile-specific meta tags -->
+    <meta name="theme-color" content="#0069ff">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+</head>
+<body>
+    <div id="root"></div>
+
+    <!-- Main app scripts -->
+    <script src="docx-generator.js"></script>
+    <script type="text/babel" src="consulting-generator.js"></script>
+
+    <script>
+        // Add error handling
+        window.addEventListener('error', function(e) {
+            console.error('Global error:', e.error);
+            document.body.innerHTML += '<div style="background: #ffebee; color: #c62828; padding: 20px; margin: 20px; border-radius: 4px; font-family: monospace;">Error: ' + e.message + '<br>File: ' + e.filename + '<br>Line: ' + e.lineno + '</div>';
+        });
+
+        document.addEventListener("DOMContentLoaded", function() {
+            console.log('DOM loaded');
+
+            if (typeof feather !== 'undefined') {
+                feather.replace();
+                console.log('Feather icons initialized');
+            }
+
+            // Add mobile viewport height fix
+            function setViewportHeight() {
+                let vh = window.innerHeight * 0.01;
+                document.documentElement.style.setProperty('--vh', `${vh}px`);
+            }
+
+            setViewportHeight();
+            window.addEventListener('resize', setViewportHeight);
+            window.addEventListener('orientationchange', setViewportHeight);
+
+            console.log('Scripts initialized');
+        });
+
+        // Log when React renders
+        setTimeout(() => {
+            if (document.getElementById('root').children.length === 0) {
+                console.error('React did not render - check console for errors');
+                document.getElementById('root').innerHTML = '<div style="padding: 40px; text-align: center; color: #c62828;">Failed to load application. Check browser console for errors (F12).</div>';
+            } else {
+                console.log('React rendered successfully');
+            }
+        }, 2000);
+    </script>
+
+    <!-- Calendly link widget -->
+    <script type="text/babel">
+        window.createCalendlyLink = function() {
+            return (
+                <a href="https://terms.law/call/" onClick="Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting'});return false;">Schedule time with me</a>
+            );
+        }
+    </script>
+
+    <!-- Calendly required assets -->
+    <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+    <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+</body>
+</html>
