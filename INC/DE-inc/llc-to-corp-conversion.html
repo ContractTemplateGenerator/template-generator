@@ -521,6 +521,72 @@
       border: 3px solid #f59e0b;
     }
 
+    /* Tab Navigation Styles */
+    .tab-nav {
+      background: white;
+      border-bottom: 3px solid #ea580c;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .tab-nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .tab-button {
+      flex: 1;
+      min-width: 140px;
+      padding: 1.2rem 1.5rem;
+      background: white;
+      border: none;
+      border-bottom: 4px solid transparent;
+      color: #6b7280;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+      text-align: center;
+    }
+
+    .tab-button:hover {
+      background: #fff7ed;
+      color: #ea580c;
+    }
+
+    .tab-button.active {
+      color: #7c2d12;
+      border-bottom-color: #ea580c;
+      background: #fff7ed;
+      font-weight: 700;
+    }
+
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.3s ease-in;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     @media (max-width: 768px) {
       .hero-title {
         font-size: 2rem;
@@ -548,6 +614,16 @@
 
       .timeline-marker {
         left: 8px;
+      }
+
+      .tab-button {
+        min-width: 120px;
+        padding: 1rem;
+        font-size: 0.85rem;
+      }
+
+      .tab-nav-container {
+        justify-content: flex-start;
       }
     }
   </style>
@@ -583,7 +659,24 @@
     </div>
   </div>
 
-  <!-- When to Convert Section -->
+  <!-- Tab Navigation -->
+  <nav class="tab-nav">
+    <div class="tab-nav-container">
+      <button class="tab-button active" onclick="switchTab(event, 'timing')">When to Convert</button>
+      <button class="tab-button" onclick="switchTab(event, 'qsbs')">QSBS Benefits</button>
+      <button class="tab-button" onclick="switchTab(event, 'tax')">Tax Implications</button>
+      <button class="tab-button" onclick="switchTab(event, 'delaware')">DE 368(a) Process</button>
+      <button class="tab-button" onclick="switchTab(event, 'wyoming')">WY to DE Path</button>
+      <button class="tab-button" onclick="switchTab(event, 'pricing')">Pricing</button>
+      <button class="tab-button" onclick="switchTab(event, 'contact')">Contact</button>
+    </div>
+  </nav>
+
+  <!-- Tab Content Container -->
+  <div class="tab-container">
+
+  <!-- Timing Tab -->
+  <div id="timing-tab" class="tab-content active">
   <section class="section section-alt">
     <div class="container">
       <h2 class="section-title">
@@ -712,8 +805,11 @@
       </div>
     </div>
   </section>
+  </div>
+  <!-- End Timing Tab -->
 
-  <!-- QSBS Section -->
+  <!-- QSBS Tab -->
+  <div id="qsbs-tab" class="tab-content">
   <section class="section">
     <div class="container">
       <h2 class="section-title">
@@ -819,8 +915,11 @@
       </div>
     </div>
   </section>
+  </div>
+  <!-- End QSBS Tab -->
 
-  <!-- Tax Implications Section -->
+  <!-- Tax Tab -->
+  <div id="tax-tab" class="tab-content">
   <section class="section section-alt">
     <div class="container">
       <h2 class="section-title">
@@ -925,8 +1024,11 @@
       </div>
     </div>
   </section>
+  </div>
+  <!-- End Tax Tab -->
 
-  <!-- Delaware 368(a) Walkthrough -->
+  <!-- Delaware 368(a) Tab -->
+  <div id="delaware-tab" class="tab-content">
   <section class="section">
     <div class="container">
       <h2 class="section-title">
@@ -1082,8 +1184,11 @@
       </div>
     </div>
   </section>
+  </div>
+  <!-- End Delaware 368(a) Tab -->
 
-  <!-- Wyoming to Delaware Path -->
+  <!-- Wyoming to Delaware Tab -->
+  <div id="wyoming-tab" class="tab-content">
   <section class="section section-alt">
     <div class="container">
       <h2 class="section-title">
@@ -1193,8 +1298,11 @@
       </div>
     </div>
   </section>
+  </div>
+  <!-- End Wyoming Tab -->
 
-  <!-- Pricing Section -->
+  <!-- Pricing Tab -->
+  <div id="pricing-tab" class="tab-content">
   <section class="section">
     <div class="container">
       <h2 class="section-title">
@@ -1279,8 +1387,11 @@
       </div>
     </div>
   </section>
+  </div>
+  <!-- End Pricing Tab -->
 
-  <!-- Contact Section -->
+  <!-- Contact Tab -->
+  <div id="contact-tab" class="tab-content">
   <section class="section section-alt">
     <div class="container">
       <h2 class="section-title">
@@ -1365,8 +1476,36 @@
       </div>
     </div>
   </section>
+  </div>
+  <!-- End Contact Tab -->
+
+  </div>
+  <!-- End Tab Container -->
 
   <script>
+    // Tab switching function
+    function switchTab(event, tabName) {
+      // Hide all tab contents
+      const tabContents = document.getElementsByClassName('tab-content');
+      for (let i = 0; i < tabContents.length; i++) {
+        tabContents[i].classList.remove('active');
+      }
+
+      // Remove active class from all buttons
+      const tabButtons = document.getElementsByClassName('tab-button');
+      for (let i = 0; i < tabButtons.length; i++) {
+        tabButtons[i].classList.remove('active');
+      }
+
+      // Show the selected tab
+      document.getElementById(tabName + '-tab').classList.add('active');
+
+      // Add active class to clicked button
+      event.currentTarget.classList.add('active');
+
+      // Scroll to top of tab content
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
     // Set default conversion date to today
     document.addEventListener('DOMContentLoaded', function() {
       const today = new Date().toISOString().split('T')[0];
