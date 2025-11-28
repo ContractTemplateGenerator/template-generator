@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI & Demand for Legal Services | Interactive Simulator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f1419;
+            --bg-card: #1a2029;
+            --bg-input: #242d3a;
+            --accent-gold: #d4a853;
+            --accent-gold-dim: #b8923f;
+            --text-primary: #e8e6e3;
+            --text-secondary: #9ca3af;
+            --text-dim: #6b7280;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border: #2d3748;
+            --gradient-gold: linear-gradient(135deg, #d4a853 0%, #f0d78c 50%, #d4a853 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Source Sans 3', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+
+        /* Texture overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 4rem 2rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 3rem;
+        }
+
+        .eyebrow {
+            font-size: 0.75rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--accent-gold);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 500;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: var(--gradient-gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+
+        /* Section styling */
+        section {
+            margin-bottom: 4rem;
+        }
+
+        h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            position: relative;
+            display: inline-block;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -0.5rem;
+            left: 0;
+            width: 3rem;
+            height: 2px;
+            background: var(--accent-gold);
+        }
+
+        h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        /* Intro cards */
+        .intro-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .intro-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .intro-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-gold-dim);
+        }
+
+        .intro-card .icon {
+            width: 48px;
+            height: 48px;
+            background: var(--bg-input);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .intro-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .intro-card p {
+            font-size: 0.95rem;
+            margin-bottom: 0;
+        }
+
+        /* Simulator section */
+        .simulator-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .simulator-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .controls-panel, .results-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+        }
+
+        .panel-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .panel-title .icon {
+            color: var(--accent-gold);
+        }
+
+        /* Form controls */
+        .control-group {
+            margin-bottom: 1.75rem;
+        }
+
+        .control-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .label-hint {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            font-weight: 400;
+            display: block;
+            margin-top: 0.25rem;
+        }
+
+        select {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: inherit;
+            cursor: pointer;
+            transition: border-color 0.2s ease;
+        }
+
+        select:hover, select:focus {
+            border-color: var(--accent-gold-dim);
+            outline: none;
+        }
+
+        /* Custom slider */
+        .slider-container {
+            position: relative;
+        }
+
+        .slider-value {
+            position: absolute;
+            right: 0;
+            top: -1.75rem;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--accent-gold);
+            font-family: 'Source Sans 3', sans-serif;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-input);
+            border-radius: 4px;
+            appearance: none;
+            cursor: pointer;
+            margin-top: 0.5rem;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(212, 168, 83, 0.4);
+            transition: transform 0.2s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 8px rgba(212, 168, 83, 0.4);
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            margin-top: 0.5rem;
+        }
+
+        /* Results cards */
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .result-card {
+            background: var(--bg-input);
+            border-radius: 8px;
+            padding: 1.25rem;
+            text-align: center;
+            border: 1px solid transparent;
+            transition: border-color 0.3s ease;
+        }
+
+        .result-card.positive {
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+
+        .result-card.negative {
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .result-card .metric-label {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-card .metric-value {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 0.25rem;
+        }
+
+        .result-card .metric-change {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .metric-change.positive { color: var(--success); }
+        .metric-change.negative { color: var(--danger); }
+        .metric-change.neutral { color: var(--text-dim); }
+
+        /* Before/After comparison */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        .comparison-table th {
+            text-align: left;
+            padding: 0.75rem;
+            border-bottom: 2px solid var(--border);
+            color: var(--text-dim);
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+
+        .comparison-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        .comparison-table td:nth-child(2),
+        .comparison-table td:nth-child(3) {
+            text-align: right;
+            font-family: 'Source Sans 3', sans-serif;
+            font-weight: 500;
+        }
+
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Narrative box */
+        .narrative-box {
+            background: linear-gradient(135deg, rgba(212, 168, 83, 0.1) 0%, rgba(212, 168, 83, 0.05) 100%);
+            border: 1px solid rgba(212, 168, 83, 0.3);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .narrative-box h4 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.1rem;
+            color: var(--accent-gold);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .narrative-box p {
+            color: var(--text-secondary);
+            margin-bottom: 0;
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        /* Demand curve visualization */
+        .chart-container {
+            background: var(--bg-input);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .chart-title {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        #demandChart {
+            width: 100%;
+            height: 200px;
+        }
+
+        /* Elasticity spectrum */
+        .elasticity-section {
+            margin-top: 4rem;
+        }
+
+        .elasticity-spectrum {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .spectrum-bar {
+            height: 12px;
+            background: linear-gradient(to right, 
+                #ef4444 0%, 
+                #f59e0b 33%, 
+                #22c55e 66%, 
+                #3b82f6 100%);
+            border-radius: 6px;
+            margin: 2rem 0 1rem;
+            position: relative;
+        }
+
+        .spectrum-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+
+        .practice-areas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .practice-card {
+            background: var(--bg-input);
+            border-radius: 8px;
+            padding: 1.5rem;
+            border-left: 4px solid;
+        }
+
+        .practice-card.high-squeeze { border-left-color: #ef4444; }
+        .practice-card.medium-squeeze { border-left-color: #f59e0b; }
+        .practice-card.low-squeeze { border-left-color: #22c55e; }
+
+        .practice-card h4 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .practice-card .squeeze-level {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.75rem;
+        }
+
+        .practice-card.high-squeeze .squeeze-level { color: #ef4444; }
+        .practice-card.medium-squeeze .squeeze-level { color: #f59e0b; }
+        .practice-card.low-squeeze .squeeze-level { color: #22c55e; }
+
+        .practice-card p {
+            font-size: 0.9rem;
+            margin-bottom: 0;
+        }
+
+        .practice-card ul {
+            margin-top: 0.75rem;
+            padding-left: 1.25rem;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+
+        .practice-card li {
+            margin-bottom: 0.25rem;
+        }
+
+        /* Key findings */
+        .findings-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        @media (max-width: 900px) {
+            .findings-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .finding-card {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .finding-card .stat {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .finding-card .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .finding-card .stat-source {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            margin-top: 0.5rem;
+        }
+
+        /* CTA section */
+        .cta-section {
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(212, 168, 83, 0.1) 100%);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 3rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .cta-section h2::after {
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            background: var(--gradient-gold);
+            color: var(--bg-dark);
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: 6px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-top: 1rem;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(212, 168, 83, 0.3);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            border-top: 1px solid var(--border);
+            margin-top: 4rem;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: var(--accent-gold);
+            text-decoration: none;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-in {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+            cursor: help;
+            border-bottom: 1px dotted var(--text-dim);
+        }
+
+        .tooltip:hover::after {
+            content: attr(data-tip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            padding: 0.5rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            z-index: 10;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="eyebrow">Economic Analysis</div>
+            <h1>AI & The Future Demand for Legal Services</h1>
+            <p class="subtitle">An interactive exploration of how artificial intelligence is reshaping the economics of legal work—and which practice areas face the most pressure.</p>
+        </header>
+
+        <!-- Key Stats -->
+        <section>
+            <div class="findings-grid">
+                <div class="finding-card animate-in delay-1">
+                    <div class="stat">44%</div>
+                    <div class="stat-label">of legal tasks are potentially automatable by generative AI</div>
+                    <div class="stat-source">Goldman Sachs, 2023</div>
+                </div>
+                <div class="finding-card animate-in delay-2">
+                    <div class="stat">92%</div>
+                    <div class="stat-label">of civil legal problems receive inadequate or no legal help (US)</div>
+                    <div class="stat-source">Legal Services Corp., 2022</div>
+                </div>
+                <div class="finding-card animate-in delay-3">
+                    <div class="stat">$28.5B</div>
+                    <div class="stat-label">Alternative Legal Services Provider market size</div>
+                    <div class="stat-source">Thomson Reuters, 2023</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Intro Section -->
+        <section>
+            <h2>The Economic Question</h2>
+            <p>When AI reduces the time needed to complete legal work, what happens to demand for lawyers? The answer depends on a concept economists call <strong>price elasticity of demand</strong>—how much the quantity of legal services demanded changes when prices change.</p>
+            
+            <div class="intro-grid">
+                <div class="intro-card animate-in delay-1">
+                    <div class="icon">⚖️</div>
+                    <h3>Inelastic Demand</h3>
+                    <p>When clients <em>must</em> have legal help regardless of price—bet-the-company litigation, criminal defense, regulatory investigations. Price drops don't dramatically increase volume; they increase lawyer margins.</p>
+                </div>
+                <div class="intro-card animate-in delay-2">
+                    <div class="icon">📊</div>
+                    <h3>Elastic Demand</h3>
+                    <p>When clients are price-sensitive and have alternatives—routine contracts, basic formations, DIY-able documents. Lower prices can dramatically increase the volume of matters tackled.</p>
+                </div>
+                <div class="intro-card animate-in delay-3">
+                    <div class="icon">🎯</div>
+                    <h3>The AI Effect</h3>
+                    <p>AI doesn't affect all legal work equally. It crushes tasks that are standardized and text-heavy, while amplifying lawyers' capacity for judgment and strategy.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Simulator -->
+        <section id="simulator">
+            <h2>Interactive Simulator</h2>
+            <p>Explore how AI might affect your practice economics. Adjust the inputs below to see how changes in automation, pricing strategy, and client sensitivity interact.</p>
+
+            <div class="simulator-container">
+                <!-- Controls Panel -->
+                <div class="controls-panel">
+                    <div class="panel-title">
+                        <span class="icon">⚙️</span>
+                        Inputs
+                    </div>
+
+                    <div class="control-group">
+                        <label for="segment">Practice Segment</label>
+                        <select id="segment" onchange="updatePresets()">
+                            <option value="routine">Routine / Consumer (wills, basic LLC, ToS, NDAs)</option>
+                            <option value="midmarket">Growth-Stage Tech / Commercial</option>
+                            <option value="highstakes">Bet-the-Company / High-Stakes</option>
+                            <option value="accesstojustice">Access-to-Justice / Latent Demand</option>
+                        </select>
+                        <span class="label-hint">Pre-fills typical values for this type of work</span>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="basePrice">Your Current Fee per Matter</label>
+                        <div class="slider-container">
+                            <span class="slider-value" id="basePriceValue">$1,000</span>
+                            <input type="range" id="basePrice" min="200" max="50000" value="1000" step="100" oninput="updateSimulation()">
+                        </div>
+                        <div class="slider-labels">
+                            <span>$200</span>
+                            <span>$50,000</span>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="baseVolume">Matters Per Year at That Price</label>
+                        <div class="slider-container">
+                            <span class="slider-value" id="baseVolumeValue">50</span>
+                            <input type="range" id="baseVolume" min="5" max="500" value="50" step="5" oninput="updateSimulation()">
+                        </div>
+                        <div class="slider-labels">
+                            <span>5</span>
+                            <span>500</span>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="hoursPerMatter">Your Hours Per Matter (Today)</label>
+                        <div class="slider-container">
+                            <span class="slider-value" id="hoursPerMatterValue">3 hrs</span>
+                            <input type="range" id="hoursPerMatter" min="1" max="80" value="3" step="0.5" oninput="updateSimulation()">
+                        </div>
+                        <div class="slider-labels">
+                            <span>1 hr</span>
+                            <span>80 hrs</span>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="automationShare">% of Work That's Pattern-Based / Automatable</label>
+                        <div class="slider-container">
+                            <span class="slider-value" id="automationShareValue">70%</span>
+                            <input type="range" id="automationShare" min="0" max="100" value="70" step="5" oninput="updateSimulation()">
+                        </div>
+                        <div class="slider-labels">
+                            <span>0%</span>
+                            <span>100%</span>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="aiTimeSaving">AI Time Saving on That Automatable Work</label>
+                        <div class="slider-container">
+                            <span class="slider-value" id="aiTimeSavingValue">60%</span>
+                            <input type="range" id="aiTimeSaving" min="0" max="80" value="60" step="5" oninput="updateSimulation()">
+                        </div>
+                        <div class="slider-labels">
+                            <span>0%</span>
+                            <span>80%</span>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="elasticity">
+                            <span class="tooltip" data-tip="How much demand changes when price changes">Client Price Sensitivity (Elasticity)</span>
+                        </label>
+                        <div class="slider-container">
+                            <span class="slider-value" id="elasticityValue">1.5</span>
+                            <input type="range" id="elasticity" min="0.1" max="3" value="1.5" step="0.1" oninput="updateSimulation()">
+                        </div>
+                        <div class="slider-labels">
+                            <span>Low (0.1)</span>
+                            <span>Mid (1.0)</span>
+                            <span>High (3.0)</span>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="passThrough">% of Cost Savings Passed to Clients as Lower Prices</label>
+                        <div class="slider-container">
+                            <span class="slider-value" id="passThroughValue">50%</span>
+                            <input type="range" id="passThrough" min="0" max="150" value="50" step="10" oninput="updateSimulation()">
+                        </div>
+                        <div class="slider-labels">
+                            <span>0% (keep all)</span>
+                            <span>100%+</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Panel -->
+                <div class="results-panel">
+                    <div class="panel-title">
+                        <span class="icon">📈</span>
+                        Projected Impact
+                    </div>
+
+                    <div class="results-grid">
+                        <div class="result-card" id="hoursCard">
+                            <div class="metric-label">Hours Per Matter</div>
+                            <div class="metric-value" id="newHours">1.74</div>
+                            <div class="metric-change positive" id="hoursChange">▼ 42% faster</div>
+                        </div>
+                        <div class="result-card" id="mattersCard">
+                            <div class="metric-label">Matters Per Year</div>
+                            <div class="metric-value" id="newMatters">71</div>
+                            <div class="metric-change positive" id="mattersChange">▲ 42% more</div>
+                        </div>
+                        <div class="result-card" id="revenueCard">
+                            <div class="metric-label">Annual Revenue</div>
+                            <div class="metric-value" id="newRevenue">$56K</div>
+                            <div class="metric-change positive" id="revenueChange">▲ 12%</div>
+                        </div>
+                        <div class="result-card" id="profitCard">
+                            <div class="metric-label">Annual Profit</div>
+                            <div class="metric-value" id="newProfit">$57K</div>
+                            <div class="metric-change positive" id="profitChange">▲ 14%</div>
+                        </div>
+                    </div>
+
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Before AI</th>
+                                <th>After AI</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Price per matter</td>
+                                <td id="tablePriceBefore">$1,000</td>
+                                <td id="tablePriceAfter">$790</td>
+                            </tr>
+                            <tr>
+                                <td>Matters per year</td>
+                                <td id="tableMattersBefore">50</td>
+                                <td id="tableMattersAfter">71</td>
+                            </tr>
+                            <tr>
+                                <td>Hours per matter</td>
+                                <td id="tableHoursBefore">3</td>
+                                <td id="tableHoursAfter">1.74</td>
+                            </tr>
+                            <tr>
+                                <td>Total hours per year</td>
+                                <td id="tableTotalHoursBefore">150</td>
+                                <td id="tableTotalHoursAfter">124</td>
+                            </tr>
+                            <tr>
+                                <td>Hours freed up</td>
+                                <td>—</td>
+                                <td id="tableHoursFreed">26 hrs</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Demand curve chart -->
+                    <div class="chart-container">
+                        <div class="chart-title">Demand Curve Visualization</div>
+                        <svg id="demandChart" viewBox="0 0 400 200">
+                            <!-- Will be populated by JS -->
+                        </svg>
+                    </div>
+
+                    <div class="narrative-box">
+                        <h4>💡 What This Means</h4>
+                        <p id="narrativeText">In this scenario, AI lets you earn more while working fewer total hours. Because your clients are price-sensitive (high elasticity), even a modest price cut produces a significant increase in volume. The sweet spot is sharing some AI savings with clients to capture more of the expanding market.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Elasticity Spectrum -->
+        <section class="elasticity-section">
+            <h2>Which Practice Areas Get Squeezed First?</h2>
+            <p>Not all legal work responds the same way to AI disruption. Practice areas vary dramatically in their price elasticity and automability—and that determines who feels pressure first.</p>
+
+            <div class="elasticity-spectrum">
+                <h3 style="text-align: center; margin-bottom: 0.5rem;">AI Pressure Spectrum</h3>
+                <div class="spectrum-bar"></div>
+                <div class="spectrum-labels">
+                    <span>🔴 High Squeeze</span>
+                    <span>🟡 Medium Squeeze</span>
+                    <span>🟢 Low Squeeze</span>
+                    <span>🔵 AI-Enabled Growth</span>
+                </div>
+
+                <div class="practice-areas-grid">
+                    <div class="practice-card high-squeeze">
+                        <div class="squeeze-level">High Squeeze</div>
+                        <h4>Commoditized B2C / SMB Work</h4>
+                        <p>Routine, standardized work where clients have many alternatives—including AI itself.</p>
+                        <ul>
+                            <li>Website ToS, Privacy Policies</li>
+                            <li>Simple NDAs, contractor agreements</li>
+                            <li>Basic LLC formations</li>
+                            <li>Uncontested family matters</li>
+                            <li>Simple wills and POAs</li>
+                        </ul>
+                    </div>
+
+                    <div class="practice-card medium-squeeze">
+                        <div class="squeeze-level">Medium Squeeze</div>
+                        <h4>Mid-Market Commercial</h4>
+                        <p>Pattern-based but with meaningful stakes. Clients want quality but watch costs closely.</p>
+                        <ul>
+                            <li>SaaS agreements, DPAs</li>
+                            <li>Series A / seed round docs</li>
+                            <li>Commercial leases</li>
+                            <li>Vendor and customer contracts</li>
+                            <li>Employment agreements</li>
+                        </ul>
+                    </div>
+
+                    <div class="practice-card low-squeeze">
+                        <div class="squeeze-level">Low Squeeze</div>
+                        <h4>High-Stakes / Bespoke</h4>
+                        <p>Judgment-intensive work where stakes are high and substitutes are few. AI amplifies capacity.</p>
+                        <ul>
+                            <li>Bet-the-company litigation</li>
+                            <li>Major M&A, PE, capital markets</li>
+                            <li>Regulatory investigations</li>
+                            <li>Complex cross-border structuring</li>
+                            <li>Board-level governance</li>
+                        </ul>
+                    </div>
+
+                    <div class="practice-card" style="border-left-color: #3b82f6;">
+                        <div class="squeeze-level" style="color: #3b82f6;">Growth Opportunity</div>
+                        <h4>Access-to-Justice / Latent Demand</h4>
+                        <p>Massive unmet need held back by cost. AI can unlock entirely new markets.</p>
+                        <ul>
+                            <li>Consumer civil issues</li>
+                            <li>Housing, small employment claims</li>
+                            <li>Small business counseling</li>
+                            <li>Scaled legal clinics</li>
+                            <li>Productized advice platforms</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Key Insights -->
+        <section>
+            <h2>Key Insights from the Research</h2>
+            
+            <div class="intro-grid">
+                <div class="intro-card">
+                    <div class="icon">🔬</div>
+                    <h3>AI Equalizes Technical Skill</h3>
+                    <p>Studies show AI assistance helps weaker performers more than strong ones. The value shifts from technical drafting ability to judgment, strategy, and client skills. <em>(Choi, Monahan & Schwarcz, 2023)</em></p>
+                </div>
+                <div class="intro-card">
+                    <div class="icon">💰</div>
+                    <h3>ALSPs Are Growing Fast</h3>
+                    <p>Alternative Legal Service Providers grew to $28.5B by 2023, driven by cost-sensitive work. This is revealed preference evidence that much legal demand is highly price-elastic. <em>(Thomson Reuters)</em></p>
+                </div>
+                <div class="intro-card">
+                    <div class="icon">⚡</div>
+                    <h3>BigLaw Rates Still Rising</h3>
+                    <p>Large firms raised rates 8%+ in 2023 while demand held. For high-stakes work, short-run elasticity is low—but pressure on the billable hour model is building. <em>(Citi-Hildebrandt)</em></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="cta-section">
+            <h2>Position Your Practice for the AI Era</h2>
+            <p style="max-width: 600px; margin: 1rem auto;">Whether you're looking to productize routine work, leverage AI for complex matters, or navigate the changing economics of legal services, I can help.</p>
+            <a href="https://terms.law/call/" class="cta-button">Schedule a Consultation</a>
+        </section>
+
+        <footer>
+            <p>© 2025 <a href="https://terms.law">Terms.law</a> | California Attorney Sergei Tokmakov (CA Bar #279869)</p>
+            <p style="margin-top: 0.5rem; font-size: 0.8rem;">This simulator is for educational purposes. Actual results depend on your specific practice, market, and implementation.</p>
+        </footer>
+    </div>
+
+    <script>
+        (function() {
+            // Preset configurations
+            const presets = {
+                routine: {
+                    basePrice: 1000,
+                    baseVolume: 50,
+                    hoursPerMatter: 3,
+                    automationShare: 70,
+                    aiTimeSaving: 60,
+                    elasticity: 1.5,
+                    passThrough: 50
+                },
+                midmarket: {
+                    basePrice: 5000,
+                    baseVolume: 30,
+                    hoursPerMatter: 8,
+                    automationShare: 60,
+                    aiTimeSaving: 55,
+                    elasticity: 0.9,
+                    passThrough: 40
+                },
+                highstakes: {
+                    basePrice: 25000,
+                    baseVolume: 15,
+                    hoursPerMatter: 40,
+                    automationShare: 50,
+                    aiTimeSaving: 50,
+                    elasticity: 0.3,
+                    passThrough: 20
+                },
+                accesstojustice: {
+                    basePrice: 500,
+                    baseVolume: 100,
+                    hoursPerMatter: 2,
+                    automationShare: 80,
+                    aiTimeSaving: 70,
+                    elasticity: 2.0,
+                    passThrough: 70
+                }
+            };
+
+            // Format currency
+            function formatCurrency(value) {
+                if (value >= 1000000) {
+                    return '$' + (value / 1000000).toFixed(1) + 'M';
+                } else if (value >= 1000) {
+                    return '$' + (value / 1000).toFixed(0) + 'K';
+                }
+                return '$' + Math.round(value);
+            }
+
+            // Format percentage change
+            function formatChange(oldVal, newVal) {
+                const change = ((newVal - oldVal) / oldVal) * 100;
+                if (Math.abs(change) < 0.5) return { text: '—', cls: 'neutral' };
+                const arrow = change > 0 ? '▲' : '▼';
+                const absChange = Math.abs(change).toFixed(0);
+                return {
+                    text: arrow + ' ' + absChange + '%',
+                    cls: change > 0 ? 'positive' : 'negative'
+                };
+            }
+
+            // Draw demand curve
+            function updateDemandCurve(P0, Q0, P1, Q1, E) {
+                const svg = document.getElementById('demandChart');
+                if (!svg) return;
+                
+                const width = 400;
+                const height = 200;
+                const padding = 40;
+
+                // Generate curve points
+                const points = [];
+                const priceMin = P0 * 0.5;
+                const priceMax = P0 * 1.5;
+                const step = (priceMax - priceMin) / 50;
+                
+                for (let p = priceMin; p <= priceMax; p += step) {
+                    const q = Q0 * Math.pow(p / P0, -E);
+                    points.push({ p: p, q: q });
+                }
+
+                // Find scale factors
+                let qMaxVal = Q1;
+                let qMinVal = Q1;
+                for (let i = 0; i < points.length; i++) {
+                    if (points[i].q > qMaxVal) qMaxVal = points[i].q;
+                    if (points[i].q < qMinVal) qMinVal = points[i].q;
+                }
+                qMaxVal = qMaxVal * 1.1;
+                qMinVal = qMinVal * 0.9;
+                
+                function scaleX(q) {
+                    return padding + ((q - qMinVal) / (qMaxVal - qMinVal)) * (width - 2 * padding);
+                }
+                
+                function scaleY(p) {
+                    return height - padding - ((p - priceMin) / (priceMax - priceMin)) * (height - 2 * padding);
+                }
+
+                // Create path string
+                let pathD = '';
+                for (let i = 0; i < points.length; i++) {
+                    const prefix = i === 0 ? 'M' : 'L';
+                    pathD += prefix + scaleX(points[i].q).toFixed(1) + ',' + scaleY(points[i].p).toFixed(1) + ' ';
+                }
+
+                const beforeX = scaleX(Q0);
+                const beforeY = scaleY(P0);
+                const afterX = scaleX(Q1);
+                const afterY = scaleY(P1);
+
+                svg.innerHTML = 
+                    '<line x1="' + padding + '" y1="' + (height - padding) + '" x2="' + (width - padding) + '" y2="' + (height - padding) + '" stroke="#4a5568" stroke-width="1"/>' +
+                    '<line x1="' + padding + '" y1="' + padding + '" x2="' + padding + '" y2="' + (height - padding) + '" stroke="#4a5568" stroke-width="1"/>' +
+                    '<text x="' + (width/2) + '" y="' + (height - 8) + '" fill="#6b7280" font-size="11" text-anchor="middle">Quantity (matters/year)</text>' +
+                    '<text x="12" y="' + (height/2) + '" fill="#6b7280" font-size="11" text-anchor="middle" transform="rotate(-90, 12, ' + (height/2) + ')">Price</text>' +
+                    '<path d="' + pathD + '" fill="none" stroke="#d4a853" stroke-width="2" opacity="0.8"/>' +
+                    '<circle cx="' + beforeX + '" cy="' + beforeY + '" r="8" fill="#6b7280" stroke="#fff" stroke-width="2"/>' +
+                    '<text x="' + (beforeX + 12) + '" y="' + (beforeY - 5) + '" fill="#9ca3af" font-size="10">Before</text>' +
+                    '<circle cx="' + afterX + '" cy="' + afterY + '" r="8" fill="#22c55e" stroke="#fff" stroke-width="2"/>' +
+                    '<text x="' + (afterX + 12) + '" y="' + (afterY + 15) + '" fill="#22c55e" font-size="10">After AI</text>' +
+                    '<line x1="' + beforeX + '" y1="' + beforeY + '" x2="' + afterX + '" y2="' + afterY + '" stroke="#22c55e" stroke-width="1" stroke-dasharray="4,4" opacity="0.6"/>';
+            }
+
+            // Generate narrative text
+            function updateNarrative(R0, R1, Profit0, Profit1, E, Q0, Q1, H0, H1, hoursFreed) {
+                let narrative = '';
+
+                // Main outcome
+                if (R1 > R0 && Profit1 > Profit0) {
+                    narrative = '<strong>Win-win scenario.</strong> AI lets you earn more while working fewer total hours. ';
+                } else if (R1 > R0 && Profit1 < Profit0) {
+                    narrative = '<strong>Volume over margin.</strong> You win more work, but your per-matter margin shrinks. Consider whether the extra volume is worth the hustle. ';
+                } else if (R1 < R0 && Profit1 > Profit0) {
+                    narrative = '<strong>Leaner practice.</strong> Fewer matters, higher margin per matter. You are working smarter, not harder. ';
+                } else {
+                    narrative = '<strong>Pressure on both ends.</strong> Both revenue and profit fall under these assumptions. This is the squeeze scenario—you may need to reposition or productize. ';
+                }
+
+                // Elasticity insight
+                if (E > 1.2) {
+                    narrative += 'Because your clients are highly price-sensitive, even modest price cuts produce large swings in volume. The key is capturing more of an expanding market.';
+                } else if (E < 0.6) {
+                    narrative += 'In this low-elasticity segment, clients do not change volume much when prices move. Most of the AI benefit shows up as extra margin, not extra matters.';
+                } else {
+                    narrative += 'With moderate price sensitivity, you have flexibility—share some savings with clients to grow volume, or keep prices steady to boost margins.';
+                }
+
+                // Hours insight
+                if (hoursFreed > 20) {
+                    narrative += ' You are freeing up ' + Math.round(hoursFreed) + ' hours per year—capacity you could deploy on higher-value work or additional matters.';
+                }
+
+                var narrativeEl = document.getElementById('narrativeText');
+                if (narrativeEl) {
+                    narrativeEl.innerHTML = narrative;
+                }
+            }
+
+            // Main simulation function
+            function updateSimulation() {
+                // Get input values
+                var basePriceEl = document.getElementById('basePrice');
+                var baseVolumeEl = document.getElementById('baseVolume');
+                var hoursPerMatterEl = document.getElementById('hoursPerMatter');
+                var automationShareEl = document.getElementById('automationShare');
+                var aiTimeSavingEl = document.getElementById('aiTimeSaving');
+                var elasticityEl = document.getElementById('elasticity');
+                var passThroughEl = document.getElementById('passThrough');
+
+                if (!basePriceEl) return;
+
+                var P0 = parseFloat(basePriceEl.value);
+                var Q0 = parseFloat(baseVolumeEl.value);
+                var H0 = parseFloat(hoursPerMatterEl.value);
+                var automationShare = parseFloat(automationShareEl.value) / 100;
+                var aiTimeSaving = parseFloat(aiTimeSavingEl.value) / 100;
+                var E = parseFloat(elasticityEl.value);
+                var passThrough = parseFloat(passThroughEl.value) / 100;
+
+                // Update slider display values
+                document.getElementById('basePriceValue').textContent = formatCurrency(P0);
+                document.getElementById('baseVolumeValue').textContent = Q0;
+                document.getElementById('hoursPerMatterValue').textContent = H0 + ' hrs';
+                document.getElementById('automationShareValue').textContent = Math.round(automationShare * 100) + '%';
+                document.getElementById('aiTimeSavingValue').textContent = Math.round(aiTimeSaving * 100) + '%';
+                document.getElementById('elasticityValue').textContent = E.toFixed(1);
+                document.getElementById('passThroughValue').textContent = Math.round(passThrough * 100) + '%';
+
+                // Calculate AI impact
+                var effectiveSaving = automationShare * aiTimeSaving;
+                var H1 = H0 * (1 - effectiveSaving);
+
+                // Normalize cost (set c = 1)
+                var Cost0 = H0;
+                var Cost1 = H1;
+                var costSavingFraction = Cost0 > 0 ? (Cost0 - Cost1) / Cost0 : 0;
+
+                // New price based on pass-through
+                var P1 = P0 * (1 - passThrough * costSavingFraction);
+
+                // New quantity based on elasticity
+                // Q1 = Q0 * (P1/P0)^(-E)
+                var Q1 = Q0 * Math.pow(P1 / P0, -E);
+
+                // Revenue and profit
+                var R0 = P0 * Q0;
+                var R1 = P1 * Q1;
+
+                var Profit0 = (P0 - Cost0) * Q0;
+                var Profit1 = (P1 - Cost1) * Q1;
+
+                var totalHours0 = H0 * Q0;
+                var totalHours1 = H1 * Q1;
+                var hoursFreed = totalHours0 - totalHours1;
+
+                // Update result cards
+                document.getElementById('newHours').textContent = H1.toFixed(1);
+                var hoursChangeData = formatChange(H0, H1);
+                var hoursChangeEl = document.getElementById('hoursChange');
+                hoursChangeEl.textContent = '▼ ' + Math.abs(Math.round(((H1 - H0) / H0) * 100)) + '% faster';
+                hoursChangeEl.className = 'metric-change ' + (H1 < H0 ? 'positive' : 'negative');
+                document.getElementById('hoursCard').className = 'result-card ' + (H1 < H0 ? 'positive' : 'negative');
+
+                document.getElementById('newMatters').textContent = Math.round(Q1);
+                var mattersChangeData = formatChange(Q0, Q1);
+                var mattersChangeEl = document.getElementById('mattersChange');
+                mattersChangeEl.textContent = mattersChangeData.text + (Q1 > Q0 ? ' more' : ' fewer');
+                mattersChangeEl.className = 'metric-change ' + mattersChangeData.cls;
+                document.getElementById('mattersCard').className = 'result-card ' + mattersChangeData.cls;
+
+                document.getElementById('newRevenue').textContent = formatCurrency(R1);
+                var revenueChangeData = formatChange(R0, R1);
+                var revenueChangeEl = document.getElementById('revenueChange');
+                revenueChangeEl.textContent = revenueChangeData.text;
+                revenueChangeEl.className = 'metric-change ' + revenueChangeData.cls;
+                document.getElementById('revenueCard').className = 'result-card ' + revenueChangeData.cls;
+
+                document.getElementById('newProfit').textContent = formatCurrency(Profit1);
+                var profitChangeData = formatChange(Profit0, Profit1);
+                var profitChangeEl = document.getElementById('profitChange');
+                profitChangeEl.textContent = profitChangeData.text;
+                profitChangeEl.className = 'metric-change ' + profitChangeData.cls;
+                document.getElementById('profitCard').className = 'result-card ' + profitChangeData.cls;
+
+                // Update comparison table
+                document.getElementById('tablePriceBefore').textContent = formatCurrency(P0);
+                document.getElementById('tablePriceAfter').textContent = formatCurrency(P1);
+                document.getElementById('tableMattersBefore').textContent = Q0;
+                document.getElementById('tableMattersAfter').textContent = Math.round(Q1);
+                document.getElementById('tableHoursBefore').textContent = H0;
+                document.getElementById('tableHoursAfter').textContent = H1.toFixed(1);
+                document.getElementById('tableTotalHoursBefore').textContent = Math.round(totalHours0);
+                document.getElementById('tableTotalHoursAfter').textContent = Math.round(totalHours1);
+                document.getElementById('tableHoursFreed').textContent = hoursFreed > 0 ? Math.round(hoursFreed) + ' hrs' : '—';
+
+                // Update demand curve
+                updateDemandCurve(P0, Q0, P1, Q1, E);
+
+                // Update narrative
+                updateNarrative(R0, R1, Profit0, Profit1, E, Q0, Q1, H0, H1, hoursFreed);
+            }
+
+            // Update presets when segment changes
+            function updatePresets() {
+                var segmentEl = document.getElementById('segment');
+                if (!segmentEl) return;
+                
+                var segment = segmentEl.value;
+                var preset = presets[segment];
+                
+                document.getElementById('basePrice').value = preset.basePrice;
+                document.getElementById('baseVolume').value = preset.baseVolume;
+                document.getElementById('hoursPerMatter').value = preset.hoursPerMatter;
+                document.getElementById('automationShare').value = preset.automationShare;
+                document.getElementById('aiTimeSaving').value = preset.aiTimeSaving;
+                document.getElementById('elasticity').value = preset.elasticity;
+                document.getElementById('passThrough').value = preset.passThrough;
+                
+                updateSimulation();
+            }
+
+            // Expose functions globally
+            window.updateSimulation = updateSimulation;
+            window.updatePresets = updatePresets;
+
+            // Initialize when DOM is ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', function() {
+                    updateSimulation();
+                    
+                    // Add event listeners to all sliders
+                    var sliders = document.querySelectorAll('input[type="range"]');
+                    for (var i = 0; i < sliders.length; i++) {
+                        sliders[i].addEventListener('input', updateSimulation);
+                    }
+                    
+                    // Add event listener to dropdown
+                    var segmentSelect = document.getElementById('segment');
+                    if (segmentSelect) {
+                        segmentSelect.addEventListener('change', updatePresets);
+                    }
+                });
+            } else {
+                updateSimulation();
+                
+                // Add event listeners to all sliders
+                var sliders = document.querySelectorAll('input[type="range"]');
+                for (var i = 0; i < sliders.length; i++) {
+                    sliders[i].addEventListener('input', updateSimulation);
+                }
+                
+                // Add event listener to dropdown
+                var segmentSelect = document.getElementById('segment');
+                if (segmentSelect) {
+                    segmentSelect.addEventListener('change', updatePresets);
+                }
+            }
+        })();
+    </script>
+</body>
+</html>
