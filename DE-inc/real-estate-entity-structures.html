@@ -483,16 +483,16 @@
   <!-- Tabbed Navigation -->
   <div class="tabs-container">
     <div class="tabs">
-      <button class="tab active" onclick="switchTab('overview')">📚 Overview</button>
-      <button class="tab" onclick="switchTab('fix-flip')">🔨 Fix-and-Flip</button>
-      <button class="tab" onclick="switchTab('buy-hold')">🏘️ Buy-and-Hold</button>
-      <button class="tab" onclick="switchTab('str')">🏖️ Short-Term Rentals</button>
-      <button class="tab" onclick="switchTab('privacy')">🕵️ Privacy Strategies</button>
-      <button class="tab" onclick="switchTab('series')">🏢 Series LLC</button>
-      <button class="tab" onclick="switchTab('protection')">🛡️ Asset Protection</button>
-      <button class="tab" onclick="switchTab('tax')">💰 Tax Strategies</button>
-      <button class="tab" onclick="switchTab('states')">📍 State Guide</button>
-      <button class="tab" onclick="switchTab('services')">⚖️ Services</button>
+      <button class="tab active" onclick="switchTab('overview', event)">📚 Overview</button>
+      <button class="tab" onclick="switchTab('fix-flip', event)">🔨 Fix-and-Flip</button>
+      <button class="tab" onclick="switchTab('buy-hold', event)">🏘️ Buy-and-Hold</button>
+      <button class="tab" onclick="switchTab('str', event)">🏖️ Short-Term Rentals</button>
+      <button class="tab" onclick="switchTab('privacy', event)">🕵️ Privacy Strategies</button>
+      <button class="tab" onclick="switchTab('series', event)">🏢 Series LLC</button>
+      <button class="tab" onclick="switchTab('protection', event)">🛡️ Asset Protection</button>
+      <button class="tab" onclick="switchTab('tax', event)">💰 Tax Strategies</button>
+      <button class="tab" onclick="switchTab('states', event)">📍 State Guide</button>
+      <button class="tab" onclick="switchTab('services', event)">⚖️ Services</button>
     </div>
   </div>
 
@@ -1529,7 +1529,13 @@
 
   <script>
     // Tab Switching
-    function switchTab(tabId) {
+    function switchTab(tabId, event) {
+      // Prevent default behavior and stop propagation for WordPress compatibility
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+
       // Hide all tab contents
       const contents = document.querySelectorAll('.tab-content');
       contents.forEach(content => content.classList.remove('active'));
@@ -1542,10 +1548,9 @@
       document.getElementById(tabId).classList.add('active');
 
       // Add active class to clicked tab
-      event.target.classList.add('active');
-
-      // Scroll to top of content
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (event && event.target) {
+        event.target.classList.add('active');
+      }
     }
 
     // Back to Top Button
