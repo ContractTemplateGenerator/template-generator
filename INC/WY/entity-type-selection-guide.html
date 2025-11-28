@@ -1,0 +1,2029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LLC vs C-Corp vs S-Corp: Complete Entity Selection Guide | Sergei Tokmakov, Esq.</title>
+<meta name="description" content="Choose the right business entity: LLC, C-Corporation, or S-Corporation. Interactive decision wizard, taxation comparison, conversion paths, and use cases for startups and small businesses.">
+<link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+<style>
+  :root {
+    --primary: #7c3aed;
+    --primary-light: #a78bfa;
+    --accent: #ec4899;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --muted: #64748b;
+    --bg: #faf5ff;
+    --llc-color: #059669;
+    --ccorp-color: #7c3aed;
+    --scorp-color: #dc2626;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    margin: 0;
+    background: var(--bg);
+    color: #1e293b;
+    line-height: 1.6;
+  }
+
+  .entity-guide {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 24px 60px;
+  }
+
+  /* Hero */
+  .hero {
+    background: linear-gradient(135deg, var(--primary), var(--primary-light) 80%);
+    color: #fff;
+    padding: 48px;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(124, 58, 237, 0.3);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 30px;
+  }
+
+  .hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top right, rgba(255,255,255,0.15), transparent 60%);
+    pointer-events: none;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+
+  .hero h1 {
+    margin: 0 0 16px;
+    font-size: clamp(32px, 5vw, 48px);
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .hero-intro {
+    margin: 0 0 24px;
+    max-width: 800px;
+    color: rgba(255,255,255,0.95);
+    font-size: 18px;
+    line-height: 1.7;
+  }
+
+  .cta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .cta-row a {
+    text-decoration: none;
+    font-weight: 600;
+    border-radius: 999px;
+    padding: 14px 28px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+  }
+
+  .btn-primary {
+    background: #fff;
+    color: var(--primary);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  }
+
+  .btn-secondary {
+    border: 2px solid rgba(255,255,255,0.6);
+    color: #fff;
+  }
+
+  .btn-secondary:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: #fff;
+  }
+
+  /* Stats Grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 18px;
+    margin: 30px 0 24px;
+  }
+
+  .stat {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 10px 25px rgba(15,23,42,0.06);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .stat:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(15,23,42,0.1);
+  }
+
+  .stat h3 {
+    margin: 0 0 6px;
+    font-size: 28px;
+    color: var(--primary);
+    font-weight: 700;
+  }
+
+  .stat p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* Tab Navigation */
+  .tab-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    border-bottom: 2px solid #e2e8f0;
+    margin-bottom: 30px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+    padding-top: 10px;
+  }
+
+  .tab-btn {
+    border: none;
+    background: transparent;
+    padding: 14px 20px;
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: 0.02em;
+    color: #64748b;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    bottom: -2px;
+  }
+
+  .tab-btn:hover {
+    color: var(--primary);
+    background: rgba(124, 58, 237, 0.05);
+  }
+
+  .tab-btn.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+    background: #fff;
+  }
+
+  .tab-panel {
+    display: none;
+    animation: fade 0.3s ease;
+  }
+
+  .tab-panel.active {
+    display: block;
+  }
+
+  @keyframes fade {
+    from {opacity:0; transform: translateY(8px);}
+    to {opacity:1; transform:translateY(0);}
+  }
+
+  /* Section Headings */
+  .tab-panel h2 {
+    font-size: 28px;
+    color: var(--primary);
+    margin: 0 0 20px;
+    font-weight: 700;
+  }
+
+  .tab-panel h3 {
+    font-size: 22px;
+    color: var(--primary);
+    margin: 30px 0 16px;
+    font-weight: 600;
+  }
+
+  .tab-panel h4 {
+    font-size: 18px;
+    color: #1f2937;
+    margin: 0 0 12px;
+    font-weight: 600;
+  }
+
+  .tab-panel p {
+    margin: 0 0 16px;
+    color: #475569;
+    line-height: 1.7;
+  }
+
+  .tab-panel ul, .tab-panel ol {
+    margin: 0 0 20px;
+    padding-left: 24px;
+  }
+
+  .tab-panel li {
+    margin-bottom: 10px;
+    color: #475569;
+    line-height: 1.6;
+  }
+
+  .tab-panel li strong {
+    color: var(--primary);
+  }
+
+  /* Card Grid */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin: 24px 0;
+  }
+
+  .card {
+    background: #fff;
+    border: 2px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 10px 25px rgba(15,23,42,0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(15,23,42,0.1);
+  }
+
+  .card.llc-card {
+    border-color: var(--llc-color);
+    border-left-width: 6px;
+  }
+
+  .card.ccorp-card {
+    border-color: var(--ccorp-color);
+    border-left-width: 6px;
+  }
+
+  .card.scorp-card {
+    border-color: var(--scorp-color);
+    border-left-width: 6px;
+  }
+
+  .card h4 {
+    margin: 0 0 12px;
+    font-size: 20px;
+  }
+
+  .card.llc-card h4 { color: var(--llc-color); }
+  .card.ccorp-card h4 { color: var(--ccorp-color); }
+  .card.scorp-card h4 { color: var(--scorp-color); }
+
+  .card p {
+    margin: 0;
+    color: #64748b;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .card ul {
+    margin: 12px 0 0;
+    padding-left: 20px;
+  }
+
+  .card li {
+    margin-bottom: 8px;
+    color: #64748b;
+    font-size: 14px;
+  }
+
+  /* Entity Badge */
+  .entity-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .entity-badge.llc { background: rgba(5, 150, 105, 0.1); color: var(--llc-color); }
+  .entity-badge.ccorp { background: rgba(124, 58, 237, 0.1); color: var(--ccorp-color); }
+  .entity-badge.scorp { background: rgba(220, 38, 38, 0.1); color: var(--scorp-color); }
+
+  /* Alert Boxes */
+  .warning-box {
+    background: #fef3c7;
+    border-left: 4px solid var(--warning);
+    padding: 18px 20px;
+    border-radius: 12px;
+    margin: 24px 0;
+  }
+
+  .warning-box strong {
+    color: #92400e;
+    display: block;
+    margin-bottom: 8px;
+    font-size: 15px;
+  }
+
+  .warning-box p {
+    color: #92400e;
+    margin: 0;
+  }
+
+  .info-box {
+    background: #dbeafe;
+    border-left: 4px solid #3b82f6;
+    padding: 18px 20px;
+    border-radius: 12px;
+    margin: 24px 0;
+  }
+
+  .info-box strong {
+    color: #1e40af;
+    display: block;
+    margin-bottom: 8px;
+    font-size: 15px;
+  }
+
+  .info-box p, .info-box ul {
+    color: #1e40af;
+    margin: 0;
+  }
+
+  .success-box {
+    background: #d1fae5;
+    border-left: 4px solid var(--success);
+    padding: 18px 20px;
+    border-radius: 12px;
+    margin: 24px 0;
+  }
+
+  .success-box strong {
+    color: #065f46;
+    display: block;
+    margin-bottom: 8px;
+    font-size: 15px;
+  }
+
+  .success-box p {
+    color: #065f46;
+    margin: 0;
+  }
+
+  /* Comparison Table */
+  table.compare {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(15,23,42,0.08);
+  }
+
+  table.compare th,
+  table.compare td {
+    border: 1px solid #e5e7eb;
+    padding: 16px;
+    text-align: left;
+    font-size: 15px;
+  }
+
+  table.compare th {
+    background: #f8fafc;
+    font-weight: 600;
+    color: var(--primary);
+  }
+
+  table.compare td {
+    color: #475569;
+  }
+
+  table.compare tr:hover {
+    background: #f9fafb;
+  }
+
+  table.compare .feature-name {
+    font-weight: 600;
+    color: #1f2937;
+  }
+
+  /* Decision Wizard */
+  .wizard-container {
+    background: #fff;
+    border: 2px solid var(--primary);
+    border-radius: 20px;
+    padding: 40px;
+    margin: 30px 0;
+    box-shadow: 0 20px 40px rgba(124, 58, 237, 0.15);
+  }
+
+  .wizard-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 24px;
+    border-bottom: 2px solid #e5e7eb;
+  }
+
+  .wizard-header h3 {
+    margin: 0 0 8px;
+    color: var(--primary);
+    font-size: 28px;
+  }
+
+  .wizard-header p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 16px;
+  }
+
+  .wizard-step {
+    display: none;
+  }
+
+  .wizard-step.active {
+    display: block;
+    animation: fadeIn 0.4s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .wizard-progress {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    padding: 0 20px;
+  }
+
+  .progress-dot {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: #94a3b8;
+    position: relative;
+    transition: all 0.3s ease;
+  }
+
+  .progress-dot.active {
+    background: var(--primary);
+    color: #fff;
+    transform: scale(1.1);
+  }
+
+  .progress-dot.completed {
+    background: var(--success);
+    color: #fff;
+  }
+
+  .progress-dot::after {
+    content: '';
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    width: calc(100vw / 8);
+    height: 2px;
+    background: #e5e7eb;
+  }
+
+  .progress-dot:last-child::after {
+    display: none;
+  }
+
+  .question-card {
+    background: #f8fafc;
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 24px;
+  }
+
+  .question-card h4 {
+    margin: 0 0 20px;
+    font-size: 20px;
+    color: #1f2937;
+  }
+
+  .option-grid {
+    display: grid;
+    gap: 12px;
+  }
+
+  .option-btn {
+    background: #fff;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 16px 20px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 15px;
+    font-weight: 500;
+    color: #1f2937;
+  }
+
+  .option-btn:hover {
+    border-color: var(--primary);
+    background: rgba(124, 58, 237, 0.05);
+  }
+
+  .option-btn.selected {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: #fff;
+  }
+
+  .wizard-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 24px;
+    gap: 12px;
+  }
+
+  .wizard-btn {
+    padding: 14px 28px;
+    border-radius: 999px;
+    border: none;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .wizard-btn-back {
+    background: #fff;
+    border: 2px solid #e5e7eb;
+    color: #64748b;
+  }
+
+  .wizard-btn-back:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+
+  .wizard-btn-next {
+    background: var(--primary);
+    color: #fff;
+  }
+
+  .wizard-btn-next:hover {
+    background: var(--primary-light);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(124, 58, 237, 0.25);
+  }
+
+  .wizard-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Wizard Result */
+  .wizard-result {
+    display: none;
+    text-align: center;
+  }
+
+  .wizard-result.show {
+    display: block;
+    animation: fadeIn 0.5s ease;
+  }
+
+  .result-entity {
+    font-size: 48px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  .result-entity.llc { color: var(--llc-color); }
+  .result-entity.ccorp { color: var(--ccorp-color); }
+  .result-entity.scorp { color: var(--scorp-color); }
+
+  .result-subtitle {
+    font-size: 20px;
+    color: var(--muted);
+    margin-bottom: 30px;
+  }
+
+  .result-reasons {
+    background: #f8fafc;
+    border-radius: 16px;
+    padding: 32px;
+    text-align: left;
+    margin-top: 24px;
+  }
+
+  .result-reasons h4 {
+    margin: 0 0 16px;
+    font-size: 18px;
+    color: var(--primary);
+  }
+
+  .result-reasons ul {
+    margin: 0;
+    padding-left: 24px;
+  }
+
+  .result-reasons li {
+    margin-bottom: 12px;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .result-next-steps {
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    border-radius: 16px;
+    padding: 32px;
+    color: #fff;
+    margin-top: 24px;
+  }
+
+  .result-next-steps h4 {
+    margin: 0 0 16px;
+    color: #fff;
+  }
+
+  .result-next-steps p {
+    margin: 0 0 20px;
+    color: rgba(255,255,255,0.9);
+  }
+
+  .result-cta {
+    display: inline-flex;
+    background: #fff;
+    color: var(--primary);
+    padding: 14px 28px;
+    border-radius: 999px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  .result-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  }
+
+  .restart-btn {
+    margin-top: 20px;
+    background: transparent;
+    border: 2px solid var(--primary);
+    color: var(--primary);
+    padding: 12px 24px;
+    border-radius: 999px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .restart-btn:hover {
+    background: var(--primary);
+    color: #fff;
+  }
+
+  /* Intake Form */
+  .intake-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 20px;
+    padding: 32px;
+    margin-top: 24px;
+    box-shadow: 0 10px 30px rgba(15,23,42,0.08);
+  }
+
+  form {
+    display: grid;
+    gap: 20px;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+  }
+
+  label {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: #475569;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  input, select, textarea {
+    width: 100%;
+    border-radius: 12px;
+    border: 1px solid #cbd5e1;
+    padding: 12px 14px;
+    font-size: 15px;
+    font-family: inherit;
+    color: #1f2937;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+  }
+
+  textarea {
+    min-height: 140px;
+    resize: vertical;
+  }
+
+  button.submit-btn {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 16px 32px;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  button.submit-btn:hover {
+    background: var(--primary-light);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(124, 58, 237, 0.25);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .hero { padding: 28px 24px; }
+    .cta-row { flex-direction: column; }
+    .tab-bar { overflow-x: auto; flex-wrap: nowrap; }
+    .tab-btn { white-space: nowrap; }
+    .stats-grid { grid-template-columns: 1fr; }
+    .card-grid { grid-template-columns: 1fr; }
+    .wizard-container { padding: 24px; }
+    .wizard-progress { padding: 0; }
+    .progress-dot::after { width: 40px; }
+  }
+</style>
+</head>
+<body>
+<div class="entity-guide">
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">Entity Selection Guide</div>
+      <h1>LLC vs C-Corp vs S-Corp: Choose the Right Business Entity</h1>
+      <p class="hero-intro">Choosing between an LLC, C-Corporation, and S-Corporation is one of the most important early decisions for your business. Each has radically different tax treatment, ownership restrictions, investor compatibility, and complexity. I'll walk you through the detailed comparison, show you when to convert from one to another, and provide an interactive decision wizard to help you choose the optimal structure based on your specific situation.</p>
+      <div class="cta-row">
+        <a class="btn-primary" href="https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting" target="_blank" rel="noopener">Book Strategy Call</a>
+        <a class="btn-secondary" href="mailto:owner@terms.law">Email owner@terms.law</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Grid -->
+  <div class="stats-grid">
+    <div class="stat">
+      <h3>LLC</h3>
+      <p>Most popular for small businesses & real estate (flexibility + simplicity)</p>
+    </div>
+    <div class="stat">
+      <h3>C-Corp</h3>
+      <p>Required for VC funding & IPO; 98% of funded startups</p>
+    </div>
+    <div class="stat">
+      <h3>S-Corp</h3>
+      <p>Best for profitable service businesses ($60K+ net income)</p>
+    </div>
+    <div class="stat">
+      <h3>QSBS</h3>
+      <p>C-Corps eligible for $10M+ tax-free gains (Section 1202)</p>
+    </div>
+  </div>
+
+  <!-- Tab Navigation -->
+  <nav class="tab-bar">
+    <button class="tab-btn active" data-tab="overview">Overview</button>
+    <button class="tab-btn" data-tab="comparison">Detailed Comparison</button>
+    <button class="tab-btn" data-tab="taxation">Taxation Deep Dive</button>
+    <button class="tab-btn" data-tab="ownership">Ownership & Investors</button>
+    <button class="tab-btn" data-tab="conversion">Conversion Paths</button>
+    <button class="tab-btn" data-tab="use-cases">Use Cases</button>
+    <button class="tab-btn" data-tab="wizard">Decision Wizard</button>
+    <button class="tab-btn" data-tab="get-started">Get Started</button>
+  </nav>
+
+  <!-- Tab 1: Overview -->
+  <section class="tab-panel active" id="overview">
+    <h2>Entity Type Overview</h2>
+
+    <div class="card-grid">
+      <div class="card llc-card">
+        <span class="entity-badge llc">LLC</span>
+        <h4>Limited Liability Company</h4>
+        <p><strong>Best for:</strong> Small businesses, real estate, freelancers, partnerships</p>
+        <p style="margin-top: 12px;"><strong>Key features:</strong></p>
+        <ul>
+          <li>Pass-through taxation (profits taxed once on your personal return)</li>
+          <li>Flexible ownership & profit distribution</li>
+          <li>No ownership restrictions (unlimited members, any type)</li>
+          <li>Simple compliance (minimal formalities)</li>
+          <li>NOT ideal for VC funding or stock options</li>
+        </ul>
+        <p style="margin-top: 16px; font-size: 14px;"><strong>Tax:</strong> Pass-through (1040 Schedule C/E or 1065 + K-1s)<br><strong>Complexity:</strong> Low</p>
+      </div>
+
+      <div class="card ccorp-card">
+        <span class="entity-badge ccorp">C-Corp</span>
+        <h4>C-Corporation</h4>
+        <p><strong>Best for:</strong> VC-backed startups, companies seeking IPO, high-growth tech</p>
+        <p style="margin-top: 12px;"><strong>Key features:</strong></p>
+        <ul>
+          <li>Double taxation (corporate + personal), but deferred until exit</li>
+          <li>Unlimited shareholders of any type (VCs, institutions, foreign)</li>
+          <li>Stock options (ISOs, NSOs) available for employees</li>
+          <li>QSBS eligible ($10M tax-free gain after 5 years)</li>
+          <li>Required for institutional investors & IPO</li>
+        </ul>
+        <p style="margin-top: 16px; font-size: 14px;"><strong>Tax:</strong> Corporate (Form 1120) + personal (dividends/capital gains)<br><strong>Complexity:</strong> High</p>
+      </div>
+
+      <div class="card scorp-card">
+        <span class="entity-badge scorp">S-Corp</span>
+        <h4>S-Corporation</h4>
+        <p><strong>Best for:</strong> Profitable service businesses, consultants, agencies ($60K+ net income)</p>
+        <p style="margin-top: 12px;"><strong>Key features:</strong></p>
+        <ul>
+          <li>Pass-through taxation + self-employment tax savings</li>
+          <li>Limited to 100 U.S. citizen/resident shareholders</li>
+          <li>One class of stock (no preferred stock for investors)</li>
+          <li>NOT compatible with VC funding</li>
+          <li>Reduces self-employment tax vs LLC</li>
+        </ul>
+        <p style="margin-top: 16px; font-size: 14px;"><strong>Tax:</strong> Pass-through (Form 1120-S + K-1s), payroll required<br><strong>Complexity:</strong> Moderate</p>
+      </div>
+    </div>
+
+    <h3>Quick Decision Framework</h3>
+
+    <div class="info-box">
+      <strong>Choose based on your primary goal:</strong>
+      <ul style="margin-top: 12px;">
+        <li><strong>Simplicity & flexibility?</strong> → LLC</li>
+        <li><strong>Raising VC funding or planning IPO?</strong> → C-Corp (Delaware)</li>
+        <li><strong>Profitable service business, want to save on self-employment tax?</strong> → S-Corp (or LLC electing S-Corp)</li>
+        <li><strong>Real estate investing?</strong> → LLC (Wyoming or Delaware)</li>
+        <li><strong>Bootstrapped product startup, might raise later?</strong> → Start as LLC, convert to C-Corp when fundraising</li>
+      </ul>
+    </div>
+
+    <h3>Most Common Mistake: Choosing Wrong Entity Too Early</h3>
+
+    <div class="warning-box">
+      <strong>Don't form a C-Corp prematurely:</strong>
+      <p>Many founders incorporate as a Delaware C-Corp on day one because "that's what startups do." But if you're not raising VC money immediately, you're paying for unnecessary complexity (corporate formalities, double taxation if you take profits) with no benefit. Start as an LLC; convert to C-Corp 6-12 months before your first institutional funding round. Timing matters for QSBS (5-year clock starts at issuance).</p>
+    </div>
+  </section>
+
+  <!-- Tab 2: Detailed Comparison -->
+  <section class="tab-panel" id="comparison">
+    <h2>Comprehensive Entity Comparison Table</h2>
+
+    <table class="compare">
+      <thead>
+        <tr>
+          <th class="feature-name">Feature</th>
+          <th>LLC</th>
+          <th>C-Corporation</th>
+          <th>S-Corporation</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="feature-name">Taxation</td>
+          <td>Pass-through (default). Taxed once on member's 1040 (Schedule C/E or K-1)</td>
+          <td>Double taxation: corporate (21%) + personal (15-20% capital gains or 37% dividends)</td>
+          <td>Pass-through. Taxed once on shareholder's 1040 (K-1), but must pay reasonable salary (payroll tax)</td>
+        </tr>
+        <tr>
+          <td class="feature-name">Self-Employment Tax</td>
+          <td>All profits subject to 15.3% SE tax (unless electing S-Corp)</td>
+          <td>N/A (corporate entity). Shareholders pay payroll tax only on W-2 salary</td>
+          <td>Only W-2 salary subject to payroll tax; distributions are not (tax savings)</td>
+        </tr>
+        <tr>
+          <td class="feature-name">Ownership Restrictions</td>
+          <td>None. Unlimited members of any type (individuals, entities, foreigners)</td>
+          <td>None. Unlimited shareholders of any type (VCs, institutions, foreign investors)</td>
+          <td>Max 100 shareholders; must be U.S. citizens/residents; no entity shareholders (except certain trusts)</td>
+        </tr>
+        <tr>
+          <td class="feature-name">Stock Classes</td>
+          <td>Flexible "membership interests"; can allocate profits/losses however you want</td>
+          <td>Multiple classes allowed (common, preferred). Essential for VC funding (liquidation preferences, anti-dilution)</td>
+          <td>One class of stock only. No preferred stock allowed</td>
+        </tr>
+        <tr>
+          <td class="feature-name">VC / Investor Compatibility</td>
+          <td>❌ VCs will not invest in LLCs (tax/structural issues)</td>
+          <td>✅ Required for VC funding. 98% of funded startups are DE C-Corps</td>
+          <td>❌ VCs will not invest (one-class restriction, 100-shareholder limit)</td>
+        </tr>
+        <tr>
+          <td class="feature-name">Stock Options (ISOs/NSOs)</td>
+          <td>❌ Cannot issue stock options (profits interests instead, but less favorable)</td>
+          <td>✅ Full ISO and NSO support; standard for employee equity</td>
+          <td>✅ Can issue stock options, but limited appeal due to one-class restriction</td>
+        </tr>
+        <tr>
+          <td class="feature-name">QSBS Eligibility (Section 1202)</td>
+          <td>❌ Not eligible</td>
+          <td>✅ Eligible. $10M+ capital gains tax-free if held 5+ years</td>
+          <td>❌ Not eligible</td>
+        </tr>
+        <tr>
+          <td class="feature-name">Profit Distribution Rules</td>
+          <td>Flexible. Can distribute disproportionately (e.g., sweat equity partner gets 50% profits but owns 10%)</td>
+          <td>Must distribute dividends pro-rata by share ownership</td>
+          <td>Must distribute pro-rata (one class of stock)</td>
+        </tr>
+        <tr>
+          <td class="feature-name">Formalities / Compliance</td>
+          <td>Minimal. Operating agreement, annual reports. No board meetings required (though recommended)</td>
+          <td>Heavy. Board meetings, stockholder meetings, minutes, 83(b) elections, 409A valuations, Delaware franchise tax</td>
+          <td>Moderate. Board meetings, payroll (W-2 for owner), reasonable compensation analysis, annual S-Corp election maintenance</td>
+        </tr>
+        <tr>
+          <td class="feature-name">Perpetual Existence</td>
+          <td>Can be structured for perpetual existence or dissolution triggers (member death, etc.)</td>
+          <td>Perpetual existence by default (unless dissolved)</td>
+          <td>Perpetual existence (but S-Corp election can be lost if rules violated)</td>
+        </tr>
+        <tr>
+          <td class="feature-name">Transferability of Ownership</td>
+          <td>Restricted by operating agreement (typically requires member consent)</td>
+          <td>Freely transferable (unless restricted by bylaws/shareholder agreement)</td>
+          <td>Restricted (must maintain S-Corp eligibility; can't transfer to ineligible shareholders)</td>
+        </tr>
+        <tr>
+          <td class="feature-name">Best State to Form</td>
+          <td>Wyoming (asset protection, low cost) or Delaware (if VC-track)</td>
+          <td>Delaware (Court of Chancery, VC standard, well-developed law)</td>
+          <td>Any state (S-Corp is federal tax election, not state-level entity)</td>
+        </tr>
+        <tr>
+          <td class="feature-name">When to Choose</td>
+          <td>Small business, real estate, partnerships, freelancers, no VC plans</td>
+          <td>Seeking VC funding, planning IPO, issuing stock options, QSBS planning</td>
+          <td>Profitable service business ($60K+ net), want SE tax savings, no investor plans</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Summary: Which Entity When?</h3>
+
+    <div class="card-grid">
+      <div class="card llc-card">
+        <h4>Choose LLC If...</h4>
+        <ul>
+          <li>You want simplicity and flexibility</li>
+          <li>You're a solopreneur, consultant, or small partnership</li>
+          <li>You're investing in real estate</li>
+          <li>You don't plan to raise institutional funding</li>
+          <li>You want to avoid double taxation</li>
+          <li>You want flexible profit distribution (sweat equity arrangements)</li>
+        </ul>
+      </div>
+
+      <div class="card ccorp-card">
+        <h4>Choose C-Corp If...</h4>
+        <ul>
+          <li>You plan to raise venture capital or seek institutional investors</li>
+          <li>You're building a high-growth tech/software startup</li>
+          <li>You want to issue stock options to employees (ISOs)</li>
+          <li>You're planning an IPO in 5-10 years</li>
+          <li>You want QSBS tax benefits ($10M+ gain exclusion)</li>
+          <li>You need multiple classes of stock (preferred for investors)</li>
+        </ul>
+      </div>
+
+      <div class="card scorp-card">
+        <h4>Choose S-Corp If...</h4>
+        <ul>
+          <li>You have a profitable service business (consulting, agency, SaaS)</li>
+          <li>Net income is $60K+ (SE tax savings justify payroll complexity)</li>
+          <li>You don't need outside investors</li>
+          <li>All shareholders are U.S. citizens/residents (max 100)</li>
+          <li>You want pass-through taxation + payroll tax savings</li>
+          <li>You're bootstrapping and retaining 100% control</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tab 3: Taxation -->
+  <section class="tab-panel" id="taxation">
+    <h2>Taxation Deep Dive: How Each Entity is Taxed</h2>
+
+    <h3>LLC Taxation (Pass-Through)</h3>
+
+    <div class="card llc-card">
+      <h4>Single-Member LLC (SMLLC)</h4>
+      <p><strong>Tax status:</strong> Disregarded entity (default). You report LLC income/expenses directly on your personal 1040 using Schedule C (business) or Schedule E (rental real estate).</p>
+      <p style="margin-top: 12px;"><strong>Example:</strong> Your SMLLC earns $100K net profit. You report the full $100K on Schedule C of your 1040. You owe:</p>
+      <ul>
+        <li>Income tax: ~$25K (assuming 25% effective rate)</li>
+        <li>Self-employment tax: $15,300 (15.3% of $100K)</li>
+        <li><strong>Total tax: ~$40,300 (40.3%)</strong></li>
+      </ul>
+      <p style="margin-top: 12px;">No separate LLC tax return. The LLC is "invisible" for tax purposes.</p>
+    </div>
+
+    <div class="card llc-card">
+      <h4>Multi-Member LLC (MMLLC)</h4>
+      <p><strong>Tax status:</strong> Partnership (default). The LLC files Form 1065 (partnership return) and issues Schedule K-1 to each member showing their share of profit/loss. Members report K-1 income on their personal 1040.</p>
+      <p style="margin-top: 12px;"><strong>Example:</strong> MMLLC earns $200K. Two members: 60% / 40% split. LLC files Form 1065 showing $200K profit. Member A receives K-1 showing $120K; Member B receives K-1 showing $80K. Each reports their K-1 income on 1040 and owes income tax + SE tax on their share.</p>
+      <p style="margin-top: 12px;"><strong>Benefit:</strong> Can allocate profits/losses disproportionately (e.g., sweat equity partner gets 50% profits but only 10% ownership).</p>
+    </div>
+
+    <h3>C-Corp Taxation (Double Taxation)</h3>
+
+    <div class="card ccorp-card">
+      <h4>How C-Corp Double Taxation Works</h4>
+      <p><strong>Layer 1 (Corporate):</strong> The C-Corp pays 21% federal corporate income tax on profits (Form 1120).</p>
+      <p><strong>Layer 2 (Personal):</strong> When the corporation distributes dividends to shareholders, they pay 15-20% capital gains tax (or up to 37% on ordinary dividends).</p>
+      <p style="margin-top: 16px;"><strong>Example:</strong> C-Corp earns $100K profit.</p>
+      <ul>
+        <li>Corporate tax (21%): $21,000</li>
+        <li>After-tax profit: $79,000</li>
+        <li>If distributed as dividend to shareholder taxed at 20%: $15,800</li>
+        <li>Shareholder receives: $63,200</li>
+        <li><strong>Total effective tax: 36.8% ($21K + $15.8K)</strong></li>
+      </ul>
+    </div>
+
+    <div class="success-box">
+      <strong>Why C-Corps work for startups despite double taxation:</strong>
+      <p>Early-stage startups rarely distribute profits. Instead, they reinvest everything into growth (hiring, R&D, marketing). No distributions = no second layer of tax. The double taxation only hits upon exit (acquisition or IPO), and by then, QSBS or capital gains treatment makes it favorable. Plus, VCs require C-Corp structure, so it's non-negotiable.</p>
+    </div>
+
+    <h3>S-Corp Taxation (Pass-Through + Payroll)</h3>
+
+    <div class="card scorp-card">
+      <h4>How S-Corp Saves Self-Employment Tax</h4>
+      <p><strong>Mechanic:</strong> S-Corp is pass-through (like LLC), but you're required to pay yourself a "reasonable salary" as a W-2 employee. Only the salary is subject to payroll tax (15.3%). Remaining profit is distributed as a dividend (not subject to SE tax).</p>
+      <p style="margin-top: 16px;"><strong>Example:</strong> S-Corp earns $100K profit. You pay yourself $60K salary (W-2). Remaining $40K distributed as S-Corp dividend.</p>
+      <ul>
+        <li>Payroll tax on $60K salary: $9,180 (15.3%)</li>
+        <li>Income tax on $100K total: ~$25,000</li>
+        <li>Payroll tax on $40K distribution: $0 (dividends not subject to SE tax)</li>
+        <li><strong>Total tax: $34,180</strong></li>
+      </ul>
+      <p style="margin-top: 12px;"><strong>Compare to LLC:</strong> If this were an LLC, the full $100K would be subject to SE tax ($15,300 vs $9,180). <strong>Savings: $6,120/year</strong>.</p>
+    </div>
+
+    <div class="warning-box">
+      <strong>IRS "reasonable compensation" requirement:</strong>
+      <p>You cannot pay yourself $20K salary and take $80K in distributions to avoid payroll tax. The IRS requires "reasonable compensation" for services performed. Rule of thumb: salary should be 50-70% of profit for owner-operators. If audited, IRS can reclassify distributions as wages and assess back payroll taxes + penalties.</p>
+    </div>
+
+    <h3>When S-Corp Election Makes Sense</h3>
+
+    <div class="info-box">
+      <strong>Breakeven analysis:</strong>
+      <p>S-Corp saves ~15.3% SE tax on the portion of profit taken as distributions (vs salary). But S-Corp adds costs:</p>
+      <ul style="margin-top: 10px;">
+        <li>Payroll processing: $500-1,500/year</li>
+        <li>Additional accounting/bookkeeping: $500-1,000/year</li>
+        <li>Extra compliance (quarterly payroll filings, annual W-2s): time/cost</li>
+      </ul>
+      <p style="margin-top: 12px;"><strong>General rule:</strong> S-Corp election is worth it if your net business income exceeds $60K-80K/year. Below that, the tax savings don't justify the added complexity and cost.</p>
+    </div>
+
+    <h3>Can You Elect S-Corp on an LLC?</h3>
+
+    <div class="success-box">
+      <strong>Yes! LLC electing S-Corp taxation (best of both worlds):</strong>
+      <p>You can form an LLC (for flexibility and asset protection) and elect S-Corp taxation (for SE tax savings). This is called "check-the-box" election (Form 2553). You get:</p>
+      <ul style="margin-top: 10px;">
+        <li>LLC legal structure (charging order protection, flexible operating agreement)</li>
+        <li>S-Corp tax treatment (pass-through + payroll tax savings)</li>
+        <li>No need to incorporate as a statutory S-Corp</li>
+      </ul>
+      <p style="margin-top: 12px;"><strong>I recommend this for most profitable service businesses:</strong> Form a Wyoming or Delaware LLC, elect S-Corp tax status when profit exceeds $60K.</p>
+    </div>
+  </section>
+
+  <!-- Tab 4: Ownership & Investors -->
+  <section class="tab-panel" id="ownership">
+    <h2>Ownership Restrictions & Investor Compatibility</h2>
+
+    <h3>Why VCs Won't Invest in LLCs or S-Corps</h3>
+
+    <div class="warning-box">
+      <strong>Venture capital firms require Delaware C-Corps. Here's why:</strong>
+      <ul style="margin-top: 12px;">
+        <li><strong>LLCs:</strong> Pass-through taxation creates K-1 tax liability for VC fund (they owe tax on your profits even if no distributions). VCs are often tax-exempt entities (pension funds, endowments) and cannot receive K-1s. Also, LLCs don't support preferred stock or liquidation preferences.</li>
+        <li><strong>S-Corps:</strong> VCs are typically entities (funds, LPs), not individuals, so they cannot be S-Corp shareholders (violates eligibility). Also, one-class-of-stock rule prevents preferred stock structures VCs require.</li>
+      </ul>
+      <p style="margin-top: 12px;"><strong>Bottom line:</strong> If you want institutional funding, you must be a C-Corp. 98% of VC-backed companies are Delaware C-Corps.</p>
+    </div>
+
+    <h3>Ownership Comparison Table</h3>
+
+    <table class="compare">
+      <tr>
+        <th>Question</th>
+        <th>LLC</th>
+        <th>C-Corp</th>
+        <th>S-Corp</th>
+      </tr>
+      <tr>
+        <td class="feature-name">Max # of Owners</td>
+        <td>Unlimited</td>
+        <td>Unlimited</td>
+        <td>100 shareholders max</td>
+      </tr>
+      <tr>
+        <td class="feature-name">Foreign Owners Allowed?</td>
+        <td>✅ Yes</td>
+        <td>✅ Yes</td>
+        <td>❌ No (only U.S. citizens/residents)</td>
+      </tr>
+      <tr>
+        <td class="feature-name">Entity Owners Allowed?</td>
+        <td>✅ Yes (LLCs, corps, trusts)</td>
+        <td>✅ Yes</td>
+        <td>❌ No (only individuals + certain trusts)</td>
+      </tr>
+      <tr>
+        <td class="feature-name">VC Funds Can Invest?</td>
+        <td>❌ No</td>
+        <td>✅ Yes</td>
+        <td>❌ No</td>
+      </tr>
+      <tr>
+        <td class="feature-name">Can Issue Preferred Stock?</td>
+        <td>❌ No (membership interests only)</td>
+        <td>✅ Yes (multiple classes)</td>
+        <td>❌ No (one class only)</td>
+      </tr>
+      <tr>
+        <td class="feature-name">Stock Options (ISOs/NSOs)?</td>
+        <td>❌ No (profits interests instead)</td>
+        <td>✅ Yes (full ISO/NSO support)</td>
+        <td>✅ Yes (but limited utility)</td>
+      </tr>
+    </table>
+
+    <h3>Stock Options & Equity Compensation</h3>
+
+    <div class="card-grid">
+      <div class="card llc-card">
+        <h4>LLCs: Profits Interests</h4>
+        <p>LLCs cannot issue stock options. Instead, you grant "profits interests" (a future profit share that vests over time). These are less favorable than stock options:</p>
+        <ul>
+          <li>No ISO treatment (always taxed as ordinary income)</li>
+          <li>Complex valuation and vesting mechanics</li>
+          <li>Not well-understood by employees (vs stock options)</li>
+        </ul>
+        <p style="margin-top: 12px;"><strong>Bottom line:</strong> If you need to grant equity to employees, C-Corp or S-Corp is better.</p>
+      </div>
+
+      <div class="card ccorp-card">
+        <h4>C-Corps: Full ISO/NSO Support</h4>
+        <p>C-Corps can issue:</p>
+        <ul>
+          <li><strong>ISOs (Incentive Stock Options):</strong> Favorable tax treatment if holding periods met (long-term capital gains on exercise + sale). Employees love these.</li>
+          <li><strong>NSOs (Non-Qualified Stock Options):</strong> More flexible; ordinary income on exercise spread.</li>
+          <li><strong>Restricted Stock / RSUs:</strong> Grant actual shares that vest over time.</li>
+        </ul>
+        <p style="margin-top: 12px;"><strong>Why this matters:</strong> Top talent expects stock options. C-Corp structure allows you to compete for employees with equity-based comp.</p>
+      </div>
+
+      <div class="card scorp-card">
+        <h4>S-Corps: Limited Stock Options</h4>
+        <p>S-Corps can issue stock options, but they're less attractive:</p>
+        <ul>
+          <li>One class of stock limits flexibility</li>
+          <li>Option holders must be eligible S-Corp shareholders (U.S. citizens/residents)</li>
+          <li>Cannot grant options to entities or foreign employees</li>
+        </ul>
+        <p style="margin-top: 12px;"><strong>Practical impact:</strong> S-Corps work for small, U.S.-based teams but don't scale well for equity comp.</p>
+      </div>
+    </div>
+
+    <h3>QSBS: The $10 Million Tax-Free Gain (C-Corps Only)</h3>
+
+    <div class="success-box">
+      <strong>Qualified Small Business Stock (Section 1202):</strong>
+      <p>If you hold C-Corp stock for 5+ years, you can exclude up to $10 million in capital gains from federal tax (or 10x your basis, whichever is greater). This is a massive benefit for founders.</p>
+      <p style="margin-top: 12px;"><strong>Requirements:</strong></p>
+      <ul style="margin-top: 8px;">
+        <li>Must be a C-Corporation (not LLC or S-Corp)</li>
+        <li>Gross assets ≤ $50M at time of stock issuance</li>
+        <li>Must be an "active business" (not passive investment or real estate)</li>
+        <li>Original issuance (not secondary purchase)</li>
+        <li>Hold for 5 years minimum</li>
+      </ul>
+      <p style="margin-top: 12px;"><strong>Example:</strong> You found a C-Corp, own 100% at formation (stock basis: $0). After 7 years, you sell for $15M. With QSBS:</p>
+      <ul style="margin-top: 8px;">
+        <li>Excluded from tax: $10M</li>
+        <li>Taxable gain: $5M (at 20% capital gains = $1M tax)</li>
+        <li><strong>Without QSBS:</strong> $15M × 20% = $3M tax</li>
+        <li><strong>QSBS saves you $2M in taxes</strong></li>
+      </ul>
+      <p style="margin-top: 12px;"><strong>This is why founders form C-Corps early:</strong> The 5-year clock starts at stock issuance. If you wait until year 3 to convert from LLC to C-Corp, your QSBS clock doesn't start until year 3—you won't hit 5 years by typical exit timelines.</p>
+    </div>
+  </section>
+
+  <!-- Tab 5: Conversion Paths -->
+  <section class="tab-panel" id="conversion">
+    <h2>Conversion Paths Between Entity Types</h2>
+
+    <p>Many businesses start as one entity type and convert to another as they grow. Understanding the mechanics, timing, and tax implications is critical.</p>
+
+    <h3>LLC → C-Corp (Most Common for Funded Startups)</h3>
+
+    <div class="card ccorp-card">
+      <h4>When to Convert</h4>
+      <p><strong>Ideal timing:</strong> 6-12 months before your first institutional funding round. This gives you:</p>
+      <ul>
+        <li>Time to clean up cap table and issue founder stock</li>
+        <li>Runway to start the QSBS 5-year clock</li>
+        <li>Time to implement 83(b) elections for vesting stock</li>
+        <li>Compliance infrastructure in place (board, minutes, stock ledger)</li>
+      </ul>
+      <p style="margin-top: 12px;"><strong>Don't wait until:</strong> The week before your seed round closes. You'll be rushed, make mistakes, and potentially lose QSBS benefits.</p>
+    </div>
+
+    <div class="card ccorp-card">
+      <h4>How to Convert: Section 351 Exchange</h4>
+      <p><strong>Tax-free conversion under IRC Section 351:</strong> LLC members transfer their membership interests to a newly formed C-Corp in exchange for stock. If done correctly, this is tax-free.</p>
+      <p style="margin-top: 12px;"><strong>Steps:</strong></p>
+      <ol>
+        <li>Form a new Delaware C-Corporation</li>
+        <li>LLC members contribute their LLC interests to the C-Corp in exchange for C-Corp stock (proportional ownership)</li>
+        <li>C-Corp now owns 100% of the LLC (the LLC becomes a subsidiary)</li>
+        <li>Optionally: merge the LLC into the C-Corp and dissolve the LLC (clean cap table)</li>
+        <li>File Section 351 election with IRS (tax-free exchange)</li>
+      </ol>
+      <p style="margin-top: 12px;"><strong>Timing:</strong> Must be done <em>before</em> raising from VCs. VCs will not invest into an LLC.</p>
+    </div>
+
+    <div class="warning-box">
+      <strong>QSBS trap: Don't wait too long to convert:</strong>
+      <p>The 5-year QSBS holding period starts when stock is <em>issued</em>. If you form your LLC today and convert to C-Corp in year 3, your QSBS clock starts at year 3. If you exit in year 6 (total), you've only held C-Corp stock for 3 years—no QSBS. <strong>Solution:</strong> Form C-Corp early (even if pre-revenue) if you have serious exit potential, or convert within first 12-18 months.</p>
+    </div>
+
+    <h3>LLC → S-Corp (Tax Election for SE Tax Savings)</h3>
+
+    <div class="card scorp-card">
+      <h4>When to Elect S-Corp Status</h4>
+      <p><strong>Ideal candidate:</strong> Profitable service business (consulting, agency, SaaS) earning $60K+ net income annually.</p>
+      <p style="margin-top: 12px;"><strong>How it works:</strong> You keep your LLC legal structure but elect to be taxed as an S-Corp (Form 2553 with IRS). This is "check-the-box" taxation—you don't form a new entity.</p>
+      <p style="margin-top: 12px;"><strong>Benefits:</strong></p>
+      <ul>
+        <li>Retain LLC asset protection and operating agreement flexibility</li>
+        <li>Save self-employment tax on distributions (vs salary)</li>
+        <li>No need to re-form or transfer assets</li>
+      </ul>
+    </div>
+
+    <div class="info-box">
+      <strong>Deadline to elect S-Corp status:</strong>
+      <p>Form 2553 must be filed by <strong>March 15</strong> (for calendar-year businesses) or within 2 months and 15 days of forming the LLC to be effective for the current tax year. <strong>Miss the deadline?</strong> Election applies to the <em>following</em> year. I see this mistake constantly—file early to avoid losing a full year of tax savings.</p>
+    </div>
+
+    <h3>S-Corp → C-Corp (Pre-Funding Conversion)</h3>
+
+    <div class="card ccorp-card">
+      <h4>When S-Corp Founders Seek VC Funding</h4>
+      <p>If you formed as an S-Corp (or LLC electing S-Corp) and later want to raise VC money, you must convert to C-Corp.</p>
+      <p style="margin-top: 12px;"><strong>How to convert:</strong></p>
+      <ol>
+        <li>Revoke S-Corp election (Form 2553 revocation or let it lapse)</li>
+        <li>S-Corp automatically becomes C-Corp for tax purposes</li>
+        <li>Reincorporate in Delaware if originally formed in another state (most VCs require Delaware)</li>
+        <li>Transfer assets/shareholders to new DE C-Corp</li>
+      </ol>
+      <p style="margin-top: 12px;"><strong>Tax consequence:</strong> May trigger built-in gains tax if S-Corp has appreciated assets. Consult CPA before converting.</p>
+    </div>
+
+    <h3>C-Corp → LLC or S-Corp (Rare, Usually Bad Idea)</h3>
+
+    <div class="danger-box">
+      <strong>Converting from C-Corp to LLC/S-Corp is usually a mistake:</strong>
+      <p>This is treated as a <strong>liquidation</strong> of the C-Corp—triggering immediate tax on all appreciated assets at the corporate level, plus personal tax on distributions. Extremely expensive.</p>
+      <p style="margin-top: 10px;"><strong>Example:</strong> C-Corp has $1M in appreciated assets (basis: $100K). You liquidate to convert to LLC. Corp owes tax on $900K gain (~$189K). Shareholders then owe tax on distribution (~$180K). <strong>Total tax: ~$369K just to change entity type.</strong></p>
+      <p style="margin-top: 10px;"><strong>When it might make sense:</strong> Very early stage (pre-revenue, no assets), and you realize you don't need C-Corp structure. But even then, usually better to just keep the C-Corp dormant and start fresh with an LLC for a different venture.</p>
+    </div>
+
+    <h3>Conversion Decision Flowchart</h3>
+
+    <div class="info-box">
+      <strong>When to convert (summary):</strong>
+      <ul style="margin-top: 12px;">
+        <li><strong>LLC → C-Corp:</strong> 6-12 months before seeking VC funding; ASAP if you want QSBS benefits</li>
+        <li><strong>LLC → S-Corp election:</strong> When net income exceeds $60K and you want SE tax savings</li>
+        <li><strong>S-Corp → C-Corp:</strong> Immediately upon deciding to raise VC money</li>
+        <li><strong>C-Corp → anything else:</strong> Almost never (too expensive)</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Tab 6: Use Cases -->
+  <section class="tab-panel" id="use-cases">
+    <h2>Entity Selection by Business Type & Stage</h2>
+
+    <h3>Use Case 1: Solo Consultant / Freelancer</h3>
+
+    <div class="card-grid">
+      <div class="card llc-card">
+        <h4>✅ Best Choice: LLC (Wyoming or Delaware)</h4>
+        <p><strong>Why:</strong></p>
+        <ul>
+          <li>Simple setup and maintenance</li>
+          <li>Liability protection for client work</li>
+          <li>Pass-through taxation (no double tax)</li>
+          <li>Flexible profit distribution (if you bring on partners later)</li>
+        </ul>
+        <p style="margin-top: 12px;"><strong>Tax optimization:</strong> If net income exceeds $60K, elect S-Corp status to save self-employment tax.</p>
+        <p style="margin-top: 12px;"><strong>I form:</strong> Wyoming LLC ($100 filing + $60/year) for lowest cost and strong asset protection.</p>
+      </div>
+    </div>
+
+    <h3>Use Case 2: Two Co-Founders, Bootstrapped SaaS Product</h3>
+
+    <div class="card-grid">
+      <div class="card llc-card">
+        <h4>Option A: Start with LLC</h4>
+        <p><strong>Pros:</strong></p>
+        <ul>
+          <li>Simple and cheap while you validate product-market fit</li>
+          <li>Flexible profit split (50/50 ownership, but maybe 60/40 profit if one founder does more early work)</li>
+          <li>Easy to grant profits interests to early employees</li>
+        </ul>
+        <p style="margin-top: 12px;"><strong>Cons:</strong></p>
+        <ul>
+          <li>If you later want VC funding, must convert to C-Corp (adds complexity)</li>
+          <li>No QSBS unless converted early</li>
+        </ul>
+      </div>
+
+      <div class="card ccorp-card">
+        <h4>Option B: Form Delaware C-Corp Immediately</h4>
+        <p><strong>Pros:</strong></p>
+        <ul>
+          <li>VC-ready from day one (if you raise, no conversion needed)</li>
+          <li>QSBS 5-year clock starts immediately</li>
+          <li>Can issue stock options to early employees</li>
+          <li>Demonstrates seriousness to potential investors/partners</li>
+        </ul>
+        <p style="margin-top: 12px;"><strong>Cons:</strong></p>
+        <ul>
+          <li>Higher compliance cost ($300/year DE franchise tax + corp formalities)</li>
+          <li>Double taxation if you take profits (though most startups don't distribute)</li>
+          <li>Overkill if you're not serious about raising VC</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <strong>My recommendation:</strong>
+      <p>If you're 80%+ sure you'll raise VC within 24 months, form Delaware C-Corp now. If you're unsure or bootstrapping, start with LLC and convert to C-Corp 6-12 months before fundraising. The conversion is straightforward if done early (before complex cap table).</p>
+    </div>
+
+    <h3>Use Case 3: Real Estate Investor (Rental Properties)</h3>
+
+    <div class="card-grid">
+      <div class="card llc-card">
+        <h4>✅ Best Choice: Wyoming LLC (Strongly Recommended)</h4>
+        <p><strong>Structure:</strong> One LLC per property (or series LLC with protected series for each property).</p>
+        <p><strong>Why LLC:</strong></p>
+        <ul>
+          <li>Charging order protection (personal creditors can't seize rental properties)</li>
+          <li>Liability isolation (tenant slip-and-fall on Property A doesn't reach Property B)</li>
+          <li>Pass-through taxation (rental income/losses on Schedule E, no corporate tax)</li>
+          <li>Flexible distributions (can reinvest or take cash as needed)</li>
+        </ul>
+        <p style="margin-top: 12px;"><strong>Why Wyoming:</strong> Strongest asset protection, no state income tax, lowest annual fees ($60/year + small asset fee).</p>
+        <p style="margin-top: 12px;"><strong>Do NOT use:</strong> C-Corp (double taxation) or S-Corp (passive income disqualifies S-Corp status).</p>
+      </div>
+    </div>
+
+    <h3>Use Case 4: VC-Backed Tech Startup (Seed/Series A)</h3>
+
+    <div class="card-grid">
+      <div class="card ccorp-card">
+        <h4>✅ Only Choice: Delaware C-Corporation</h4>
+        <p><strong>Why Delaware:</strong></p>
+        <ul>
+          <li>Court of Chancery (specialized business court, predictable case law)</li>
+          <li>VC standard (98% of funded startups; investors' lawyers know DE law)</li>
+          <li>Strong statutory protections for directors/officers</li>
+          <li>Easy to do stock option grants, preferred stock rounds, acquisitions</li>
+        </ul>
+        <p style="margin-top: 12px;"><strong>Why C-Corp (not LLC/S-Corp):</strong></p>
+        <ul>
+          <li>VCs require C-Corp (will not invest in LLC/S-Corp)</li>
+          <li>Need preferred stock for liquidation preferences and anti-dilution</li>
+          <li>Stock options (ISOs) essential for recruiting top talent</li>
+          <li>QSBS eligibility (founders can exclude $10M+ in gains)</li>
+        </ul>
+        <p style="margin-top: 12px;"><strong>Tax note:</strong> Early-stage C-Corps don't pay dividends (reinvest all profit), so double taxation is deferred until exit (acquisition/IPO).</p>
+      </div>
+    </div>
+
+    <h3>Use Case 5: Profitable Agency / Consulting Firm ($200K+ Revenue)</h3>
+
+    <div class="card-grid">
+      <div class="card scorp-card">
+        <h4>✅ Best Choice: LLC Electing S-Corp Taxation</h4>
+        <p><strong>Structure:</strong> Form Wyoming or Delaware LLC, elect S-Corp status (Form 2553).</p>
+        <p><strong>Why this combination:</strong></p>
+        <ul>
+          <li>LLC legal structure: charging order protection, flexible operating agreement</li>
+          <li>S-Corp taxation: save ~15.3% SE tax on distributions (vs salary)</li>
+          <li>Pass-through taxation: avoid double tax, profits taxed once</li>
+        </ul>
+        <p style="margin-top: 12px;"><strong>Example tax savings:</strong> $200K net income. Pay yourself $120K salary (W-2), take $80K distribution. Save ~$12,240/year in SE tax vs pure LLC.</p>
+        <p style="margin-top: 12px;"><strong>Cost:</strong> Payroll processing (~$1,000/year) + extra accounting (~$500/year). Net savings: ~$10,700/year.</p>
+        <p style="margin-top: 12px;"><strong>Do NOT use:</strong> C-Corp (double taxation unnecessary for service business with no investor plans).</p>
+      </div>
+    </div>
+
+    <h3>Use Case 6: Partnership (Two Equal Partners, Small Business)</h3>
+
+    <div class="card-grid">
+      <div class="card llc-card">
+        <h4>✅ Best Choice: Multi-Member LLC</h4>
+        <p><strong>Why:</strong></p>
+        <ul>
+          <li>Flexible profit/loss allocation (can adjust splits without changing ownership %)</li>
+          <li>Simple operating agreement covers all governance</li>
+          <li>Pass-through taxation (partnership return, K-1s to each partner)</li>
+          <li>Easy to add/remove members later</li>
+        </ul>
+        <p style="margin-top: 12px;"><strong>If profitable ($60K+ each):</strong> Elect S-Corp status to save SE tax.</p>
+        <p style="margin-top: 12px;"><strong>Key documents:</strong></p>
+        <ul>
+          <li>Operating agreement with buy-sell provisions (what happens if one partner wants out)</li>
+          <li>Vesting schedule (4-year vest, 1-year cliff recommended even for partners)</li>
+          <li>Sweat equity or capital contribution rules (who puts in $, who puts in time)</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Use Case 7: Side Hustle / E-Commerce Store (Pre-Revenue or Low Revenue)</h3>
+
+    <div class="card-grid">
+      <div class="card llc-card">
+        <h4>✅ Best Choice: LLC (or Sole Proprietorship if Minimal Risk)</h4>
+        <p><strong>LLC pros:</strong></p>
+        <ul>
+          <li>Liability protection (if product causes injury, your personal assets are shielded)</li>
+          <li>Professional appearance (customers/suppliers trust "ABC LLC" more than "John Smith DBA")</li>
+          <li>Easy to scale (add partners, elect S-Corp, convert to C-Corp later)</li>
+        </ul>
+        <p style="margin-top: 12px;"><strong>Sole proprietorship (no entity) pros:</strong></p>
+        <ul>
+          <li>$0 formation cost (just file Schedule C on 1040)</li>
+          <li>Simplest possible structure</li>
+        </ul>
+        <p style="margin-top: 12px;"><strong>When to form LLC:</strong> Once revenue exceeds $20K/year or liability risk is real (physical products, contracts, employees). Until then, sole proprietorship may be fine.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tab 7: Decision Wizard -->
+  <section class="tab-panel" id="wizard">
+    <h2>Interactive Entity Selection Wizard</h2>
+
+    <p style="margin-bottom: 30px;">Answer 6 questions and I'll recommend the optimal entity type for your specific situation.</p>
+
+    <div class="wizard-container">
+      <div class="wizard-header">
+        <h3>🧙‍♂️ Entity Selection Wizard</h3>
+        <p>Get a personalized recommendation in 2 minutes</p>
+      </div>
+
+      <div class="wizard-progress" id="wizard-progress">
+        <div class="progress-dot active">1</div>
+        <div class="progress-dot">2</div>
+        <div class="progress-dot">3</div>
+        <div class="progress-dot">4</div>
+        <div class="progress-dot">5</div>
+        <div class="progress-dot">6</div>
+      </div>
+
+      <!-- Step 1 -->
+      <div class="wizard-step active" id="step-1">
+        <div class="question-card">
+          <h4>What stage is your business?</h4>
+          <div class="option-grid">
+            <button class="option-btn" data-value="idea">💡 Idea stage (no revenue yet)</button>
+            <button class="option-btn" data-value="mvp">🛠️ MVP / early traction (< $50K revenue)</button>
+            <button class="option-btn" data-value="revenue">📈 Generating revenue ($50K–$500K/year)</button>
+            <button class="option-btn" data-value="growth">🚀 High growth (> $500K revenue or scaling fast)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="wizard-step" id="step-2">
+        <div class="question-card">
+          <h4>Do you plan to raise venture capital or seek institutional investors?</h4>
+          <div class="option-grid">
+            <button class="option-btn" data-value="vc-yes">✅ Yes, planning to raise VC within 12-24 months</button>
+            <button class="option-btn" data-value="vc-maybe">🤔 Maybe eventually, but bootstrapping first</button>
+            <button class="option-btn" data-value="vc-no">❌ No, planning to bootstrap / stay independent</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="wizard-step" id="step-3">
+        <div class="question-card">
+          <h4>How many founders/owners?</h4>
+          <div class="option-grid">
+            <button class="option-btn" data-value="solo">👤 Solo founder (just me)</button>
+            <button class="option-btn" data-value="two">👥 Two co-founders</button>
+            <button class="option-btn" data-value="multiple">👨‍👩‍👧‍👦 Three or more co-founders/partners</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="wizard-step" id="step-4">
+        <div class="question-card">
+          <h4>What type of business?</h4>
+          <div class="option-grid">
+            <button class="option-btn" data-value="tech">💻 Tech/software startup</button>
+            <button class="option-btn" data-value="service">🎯 Consulting / agency / professional services</button>
+            <button class="option-btn" data-value="realestate">🏠 Real estate investing</button>
+            <button class="option-btn" data-value="ecommerce">🛒 E-commerce / physical products</button>
+            <button class="option-btn" data-value="other">📊 Other</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="wizard-step" id="step-5">
+        <div class="question-card">
+          <h4>Will you need to grant equity/stock options to employees?</h4>
+          <div class="option-grid">
+            <button class="option-btn" data-value="equity-yes">✅ Yes, equity comp is important for recruiting</button>
+            <button class="option-btn" data-value="equity-maybe">🤔 Maybe in the future</button>
+            <button class="option-btn" data-value="equity-no">❌ No, just cash compensation</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 6 -->
+      <div class="wizard-step" id="step-6">
+        <div class="question-card">
+          <h4>What's your priority?</h4>
+          <div class="option-grid">
+            <button class="option-btn" data-value="priority-simple">🎯 Simplicity & low cost</button>
+            <button class="option-btn" data-value="priority-tax">💰 Tax optimization (minimize SE tax / maximize deductions)</button>
+            <button class="option-btn" data-value="priority-investor">🚀 Investor readiness & scalability</button>
+            <button class="option-btn" data-value="priority-protection">🛡️ Asset protection</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Result -->
+      <div class="wizard-result" id="wizard-result">
+        <div class="result-entity" id="result-entity"></div>
+        <div class="result-subtitle" id="result-subtitle"></div>
+
+        <div class="result-reasons">
+          <h4>Why this recommendation:</h4>
+          <ul id="result-reasons-list"></ul>
+        </div>
+
+        <div class="result-next-steps">
+          <h4>Next Steps</h4>
+          <p id="result-next-steps-text"></p>
+          <a href="https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting" target="_blank" rel="noopener" class="result-cta">Book Formation Consultation</a>
+        </div>
+
+        <button class="restart-btn" onclick="restartWizard()">Start Over</button>
+      </div>
+
+      <!-- Navigation -->
+      <div class="wizard-nav" id="wizard-nav">
+        <button class="wizard-btn wizard-btn-back" id="wizard-back" style="display: none;">← Back</button>
+        <button class="wizard-btn wizard-btn-next" id="wizard-next" disabled>Next →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tab 8: Get Started -->
+  <section class="tab-panel" id="get-started">
+    <h2>Get Started: Entity Formation Services</h2>
+
+    <p>I help clients choose and form the optimal entity structure for their business. Services include:</p>
+
+    <div class="card-grid">
+      <div class="card llc-card">
+        <h4>LLC Formation</h4>
+        <p><strong>$800–$1,200</strong> (complete setup)</p>
+        <ul>
+          <li>State selection (Wyoming vs Delaware)</li>
+          <li>Articles of Organization filing</li>
+          <li>Operating Agreement (single-member or multi-member)</li>
+          <li>EIN application</li>
+          <li>Member ledger & capital accounts</li>
+          <li>S-Corp election if beneficial (Form 2553)</li>
+        </ul>
+        <p style="margin-top: 12px;"><strong>Timeline:</strong> 1-2 weeks</p>
+      </div>
+
+      <div class="card ccorp-card">
+        <h4>C-Corporation Formation</h4>
+        <p><strong>$1,500–$2,500</strong> (Delaware C-Corp)</p>
+        <ul>
+          <li>Delaware incorporation (Certificate of Incorporation)</li>
+          <li>Bylaws, initial resolutions, organizational minutes</li>
+          <li>Founder stock issuance + 83(b) elections</li>
+          <li>Stock ledger & cap table setup</li>
+          <li>EIN, registered agent, Delaware franchise tax setup</li>
+          <li>Board/stockholder governance framework</li>
+        </ul>
+        <p style="margin-top: 12px;"><strong>Timeline:</strong> 2-3 weeks</p>
+      </div>
+
+      <div class="card scorp-card">
+        <h4>S-Corp Election</h4>
+        <p><strong>$400–$600</strong> (for existing LLC)</p>
+        <ul>
+          <li>Eligibility analysis (100 shareholders, U.S. only, etc.)</li>
+          <li>Form 2553 preparation & filing</li>
+          <li>Payroll setup guidance (reasonable compensation)</li>
+          <li>Operating agreement amendment (if needed)</li>
+        </ul>
+        <p style="margin-top: 12px;"><strong>Deadline:</strong> March 15 (or 2 mo. + 15 days from formation)</p>
+      </div>
+    </div>
+
+    <h3>Entity Conversion Services</h3>
+
+    <div class="card-grid">
+      <div class="card ccorp-card">
+        <h4>LLC → C-Corp Conversion</h4>
+        <p><strong>$1,500–$2,500</strong></p>
+        <ul>
+          <li>Form Delaware C-Corp</li>
+          <li>Section 351 tax-free exchange</li>
+          <li>Transfer LLC interests for C-Corp stock</li>
+          <li>83(b) elections for founder vesting</li>
+          <li>Clean up cap table</li>
+          <li>QSBS compliance (5-year clock)</li>
+        </ul>
+      </div>
+
+      <div class="card scorp-card">
+        <h4>SMLLC → MMLLC Conversion</h4>
+        <p><strong>$600–$1,000</strong></p>
+        <ul>
+          <li>Add spouse/family member as co-member</li>
+          <li>Amend operating agreement (partnership)</li>
+          <li>Set up capital accounts</li>
+          <li>Partnership tax election (Form 1065 filing)</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Contact for Entity Formation</h3>
+
+    <div class="intake-card">
+      <form action="https://formsubmit.co/owner@terms.law" method="POST">
+        <input type="hidden" name="_subject" value="Entity Formation Inquiry">
+        <input type="hidden" name="_template" value="table">
+        <input type="hidden" name="_next" value="https://terms.law/thank-you">
+
+        <div class="form-row">
+          <div>
+            <label for="name">Full Name *</label>
+            <input id="name" name="name" type="text" required placeholder="Your name">
+          </div>
+          <div>
+            <label for="email">Email Address *</label>
+            <input id="email" name="_replyto" type="email" required placeholder="you@example.com">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div>
+            <label for="phone">Phone Number</label>
+            <input id="phone" name="phone" type="tel" placeholder="Optional">
+          </div>
+          <div>
+            <label for="business-name">Business Name</label>
+            <input id="business-name" name="business_name" type="text" placeholder="Your business or working name">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div>
+            <label for="entity-type">Which entity type are you considering?</label>
+            <select id="entity-type" name="entity_type">
+              <option value="">Select...</option>
+              <option>LLC</option>
+              <option>C-Corporation</option>
+              <option>S-Corporation</option>
+              <option>Not sure / need help deciding</option>
+            </select>
+          </div>
+          <div>
+            <label for="business-stage">Business stage</label>
+            <select id="business-stage" name="business_stage">
+              <option value="">Select...</option>
+              <option>Idea stage (pre-revenue)</option>
+              <option>MVP / early traction</option>
+              <option>Generating revenue</option>
+              <option>Seeking funding</option>
+              <option>Already formed, want to convert</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div>
+            <label for="founders">Number of founders/owners</label>
+            <select id="founders" name="founders">
+              <option value="">Select...</option>
+              <option>1 (solo)</option>
+              <option>2</option>
+              <option>3+</option>
+            </select>
+          </div>
+          <div>
+            <label for="vc-plans">VC fundraising plans?</label>
+            <select id="vc-plans" name="vc_plans">
+              <option value="">Select...</option>
+              <option>Yes, planning to raise VC</option>
+              <option>Maybe eventually</option>
+              <option>No, bootstrapping</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label for="business-type">Business type & description *</label>
+          <textarea id="business-type" name="business_type" required placeholder="e.g., SaaS startup, consulting agency, real estate investing, e-commerce store..."></textarea>
+        </div>
+
+        <div>
+          <label for="message">Goals & questions *</label>
+          <textarea id="message" name="message" required placeholder="Tell me about your business goals, timeline, any specific concerns (tax optimization, investor readiness, asset protection, conversions, etc.)"></textarea>
+        </div>
+
+        <button type="submit" class="submit-btn">Send Inquiry</button>
+      </form>
+    </div>
+
+    <div style="margin-top: 40px; text-align: center;">
+      <p style="margin-bottom: 20px; font-size: 16px;">Prefer to discuss your situation first?</p>
+      <a href="https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting" target="_blank" rel="noopener" class="btn-primary" style="display: inline-flex; text-decoration: none; padding: 16px 32px; border-radius: 999px; font-weight: 600;">Book 30-Minute Consultation</a>
+    </div>
+  </section>
+
+</div>
+
+<script src="https://assets.calendly.com/assets/external/widget.js" async></script>
+<script>
+  // Tab switching
+  const tabs = document.querySelectorAll('.tab-btn');
+  const panels = document.querySelectorAll('.tab-panel');
+
+  tabs.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabs.forEach(b => b.classList.remove('active'));
+      panels.forEach(panel => panel.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.tab).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+
+  // Wizard Logic
+  let currentStep = 1;
+  const wizardData = {};
+
+  // Option button selection
+  document.querySelectorAll('.option-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      // Deselect all options in this step
+      this.closest('.option-grid').querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+      // Select this option
+      this.classList.add('selected');
+      // Store value
+      const step = this.closest('.wizard-step').id;
+      wizardData[step] = this.dataset.value;
+      // Enable next button
+      document.getElementById('wizard-next').disabled = false;
+    });
+  });
+
+  // Back button
+  document.getElementById('wizard-back').addEventListener('click', () => {
+    if (currentStep > 1) {
+      document.getElementById(`step-${currentStep}`).classList.remove('active');
+      currentStep--;
+      document.getElementById(`step-${currentStep}`).classList.add('active');
+      updateProgress();
+      updateNavigation();
+    }
+  });
+
+  // Next button
+  document.getElementById('wizard-next').addEventListener('click', () => {
+    if (currentStep < 6) {
+      document.getElementById(`step-${currentStep}`).classList.remove('active');
+      updateProgressCompleted(currentStep);
+      currentStep++;
+      document.getElementById(`step-${currentStep}`).classList.add('active');
+      updateProgress();
+      updateNavigation();
+      // Check if this step already has selection
+      const selectedOption = document.querySelector(`#step-${currentStep} .option-btn.selected`);
+      document.getElementById('wizard-next').disabled = !selectedOption;
+    } else {
+      // Calculate result
+      calculateEntityRecommendation();
+    }
+  });
+
+  function updateProgress() {
+    document.querySelectorAll('.progress-dot').forEach((dot, index) => {
+      if (index + 1 === currentStep) {
+        dot.classList.add('active');
+      } else {
+        dot.classList.remove('active');
+      }
+    });
+  }
+
+  function updateProgressCompleted(step) {
+    const dot = document.querySelectorAll('.progress-dot')[step - 1];
+    dot.classList.add('completed');
+  }
+
+  function updateNavigation() {
+    const backBtn = document.getElementById('wizard-back');
+    const nextBtn = document.getElementById('wizard-next');
+
+    if (currentStep === 1) {
+      backBtn.style.display = 'none';
+    } else {
+      backBtn.style.display = 'block';
+    }
+
+    if (currentStep === 6) {
+      nextBtn.textContent = 'See Recommendation →';
+    } else {
+      nextBtn.textContent = 'Next →';
+    }
+  }
+
+  function calculateEntityRecommendation() {
+    const stage = wizardData['step-1'];
+    const vcPlans = wizardData['step-2'];
+    const founders = wizardData['step-3'];
+    const businessType = wizardData['step-4'];
+    const equity = wizardData['step-5'];
+    const priority = wizardData['step-6'];
+
+    let entity = 'LLC';
+    let reasons = [];
+    let nextSteps = '';
+
+    // Decision logic
+    if (vcPlans === 'vc-yes' || (vcPlans === 'vc-maybe' && equity === 'equity-yes')) {
+      entity = 'C-Corp';
+      reasons.push('You plan to raise venture capital, which requires C-Corporation structure');
+      reasons.push('VCs will not invest in LLCs or S-Corps due to tax and ownership restrictions');
+      if (equity === 'equity-yes') reasons.push('C-Corps offer full stock option support (ISOs/NSOs) for employee equity');
+      reasons.push('Delaware C-Corp is the standard for funded startups (98% of VC-backed companies)');
+      if (stage === 'idea' || stage === 'mvp') reasons.push('Forming C-Corp early starts your QSBS 5-year clock ($10M+ tax-free gain)');
+      nextSteps = 'I recommend forming a Delaware C-Corporation now. I'll handle incorporation, founder stock issuance, 83(b) elections, and governance documents. Timeline: 2-3 weeks. Fee: $1,500-$2,500.';
+    } else if (businessType === 'realestate') {
+      entity = 'LLC';
+      reasons.push('Real estate investing is best done through LLCs for asset protection and tax benefits');
+      reasons.push('Wyoming LLC offers strongest charging order protection (personal creditors can\'t seize properties)');
+      reasons.push('Pass-through taxation on rental income (no double tax)');
+      reasons.push('Create one LLC per property or use Series LLC for multiple properties');
+      if (priority === 'priority-protection') reasons.push('Wyoming has superior asset protection laws vs other states');
+      nextSteps = 'I recommend forming a Wyoming LLC (or multiple LLCs, one per property). I'll prepare articles, operating agreement, and set up proper structure. Fee: $800-$1,200 per LLC.';
+    } else if (priority === 'priority-tax' && stage === 'revenue') {
+      entity = 'S-Corp';
+      reasons.push('S-Corp election saves self-employment tax on distributions (vs LLC)');
+      reasons.push('You can form LLC and elect S-Corp taxation (best of both worlds)');
+      reasons.push('Savings typically $6K-15K/year if net income exceeds $60K');
+      reasons.push('You don\'t plan to raise VC, so S-Corp restrictions don\'t hurt you');
+      nextSteps = 'I recommend forming a Wyoming or Delaware LLC and electing S-Corp tax status (Form 2553). This gives you LLC asset protection + S-Corp tax savings. Fee: $800-$1,200 (LLC) + $400-$600 (S-Corp election).';
+    } else if (vcPlans === 'vc-maybe' && (stage === 'idea' || stage === 'mvp')) {
+      entity = 'LLC';
+      reasons.push('Start with LLC for simplicity while validating product-market fit');
+      reasons.push('LLC is cheaper and easier to maintain than C-Corp');
+      reasons.push('You can convert to C-Corp 6-12 months before fundraising (straightforward process)');
+      reasons.push('Avoid premature C-Corp complexity and costs');
+      nextSteps = 'I recommend forming a Wyoming or Delaware LLC now. When you\'re ready to raise VC (6-12 months before first round), I\'ll convert you to Delaware C-Corp via Section 351 exchange. LLC fee: $800-$1,200. Conversion later: $1,500-$2,500.';
+    } else {
+      entity = 'LLC';
+      reasons.push('LLC offers simplicity, flexibility, and pass-through taxation');
+      if (priority === 'priority-simple') reasons.push('LLC has minimal compliance requirements vs C-Corp');
+      if (priority === 'priority-protection') reasons.push('Wyoming LLC provides strong asset protection (charging order)');
+      if (founders === 'solo') reasons.push('Single-member LLC is simple and works well for solo founders');
+      if (founders === 'two' || founders === 'multiple') reasons.push('Multi-member LLC allows flexible profit sharing and partnership structure');
+      reasons.push('You can elect S-Corp taxation later if profitable (for tax savings)');
+      nextSteps = 'I recommend forming a Wyoming or Delaware LLC. I'll prepare all formation documents, operating agreement, and EIN application. If your net income exceeds $60K/year, we can elect S-Corp status to save self-employment tax. Fee: $800-$1,200.';
+    }
+
+    // Display result
+    document.getElementById('wizard-result').classList.add('show');
+    document.getElementById('wizard-nav').style.display = 'none';
+    document.querySelectorAll('.wizard-step').forEach(step => step.classList.remove('active'));
+
+    const entityEl = document.getElementById('result-entity');
+    entityEl.textContent = entity === 'LLC' ? 'Limited Liability Company (LLC)' :
+                            entity === 'C-Corp' ? 'C-Corporation (Delaware)' :
+                            'S-Corporation (or LLC electing S-Corp)';
+    entityEl.className = 'result-entity ' + (entity === 'LLC' ? 'llc' : entity === 'C-Corp' ? 'ccorp' : 'scorp');
+
+    document.getElementById('result-subtitle').textContent = 'Recommended for your situation';
+
+    const reasonsList = document.getElementById('result-reasons-list');
+    reasonsList.innerHTML = '';
+    reasons.forEach(reason => {
+      const li = document.createElement('li');
+      li.textContent = reason;
+      reasonsList.appendChild(li);
+    });
+
+    document.getElementById('result-next-steps-text').textContent = nextSteps;
+
+    // Scroll to result
+    document.getElementById('wizard-result').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function restartWizard() {
+    currentStep = 1;
+    Object.keys(wizardData).forEach(key => delete wizardData[key]);
+    document.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('selected'));
+    document.querySelectorAll('.progress-dot').forEach(dot => {
+      dot.classList.remove('active', 'completed');
+    });
+    document.querySelectorAll('.progress-dot')[0].classList.add('active');
+    document.getElementById('step-1').classList.add('active');
+    document.getElementById('wizard-result').classList.remove('show');
+    document.getElementById('wizard-nav').style.display = 'flex';
+    document.getElementById('wizard-back').style.display = 'none';
+    document.getElementById('wizard-next').disabled = true;
+    document.getElementById('wizard-next').textContent = 'Next →';
+  }
+</script>
+</body>
+</html>

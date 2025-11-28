@@ -1907,6 +1907,47 @@ function toggleCard(header) {
 }
 
 // Intake form submission
+function handleIntakeSubmit(event) {
+  event.preventDefault();
+
+  const formData = new FormData(event.target);
+  const data = Object.fromEntries(formData.entries());
+
+  // Create mailto link with form data
+  const subject = encodeURIComponent(`Delaware C-Corp Formation Intake - ${data.corpName}`);
+  const body = encodeURIComponent(`
+Delaware C-Corporation Formation Intake Form
+
+CLIENT INFORMATION:
+Name: ${data.firstName} ${data.lastName}
+Email: ${data.email}
+Phone: ${data.phone}
+
+CORPORATION DETAILS:
+Proposed Corporation Name: ${data.corpName}
+Service Package: ${data.package}
+Raising Venture Capital: ${data.raisingVC}
+Number of Founders: ${data.founderCount}
+Need Stock Option Plan: ${data.needESOP}
+U.S. Citizenship: ${data.usCitizen}
+Converting from Existing Entity: ${data.converting}
+
+BUSINESS DESCRIPTION:
+${data.businessDescription || 'Not provided'}
+
+ADDITIONAL NOTES:
+${data.additionalNotes || 'None'}
+  `);
+
+  // Open email client
+  window.location.href = `mailto:owner@terms.law?subject=${subject}&body=${body}`;
+
+  // Show success message
+  alert('Thank you! Your intake form has been prepared. Please send the email that just opened in your email client, or copy the information and email it to owner@terms.law. I will respond within 24 hours.');
+
+  // Optionally reset form
+  // event.target.reset();
+}
 
 // PayPal Buttons
 paypal.Buttons({

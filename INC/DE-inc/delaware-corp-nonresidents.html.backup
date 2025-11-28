@@ -2491,12 +2491,7 @@
         <p class="form-subtitle">Complete this confidential intake form. I'll review your situation and contact you within 24 hours to discuss your specific incorporation, tax, and banking needs.</p>
       </div>
 
-      <form action="https://formsubmit.co/owner.law" method="POST">
-        <!-- FormSubmit Configuration -->
-        <input type="hidden" name="_subject" value="Delaware Formation Intake">
-        <input type="hidden" name="_template" value="table">
-        <input type="hidden" name="_next" value="https://terms.law/thank-you">
-
+      <form id="corp-intake-form" onsubmit="handleIntakeSubmit(event)">
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">
@@ -2759,6 +2754,47 @@ function toggleAccordion(header) {
 }
 
 // Intake form submission
+function handleIntakeSubmit(event) {
+  event.preventDefault();
+
+  const formData = new FormData(event.target);
+  const data = Object.fromEntries(formData.entries());
+
+  const subject = encodeURIComponent(`DE C-Corp Non-Resident Intake - ${data.country}`);
+  const body = encodeURIComponent(`
+Delaware C-Corporation for Non-Resident - Confidential Intake
+
+CLIENT INFORMATION:
+Name: ${data.firstName} ${data.lastName}
+Email: ${data.email}
+Phone: ${data.phone}
+Country of Residence: ${data.country}
+Citizenship: ${data.citizenship}
+
+BUSINESS DETAILS:
+Business Type: ${data.businessType}
+Proposed Corp Name: ${data.corpName || 'To be determined'}
+Number of Founders: ${data.founderCount}
+Fundraising Plans: ${data.fundraising}
+Existing Entity: ${data.existingEntity}
+U.S. Tax Treaty: ${data.treaty}
+U.S. Revenue Percentage: ${data.usRevenue}
+Has SSN/ITIN: ${data.hasSSN}
+
+SERVICE PACKAGE:
+${data.package}
+
+BUSINESS DESCRIPTION & GOALS:
+${data.businessDescription || 'Not provided'}
+
+SPECIFIC QUESTIONS/CONCERNS:
+${data.questions || 'None specified'}
+  `);
+
+  window.location.href = `mailto:owner@terms.law?subject=${subject}&body=${body}`;
+
+  alert('Thank you! Your confidential intake form has been prepared. Please send the email that opened, or copy the information and email it to owner@terms.law. I will respond within 24 hours with a consultation proposal.');
+}
 
 // PayPal Buttons
 paypal.Buttons({

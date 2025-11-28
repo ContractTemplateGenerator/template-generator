@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Founder Equity Split Calculator | Fair Equity Distribution Tool</title>
+  <meta name="description" content="Calculate fair founder equity splits based on cash investment, time commitment, expertise, and idea contribution. Includes vesting schedules and dilution modeling.">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      line-height: 1.6;
+      color: #1f2937;
+      background: #f9fafb;
+    }
+
+    .hero-section {
+      background: linear-gradient(135deg, #065f46 0%, #10b981 50%, #34d399 100%);
+      color: white;
+      padding: 30px 20px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg width="60" height="60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="30" r="2" fill="rgba(255,255,255,0.1)"/></svg>');
+      opacity: 0.5;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .hero-title {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+      line-height: 1.2;
+    }
+
+    .hero-subtitle {
+      font-size: 1rem;
+      opacity: 0.95;
+    }
+
+    .main-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 30px 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      align-items: start;
+    }
+
+    .left-panel {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e5e7eb;
+      overflow: hidden;
+    }
+
+    .tabs {
+      display: flex;
+      background: #f9fafb;
+      border-bottom: 2px solid #e5e7eb;
+      overflow-x: auto;
+    }
+
+    .tab {
+      padding: 16px 24px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #6b7280;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+      border-bottom: 3px solid transparent;
+    }
+
+    .tab:hover {
+      background: #f3f4f6;
+      color: #065f46;
+    }
+
+    .tab.active {
+      color: #065f46;
+      border-bottom-color: #10b981;
+      background: white;
+    }
+
+    .tab-content {
+      display: none;
+      padding: 30px;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .right-panel {
+      position: sticky;
+      top: 20px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e5e7eb;
+      padding: 30px;
+    }
+
+    .preview-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #065f46;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .preview-badge {
+      font-size: 0.7rem;
+      background: linear-gradient(135deg, #10b981, #34d399);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .chart-container {
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto 30px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #374151;
+      font-size: 0.95rem;
+    }
+
+    .help-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      background: #10b981;
+      color: white;
+      border-radius: 50%;
+      font-size: 0.7rem;
+      font-weight: 700;
+      cursor: help;
+      position: relative;
+    }
+
+    .help-icon:hover .tooltip {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .tooltip {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-5px);
+      background: #1f2937;
+      color: white;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 400;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      z-index: 100;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      max-width: 280px;
+      white-space: normal;
+      width: max-content;
+      margin-bottom: 8px;
+    }
+
+    .tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: #1f2937;
+    }
+
+    .form-input,
+    .form-select {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      transition: border-color 0.3s ease;
+    }
+
+    .form-input:focus,
+    .form-select:focus {
+      outline: none;
+      border-color: #10b981;
+    }
+
+    .form-input[type="number"] {
+      -moz-appearance: textfield;
+    }
+
+    .form-input[type="number"]::-webkit-outer-spin-button,
+    .form-input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+    }
+
+    .founder-card {
+      background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      border: 2px solid #10b981;
+    }
+
+    .founder-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .remove-founder {
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .remove-founder:hover {
+      background: #dc2626;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+
+    .slider {
+      width: 100%;
+      height: 6px;
+      border-radius: 5px;
+      background: #d1d5db;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #10b981;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .slider::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #10b981;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .slider-value {
+      display: inline-block;
+      background: #065f46;
+      color: white;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-weight: 600;
+      margin-left: 10px;
+      font-size: 0.85rem;
+      min-width: 50px;
+      text-align: center;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #10b981;
+      border: 2px solid #10b981;
+    }
+
+    .btn-secondary:hover {
+      background: #ecfdf5;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      background: #f9fafb;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+
+    .legend-color {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    .legend-text {
+      font-size: 0.9rem;
+      color: #374151;
+      flex: 1;
+    }
+
+    .legend-percentage {
+      font-weight: 700;
+      color: #065f46;
+      font-size: 1.1rem;
+    }
+
+    .cap-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 30px;
+      font-size: 0.9rem;
+    }
+
+    .cap-table thead {
+      background: linear-gradient(135deg, #065f46 0%, #10b981 100%);
+      color: white;
+    }
+
+    .cap-table th {
+      padding: 12px 10px;
+      text-align: left;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    .cap-table td {
+      padding: 10px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .cap-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .cap-table tbody tr:nth-child(even) {
+      background: #f9fafb;
+    }
+
+    .cap-table tbody tr:hover {
+      background: #ecfdf5;
+    }
+
+    .alert-box {
+      border-radius: 10px;
+      padding: 15px;
+      margin: 15px 0;
+      border-left: 4px solid;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      font-size: 0.9rem;
+    }
+
+    .alert-icon {
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+
+    .alert-success {
+      background: #ecfdf5;
+      border-color: #10b981;
+      color: #065f46;
+    }
+
+    .alert-warning {
+      background: #fef3c7;
+      border-color: #f59e0b;
+      color: #92400e;
+    }
+
+    .alert-danger {
+      background: #fee2e2;
+      border-color: #ef4444;
+      color: #991b1b;
+    }
+
+    .alert-info {
+      background: #eff6ff;
+      border-color: #3b82f6;
+      color: #1e3a8a;
+    }
+
+    .export-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #6b7280;
+    }
+
+    .empty-state-icon {
+      font-size: 4rem;
+      margin-bottom: 15px;
+      opacity: 0.3;
+    }
+
+    @media (max-width: 1024px) {
+      .main-container {
+        grid-template-columns: 1fr;
+      }
+
+      .right-panel {
+        position: static;
+      }
+
+      .hero-title {
+        font-size: 1.6rem;
+      }
+
+      .hero-subtitle {
+        font-size: 0.9rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .hero-section {
+        padding: 20px;
+      }
+
+      .main-container {
+        padding: 20px 15px;
+      }
+
+      .tab-content {
+        padding: 20px;
+      }
+
+      .right-panel {
+        padding: 20px;
+      }
+
+      .tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+      }
+
+      .tab {
+        padding: 12px 16px;
+        font-size: 0.85rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <div class="hero-content">
+      <h1 class="hero-title">⚖️ Founder Equity Split Calculator</h1>
+      <p class="hero-subtitle">
+        Real-time equity modeling with vesting schedules and dilution tracking
+      </p>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <div class="main-container">
+
+    <!-- Left Panel: Inputs -->
+    <div class="left-panel">
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('founders')">👥 Founders</button>
+        <button class="tab" onclick="switchTab('weights')">⚖️ Weights</button>
+        <button class="tab" onclick="switchTab('vesting')">📅 Vesting</button>
+        <button class="tab" onclick="switchTab('dilution')">📉 Dilution</button>
+        <button class="tab" onclick="switchTab('export')">💾 Export</button>
+      </div>
+
+      <!-- Tab Contents -->
+
+      <!-- Founders Tab -->
+      <div id="founders-tab" class="tab-content active">
+        <h2 style="font-size: 1.4rem; font-weight: 700; color: #065f46; margin-bottom: 15px;">Founder Details</h2>
+        <p style="color: #6b7280; margin-bottom: 25px; font-size: 0.95rem;">
+          Add founders and enter their contributions. Watch the preview update in real-time.
+        </p>
+
+        <div class="form-group">
+          <label class="form-label">
+            Number of Founders
+            <span class="help-icon">?
+              <span class="tooltip">Include all co-founders who will receive equity. Advisors and employees should not be counted here.</span>
+            </span>
+          </label>
+          <input type="number" id="founder-count" class="form-input" min="1" max="10" value="2" onchange="updateFounderCount()">
+        </div>
+
+        <div id="founders-container"></div>
+
+        <button class="btn btn-primary" onclick="addFounder()" style="width: 100%; margin-top: 10px;">
+          + Add Another Founder
+        </button>
+      </div>
+
+      <!-- Weights Tab -->
+      <div id="weights-tab" class="tab-content">
+        <h2 style="font-size: 1.4rem; font-weight: 700; color: #065f46; margin-bottom: 15px;">Factor Weights</h2>
+        <p style="color: #6b7280; margin-bottom: 25px; font-size: 0.95rem;">
+          Customize how much each factor influences the equity split. Defaults are based on typical startups.
+        </p>
+
+        <div class="form-group">
+          <label class="form-label">
+            Cash Investment: <span class="slider-value" id="weight-cash-display">30%</span>
+            <span class="help-icon">?
+              <span class="tooltip">How important is the money each founder puts in? Higher weight means cash investment has more influence.</span>
+            </span>
+          </label>
+          <input type="range" id="weight-cash" class="slider" min="0" max="50" value="30" oninput="updateWeights(); recalculate();">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            Time Commitment: <span class="slider-value" id="weight-time-display">25%</span>
+            <span class="help-icon">?
+              <span class="tooltip">Full-time vs part-time matters. Higher weight means time commitment has more influence.</span>
+            </span>
+          </label>
+          <input type="range" id="weight-time" class="slider" min="0" max="50" value="25" oninput="updateWeights(); recalculate();">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            Expertise: <span class="slider-value" id="weight-expertise-display">25%</span>
+            <span class="help-icon">?
+              <span class="tooltip">Experience and skills brought to the company. Higher weight means expertise has more influence.</span>
+            </span>
+          </label>
+          <input type="range" id="weight-expertise" class="slider" min="0" max="50" value="25" oninput="updateWeights(); recalculate();">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            Idea Contribution: <span class="slider-value" id="weight-idea-display">20%</span>
+            <span class="help-icon">?
+              <span class="tooltip">Who came up with the original idea? Note: Ideas are worth less than execution in most cases.</span>
+            </span>
+          </label>
+          <input type="range" id="weight-idea" class="slider" min="0" max="50" value="20" oninput="updateWeights(); recalculate();">
+        </div>
+
+        <div id="weight-warning" class="alert-box alert-info" style="display: none;">
+          <span class="alert-icon">ℹ️</span>
+          <div>
+            Weights total <strong><span id="total-weight">100</span>%</strong>. They will be normalized to 100%.
+          </div>
+        </div>
+      </div>
+
+      <!-- Vesting Tab -->
+      <div id="vesting-tab" class="tab-content">
+        <h2 style="font-size: 1.4rem; font-weight: 700; color: #065f46; margin-bottom: 15px;">Vesting Schedule</h2>
+        <p style="color: #6b7280; margin-bottom: 25px; font-size: 0.95rem;">
+          Protect the company and co-founders by adding vesting to founder shares.
+        </p>
+
+        <div class="alert-box alert-warning">
+          <span class="alert-icon">💡</span>
+          <div>
+            <strong>Why Vesting?</strong> Without vesting, a founder who leaves after 1 month keeps 100% of their equity. Vesting ensures founders earn equity over time.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            Vesting Schedule
+            <span class="help-icon">?
+              <span class="tooltip">4-year vesting with 1-year cliff is the industry standard. VCs will require this.</span>
+            </span>
+          </label>
+          <select id="vesting-type" class="form-select" onchange="updateVesting(); recalculate();">
+            <option value="none">No Vesting (Not Recommended)</option>
+            <option value="standard" selected>Standard: 4 Years, 1-Year Cliff</option>
+            <option value="fast">Fast: 3 Years, 6-Month Cliff</option>
+            <option value="slow">Conservative: 5 Years, 1-Year Cliff</option>
+          </select>
+        </div>
+
+        <div id="vesting-explanation"></div>
+      </div>
+
+      <!-- Dilution Tab -->
+      <div id="dilution-tab" class="tab-content">
+        <h2 style="font-size: 1.4rem; font-weight: 700; color: #065f46; margin-bottom: 15px;">Funding Rounds</h2>
+        <p style="color: #6b7280; margin-bottom: 25px; font-size: 0.95rem;">
+          Model how founder equity will be diluted through funding rounds. See results in the preview.
+        </p>
+
+        <div class="alert-box alert-success">
+          <span class="alert-icon">📊</span>
+          <div>
+            <strong>Understanding Dilution:</strong> When you raise funding, new investors buy shares, diluting existing shareholders. Your smaller slice is of a much bigger pie.
+          </div>
+        </div>
+
+        <div id="funding-rounds-container">
+          <!-- Seed Round -->
+          <div class="founder-card">
+            <div class="founder-card-header">
+              <h3 style="font-size: 1.2rem; font-weight: 700; color: #065f46;">Seed Round</h3>
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label">Investment ($)</label>
+                <input type="number" class="form-input" id="seed-amount" min="0" step="50000" value="500000" oninput="recalculate()">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Pre-Money Valuation ($)</label>
+                <input type="number" class="form-input" id="seed-valuation" min="0" step="100000" value="2000000" oninput="recalculate()">
+              </div>
+            </div>
+          </div>
+
+          <!-- Series A -->
+          <div class="founder-card">
+            <div class="founder-card-header">
+              <h3 style="font-size: 1.2rem; font-weight: 700; color: #065f46;">Series A</h3>
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label">Investment ($)</label>
+                <input type="number" class="form-input" id="series-a-amount" min="0" step="100000" value="3000000" oninput="recalculate()">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Pre-Money Valuation ($)</label>
+                <input type="number" class="form-input" id="series-a-valuation" min="0" step="500000" value="10000000" oninput="recalculate()">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Export Tab -->
+      <div id="export-tab" class="tab-content">
+        <h2 style="font-size: 1.4rem; font-weight: 700; color: #065f46; margin-bottom: 15px;">Export & Next Steps</h2>
+        <p style="color: #6b7280; margin-bottom: 25px; font-size: 0.95rem;">
+          Save your cap table and take the next steps to formalize your equity split.
+        </p>
+
+        <div class="export-buttons">
+          <button class="btn btn-primary" onclick="exportCapTable()">
+            📥 Export as CSV
+          </button>
+          <button class="btn btn-primary" onclick="window.print()">
+            🖨️ Print Cap Table
+          </button>
+        </div>
+
+        <div class="alert-box alert-success" style="margin-top: 30px;">
+          <span class="alert-icon">✅</span>
+          <div>
+            <strong>Next Steps:</strong>
+            <ul style="margin: 10px 0 0 20px; line-height: 1.8;">
+              <li>Save this cap table for your records</li>
+              <li>Discuss with co-founders and reach agreement</li>
+              <li>Document in Founder Stock Purchase Agreement</li>
+              <li>File 83(b) election within 30 days of stock grant</li>
+              <li>Set up cap table management (Carta, Pulley, etc.)</li>
+            </ul>
+          </div>
+        </div>
+
+        <div style="margin-top: 30px; padding: 25px; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-radius: 12px;">
+          <h3 style="font-size: 1.2rem; font-weight: 700; color: #1e3a8a; margin-bottom: 12px;">
+            Need Help Formalizing This?
+          </h3>
+          <p style="color: #374151; margin-bottom: 15px; font-size: 0.95rem;">
+            I can help you create the legal documents to implement this equity split, including founder stock purchase agreements, vesting schedules, and 83(b) election filing.
+          </p>
+          <p style="color: #374151; font-size: 0.95rem;">
+            <strong>Contact:</strong> <a href="mailto:owner@terms.law" style="color: #3b82f6; font-weight: 600;">owner@terms.law</a><br>
+            <strong>Attorney:</strong> Sergei Tokmakov, Esq.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right Panel: Live Preview -->
+    <div class="right-panel">
+      <div class="preview-title">
+        📊 Live Preview
+        <span class="preview-badge">Updates in Real-Time</span>
+      </div>
+
+      <!-- Pie Chart -->
+      <div class="chart-container">
+        <canvas id="equity-chart" width="400" height="400"></canvas>
+      </div>
+
+      <!-- Legend -->
+      <div id="chart-legend"></div>
+
+      <!-- Cap Table -->
+      <h3 style="font-size: 1.2rem; font-weight: 700; color: #065f46; margin-top: 30px; margin-bottom: 15px;">
+        Cap Table Summary
+      </h3>
+
+      <table class="cap-table">
+        <thead>
+          <tr>
+            <th>Shareholder</th>
+            <th>Initial %</th>
+            <th>After Dilution</th>
+          </tr>
+        </thead>
+        <tbody id="cap-table-body"></tbody>
+      </table>
+
+      <div id="empty-state" class="empty-state">
+        <div class="empty-state-icon">⚖️</div>
+        <p>Configure founders in the left panel to see equity split preview</p>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Global state
+    let foundersData = [];
+    const founderColors = [
+      '#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6',
+      '#ec4899', '#06b6d4', '#84cc16', '#f97316', '#6366f1'
+    ];
+
+    // Initialize with default founders
+    function init() {
+      foundersData = [
+        { name: 'Founder 1', cash: 50000, timeCommitment: 100, expertise: 60, ideaContribution: 80 },
+        { name: 'Founder 2', cash: 25000, timeCommitment: 100, expertise: 70, ideaContribution: 40 }
+      ];
+      updateFounderCount();
+      updateWeights();
+      updateVesting();
+      recalculate();
+    }
+
+    function switchTab(tabName) {
+      // Remove active class from all tabs and contents
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+      // Add active class to selected tab and content
+      event.target.classList.add('active');
+      document.getElementById(tabName + '-tab').classList.add('active');
+    }
+
+    function updateFounderCount() {
+      const count = parseInt(document.getElementById('founder-count').value);
+      const container = document.getElementById('founders-container');
+
+      // Adjust foundersData array
+      while (foundersData.length < count) {
+        foundersData.push({
+          name: `Founder ${foundersData.length + 1}`,
+          cash: 0,
+          timeCommitment: 100,
+          expertise: 50,
+          ideaContribution: 0
+        });
+      }
+      while (foundersData.length > count) {
+        foundersData.pop();
+      }
+
+      // Re-render founders
+      container.innerHTML = '';
+      foundersData.forEach((founder, index) => {
+        const founderCard = document.createElement('div');
+        founderCard.className = 'founder-card';
+        founderCard.innerHTML = `
+          <div class="founder-card-header">
+            <input type="text" class="form-input" placeholder="Founder Name" value="${founder.name}"
+                   style="max-width: 200px; font-weight: 700;"
+                   onchange="foundersData[${index}].name = this.value; recalculate();">
+            ${foundersData.length > 1 ? `<button class="remove-founder" onclick="removeFounder(${index})">Remove</button>` : ''}
+          </div>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label">Cash Investment ($)</label>
+              <input type="number" class="form-input" min="0" step="1000" value="${founder.cash}"
+                     oninput="foundersData[${index}].cash = parseFloat(this.value) || 0; recalculate();">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Time Commitment</label>
+              <select class="form-select" onchange="foundersData[${index}].timeCommitment = parseFloat(this.value); recalculate();">
+                <option value="100" ${founder.timeCommitment === 100 ? 'selected' : ''}>100% - Full Time</option>
+                <option value="75" ${founder.timeCommitment === 75 ? 'selected' : ''}>75% - Mostly Full Time</option>
+                <option value="50" ${founder.timeCommitment === 50 ? 'selected' : ''}>50% - Half Time</option>
+                <option value="25" ${founder.timeCommitment === 25 ? 'selected' : ''}>25% - Quarter Time</option>
+                <option value="10" ${founder.timeCommitment === 10 ? 'selected' : ''}>10% - Advisor Level</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                Expertise: <span class="slider-value" id="expertise-${index}">${getExpertiseLabel(founder.expertise)}</span>
+              </label>
+              <input type="range" class="slider" min="0" max="100" value="${founder.expertise}"
+                     oninput="foundersData[${index}].expertise = parseFloat(this.value); document.getElementById('expertise-${index}').textContent = getExpertiseLabel(this.value); recalculate();">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                Idea: <span class="slider-value" id="idea-${index}">${founder.ideaContribution}%</span>
+              </label>
+              <input type="range" class="slider" min="0" max="100" value="${founder.ideaContribution}"
+                     oninput="foundersData[${index}].ideaContribution = parseFloat(this.value); document.getElementById('idea-${index}').textContent = this.value + '%'; recalculate();">
+            </div>
+          </div>
+        `;
+        container.appendChild(founderCard);
+      });
+
+      recalculate();
+    }
+
+    function addFounder() {
+      foundersData.push({
+        name: `Founder ${foundersData.length + 1}`,
+        cash: 0,
+        timeCommitment: 100,
+        expertise: 50,
+        ideaContribution: 0
+      });
+      document.getElementById('founder-count').value = foundersData.length;
+      updateFounderCount();
+    }
+
+    function removeFounder(index) {
+      foundersData.splice(index, 1);
+      document.getElementById('founder-count').value = foundersData.length;
+      updateFounderCount();
+    }
+
+    function getExpertiseLabel(value) {
+      const labels = ['Beginner', 'Junior', 'Average', 'Senior', 'Expert'];
+      const labelIndex = Math.floor((value / 100) * (labels.length - 1));
+      return labels[labelIndex];
+    }
+
+    function updateWeights() {
+      const weights = {
+        cash: parseInt(document.getElementById('weight-cash').value),
+        time: parseInt(document.getElementById('weight-time').value),
+        expertise: parseInt(document.getElementById('weight-expertise').value),
+        idea: parseInt(document.getElementById('weight-idea').value)
+      };
+
+      document.getElementById('weight-cash-display').textContent = weights.cash + '%';
+      document.getElementById('weight-time-display').textContent = weights.time + '%';
+      document.getElementById('weight-expertise-display').textContent = weights.expertise + '%';
+      document.getElementById('weight-idea-display').textContent = weights.idea + '%';
+
+      const total = weights.cash + weights.time + weights.expertise + weights.idea;
+      document.getElementById('total-weight').textContent = total;
+
+      if (total !== 100) {
+        document.getElementById('weight-warning').style.display = 'flex';
+      } else {
+        document.getElementById('weight-warning').style.display = 'none';
+      }
+    }
+
+    function updateVesting() {
+      const type = document.getElementById('vesting-type').value;
+      const explanationDiv = document.getElementById('vesting-explanation');
+
+      let explanation = '';
+
+      switch (type) {
+        case 'none':
+          explanation = `
+            <div class="alert-box alert-danger">
+              <span class="alert-icon">⚠️</span>
+              <div>
+                <strong>Not Recommended:</strong> Without vesting, if a founder leaves after 1 month, they keep 100% of their equity. VCs will require vesting.
+              </div>
+            </div>
+          `;
+          break;
+        case 'standard':
+          explanation = `
+            <div class="alert-box alert-success">
+              <span class="alert-icon">✅</span>
+              <div>
+                <strong>Industry Standard:</strong> 4-year vesting with 1-year cliff. After 12 months, founders earn 25%, then vest monthly for 3 more years.
+              </div>
+            </div>
+          `;
+          break;
+        case 'fast':
+          explanation = `
+            <div class="alert-box alert-info">
+              <span class="alert-icon">💡</span>
+              <div>
+                <strong>Faster Vesting:</strong> 3 years with 6-month cliff. Good for experienced teams. VCs may still push for 4 years.
+              </div>
+            </div>
+          `;
+          break;
+        case 'slow':
+          explanation = `
+            <div class="alert-box alert-success">
+              <span class="alert-icon">✅</span>
+              <div>
+                <strong>Conservative:</strong> 5 years with 1-year cliff. Extra protection for long development cycles.
+              </div>
+            </div>
+          `;
+          break;
+      }
+
+      explanationDiv.innerHTML = explanation;
+    }
+
+    function recalculate() {
+      if (foundersData.length === 0) {
+        document.getElementById('empty-state').style.display = 'block';
+        document.getElementById('chart-legend').innerHTML = '';
+        document.getElementById('cap-table-body').innerHTML = '';
+        return;
+      }
+
+      document.getElementById('empty-state').style.display = 'none';
+
+      // Get weights
+      const weights = {
+        cash: parseInt(document.getElementById('weight-cash').value),
+        time: parseInt(document.getElementById('weight-time').value),
+        expertise: parseInt(document.getElementById('weight-expertise').value),
+        idea: parseInt(document.getElementById('weight-idea').value)
+      };
+
+      // Normalize weights to 100%
+      const totalWeight = weights.cash + weights.time + weights.expertise + weights.idea;
+      Object.keys(weights).forEach(key => {
+        weights[key] = (weights[key] / totalWeight) * 100;
+      });
+
+      // Calculate equity splits
+      const equitySplits = foundersData.map((founder, index) => {
+        const totalCash = foundersData.reduce((sum, f) => sum + f.cash, 0);
+        const cashScore = totalCash > 0 ? (founder.cash / totalCash) * 100 : 100 / foundersData.length;
+
+        const totalTime = foundersData.reduce((sum, f) => sum + f.timeCommitment, 0);
+        const timeScore = (founder.timeCommitment / totalTime) * 100;
+
+        const totalExpertise = foundersData.reduce((sum, f) => sum + f.expertise, 0);
+        const expertiseScore = (founder.expertise / totalExpertise) * 100;
+
+        const totalIdea = foundersData.reduce((sum, f) => sum + f.ideaContribution, 0);
+        const ideaScore = totalIdea > 0 ? (founder.ideaContribution / totalIdea) * 100 : 100 / foundersData.length;
+
+        const weightedScore =
+          (cashScore * weights.cash / 100) +
+          (timeScore * weights.time / 100) +
+          (expertiseScore * weights.expertise / 100) +
+          (ideaScore * weights.idea / 100);
+
+        return {
+          name: founder.name,
+          equity: weightedScore,
+          color: founderColors[index]
+        };
+      });
+
+      // Normalize to 100%
+      const totalEquity = equitySplits.reduce((sum, f) => sum + f.equity, 0);
+      equitySplits.forEach(f => f.equity = (f.equity / totalEquity) * 100);
+
+      // Draw pie chart
+      drawPieChart(equitySplits);
+
+      // Update legend
+      const legendHTML = equitySplits.map(f => `
+        <div class="legend-item">
+          <div class="legend-color" style="background: ${f.color};"></div>
+          <div class="legend-text">${f.name}</div>
+          <div class="legend-percentage">${f.equity.toFixed(1)}%</div>
+        </div>
+      `).join('');
+      document.getElementById('chart-legend').innerHTML = legendHTML;
+
+      // Calculate dilution
+      const seedAmount = parseFloat(document.getElementById('seed-amount').value) || 0;
+      const seedValuation = parseFloat(document.getElementById('seed-valuation').value) || 0;
+      const seriesAAmount = parseFloat(document.getElementById('series-a-amount').value) || 0;
+      const seriesAValuation = parseFloat(document.getElementById('series-a-valuation').value) || 0;
+
+      const rounds = [];
+      if (seedAmount > 0 && seedValuation > 0) {
+        rounds.push({
+          name: 'Seed',
+          dilution: (seedAmount / (seedValuation + seedAmount)) * 100
+        });
+      }
+      if (seriesAAmount > 0 && seriesAValuation > 0) {
+        rounds.push({
+          name: 'Series A',
+          dilution: (seriesAAmount / (seriesAValuation + seriesAAmount)) * 100
+        });
+      }
+
+      // Update cap table
+      let capTableHTML = '';
+      equitySplits.forEach(founder => {
+        let currentOwnership = founder.equity;
+        rounds.forEach(round => {
+          currentOwnership = currentOwnership * (1 - round.dilution / 100);
+        });
+
+        const vestingType = document.getElementById('vesting-type').value;
+        const vestingText = vestingType === 'none' ? 'None' :
+                           vestingType === 'standard' ? '4yr/1yr cliff' :
+                           vestingType === 'fast' ? '3yr/6mo cliff' : '5yr/1yr cliff';
+
+        capTableHTML += `
+          <tr>
+            <td><strong>${founder.name}</strong><br><span style="font-size: 0.8rem; color: #6b7280;">${vestingText}</span></td>
+            <td><strong>${founder.equity.toFixed(2)}%</strong></td>
+            <td><strong style="color: ${currentOwnership < founder.equity ? '#ef4444' : '#10b981'};">${currentOwnership.toFixed(2)}%</strong></td>
+          </tr>
+        `;
+      });
+
+      // Add investor rows
+      if (rounds.length > 0) {
+        rounds.forEach(round => {
+          capTableHTML += `
+            <tr style="background: #fef3c7;">
+              <td><strong>${round.name} Investors</strong></td>
+              <td>—</td>
+              <td><strong>${round.dilution.toFixed(2)}%</strong></td>
+            </tr>
+          `;
+        });
+      }
+
+      document.getElementById('cap-table-body').innerHTML = capTableHTML;
+    }
+
+    function drawPieChart(equitySplits) {
+      const canvas = document.getElementById('equity-chart');
+      const ctx = canvas.getContext('2d');
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const radius = 160;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      let currentAngle = -Math.PI / 2;
+
+      equitySplits.forEach((founder, index) => {
+        const sliceAngle = (founder.equity / 100) * 2 * Math.PI;
+
+        // Draw slice
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
+        ctx.closePath();
+        ctx.fillStyle = founder.color;
+        ctx.fill();
+
+        // Draw border
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        // Draw percentage label
+        if (founder.equity > 5) { // Only show label if slice is big enough
+          const labelAngle = currentAngle + sliceAngle / 2;
+          const labelX = centerX + Math.cos(labelAngle) * (radius * 0.65);
+          const labelY = centerY + Math.sin(labelAngle) * (radius * 0.65);
+
+          ctx.fillStyle = 'white';
+          ctx.font = 'bold 18px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(founder.equity.toFixed(1) + '%', labelX, labelY);
+        }
+
+        currentAngle += sliceAngle;
+      });
+    }
+
+    function exportCapTable() {
+      const vestingType = document.getElementById('vesting-type').value;
+      const vestingText = vestingType === 'none' ? 'No vesting' :
+                         vestingType === 'standard' ? '4yr / 1yr cliff' :
+                         vestingType === 'fast' ? '3yr / 6mo cliff' : '5yr / 1yr cliff';
+
+      // Get current equity splits
+      const weights = {
+        cash: parseInt(document.getElementById('weight-cash').value),
+        time: parseInt(document.getElementById('weight-time').value),
+        expertise: parseInt(document.getElementById('weight-expertise').value),
+        idea: parseInt(document.getElementById('weight-idea').value)
+      };
+
+      const totalWeight = weights.cash + weights.time + weights.expertise + weights.idea;
+      Object.keys(weights).forEach(key => {
+        weights[key] = (weights[key] / totalWeight) * 100;
+      });
+
+      const equitySplits = foundersData.map((founder, index) => {
+        const totalCash = foundersData.reduce((sum, f) => sum + f.cash, 0);
+        const cashScore = totalCash > 0 ? (founder.cash / totalCash) * 100 : 100 / foundersData.length;
+
+        const totalTime = foundersData.reduce((sum, f) => sum + f.timeCommitment, 0);
+        const timeScore = (founder.timeCommitment / totalTime) * 100;
+
+        const totalExpertise = foundersData.reduce((sum, f) => sum + f.expertise, 0);
+        const expertiseScore = (founder.expertise / totalExpertise) * 100;
+
+        const totalIdea = foundersData.reduce((sum, f) => sum + f.ideaContribution, 0);
+        const ideaScore = totalIdea > 0 ? (founder.ideaContribution / totalIdea) * 100 : 100 / foundersData.length;
+
+        const weightedScore =
+          (cashScore * weights.cash / 100) +
+          (timeScore * weights.time / 100) +
+          (expertiseScore * weights.expertise / 100) +
+          (ideaScore * weights.idea / 100);
+
+        return {
+          name: founder.name,
+          equity: weightedScore
+        };
+      });
+
+      const totalEquity = equitySplits.reduce((sum, f) => sum + f.equity, 0);
+      equitySplits.forEach(f => f.equity = (f.equity / totalEquity) * 100);
+
+      let csv = 'Shareholder,Equity %,Vesting\n';
+      equitySplits.forEach(founder => {
+        csv += `"${founder.name}",${founder.equity.toFixed(2)}%,"${vestingText}"\n`;
+      });
+
+      // Create download
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'founder-cap-table.csv';
+      a.click();
+      window.URL.revokeObjectURL(url);
+    }
+
+    // Initialize on load
+    init();
+  </script>
+
+</body>
+</html>

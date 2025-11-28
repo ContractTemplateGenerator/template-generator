@@ -1274,6 +1274,46 @@ function switchTab(tabName) {
 }
 
 // Intake form submission
+function handleIntakeSubmit(event) {
+  event.preventDefault();
+
+  const formData = new FormData(event.target);
+  const data = Object.fromEntries(formData.entries());
+
+  // Create mailto link with form data
+  const subject = encodeURIComponent(`Delaware Amendment Request - ${data.currentName}`);
+  const body = encodeURIComponent(`
+Delaware Amendment Intake Form
+
+CLIENT INFORMATION:
+Name: ${data.firstName} ${data.lastName}
+Email: ${data.email}
+Phone: ${data.phone}
+
+ENTITY DETAILS:
+Entity Type: ${data.entityType}
+Current Legal Name: ${data.currentName}
+New Name (if applicable): ${data.newName || 'N/A'}
+
+AMENDMENT DETAILS:
+Type of Amendment: ${data.amendmentType}
+Service Package: ${data.package}
+Foreign Qualified in Other States: ${data.foreignQualified}
+Timeline: ${data.timeline}
+
+AMENDMENT REASON & DETAILS:
+${data.amendmentDetails || 'Not provided'}
+
+ADDITIONAL NOTES:
+${data.additionalNotes || 'None'}
+  `);
+
+  // Open email client
+  window.location.href = `mailto:owner@terms.law?subject=${subject}&body=${body}`;
+
+  // Show success message
+  alert('Thank you! Your intake form has been prepared. Please send the email that just opened in your email client, or copy the information and email it to owner@terms.law. I will respond within 24 hours.');
+}
 
 // PayPal Buttons
 paypal.Buttons({

@@ -1602,6 +1602,45 @@ function switchTab(tabName) {
 }
 
 // Intake form submission
+function handleIntakeSubmit(event) {
+  event.preventDefault();
+
+  const formData = new FormData(event.target);
+  const data = Object.fromEntries(formData.entries());
+
+  const subject = encodeURIComponent(`Non-Resident DE LLC Intake - ${data.country}`);
+  const body = encodeURIComponent(`
+Delaware LLC for Non-Resident - Confidential Intake
+
+CLIENT INFORMATION:
+Name: ${data.firstName} ${data.lastName}
+Email: ${data.email}
+Phone: ${data.phone}
+Country of Residence: ${data.country}
+Citizenship: ${data.citizenship}
+
+BUSINESS DETAILS:
+Business Type: ${data.businessType}
+Proposed LLC Name: ${data.llcName || 'To be determined'}
+Number of Owners: ${data.ownerCount}
+U.S. Revenue Percentage: ${data.usRevenue}
+U.S. Physical Presence: ${data.usPresence}
+Has SSN/ITIN: ${data.hasSSN}
+
+SERVICE PACKAGE:
+${data.package}
+
+BUSINESS DESCRIPTION:
+${data.businessDescription || 'Not provided'}
+
+SPECIFIC QUESTIONS/CONCERNS:
+${data.questions || 'None specified'}
+  `);
+
+  window.location.href = `mailto:owner@terms.law?subject=${subject}&body=${body}`;
+
+  alert('Thank you! Your confidential intake form has been prepared. Please send the email that opened, or copy the information and email it to owner@terms.law. I will respond within 24 hours with a consultation proposal.');
+}
 
 // PayPal Buttons
 paypal.Buttons({
