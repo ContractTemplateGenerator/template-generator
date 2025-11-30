@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stock Option Pool Calculator | Equity Dilution & Cap Table Modeling Tool</title>
+
+<style>
+  .option-pool-calc-wrapper {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+    color: #1a202c;
+    line-height: 1.6;
+  }
+
+  .option-pool-calc-wrapper * {
+    box-sizing: border-box;
+  }
+
+  /* Hero Section */
+  .calc-hero {
+    background: linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #c084fc 100%);
+    color: white;
+    padding: 40px 35px;
+    border-radius: 16px;
+    margin-bottom: 30px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .calc-hero::before {
+    content: '📊';
+    position: absolute;
+    top: 15px;
+    right: 30px;
+    font-size: 80px;
+    opacity: 0.15;
+  }
+
+  .hero-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.25);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .hero-title {
+    margin: 0 0 12px 0;
+    font-size: 32px;
+    font-weight: 900;
+    line-height: 1.2;
+  }
+
+  .hero-subtitle {
+    margin: 0;
+    font-size: 16px;
+    opacity: 0.95;
+    line-height: 1.5;
+    max-width: 700px;
+  }
+
+  /* Main Layout */
+  .calc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+  }
+
+  .calc-panel {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+
+  .panel-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: #7c3aed;
+    margin: 0 0 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .panel-subtitle {
+    font-size: 13px;
+    color: #64748b;
+    margin: -15px 0 20px 0;
+  }
+
+  /* Form Elements */
+  .form-group {
+    margin-bottom: 24px;
+  }
+
+  .form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 8px;
+  }
+
+  .form-help {
+    display: block;
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 4px;
+    font-style: italic;
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 15px;
+    border: 2px solid #cbd5e1;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    font-family: inherit;
+  }
+
+  .form-input:focus {
+    outline: none;
+    border-color: #7c3aed;
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+  }
+
+  .form-select {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 15px;
+    border: 2px solid #cbd5e1;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .form-select:focus {
+    outline: none;
+    border-color: #7c3aed;
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+  }
+
+  /* Slider */
+  .slider-container {
+    position: relative;
+    margin-top: 12px;
+  }
+
+  .slider-value {
+    display: inline-block;
+    padding: 4px 10px;
+    background: #f3e8ff;
+    color: #7c3aed;
+    font-weight: 700;
+    border-radius: 6px;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .form-slider {
+    width: 100%;
+    height: 8px;
+    border-radius: 5px;
+    background: #e9d5ff;
+    outline: none;
+    -webkit-appearance: none;
+  }
+
+  .form-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #7c3aed;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .form-slider::-webkit-slider-thumb:hover {
+    background: #6d28d9;
+    transform: scale(1.1);
+  }
+
+  .form-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #7c3aed;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+  }
+
+  .form-slider::-moz-range-thumb:hover {
+    background: #6d28d9;
+    transform: scale(1.1);
+  }
+
+  /* Results Summary */
+  .results-summary {
+    background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+    border: 3px solid #7c3aed;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    text-align: center;
+  }
+
+  .summary-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 8px;
+  }
+
+  .summary-amount {
+    font-size: 42px;
+    font-weight: 900;
+    color: #7c3aed;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .summary-status {
+    font-size: 15px;
+    font-weight: 700;
+    padding: 8px 16px;
+    border-radius: 6px;
+    display: inline-block;
+    margin-top: 8px;
+    background: #f3e8ff;
+    color: #6d28d9;
+  }
+
+  /* Cap Table */
+  .cap-table-wrapper {
+    overflow-x: auto;
+    margin: 24px 0;
+  }
+
+  .cap-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+
+  .cap-table thead tr {
+    background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+    color: white;
+  }
+
+  .cap-table th {
+    padding: 12px 10px;
+    text-align: left;
+    font-weight: 700;
+    border: 1px solid #cbd5e1;
+  }
+
+  .cap-table td {
+    padding: 10px;
+    border: 1px solid #e2e8f0;
+  }
+
+  .cap-table tbody tr:nth-child(even) {
+    background: #f8fafc;
+  }
+
+  .cap-table tbody tr:hover {
+    background: #faf5ff;
+  }
+
+  .cap-table .row-label {
+    font-weight: 600;
+    color: #334155;
+  }
+
+  .cap-table .total-row {
+    font-weight: 700;
+    background: #f3e8ff !important;
+    color: #7c3aed;
+  }
+
+  /* Alert Boxes */
+  .alert-box {
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 20px 0;
+    border-left: 5px solid;
+  }
+
+  .alert-info {
+    background: #eff6ff;
+    border-left-color: #3b82f6;
+    color: #1e40af;
+  }
+
+  .alert-warning {
+    background: #fef3c7;
+    border-left-color: #f59e0b;
+    color: #92400e;
+  }
+
+  .alert-success {
+    background: #dcfce7;
+    border-left-color: #16a34a;
+    color: #166534;
+  }
+
+  .alert-title {
+    font-weight: 700;
+    margin-bottom: 6px;
+    font-size: 14px;
+  }
+
+  .alert-text {
+    font-size: 13px;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  /* Detail Cards */
+  .detail-section {
+    margin: 24px 0;
+  }
+
+  .detail-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #7c3aed;
+    margin: 0 0 12px 0;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #ddd6fe;
+  }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .detail-card {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 16px;
+  }
+
+  .detail-card-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+
+  .detail-card-value {
+    font-size: 22px;
+    font-weight: 800;
+    color: #7c3aed;
+  }
+
+  .detail-card-note {
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 4px;
+  }
+
+  /* Multi-Round Section */
+  .round-section {
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+
+  .round-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .round-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #7c3aed;
+  }
+
+  .round-badge {
+    background: #f3e8ff;
+    color: #7c3aed;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  /* Methodology */
+  .methodology-section {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 30px;
+    margin-top: 30px;
+  }
+
+  .methodology-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: #7c3aed;
+    margin: 0 0 16px 0;
+  }
+
+  .methodology-text {
+    font-size: 14px;
+    color: #475569;
+    line-height: 1.7;
+    margin-bottom: 12px;
+  }
+
+  .methodology-list {
+    margin: 12px 0;
+    padding-left: 24px;
+  }
+
+  .methodology-list li {
+    font-size: 13px;
+    color: #475569;
+    margin-bottom: 8px;
+    line-height: 1.6;
+  }
+
+  /* Tabs */
+  .tab-nav {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    background: #f8fafc;
+    padding: 8px;
+    border-radius: 12px;
+    overflow-x: auto;
+    flex-wrap: wrap;
+  }
+
+  .tab-button {
+    background: transparent;
+    border: none;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .tab-button:hover {
+    color: #7c3aed;
+    background: rgba(124, 58, 237, 0.1);
+  }
+
+  .tab-button.active {
+    color: white;
+    background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+  }
+
+  .tab-content {
+    display: none;
+  }
+
+  .tab-content.active {
+    display: block;
+  }
+
+  /* Dilution Chart */
+  .dilution-chart {
+    margin: 24px 0;
+    padding: 20px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+  }
+
+  .chart-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 16px;
+  }
+
+  .chart-bar {
+    margin-bottom: 12px;
+  }
+
+  .chart-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 4px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .chart-progress {
+    width: 100%;
+    height: 28px;
+    background: #e2e8f0;
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .chart-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #7c3aed 0%, #a855f7 100%);
+    transition: width 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 8px;
+  }
+
+  .chart-fill-text {
+    font-size: 12px;
+    font-weight: 700;
+    color: white;
+  }
+
+  /* Responsive */
+  @media (max-width: 968px) {
+    .calc-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .hero-title {
+      font-size: 26px;
+    }
+
+    .summary-amount {
+      font-size: 36px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .option-pool-calc-wrapper {
+      padding: 15px;
+    }
+
+    .calc-panel {
+      padding: 20px;
+    }
+
+    .cap-table {
+      font-size: 12px;
+    }
+
+    .cap-table th,
+    .cap-table td {
+      padding: 8px 6px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="option-pool-calc-wrapper">
+  <!-- Hero Section -->
+  <div class="calc-hero">
+    <div class="hero-badge">📊 EQUITY PLANNING TOOL</div>
+    <div class="hero-title">Stock Option Pool Size Calculator</div>
+    <p class="hero-subtitle">Model option pool creation, dilution impact, and multi-round fundraising scenarios. Calculate fully-diluted cap tables and visualize founder/investor/employee ownership across Series A, B, and C rounds.</p>
+  </div>
+
+  <!-- Tab Navigation -->
+  <div class="tab-nav">
+    <button class="tab-button active" onclick="switchTab('single', event)">Single Round</button>
+    <button class="tab-button" onclick="switchTab('multi', event)">Multi-Round Model</button>
+  </div>
+
+  <!-- Single Round Tab -->
+  <div id="single-tab" class="tab-content active">
+    <div class="calc-grid">
+      <!-- Left Panel: Inputs -->
+      <div class="calc-panel">
+        <div class="panel-title">
+          <span>📝</span>
+          <span>Current Situation</span>
+        </div>
+        <p class="panel-subtitle">Enter your current cap table and upcoming round details</p>
+
+        <form id="calcForm">
+          <!-- Pre-Money Valuation -->
+          <div class="form-group">
+            <label class="form-label" for="preMoneyVal">Pre-Money Valuation</label>
+            <input type="number" id="preMoneyVal" class="form-input" value="8000000" min="0" step="100000" oninput="calculateSingleRound()" onchange="calculateSingleRound()">
+            <span class="form-help">Company valuation before this investment round</span>
+          </div>
+
+          <!-- Investment Amount -->
+          <div class="form-group">
+            <label class="form-label" for="investmentAmt">Investment Amount</label>
+            <input type="number" id="investmentAmt" class="form-input" value="2000000" min="0" step="100000" oninput="calculateSingleRound()" onchange="calculateSingleRound()">
+            <span class="form-help">Total capital raised in this round</span>
+          </div>
+
+          <!-- Current Shares Outstanding -->
+          <div class="form-group">
+            <label class="form-label" for="currentShares">Current Shares Outstanding</label>
+            <input type="number" id="currentShares" class="form-input" value="10000000" min="0" step="100000" oninput="calculateSingleRound()" onchange="calculateSingleRound()">
+            <span class="form-help">Common shares issued to founders/early team (fully-diluted basis)</span>
+          </div>
+
+          <!-- Existing Option Pool -->
+          <div class="form-group">
+            <label class="form-label" for="existingPool">Existing Option Pool (%)</label>
+            <input type="number" id="existingPool" class="form-input" value="0" min="0" max="50" step="0.5" oninput="calculateSingleRound()" onchange="calculateSingleRound()">
+            <span class="form-help">Current unallocated option pool as % of fully-diluted (0% if none)</span>
+          </div>
+
+          <!-- New Option Pool Size Slider -->
+          <div class="form-group">
+            <label class="form-label" for="newPoolPct">New Option Pool Size (Post-Money %)</label>
+            <div class="slider-container">
+              <span class="slider-value" id="newPoolPctDisplay">15%</span>
+              <input type="range" id="newPoolPct" class="form-slider" min="5" max="25" value="15" step="0.5" oninput="calculateSingleRound()" onchange="calculateSingleRound()">
+            </div>
+            <span class="form-help">Typical: 10-12% Seed, 15-20% Series A, 10-15% Series B+</span>
+          </div>
+
+          <!-- Round Stage -->
+          <div class="form-group">
+            <label class="form-label" for="roundStage">Round Stage</label>
+            <select id="roundStage" class="form-select" onchange="calculateSingleRound()">
+              <option value="Seed">Seed</option>
+              <option value="Series A" selected>Series A</option>
+              <option value="Series B">Series B</option>
+              <option value="Series C">Series C</option>
+            </select>
+            <span class="form-help">Helps determine typical option pool benchmarks</span>
+          </div>
+
+          <!-- Hiring Plan -->
+          <div class="form-group">
+            <label class="form-label" for="hiringPlan">18-Month Hiring Plan (# of Employees)</label>
+            <input type="number" id="hiringPlan" class="form-input" value="15" min="0" step="1" oninput="calculateSingleRound()" onchange="calculateSingleRound()">
+            <span class="form-help">Expected new hires over next 18 months (validates pool size)</span>
+          </div>
+        </form>
+      </div>
+
+      <!-- Right Panel: Results -->
+      <div class="calc-panel">
+        <div class="panel-title">
+          <span>💡</span>
+          <span>Cap Table Impact</span>
+        </div>
+        <p class="panel-subtitle">Ownership breakdown after option pool creation and investment</p>
+
+        <!-- Summary Box -->
+        <div class="results-summary">
+          <div class="summary-label">Recommended Option Pool</div>
+          <div class="summary-amount" id="summaryPoolSize">15.0%</div>
+          <div class="summary-status" id="summaryStatus">Industry Standard</div>
+        </div>
+
+        <!-- Guidance Alert -->
+        <div id="guidanceAlert"></div>
+
+        <!-- Detail Cards -->
+        <div class="detail-section">
+          <div class="detail-title">Key Metrics</div>
+          <div class="detail-grid">
+            <div class="detail-card">
+              <div class="detail-card-label">Post-Money Valuation</div>
+              <div class="detail-card-value" id="postMoneyVal">$0</div>
+              <div class="detail-card-note">Pre-money + investment</div>
+            </div>
+            <div class="detail-card">
+              <div class="detail-card-label">Price Per Share</div>
+              <div class="detail-card-value" id="pricePerShare">$0.00</div>
+              <div class="detail-card-note">Post-money ÷ FD shares</div>
+            </div>
+            <div class="detail-card">
+              <div class="detail-card-label">Founder Dilution</div>
+              <div class="detail-card-value" id="founderDilution">0%</div>
+              <div class="detail-card-note">From pool + investment</div>
+            </div>
+            <div class="detail-card">
+              <div class="detail-card-label">Option Pool Shares</div>
+              <div class="detail-card-value" id="poolShares">0</div>
+              <div class="detail-card-note">Reserved for employees</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cap Table -->
+        <div class="cap-table-wrapper">
+          <table class="cap-table">
+            <thead>
+              <tr>
+                <th>Shareholder</th>
+                <th>Shares</th>
+                <th>% Ownership</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody id="capTableBody">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dilution Visualization -->
+    <div class="round-section">
+      <div class="round-header">
+        <div class="round-title">Ownership Breakdown (Post-Money)</div>
+        <div class="round-badge">Fully-Diluted Basis</div>
+      </div>
+      <div class="dilution-chart" id="dilutionChart">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Multi-Round Tab -->
+  <div id="multi-tab" class="tab-content">
+    <div class="calc-panel">
+      <div class="panel-title">
+        <span>📈</span>
+        <span>Multi-Round Dilution Model</span>
+      </div>
+      <p class="panel-subtitle">Model option pool expansion and dilution across Series A, B, and C</p>
+
+      <div class="alert-info">
+        <div class="alert-title">💡 How This Works</div>
+        <div class="alert-text">
+          This model shows how founder ownership dilutes across multiple funding rounds. Each round creates a new option pool (if needed), issues new shares to investors, and recalculates ownership percentages on a fully-diluted basis.
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="founderShares">Founder Shares at Formation</label>
+        <input type="number" id="founderShares" class="form-input" value="10000000" min="0" step="100000">
+        <span class="form-help">Total common shares issued to founders at company formation</span>
+      </div>
+
+      <div class="round-section">
+        <div class="round-header">
+          <div class="round-title">Series A</div>
+          <div class="round-badge">Round 1</div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="form-group">
+            <label class="form-label" for="seriesA_preMoney">Pre-Money Valuation</label>
+            <input type="number" id="seriesA_preMoney" class="form-input" value="8000000" min="0" step="100000">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="seriesA_investment">Investment Amount</label>
+            <input type="number" id="seriesA_investment" class="form-input" value="2000000" min="0" step="100000">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="seriesA_pool">Option Pool (Post-Money %)</label>
+            <input type="number" id="seriesA_pool" class="form-input" value="15" min="0" max="30" step="0.5">
+          </div>
+        </div>
+      </div>
+
+      <div class="round-section">
+        <div class="round-header">
+          <div class="round-title">Series B</div>
+          <div class="round-badge">Round 2</div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="form-group">
+            <label class="form-label" for="seriesB_preMoney">Pre-Money Valuation</label>
+            <input type="number" id="seriesB_preMoney" class="form-input" value="25000000" min="0" step="100000">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="seriesB_investment">Investment Amount</label>
+            <input type="number" id="seriesB_investment" class="form-input" value="10000000" min="0" step="100000">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="seriesB_pool">Additional Pool Top-Up (%)</label>
+            <input type="number" id="seriesB_pool" class="form-input" value="5" min="0" max="20" step="0.5">
+          </div>
+        </div>
+      </div>
+
+      <div class="round-section">
+        <div class="round-header">
+          <div class="round-title">Series C</div>
+          <div class="round-badge">Round 3</div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="form-group">
+            <label class="form-label" for="seriesC_preMoney">Pre-Money Valuation</label>
+            <input type="number" id="seriesC_preMoney" class="form-input" value="80000000" min="0" step="1000000">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="seriesC_investment">Investment Amount</label>
+            <input type="number" id="seriesC_investment" class="form-input" value="30000000" min="0" step="1000000">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="seriesC_pool">Additional Pool Top-Up (%)</label>
+            <input type="number" id="seriesC_pool" class="form-input" value="3" min="0" max="15" step="0.5">
+          </div>
+        </div>
+      </div>
+
+      <button onclick="calculateMultiRound()" style="background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); color: white; border: none; padding: 14px 32px; font-size: 16px; font-weight: 700; border-radius: 8px; cursor: pointer; width: 100%; margin-top: 16px;">
+        Calculate Multi-Round Dilution
+      </button>
+
+      <div id="multiRoundResults" style="margin-top: 30px;"></div>
+    </div>
+  </div>
+
+  <!-- Methodology Section -->
+  <div class="methodology-section">
+    <div class="methodology-title">📖 How Option Pool Sizing Works</div>
+
+    <p class="methodology-text"><strong>Option Pool Creation (Pre-Money vs Post-Money):</strong></p>
+    <ul class="methodology-list">
+      <li><strong>Pre-Money Pool:</strong> Option pool is carved out BEFORE the investment, diluting founders but not investors. Most common structure in VC deals.</li>
+      <li><strong>Post-Money Pool:</strong> Pool size is expressed as % of post-money fully-diluted shares (what this calculator uses for clarity).</li>
+      <li><strong>Example:</strong> If investors want a 20% post-money pool and invest $2M at $8M pre-money, the pool dilutes founders MORE than the investment itself.</li>
+    </ul>
+
+    <p class="methodology-text"><strong>Typical Pool Sizes by Stage:</strong></p>
+    <ul class="methodology-list">
+      <li><strong>Seed Round:</strong> 10-12% post-money. Enough for first 5-10 hires (VP Eng, Head of Sales, early engineers).</li>
+      <li><strong>Series A:</strong> 15-20% post-money. Enough for 10-20 hires over 18-24 months (senior execs, eng team, product).</li>
+      <li><strong>Series B:</strong> 10-15% top-up. Replenish pool for next 20-30 hires (scale sales, marketing, ops).</li>
+      <li><strong>Series C+:</strong> 5-10% top-up. Smaller % but larger absolute number of shares as valuation grows.</li>
+    </ul>
+
+    <p class="methodology-text"><strong>Dilution Mechanics:</strong></p>
+    <ul class="methodology-list">
+      <li><strong>Fully-Diluted Shares:</strong> Common shares + Preferred shares + ENTIRE option pool (not just vested/granted options).</li>
+      <li><strong>Founder Dilution:</strong> Founders get diluted by BOTH the new investment AND the option pool creation.</li>
+      <li><strong>Price Per Share:</strong> Post-money valuation ÷ Fully-diluted shares = price used for 409A valuations and option grants.</li>
+      <li><strong>Investor Protection:</strong> VCs negotiate option pool size pre-money to avoid their own dilution from employee grants.</li>
+    </ul>
+
+    <p class="methodology-text"><strong>Hiring Plan Validation:</strong></p>
+    <ul class="methodology-list">
+      <li>Rule of thumb: Senior exec (VP/C-level) = 0.5-1.5% of company. Senior IC/Manager = 0.1-0.5%. Early employee = 0.01-0.1%.</li>
+      <li>Example: 15% pool can support ~10 senior hires (1% each) + 20 early employees (0.25% avg) = ~30 total grants.</li>
+      <li>If your 18-month hiring plan is 50 people and you only have a 10% pool, you'll run out of options and need a top-up mid-round.</li>
+    </ul>
+
+    <p class="methodology-text"><strong>Common Mistakes:</strong></p>
+    <ul class="methodology-list">
+      <li><strong>Pool too small:</strong> Run out of options mid-hiring plan, forced to raise emergency capital or re-negotiate with investors.</li>
+      <li><strong>Pool too large:</strong> Founders get over-diluted upfront for options that won't be granted for years.</li>
+      <li><strong>Ignoring top-ups:</strong> Forgetting that each new round typically requires refreshing the option pool (dilutes everyone pro-rata).</li>
+      <li><strong>Confusing FD with outstanding:</strong> Option pool counts as issued shares for dilution purposes, even if no options are actually granted yet.</li>
+    </ul>
+
+    <p class="methodology-text" style="margin-top: 16px; font-size: 12px; color: #64748b;">
+      <strong>Disclaimer:</strong> This calculator provides estimates for educational purposes. Actual cap table modeling requires 409A valuations, vesting schedules, and legal/tax advice. Consult a startup attorney and CFO before finalizing option pool size and investor terms.
+    </p>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// SINGLE ROUND CALCULATOR
+// ============================================================
+function calculateSingleRound() {
+  const inputs = {
+    preMoneyVal: parseFloat(document.getElementById('preMoneyVal').value) || 0,
+    investmentAmt: parseFloat(document.getElementById('investmentAmt').value) || 0,
+    currentShares: parseFloat(document.getElementById('currentShares').value) || 0,
+    existingPool: parseFloat(document.getElementById('existingPool').value) || 0,
+    newPoolPct: parseFloat(document.getElementById('newPoolPct').value) || 15,
+    roundStage: document.getElementById('roundStage').value,
+    hiringPlan: parseFloat(document.getElementById('hiringPlan').value) || 0
+  };
+
+  // Update slider display
+  document.getElementById('newPoolPctDisplay').textContent = inputs.newPoolPct + '%';
+
+  // Post-money valuation
+  const postMoneyVal = inputs.preMoneyVal + inputs.investmentAmt;
+
+  // Calculate new shares needed for investment (before option pool)
+  // We'll solve this iteratively:
+  // Let X = new investor shares
+  // Let P = option pool shares to be created
+  // Investor % = X / (currentShares + X + P)
+  // Pool % (post-money) = P / (currentShares + X + P)
+  // Investment / Post-Money = Investor %
+
+  const investorPct = inputs.investmentAmt / postMoneyVal;
+  const poolPctDecimal = inputs.newPoolPct / 100;
+
+  // Solve for fully-diluted shares
+  // FD = currentShares + investorShares + poolShares
+  // investorShares = FD * investorPct
+  // poolShares = FD * poolPctDecimal
+  // FD = currentShares + (FD * investorPct) + (FD * poolPctDecimal)
+  // FD * (1 - investorPct - poolPctDecimal) = currentShares
+  // FD = currentShares / (1 - investorPct - poolPctDecimal)
+
+  const fullyDilutedShares = inputs.currentShares / (1 - investorPct - poolPctDecimal);
+  const investorShares = fullyDilutedShares * investorPct;
+  const poolShares = fullyDilutedShares * poolPctDecimal;
+
+  // Price per share
+  const pricePerShare = postMoneyVal / fullyDilutedShares;
+
+  // Ownership percentages
+  const founderPct = (inputs.currentShares / fullyDilutedShares) * 100;
+  const founderDilution = 100 - founderPct;
+
+  // Update summary
+  document.getElementById('summaryPoolSize').textContent = inputs.newPoolPct.toFixed(1) + '%';
+
+  // Status based on round stage and pool size
+  let status = 'Custom Size';
+  if (inputs.roundStage === 'Seed' && inputs.newPoolPct >= 10 && inputs.newPoolPct <= 12) {
+    status = 'Industry Standard for Seed';
+  } else if (inputs.roundStage === 'Series A' && inputs.newPoolPct >= 15 && inputs.newPoolPct <= 20) {
+    status = 'Industry Standard for Series A';
+  } else if (inputs.roundStage === 'Series B' && inputs.newPoolPct >= 10 && inputs.newPoolPct <= 15) {
+    status = 'Industry Standard for Series B';
+  } else if (inputs.roundStage === 'Series C' && inputs.newPoolPct >= 5 && inputs.newPoolPct <= 10) {
+    status = 'Industry Standard for Series C';
+  } else if (inputs.newPoolPct < 8) {
+    status = '⚠️ May Be Too Small';
+  } else if (inputs.newPoolPct > 22) {
+    status = '⚠️ May Over-Dilute Founders';
+  }
+
+  document.getElementById('summaryStatus').textContent = status;
+
+  // Update detail cards
+  document.getElementById('postMoneyVal').textContent = formatCurrency(postMoneyVal);
+  document.getElementById('pricePerShare').textContent = '$' + pricePerShare.toFixed(4);
+  document.getElementById('founderDilution').textContent = founderDilution.toFixed(1) + '%';
+  document.getElementById('poolShares').textContent = formatShares(poolShares);
+
+  // Guidance alert
+  const guidanceAlert = document.getElementById('guidanceAlert');
+  let alertHTML = '';
+
+  if (inputs.hiringPlan > 0) {
+    const avgGrantPct = (poolShares / fullyDilutedShares) / inputs.hiringPlan * 100;
+    if (avgGrantPct < 0.05) {
+      alertHTML = `
+        <div class="alert-box alert-warning">
+          <div class="alert-title">⚠️ Pool May Be Too Small</div>
+          <div class="alert-text">
+            Your 18-month hiring plan (${inputs.hiringPlan} people) with a ${inputs.newPoolPct}% pool gives an average grant of only ${avgGrantPct.toFixed(3)}% per hire.
+            Typical early employees expect 0.1-0.5%, senior hires 0.5-1.5%. Consider increasing pool size or reducing hiring plan.
+          </div>
+        </div>
+      `;
+    } else if (avgGrantPct > 1.5) {
+      alertHTML = `
+        <div class="alert-box alert-success">
+          <div class="alert-title">✅ Pool Size Looks Comfortable</div>
+          <div class="alert-text">
+            Your ${inputs.newPoolPct}% pool supports ${inputs.hiringPlan} hires with an average ~${avgGrantPct.toFixed(2)}% per person.
+            This provides flexibility for senior executive grants (0.5-1.5%) and early employee grants (0.1-0.5%).
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  if (founderDilution > 50) {
+    alertHTML += `
+      <div class="alert-box alert-warning">
+        <div class="alert-title">⚠️ High Founder Dilution</div>
+        <div class="alert-text">
+          Founders will be diluted by ${founderDilution.toFixed(1)}% in this round. This is high but may be justified if the pre-money valuation is strong.
+          Make sure the option pool size is truly needed for your 18-month hiring plan.
+        </div>
+      </div>
+    `;
+  }
+
+  guidanceAlert.innerHTML = alertHTML;
+
+  // Update cap table
+  updateCapTable(inputs.currentShares, investorShares, poolShares, fullyDilutedShares, pricePerShare);
+
+  // Update dilution chart
+  updateDilutionChart(inputs.currentShares, investorShares, poolShares, fullyDilutedShares);
+}
+
+function updateCapTable(founderShares, investorShares, poolShares, fullyDilutedShares, pricePerShare) {
+  const tbody = document.getElementById('capTableBody');
+
+  const rows = [
+    {
+      label: 'Founders (Common Stock)',
+      shares: founderShares,
+      pct: (founderShares / fullyDilutedShares) * 100
+    },
+    {
+      label: 'Investors (Preferred Stock)',
+      shares: investorShares,
+      pct: (investorShares / fullyDilutedShares) * 100
+    },
+    {
+      label: 'Option Pool (Unallocated)',
+      shares: poolShares,
+      pct: (poolShares / fullyDilutedShares) * 100
+    }
+  ];
+
+  let html = '';
+  rows.forEach(row => {
+    const value = row.shares * pricePerShare;
+    html += '<tr>';
+    html += '<td class="row-label">' + row.label + '</td>';
+    html += '<td>' + formatShares(row.shares) + '</td>';
+    html += '<td>' + row.pct.toFixed(2) + '%</td>';
+    html += '<td>' + formatCurrency(value) + '</td>';
+    html += '</tr>';
+  });
+
+  html += '<tr class="total-row">';
+  html += '<td>Total (Fully-Diluted)</td>';
+  html += '<td>' + formatShares(fullyDilutedShares) + '</td>';
+  html += '<td>100.00%</td>';
+  html += '<td>' + formatCurrency(fullyDilutedShares * pricePerShare) + '</td>';
+  html += '</tr>';
+
+  tbody.innerHTML = html;
+}
+
+function updateDilutionChart(founderShares, investorShares, poolShares, fullyDilutedShares) {
+  const chart = document.getElementById('dilutionChart');
+
+  const data = [
+    { label: 'Founders', shares: founderShares, color: '#7c3aed' },
+    { label: 'Investors', shares: investorShares, color: '#a855f7' },
+    { label: 'Option Pool', shares: poolShares, color: '#c084fc' }
+  ];
+
+  let html = '<div class="chart-title">Ownership Distribution</div>';
+
+  data.forEach(item => {
+    const pct = (item.shares / fullyDilutedShares) * 100;
+    html += '<div class="chart-bar">';
+    html += '<div class="chart-label">';
+    html += '<span>' + item.label + '</span>';
+    html += '<span>' + pct.toFixed(1) + '%</span>';
+    html += '</div>';
+    html += '<div class="chart-progress">';
+    html += '<div class="chart-fill" style="width: ' + pct + '%; background: ' + item.color + ';">';
+    if (pct > 10) {
+      html += '<span class="chart-fill-text">' + formatShares(item.shares) + '</span>';
+    }
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+  });
+
+  chart.innerHTML = html;
+}
+
+// ============================================================
+// MULTI-ROUND CALCULATOR
+// ============================================================
+function calculateMultiRound() {
+  const founderShares = parseFloat(document.getElementById('founderShares').value) || 10000000;
+
+  // Series A
+  const aPreMoney = parseFloat(document.getElementById('seriesA_preMoney').value) || 0;
+  const aInvestment = parseFloat(document.getElementById('seriesA_investment').value) || 0;
+  const aPoolPct = parseFloat(document.getElementById('seriesA_pool').value) || 0;
+
+  // Series B
+  const bPreMoney = parseFloat(document.getElementById('seriesB_preMoney').value) || 0;
+  const bInvestment = parseFloat(document.getElementById('seriesB_investment').value) || 0;
+  const bPoolPct = parseFloat(document.getElementById('seriesB_pool').value) || 0;
+
+  // Series C
+  const cPreMoney = parseFloat(document.getElementById('seriesC_preMoney').value) || 0;
+  const cInvestment = parseFloat(document.getElementById('seriesC_investment').value) || 0;
+  const cPoolPct = parseFloat(document.getElementById('seriesC_pool').value) || 0;
+
+  // Calculate each round
+  const rounds = [];
+
+  // Initial state
+  let currentFounderShares = founderShares;
+  let currentTotalShares = founderShares;
+
+  // Series A
+  const aPostMoney = aPreMoney + aInvestment;
+  const aInvestorPct = aInvestment / aPostMoney;
+  const aPoolPctDecimal = aPoolPct / 100;
+  const aFD = currentTotalShares / (1 - aInvestorPct - aPoolPctDecimal);
+  const aInvestorShares = aFD * aInvestorPct;
+  const aPoolShares = aFD * aPoolPctDecimal;
+  const aFounderPct = (currentFounderShares / aFD) * 100;
+
+  rounds.push({
+    name: 'Series A',
+    preMoney: aPreMoney,
+    investment: aInvestment,
+    postMoney: aPostMoney,
+    founderShares: currentFounderShares,
+    investorShares: aInvestorShares,
+    poolShares: aPoolShares,
+    totalShares: aFD,
+    founderPct: aFounderPct,
+    investorPct: aInvestorPct * 100,
+    poolPct: aPoolPct
+  });
+
+  // Update for Series B (founders keep same shares, but total expands)
+  currentTotalShares = aFD;
+  const bPostMoney = bPreMoney + bInvestment;
+  const bInvestorPct = bInvestment / bPostMoney;
+  const bPoolPctDecimal = bPoolPct / 100;
+  const bFD = currentTotalShares / (1 - bInvestorPct - bPoolPctDecimal);
+  const bInvestorShares = bFD * bInvestorPct;
+  const bPoolShares = bFD * bPoolPctDecimal;
+  const bFounderPct = (currentFounderShares / bFD) * 100;
+
+  rounds.push({
+    name: 'Series B',
+    preMoney: bPreMoney,
+    investment: bInvestment,
+    postMoney: bPostMoney,
+    founderShares: currentFounderShares,
+    investorShares: bInvestorShares,
+    poolShares: bPoolShares,
+    totalShares: bFD,
+    founderPct: bFounderPct,
+    investorPct: bInvestorPct * 100,
+    poolPct: bPoolPct
+  });
+
+  // Update for Series C
+  currentTotalShares = bFD;
+  const cPostMoney = cPreMoney + cInvestment;
+  const cInvestorPct = cInvestment / cPostMoney;
+  const cPoolPctDecimal = cPoolPct / 100;
+  const cFD = currentTotalShares / (1 - cInvestorPct - cPoolPctDecimal);
+  const cInvestorShares = cFD * cInvestorPct;
+  const cPoolShares = cFD * cPoolPctDecimal;
+  const cFounderPct = (currentFounderShares / cFD) * 100;
+
+  rounds.push({
+    name: 'Series C',
+    preMoney: cPreMoney,
+    investment: cInvestment,
+    postMoney: cPostMoney,
+    founderShares: currentFounderShares,
+    investorShares: cInvestorShares,
+    poolShares: cPoolShares,
+    totalShares: cFD,
+    founderPct: cFounderPct,
+    investorPct: cInvestorPct * 100,
+    poolPct: cPoolPct
+  });
+
+  displayMultiRoundResults(rounds, founderShares);
+}
+
+function displayMultiRoundResults(rounds, initialFounderShares) {
+  const container = document.getElementById('multiRoundResults');
+
+  let html = `
+    <div class="alert-success">
+      <div class="alert-title">✅ Multi-Round Analysis Complete</div>
+      <div class="alert-text">
+        Starting with ${formatShares(initialFounderShares)} founder shares, here's how ownership evolves across three funding rounds.
+      </div>
+    </div>
+  `;
+
+  // Dilution summary
+  html += `
+    <div class="detail-section">
+      <div class="detail-title">Founder Ownership Across Rounds</div>
+      <div class="dilution-chart">
+        <div class="chart-title">Founder Dilution Timeline</div>
+  `;
+
+  rounds.forEach(round => {
+    html += `
+      <div class="chart-bar">
+        <div class="chart-label">
+          <span>${round.name}</span>
+          <span>${round.founderPct.toFixed(1)}%</span>
+        </div>
+        <div class="chart-progress">
+          <div class="chart-fill" style="width: ${round.founderPct}%; background: linear-gradient(90deg, #7c3aed 0%, #a855f7 100%);">
+            ${round.founderPct > 15 ? `<span class="chart-fill-text">${formatCurrency(round.postMoney * round.founderPct / 100)}</span>` : ''}
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  html += `
+      </div>
+    </div>
+  `;
+
+  // Detailed table
+  html += `
+    <div class="cap-table-wrapper">
+      <table class="cap-table">
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>Series A</th>
+            <th>Series B</th>
+            <th>Series C</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="row-label">Pre-Money Valuation</td>
+            <td>${formatCurrency(rounds[0].preMoney)}</td>
+            <td>${formatCurrency(rounds[1].preMoney)}</td>
+            <td>${formatCurrency(rounds[2].preMoney)}</td>
+          </tr>
+          <tr>
+            <td class="row-label">Investment</td>
+            <td>${formatCurrency(rounds[0].investment)}</td>
+            <td>${formatCurrency(rounds[1].investment)}</td>
+            <td>${formatCurrency(rounds[2].investment)}</td>
+          </tr>
+          <tr>
+            <td class="row-label">Post-Money Valuation</td>
+            <td>${formatCurrency(rounds[0].postMoney)}</td>
+            <td>${formatCurrency(rounds[1].postMoney)}</td>
+            <td>${formatCurrency(rounds[2].postMoney)}</td>
+          </tr>
+          <tr>
+            <td class="row-label">Founder Ownership %</td>
+            <td>${rounds[0].founderPct.toFixed(2)}%</td>
+            <td>${rounds[1].founderPct.toFixed(2)}%</td>
+            <td>${rounds[2].founderPct.toFixed(2)}%</td>
+          </tr>
+          <tr>
+            <td class="row-label">Investor Ownership %</td>
+            <td>${rounds[0].investorPct.toFixed(2)}%</td>
+            <td>${rounds[1].investorPct.toFixed(2)}%</td>
+            <td>${rounds[2].investorPct.toFixed(2)}%</td>
+          </tr>
+          <tr>
+            <td class="row-label">Option Pool %</td>
+            <td>${rounds[0].poolPct.toFixed(2)}%</td>
+            <td>${rounds[1].poolPct.toFixed(2)}%</td>
+            <td>${rounds[2].poolPct.toFixed(2)}%</td>
+          </tr>
+          <tr class="total-row">
+            <td>Fully-Diluted Shares</td>
+            <td>${formatShares(rounds[0].totalShares)}</td>
+            <td>${formatShares(rounds[1].totalShares)}</td>
+            <td>${formatShares(rounds[2].totalShares)}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  const finalFounderValue = rounds[2].postMoney * rounds[2].founderPct / 100;
+  const totalDilution = 100 - rounds[2].founderPct;
+
+  html += `
+    <div class="alert-info">
+      <div class="alert-title">💡 Summary</div>
+      <div class="alert-text">
+        After three funding rounds, founders own <strong>${rounds[2].founderPct.toFixed(1)}%</strong> of the company
+        (down from 100% at formation, ${totalDilution.toFixed(1)}% total dilution).
+        Founder stake is worth <strong>${formatCurrency(finalFounderValue)}</strong> at Series C post-money valuation.
+      </div>
+    </div>
+  `;
+
+  container.innerHTML = html;
+}
+
+// ============================================================
+// UTILITY FUNCTIONS
+// ============================================================
+function formatCurrency(value) {
+  if (value === 0) return '$0';
+  if (value >= 1000000) {
+    return '$' + (value / 1000000).toFixed(1) + 'M';
+  }
+  if (value >= 1000) {
+    return '$' + (value / 1000).toFixed(0) + 'K';
+  }
+  return '$' + value.toLocaleString('en-US', { maximumFractionDigits: 0 });
+}
+
+function formatShares(value) {
+  if (value >= 1000000) {
+    return (value / 1000000).toFixed(2) + 'M';
+  }
+  if (value >= 1000) {
+    return (value / 1000).toFixed(0) + 'K';
+  }
+  return value.toLocaleString('en-US', { maximumFractionDigits: 0 });
+}
+
+function switchTab(tabId, event) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  const contents = document.querySelectorAll('.tab-content');
+  contents.forEach(content => content.classList.remove('active'));
+
+  const tabs = document.querySelectorAll('.tab-button');
+  tabs.forEach(tab => tab.classList.remove('active'));
+
+  const targetTab = document.getElementById(tabId + '-tab');
+  if (targetTab) {
+    targetTab.classList.add('active');
+  }
+
+  if (event && event.target) {
+    event.target.classList.add('active');
+  }
+}
+
+// ============================================================
+// INITIALIZATION
+// ============================================================
+// Run initial calculation when page loads
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', calculateSingleRound);
+} else {
+  // DOM already loaded
+  calculateSingleRound();
+}
+</script>
+
+</body>
+</html>
