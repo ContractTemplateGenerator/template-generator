@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kentucky Entity Types – Interactive Summary</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #2c3e50;
+        }
+
+        .ky-widget {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 12px 35px rgba(15, 23, 42, 0.12);
+        }
+
+        header {
+            background: linear-gradient(135deg, #0f172a, #1e40af);
+            color: white;
+            text-align: center;
+            padding: 42px 20px 48px;
+        }
+
+        .state-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.18);
+            padding: 8px 18px;
+            border-radius: 999px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+        }
+
+        .hero-title {
+            font-size: clamp(2rem, 5vw, 2.8rem);
+            font-weight: 700;
+            margin: 18px 0 12px;
+        }
+
+        .hero-subtitle {
+            max-width: 880px;
+            margin: 0 auto;
+            font-size: 1.05rem;
+            opacity: 0.92;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            padding: 28px 24px;
+            background: #e0e7ff;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+            border-left: 5px solid #1e40af;
+        }
+
+        .stat-icon {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 0.92rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #475569;
+            margin-bottom: 6px;
+        }
+
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .tabs-wrapper {
+            position: relative;
+            background: #fafafa;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 6px;
+            padding: 12px 60px 12px 24px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+        }
+
+        .tabs::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .tabs::-webkit-scrollbar-thumb {
+            background: #cbd5f5;
+            border-radius: 999px;
+        }
+
+        .tab-scroll-indicator {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #1e3a8a;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(30, 58, 138, 0.25);
+            transition: transform 0.3s, background 0.3s;
+        }
+
+        .tab-scroll-indicator:hover {
+            transform: translateY(-50%) scale(1.08);
+            background: #1d4ed8;
+        }
+
+        .tab {
+            border: none;
+            background: transparent;
+            padding: 12px 20px;
+            border-radius: 999px;
+            font-weight: 600;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.25s;
+            white-space: nowrap;
+        }
+
+        .tab:hover {
+            color: #1e3a8a;
+        }
+
+        .tab.active {
+            background: #1e3a8a;
+            color: white;
+            box-shadow: 0 6px 16px rgba(30, 58, 138, 0.35);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 40px 28px 50px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        h2 {
+            font-size: 1.9rem;
+            margin-bottom: 18px;
+            color: #1e3a8a;
+        }
+
+        h3 {
+            font-size: 1.3rem;
+            color: #0f172a;
+            margin: 24px 0 12px;
+        }
+
+        p {
+            margin-bottom: 14px;
+        }
+
+        .info-box {
+            background: #dbeafe;
+            border-left: 5px solid #1d4ed8;
+            padding: 22px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        .warning-box {
+            background: #fef3c7;
+            border-left: 5px solid #f97316;
+            padding: 18px 22px;
+            border-radius: 12px;
+            margin: 24px 0;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 18px;
+        }
+
+        .card {
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+        }
+
+        .card h4 {
+            margin-bottom: 10px;
+            color: #1e3a8a;
+            font-size: 1.05rem;
+        }
+
+        .tag-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .tag {
+            background: #eef2ff;
+            color: #312e81;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
+        }
+
+        th {
+            text-align: left;
+            padding: 14px;
+            background: #1e3a8a;
+            color: white;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        td {
+            padding: 14px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.95rem;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        ul {
+            padding-left: 20px;
+            margin-bottom: 14px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .pill-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .pill {
+            background: #eef2ff;
+            color: #1e3a8a;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .pill:hover {
+            background: #c7d2fe;
+            color: #0f172a;
+        }
+
+        @media (max-width: 640px) {
+            header {
+                padding: 36px 16px 42px;
+            }
+
+            .tabs-wrapper {
+                padding-right: 48px;
+            }
+
+            .tab-content {
+                padding: 30px 18px 40px;
+            }
+
+            .stat-card {
+                border-left-width: 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="ky-widget">
+        <header>
+            <div class="state-badge">🐎 KENTUCKY • COMMONWEALTH</div>
+            <div class="hero-title">Kentucky Business Entity Types – Quick Navigator</div>
+            <p class="hero-subtitle">Snapshot of how Kentucky structures its LLCs, corporations, partnerships, and professional entities – plus the quirks (no series LLCs + the Limited Liability Entity Tax) that every founder, freelancer, or fund manager should know before filing.</p>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-label">Limited Liability Entity Tax</div>
+                <div class="stat-value">Applies to LLCs & corporations</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🚫</div>
+                <div class="stat-label">Series LLCs</div>
+                <div class="stat-value">Not authorized under KRS 275</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🌱</div>
+                <div class="stat-label">Benefit Corporations</div>
+                <div class="stat-value">Public benefit option since 2017</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⚕️</div>
+                <div class="stat-label">Professional Structures</div>
+                <div class="stat-value">PLLC • P.S.C. • LLP</div>
+            </div>
+        </div>
+
+        <div class="tabs-wrapper">
+            <div class="tabs" id="kyTabStrip">
+                <button class="tab active" onclick="switchTab('overview', event)">Overview</button>
+                <button class="tab" onclick="switchTab('fits', event)">Best Fits</button>
+                <button class="tab" onclick="switchTab('llc', event)">LLCs</button>
+                <button class="tab" onclick="switchTab('corporations', event)">Corporations & Mission</button>
+                <button class="tab" onclick="switchTab('compliance', event)">LLET & Compliance</button>
+                <button class="tab" onclick="switchTab('services', event)">My Services</button>
+            </div>
+            <div class="tab-scroll-indicator" onclick="scrollTabs()" title="Scroll tabs">→</div>
+        </div>
+
+        <section id="overview" class="tab-content active">
+            <h2>Entity Landscape in the Commonwealth</h2>
+            <div class="info-box">
+                <strong>Bluegrass snapshot:</strong>
+                <p>Kentucky blends a modern LLC act, professional entity choices, and public benefit corporations with a unique Limited Liability Entity Tax. Whether you are bootstrapping a Louisville side-hustle, launching a distillery in Bardstown, or scaling tech in Lexington, the entity you pick controls liability, the ability to raise capital, and how the LLET hits your revenue.</p>
+            </div>
+
+            <div class="card" style="margin-bottom: 24px;">
+                <h4>Kentucky Deep Dives</h4>
+                <p>Jump directly to the full-length formation playbooks for more detailed filing steps and compliance checklists.</p>
+                <div class="pill-list">
+                    <a class="pill" href="/kentucky-llc-formation-guide/">Kentucky LLC formation guide</a>
+                    <a class="pill" href="/kentucky-corporation-formation-guide/">Kentucky corporation guide</a>
+                </div>
+            </div>
+
+            <h3>What Kentucky Recognizes</h3>
+            <div class="grid">
+                <div class="card">
+                    <h4>Informal</h4>
+                    <ul>
+                        <li>Sole proprietorships</li>
+                        <li>General partnerships</li>
+                        <li>Assumed name (DBA) filings available</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>LLCs</h4>
+                    <ul>
+                        <li>Standard LLCs</li>
+                        <li>Professional LLCs</li>
+                        <li>Nonprofit LLCs</li>
+                        <li>Foreign registrations</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>Corporations</h4>
+                    <ul>
+                        <li>For-profit corporations</li>
+                        <li>Nonprofit corporations</li>
+                        <li>Professional service corporations</li>
+                        <li>Public benefit corporations</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>Partnerships</h4>
+                    <ul>
+                        <li>General partnerships (GP)</li>
+                        <li>Limited partnerships (LP)</li>
+                        <li>Limited liability partnerships (LLP)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <strong>No series LLCs:</strong>
+                <p>Kentucky’s LLC act does not authorize series LLCs. Investors typically form separate LLCs for each asset or use statutory trusts when “cell” structures are required.</p>
+            </div>
+        </section>
+
+        <section id="fits" class="tab-content">
+            <h2>Which Kentucky Entity Fits Your Scenario?</h2>
+            <p>Match the use case with the most common Kentucky structure. This mirrors the quick comparison table from the full article.</p>
+
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Scenario</th>
+                            <th>Good Fit</th>
+                            <th>Why</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Solo freelancer / online creator</td>
+                            <td>Sole prop → LLC upgrade</td>
+                            <td>Start lean, then add liability protection when revenue and risk climb.</td>
+                        </tr>
+                        <tr>
+                            <td>Local service business or e-commerce</td>
+                            <td>Standard Kentucky LLC</td>
+                            <td>Flexible operating agreements, pass-through tax default, easy management.</td>
+                        </tr>
+                        <tr>
+                            <td>Professional practice (law, medicine, CPA)</td>
+                            <td>PLLC, P.S.C., or LLP</td>
+                            <td>Tracks licensing-board requirements and isolates malpractice exposure.</td>
+                        </tr>
+                        <tr>
+                            <td>High-growth / VC-backed startup</td>
+                            <td>Business corporation (possibly PBC)</td>
+                            <td>Clean equity structure for stock, options, and preferred rounds.</td>
+                        </tr>
+                        <tr>
+                            <td>Charitable or membership nonprofit</td>
+                            <td>Nonprofit corporation or nonprofit LLC</td>
+                            <td>Aligns with 501(c)(3) rules and charitable fiduciary duties.</td>
+                        </tr>
+                        <tr>
+                            <td>Fund / real estate syndicate</td>
+                            <td>LP or manager-managed LLC</td>
+                            <td>Split economics between managing members/GPs and passive investors.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Icon cheat sheet</h3>
+            <div class="tag-grid">
+                <div class="tag">✅ mainstream</div>
+                <div class="tag">🚀 investor-focused</div>
+                <div class="tag">⚕️ professional</div>
+                <div class="tag">💚 mission-driven</div>
+            </div>
+        </section>
+
+        <section id="llc" class="tab-content">
+            <h2>LLCs in Kentucky</h2>
+            <div class="grid">
+                <div class="card">
+                    <h4>Standard Kentucky LLC</h4>
+                    <ul>
+                        <li>Formed by filing Articles of Organization with the Secretary of State.</li>
+                        <li>Operating agreement governs management, voting, exits, and distributions.</li>
+                        <li>Flexible tax status: default pass-through with corporate/S-corp elections available.</li>
+                        <li>Single-member LLCs retain the liability shield; Kentucky clarified no veil piercing solely for single-owner status.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>Professional & Nonprofit LLCs</h4>
+                    <ul>
+                        <li>PLLCs limit ownership/management to licensed professionals (law, medicine, engineering, etc.).</li>
+                        <li>Operating agreements often include forced redemptions if a license is lost.</li>
+                        <li>Nonprofit LLCs combine KRS 275 with KRS 273.167, usually where members are themselves nonprofits.</li>
+                        <li>IRS still reviews the operating agreement to confirm charitable control.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>No Series, Alternative Structures</h4>
+                    <ul>
+                        <li>KRS 275 has no series LLC provisions, so multiple LLCs remain the standard risk-segmentation strategy.</li>
+                        <li>Some fund managers use statutory trusts with series if they need “cells.”</li>
+                        <li>Real-estate investors often put each property in its own Kentucky LLC.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="corporations" class="tab-content">
+            <h2>Corporations, P.S.C.s, and Public Benefit Corps</h2>
+            <div class="grid">
+                <div class="card">
+                    <h4>Standard Business Corporations</h4>
+                    <ul>
+                        <li>Formed under KRS 271B with Articles of Incorporation.</li>
+                        <li>Board of directors, officers, bylaws, and shareholder meetings are standard.</li>
+                        <li>Default C-corporation taxation with the ability to elect S-corp status.</li>
+                        <li>Best for companies issuing stock, options, or planning for M&A/IPO exits.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>Professional Service Corporations (P.S.C.)</h4>
+                    <ul>
+                        <li>Used by law firms, medical groups, dentists, and other licensed practices.</li>
+                        <li>Shareholders and directors generally must hold the relevant license.</li>
+                        <li>Protects against contractual liabilities but not personal malpractice.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>Public Benefit Corporations</h4>
+                    <ul>
+                        <li>Must identify the public benefit in the Articles and include “PBC” or “Public Benefit Corporation” in the name.</li>
+                        <li>Directors balance shareholder interests with stated public benefits and other stakeholders.</li>
+                        <li>Conversion from a standard corporation requires 90% approval and offers dissenter’s rights.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>Nonprofit Corporations</h4>
+                    <ul>
+                        <li>Governed by KRS 273; commonly used for 501(c)(3) organizations, member groups, and religious bodies.</li>
+                        <li>No shareholders—surplus stays in the mission.</li>
+                        <li>Directors owe heightened fiduciary duties and must follow charitable trust rules.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="compliance" class="tab-content">
+            <h2>LLET, Naming Rules, and Other Compliance Notes</h2>
+            <div class="info-box">
+                <strong>Limited Liability Entity Tax (LLET)</strong>
+                <p>Kentucky collects the LLET from most limited liability entities—LLCs, corporations, and certain partnerships—based on gross receipts or gross profits. Pass-through tax treatment does not bypass the LLET; it’s a separate Kentucky-level minimum tax layered on top of income tax.</p>
+            </div>
+
+            <h3>Other Must-Know Details</h3>
+            <ul>
+                <li>Both LLCs and corporations require a Kentucky registered agent even if the owners live outside the Commonwealth.</li>
+                <li>Entity names must follow KRS 14A.3-010, including “LLC,” “Inc.,” “P.S.C.,” or “PBC” suffixes where applicable.</li>
+                <li>Professional service entities can be organized as LLCs, LLPs, corporations, or even traditional partnerships, but licensing boards may cap ownership to licensed individuals.</li>
+                <li>Single Kentucky entities cannot usually mix unrelated professional services (e.g., medicine + law) without careful ethics analysis and insurer approval.</li>
+                <li>General partnerships and LLPs remain viable for firms wanting partnership taxation while shielding partners from one another’s malpractice.</li>
+            </ul>
+
+            <div class="warning-box">
+                <strong>Converting to a Public Benefit Corporation?</strong>
+                <p>Plan ahead: you will need 90% shareholder approval and must provide dissenter’s rights. Update your Articles, bylaws, investor documents, and registered name simultaneously so filings do not get rejected.</p>
+            </div>
+        </section>
+
+        <section id="services" class="tab-content">
+            <h2>My Attorney-Led Kentucky Entity Packages</h2>
+            <p>I personally guide each engagement—from conflict checks through the first 90 days of compliance—so you are not handed off to a filing mill. Pricing below excludes state fees and the Kentucky LLET.</p>
+
+            <div class="grid">
+                <div class="card">
+                    <h4>LLC Launch Strategy – $950 + fees</h4>
+                    <ul>
+                        <li>Attorney consult focused on operations, founders, and LLET impact.</li>
+                        <li>Articles of Organization + tailored operating agreement with capital tables.</li>
+                        <li>First 90-day compliance calendar (tax accounts, BOI/CTA triggers, LLET reminders).</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>Corporate & PBC Formation – $1,450 + fees</h4>
+                    <ul>
+                        <li>Formation planning for C-corps, S-corps, or public benefit conversions.</li>
+                        <li>Bylaws, initial board minutes, shareholder agreements, and equity incentive scaffolding.</li>
+                        <li>Investor-ready compliance memo covering LLET, securities carve-outs, and foreign qualification checkpoints.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4>Regulated Practice Setup – $1,900 + fees</h4>
+                    <ul>
+                        <li>PLLC/P.S.C./LLP comparison call customized to your licensing board.</li>
+                        <li>Professional ownership provisions, malpractice carve-outs, and loss-of-license triggers.</li>
+                        <li>Ancillary agreements (employment, buy-sell) plus local licensing checklist.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="info-box" style="margin-top: 24px;">
+                <strong>Next steps:</strong>
+                <p>Email me at <a href="mailto:owner@terms.law">owner@terms.law</a> with your Kentucky fact pattern, or book a paid strategy slot via Calendly using the link below. I respond within one business day.</p>
+                <p><a href="" onclick="Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting'});return false;">Schedule a Kentucky entity strategy session</a></p>
+            </div>
+
+            <!-- Calendly link widget begin -->
+            <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+            <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+            <!-- Calendly link widget end -->
+            <!-- Calendly inline widget begin -->
+            <div class="calendly-inline-widget" data-url="https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1" style="min-width:320px;height:600px;margin-top:20px;"></div>
+            <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
+            <!-- Calendly inline widget end -->
+        </section>
+    </div>
+
+    <script>
+        function switchTab(tabId, event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.classList.remove('active'));
+
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            const targetContent = document.getElementById(tabId);
+            if (targetContent) {
+                targetContent.classList.add('active');
+            }
+
+            if (event && event.currentTarget) {
+                event.currentTarget.classList.add('active');
+            }
+        }
+
+        function scrollTabs() {
+            const tabStrip = document.getElementById('kyTabStrip');
+            tabStrip.scrollBy({
+                left: 200,
+                behavior: 'smooth'
+            });
+        }
+    </script>
+</body>
+</html>
