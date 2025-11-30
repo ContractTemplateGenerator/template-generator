@@ -866,11 +866,11 @@
 
   <!-- Tab Navigation -->
   <div class="tab-navigation">
-    <button class="tab-button active" onclick="switchTab('overview')">Overview</button>
-    <button class="tab-button" onclick="switchTab('entity-types')">Entity Types</button>
-    <button class="tab-button" onclick="switchTab('services')">Services & Pricing</button>
-    <button class="tab-button" onclick="switchTab('intake')">Get Started</button>
-    <button class="tab-button" onclick="switchTab('contact')">Contact</button>
+    <button class="tab-button active" onclick="switchTab('overview', event)">Overview</button>
+    <button class="tab-button" onclick="switchTab('entity-types', event)">Entity Types</button>
+    <button class="tab-button" onclick="switchTab('services', event)">Services & Pricing</button>
+    <button class="tab-button" onclick="switchTab('intake', event)">Get Started</button>
+    <button class="tab-button" onclick="switchTab('contact', event)">Contact</button>
   </div>
 
   <!-- Overview Tab -->
@@ -2236,7 +2236,7 @@
           Join thousands of entrepreneurs who've chosen Florida for its zero state income tax, business-friendly environment, and fast processing. Get started today with expert guidance and streamlined formation.
         </p>
         <div style="margin-top: 20px; display: flex; gap: 15px; flex-wrap: wrap;">
-          <a href="#" onclick="switchTab('intake'); return false;" class="cta-button" style="flex: 1; min-width: 200px;">Start Formation Now</a>
+          <a href="#" onclick="switchTab('intake', event); return false;" class="cta-button" style="flex: 1; min-width: 200px;">Start Formation Now</a>
           <a href="mailto:owner@terms.law" class="cta-button cta-button-secondary" style="flex: 1; min-width: 200px;">Ask a Question First</a>
         </div>
       </div>
@@ -2249,51 +2249,29 @@
 
 <!-- Tab Switching JavaScript -->
 <script>
-function switchTab(tabName, triggerButton) {
-  var tabContents = document.getElementsByClassName('tab-content');
-  for (var i = 0; i < tabContents.length; i++) {
-    tabContents[i].classList.remove('active');
+function switchTab(tabId, event) {
+  // Prevent default behavior and stop propagation for WordPress compatibility
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
   }
 
-  var tabButtons = document.getElementsByClassName('tab-button');
-  for (var j = 0; j < tabButtons.length; j++) {
-    tabButtons[j].classList.remove('active');
-  }
+  // Hide all tab contents
+  const contents = document.querySelectorAll('.tab-content');
+  contents.forEach(content => content.classList.remove('active'));
 
-  var activePanel = document.getElementById(tabName + '-tab');
-  if (activePanel) {
-    activePanel.classList.add('active');
-  }
+  // Deactivate all tabs
+  const tabs = document.querySelectorAll('.tab-button');
+  tabs.forEach(tab => tab.classList.remove('active'));
 
-  if (triggerButton) {
-    triggerButton.classList.add('active');
-  } else {
-    for (var k = 0; k < tabButtons.length; k++) {
-      if (tabButtons[k].dataset.tab === tabName) {
-        tabButtons[k].classList.add('active');
-      }
-    }
-  }
+  // Show selected tab content
+  document.getElementById(tabId + '-tab').classList.add('active');
 
-  var hub = document.querySelector('.fl-formation-hub');
-  if (hub) {
-    hub.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // Activate clicked tab
+  if (event && event.target) {
+    event.target.classList.add('active');
   }
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-  var tabButtons = document.querySelectorAll('.tab-button');
-  var tabNames = ['overview', 'entity-types', 'services', 'intake', 'contact'];
-
-  tabButtons.forEach(function(button, index) {
-    button.dataset.tab = tabNames[index] || '';
-    button.addEventListener('click', function(e) {
-      e.preventDefault();
-      var tab = this.dataset.tab || tabNames[index];
-      switchTab(tab, this);
-    });
-  });
-});
 
 function toggleCard(header) {
   header.classList.toggle('active');

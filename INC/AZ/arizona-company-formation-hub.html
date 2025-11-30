@@ -77,7 +77,7 @@
     border: 1px solid rgba(255,255,255,0.2);
   }
 
-  .hero-section h1 {
+  .hero-title {
     margin: 0 0 18px 0;
     font-size: 42px;
     font-weight: 800;
@@ -819,7 +819,7 @@
       padding: 40px 30px;
     }
 
-    .hero-section h1 {
+    .hero-title {
       font-size: 32px;
     }
 
@@ -842,7 +842,7 @@
   <div class="hero-section">
     <div class="hero-content">
       <div class="hero-label">🌵 ARIZONA BUSINESS FORMATION HUB</div>
-      <h1>Form Your Arizona Company: LLC, Corporation, Benefit Corp & Nonprofit</h1>
+      <div class="hero-title">Form Your Arizona Company: LLC, Corporation, Benefit Corp & Nonprofit</div>
       <p>Your complete resource for forming any business entity in Arizona. Low fees, no annual reports for LLCs, business-friendly regulations, and expert guidance every step of the way.</p>
       <div class="hero-stats">
         <div class="hero-stat">
@@ -867,11 +867,11 @@
 
   <!-- Tab Navigation -->
   <div class="tab-navigation">
-    <button class="tab-button active" onclick="switchTab('overview')">Overview</button>
-    <button class="tab-button" onclick="switchTab('entity-types')">Entity Types</button>
-    <button class="tab-button" onclick="switchTab('services')">Services & Pricing</button>
-    <button class="tab-button" onclick="switchTab('intake')">Get Started</button>
-    <button class="tab-button" onclick="switchTab('contact')">Contact</button>
+    <button class="tab-button active" onclick="switchTab('overview', event)">Overview</button>
+    <button class="tab-button" onclick="switchTab('entity-types', event)">Entity Types</button>
+    <button class="tab-button" onclick="switchTab('services', event)">Services & Pricing</button>
+    <button class="tab-button" onclick="switchTab('intake', event)">Get Started</button>
+    <button class="tab-button" onclick="switchTab('contact', event)">Contact</button>
   </div>
 
   <!-- Overview Tab -->
@@ -2047,7 +2047,7 @@
           Join thousands of entrepreneurs who've chosen Arizona for its low costs, minimal compliance, and business-friendly environment. Get started today with our streamlined formation process and expert support.
         </p>
         <div style="margin-top: 20px; display: flex; gap: 15px; flex-wrap: wrap;">
-          <a href="#" onclick="switchTab('intake'); return false;" class="cta-button" style="flex: 1; min-width: 200px;">Start Formation Now</a>
+          <a href="#" onclick="switchTab('intake', event); return false;" class="cta-button" style="flex: 1; min-width: 200px;">Start Formation Now</a>
           <a href="mailto:owner@terms.law" class="cta-button cta-button-secondary" style="flex: 1; min-width: 200px;">Ask a Question First</a>
         </div>
       </div>
@@ -2060,27 +2060,28 @@
 
 <!-- Tab Switching JavaScript -->
 <script>
-function switchTab(tabName) {
-  // Hide all tab contents
-  var tabContents = document.getElementsByClassName('tab-content');
-  for (var i = 0; i < tabContents.length; i++) {
-    tabContents[i].classList.remove('active');
+function switchTab(tabId, event) {
+  // Prevent default behavior and stop propagation for WordPress compatibility
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
   }
 
-  // Remove active class from all tab buttons
-  var tabButtons = document.getElementsByClassName('tab-button');
-  for (var i = 0; i < tabButtons.length; i++) {
-    tabButtons[i].classList.remove('active');
-  }
+  // Hide all tab contents
+  const contents = document.querySelectorAll('.tab-content');
+  contents.forEach(content => content.classList.remove('active'));
+
+  // Deactivate all tabs
+  const tabs = document.querySelectorAll('.tab-button');
+  tabs.forEach(tab => tab.classList.remove('active'));
 
   // Show selected tab content
-  document.getElementById(tabName + '-tab').classList.add('active');
+  document.getElementById(tabId + '-tab').classList.add('active');
 
-  // Add active class to clicked button
-  event.currentTarget.classList.add('active');
-
-  // Scroll to top of widget
-  document.querySelector('.az-formation-hub').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // Activate clicked tab
+  if (event && event.target) {
+    event.target.classList.add('active');
+  }
 }
 
 // Expandable card toggle
