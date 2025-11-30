@@ -969,38 +969,32 @@ function calculateSingleRound() {
   if (inputs.hiringPlan > 0) {
     const avgGrantPct = (poolShares / fullyDilutedShares) / inputs.hiringPlan * 100;
     if (avgGrantPct < 0.05) {
-      alertHTML = `
-        <div class="alert-box alert-warning">
-          <div class="alert-title">⚠️ Pool May Be Too Small</div>
-          <div class="alert-text">
-            Your 18-month hiring plan (${inputs.hiringPlan} people) with a ${inputs.newPoolPct}% pool gives an average grant of only ${avgGrantPct.toFixed(3)}% per hire.
-            Typical early employees expect 0.1-0.5%, senior hires 0.5-1.5%. Consider increasing pool size or reducing hiring plan.
-          </div>
-        </div>
-      `;
+      alertHTML += '<div class="alert-box alert-warning">';
+      alertHTML += '<div class="alert-title">⚠️ Pool May Be Too Small</div>';
+      alertHTML += '<div class="alert-text">';
+      alertHTML += 'Your 18-month hiring plan (' + inputs.hiringPlan + ' people) with a ' + inputs.newPoolPct + '% pool gives an average grant of only ' + avgGrantPct.toFixed(3) + '% per hire. ';
+      alertHTML += 'Typical early employees expect 0.1-0.5%, senior hires 0.5-1.5%. Consider increasing pool size or reducing hiring plan.';
+      alertHTML += '</div>';
+      alertHTML += '</div>';
     } else if (avgGrantPct > 1.5) {
-      alertHTML = `
-        <div class="alert-box alert-success">
-          <div class="alert-title">✅ Pool Size Looks Comfortable</div>
-          <div class="alert-text">
-            Your ${inputs.newPoolPct}% pool supports ${inputs.hiringPlan} hires with an average ~${avgGrantPct.toFixed(2)}% per person.
-            This provides flexibility for senior executive grants (0.5-1.5%) and early employee grants (0.1-0.5%).
-          </div>
-        </div>
-      `;
+      alertHTML += '<div class="alert-box alert-success">';
+      alertHTML += '<div class="alert-title">✅ Pool Size Looks Comfortable</div>';
+      alertHTML += '<div class="alert-text">';
+      alertHTML += 'Your ' + inputs.newPoolPct + '% pool supports ' + inputs.hiringPlan + ' hires with an average ~' + avgGrantPct.toFixed(2) + '% per person. ';
+      alertHTML += 'This provides flexibility for senior executive grants (0.5-1.5%) and early employee grants (0.1-0.5%).';
+      alertHTML += '</div>';
+      alertHTML += '</div>';
     }
   }
 
   if (founderDilution > 50) {
-    alertHTML += `
-      <div class="alert-box alert-warning">
-        <div class="alert-title">⚠️ High Founder Dilution</div>
-        <div class="alert-text">
-          Founders will be diluted by ${founderDilution.toFixed(1)}% in this round. This is high but may be justified if the pre-money valuation is strong.
-          Make sure the option pool size is truly needed for your 18-month hiring plan.
-        </div>
-      </div>
-    `;
+    alertHTML += '<div class="alert-box alert-warning">';
+    alertHTML += '<div class="alert-title">⚠️ High Founder Dilution</div>';
+    alertHTML += '<div class="alert-text">';
+    alertHTML += 'Founders will be diluted by ' + founderDilution.toFixed(1) + '% in this round. This is high but may be justified if the pre-money valuation is strong. ';
+    alertHTML += 'Make sure the option pool size is truly needed for your 18-month hiring plan.';
+    alertHTML += '</div>';
+    alertHTML += '</div>';
   }
 
   guidanceAlert.innerHTML = alertHTML;
@@ -1190,117 +1184,108 @@ function calculateMultiRound() {
 function displayMultiRoundResults(rounds, initialFounderShares) {
   const container = document.getElementById('multiRoundResults');
 
-  let html = `
-    <div class="alert-success">
-      <div class="alert-title">✅ Multi-Round Analysis Complete</div>
-      <div class="alert-text">
-        Starting with ${formatShares(initialFounderShares)} founder shares, here's how ownership evolves across three funding rounds.
-      </div>
-    </div>
-  `;
+  let html = '';
+  html += '<div class="alert-success">';
+  html += '<div class="alert-title">✅ Multi-Round Analysis Complete</div>';
+  html += '<div class="alert-text">';
+  html += 'Starting with ' + formatShares(initialFounderShares) + ' founder shares, here\'s how ownership evolves across three funding rounds.';
+  html += '</div>';
+  html += '</div>';
 
   // Dilution summary
-  html += `
-    <div class="detail-section">
-      <div class="detail-title">Founder Ownership Across Rounds</div>
-      <div class="dilution-chart">
-        <div class="chart-title">Founder Dilution Timeline</div>
-  `;
+  html += '<div class="detail-section">';
+  html += '<div class="detail-title">Founder Ownership Across Rounds</div>';
+  html += '<div class="dilution-chart">';
+  html += '<div class="chart-title">Founder Dilution Timeline</div>';
 
   rounds.forEach(round => {
-    html += `
-      <div class="chart-bar">
-        <div class="chart-label">
-          <span>${round.name}</span>
-          <span>${round.founderPct.toFixed(1)}%</span>
-        </div>
-        <div class="chart-progress">
-          <div class="chart-fill" style="width: ${round.founderPct}%; background: linear-gradient(90deg, #7c3aed 0%, #a855f7 100%);">
-            ${round.founderPct > 15 ? `<span class="chart-fill-text">${formatCurrency(round.postMoney * round.founderPct / 100)}</span>` : ''}
-          </div>
-        </div>
-      </div>
-    `;
+    html += '<div class="chart-bar">';
+    html += '<div class="chart-label">';
+    html += '<span>' + round.name + '</span>';
+    html += '<span>' + round.founderPct.toFixed(1) + '%</span>';
+    html += '</div>';
+    html += '<div class="chart-progress">';
+    html += '<div class="chart-fill" style="width: ' + round.founderPct + '%; background: linear-gradient(90deg, #7c3aed 0%, #a855f7 100%);">';
+    if (round.founderPct > 15) {
+      html += '<span class="chart-fill-text">' + formatCurrency(round.postMoney * round.founderPct / 100) + '</span>';
+    }
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
   });
 
-  html += `
-      </div>
-    </div>
-  `;
+  html += '</div>';
+  html += '</div>';
 
   // Detailed table
-  html += `
-    <div class="cap-table-wrapper">
-      <table class="cap-table">
-        <thead>
-          <tr>
-            <th>Metric</th>
-            <th>Series A</th>
-            <th>Series B</th>
-            <th>Series C</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="row-label">Pre-Money Valuation</td>
-            <td>${formatCurrency(rounds[0].preMoney)}</td>
-            <td>${formatCurrency(rounds[1].preMoney)}</td>
-            <td>${formatCurrency(rounds[2].preMoney)}</td>
-          </tr>
-          <tr>
-            <td class="row-label">Investment</td>
-            <td>${formatCurrency(rounds[0].investment)}</td>
-            <td>${formatCurrency(rounds[1].investment)}</td>
-            <td>${formatCurrency(rounds[2].investment)}</td>
-          </tr>
-          <tr>
-            <td class="row-label">Post-Money Valuation</td>
-            <td>${formatCurrency(rounds[0].postMoney)}</td>
-            <td>${formatCurrency(rounds[1].postMoney)}</td>
-            <td>${formatCurrency(rounds[2].postMoney)}</td>
-          </tr>
-          <tr>
-            <td class="row-label">Founder Ownership %</td>
-            <td>${rounds[0].founderPct.toFixed(2)}%</td>
-            <td>${rounds[1].founderPct.toFixed(2)}%</td>
-            <td>${rounds[2].founderPct.toFixed(2)}%</td>
-          </tr>
-          <tr>
-            <td class="row-label">Investor Ownership %</td>
-            <td>${rounds[0].investorPct.toFixed(2)}%</td>
-            <td>${rounds[1].investorPct.toFixed(2)}%</td>
-            <td>${rounds[2].investorPct.toFixed(2)}%</td>
-          </tr>
-          <tr>
-            <td class="row-label">Option Pool %</td>
-            <td>${rounds[0].poolPct.toFixed(2)}%</td>
-            <td>${rounds[1].poolPct.toFixed(2)}%</td>
-            <td>${rounds[2].poolPct.toFixed(2)}%</td>
-          </tr>
-          <tr class="total-row">
-            <td>Fully-Diluted Shares</td>
-            <td>${formatShares(rounds[0].totalShares)}</td>
-            <td>${formatShares(rounds[1].totalShares)}</td>
-            <td>${formatShares(rounds[2].totalShares)}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  `;
+  html += '<div class="cap-table-wrapper">';
+  html += '<table class="cap-table">';
+  html += '<thead>';
+  html += '<tr>';
+  html += '<th>Metric</th>';
+  html += '<th>Series A</th>';
+  html += '<th>Series B</th>';
+  html += '<th>Series C</th>';
+  html += '</tr>';
+  html += '</thead>';
+  html += '<tbody>';
+  html += '<tr>';
+  html += '<td class="row-label">Pre-Money Valuation</td>';
+  html += '<td>' + formatCurrency(rounds[0].preMoney) + '</td>';
+  html += '<td>' + formatCurrency(rounds[1].preMoney) + '</td>';
+  html += '<td>' + formatCurrency(rounds[2].preMoney) + '</td>';
+  html += '</tr>';
+  html += '<tr>';
+  html += '<td class="row-label">Investment</td>';
+  html += '<td>' + formatCurrency(rounds[0].investment) + '</td>';
+  html += '<td>' + formatCurrency(rounds[1].investment) + '</td>';
+  html += '<td>' + formatCurrency(rounds[2].investment) + '</td>';
+  html += '</tr>';
+  html += '<tr>';
+  html += '<td class="row-label">Post-Money Valuation</td>';
+  html += '<td>' + formatCurrency(rounds[0].postMoney) + '</td>';
+  html += '<td>' + formatCurrency(rounds[1].postMoney) + '</td>';
+  html += '<td>' + formatCurrency(rounds[2].postMoney) + '</td>';
+  html += '</tr>';
+  html += '<tr>';
+  html += '<td class="row-label">Founder Ownership %</td>';
+  html += '<td>' + rounds[0].founderPct.toFixed(2) + '%</td>';
+  html += '<td>' + rounds[1].founderPct.toFixed(2) + '%</td>';
+  html += '<td>' + rounds[2].founderPct.toFixed(2) + '%</td>';
+  html += '</tr>';
+  html += '<tr>';
+  html += '<td class="row-label">Investor Ownership %</td>';
+  html += '<td>' + rounds[0].investorPct.toFixed(2) + '%</td>';
+  html += '<td>' + rounds[1].investorPct.toFixed(2) + '%</td>';
+  html += '<td>' + rounds[2].investorPct.toFixed(2) + '%</td>';
+  html += '</tr>';
+  html += '<tr>';
+  html += '<td class="row-label">Option Pool %</td>';
+  html += '<td>' + rounds[0].poolPct.toFixed(2) + '%</td>';
+  html += '<td>' + rounds[1].poolPct.toFixed(2) + '%</td>';
+  html += '<td>' + rounds[2].poolPct.toFixed(2) + '%</td>';
+  html += '</tr>';
+  html += '<tr class="total-row">';
+  html += '<td>Fully-Diluted Shares</td>';
+  html += '<td>' + formatShares(rounds[0].totalShares) + '</td>';
+  html += '<td>' + formatShares(rounds[1].totalShares) + '</td>';
+  html += '<td>' + formatShares(rounds[2].totalShares) + '</td>';
+  html += '</tr>';
+  html += '</tbody>';
+  html += '</table>';
+  html += '</div>';
 
   const finalFounderValue = rounds[2].postMoney * rounds[2].founderPct / 100;
   const totalDilution = 100 - rounds[2].founderPct;
 
-  html += `
-    <div class="alert-info">
-      <div class="alert-title">💡 Summary</div>
-      <div class="alert-text">
-        After three funding rounds, founders own <strong>${rounds[2].founderPct.toFixed(1)}%</strong> of the company
-        (down from 100% at formation, ${totalDilution.toFixed(1)}% total dilution).
-        Founder stake is worth <strong>${formatCurrency(finalFounderValue)}</strong> at Series C post-money valuation.
-      </div>
-    </div>
-  `;
+  html += '<div class="alert-info">';
+  html += '<div class="alert-title">💡 Summary</div>';
+  html += '<div class="alert-text">';
+  html += 'After three funding rounds, founders own <strong>' + rounds[2].founderPct.toFixed(1) + '%</strong> of the company ';
+  html += '(down from 100% at formation, ' + totalDilution.toFixed(1) + '% total dilution). ';
+  html += 'Founder stake is worth <strong>' + formatCurrency(finalFounderValue) + '</strong> at Series C post-money valuation.';
+  html += '</div>';
+  html += '</div>';
 
   container.innerHTML = html;
 }
