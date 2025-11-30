@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Vermont Entity Type Helper</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    /* Root container – full-width */
+    #nh-entity-tool {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 16px;
+      background: #fafafa;
+      width: 100%;
+      max-width: 100%;
+      margin: 0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    }
+
+    #nh-entity-tool * {
+      box-sizing: border-box;
+    }
+
+    #nh-entity-tool .nh-tool-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    #nh-entity-tool .nh-tool-subtitle {
+      font-size: 0.9rem;
+      color: #555;
+      margin-bottom: 14px;
+    }
+
+    #nh-entity-tool .nh-tagline {
+      font-size: 0.8rem;
+      color: #777;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    #nh-entity-tool .nh-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      color: #666;
+    }
+
+    #nh-entity-tool .nh-nav {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    #nh-entity-tool .nh-nav button {
+      flex: 1 1 140px;
+      border-radius: 999px;
+      border: 1px solid #d0d0d0;
+      background: #ffffff;
+      padding: 6px 10px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    #nh-entity-tool .nh-nav button span.nh-emoji {
+      font-size: 1rem;
+    }
+
+    #nh-entity-tool .nh-nav button.nh-active {
+      background: #0f766e;
+      color: #ffffff;
+      border-color: #0f766e;
+      box-shadow: 0 2px 6px rgba(15,118,110,0.35);
+    }
+
+    #nh-entity-tool .nh-nav button:hover {
+      background: #f1f5f9;
+    }
+
+    #nh-entity-tool .nh-nav button.nh-active:hover {
+      background: #115e59;
+    }
+
+    #nh-entity-tool .nh-tabs {
+      border-radius: 10px;
+      background: #ffffff;
+      border: 1px solid #e0e0e0;
+      padding: 12px;
+    }
+
+    #nh-entity-tool .nh-tab {
+      display: none;
+      animation: nhFadeIn 0.18s ease-out;
+    }
+
+    #nh-entity-tool .nh-tab.nh-active-tab {
+      display: block;
+    }
+
+    @keyframes nhFadeIn {
+      from { opacity: 0; transform: translateY(2px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+
+    #nh-entity-tool .nh-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.3fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 780px) {
+      #nh-entity-tool .nh-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    #nh-entity-tool .nh-panel-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    #nh-entity-tool .nh-panel-title span.nh-step-pill {
+      font-size: 0.7rem;
+      background: #ecfeff;
+      border-radius: 999px;
+      padding: 2px 8px;
+      border: 1px solid #22c1c3;
+      color: #036968;
+    }
+
+    #nh-entity-tool .nh-field-group {
+      margin-bottom: 10px;
+    }
+
+    #nh-entity-tool .nh-field-label {
+      font-size: 0.82rem;
+      font-weight: 500;
+      margin-bottom: 4px;
+      display: block;
+    }
+
+    #nh-entity-tool select,
+    #nh-entity-tool input[type="radio"] {
+      cursor: pointer;
+    }
+
+    #nh-entity-tool select {
+      width: 100%;
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: 1px solid #d4d4d4;
+      font-size: 0.85rem;
+      background: #f9fafb;
+    }
+
+    #nh-entity-tool .nh-radio-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    #nh-entity-tool .nh-radio-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      border-radius: 999px;
+      border: 1px solid #d4d4d4;
+      padding: 4px 8px;
+      font-size: 0.8rem;
+      background: #f9fafb;
+    }
+
+    #nh-entity-tool .nh-radio-pill input {
+      margin: 0;
+    }
+
+    #nh-entity-tool .nh-hint {
+      font-size: 0.72rem;
+      color: #777;
+      margin-top: 4px;
+    }
+
+    #nh-entity-tool .nh-result-card {
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+      padding: 10px;
+      margin-bottom: 10px;
+      background: #f9fafb;
+    }
+
+    #nh-entity-tool .nh-result-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    #nh-entity-tool .nh-result-name {
+      font-size: 0.95rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    #nh-entity-tool .nh-badge-fit {
+      font-size: 0.6rem;
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid #16a34a;
+      color: #166534;
+      background: #dcfce7;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    #nh-entity-tool .nh-badge-caution {
+      font-size: 0.6rem;
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid #f97316;
+      color: #9a3412;
+      background: #ffedd5;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    #nh-entity-tool .nh-badge-poor {
+      font-size: 0.6rem;
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid #ef4444;
+      color: #991b1b;
+      background: #fee2e2;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    #nh-entity-tool .nh-fit-line {
+      font-size: 0.8rem;
+      margin-bottom: 2px;
+    }
+
+    #nh-entity-tool .nh-fit-line span.nh-check {
+      color: #16a34a;
+      font-weight: 600;
+      margin-right: 4px;
+    }
+
+    #nh-entity-tool .nh-fit-line span.nh-cross {
+      color: #ef4444;
+      font-weight: 600;
+      margin-right: 4px;
+    }
+
+    #nh-entity-tool .nh-fit-line span.nh-neutral {
+      color: #6b7280;
+      font-weight: 600;
+      margin-right: 4px;
+    }
+
+    #nh-entity-tool .nh-small-note {
+      font-size: 0.72rem;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+
+    #nh-entity-tool .nh-browser-wrap {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      gap: 12px;
+    }
+
+    @media (max-width: 820px) {
+      #nh-entity-tool .nh-browser-wrap {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    #nh-entity-tool .nh-chip-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    #nh-entity-tool .nh-chip {
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-size: 0.8rem;
+      border: 1px solid #d4d4d4;
+      background: #f9fafb;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    #nh-entity-tool .nh-chip span.nh-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #94a3b8;
+    }
+
+    #nh-entity-tool .nh-chip.nh-chip-active {
+      background: #0f172a;
+      color: #e5e7eb;
+      border-color: #0f172a;
+    }
+
+    #nh-entity-tool .nh-chip.nh-chip-active span.nh-dot {
+      background: #22c55e;
+    }
+
+    #nh-entity-tool .nh-entity-display {
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+      padding: 10px;
+      background: #f9fafb;
+      min-height: 140px;
+      font-size: 0.85rem;
+    }
+
+    #nh-entity-tool .nh-entity-name {
+      font-weight: 600;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.95rem;
+    }
+
+    #nh-entity-tool .nh-entity-tagline {
+      font-size: 0.78rem;
+      color: #6b7280;
+      margin-bottom: 6px;
+    }
+
+    #nh-entity-tool .nh-entity-cols {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 10px;
+    }
+
+    @media (max-width: 640px) {
+      #nh-entity-tool .nh-entity-cols {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    #nh-entity-tool .nh-entity-list {
+      font-size: 0.8rem;
+    }
+
+    #nh-entity-tool .nh-entity-list div {
+      margin-bottom: 4px;
+    }
+
+    #nh-entity-tool .nh-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      font-size: 0.7rem;
+      border-radius: 999px;
+      border: 1px solid #cbd5f5;
+      background: #e0edff;
+      color: #1e293b;
+    }
+
+    #nh-entity-tool .nh-bottom-note {
+      font-size: 0.72rem;
+      color: #9ca3af;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="nh-entity-tool">
+    <div class="nh-tool-title">Vermont Entity Type Helper</div>
+    <div class="nh-tool-subtitle">
+      Play with the sliders and chips below to see which structures tend to fit common Vermont business profiles.
+    </div>
+    <div class="nh-tagline">
+      <span class="nh-badge">✅ likely good fit</span>
+      <span class="nh-badge">⚠️ use with caution</span>
+      <span class="nh-badge">❌ usually poor fit</span>
+    </div>
+
+    <div class="nh-nav" aria-label="Vermont entity helper mode">
+      <button type="button" class="nh-active" data-nh-tab="match">
+        <span class="nh-emoji">🎯</span>
+        <span>Quick Matcher</span>
+      </button>
+      <button type="button" data-nh-tab="browser">
+        <span class="nh-emoji">📚</span>
+        <span>Entity Browser</span>
+      </button>
+    </div>
+
+    <div class="nh-tabs">
+      <!-- Matcher tab -->
+      <div class="nh-tab nh-active-tab" data-nh-tab="match">
+        <div class="nh-grid">
+          <div>
+            <div class="nh-panel-title">
+              <span class="nh-step-pill">Step 1</span>
+              <span>Describe your Vermont business</span>
+            </div>
+
+            <div class="nh-field-group">
+              <label class="nh-field-label" for="nh-profile">What best describes your project?</label>
+              <select id="nh-profile">
+                <option value="solo">Solo freelancer / consultant</option>
+                <option value="local">Local brick-and-mortar or service business</option>
+                <option value="startup">High-growth startup aiming for investors</option>
+                <option value="professional">Licensed professional practice (law, medicine, accounting, etc.)</option>
+                <option value="mission">Mission-driven or social-impact venture</option>
+                <option value="nonprofit">Charity, association or community nonprofit</option>
+                <option value="investment">Real-estate holding company or investment fund</option>
+                <option value="crossborder">Owner(s) outside Vermont / outside U.S.</option>
+              </select>
+            </div>
+
+            <div class="nh-field-group">
+              <span class="nh-field-label">How many owners will you have in the near term?</span>
+              <div class="nh-radio-row">
+                <label class="nh-radio-pill">
+                  <input type="radio" name="nh-owners" value="one" checked />
+                  <span>Just me</span>
+                </label>
+                <label class="nh-radio-pill">
+                  <input type="radio" name="nh-owners" value="few" />
+                  <span>2–3 owners</span>
+                </label>
+                <label class="nh-radio-pill">
+                  <input type="radio" name="nh-owners" value="many" />
+                  <span>4+ owners</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="nh-field-group">
+              <span class="nh-field-label">What do you care about most right now?</span>
+              <div class="nh-radio-row">
+                <label class="nh-radio-pill">
+                  <input type="radio" name="nh-priority" value="simplicity" checked />
+                  <span>Keep it simple</span>
+                </label>
+                <label class="nh-radio-pill">
+                  <input type="radio" name="nh-priority" value="investors" />
+                  <span>Appeal to investors / acquirers</span>
+                </label>
+                <label class="nh-radio-pill">
+                  <input type="radio" name="nh-priority" value="tax" />
+                  <span>Tax &amp; cash-flow flexibility</span>
+                </label>
+              </div>
+              <div class="nh-hint">
+                This tool is educational and does not replace individualized tax or legal advice.
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="nh-panel-title">
+              <span class="nh-step-pill">Step 2</span>
+              <span>See which Vermont entities tend to fit</span>
+            </div>
+
+            <div id="nh-results"></div>
+
+            <div class="nh-small-note">
+              Icons:
+              <span class="nh-check">✔</span> typically strong fit ·
+              <span class="nh-neutral">●</span> depends on details ·
+              <span class="nh-cross">✘</span> often misaligned for this profile.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Browser tab -->
+      <div class="nh-tab" data-nh-tab="browser">
+        <div class="nh-browser-wrap">
+          <div>
+            <div class="nh-panel-title">
+              <span class="nh-step-pill">Browse</span>
+              <span>Tap an entity type to see pros and cons</span>
+            </div>
+            <div class="nh-chip-list" id="nh-entity-chips">
+              <button type="button" class="nh-chip nh-chip-active" data-nh-entity="sm-llc">
+                <span class="nh-dot"></span>Single-member LLC
+              </button>
+              <button type="button" class="nh-chip" data-nh-entity="mm-llc">
+                <span class="nh-dot"></span>Multi-member LLC
+              </button>
+              <button type="button" class="nh-chip" data-nh-entity="l3c">
+                <span class="nh-dot"></span>L3C (low-profit LLC)
+              </button>
+              <button type="button" class="nh-chip" data-nh-entity="pc-pllc">
+                <span class="nh-dot"></span>Professional PC / PLLC
+              </button>
+              <button type="button" class="nh-chip" data-nh-entity="corp">
+                <span class="nh-dot"></span>Business corporation
+              </button>
+              <button type="button" class="nh-chip" data-nh-entity="pbc">
+                <span class="nh-dot"></span>Benefit corporation
+              </button>
+              <button type="button" class="nh-chip" data-nh-entity="coop">
+                <span class="nh-dot"></span>Cooperative / mutual-benefit enterprise
+              </button>
+              <button type="button" class="nh-chip" data-nh-entity="gp">
+                <span class="nh-dot"></span>General partnership
+              </button>
+              <button type="button" class="nh-chip" data-nh-entity="lp-lllp">
+                <span class="nh-dot"></span>LP / LLLP
+              </button>
+              <button type="button" class="nh-chip" data-nh-entity="llp">
+                <span class="nh-dot"></span>LLP
+              </button>
+              <button type="button" class="nh-chip" data-nh-entity="nonprofit">
+                <span class="nh-dot"></span>Nonprofit corporation
+              </button>
+              <button type="button" class="nh-chip" data-nh-entity="sole">
+                <span class="nh-dot"></span>Sole proprietorship
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <div class="nh-panel-title">
+              <span class="nh-step-pill">Details</span>
+              <span id="nh-browser-short-label">Single-member Vermont LLC</span>
+            </div>
+            <div class="nh-entity-display" id="nh-entity-display"></div>
+            <div class="nh-bottom-note">
+              Actual fit depends on licensing, tax profile, investors and the way documents are drafted.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var profileEl = document.getElementById("nh-profile");
+      var ownersEls = document.querySelectorAll('input[name="nh-owners"]');
+      var priorityEls = document.querySelectorAll('input[name="nh-priority"]');
+      var resultsEl = document.getElementById("nh-results");
+
+      function getRadioValue(nodeList) {
+        for (var i = 0; i < nodeList.length; i++) {
+          if (nodeList[i].checked) return nodeList[i].value;
+        }
+        return null;
+      }
+
+      function renderResults() {
+        var profile = profileEl.value;
+        var owners = getRadioValue(ownersEls);
+        var priority = getRadioValue(priorityEls);
+
+        var primary = [];
+        var caution = [];
+        var poor = [];
+
+        function addPrimary(name, reason) {
+          primary.push({ name: name, reason: reason });
+        }
+        function addCaution(name, reason) {
+          caution.push({ name: name, reason: reason });
+        }
+        function addPoor(name, reason) {
+          poor.push({ name: name, reason: reason });
+        }
+
+        if (profile === "solo") {
+          addPrimary(
+            "Single-member Vermont LLC",
+            "Limited liability with simple administration; can start disregarded for tax and evolve as revenue grows."
+          );
+          if (priority === "tax") {
+            addCaution(
+              "Vermont LLC electing S-corporation taxation",
+              "Can reduce self-employment tax once profit is meaningful, but payroll and compliance become more complex."
+            );
+          } else {
+            addCaution(
+              "Plain sole proprietorship",
+              "Fastest way to start, but no liability shield. Sometimes acceptable for very low-risk, low-revenue experiments."
+            );
+          }
+          addPoor(
+            "Complex multi-class corporation",
+            "Overkill for a one-owner service practice unless investors are on the near-term roadmap."
+          );
+        } else if (profile === "local") {
+          addPrimary(
+            "Member-managed Vermont LLC",
+            "Well-suited for local shops, trades and online sellers with a small group of owners."
+          );
+          if (priority === "tax") {
+            addCaution(
+              "Vermont LLC taxed as S-corporation",
+              "Often attractive once salaries and distributions are high enough to justify payroll formalities."
+            );
+          } else {
+            addCaution(
+              "Multi-member Vermont LLC with detailed operating agreement",
+              "Worth drafting if owners have asymmetric capital, roles or exit expectations."
+            );
+          }
+          addPoor(
+            "Unregistered general partnership",
+            "Exposes each owner to the full debts and liabilities of the business and the other partners."
+          );
+        } else if (profile === "startup") {
+          addPrimary(
+            "Vermont business corporation",
+            "Familiar to investors, supports preferred stock, stock options and classic venture structures."
+          );
+          addCaution(
+            "Vermont LLC with planned conversion",
+            "Sometimes acceptable for bootstrap phase if conversion to a corporation is mapped out early."
+          );
+          addPoor(
+            "Sole proprietorship or informal partnership",
+            "Difficult to fund, impossible to grant equity cleanly, and unattractive in a due diligence process."
+          );
+        } else if (profile === "professional") {
+          addPrimary(
+            "Professional corporation (PC)",
+            "Often preferred for law, medicine and accounting, and tracks licensing rules on ownership and control."
+          );
+          addPrimary(
+            "Professional LLC (PLLC)",
+            "Combines professional-compliance features with LLC flexibility if accepted by the licensing board."
+          );
+          addCaution(
+            "Standard LLC with professional overlay",
+            "Works only if the regulatory board is comfortable that ownership and control are properly limited."
+          );
+        } else if (profile === "mission") {
+          addPrimary(
+            "Vermont benefit corporation",
+            "Builds a statutory general public benefit purpose and reporting into a for-profit corporate structure."
+          );
+          addCaution(
+            "L3C (low-profit LLC)",
+            "Strong mission signal, especially for foundation and impact investors, but may feel unusual to traditional equity."
+          );
+          addCaution(
+            "Standard corporation or LLC with mission provisions",
+            "Adequate for some teams where investors are comfortable with contractual mission protections rather than a separate statute."
+          );
+          addPoor(
+            "Pure nonprofit corporation",
+            "Not a fit if founders expect to own equity or realize a sale; nonprofit assets must stay in charitable or member-benefit channels."
+          );
+        } else if (profile === "nonprofit") {
+          addPrimary(
+            "Vermont nonprofit corporation",
+            "Purpose-built for charities, associations and community organizations with no private shareholders."
+          );
+          addCaution(
+            "Single-member LLC owned by a nonprofit",
+            "Useful as a subsidiary for risky programs or real estate, but not a replacement for the core nonprofit entity."
+          );
+          addPoor(
+            "For-profit LLC soliciting donations",
+            "Blurs regulatory lines and can create tax and consumer-protection problems if not structured carefully."
+          );
+        } else if (profile === "investment") {
+          if (owners === "one") {
+            addPrimary(
+              "Vermont single-member LLC for each property or portfolio",
+              "Common approach for real-estate and simple holding structures with clear liability silos."
+            );
+          } else {
+            addPrimary(
+              "Multi-member Vermont LLC with detailed capital and distribution provisions",
+              "Flexible enough to express preferred returns, waterfalls and sponsor promotes."
+            );
+            addCaution(
+              "Limited partnership or LLLP",
+              "Still favored for institutional-style funds and deals where LP/GP language is expected."
+            );
+          }
+          addCaution(
+            "Series of LLCs or subsidiary LLC stack",
+            "Sometimes used for multiple properties; must be weighed against administrative overhead."
+          );
+          addPoor(
+            "Bare co-ownership or tenancy-in-common",
+            "Invites disputes and exposes each investor to more risk than necessary."
+          );
+        } else if (profile === "crossborder") {
+          addPrimary(
+            "Vermont LLC with clear operating agreement",
+            "Often the easiest structure to open, govern and later convert or redomicile if needed."
+          );
+          addCaution(
+            "Corporation with foreign shareholders",
+            "Works well when cross-border tax and immigration constraints are fully modeled in advance."
+          );
+          addPoor(
+            "S-corporation with non-resident shareholders",
+            "S-status is generally incompatible with non-resident alien shareholders, so this pairing is usually off the table."
+          );
+        }
+
+        if (!primary.length && !caution.length && !poor.length) {
+          addPrimary(
+            "Vermont LLC",
+            "Default flexible structure for many small and mid-sized businesses in the state."
+          );
+        }
+
+        var html = "";
+
+        function renderBlock(items, badgeClass, badgeLabel, iconType) {
+          for (var i = 0; i < items.length; i++) {
+            var ic =
+              iconType === "good"
+                ? '<span class="nh-check">✔</span>'
+                : iconType === "caution"
+                ? '<span class="nh-neutral">●</span>'
+                : '<span class="nh-cross">✘</span>';
+            var badge =
+              badgeClass === "fit"
+                ? '<span class="nh-badge-fit">' + badgeLabel + "</span>"
+                : badgeClass === "caution"
+                ? '<span class="nh-badge-caution">' + badgeLabel + "</span>"
+                : '<span class="nh-badge-poor">' + badgeLabel + "</span>";
+
+            html +=
+              '<div class="nh-result-card">' +
+              '<div class="nh-result-header">' +
+              '<div class="nh-result-name">' +
+              ic +
+              items[i].name +
+              "</div>" +
+              "<div>" +
+              badge +
+              "</div>" +
+              "</div>" +
+              '<div class="nh-fit-line">' +
+              ic +
+              items[i].reason +
+              "</div>" +
+              "</div>";
+          }
+        }
+
+        renderBlock(primary, "fit", "Likely good fit", "good");
+        renderBlock(caution, "caution", "Use with caution", "caution");
+        renderBlock(poor, "poor", "Usually poor fit", "poor");
+
+        resultsEl.innerHTML = html;
+      }
+
+      profileEl.addEventListener("change", renderResults);
+      ownersEls.forEach(function (el) {
+        el.addEventListener("change", renderResults);
+      });
+      priorityEls.forEach(function (el) {
+        el.addEventListener("change", renderResults);
+      });
+
+      renderResults();
+
+      // Tabs
+      var tabButtons = document.querySelectorAll("#nh-entity-tool .nh-nav button");
+      var tabPanels = document.querySelectorAll("#nh-entity-tool .nh-tab");
+
+      tabButtons.forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var target = btn.getAttribute("data-nh-tab");
+          tabButtons.forEach(function (b) {
+            b.classList.remove("nh-active");
+          });
+          tabPanels.forEach(function (panel) {
+            if (panel.getAttribute("data-nh-tab") === target) {
+              panel.classList.add("nh-active-tab");
+            } else {
+              panel.classList.remove("nh-active-tab");
+            }
+          });
+          btn.classList.add("nh-active");
+        });
+      });
+
+      // Entity browser
+      var chipContainer = document.getElementById("nh-entity-chips");
+      var displayEl = document.getElementById("nh-entity-display");
+      var browserLabel = document.getElementById("nh-browser-short-label");
+
+      var entityData = {
+        "sm-llc": {
+          name: "Single-member Vermont LLC",
+          tagline: "Solo business with a liability shield and flexible tax options.",
+          pros: [
+            "✔ Simple to form and maintain; only one owner’s decisions to coordinate.",
+            "✔ Liability shield separates business obligations from personal assets.",
+            "✔ Can start as disregarded for tax and later elect S-corp taxation if useful."
+          ],
+          cons: [
+            "✘ Creditors may still ask for personal guarantees on leases and loans.",
+            "✘ Weak bookkeeping or commingling personal and business funds can undermine the liability shield."
+          ],
+          notes:
+            "Common for freelancers, online sellers, trades and smaller operations that have outgrown sole proprietorship status."
+        },
+        "mm-llc": {
+          name: "Multi-member Vermont LLC",
+          tagline: "Flexible joint-venture and operating-company vehicle for two or more owners.",
+          pros: [
+            "✔ Operating agreement can custom-fit economics, voting, exits and drag-along rights.",
+            "✔ Pass-through taxation by default allows income and losses to flow to members.",
+            "✔ Easier to adapt for real-estate deals and small investor pools than a full corporate stack."
+          ],
+          cons: [
+            "✘ Requires careful drafting to manage death, disability, buyouts and capital calls.",
+            "✘ Member disagreements can paralyze operations if decision rules are vague."
+          ],
+          notes:
+            "Frequently used for restaurants, agencies, trades and real-estate projects with a handful of co-owners across Vermont."
+        },
+        "l3c": {
+          name: "L3C (low-profit Vermont LLC)",
+          tagline: "LLC variant with a primary charitable or educational purpose and a secondary profit motive.",
+          pros: [
+            "✔ Statutory recognition of a mission-first, profit-second structure.",
+            "✔ Designed to help attract program-related investments and impact capital.",
+            "✔ Retains LLC-style flexibility while emphasizing social purpose."
+          ],
+          cons: [
+            "✘ Still a for-profit entity for tax purposes; no automatic tax-exempt status.",
+            "✘ Less familiar to conventional investors and some lenders.",
+            "✘ Must maintain specific statutory requirements to keep L3C status."
+          ],
+          notes:
+            "A niche but useful form when you are clearly a social enterprise and want that fact reflected in the statute as well as in your branding."
+        },
+        "pc-pllc": {
+          name: "Professional PC / PLLC",
+          tagline: "Licensed professions practicing through a regulated entity.",
+          pros: [
+            "✔ Aligns with licensing-board requirements on ownership and control.",
+            "✔ Limits innocent co-owners’ exposure to each other’s malpractice and business debts.",
+            "✔ Supports retirement, buy-in / buy-out and succession planning among professionals."
+          ],
+          cons: [
+            "✘ Does not shield a professional from their own malpractice or ethical violations.",
+            "✘ Ownership restrictions can complicate outside investment or non-professional equity."
+          ],
+          notes:
+            "Typical for medical groups, law firms, dentists, accountants and other licensed practices operating in Vermont."
+        },
+        "corp": {
+          name: "Vermont business corporation (Inc.)",
+          tagline: "Classic share-based structure under the Vermont Business Corporations Act.",
+          pros: [
+            "✔ Familiar to investors, lenders and acquirers; supports preferred stock and option plans.",
+            "✔ Clear separation of ownership (shareholders) and control (board and officers).",
+            "✔ Well-developed statutory roadmap for mergers, conversions and sales."
+          ],
+          cons: [
+            "✘ More formal governance, with board meetings, minutes and stock records.",
+            "✘ C-corp taxation can introduce double taxation if profit is not managed carefully, unless S-status is available."
+          ],
+          notes:
+            "Often the default for high-growth startups and businesses planning an eventual sale or outside equity financing."
+        },
+        "pbc": {
+          name: "Vermont benefit corporation",
+          tagline: "For-profit corporation that also pursues a stated public benefit under Vermont statute.",
+          pros: [
+            "✔ Gives directors statutory permission to weigh social and environmental impact alongside profit.",
+            "✔ Sends a strong branding signal to employees, customers and aligned investors.",
+            "✔ Can still raise capital and operate as a normal business corporation."
+          ],
+          cons: [
+            "✘ Additional reporting and mission-tracking expectations compared with a standard corporation.",
+            "✘ Some purely financial investors prefer ordinary C-corps without explicit stakeholder mandates."
+          ],
+          notes:
+            "Attractive for mission-driven consumer brands, sustainability ventures and social enterprises headquartered or operating in Vermont."
+        },
+        "coop": {
+          name: "Cooperative / mutual-benefit enterprise",
+          tagline: "Member-owned structure common in agriculture, food systems and shared services.",
+          pros: [
+            "✔ Built around member benefit and democratic control rather than outside shareholders.",
+            "✔ Well-known format for farm, food, and community co-ops in Vermont.",
+            "✔ Can align economic returns with member patronage."
+          ],
+          cons: [
+            "✘ Requires a critical mass of engaged members and more complex governance than a single-owner LLC.",
+            "✘ Less familiar to conventional equity investors.",
+            "✘ Onboarding and buyout rules must be drafted carefully to avoid gridlock."
+          ],
+          notes:
+            "A strong option where farmers, workers or customers are meant to own and control the enterprise collectively."
+        },
+        "gp": {
+          name: "General partnership",
+          tagline: "Two or more people in business together by default, without a formal entity filing.",
+          pros: [
+            "✔ Very simple to start; can arise automatically from conduct and agreement.",
+            "✔ Pass-through taxation without separate entity-level filings."
+          ],
+          cons: [
+            "✘ Each partner is personally liable for partnership debts and, in many cases, the acts of other partners.",
+            "✘ Hard to bring in new partners or investors without refactoring the arrangement.",
+            "✘ Often needs to be replaced by an LLC or corporation once the business grows."
+          ],
+          notes:
+            "Acceptable only for very low-risk collaborations. Most serious Vermont ventures move to an LLC or corporation relatively early."
+        },
+        "lp-lllp": {
+          name: "Limited partnership / LLLP",
+          tagline:
+            "Partnership with separate investor and manager roles, sometimes with a liability shield for general partners.",
+          pros: [
+            "✔ Familiar template for real-estate syndications and investment funds.",
+            "✔ Limited partners generally enjoy limited liability while contributing capital.",
+            "✔ LLLP status can protect general partners similar to an LLP."
+          ],
+          cons: [
+            "✘ More complex formation and documentation than a basic LLC.",
+            "✘ Limited partners’ participation in control must be managed carefully under the partnership agreement."
+          ],
+          notes:
+            "Useful when investor expectations or legacy structures already follow an LP/GP model. For many small Vermont deals, a carefully drafted multi-member LLC is simpler."
+        },
+        "llp": {
+          name: "Limited liability partnership (LLP)",
+          tagline: "Partnership that elects a liability shield while keeping partnership-style governance.",
+          pros: [
+            "✔ Can protect partners from many partnership-level debts and obligations.",
+            "✔ Comfortably used by some professional firms that evolved out of historic partnerships."
+          ],
+          cons: [
+            "✘ Still relies on a detailed partnership agreement and careful capital-account management.",
+            "✘ For new ventures, an LLC often achieves similar goals with less complexity."
+          ],
+          notes:
+            "Relevant mainly for existing partnerships professionalizing their risk management or firms that prefer partnership tax rules but want some liability protection."
+        },
+        "nonprofit": {
+          name: "Vermont nonprofit corporation",
+          tagline:
+            "Entity with no shareholders, organized for charitable, educational or member-benefit purposes.",
+          pros: [
+            "✔ Suitable for organizations that reinvest all surplus into mission rather than owners.",
+            "✔ Directors and officers enjoy limited liability when acting within their duties.",
+            "✔ Can apply for federal tax-exempt status and eligibility for grants."
+          ],
+          cons: [
+            "✘ Assets are locked into nonprofit purposes and cannot be distributed to founders.",
+            "✘ Governance, reporting and compliance expectations are higher than for many small for-profit entities."
+          ],
+          notes:
+            "Standard for charities, youth programs, religious organizations and trade associations operating in Vermont."
+        },
+        "sole": {
+          name: "Sole proprietorship (Vermont)",
+          tagline: "An individual doing business without a separate entity.",
+          pros: [
+            "✔ Easiest way to start; no formation filing required if using your own name.",
+            "✔ All income and loss flows directly onto the individual tax return."
+          ],
+          cons: [
+            "✘ No liability shield at all; personal assets are exposed to business creditors.",
+            "✘ Harder to bring in partners, investors or buyers later without restructuring.",
+            "✘ Some clients and vendors prefer dealing with a formal entity."
+          ],
+          notes:
+            "Sometimes acceptable for very small, low-risk side gigs; most serious Vermont businesses upgrade to an LLC or corporation quickly."
+        }
+      };
+
+      function renderEntity(key) {
+        var data = entityData[key] || entityData["sm-llc"];
+        browserLabel.textContent = data.name;
+        var prosHtml = data.pros
+          .map(function (p) {
+            return "<div>" + p + "</div>";
+          })
+          .join("");
+        var consHtml = data.cons
+          .map(function (c) {
+            return "<div>" + c + "</div>";
+          })
+          .join("");
+        displayEl.innerHTML =
+          '<div class="nh-entity-name">' +
+          '<span class="nh-pill">Structure snapshot</span>' +
+          "<span>" +
+          data.name +
+          "</span>" +
+          "</div>" +
+          '<div class="nh-entity-tagline">' +
+          data.tagline +
+          "</div>" +
+          '<div class="nh-entity-cols">' +
+          '<div class="nh-entity-list">' +
+          prosHtml +
+          "</div>" +
+          '<div class="nh-entity-list">' +
+          consHtml +
+          "</div>" +
+          "</div>" +
+          '<div class="nh-small-note" style="margin-top:6px;">' +
+          data.notes +
+          "</div>";
+      }
+
+      renderEntity("sm-llc");
+
+      chipContainer.addEventListener("click", function (e) {
+        var chip = e.target.closest(".nh-chip");
+        if (!chip) return;
+        var key = chip.getAttribute("data-nh-entity");
+        var allChips = chipContainer.querySelectorAll(".nh-chip");
+        allChips.forEach(function (c) {
+          c.classList.remove("nh-chip-active");
+        });
+        chip.classList.add("nh-chip-active");
+        renderEntity(key);
+      });
+    })();
+  </script>
+</body>
+</html>
