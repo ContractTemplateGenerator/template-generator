@@ -51,6 +51,71 @@ function switchTab(tabId, event) {
 - `/INC/AK/alaska-entity-types-guide.html` - Inline onclick with event parameter ✅
 - Pattern: `onclick="switchTab('tab-id', event)"` + simple function with preventDefault/stopPropagation
 
+## WordPress Heading Compatibility - CRITICAL
+
+**NEVER use h1, h2, h3, h4, or h5 elements in WordPress widgets/HTML files.**
+
+### Why No Headings?
+WordPress Table of Contents (TOC) plugins automatically detect and index all h1-h5 headings on a page. When HTML widgets/files use semantic headings, these get picked up by the TOC, creating:
+- ❌ TOC pollution with widget headings mixed into article structure
+- ❌ Confusing navigation for users
+- ❌ Broken document hierarchy
+
+### Solution: Use Styled Divs Instead
+
+**✅ CORRECT PATTERN:**
+```html
+<!-- CSS -->
+<style>
+.card-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1e3a8a;
+  margin: 0 0 18px 0;
+}
+
+.card-section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #334155;
+  margin: 24px 0 12px 0;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.subsection-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e3a8a;
+  margin: 20px 0 10px 0;
+}
+
+.minor-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e3a8a;
+  margin: 0 0 12px 0;
+}
+</style>
+
+<!-- HTML -->
+<div class="card-title">This Looks Like a Heading</div>
+<div class="card-section-title">Major Section</div>
+<div class="subsection-title">Subsection</div>
+<div class="minor-title">Minor Heading</div>
+```
+
+**❌ WRONG - Never Use:**
+```html
+<h1>Main Title</h1>  <!-- WordPress TOC will index this -->
+<h2>Section</h2>     <!-- WordPress TOC will index this -->
+<h3>Subsection</h3>  <!-- WordPress TOC will index this -->
+```
+
+### Working Examples (No Heading Elements)
+- `/Article-Widgets/warranty-disclaimers-summary-widget.html` - Uses styled divs for all headings ✅
+- All widget/article summary files must follow this pattern
+
 ## WordPress CSS Compatibility
 
 ### Body Styles - CRITICAL (AVOID COLOR SPILL)
