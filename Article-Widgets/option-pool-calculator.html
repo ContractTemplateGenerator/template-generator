@@ -611,28 +611,28 @@
           <!-- Pre-Money Valuation -->
           <div class="form-group">
             <label class="form-label" for="preMoneyVal">Pre-Money Valuation</label>
-            <input type="number" id="preMoneyVal" class="form-input" value="8000000" min="0" step="100000" oninput="calculateSingleRound()" onchange="calculateSingleRound()">
+            <input type="number" id="preMoneyVal" class="form-input" value="8000000" min="0" step="100000">
             <span class="form-help">Company valuation before this investment round</span>
           </div>
 
           <!-- Investment Amount -->
           <div class="form-group">
             <label class="form-label" for="investmentAmt">Investment Amount</label>
-            <input type="number" id="investmentAmt" class="form-input" value="2000000" min="0" step="100000" oninput="calculateSingleRound()" onchange="calculateSingleRound()">
+            <input type="number" id="investmentAmt" class="form-input" value="2000000" min="0" step="100000">
             <span class="form-help">Total capital raised in this round</span>
           </div>
 
           <!-- Current Shares Outstanding -->
           <div class="form-group">
             <label class="form-label" for="currentShares">Current Shares Outstanding</label>
-            <input type="number" id="currentShares" class="form-input" value="10000000" min="0" step="100000" oninput="calculateSingleRound()" onchange="calculateSingleRound()">
+            <input type="number" id="currentShares" class="form-input" value="10000000" min="0" step="100000">
             <span class="form-help">Common shares issued to founders/early team (fully-diluted basis)</span>
           </div>
 
           <!-- Existing Option Pool -->
           <div class="form-group">
             <label class="form-label" for="existingPool">Existing Option Pool (%)</label>
-            <input type="number" id="existingPool" class="form-input" value="0" min="0" max="50" step="0.5" oninput="calculateSingleRound()" onchange="calculateSingleRound()">
+            <input type="number" id="existingPool" class="form-input" value="0" min="0" max="50" step="0.5">
             <span class="form-help">Current unallocated option pool as % of fully-diluted (0% if none)</span>
           </div>
 
@@ -641,7 +641,7 @@
             <label class="form-label" for="newPoolPct">New Option Pool Size (Post-Money %)</label>
             <div class="slider-container">
               <span class="slider-value" id="newPoolPctDisplay">15%</span>
-              <input type="range" id="newPoolPct" class="form-slider" min="5" max="25" value="15" step="0.5" oninput="calculateSingleRound()" onchange="calculateSingleRound()">
+              <input type="range" id="newPoolPct" class="form-slider" min="5" max="25" value="15" step="0.5">
             </div>
             <span class="form-help">Typical: 10-12% Seed, 15-20% Series A, 10-15% Series B+</span>
           </div>
@@ -649,7 +649,7 @@
           <!-- Round Stage -->
           <div class="form-group">
             <label class="form-label" for="roundStage">Round Stage</label>
-            <select id="roundStage" class="form-select" onchange="calculateSingleRound()">
+            <select id="roundStage" class="form-select">
               <option value="Seed">Seed</option>
               <option value="Series A" selected>Series A</option>
               <option value="Series B">Series B</option>
@@ -661,7 +661,7 @@
           <!-- Hiring Plan -->
           <div class="form-group">
             <label class="form-label" for="hiringPlan">18-Month Hiring Plan (# of Employees)</label>
-            <input type="number" id="hiringPlan" class="form-input" value="15" min="0" step="1" oninput="calculateSingleRound()" onchange="calculateSingleRound()">
+            <input type="number" id="hiringPlan" class="form-input" value="15" min="0" step="1">
             <span class="form-help">Expected new hires over next 18 months (validates pool size)</span>
           </div>
         </form>
@@ -1337,15 +1337,34 @@ function switchTab(tabId, event) {
 }
 
 // ============================================================
-// INITIALIZATION
+// EVENT LISTENERS
 // ============================================================
-// Run initial calculation when page loads
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', calculateSingleRound);
-} else {
-  // DOM already loaded
+document.addEventListener('DOMContentLoaded', function() {
+  // Initial calculation
   calculateSingleRound();
-}
+
+  // Attach listeners to single-round inputs
+  const singleRoundInputs = ['preMoneyVal', 'investmentAmt', 'currentShares', 'existingPool', 'newPoolPct', 'roundStage', 'hiringPlan'];
+
+  singleRoundInputs.forEach(id => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.addEventListener('input', calculateSingleRound);
+      element.addEventListener('change', calculateSingleRound);
+    }
+  });
+
+  // Attach listeners to multi-round inputs
+  const multiRoundInputs = ['founderShares', 'seriesA_preMoney', 'seriesA_investment', 'seriesA_pool', 'seriesB_preMoney', 'seriesB_investment', 'seriesB_pool', 'seriesC_preMoney', 'seriesC_investment', 'seriesC_pool'];
+
+  multiRoundInputs.forEach(id => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.addEventListener('input', calculateMultiRound);
+      element.addEventListener('change', calculateMultiRound);
+    }
+  });
+});
 </script>
 
 </body>

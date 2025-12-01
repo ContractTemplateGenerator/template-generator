@@ -1,0 +1,2363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complete Business Formation & Compliance Hub</title>
+
+  <!-- PayPal SDK -->
+  <script src="https://www.paypal.com/sdk/js?client-id=ASmwKug6zVE_78S-152YKAzzh2iH8VgSjs-P6RkrWcfqdznNjeE_UYwKJkuJ3BvIJrxCotS8GtXEJ2fx&currency=USD"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      line-height: 1.6;
+      color: #2c3e50;
+      background-color: #f5f7fa;
+      padding: 20px;
+    }
+
+    .intake-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 24px 30px;
+      border-radius: 12px 12px 0 0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .header h1 {
+      font-size: 26px;
+      margin-bottom: 6px;
+    }
+
+    .header p {
+      font-size: 15px;
+      opacity: 0.95;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.62fr) minmax(360px, 0.38fr);
+      gap: 25px;
+      margin-top: 15px;
+      max-width: 100%;
+    }
+
+    .left-column {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .right-column {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      position: sticky;
+      top: 15px;
+      align-self: flex-start;
+      min-width: 320px;
+      max-width: 420px;
+      width: 100%;
+    }
+
+    .card {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      padding: 18px;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .service-card {
+      order: -1;
+    }
+
+    .delaware-share-card {
+      order: -0.5;
+    }
+
+    .foldout-card {
+      order: 10;
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 15px;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-subtitle {
+      font-size: 13px;
+      color: #64748b;
+      margin-bottom: 15px;
+      line-height: 1.5;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .industry-inputs {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .comparison-details {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 10px 14px;
+      background-color: #f8fafc;
+    }
+
+    .comparison-details summary {
+      font-weight: 600;
+      cursor: pointer;
+      color: #334155;
+      outline: none;
+      list-style: none;
+    }
+
+    .comparison-details summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .comparison-details summary::after {
+      content: '▼';
+      float: right;
+      font-size: 12px;
+      transition: transform 0.2s ease;
+    }
+
+    .comparison-details[open] summary::after {
+      transform: rotate(-180deg);
+    }
+
+    .comparison-details > div {
+      margin-top: 12px;
+    }
+
+    label {
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #334155;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .help-icon {
+      width: 16px;
+      height: 16px;
+      background-color: #667eea;
+      color: white;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: help;
+      position: relative;
+    }
+
+    .tooltip {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-8px);
+      background-color: #1e293b;
+      color: white;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: normal;
+      line-height: 1.5;
+      white-space: normal;
+      width: 280px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s;
+      z-index: 1000;
+      pointer-events: none;
+    }
+
+    .tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: #1e293b;
+    }
+
+    .help-icon:hover .tooltip {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .required {
+      color: #e74c3c;
+      margin-left: 3px;
+    }
+
+    input, select, textarea {
+      padding: 10px 12px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: all 0.2s;
+      width: 100%;
+      max-width: 100%;
+    }
+
+    select, input[type="text"], input[type="email"], input[type="tel"] {
+      max-width: 320px;
+    }
+
+    .form-group.full-width input,
+    .form-group.full-width textarea,
+    .form-group.full-width select {
+      max-width: 100%;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    textarea {
+      min-height: 70px;
+      resize: vertical;
+      font-family: inherit;
+    }
+
+    .help-text {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 4px;
+    }
+
+    .service-tiers {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 0;
+    }
+
+    .tier-option {
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      background-color: white;
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .tier-option:hover {
+      border-color: #667eea;
+      background-color: #f8f9ff;
+    }
+
+    .tier-option.selected {
+      border-color: #667eea;
+      background-color: #f0f4ff;
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+    }
+
+    .tier-option input[type="radio"] {
+      width: 20px;
+      height: 20px;
+      margin: 0;
+      cursor: pointer;
+      accent-color: #667eea;
+      flex-shrink: 0;
+    }
+
+    .tier-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .tier-header {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 4px;
+      flex-wrap: wrap;
+    }
+
+    .tier-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .tier-base-price {
+      font-size: 20px;
+      font-weight: 800;
+      color: #667eea;
+    }
+
+    .tier-badge {
+      font-size: 11px;
+      background-color: #10b981;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+
+    .tier-description {
+      font-size: 13px;
+      color: #64748b;
+      margin-bottom: 6px;
+      line-height: 1.4;
+    }
+
+    .tier-features {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      font-size: 12px;
+      color: #475569;
+    }
+
+    .tier-features span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .tier-features span:before {
+      content: "✓";
+      color: #667eea;
+      font-weight: bold;
+      font-size: 13px;
+    }
+
+    .alert-box {
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      border-left: 4px solid;
+    }
+
+    .alert-warning {
+      background-color: #fef3c7;
+      border-color: #f59e0b;
+      color: #92400e;
+    }
+
+    .alert-info {
+      background-color: #dbeafe;
+      border-color: #3b82f6;
+      color: #1e40af;
+    }
+
+    .alert-success {
+      background-color: #d1fae5;
+      border-color: #10b981;
+      color: #065f46;
+    }
+
+    .alert-box strong {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 700;
+    }
+
+    .compliance-timeline {
+      margin-top: 20px;
+    }
+
+    .timeline-item {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .timeline-item:not(:last-child)::before {
+      content: '';
+      position: absolute;
+      left: 19px;
+      top: 40px;
+      bottom: -20px;
+      width: 2px;
+      background-color: #e2e8f0;
+    }
+
+    .timeline-icon {
+      width: 40px;
+      height: 40px;
+      background-color: #667eea;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      flex-shrink: 0;
+      font-size: 18px;
+    }
+
+    .timeline-content {
+      flex: 1;
+    }
+
+    .timeline-title {
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 4px;
+      font-size: 15px;
+    }
+
+    .timeline-date {
+      font-size: 13px;
+      color: #667eea;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    .timeline-description {
+      font-size: 13px;
+      color: #64748b;
+      line-height: 1.5;
+    }
+
+    .timeline-fee {
+      display: inline-block;
+      background-color: #fef3c7;
+      color: #92400e;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 6px;
+    }
+
+    .cost-breakdown {
+      background-color: #f8fafc;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .breakdown-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 15px;
+      color: #1e293b;
+    }
+
+    .breakdown-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 14px;
+      gap: 10px;
+    }
+
+    .breakdown-row:last-of-type {
+      border-bottom: none;
+    }
+
+    .breakdown-row.total {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-top: 10px;
+      padding-top: 15px;
+      border-top: 2px solid #cbd5e1;
+    }
+
+    .breakdown-label {
+      color: #64748b;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .breakdown-value {
+      font-weight: 600;
+      color: #334155;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .breakdown-row.total .breakdown-value {
+      color: #667eea;
+      font-size: 24px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .info-card {
+      background-color: #f8fafc;
+      padding: 15px;
+      border-radius: 8px;
+      border-left: 3px solid #667eea;
+    }
+
+    .info-card-label {
+      font-size: 12px;
+      color: #64748b;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .info-card-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .franchise-tax-calc {
+      background-color: #fef3c7;
+      border-left: 4px solid #f59e0b;
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+
+    .franchise-tax-calc h4 {
+      color: #92400e;
+      margin-bottom: 15px;
+      font-size: 16px;
+    }
+
+    .tax-method {
+      background-color: white;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+    }
+
+    .tax-method-title {
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .tax-method-calc {
+      font-size: 13px;
+      color: #64748b;
+      margin-bottom: 8px;
+      font-family: 'Courier New', monospace;
+      background-color: #f8fafc;
+      padding: 8px;
+      border-radius: 4px;
+    }
+
+    .tax-method-result {
+      font-size: 18px;
+      font-weight: 700;
+      color: #667eea;
+    }
+
+    .five-year-projection {
+      margin-top: 20px;
+    }
+
+    .projection-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .projection-table th {
+      background-color: #f1f5f9;
+      padding: 10px;
+      text-align: left;
+      font-weight: 600;
+      color: #475569;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .projection-table td {
+      padding: 10px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .projection-table tr:last-child td {
+      border-bottom: none;
+      font-weight: 700;
+      background-color: #f8fafc;
+    }
+
+    .best-practices {
+      margin-top: 20px;
+    }
+
+    .practice-item {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+
+    .practice-icon {
+      width: 24px;
+      height: 24px;
+      background-color: #10b981;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .practice-text {
+      font-size: 14px;
+      color: #475569;
+      line-height: 1.6;
+    }
+
+    .state-badge {
+      display: inline-block;
+      background-color: #667eea;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+
+    .paypal-button-container {
+      margin-top: 20px;
+      min-height: 45px;
+    }
+
+    .payment-disabled {
+      background-color: #f1f5f9;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      color: #64748b;
+      font-size: 14px;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      font-size: 13px;
+    }
+
+    .comparison-table th {
+      background-color: #1e293b;
+      color: white;
+      padding: 12px;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    .comparison-table td {
+      padding: 12px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .comparison-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .check-yes {
+      color: #10b981;
+      font-weight: bold;
+    }
+
+    .check-no {
+      color: #ef4444;
+    }
+
+    @media (max-width: 1024px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .right-column {
+        position: static;
+      }
+
+      .form-grid, .service-tiers, .info-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        padding: 20px;
+      }
+
+      .header h1 {
+        font-size: 22px;
+      }
+
+      .card {
+        padding: 15px;
+      }
+    }
+
+    .tabs {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .tab {
+      padding: 12px 20px;
+      background: none;
+      border: none;
+      color: #64748b;
+      font-weight: 600;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+      font-size: 14px;
+    }
+
+    .tab:hover {
+      color: #667eea;
+      background-color: #f8fafc;
+    }
+
+    .tab.active {
+      color: #667eea;
+      border-bottom-color: #667eea;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="intake-container">
+    <div class="header">
+      <h1>Business Formation & Compliance</h1>
+      <p>Attorney-led service • Real-time compliance intelligence • Transparent pricing</p>
+    </div>
+
+    <div class="main-grid">
+      <!-- LEFT COLUMN: Main Form -->
+      <div class="left-column">
+        <!-- Entity Selection Card -->
+        <div class="card">
+          <div class="card-title">
+            <span>1️⃣</span>
+            <span>Choose Your Business Structure</span>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label>
+                State of Formation
+                <span class="required">*</span>
+                <span class="help-icon">?
+                  <span class="tooltip">This is where your business will be legally registered. Most businesses choose their home state, but some opt for Delaware or Wyoming for specific legal benefits.</span>
+                </span>
+              </label>
+              <select id="state" required>
+                <option value="">Select a state...</option>
+              </select>
+              <span class="help-text">Where you want to legally form your business</span>
+            </div>
+
+            <div class="form-group">
+              <label>
+                Entity Type
+                <span class="required">*</span>
+                <span class="help-icon">?
+                  <span class="tooltip">LLCs offer flexibility and pass-through taxation. Corporations are better for raising venture capital and offer stock options. Choose based on your business goals.</span>
+                </span>
+              </label>
+              <select id="entityType" required>
+                <option value="">Select type...</option>
+                <option value="llc">LLC (Limited Liability Company)</option>
+                <option value="corporation">Corporation (C-Corp)</option>
+              </select>
+              <span class="help-text">Type of business entity</span>
+            </div>
+          </div>
+
+          <!-- Dynamic Alerts -->
+          <div id="dynamicAlerts"></div>
+
+        </div>
+
+        <!-- Business Information Card -->
+        <div class="card">
+          <div class="card-title">
+            <span>2️⃣</span>
+            <span>Business Information</span>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label>
+                Proposed Business Name
+                <span class="required">*</span>
+                <span class="help-icon">?
+                  <span class="tooltip">Your business name must be unique in your state and include appropriate designators (LLC, Inc., Corp.). I'll verify availability before filing.</span>
+                </span>
+              </label>
+              <input type="text" id="businessName" required>
+              <span class="help-text">Your desired company name</span>
+            </div>
+
+            <div class="form-group">
+              <label>
+                Industry/Business Type
+                <span class="help-icon">?
+                  <span class="tooltip">Knowing your industry helps me provide tailored compliance advice and identify any special licensing requirements your business may need.</span>
+                </span>
+              </label>
+              <div class="industry-inputs">
+                <select id="industrySelect">
+                  <option value="">Select an industry...</option>
+                  <option value="Software / SaaS">Software / SaaS</option>
+                  <option value="E-commerce / Retail">E-commerce / Retail</option>
+                  <option value="Consulting / Advisory">Consulting / Advisory</option>
+                  <option value="Marketing / Creative Agency">Marketing / Creative Agency</option>
+                  <option value="Professional Services">Professional Services</option>
+                  <option value="Finance / Fintech">Finance / Fintech</option>
+                  <option value="Healthcare / Biotech">Healthcare / Biotech</option>
+                  <option value="Real Estate / Property">Real Estate / Property</option>
+                  <option value="Manufacturing / Supply Chain">Manufacturing / Supply Chain</option>
+                  <option value="Logistics / Transportation">Logistics / Transportation</option>
+                  <option value="Hospitality / Food & Beverage">Hospitality / Food & Beverage</option>
+                  <option value="Nonprofit / Social Impact">Nonprofit / Social Impact</option>
+                  <option value="Other / Custom">Other / Custom (write in below)</option>
+                </select>
+                <input type="text" id="industry" placeholder="Add details or write in your specific niche">
+              </div>
+              <span class="help-text">Choose a category or describe your specific niche (typed text overrides the dropdown).</span>
+            </div>
+
+            <div class="form-group">
+              <label>
+                Number of Founders/Owners
+                <span class="help-icon">?
+                  <span class="tooltip">This affects how I draft your operating agreement or bylaws. Multiple owners require more detailed ownership and governance provisions.</span>
+                </span>
+              </label>
+              <select id="numOwners">
+                <option value="1">1 (Solo founder)</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4+">4 or more</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Information Card -->
+        <div class="card">
+          <div class="card-title">
+            <span>3️⃣</span>
+            <span>Contact Information</span>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label>First Name <span class="required">*</span></label>
+              <input type="text" id="firstName" required>
+            </div>
+
+            <div class="form-group">
+              <label>Last Name <span class="required">*</span></label>
+              <input type="text" id="lastName" required>
+            </div>
+
+            <div class="form-group">
+              <label>Email Address <span class="required">*</span></label>
+              <input type="email" id="email" required>
+              <span class="help-text">I'll send formation documents here</span>
+            </div>
+
+            <div class="form-group">
+              <label>Phone Number</label>
+              <input type="tel" id="phone">
+            </div>
+          </div>
+
+          <div class="form-group full-width">
+            <label>
+              Additional Information or Special Requests
+              <span class="help-icon">?
+                <span class="tooltip">Let me know about any unique requirements: multi-class stock, vesting schedules, foreign owners, etc. I'll address them in your documents.</span>
+              </span>
+            </label>
+            <textarea id="additionalInfo" rows="3" placeholder="Tell me about any specific requirements, questions, or concerns..."></textarea>
+          </div>
+        </div>
+
+        <!-- Entity Comparison Foldout -->
+        <div class="card foldout-card" id="comparisonCard" style="display:none;">
+          <div class="card-title">
+            <span>📚</span>
+            <span>LLC vs Corporation Snapshot</span>
+          </div>
+          <details class="comparison-details">
+            <summary>Expand to compare the two structures</summary>
+            <div id="entityComparison">
+              <table class="comparison-table">
+                <thead>
+                  <tr>
+                    <th>Feature</th>
+                    <th>LLC</th>
+                    <th>Corporation</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Personal Liability Protection</td>
+                    <td class="check-yes">✓ Yes</td>
+                    <td class="check-yes">✓ Yes</td>
+                  </tr>
+                  <tr>
+                    <td>Management Flexibility</td>
+                    <td class="check-yes">✓ High</td>
+                    <td class="check-no">✗ Formal Structure Required</td>
+                  </tr>
+                  <tr>
+                    <td>Raising Venture Capital</td>
+                    <td class="check-no">✗ Difficult</td>
+                    <td class="check-yes">✓ Easy</td>
+                  </tr>
+                  <tr>
+                    <td>Tax Treatment</td>
+                    <td class="check-yes">✓ Pass-through (default)</td>
+                    <td class="check-no">Double taxation (unless S-Corp election)</td>
+                  </tr>
+                  <tr>
+                    <td>Stock Options for Employees</td>
+                    <td class="check-no">✗ No</td>
+                    <td class="check-yes">✓ Yes (ISOs/NSOs)</td>
+                  </tr>
+                  <tr>
+                    <td>Ongoing Formalities</td>
+                    <td class="check-yes">✓ Minimal</td>
+                    <td class="check-no">✗ Board meetings, minutes required</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </details>
+
+          <details class="comparison-details" style="margin-top: 12px;">
+            <summary>✅ Best Practices for Your Entity</summary>
+            <div id="bestPractices" style="margin-top: 10px;"></div>
+          </details>
+        </div>
+
+        <!-- Service Tier Selection -->
+        <div class="card service-card">
+          <div class="card-title">
+            <span>4️⃣</span>
+            <span>Select Your Service Package</span>
+          </div>
+
+          <div class="service-tiers">
+            <label class="tier-option">
+              <input type="radio" name="serviceTier" value="starter" data-base-price="400">
+              <div class="tier-info">
+                <div class="tier-header">
+                  <span class="tier-name">Starter</span>
+                  <span class="tier-base-price" id="starterPrice">$400</span>
+                </div>
+                <div class="tier-description">Best for single-owner businesses</div>
+                <div class="tier-features">
+                  <span>14-day delivery</span>
+                  <span>EIN</span>
+                  <span>Basic Bylaws/Operating Agreement</span>
+                  <span>No consultation</span>
+                  <span>0 revisions</span>
+                </div>
+              </div>
+            </label>
+
+            <label class="tier-option selected">
+              <input type="radio" name="serviceTier" value="standard" data-base-price="750" checked>
+              <div class="tier-info">
+                <div class="tier-header">
+                  <span class="tier-name">Standard</span>
+                  <span class="tier-base-price" id="standardPrice">$750</span>
+                  <span class="tier-badge">Most Popular</span>
+                </div>
+                <div class="tier-description">Attorney-drafted documents with personal consultation</div>
+                <div class="tier-features">
+                  <span>5-day delivery</span>
+                  <span>EIN</span>
+                  <span>Attorney-customized Bylaws/Operating Agreement</span>
+                  <span>30min consultation</span>
+                  <span>2 revisions</span>
+                </div>
+              </div>
+            </label>
+
+            <label class="tier-option">
+              <input type="radio" name="serviceTier" value="advanced" data-base-price="850">
+              <div class="tier-info">
+                <div class="tier-header">
+                  <span class="tier-name">Advanced</span>
+                  <span class="tier-base-price" id="advancedPrice">$850</span>
+                </div>
+                <div class="tier-description">For complex structures with multiple owners or investors</div>
+                <div class="tier-features">
+                  <span>3-day delivery</span>
+                  <span>EIN</span>
+                  <span>Attorney-customized Bylaws/Operating Agreement</span>
+                  <span>1hr consultation</span>
+                  <span>Advanced structuring</span>
+                  <span>5 revisions</span>
+                </div>
+              </div>
+            </label>
+          </div>
+        </div>
+        
+        <!-- Delaware Share Structure Card -->
+        <div class="card delaware-share-card" id="delawareShareCard" style="display:none;">
+          <div class="card-title">
+            <span>🧾</span>
+            <span>Delaware Authorized Shares & Par Value</span>
+          </div>
+          <p class="card-subtitle">Delaware keeps your franchise tax lowest when you authorize 5,000 shares or fewer and use a tiny par value (e.g., $0.0001). We can always increase later if investors require it.</p>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Authorized Shares <span class="required">*</span></label>
+              <input type="number" id="authorizedShares" min="1" value="5000">
+              <span class="help-text">This tier keeps you within the $400 minimum franchise tax using the assumed par value method.</span>
+            </div>
+            <div class="form-group">
+              <label>Par Value Per Share <span class="required">*</span></label>
+              <input type="text" id="parValue" value="0.0001">
+              <span class="help-text">Lower par value makes it easier to stay in the cheapest tax bracket.</span>
+            </div>
+          </div>
+          <p class="help-text">Need millions of shares for SAFEs or an option pool? Add it above and I'll model the tax impact before filing.</p>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: Dynamic Info & Pricing -->
+      <div class="right-column">
+        <!-- Pricing Card -->
+        <div class="card">
+          <div class="card-title">💰 Price Breakdown</div>
+
+          <div class="cost-breakdown">
+            <div class="breakdown-row">
+              <span class="breakdown-label">Attorney Service Fee</span>
+              <span class="breakdown-value" id="serviceFee">$750.00</span>
+            </div>
+
+            <div class="breakdown-row">
+              <span class="breakdown-label">State Filing Fee</span>
+              <span class="breakdown-value" id="stateFee">$0.00</span>
+            </div>
+            <p class="help-text" id="stateFeeNote" style="margin: -8px 0 12px 0; font-size: 12px; color: #64748b; font-style: italic;">
+              Will be added when you select state and entity type
+            </p>
+
+            <div class="breakdown-row">
+              <span class="breakdown-label">Registered Agent (1st year)</span>
+              <span class="breakdown-value">$0.00 <small style="color: #10b981; font-weight: 600;">(included)</small></span>
+            </div>
+
+            <div class="breakdown-row total">
+              <span class="breakdown-label">Total Due Today</span>
+              <span class="breakdown-value" id="totalPrice">$850.00</span>
+            </div>
+          </div>
+
+          <p class="help-text" style="margin-top: 12px; font-size: 13px; color: #64748b;">
+            <strong>Registered Agent Renewal:</strong> After the first year, registered agent service is $100/year if you want me to continue monitoring your mailbox, or you may choose your own registered agent.
+          </p>
+
+          <div id="paypalButtonContainer" class="paypal-button-container">
+            <div class="payment-disabled">Select state and entity type to continue</div>
+          </div>
+        </div>
+
+        <!-- State-Specific Info Card -->
+        <div class="card" id="stateInfoCard" style="display:none;">
+          <div class="card-title">📋 State & Entity Information</div>
+          <div id="stateInfoContent"></div>
+        </div>
+
+        <!-- Compliance Timeline Card -->
+        <div class="card" id="complianceCard" style="display:none;">
+          <div class="card-title">📅 Your Compliance Timeline</div>
+          <p class="card-subtitle">Key dates and fees for the next 18 months (assuming formation today)</p>
+          <div id="complianceTimeline"></div>
+        </div>
+
+        <!-- 5-Year Cost Projection Card -->
+        <div class="card" id="costProjectionCard" style="display:none;">
+          <div class="card-title">📊 5-Year Cost Projection</div>
+          <p class="card-subtitle">Total ongoing costs to maintain your entity</p>
+          <div id="costProjection"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Comprehensive state data for LLCs
+    const stateCostData = [
+      {
+        "state": "Alabama",
+        "formationFee": 200,
+        "annualReportFee": 0,
+        "reportFrequency": "none",
+        "filingDeadline": "Apr 15",
+        "annualFranchiseFee": 100,
+        "notes": "Business Privilege Tax $100 minimum. No annual reports since 2024."
+      },
+      {
+        "state": "Alaska",
+        "formationFee": 250,
+        "annualReportFee": 100,
+        "reportFrequency": "biennial",
+        "filingDeadline": "Jan 2",
+        "annualFranchiseFee": 0,
+        "notes": "Biennial reports every 2 years by Jan 2."
+      },
+      {
+        "state": "Arizona",
+        "formationFee": 60,
+        "annualReportFee": 45,
+        "reportFrequency": "annual",
+        "filingDeadline": "Anniversary",
+        "annualFranchiseFee": 0,
+        "notes": "Annual reports due on incorporation anniversary."
+      },
+      {
+        "state": "Arkansas",
+        "formationFee": 50,
+        "annualReportFee": 150,
+        "reportFrequency": "annual",
+        "filingDeadline": "May 1",
+        "annualFranchiseFee": 150,
+        "notes": "Annual franchise tax report required May 1."
+      },
+      {
+        "state": "California",
+        "formationFee": 100,
+        "annualReportFee": 20,
+        "reportFrequency": "annual",
+        "filingDeadline": "Anniversary",
+        "annualFranchiseFee": 800,
+        "notes": "Statement of Information ($20 for LLC, $25 for Corp) due within 90 days and annually thereafter. $800 annual franchise tax."
+      },
+      {
+        "state": "Colorado",
+        "formationFee": 50,
+        "annualReportFee": 25,
+        "reportFrequency": "annual",
+        "filingDeadline": "Anniversary",
+        "annualFranchiseFee": 0,
+        "notes": "Periodic report fee increased to $25 in 2024."
+      },
+      {
+        "state": "Connecticut",
+        "formationFee": 315,
+        "annualReportFee": 150,
+        "reportFrequency": "annual",
+        "filingDeadline": "Mar 31",
+        "annualFranchiseFee": 0,
+        "notes": "High formation fees but no franchise tax. Free dissolution."
+      },
+      {
+        "state": "Delaware",
+        "formationFee": 109,
+        "annualReportFee": 50,
+        "reportFrequency": "annual",
+        "filingDeadline": "Mar 1",
+        "annualFranchiseFee": 175,
+        "notes": "Premier legal jurisdiction. Franchise tax minimum $175, can be much higher."
+      },
+      {
+        "state": "Florida",
+        "formationFee": 70,
+        "annualReportFee": 150,
+        "reportFrequency": "annual",
+        "filingDeadline": "May 1",
+        "annualFranchiseFee": 0,
+        "notes": "High annual report fees. $400 late penalty if missed."
+      },
+      {
+        "state": "Georgia",
+        "formationFee": 100,
+        "annualReportFee": 50,
+        "reportFrequency": "annual",
+        "filingDeadline": "Apr 1",
+        "annualFranchiseFee": 0,
+        "notes": "Multi-year renewals available. Free dissolution."
+      },
+      {
+        "state": "Hawaii",
+        "formationFee": 51,
+        "annualReportFee": 15,
+        "reportFrequency": "annual",
+        "filingDeadline": "Anniversary",
+        "annualFranchiseFee": 0,
+        "notes": "Very low ongoing costs. Online discount available."
+      },
+      {
+        "state": "Idaho",
+        "formationFee": 100,
+        "annualReportFee": 0,
+        "reportFrequency": "annual",
+        "filingDeadline": "Anniversary",
+        "annualFranchiseFee": 0,
+        "notes": "Annual reports required but completely free to file."
+      },
+      {
+        "state": "Illinois",
+        "formationFee": 150,
+        "annualReportFee": 75,
+        "reportFrequency": "annual",
+        "filingDeadline": "Anniversary",
+        "annualFranchiseFee": 25,
+        "notes": "Franchise tax being phased out by 2025."
+      },
+      {
+        "state": "Indiana",
+        "formationFee": 91,
+        "annualReportFee": 32,
+        "reportFrequency": "biennial",
+        "filingDeadline": "Anniversary",
+        "annualFranchiseFee": 0,
+        "notes": "Biennial reports every 2 years. Online filing available."
+      },
+      {
+        "state": "Iowa",
+        "formationFee": 50,
+        "annualReportFee": 30,
+        "reportFrequency": "biennial",
+        "filingDeadline": "Anniversary",
+        "annualFranchiseFee": 0,
+        "notes": "Biennial reports keep costs low. $30 online."
+      },
+      {
+        "state": "Kansas",
+        "formationFee": 90,
+        "annualReportFee": 50,
+        "reportFrequency": "biennial",
+        "filingDeadline": "Anniversary",
+        "annualFranchiseFee": 0,
+        "notes": "Switched to biennial reporting in 2022."
+      },
+      {
+        "state": "Kentucky",
+        "formationFee": 100,
+        "annualReportFee": 15,
+        "reportFrequency": "annual",
+        "filingDeadline": "Jun 30",
+        "annualFranchiseFee": 0,
+        "notes": "Low annual report fees. One-time organization tax on capital."
+      },
+      {
+        "state": "Louisiana",
+        "formationFee": 170,
+        "annualReportFee": 30,
+        "reportFrequency": "annual",
+        "filingDeadline": "Anniversary",
+        "annualFranchiseFee": 110,
+        "notes": "Franchise tax $110 minimum based on capital."
+      },
+      {
+        "state": "Maine",
+        "formationFee": 145,
+        "annualReportFee": 85,
+        "reportFrequency": "annual",
+        "filingDeadline": "Jun 1",
+        "annualFranchiseFee": 0,
+        "notes": "Reports due June 1. $50 late penalty."
+      },
+      {
+        "state": "Maryland",
+        "formationFee": 145,
+        "annualReportFee": 300,
+        "reportFrequency": "annual",
+        "filingDeadline": "Apr 15",
+        "annualFranchiseFee": 300,
+        "notes": "$300 annual SDAT filing fee. Can be waived with retirement savings program."
+      },
+      {
+        "state": "Massachusetts",
+        "formationFee": 275,
+        "annualReportFee": 125,
+        "reportFrequency": "annual",
+        "filingDeadline": "Mar 15",
+        "annualFranchiseFee": 0,
+        "notes": "High costs. Online filing discounts available."
+      },
+      {
+        "state": "Michigan",
+        "formationFee": 50,
+        "annualReportFee": 0,
+        "reportFrequency": "annual",
+        "filingDeadline": "May 15",
+        "annualFranchiseFee": 0,
+        "notes": "No fee for timely annual reports (due May 15)."
+      },
+      {
+        "state": "Minnesota",
+        "formationFee": 155,
+        "annualReportFee": 0,
+        "reportFrequency": "annual",
+        "filingDeadline": "Dec 31",
+        "annualFranchiseFee": 0,
+        "notes": "Free annual renewals for domestic corporations. Free dissolution."
+      },
+      {
+        "state": "Mississippi",
+        "formationFee": 52,
+        "annualReportFee": 25,
+        "reportFrequency": "annual",
+        "filingDeadline": "Apr 15",
+        "annualFranchiseFee": 0,
+        "notes": "Annual reports required by April 15."
+      },
+      {
+        "state": "Missouri",
+        "formationFee": 60,
+        "annualReportFee": 20,
+        "reportFrequency": "annual",
+        "filingDeadline": "Anniversary +3mo",
+        "annualFranchiseFee": 0,
+        "notes": "Annual registration reports required."
+      },
+      {
+        "state": "Montana",
+        "formationFee": 70,
+        "annualReportFee": 20,
+        "reportFrequency": "annual",
+        "filingDeadline": "Apr 15",
+        "annualFranchiseFee": 0,
+        "notes": "Very low fees. $35 if filed after April 15."
+      },
+      {
+        "state": "Nebraska",
+        "formationFee": 67,
+        "annualReportFee": 26,
+        "reportFrequency": "biennial",
+        "filingDeadline": "Mar 1",
+        "annualFranchiseFee": 26,
+        "notes": "Biennial occupation tax based on capital."
+      },
+      {
+        "state": "Nevada",
+        "formationFee": 75,
+        "annualReportFee": 150,
+        "reportFrequency": "annual",
+        "filingDeadline": "Anniversary",
+        "annualFranchiseFee": 500,
+        "notes": "No state income tax but high ongoing fees ($650/year total)."
+      },
+      {
+        "state": "New Hampshire",
+        "formationFee": 100,
+        "annualReportFee": 100,
+        "reportFrequency": "annual",
+        "filingDeadline": "Apr 1",
+        "annualFranchiseFee": 0,
+        "notes": "Reports due April 1. $50 late fee."
+      },
+      {
+        "state": "New Jersey",
+        "formationFee": 130,
+        "annualReportFee": 75,
+        "reportFrequency": "annual",
+        "filingDeadline": "Anniversary",
+        "annualFranchiseFee": 0,
+        "notes": "Tax clearance required for dissolution."
+      },
+      {
+        "state": "New Mexico",
+        "formationFee": 100,
+        "annualReportFee": 25,
+        "reportFrequency": "biennial",
+        "filingDeadline": "Apr 15",
+        "annualFranchiseFee": 0,
+        "notes": "Biennial reports reduce frequency."
+      },
+      {
+        "state": "New York",
+        "formationFee": 125,
+        "annualReportFee": 9,
+        "reportFrequency": "biennial",
+        "filingDeadline": "Anniversary",
+        "annualFranchiseFee": 0,
+        "notes": "Biennial statements every 2 years. Very low fee."
+      },
+      {
+        "state": "North Carolina",
+        "formationFee": 127,
+        "annualReportFee": 25,
+        "reportFrequency": "annual",
+        "filingDeadline": "Apr 15",
+        "annualFranchiseFee": 200,
+        "notes": "Franchise tax $200 minimum via Dept of Revenue."
+      },
+      {
+        "state": "North Dakota",
+        "formationFee": 100,
+        "annualReportFee": 25,
+        "reportFrequency": "annual",
+        "filingDeadline": "Aug 1",
+        "annualFranchiseFee": 0,
+        "notes": "Due by Aug 1. $85 late penalty."
+      },
+      {
+        "state": "Ohio",
+        "formationFee": 99,
+        "annualReportFee": 0,
+        "reportFrequency": "none",
+        "filingDeadline": "None required",
+        "annualFranchiseFee": 0,
+        "notes": "No annual reports required. Very maintenance-friendly."
+      },
+      {
+        "state": "Oklahoma",
+        "formationFee": 50,
+        "annualReportFee": 25,
+        "reportFrequency": "annual",
+        "filingDeadline": "Jul 1",
+        "annualFranchiseFee": 25,
+        "notes": "Small capital pays $25 activity fee instead of franchise tax."
+      },
+      {
+        "state": "Oregon",
+        "formationFee": 100,
+        "annualReportFee": 100,
+        "reportFrequency": "annual",
+        "filingDeadline": "Anniversary",
+        "annualFranchiseFee": 0,
+        "notes": "Higher fees across all categories."
+      },
+      {
+        "state": "Pennsylvania",
+        "formationFee": 125,
+        "annualReportFee": 0,
+        "reportFrequency": "decennial",
+        "filingDeadline": "As needed",
+        "annualFranchiseFee": 0,
+        "notes": "No annual reports. Decennial reports every 10 years only if dormant."
+      },
+      {
+        "state": "Rhode Island",
+        "formationFee": 238,
+        "annualReportFee": 50,
+        "reportFrequency": "annual",
+        "filingDeadline": "May 1",
+        "annualFranchiseFee": 0,
+        "notes": "Reports due March 1. $25 late penalty."
+      },
+      {
+        "state": "South Carolina",
+        "formationFee": 235,
+        "annualReportFee": 0,
+        "reportFrequency": "none",
+        "filingDeadline": "Apr 15",
+        "annualFranchiseFee": 25,
+        "notes": "No SOS annual reports. License fee paid with tax return."
+      },
+      {
+        "state": "South Dakota",
+        "formationFee": 150,
+        "annualReportFee": 50,
+        "reportFrequency": "annual",
+        "filingDeadline": "Anniversary",
+        "annualFranchiseFee": 0,
+        "notes": "No state corporate income tax."
+      },
+      {
+        "state": "Tennessee",
+        "formationFee": 105,
+        "annualReportFee": 20,
+        "reportFrequency": "annual",
+        "filingDeadline": "Apr 1",
+        "annualFranchiseFee": 100,
+        "notes": "Franchise tax $100 minimum plus 6.5% excise tax."
+      },
+      {
+        "state": "Texas",
+        "formationFee": 300,
+        "annualReportFee": 0,
+        "reportFrequency": "none",
+        "filingDeadline": "May 15",
+        "annualFranchiseFee": 0,
+        "notes": "No SOS annual reports. Franchise tax only if revenue >$1.23M."
+      },
+      {
+        "state": "Utah",
+        "formationFee": 76,
+        "annualReportFee": 20,
+        "reportFrequency": "annual",
+        "filingDeadline": "Anniversary",
+        "annualFranchiseFee": 0,
+        "notes": "Annual renewal $20. $10 late penalty."
+      },
+      {
+        "state": "Vermont",
+        "formationFee": 125,
+        "annualReportFee": 45,
+        "reportFrequency": "annual",
+        "filingDeadline": "Mar 15",
+        "annualFranchiseFee": 0,
+        "notes": "Reports due March 15. $25 late fee."
+      },
+      {
+        "state": "Virginia",
+        "formationFee": 77,
+        "annualReportFee": 100,
+        "reportFrequency": "annual",
+        "filingDeadline": "Anniversary",
+        "annualFranchiseFee": 0,
+        "notes": "Annual registration fee based on authorized shares."
+      },
+      {
+        "state": "Washington",
+        "formationFee": 180,
+        "annualReportFee": 60,
+        "reportFrequency": "annual",
+        "filingDeadline": "Anniversary",
+        "annualFranchiseFee": 0,
+        "notes": "No state income tax. Free dissolution."
+      },
+      {
+        "state": "West Virginia",
+        "formationFee": 100,
+        "annualReportFee": 25,
+        "reportFrequency": "annual",
+        "filingDeadline": "Jun 30",
+        "annualFranchiseFee": 0,
+        "notes": "Reports due July 1. $50 late penalty."
+      },
+      {
+        "state": "Wisconsin",
+        "formationFee": 100,
+        "annualReportFee": 25,
+        "reportFrequency": "annual",
+        "filingDeadline": "Quarterly",
+        "annualFranchiseFee": 0,
+        "notes": "$25 online vs $40 paper. Due by quarter of incorporation."
+      },
+      {
+        "state": "Wyoming",
+        "formationFee": 102,
+        "annualReportFee": 60,
+        "reportFrequency": "annual",
+        "filingDeadline": "Anniversary",
+        "annualFranchiseFee": 60,
+        "notes": "Asset-based license tax. No income or franchise tax."
+      }
+    ];
+
+    const monthLookup = { Jan: 1, Feb: 2, Mar: 3, Apr: 4, May: 5, Jun: 6, Jul: 7, Aug: 8, Sep: 9, Oct: 10, Nov: 11, Dec: 12 };
+    const monthNamesFull = { Jan: 'January', Feb: 'February', Mar: 'March', Apr: 'April', May: 'May', Jun: 'June', Jul: 'July', Aug: 'August', Sep: 'September', Oct: 'October', Nov: 'November', Dec: 'December' };
+
+    function parseDeadlineValue(deadline) {
+      if (!deadline) {
+        return { type: 'anniversary', label: 'Anniversary date', offset: 0 };
+      }
+
+      const normalized = deadline.trim();
+      if (normalized === 'Anniversary') {
+        return { type: 'anniversary', label: 'Anniversary date', offset: 0 };
+      }
+      if (normalized === 'Anniversary +3mo') {
+        return { type: 'anniversary', label: '3 months after anniversary', offset: 3 };
+      }
+      if (normalized === 'None required') {
+        return { type: 'none', label: 'None required' };
+      }
+      if (normalized === 'As needed') {
+        return { type: 'flex', label: 'As needed' };
+      }
+      if (normalized === 'Quarterly') {
+        return { type: 'quarterly', label: 'Quarterly (Mar 31, Jun 30, Sep 30, Dec 31)' };
+      }
+
+      const match = normalized.match(/^([A-Za-z]{3})\s+(\d{1,2})$/);
+      if (match) {
+        const monthAbbr = match[1];
+        const day = parseInt(match[2], 10);
+        const month = monthLookup[monthAbbr];
+        if (month) {
+          return {
+            type: 'fixed',
+            label: monthNamesFull[monthAbbr] + ' ' + day,
+            month,
+            day
+          };
+        }
+      }
+
+      return { type: 'flex', label: normalized };
+    }
+
+    function normalizeStateEntry(entry) {
+      const deadline = parseDeadlineValue(entry.filingDeadline || 'Anniversary');
+      return {
+        formationFee: Number(entry.formationFee) || 0,
+        annualFee: Number(entry.annualReportFee) || 0,
+        reportFee: Number(entry.annualReportFee) || 0,
+        reportFreq: (entry.reportFrequency || 'none').toLowerCase(),
+        deadlineType: deadline.type,
+        deadlineLabel: deadline.label,
+        reportMonth: deadline.month || null,
+        reportDay: deadline.day || null,
+        reportOffsetMonths: deadline.offset || 0,
+        additionalFee: entry.annualFranchiseFee && Number(entry.annualFranchiseFee) > 0 ? Number(entry.annualFranchiseFee) : null,
+        notes: entry.notes || '',
+        filingDeadline: entry.filingDeadline
+      };
+    }
+
+    const llcData = {};
+    stateCostData.forEach(entry => {
+      llcData[entry.state] = normalizeStateEntry(entry);
+    });
+
+    const corpData = {};
+    Object.keys(llcData).forEach(state => {
+      corpData[state] = { ...llcData[state] };
+    });
+
+
+    // Populate all 50 states
+    const allStates = ["Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "Florida", "Georgia",
+                       "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland",
+                       "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey",
+                       "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina",
+                       "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"];
+
+    const stateSelect = document.getElementById('state');
+    allStates.forEach(state => {
+      const option = document.createElement('option');
+      option.value = state;
+      option.textContent = state;
+      stateSelect.appendChild(option);
+    });
+
+    // Form elements
+    const entityTypeSelect = document.getElementById('entityType');
+    const serviceTierRadios = document.querySelectorAll('input[name="serviceTier"]');
+    const tierOptions = document.querySelectorAll('.tier-option');
+    const comparisonCard = document.getElementById('comparisonCard');
+    const delawareShareCard = document.getElementById('delawareShareCard');
+
+    // Handle tier option selection
+    tierOptions.forEach(option => {
+      option.addEventListener('click', function() {
+        tierOptions.forEach(o => o.classList.remove('selected'));
+        this.classList.add('selected');
+        const radio = this.querySelector('input[type="radio"]');
+        radio.checked = true;
+        updateEverything();
+      });
+    });
+
+    // Handle state/entity change
+    stateSelect.addEventListener('change', updateEverything);
+    entityTypeSelect.addEventListener('change', updateEverything);
+    serviceTierRadios.forEach(radio => {
+      radio.addEventListener('change', updateEverything);
+    });
+
+    function updateEverything() {
+      updatePricing();
+      updateStateInfo();
+      updateComplianceTimeline();
+      updateCostProjection();
+      updateBestPractices();
+      updateAlerts();
+      updateDelawareShareCard();
+    }
+
+    function updatePricing() {
+      const selectedState = stateSelect.value;
+      const entityType = entityTypeSelect.value;
+      const selectedTier = document.querySelector('input[name="serviceTier"]:checked');
+
+      // Always update tier prices to show base prices
+      document.getElementById('starterPrice').textContent = '$400';
+      document.getElementById('standardPrice').textContent = '$750';
+      document.getElementById('advancedPrice').textContent = '$850';
+
+      // If a tier is selected, update the attorney service fee immediately
+      if (selectedTier) {
+        const basePrice = parseInt(selectedTier.dataset.basePrice);
+        document.getElementById('serviceFee').textContent = '$' + basePrice.toFixed(2);
+      }
+
+      const stateFeeNote = document.getElementById('stateFeeNote');
+
+      // Only calculate full pricing if all required fields are selected
+      if (!selectedState || !entityType || !selectedTier) {
+        // Show the note when state/entity not selected
+        if (stateFeeNote) stateFeeNote.style.display = 'block';
+        return;
+      }
+
+      const data = entityType === 'llc' ? llcData[selectedState] : corpData[selectedState];
+      if (!data) {
+        if (stateFeeNote) stateFeeNote.style.display = 'block';
+        return;
+      }
+
+      const stateFilingFee = data.formationFee;
+      const basePrice = parseInt(selectedTier.dataset.basePrice);
+      const registeredAgentFee = 0; // First year is $0 (included in attorney fee)
+      const totalPrice = basePrice + stateFilingFee + registeredAgentFee;
+
+      // Update breakdown - show exact amounts with 2 decimals
+      document.getElementById('serviceFee').textContent = '$' + basePrice.toFixed(2);
+      document.getElementById('stateFee').textContent = '$' + stateFilingFee.toFixed(2);
+      document.getElementById('totalPrice').textContent = '$' + totalPrice.toFixed(2);
+
+      // Hide the note when state fee is populated
+      if (stateFeeNote) stateFeeNote.style.display = 'none';
+
+      renderPayPalButton(totalPrice, selectedState, entityType, selectedTier.value);
+    }
+
+    function updateStateInfo() {
+      const selectedState = stateSelect.value;
+      const entityType = entityTypeSelect.value;
+
+      if (!selectedState || !entityType) {
+        document.getElementById('stateInfoCard').style.display = 'none';
+        if (comparisonCard) {
+          comparisonCard.style.display = 'none';
+        }
+        return;
+      }
+
+      if (comparisonCard) {
+        comparisonCard.style.display = 'block';
+      }
+      document.getElementById('stateInfoCard').style.display = 'block';
+
+      const data = entityType === 'llc' ? llcData[selectedState] : corpData[selectedState];
+      if (!data) return;
+
+      const entityLabel = entityType === 'llc' ? 'LLC' : 'Corporation';
+      let html = '<div class="state-badge">' + selectedState + ' ' + entityLabel + '</div>';
+
+      html += '<div class="info-grid">';
+      html += '<div class="info-card">';
+      html += '<div class="info-card-label">Formation Fee</div>';
+      html += '<div class="info-card-value">$' + data.formationFee + '</div>';
+      html += '</div>';
+
+      html += '<div class="info-card">';
+      html += '<div class="info-card-label">Annual Cost</div>';
+      html += '<div class="info-card-value">$' + (data.annualFee || 0) + '</div>';
+      html += '</div>';
+
+      html += '<div class="info-card">';
+      html += '<div class="info-card-label">Report Frequency</div>';
+      html += '<div class="info-card-value">' + (data.reportFreq === 'none' ? 'None Required' : data.reportFreq.charAt(0).toUpperCase() + data.reportFreq.slice(1)) + '</div>';
+      html += '</div>';
+
+      html += '<div class="info-card">';
+      html += '<div class="info-card-label">Report Fee</div>';
+      html += '<div class="info-card-value">$' + (data.reportFee || 0) + '</div>';
+      html += '</div>';
+
+      html += '<div class="info-card">';
+      html += '<div class="info-card-label">Report Deadline</div>';
+      html += '<div class="info-card-value">' + (data.deadlineLabel || 'See state instructions') + '</div>';
+      html += '</div>';
+
+      html += '<div class="info-card">';
+      html += '<div class="info-card-label">Franchise / Privilege Tax</div>';
+      html += '<div class="info-card-value">' + (data.additionalFee ? '$' + data.additionalFee : 'None') + '</div>';
+      html += '</div>';
+      html += '</div>';
+
+      if (data.notes) {
+        html += '<div class="alert-box alert-info" style="margin-top: 15px;">';
+        html += '<strong>Important Notes</strong>';
+        html += data.notes;
+        html += '</div>';
+      }
+
+      // Delaware Corporation Franchise Tax Calculator
+      if (selectedState === 'Delaware' && entityType === 'corporation') {
+        html += '<div class="franchise-tax-calc">';
+        html += '<h4>🧮 Delaware Franchise Tax Calculator</h4>';
+        html += '<p style="font-size: 13px; color: #92400e; margin-bottom: 15px;">Delaware corporations pay the LOWER of two calculation methods:</p>';
+
+        html += '<div class="tax-method">';
+        html += '<div class="tax-method-title">Method 1: Authorized Shares Method</div>';
+        html += '<div class="tax-method-calc">5,000 shares or fewer = $175 minimum<br>5,001-10,000 shares = $250<br>Each additional 10,000 shares = +$85<br>Maximum = $200,000</div>';
+        html += '<div class="tax-method-result">Typical startup (10M shares): ~$85,000/year</div>';
+        html += '</div>';
+
+        html += '<div class="tax-method">';
+        html += '<div class="tax-method-title">Method 2: Assumed Par Value Capital Method</div>';
+        html += '<div class="tax-method-calc">Total Gross Assets / Issued Shares = Assumed Par<br>Assumed Par × Authorized Shares = Assumed Par Capital<br>Tax = $400 per $1,000,000 of Assumed Par Capital<br>Minimum = $400</div>';
+        html += '<div class="tax-method-result">Most startups use this: $400-$1,000/year</div>';
+        html += '</div>';
+
+        html += '<p style="font-size: 12px; color: #92400e; margin-top: 12px;"><strong>💡 Pro Tip:</strong> Startups typically authorize 10-15M shares but only issue 8-10M to founders, keeping assumed par value low and using Method 2 for minimal tax ($400-$1,000/year).</p>';
+        html += '</div>';
+      }
+
+      document.getElementById('stateInfoContent').innerHTML = html;
+    }
+
+    function updateComplianceTimeline() {
+      const selectedState = stateSelect.value;
+      const entityType = entityTypeSelect.value;
+
+      if (!selectedState || !entityType) {
+        document.getElementById('complianceCard').style.display = 'none';
+        document.getElementById('complianceTimeline').innerHTML = '';
+        return;
+      }
+
+      const data = entityType === 'llc' ? llcData[selectedState] : corpData[selectedState];
+      if (!data) {
+        document.getElementById('complianceCard').style.display = 'none';
+        document.getElementById('complianceTimeline').innerHTML = '';
+        return;
+      }
+
+      document.getElementById('complianceCard').style.display = 'block';
+
+      const today = new Date();
+      let html = '<div class="compliance-timeline">';
+
+      // Formation
+      html += '<div class="timeline-item">';
+      html += '<div class="timeline-icon">📝</div>';
+      html += '<div class="timeline-content">';
+      html += '<div class="timeline-title">Formation Complete</div>';
+      html += '<div class="timeline-date">' + formatDate(addDays(today, 7)) + ' (estimated)</div>';
+      html += '<div class="timeline-description">Your ' + (entityType === 'llc' ? 'LLC' : 'Corporation') + ' is officially formed and you receive your Certificate of Formation, EIN, and governing documents.</div>';
+      html += '</div>';
+      html += '</div>';
+
+      // Registered Agent Renewal
+      html += '<div class="timeline-item">';
+      html += '<div class="timeline-icon">📬</div>';
+      html += '<div class="timeline-content">';
+      html += '<div class="timeline-title">Registered Agent Renewal</div>';
+      html += '<div class="timeline-date">' + formatDate(addMonths(today, 12)) + '</div>';
+      html += '<div class="timeline-description">Your registered agent service renews annually.</div>';
+      html += '<span class="timeline-fee">Fee: $100/year</span>';
+      html += '</div>';
+      html += '</div>';
+
+      const intervalMonths = getReportIntervalMonths(data.reportFreq);
+
+      if (data.reportFreq && data.reportFreq !== 'none') {
+        let firstReportDate = null;
+        let dueLabel = data.deadlineLabel || 'State schedule';
+
+        if (data.deadlineType === 'fixed' && data.reportMonth && data.reportDay) {
+          firstReportDate = getNextFixedDate(data.reportMonth, data.reportDay, today);
+        } else if (data.deadlineType === 'anniversary') {
+          const offsetMonths = intervalMonths + (data.reportOffsetMonths || 0);
+          firstReportDate = addMonths(today, offsetMonths);
+        } else if (data.deadlineType === 'quarterly') {
+          dueLabel = 'Quarterly (Mar 31, Jun 30, Sep 30, Dec 31)';
+        } else if (data.deadlineType === 'none') {
+          dueLabel = 'No periodic report required';
+        }
+
+        const displayDate = firstReportDate ? formatDate(firstReportDate) : dueLabel;
+        const title = data.reportFreq === 'biennial' ? 'Biennial Report Due' : (data.reportFreq === 'decennial' ? 'Decennial Report Due' : 'Annual Report Due');
+
+        html += '<div class="timeline-item">';
+        html += '<div class="timeline-icon">📄</div>';
+        html += '<div class="timeline-content">';
+        html += '<div class="timeline-title">' + title + '</div>';
+        html += '<div class="timeline-date">' + displayDate + '</div>';
+        html += '<div class="timeline-description">' + selectedState + ' requires ' + data.reportFreq + ' reports to keep your entity in good standing.</div>';
+        if (data.reportFee > 0) {
+          html += '<span class="timeline-fee">Fee: $' + data.reportFee + '</span>';
+        }
+        html += '</div>';
+        html += '</div>';
+      } else if (data.deadlineType !== 'none' && data.deadlineLabel) {
+        html += '<div class="timeline-item">';
+        html += '<div class="timeline-icon">📄</div>';
+        html += '<div class="timeline-content">';
+        html += '<div class="timeline-title">State Maintenance Reminder</div>';
+        html += '<div class="timeline-date">' + data.deadlineLabel + '</div>';
+        html += '<div class="timeline-description">' + selectedState + ' does not require routine reports, but use this date to confirm whether privilege-tax filings or address updates are needed.</div>';
+        html += '</div>';
+        html += '</div>';
+      } else if (!data.additionalFee) {
+        html += '<div class="timeline-item">';
+        html += '<div class="timeline-icon">📄</div>';
+        html += '<div class="timeline-content">';
+        html += '<div class="timeline-title">No Recurring State Filings</div>';
+        html += '<div class="timeline-description">After formation, ' + selectedState + ' does not require periodic reports. Maintain internal records and update the state only when ownership or address information changes.</div>';
+        html += '</div>';
+        html += '</div>';
+      }
+
+      if (data.additionalFee) {
+        let taxDateText = '';
+        if (selectedState === 'Delaware' && entityType === 'corporation') {
+          taxDateText = formatDate(new Date(today.getFullYear() + 1, 2, 1));
+        } else if (selectedState === 'California') {
+          taxDateText = '15th day of the 4th month of each tax year';
+        } else if (data.deadlineType === 'fixed' && data.reportMonth && data.reportDay) {
+          taxDateText = formatDate(getNextFixedDate(data.reportMonth, data.reportDay, today));
+        } else if (data.deadlineType === 'anniversary') {
+          const offsetMonths = 12 + (data.reportOffsetMonths || 0);
+          taxDateText = formatDate(addMonths(today, offsetMonths));
+        } else if (data.deadlineType === 'quarterly') {
+          taxDateText = 'Quarterly (Mar 31, Jun 30, Sep 30, Dec 31)';
+        } else {
+          taxDateText = data.deadlineLabel || 'See state instructions';
+        }
+
+        html += '<div class="timeline-item">';
+        html += '<div class="timeline-icon">💰</div>';
+        html += '<div class="timeline-content">';
+        html += '<div class="timeline-title">Franchise / Privilege Tax Due</div>';
+        html += '<div class="timeline-date">' + taxDateText + '</div>';
+        html += '<div class="timeline-description">' + selectedState + ' charges an annual franchise, privilege, or license tax to keep your entity active.</div>';
+        html += '<span class="timeline-fee">Fee: $' + data.additionalFee + (selectedState === 'California' || selectedState === 'Delaware' ? '+' : '') + '</span>';
+        html += '</div>';
+        html += '</div>';
+      }
+
+      html += '</div>';
+      document.getElementById('complianceTimeline').innerHTML = html;
+    }
+
+    function updateCostProjection() {
+      const selectedState = stateSelect.value;
+      const entityType = entityTypeSelect.value;
+
+      if (!selectedState || !entityType) {
+        document.getElementById('costProjectionCard').style.display = 'none';
+        return;
+      }
+
+      document.getElementById('costProjectionCard').style.display = 'block';
+
+      const data = entityType === 'llc' ? llcData[selectedState] : corpData[selectedState];
+      if (!data) return;
+
+      let html = '<div class="five-year-projection">';
+      html += '<table class="projection-table">';
+      html += '<thead><tr><th>Year</th><th>Annual Report</th><th>Franchise Tax</th><th>Registered Agent</th><th>Total</th></tr></thead>';
+      html += '<tbody>';
+
+      let total = 0;
+      for (let year = 1; year <= 5; year++) {
+        let reportCost = 0;
+        if (data.reportFreq === 'annual') {
+          reportCost = data.reportFee;
+        } else if (data.reportFreq === 'biennial') {
+          reportCost = year % 2 === 0 ? data.reportFee : 0;
+        } else if (data.reportFreq === 'decennial') {
+          reportCost = 0;
+        }
+
+        const franchiseTax = data.additionalFee || 0;
+        const regAgent = 100;
+        const yearTotal = reportCost + franchiseTax + regAgent;
+        total += yearTotal;
+
+        html += '<tr>';
+        html += '<td>Year ' + year + '</td>';
+        html += '<td>$' + reportCost + '</td>';
+        html += '<td>$' + franchiseTax + '</td>';
+        html += '<td>$' + regAgent + '</td>';
+        html += '<td><strong>$' + yearTotal + '</strong></td>';
+        html += '</tr>';
+      }
+
+      html += '<tr>';
+      html += '<td colspan="4"><strong>5-Year Total Ongoing Costs</strong></td>';
+      html += '<td><strong>$' + total + '</strong></td>';
+      html += '</tr>';
+
+      html += '</tbody></table>';
+      if (data.reportFreq === 'decennial') {
+        html += '<p style="font-size: 12px; color: #64748b; margin-top: 10px;">' + selectedState + ' only requires reports every 10 years, so no report fees appear in this 5-year snapshot.</p>';
+      }
+      html += '</div>';
+
+      document.getElementById('costProjection').innerHTML = html;
+    }
+
+    function updateBestPractices() {
+      const selectedState = stateSelect.value;
+      const entityType = entityTypeSelect.value;
+
+      if (!selectedState || !entityType) {
+        return;
+      }
+
+      const entityLabel = entityType === 'llc' ? 'LLC' : 'Corporation';
+
+      let html = '<div class="best-practices">';
+
+      if (entityType === 'llc') {
+        html += '<div class="practice-item">';
+        html += '<div class="practice-icon">✓</div>';
+        html += '<div class="practice-text"><strong>Get an EIN immediately</strong> - Even single-member LLCs should have an EIN instead of using your SSN for banking and taxes.</div>';
+        html += '</div>';
+
+        html += '<div class="practice-item">';
+        html += '<div class="practice-icon">✓</div>';
+        html += '<div class="practice-text"><strong>Maintain separate bank accounts</strong> - Never commingle personal and business funds. This preserves your liability protection.</div>';
+        html += '</div>';
+
+        html += '<div class="practice-item">';
+        html += '<div class="practice-icon">✓</div>';
+        html += '<div class="practice-text"><strong>Document major decisions</strong> - Keep written records of LLC resolutions for loans, real estate, hiring, etc.</div>';
+        html += '</div>';
+
+        html += '<div class="practice-item">';
+        html += '<div class="practice-icon">✓</div>';
+        html += '<div class="practice-text"><strong>Consider S-Corp election</strong> - If profitable, electing S-Corp status (Form 2553) can save self-employment taxes.</div>';
+        html += '</div>';
+      } else {
+        html += '<div class="practice-item">';
+        html += '<div class="practice-icon">✓</div>';
+        html += '<div class="practice-text"><strong>Hold annual board meetings</strong> - Document minutes and resolutions. Courts can pierce the veil if formalities aren\'t maintained.</div>';
+        html += '</div>';
+
+        html += '<div class="practice-item">';
+        html += '<div class="practice-icon">✓</div>';
+        html += '<div class="practice-text"><strong>Issue stock certificates</strong> - Properly document all stock issuances with 83(b) elections filed within 30 days for founders.</div>';
+        html += '</div>';
+
+        html += '<div class="practice-item">';
+        html += '<div class="practice-icon">✓</div>';
+        html += '<div class="practice-text"><strong>Maintain a cap table</strong> - Track all equity grants, exercises, and transfers. Critical for raising capital.</div>';
+        html += '</div>';
+
+        html += '<div class="practice-item">';
+        html += '<div class="practice-icon">✓</div>';
+        html += '<div class="practice-text"><strong>File 83(b) elections</strong> - Founders receiving restricted stock must file 83(b) with IRS within 30 days or face massive tax bills.</div>';
+        html += '</div>';
+
+        if (selectedState === 'Delaware') {
+          html += '<div class="practice-item">';
+          html += '<div class="practice-icon">✓</div>';
+          html += '<div class="practice-text"><strong>Optimize franchise tax</strong> - Use the Assumed Par Value method by limiting issued shares to ~70-80% of authorized shares.</div>';
+          html += '</div>';
+        }
+      }
+
+      html += '</div>';
+
+      document.getElementById('bestPractices').innerHTML = html;
+    }
+
+    function updateAlerts() {
+      const selectedState = stateSelect.value;
+      const entityType = entityTypeSelect.value;
+      const container = document.getElementById('dynamicAlerts');
+
+      if (!selectedState || !entityType) {
+        container.innerHTML = '';
+        return;
+      }
+
+      const data = entityType === 'llc' ? llcData[selectedState] : corpData[selectedState];
+      if (!data) return;
+
+      let html = '';
+
+      // California franchise tax warning
+      if (selectedState === 'California') {
+        html += '<div class="alert-box alert-warning">';
+        html += '<strong>⚠️ California $800 Annual Tax</strong>';
+        html += 'California charges an $800 minimum franchise tax every year, regardless of revenue or profit. This is due even if your business operates at a loss. First-year exemption applies only to new corporations (not LLCs).';
+        html += '</div>';
+      }
+
+      // Nevada cost warning
+      if (selectedState === 'Nevada') {
+        html += '<div class="alert-box alert-warning">';
+        html += '<strong>High Ongoing Costs</strong>';
+        html += 'Nevada has no state income tax but charges high annual fees ($350+). Consider if the tax benefits outweigh the compliance costs for your situation.';
+        html += '</div>';
+      }
+
+      // Delaware benefits
+      if (selectedState === 'Delaware' && entityType === 'corporation') {
+        html += '<div class="alert-box alert-success">';
+        html += '<strong>✓ Investor-Preferred Jurisdiction</strong>';
+        html += 'Delaware is the gold standard for corporations seeking venture capital. The Court of Chancery provides well-established corporate law precedent that investors trust.';
+        html += '</div>';
+      }
+
+      // Wyoming/Nevada privacy
+      if (selectedState === 'Wyoming' || selectedState === 'Nevada') {
+        html += '<div class="alert-box alert-info">';
+        html += '<strong>Enhanced Privacy Protection</strong>';
+        html += selectedState + ' offers strong privacy protections with no public disclosure of members/owners. Good for those prioritizing anonymity.';
+        html += '</div>';
+      }
+
+      container.innerHTML = html;
+    }
+
+    function updateDelawareShareCard() {
+      if (!delawareShareCard) return;
+      const selectedState = stateSelect.value;
+      const entityType = entityTypeSelect.value;
+      if (selectedState === 'Delaware' && entityType === 'corporation') {
+        delawareShareCard.style.display = 'block';
+      } else {
+        delawareShareCard.style.display = 'none';
+      }
+    }
+
+    function renderPayPalButton(amount, state, entityType, tier) {
+      const container = document.getElementById('paypalButtonContainer');
+      container.innerHTML = '';
+
+      if (!state || !entityType) {
+        container.innerHTML = '<div class="payment-disabled">Please select a state and entity type to continue</div>';
+        return;
+      }
+
+      const entityLabel = entityType === 'llc' ? 'LLC' : 'Corporation';
+      const tierLabel = tier.charAt(0).toUpperCase() + tier.slice(1);
+
+      paypal.Buttons({
+        createOrder: function(data, actions) {
+          return actions.order.create({
+            purchase_units: [{
+              description: 'Business Formation - ' + tierLabel + ' Package (' + entityLabel + ' in ' + state + ')',
+              amount: {
+                value: amount.toFixed(2)
+              }
+            }]
+          });
+        },
+        onApprove: function(data, actions) {
+          return actions.order.capture().then(function(details) {
+            const industrySelectField = document.getElementById('industrySelect');
+            const industryInputField = document.getElementById('industry');
+            const industryValue = (industryInputField.value || '').trim() || industrySelectField.value || 'Not specified';
+            const authorizedSharesField = document.getElementById('authorizedShares');
+            const parValueField = document.getElementById('parValue');
+            const authorizedSharesValue = authorizedSharesField ? authorizedSharesField.value : '';
+            const parValueValue = parValueField ? parValueField.value : '';
+
+            const formData = {
+              state: state,
+              entityType: entityLabel,
+              tier: tierLabel,
+              businessName: document.getElementById('businessName').value,
+              industry: industryValue,
+              numOwners: document.getElementById('numOwners').value,
+              firstName: document.getElementById('firstName').value,
+              lastName: document.getElementById('lastName').value,
+              email: document.getElementById('email').value,
+              phone: document.getElementById('phone').value,
+              additionalInfo: document.getElementById('additionalInfo').value,
+              authorizedShares: authorizedSharesValue,
+              parValue: parValueValue,
+              amount: amount,
+              paypalOrderId: details.id,
+              paypalPayerName: details.payer.name.given_name + ' ' + details.payer.name.surname,
+              paypalPayerEmail: details.payer.email_address
+            };
+
+            // Send form data to owner@terms.law
+            const emailBody = `
+NEW BUSINESS FORMATION ORDER
+========================================
+
+PAYMENT DETAILS:
+- PayPal Order ID: ${formData.paypalOrderId}
+- Amount Paid: $${formData.amount}
+- Service Tier: ${formData.tier}
+- PayPal Payer: ${formData.paypalPayerName} (${formData.paypalPayerEmail})
+
+FORMATION DETAILS:
+- State: ${formData.state}
+- Entity Type: ${formData.entityType}
+- Business Name: ${formData.businessName}
+- Industry: ${formData.industry}
+- Number of Owners: ${formData.numOwners}
+${formData.authorizedShares ? `- Authorized Shares: ${formData.authorizedShares}` : ''}
+${formData.parValue ? `- Par Value: ${formData.parValue}` : ''}
+
+CLIENT CONTACT:
+- Name: ${formData.firstName} ${formData.lastName}
+- Email: ${formData.email}
+- Phone: ${formData.phone}
+
+ADDITIONAL INFORMATION:
+${formData.additionalInfo || 'None provided'}
+
+========================================
+This form was submitted automatically after successful PayPal payment.
+            `.trim();
+
+            // Send email using Web3Forms service (more reliable than FormSubmit)
+            // Get your free access key at https://web3forms.com
+            const web3formsAccessKey = 'YOUR_WEB3FORMS_ACCESS_KEY_HERE'; // Replace with your actual key
+
+            fetch('https://api.web3forms.com/submit', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+              },
+              body: JSON.stringify({
+                access_key: web3formsAccessKey,
+                subject: `New Formation Order: ${formData.businessName} (${formData.state} ${formData.entityType})`,
+                from_name: `${formData.firstName} ${formData.lastName}`,
+                email: formData.email,
+                message: emailBody,
+                to_email: 'owner@terms.law',
+                // Include all form data as separate fields for better email formatting
+                business_name: formData.businessName,
+                state: formData.state,
+                entity_type: formData.entityType,
+                service_tier: formData.tier,
+                amount_paid: formData.amount,
+                paypal_order_id: formData.paypalOrderId,
+                paypal_payer: formData.paypalPayerName,
+                industry: formData.industry,
+                num_owners: formData.numOwners,
+                phone: formData.phone,
+                additional_info: formData.additionalInfo || 'None provided'
+              })
+            })
+            .then(response => response.json())
+            .then(data => {
+              console.log('Form submitted successfully:', data);
+              if (!data.success) {
+                console.error('Web3Forms error:', data.message);
+                alert('Payment successful but there was an issue sending your details. Please email owner@terms.law with your PayPal Order ID: ' + formData.paypalOrderId);
+              }
+            })
+            .catch(error => {
+              console.error('Error sending form:', error);
+              alert('Payment successful but there was an issue sending your details. Please email owner@terms.law with your PayPal Order ID: ' + formData.paypalOrderId);
+            });
+
+            alert('Thank you for your purchase, ' + details.payer.name.given_name + '! You will receive confirmation via email at ' + formData.email + ' shortly. A copy of your order details has been sent to owner@terms.law.');
+            window.location.href = 'https://terms.law/thank-you/';
+          });
+        },
+        onError: function(err) {
+          console.error('PayPal Error:', err);
+          alert('An error occurred with your payment. Please try again or contact owner@terms.law for assistance.');
+        }
+      }).render('#paypalButtonContainer');
+    }
+
+    // Utility functions for date calculations
+    function getReportIntervalMonths(freq) {
+      if (freq === 'biennial') return 24;
+      if (freq === 'decennial') return 120;
+      return 12;
+    }
+
+    function getNextFixedDate(month, day, baseDate = new Date()) {
+      if (!month || !day) return null;
+      const candidate = new Date(baseDate.getFullYear(), month - 1, day);
+      if (candidate < baseDate) {
+        candidate.setFullYear(candidate.getFullYear() + 1);
+      }
+      return candidate;
+    }
+
+    function addDays(date, days) {
+      const result = new Date(date);
+      result.setDate(result.getDate() + days);
+      return result;
+    }
+
+    function addMonths(date, months) {
+      const result = new Date(date);
+      result.setMonth(result.getMonth() + months);
+      return result;
+    }
+
+    function formatDate(date) {
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      return date.toLocaleDateString('en-US', options);
+    }
+
+    // Initialize
+    updateEverything();
+  </script>
+</body>
+</html>
