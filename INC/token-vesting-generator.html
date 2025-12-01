@@ -6,6 +6,9 @@
   <title>Professional Token Vesting Agreement Generator</title>
   <meta name="description" content="Create comprehensive, attorney-quality token vesting agreements with cliff periods, acceleration provisions, and full legal protections.">
 
+  <!-- PayPal SDK -->
+  <script src="https://www.paypal.com/sdk/js?client-id=ASmwKug6zVE_78S-152YKAzzh2iH8VgSjs-P6RkrWcfqdznNjeE_UYwKJkuJ3BvIJrxCotS8GtXEJ2fx&currency=USD"></script>
+
   <style>
     * {
       box-sizing: border-box;
@@ -132,13 +135,13 @@
     }
 
     .form-input[type="number"] {
-      -moz-appearance: textfield;
+      -moz-appearance: auto;
     }
 
     .form-input[type="number"]::-webkit-inner-spin-button,
     .form-input[type="number"]::-webkit-outer-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
+      -webkit-appearance: auto;
+      opacity: 1;
     }
 
     .help-text {
@@ -345,6 +348,10 @@
       line-height: 1.8;
       color: #1e293b;
       position: relative;
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
     }
 
     .doc-title {
@@ -385,6 +392,19 @@
       background-color: #fef3c7;
       padding: 2px 4px;
       border-radius: 3px;
+    }
+
+    .highlight-flash {
+      background-color: #fef08a;
+      padding: 4px 6px;
+      border-radius: 4px;
+      transition: background-color 0.5s ease-out;
+      animation: flash 0.5s ease-in-out;
+    }
+
+    @keyframes flash {
+      0%, 100% { background-color: #fef08a; }
+      50% { background-color: #fde047; }
     }
 
     /* Vesting Calculator */
@@ -449,86 +469,67 @@
       transition: all 0.3s;
     }
 
-    /* Payment Modal */
-    .payment-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 1000;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .payment-content {
-      background: white;
+    /* PayPal Button Container */
+    .paypal-container {
+      margin-top: 30px;
+      padding: 25px;
+      background: linear-gradient(135deg, #f0f4ff 0%, #e0e7ff 100%);
+      border: 2px solid #667eea;
       border-radius: 12px;
-      padding: 30px;
-      max-width: 500px;
-      width: 90%;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
     }
 
-    .payment-header {
+    .paypal-header {
       text-align: center;
       margin-bottom: 20px;
     }
 
-    .payment-icon {
-      font-size: 48px;
-      margin-bottom: 10px;
-    }
-
-    .payment-title {
-      font-size: 22px;
+    .paypal-title {
+      font-size: 20px;
       font-weight: 700;
       color: #1e293b;
       margin-bottom: 8px;
     }
 
-    .payment-description {
-      font-size: 14px;
-      color: #64748b;
-      line-height: 1.5;
-    }
-
-    .payment-features {
-      margin: 20px 0;
-      padding: 15px;
-      background: #f8fafc;
-      border-radius: 8px;
-    }
-
-    .feature-item {
-      display: flex;
-      align-items: center;
-      margin-bottom: 10px;
-      font-size: 13px;
-    }
-
-    .feature-icon {
-      color: #10b981;
-      margin-right: 10px;
-      font-size: 16px;
-    }
-
-    .price-display {
-      text-align: center;
-      margin: 20px 0;
-    }
-
-    .price-amount {
+    .paypal-price {
       font-size: 36px;
       font-weight: 700;
       color: #667eea;
+      margin-bottom: 5px;
     }
 
-    .price-label {
+    .paypal-description {
       font-size: 13px;
       color: #64748b;
+    }
+
+    #paypalButtonContainer {
+      margin-top: 20px;
+    }
+
+    .payment-disabled {
+      background: #f1f5f9;
+      color: #64748b;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .payment-success {
+      background: #f0fdf4;
+      border: 2px solid #10b981;
+      color: #065f46;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 14px;
+      margin-top: 20px;
+    }
+
+    .payment-success-icon {
+      font-size: 48px;
+      margin-bottom: 10px;
     }
 
     /* Responsive */
@@ -638,6 +639,21 @@
                 <option value="investor">Investor</option>
                 <option value="partner">Strategic Partner</option>
               </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Recipient Wallet Address</label>
+              <input type="text" class="form-input" id="walletAddress" placeholder="0x... or blockchain address">
+              <div class="help-text">Recipient's wallet address for token delivery (if known)</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Recipient Status</label>
+              <select class="form-select" id="recipientStatus">
+                <option value="us-person">U.S. Person</option>
+                <option value="non-us-person">Non-U.S. Person</option>
+              </select>
+              <div class="help-text">For securities law compliance purposes</div>
             </div>
           </div>
 
@@ -901,6 +917,22 @@
                   <input type="checkbox" id="assignmentRestriction" checked>
                   <span class="checkbox-label">Anti-assignment provisions</span>
                 </label>
+                <label class="checkbox-option">
+                  <input type="checkbox" id="kycAml" checked>
+                  <span class="checkbox-label">KYC/AML/Sanctions compliance</span>
+                </label>
+                <label class="checkbox-option">
+                  <input type="checkbox" id="tgeConditions" checked>
+                  <span class="checkbox-label">Token Generation Event (TGE) conditions</span>
+                </label>
+                <label class="checkbox-option">
+                  <input type="checkbox" id="onchainMechanics" checked>
+                  <span class="checkbox-label">On-chain implementation mechanics</span>
+                </label>
+                <label class="checkbox-option">
+                  <input type="checkbox" id="noEmploymentRights" checked>
+                  <span class="checkbox-label">No employment/engagement guarantee</span>
+                </label>
               </div>
             </div>
 
@@ -909,14 +941,20 @@
             </div>
           </div>
 
-          <!-- Action Buttons -->
+          <!-- PayPal Payment Section -->
+          <div class="paypal-container">
+            <div class="paypal-header">
+              <div class="paypal-title">🔐 Unlock Your Token Vesting Agreement</div>
+              <div class="paypal-price">$19.95</div>
+              <div class="paypal-description">One-time payment • Instant download</div>
+            </div>
+            <div id="paypalButtonContainer">
+              <div class="payment-disabled">Complete all required fields above to proceed to payment</div>
+            </div>
+            <div id="paymentSuccess" style="display: none;"></div>
+          </div>
+
           <div class="btn-group">
-            <button type="button" class="btn btn-primary" id="generateBtn">
-              📄 Generate Agreement
-            </button>
-            <button type="button" class="btn btn-secondary" id="downloadBtn" disabled>
-              ⬇️ Download DOCX
-            </button>
             <button type="reset" class="btn btn-secondary">
               🔄 Reset Form
             </button>
@@ -986,7 +1024,7 @@
       </div>
 
       <div class="price-display">
-        <div class="price-amount">$199</div>
+        <div class="price-amount">$19.95</div>
         <div class="price-label">One-time payment • Instant download</div>
       </div>
 
@@ -1043,60 +1081,213 @@
       input.addEventListener('input', updatePreview);
     });
 
+    // Track previous values for highlighting
+    let previousValues = {};
+
     function updatePreview() {
       const companyName = document.getElementById('companyName').value || '[Company Name]';
+      const companyAddress = document.getElementById('companyAddress').value || '[Company Address]';
+      const signatoryName = document.getElementById('signatoryName').value || '[Signatory Name]';
+      const signatoryTitle = document.getElementById('signatoryTitle').value || '[Signatory Title]';
       const tokenName = document.getElementById('tokenName').value || '[Token Name]';
       const tokenSymbol = document.getElementById('tokenSymbol').value || '[SYMBOL]';
       const recipientName = document.getElementById('recipientName').value || '[Recipient Name]';
+      const recipientAddress = document.getElementById('recipientAddress').value || '[Recipient Address]';
+      const recipientRole = document.getElementById('recipientRole').value || '[Role]';
+      const relationship = document.getElementById('relationship').value;
+      const walletAddress = document.getElementById('walletAddress').value || '';
+      const recipientStatus = document.getElementById('recipientStatus').value;
       const tokenAmount = document.getElementById('tokenAmount').value || '[Amount]';
+      const contractAddress = document.getElementById('contractAddress').value || '';
+      const tokenPrice = document.getElementById('tokenPrice').value || '';
+      const startDate = document.getElementById('startDate').value || '[Date]';
       const cliffMonths = document.getElementById('cliffMonths').value || '0';
       const totalMonths = document.getElementById('totalMonths').value || '48';
       const governingLaw = document.getElementById('governingLaw').value;
+      const lockupPeriod = document.getElementById('lockupPeriod').checked;
+      const companyConsent = document.getElementById('companyConsent').checked;
+      const rightFirstRefusal = document.getElementById('rightFirstRefusal').checked;
+      const confidentiality = document.getElementById('confidentiality').checked;
+      const securities = document.getElementById('securities').checked;
+      const taxProvisions = document.getElementById('taxProvisions').checked;
+      const assignmentRestriction = document.getElementById('assignmentRestriction').checked;
+      const kycAml = document.getElementById('kycAml').checked;
+      const tgeConditions = document.getElementById('tgeConditions').checked;
+      const onchainMechanics = document.getElementById('onchainMechanics').checked;
+      const noEmploymentRights = document.getElementById('noEmploymentRights').checked;
 
-      let vestingType = '';
-      document.querySelectorAll('input[name="vestingType"]').forEach(radio => {
-        if (radio.checked) {
-          vestingType = radio.value === 'linear' ? 'linear (continuous)' :
-                        radio.value === 'monthly' ? 'monthly' :
-                        radio.value === 'quarterly' ? 'quarterly' : 'yearly';
-        }
+      // Get radio button values
+      let terminationType = '';
+      document.querySelectorAll('input[name="termination"]').forEach(radio => {
+        if (radio.checked) terminationType = radio.value;
       });
+
+      let changeControlType = '';
+      document.querySelectorAll('input[name="changeControl"]').forEach(radio => {
+        if (radio.checked) changeControlType = radio.value;
+      });
+
+      let disputeType = '';
+      document.querySelectorAll('input[name="disputes"]').forEach(radio => {
+        if (radio.checked) disputeType = radio.value;
+      });
+
+      // Track what changed
+      const changedFields = [];
+      if (previousValues.companyName !== companyName) changedFields.push('company-name');
+      if (previousValues.companyAddress !== companyAddress) changedFields.push('company-address');
+      if (previousValues.signatoryName !== signatoryName) changedFields.push('signatory-name');
+      if (previousValues.signatoryTitle !== signatoryTitle) changedFields.push('signatory-title');
+      if (previousValues.recipientName !== recipientName) changedFields.push('recipient-name');
+      if (previousValues.recipientAddress !== recipientAddress) changedFields.push('recipient-address');
+      if (previousValues.recipientRole !== recipientRole) changedFields.push('recipient-role');
+      if (previousValues.relationship !== relationship) changedFields.push('relationship');
+      if (previousValues.tokenAmount !== tokenAmount) changedFields.push('token-amount');
+      if (previousValues.tokenSymbol !== tokenSymbol) changedFields.push('token-symbol');
+      if (previousValues.contractAddress !== contractAddress) changedFields.push('contract-address');
+      if (previousValues.tokenPrice !== tokenPrice) changedFields.push('token-price');
+      if (previousValues.startDate !== startDate) changedFields.push('start-date');
+      if (previousValues.cliffMonths !== cliffMonths) changedFields.push('cliff-months');
+      if (previousValues.totalMonths !== totalMonths) changedFields.push('total-months');
+      if (previousValues.governingLaw !== governingLaw) changedFields.push('governing-law');
+      if (previousValues.vestingType !== getVestingType()) changedFields.push('vesting-type');
+      if (previousValues.lockupPeriod !== lockupPeriod) changedFields.push('transfer-restrictions');
+      if (previousValues.companyConsent !== companyConsent) changedFields.push('transfer-restrictions');
+      if (previousValues.rightFirstRefusal !== rightFirstRefusal) changedFields.push('transfer-restrictions');
+      if (previousValues.terminationType !== terminationType) changedFields.push('termination-provisions');
+      if (previousValues.changeControlType !== changeControlType) changedFields.push('change-control');
+      if (previousValues.disputeType !== disputeType) changedFields.push('dispute-resolution');
+      if (previousValues.confidentiality !== confidentiality) changedFields.push('additional-provisions');
+      if (previousValues.securities !== securities) changedFields.push('additional-provisions');
+      if (previousValues.taxProvisions !== taxProvisions) changedFields.push('tax-provisions');
+      if (previousValues.assignmentRestriction !== assignmentRestriction) changedFields.push('assignment-clause');
+      if (previousValues.kycAml !== kycAml) changedFields.push('additional-provisions');
+      if (previousValues.tgeConditions !== tgeConditions) changedFields.push('company-name');
+      if (previousValues.onchainMechanics !== onchainMechanics) changedFields.push('company-name');
+      if (previousValues.noEmploymentRights !== noEmploymentRights) changedFields.push('company-name');
+      if (previousValues.walletAddress !== walletAddress) changedFields.push('company-name');
+      if (previousValues.recipientStatus !== recipientStatus) changedFields.push('additional-provisions');
+
+      // Update previous values
+      previousValues = {
+        companyName,
+        companyAddress,
+        signatoryName,
+        signatoryTitle,
+        recipientName,
+        recipientAddress,
+        recipientRole,
+        relationship,
+        walletAddress,
+        recipientStatus,
+        tokenAmount,
+        tokenSymbol,
+        contractAddress,
+        tokenPrice,
+        startDate,
+        cliffMonths,
+        totalMonths,
+        governingLaw,
+        vestingType: getVestingType(),
+        lockupPeriod,
+        companyConsent,
+        rightFirstRefusal,
+        terminationType,
+        changeControlType,
+        disputeType,
+        confidentiality,
+        securities,
+        taxProvisions,
+        assignmentRestriction,
+        kycAml,
+        tgeConditions,
+        onchainMechanics,
+        noEmploymentRights
+      };
+
+      const vestingType = getVestingType();
 
       const html = `
         <div class="doc-title">${tokenName} Token Vesting Agreement</div>
 
         <div class="doc-section">
           <p class="doc-paragraph">
-            This Token Vesting Agreement (the "Agreement") is entered into as of ${document.getElementById('startDate').value || '[Date]'} (the "Effective Date"), by and between:
+            This Token Vesting Agreement (the "Agreement") is entered into as of <span id="start-date">${startDate}</span> (the "Effective Date"), by and between:
           </p>
           <p class="doc-paragraph">
-            <strong>${companyName}</strong>, a company organized under the laws of ${governingLaw} (the "Company"), and
+            <strong><span id="company-name">${companyName}</span></strong>, a company organized under the laws of <span id="governing-law">${governingLaw}</span>, with address at <span id="company-address">${companyAddress}</span> (the "Company"), and
           </p>
           <p class="doc-paragraph">
-            <strong>${recipientName}</strong> (the "Recipient").
+            <strong><span id="recipient-name">${recipientName}</span></strong>, <span id="relationship">${relationship}</span> of the Company, with address at <span id="recipient-address">${recipientAddress}</span> (the "Recipient").
+          </p>
+          <p class="doc-paragraph">
+            <strong>RECITALS:</strong> Recipient is serving as <span id="recipient-role-recital">${recipientRole}</span> and the Company desires to grant Recipient the right to receive certain tokens subject to vesting and the terms set forth herein. This grant is made in consideration for Recipient's services to the Company and is subject to all restrictions and conditions contained in this Agreement.
+          </p>
+        </div>
+
+        <div class="doc-section">
+          <div class="doc-section-title">DEFINITIONS</div>
+          <p class="doc-paragraph">
+            <strong>"Tokens"</strong> means ${tokenName} tokens with the symbol ${tokenSymbol}, implemented as ${document.getElementById('tokenStandard').value} tokens.
+          </p>
+          <p class="doc-paragraph">
+            <strong>"Vesting Start Date"</strong> means the Effective Date specified above.
+          </p>
+          <p class="doc-paragraph">
+            <strong>"Cliff Period"</strong> means the initial ${cliffMonths}-month period during which no Tokens shall vest${cliffMonths == 0 ? ' (zero months - no cliff applies)' : ''}.
+          </p>
+          <p class="doc-paragraph">
+            <strong>"Vesting Period"</strong> means the ${totalMonths}-month period commencing on the Vesting Start Date during which the Tokens shall vest according to the schedule described herein.
+          </p>
+          <p class="doc-paragraph">
+            <strong>"Vested Tokens"</strong> means Tokens that have satisfied all vesting conditions as of a given date and are no longer subject to forfeiture under this Agreement.
+          </p>
+          <p class="doc-paragraph">
+            <strong>"Unvested Tokens"</strong> means Tokens that have not yet satisfied vesting conditions and remain subject to forfeiture. Unvested Tokens confer no rights to Recipient, including no voting, economic, or other rights, until they vest.
+          </p>
+          ${tgeConditions ? `<p class="doc-paragraph">
+            <strong>"Token Generation Event" or "TGE"</strong> means the initial issuance or creation of the Tokens on the blockchain, whether through a token sale, airdrop, or other distribution method.
+          </p>` : ''}
+          <p class="doc-paragraph">
+            <strong>"Change of Control"</strong> means: (a) the acquisition of the Company by another entity by means of merger, consolidation, or similar transaction; (b) a sale of all or substantially all of the Company's assets; or (c) any transaction resulting in a change of ownership of more than 50% of the Company's voting securities.
+          </p>
+          <p class="doc-paragraph">
+            <strong>"Cause"</strong> means: (i) conviction of any felony or crime involving fraud or dishonesty; (ii) participation in fraud, embezzlement, or misappropriation against the Company; (iii) material breach of this Agreement or any other agreement with the Company; or (iv) gross negligence or willful misconduct materially harmful to the Company's business or reputation.
           </p>
         </div>
 
         <div class="doc-section">
           <div class="doc-section-title">1. GRANT OF TOKENS</div>
           <p class="doc-paragraph">
-            Subject to the terms and conditions of this Agreement, the Company hereby grants to Recipient the right to receive <strong class="highlight">${formatNumber(tokenAmount)} ${tokenSymbol}</strong> tokens (the "Tokens"), subject to the vesting schedule described in Section 2 below.
+            Subject to the terms and conditions of this Agreement, the Company hereby grants to Recipient, in their capacity as <span id="recipient-role">${recipientRole}</span>, the conditional right to receive <strong class="highlight"><span id="token-amount">${formatNumber(tokenAmount)}</span> <span id="token-symbol">${tokenSymbol}</span></strong> tokens (the "Tokens"), subject to the vesting schedule described in Section 2 below.
           </p>
           <p class="doc-paragraph">
-            The Tokens are ${tokenName} tokens with the symbol ${tokenSymbol}, implemented as ${document.getElementById('tokenStandard').value} tokens.
+            The Tokens are ${tokenName} tokens with the symbol ${tokenSymbol}, implemented as ${document.getElementById('tokenStandard').value} tokens${contractAddress ? `, with smart contract address <span id="contract-address">${contractAddress}</span>` : ' (smart contract address to be determined)'}.${tokenPrice ? ` The reference price per token is <span id="token-price">$${tokenPrice} USD</span>.` : ''}${walletAddress ? ` Tokens shall be delivered to Recipient's designated wallet address: ${walletAddress}.` : ''}
+          </p>
+          ${tgeConditions ? `<p class="doc-paragraph">
+            <strong>Conditional Grant:</strong> This grant is expressly conditioned upon: (a) the occurrence of a Token Generation Event; (b) the Company's determination that issuance and delivery of Tokens complies with all applicable securities laws, commodities laws, and other legal requirements; and (c) Recipient's satisfaction of all compliance requirements under this Agreement, including KYC/AML verification if required. If these conditions are not satisfied, the Company may, in its sole discretion, cancel this grant, substitute alternative consideration, or defer delivery.
+          </p>` : ''}
+          ${noEmploymentRights ? `<p class="doc-paragraph">
+            <strong>No Employment Rights:</strong> This Agreement does not create any right to continued employment, engagement, or service relationship with the Company. Recipient's service relationship remains at-will (or as otherwise separately documented) and may be terminated at any time by either party. Nothing in this Agreement alters the terms of any employment or consulting agreement between the parties.
+          </p>` : ''}
+          <p class="doc-paragraph">
+            <strong>No Rights Until Vesting:</strong> Unvested Tokens confer no rights whatsoever to Recipient, including no voting rights, no rights to distributions or dividends, and no economic interest in the Company or the Tokens. Only Vested Tokens that have been delivered to Recipient shall confer the rights associated with token ownership.
           </p>
         </div>
 
         <div class="doc-section">
           <div class="doc-section-title">2. VESTING SCHEDULE</div>
           <p class="doc-paragraph">
-            <strong>Cliff Period:</strong> ${cliffMonths > 0 ? `No Tokens shall vest during the initial ${cliffMonths}-month cliff period.` : 'No cliff period applies; vesting begins immediately.'}
+            <strong>Cliff Period:</strong> ${cliffMonths > 0 ? `No Tokens shall vest during the initial <span id="cliff-months">${cliffMonths}-month</span> cliff period.` : '<span id="cliff-months">No cliff period</span> applies; vesting begins immediately.'}
           </p>
           <p class="doc-paragraph">
-            <strong>Vesting Type:</strong> Following any applicable cliff period, Tokens shall vest on a <strong class="highlight">${vestingType}</strong> basis over a total period of ${totalMonths} months from the Effective Date.
+            <strong>Vesting Type:</strong> Following any applicable cliff period, Tokens shall vest on a <strong class="highlight"><span id="vesting-type">${vestingType}</span></strong> basis over a total period of <span id="total-months">${totalMonths} months</span> from the Effective Date.
           </p>
           <p class="doc-paragraph">
             <strong>Vesting Commencement:</strong> The vesting schedule shall commence on the Effective Date.
+          </p>
+          <p class="doc-paragraph">
+            <strong>Fractional Tokens:</strong> Any fractional Token amounts resulting from the vesting calculations shall be rounded down to the nearest whole Token. Any residual Tokens resulting from rounding shall vest on the final vesting date. For example, if monthly vesting would result in 8,333.33 Tokens, only 8,333 whole Tokens shall vest each month, with remaining Tokens vesting at the conclusion of the Vesting Period.
           </p>
           <p class="doc-paragraph">
             The Company shall maintain accurate records of all vested and unvested Tokens and shall provide such information to Recipient upon reasonable request.
@@ -1105,51 +1296,103 @@
 
         <div class="doc-section">
           <div class="doc-section-title">3. TERMINATION PROVISIONS</div>
-          <p class="doc-paragraph">
+          <p class="doc-paragraph" id="termination-provisions">
             ${getTerminationText()}
           </p>
         </div>
 
         <div class="doc-section">
           <div class="doc-section-title">4. CHANGE OF CONTROL</div>
-          <p class="doc-paragraph">
+          <p class="doc-paragraph" id="change-control">
             ${getChangeOfControlText()}
           </p>
         </div>
 
         <div class="doc-section">
           <div class="doc-section-title">5. TRANSFER RESTRICTIONS</div>
-          <p class="doc-paragraph">
+          <p class="doc-paragraph" id="transfer-restrictions">
             ${getTransferRestrictionText()}
           </p>
         </div>
 
-        <div class="doc-section">
-          <div class="doc-section-title">6. REPRESENTATIONS AND WARRANTIES</div>
+        ${onchainMechanics ? `<div class="doc-section">
+          <div class="doc-section-title">6. ON-CHAIN IMPLEMENTATION AND MECHANICS</div>
           <p class="doc-paragraph">
-            Recipient represents and warrants that: (a) Recipient has full power and authority to enter into this Agreement; (b) Recipient understands that the Tokens may constitute securities under applicable law; (c) Recipient is acquiring the Tokens for investment purposes and not with a view to distribution; and (d) Recipient has had the opportunity to ask questions and receive answers regarding the Company and the Tokens.
+            <strong>Implementation Method:</strong> The Company may implement the vesting schedule through a smart contract, internal ledger, third-party custody arrangement, or other mechanism in its sole discretion. The Company shall have the right to change implementation methods at any time, provided that such changes do not materially alter the economic terms of this Agreement.
+          </p>
+          <p class="doc-paragraph">
+            <strong>Token Delivery:</strong> Vested Tokens shall be delivered to Recipient in accordance with the Company's standard procedures, which may include batch transfers at regular intervals rather than continuous delivery. Recipient acknowledges that some delay between vesting and delivery is expected and acceptable.
+          </p>
+          <p class="doc-paragraph">
+            <strong>Gas Fees:</strong> Unless otherwise agreed, Recipient shall be responsible for all gas fees, network fees, and transaction costs associated with claiming, withdrawing, or transferring Vested Tokens from any vesting contract or Company-controlled wallet. The Company shall be responsible for gas fees associated with initial token transfers into vesting contracts.
+          </p>
+          <p class="doc-paragraph">
+            <strong>Forks, Airdrops, and Token Changes:</strong> In the event of any blockchain fork, token swap, token migration, airdrop of derivative tokens, or similar event affecting the Tokens, the Company shall make equitable adjustments to this Agreement in good faith to preserve the intended economic arrangement. Such adjustments may include substituting new tokens, adjusting token quantities, or other measures reasonably necessary to maintain the original intent of this Agreement.
+          </p>
+          <p class="doc-paragraph">
+            <strong>Wallet Security:</strong> Recipient is solely responsible for maintaining the security of their wallet and private keys. The Company has no obligation to replace or re-issue Tokens that are lost, stolen, sent to an incorrect address, or otherwise become inaccessible due to Recipient's actions or negligence. However, if Recipient's wallet is compromised and Recipient provides adequate proof of identity and authorization, the Company may, in its sole discretion, redirect unvested Tokens to a new wallet address provided by Recipient.
+          </p>
+        </div>` : ''}
+
+        <div class="doc-section">
+          <div class="doc-section-title">${onchainMechanics ? '7' : '6'}. REPRESENTATIONS AND WARRANTIES</div>
+          <p class="doc-paragraph" id="additional-provisions">
+            Recipient represents and warrants that:
+          </p>
+          <p class="doc-paragraph">
+            (a) Recipient has full power and authority to enter into this Agreement and perform Recipient's obligations hereunder;
+          </p>
+          ${securities ? `<p class="doc-paragraph">
+            (b) Recipient understands that the Tokens may constitute securities under applicable law and that the Tokens have not been registered under the Securities Act of 1933 or any state securities laws;
+          </p>
+          <p class="doc-paragraph">
+            (c) Recipient is acquiring the Tokens for Recipient's own account for investment purposes only and not with a view to distribution, resale, or fractionalization;
+          </p>
+          <p class="doc-paragraph">
+            (d) Recipient is ${recipientStatus === 'us-person' ? 'a U.S. Person and an "accredited investor" as defined in Rule 501 of Regulation D under the Securities Act' : 'not a U.S. Person and is acquiring the Tokens in an offshore transaction in accordance with Regulation S under the Securities Act'};
+          </p>
+          <p class="doc-paragraph">
+            (e) Recipient acknowledges that the Tokens are subject to transfer restrictions and may not be sold, transferred, or otherwise disposed of except in compliance with applicable securities laws;
+          </p>` : ''}
+          ${kycAml ? `<p class="doc-paragraph">
+            (f) Recipient is not identified on any list of prohibited persons under applicable sanctions laws (including OFAC, UN, EU sanctions lists), is not located in or a resident of any sanctioned country or region, and is not otherwise prohibited from receiving the Tokens under applicable law;
+          </p>
+          <p class="doc-paragraph">
+            (g) Recipient agrees to provide all information and documentation reasonably requested by the Company for Know-Your-Customer (KYC) and Anti-Money Laundering (AML) compliance purposes, including but not limited to government-issued identification, proof of address, and beneficial ownership information;
+          </p>
+          <p class="doc-paragraph">
+            (h) The Company may delay, withhold, or forfeit delivery of any Vested Tokens if Recipient fails to provide requested compliance information, if Recipient becomes subject to sanctions, or if the Company determines in good faith that delivery would violate applicable law;
+          </p>` : ''}
+          ${confidentiality ? `<p class="doc-paragraph">
+            ${securities || kycAml ? '(i)' : '(b)'} Recipient agrees to maintain the confidentiality of all non-public information relating to the Company, the Tokens, and this Agreement, except as required by law or with the Company's prior written consent; and
+          </p>` : ''}
+          <p class="doc-paragraph">
+            ${securities && kycAml && confidentiality ? '(j)' : securities || kycAml ? '(i)' : confidentiality ? '(c)' : '(b)'} Recipient has had the opportunity to ask questions and receive answers regarding the Company, the Tokens, and this Agreement, and has consulted with such legal, tax, and financial advisors as Recipient deems necessary.
           </p>
         </div>
 
         <div class="doc-section">
-          <div class="doc-section-title">7. GOVERNING LAW AND DISPUTE RESOLUTION</div>
+          <div class="doc-section-title">${onchainMechanics ? '8' : '7'}. GOVERNING LAW AND DISPUTE RESOLUTION</div>
           <p class="doc-paragraph">
             This Agreement shall be governed by and construed in accordance with the laws of the State of ${governingLaw}, without regard to conflicts of law principles.
           </p>
-          <p class="doc-paragraph">
+          <p class="doc-paragraph" id="dispute-resolution">
             ${getDisputeResolutionText()}
+          </p>
+          <p class="doc-paragraph">
+            <strong>Injunctive Relief:</strong> Notwithstanding the foregoing dispute resolution provisions, either party may seek temporary or preliminary injunctive relief in a court of competent jurisdiction to protect its confidential information, intellectual property rights, or to prevent irreparable harm, without waiving the right to arbitration or other dispute resolution of the underlying dispute.
           </p>
         </div>
 
         <div class="doc-section">
-          <div class="doc-section-title">8. MISCELLANEOUS</div>
+          <div class="doc-section-title">${onchainMechanics ? '9' : '8'}. MISCELLANEOUS</div>
           <p class="doc-paragraph">
             <strong>Entire Agreement:</strong> This Agreement constitutes the entire agreement between the parties regarding the subject matter hereof.
           </p>
           <p class="doc-paragraph">
             <strong>Amendment:</strong> This Agreement may only be amended by a written instrument signed by both parties.
           </p>
-          <p class="doc-paragraph">
+          <p class="doc-paragraph" id="assignment-clause">
             <strong>Assignment:</strong> ${document.getElementById('assignmentRestriction').checked ? 'Neither party may assign this Agreement without the prior written consent of the other party.' : 'This Agreement shall bind and inure to the benefit of the parties and their respective successors and permitted assigns.'}
           </p>
           <p class="doc-paragraph">
@@ -1157,14 +1400,20 @@
           </p>
         </div>
 
-        ${document.getElementById('taxProvisions').checked ? `
+        ${taxProvisions ? `
         <div class="doc-section">
-          <div class="doc-section-title">9. TAX MATTERS</div>
-          <p class="doc-paragraph">
-            <strong>Tax Responsibility:</strong> Recipient acknowledges sole responsibility for any tax consequences arising from this Agreement or the vesting of Tokens.
+          <div class="doc-section-title">${onchainMechanics ? '10' : '9'}. TAX MATTERS</div>
+          <p class="doc-paragraph" id="tax-provisions">
+            <strong>Tax Responsibility:</strong> Recipient acknowledges and agrees that Recipient is solely responsible for all tax consequences arising from this Agreement, the grant, vesting, or transfer of Tokens, and any subsequent disposition of Tokens. The Company makes no representations or warranties regarding the tax treatment of the Tokens or this Agreement.
           </p>
           <p class="doc-paragraph">
-            <strong>83(b) Election Notice:</strong> Recipient acknowledges that they have been advised to consult with their tax advisor regarding the advisability of filing an Internal Revenue Code Section 83(b) election with respect to the Tokens. If applicable, any such election must be filed within 30 days of the Effective Date.
+            <strong>Tax Withholding:</strong> The Company shall have the right to withhold from any amounts payable to Recipient (including Tokens deliverable hereunder or other compensation) such amounts as the Company determines are required to satisfy any federal, state, local, or foreign tax withholding obligations. Recipient may be required to deliver cash to the Company or authorize the Company to withhold Tokens (at their fair market value as determined by the Company) to satisfy such obligations.
+          </p>
+          <p class="doc-paragraph">
+            <strong>83(b) Election Notice:</strong> Recipient acknowledges that they have been advised to consult with a qualified tax advisor regarding the advisability of filing an Internal Revenue Code Section 83(b) election with respect to the Tokens. If applicable and if Recipient determines such an election is appropriate, any such election must be filed with the Internal Revenue Service within 30 days of the Effective Date (or other applicable grant date). The Company does not provide tax advice and does not file 83(b) elections on behalf of Recipients. Failure to timely file an 83(b) election, if appropriate, may result in adverse tax consequences.
+          </p>
+          <p class="doc-paragraph">
+            <strong>Tax Reporting:</strong> Recipient agrees to provide the Company with any information reasonably requested for tax reporting purposes, including completed Form W-9 or W-8 (as applicable) and updates to such information as needed.
           </p>
         </div>
         ` : ''}
@@ -1178,8 +1427,8 @@
             <p><strong>COMPANY:</strong></p>
             <p>${companyName}</p>
             <p style="margin-top: 20px;">By: _________________________</p>
-            <p>Name: ${document.getElementById('signatoryName').value || '_______________________'}</p>
-            <p>Title: ${document.getElementById('signatoryTitle').value || '_______________________'}</p>
+            <p>Name: <span id="signatory-name">${signatoryName}</span></p>
+            <p>Title: <span id="signatory-title">${signatoryTitle}</span></p>
           </div>
           <div style="margin-top: 30px;">
             <p><strong>RECIPIENT:</strong></p>
@@ -1191,7 +1440,47 @@
       `;
 
       document.getElementById('previewBox').innerHTML = html;
+
+      // Highlight and scroll to changed fields
+      if (changedFields.length > 0) {
+        setTimeout(() => {
+          changedFields.forEach((fieldId, index) => {
+            const element = document.getElementById(fieldId);
+            if (element) {
+              // Add highlight class
+              element.classList.add('highlight-flash');
+
+              // Scroll to first changed element
+              if (index === 0) {
+                element.scrollIntoView({
+                  behavior: 'smooth',
+                  block: 'center',
+                  inline: 'nearest'
+                });
+              }
+
+              // Remove highlight after 10 seconds
+              setTimeout(() => {
+                element.classList.remove('highlight-flash');
+              }, 10000);
+            }
+          });
+        }, 100);
+      }
+
       updateVestingCalculator();
+    }
+
+    function getVestingType() {
+      let vestingType = '';
+      document.querySelectorAll('input[name="vestingType"]').forEach(radio => {
+        if (radio.checked) {
+          vestingType = radio.value === 'linear' ? 'linear (continuous)' :
+                        radio.value === 'monthly' ? 'monthly' :
+                        radio.value === 'quarterly' ? 'quarterly' : 'yearly';
+        }
+      });
+      return vestingType;
     }
 
     function getTerminationText() {
