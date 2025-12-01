@@ -815,7 +815,7 @@
                   <span class="tooltip">This is where your business will be legally registered. Most businesses choose their home state, but some opt for Delaware or Wyoming for specific legal benefits.</span>
                 </span>
               </label>
-              <select id="state" required>
+              <select id="state" onchange="updateEverything()" required>
                 <option value="">Select a state...</option>
               </select>
               <span class="help-text">Where you want to legally form your business</span>
@@ -829,7 +829,7 @@
                   <span class="tooltip">LLCs offer flexibility and pass-through taxation. Corporations are better for raising venture capital and offer stock options. Choose based on your business goals.</span>
                 </span>
               </label>
-              <select id="entityType" required>
+              <select id="entityType" onchange="updateEverything()" required>
                 <option value="">Select type...</option>
                 <option value="llc">LLC (Limited Liability Company)</option>
                 <option value="corporation">Corporation (C-Corp)</option>
@@ -1017,8 +1017,8 @@
           </div>
 
           <div class="service-tiers">
-            <label class="tier-option">
-              <input type="radio" name="serviceTier" value="starter" data-base-price="400">
+            <label class="tier-option" onclick="selectTier(this, event)">
+              <input type="radio" name="serviceTier" value="starter" data-base-price="400" onchange="updateEverything()">
               <div class="tier-info">
                 <div class="tier-header">
                   <span class="tier-name">Starter</span>
@@ -1035,8 +1035,8 @@
               </div>
             </label>
 
-            <label class="tier-option selected">
-              <input type="radio" name="serviceTier" value="standard" data-base-price="750" checked>
+            <label class="tier-option selected" onclick="selectTier(this, event)">
+              <input type="radio" name="serviceTier" value="standard" data-base-price="750" onchange="updateEverything()" checked>
               <div class="tier-info">
                 <div class="tier-header">
                   <span class="tier-name">Standard</span>
@@ -1054,8 +1054,8 @@
               </div>
             </label>
 
-            <label class="tier-option">
-              <input type="radio" name="serviceTier" value="advanced" data-base-price="850">
+            <label class="tier-option" onclick="selectTier(this, event)">
+              <input type="radio" name="serviceTier" value="advanced" data-base-price="850" onchange="updateEverything()">
               <div class="tier-info">
                 <div class="tier-header">
                   <span class="tier-name">Advanced</span>
@@ -1707,27 +1707,31 @@
     // Form elements
     const entityTypeSelect = document.getElementById('entityType');
     const serviceTierRadios = document.querySelectorAll('input[name="serviceTier"]');
-    const tierOptions = document.querySelectorAll('.tier-option');
     const comparisonCard = document.getElementById('comparisonCard');
     const delawareShareCard = document.getElementById('delawareShareCard');
 
     // Handle tier option selection
-    tierOptions.forEach(option => {
-      option.addEventListener('click', function() {
-        tierOptions.forEach(o => o.classList.remove('selected'));
-        this.classList.add('selected');
-        const radio = this.querySelector('input[type="radio"]');
+    function selectTier(element, event) {
+      // Prevent default behavior and stop propagation for WordPress compatibility
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+
+      // Remove selected class from all tier options
+      const tierOptions = document.querySelectorAll('.tier-option');
+      tierOptions.forEach(o => o.classList.remove('selected'));
+
+      // Add selected class to clicked option
+      element.classList.add('selected');
+
+      // Check the radio button
+      const radio = element.querySelector('input[type="radio"]');
+      if (radio) {
         radio.checked = true;
         updateEverything();
-      });
-    });
-
-    // Handle state/entity change
-    stateSelect.addEventListener('change', updateEverything);
-    entityTypeSelect.addEventListener('change', updateEverything);
-    serviceTierRadios.forEach(radio => {
-      radio.addEventListener('change', updateEverything);
-    });
+      }
+    }
 
     function updateEverything() {
       updatePricing();

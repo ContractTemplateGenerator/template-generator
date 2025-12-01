@@ -531,8 +531,8 @@
           </div>
 
           <div class="service-tiers">
-            <label class="tier-option">
-              <input type="radio" name="serviceTier" value="starter" data-base-price="450">
+            <label class="tier-option" onclick="selectTier(this, event)">
+              <input type="radio" name="serviceTier" value="starter" data-base-price="450" onchange="updatePricing()">
               <div class="tier-info">
                 <div class="tier-header">
                   <span class="tier-name">Starter Demand Letter</span>
@@ -549,8 +549,8 @@
               </div>
             </label>
 
-            <label class="tier-option selected">
-              <input type="radio" name="serviceTier" value="combo" data-base-price="900" checked>
+            <label class="tier-option selected" onclick="selectTier(this, event)">
+              <input type="radio" name="serviceTier" value="combo" data-base-price="900" onchange="updatePricing()" checked>
               <div class="tier-info">
                 <div class="tier-header">
                   <span class="tier-name">Demand Letter + Draft Lawsuit Combo</span>
@@ -570,8 +570,8 @@
               </div>
             </label>
 
-            <label class="tier-option">
-              <input type="radio" name="serviceTier" value="standard" data-base-price="675">
+            <label class="tier-option" onclick="selectTier(this, event)">
+              <input type="radio" name="serviceTier" value="standard" data-base-price="675" onchange="updatePricing()">
               <div class="tier-info">
                 <div class="tier-header">
                   <span class="tier-name">Standard Demand Letter</span>
@@ -590,8 +590,8 @@
               </div>
             </label>
 
-            <label class="tier-option">
-              <input type="radio" name="serviceTier" value="advanced" data-base-price="1125">
+            <label class="tier-option" onclick="selectTier(this, event)">
+              <input type="radio" name="serviceTier" value="advanced" data-base-price="1125" onchange="updatePricing()">
               <div class="tier-info">
                 <div class="tier-header">
                   <span class="tier-name">Advanced Litigation Package</span>
@@ -623,22 +623,22 @@
           <div class="form-grid">
             <div class="form-group">
               <label>First Name <span class="required">*</span></label>
-              <input type="text" id="firstName" required>
+              <input type="text" id="firstName" oninput="checkFormCompletion()" required>
             </div>
 
             <div class="form-group">
               <label>Last Name <span class="required">*</span></label>
-              <input type="text" id="lastName" required>
+              <input type="text" id="lastName" oninput="checkFormCompletion()" required>
             </div>
 
             <div class="form-group">
               <label>Email Address <span class="required">*</span></label>
-              <input type="email" id="email" required>
+              <input type="email" id="email" oninput="checkFormCompletion()" required>
             </div>
 
             <div class="form-group">
               <label>Phone Number <span class="required">*</span></label>
-              <input type="tel" id="phone" required>
+              <input type="tel" id="phone" oninput="checkFormCompletion()" required>
             </div>
 
             <div class="form-group full-width">
@@ -658,13 +658,13 @@
           <div class="form-grid">
             <div class="form-group full-width">
               <label>Opposing Party Name <span class="required">*</span></label>
-              <input type="text" id="opposingParty" required>
+              <input type="text" id="opposingParty" oninput="checkFormCompletion()" required>
               <span class="help-text">Full legal name of person or business you have a dispute with</span>
             </div>
 
             <div class="form-group">
               <label>Dispute Type <span class="required">*</span></label>
-              <select id="disputeType" required>
+              <select id="disputeType" onchange="checkFormCompletion()" required>
                 <option value="">Select type...</option>
                 <option value="breach-contract">Breach of Contract</option>
                 <option value="debt-collection">Debt Collection / Payment Dispute</option>
@@ -681,13 +681,13 @@
 
             <div class="form-group">
               <label>Amount in Dispute <span class="required">*</span></label>
-              <input type="text" id="disputeAmount" placeholder="e.g., $5,000" required>
+              <input type="text" id="disputeAmount" oninput="checkFormCompletion()" placeholder="e.g., $5,000" required>
               <span class="help-text">Estimated monetary value of your claim</span>
             </div>
 
             <div class="form-group full-width">
               <label>Brief Description of Dispute <span class="required">*</span></label>
-              <textarea id="disputeDescription" placeholder="Summarize what happened, when it happened, what you're demanding, and any relevant dates or agreements..." required></textarea>
+              <textarea id="disputeDescription" oninput="checkFormCompletion()" placeholder="Summarize what happened, when it happened, what you're demanding, and any relevant dates or agreements..." required></textarea>
               <span class="help-text">Include key facts, dates, and what you're seeking (payment, performance, etc.)</span>
             </div>
 
@@ -699,7 +699,7 @@
 
             <div class="form-group full-width">
               <label>Desired Outcome <span class="required">*</span></label>
-              <textarea id="desiredOutcome" placeholder="What do you want to achieve? (e.g., full payment of $5,000 within 14 days, performance of contract obligations, written apology and $10,000 damages...)" required></textarea>
+              <textarea id="desiredOutcome" oninput="checkFormCompletion()" placeholder="What do you want to achieve? (e.g., full payment of $5,000 within 14 days, performance of contract obligations, written apology and $10,000 damages...)" required></textarea>
               <span class="help-text">Be specific about what you want the opposing party to do</span>
             </div>
 
@@ -933,25 +933,28 @@
   </div>
 
   <script>
-    // Form elements
-    const serviceTierRadios = document.querySelectorAll('input[name="serviceTier"]');
-    const tierOptions = document.querySelectorAll('.tier-option');
-
     // Handle tier option selection
-    tierOptions.forEach(option => {
-      option.addEventListener('click', function() {
-        tierOptions.forEach(o => o.classList.remove('selected'));
-        this.classList.add('selected');
-        const radio = this.querySelector('input[type="radio"]');
+    function selectTier(element, event) {
+      // Prevent default behavior and stop propagation for WordPress compatibility
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+
+      // Remove selected class from all tier options
+      const tierOptions = document.querySelectorAll('.tier-option');
+      tierOptions.forEach(o => o.classList.remove('selected'));
+
+      // Add selected class to clicked option
+      element.classList.add('selected');
+
+      // Check the radio button
+      const radio = element.querySelector('input[type="radio"]');
+      if (radio) {
         radio.checked = true;
         updatePricing();
-      });
-    });
-
-    // Update pricing when tier changes
-    serviceTierRadios.forEach(radio => {
-      radio.addEventListener('change', updatePricing);
-    });
+      }
+    }
 
     function updatePricing() {
       const selectedTier = document.querySelector('input[name="serviceTier"]:checked');
@@ -991,16 +994,6 @@
           '<div class="payment-disabled">Complete all required fields to proceed to payment</div>';
       }
     }
-
-    // Add event listeners to form fields
-    ['firstName', 'lastName', 'email', 'phone', 'opposingParty', 'disputeType',
-     'disputeAmount', 'disputeDescription', 'desiredOutcome'].forEach(fieldId => {
-      const field = document.getElementById(fieldId);
-      if (field) {
-        field.addEventListener('input', checkFormCompletion);
-        field.addEventListener('change', checkFormCompletion);
-      }
-    });
 
     function renderPayPalButton(amount, tier) {
       const container = document.getElementById('paypalButtonContainer');

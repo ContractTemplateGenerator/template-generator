@@ -571,8 +571,8 @@
             </div>
 
             <div class="service-tiers">
-              <label class="tier-option selected">
-                <input type="radio" name="reviewTier" value="basic" data-base-price="200" checked>
+              <label class="tier-option selected" onclick="selectTier(this, event)">
+                <input type="radio" name="reviewTier" value="basic" data-base-price="200" onchange="updatePricing()" checked>
                 <div class="tier-info">
                   <div class="tier-header">
                     <span class="tier-name">Basic Review</span>
@@ -590,8 +590,8 @@
                 </div>
               </label>
 
-              <label class="tier-option">
-                <input type="radio" name="reviewTier" value="standard" data-base-price="350">
+              <label class="tier-option" onclick="selectTier(this, event)">
+                <input type="radio" name="reviewTier" value="standard" data-base-price="350" onchange="updatePricing()">
                 <div class="tier-info">
                   <div class="tier-header">
                     <span class="tier-name">Standard Review</span>
@@ -610,8 +610,8 @@
                 </div>
               </label>
 
-              <label class="tier-option">
-                <input type="radio" name="reviewTier" value="premium" data-base-price="550">
+              <label class="tier-option" onclick="selectTier(this, event)">
+                <input type="radio" name="reviewTier" value="premium" data-base-price="550" onchange="updatePricing()">
                 <div class="tier-info">
                   <div class="tier-header">
                     <span class="tier-name">Premium Review</span>
@@ -643,22 +643,22 @@
             <div class="form-grid">
               <div class="form-group">
                 <label>First Name <span class="required">*</span></label>
-                <input type="text" id="reviewFirstName" required>
+                <input type="text" id="reviewFirstName" oninput="checkFormCompletion()" required>
               </div>
 
               <div class="form-group">
                 <label>Last Name <span class="required">*</span></label>
-                <input type="text" id="reviewLastName" required>
+                <input type="text" id="reviewLastName" oninput="checkFormCompletion()" required>
               </div>
 
               <div class="form-group">
                 <label>Email Address <span class="required">*</span></label>
-                <input type="email" id="reviewEmail" required>
+                <input type="email" id="reviewEmail" oninput="checkFormCompletion()" required>
               </div>
 
               <div class="form-group">
                 <label>Phone Number <span class="required">*</span></label>
-                <input type="tel" id="reviewPhone" required>
+                <input type="tel" id="reviewPhone" oninput="checkFormCompletion()" required>
               </div>
 
               <div class="form-group full-width">
@@ -668,7 +668,7 @@
 
               <div class="form-group full-width">
                 <label>Contract Type <span class="required">*</span></label>
-                <select id="reviewContractType" required>
+                <select id="reviewContractType" onchange="checkFormCompletion()" required>
                   <option value="">Select contract type...</option>
                   <option value="nda">NDA / Confidentiality Agreement</option>
                   <option value="employment">Employment / Contractor Agreement</option>
@@ -686,7 +686,7 @@
 
               <div class="form-group">
                 <label>Approximate Page Count <span class="required">*</span></label>
-                <select id="reviewPageCount" required>
+                <select id="reviewPageCount" onchange="checkFormCompletion()" required>
                   <option value="">Select...</option>
                   <option value="1-2">1-2 pages</option>
                   <option value="3-5">3-5 pages</option>
@@ -698,7 +698,7 @@
 
               <div class="form-group">
                 <label>Your Role <span class="required">*</span></label>
-                <select id="reviewRole" required>
+                <select id="reviewRole" onchange="checkFormCompletion()" required>
                   <option value="">Select...</option>
                   <option value="receiving">I'm receiving this contract (other party sent it to me)</option>
                   <option value="sending">I'm sending this contract (I/my company created it)</option>
@@ -708,7 +708,7 @@
 
               <div class="form-group full-width">
                 <label>Key Concerns / Review Focus <span class="required">*</span></label>
-                <textarea id="reviewConcerns" placeholder="What are you most concerned about? (e.g., liability limitations, payment terms, IP ownership, termination rights, confidentiality scope...)" required></textarea>
+                <textarea id="reviewConcerns" oninput="checkFormCompletion()" placeholder="What are you most concerned about? (e.g., liability limitations, payment terms, IP ownership, termination rights, confidentiality scope...)" required></textarea>
                 <span class="help-text">Help me focus on what matters most to you</span>
               </div>
 
@@ -720,7 +720,7 @@
 
               <div class="form-group full-width">
                 <label>Urgency / Timeline</label>
-                <select id="reviewUrgency">
+                <select id="reviewUrgency" onchange="updatePricing(); checkFormCompletion();">
                   <option value="standard">Standard timeline is fine</option>
                   <option value="urgent">Urgent - need within 24 hours (+50% rush fee)</option>
                   <option value="same-day">Critical - need same day (+100% rush fee)</option>
@@ -1045,35 +1045,30 @@
       }
     }
 
-    // Form elements
-    const reviewTierRadios = document.querySelectorAll('input[name="reviewTier"]');
-    const tierOptions = document.querySelectorAll('.tier-option');
-
     // Handle tier option selection
-    tierOptions.forEach(option => {
-      option.addEventListener('click', function() {
-        // Only handle if we're in review mode
-        if (currentServiceType !== 'review') return;
+    function selectTier(element, event) {
+      // Prevent default behavior and stop propagation for WordPress compatibility
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
 
-        tierOptions.forEach(o => o.classList.remove('selected'));
-        this.classList.add('selected');
-        const radio = this.querySelector('input[type="radio"]');
-        if (radio) {
-          radio.checked = true;
-          updatePricing();
-        }
-      });
-    });
+      // Only handle if we're in review mode
+      if (currentServiceType !== 'review') return;
 
-    // Update pricing when tier changes
-    reviewTierRadios.forEach(radio => {
-      radio.addEventListener('change', updatePricing);
-    });
+      // Remove selected class from all tier options
+      const tierOptions = document.querySelectorAll('.tier-option');
+      tierOptions.forEach(o => o.classList.remove('selected'));
 
-    // Update pricing when urgency changes
-    const urgencySelect = document.getElementById('reviewUrgency');
-    if (urgencySelect) {
-      urgencySelect.addEventListener('change', updatePricing);
+      // Add selected class to clicked option
+      element.classList.add('selected');
+
+      // Check the radio button
+      const radio = element.querySelector('input[type="radio"]');
+      if (radio) {
+        radio.checked = true;
+        updatePricing();
+      }
     }
 
     function updatePricing() {
@@ -1145,16 +1140,6 @@
           '<div class="payment-disabled">Complete all required fields to proceed to payment</div>';
       }
     }
-
-    // Add event listeners to form fields
-    ['reviewFirstName', 'reviewLastName', 'reviewEmail', 'reviewPhone', 'reviewContractType',
-     'reviewPageCount', 'reviewRole', 'reviewConcerns', 'reviewUrgency'].forEach(fieldId => {
-      const field = document.getElementById(fieldId);
-      if (field) {
-        field.addEventListener('input', checkFormCompletion);
-        field.addEventListener('change', checkFormCompletion);
-      }
-    });
 
     function renderPayPalButton(amount, tier) {
       const container = document.getElementById('paypalButtonContainer');
