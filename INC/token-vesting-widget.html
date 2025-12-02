@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Token Vesting Agreement Guide</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      line-height: 1.6;
+      color: #2c3e50;
+      background: transparent;
+    }
+
+    .widget-container {
+      max-width: 100%;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    .widget-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 25px 30px;
+      text-align: center;
+    }
+
+    .widget-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .widget-subtitle {
+      font-size: 14px;
+      opacity: 0.95;
+    }
+
+    .tabs-container {
+      display: flex;
+      background: #f8fafc;
+      border-bottom: 2px solid #e2e8f0;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .tab-button {
+      flex: 1;
+      min-width: 120px;
+      padding: 15px 20px;
+      background: transparent;
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.2s;
+      border-bottom: 3px solid transparent;
+      white-space: nowrap;
+    }
+
+    .tab-button:hover {
+      background: #f1f5f9;
+      color: #667eea;
+    }
+
+    .tab-button.active {
+      color: #667eea;
+      background: white;
+      border-bottom-color: #667eea;
+    }
+
+    .tab-content {
+      display: none;
+      padding: 25px 30px;
+      animation: fadeIn 0.3s;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .quick-tip {
+      background: linear-gradient(135deg, #f0f4ff 0%, #e0e7ff 100%);
+      border-left: 4px solid #667eea;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    .quick-tip strong {
+      color: #667eea;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .warning-box {
+      background: #fffbeb;
+      border-left: 4px solid #f59e0b;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    .warning-box strong {
+      color: #92400e;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .info-box {
+      background: #f8fafc;
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .info-box-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .info-box-content {
+      font-size: 13px;
+      color: #475569;
+      line-height: 1.5;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-bottom: 15px;
+    }
+
+    .comparison-table th,
+    .comparison-table td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .comparison-table th {
+      background: #f8fafc;
+      font-weight: 700;
+      color: #1e293b;
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    .comparison-table tr:hover {
+      background: #f8fafc;
+    }
+
+    .accordion {
+      margin-bottom: 10px;
+    }
+
+    .accordion-header {
+      background: #f1f5f9;
+      padding: 12px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      color: #1e293b;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s;
+    }
+
+    .accordion-header:hover {
+      background: #e2e8f0;
+    }
+
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      padding: 0 15px;
+    }
+
+    .accordion-content.active {
+      max-height: 500px;
+      padding: 15px;
+    }
+
+    .accordion-icon {
+      transition: transform 0.3s;
+      font-size: 12px;
+    }
+
+    .accordion.active .accordion-icon {
+      transform: rotate(180deg);
+    }
+
+    .step-list {
+      list-style: none;
+      counter-reset: step-counter;
+    }
+
+    .step-list li {
+      counter-increment: step-counter;
+      margin-bottom: 12px;
+      padding-left: 40px;
+      position: relative;
+      font-size: 14px;
+      color: #475569;
+    }
+
+    .step-list li::before {
+      content: counter(step-counter);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 26px;
+      height: 26px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    ul {
+      margin-left: 20px;
+      margin-bottom: 15px;
+    }
+
+    li {
+      font-size: 14px;
+      color: #475569;
+      margin-bottom: 6px;
+    }
+
+    h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 15px 0 10px 0;
+    }
+
+    p {
+      font-size: 14px;
+      color: #475569;
+      margin-bottom: 12px;
+    }
+
+    @media (max-width: 768px) {
+      .widget-header {
+        padding: 20px;
+      }
+
+      .widget-title {
+        font-size: 20px;
+      }
+
+      .tab-button {
+        padding: 12px 15px;
+        font-size: 13px;
+        min-width: 100px;
+      }
+
+      .tab-content {
+        padding: 20px;
+      }
+
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="widget-container">
+    <!-- Header -->
+    <div class="widget-header">
+      <div class="widget-title">🪙 Token Vesting Agreement Generator</div>
+      <div class="widget-subtitle">Create professional token vesting agreements with comprehensive legal protections</div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs-container">
+      <button class="tab-button active" onclick="switchTab(event, 'overview')">📋 Overview</button>
+      <button class="tab-button" onclick="switchTab(event, 'guide')">🚀 Quick Guide</button>
+      <button class="tab-button" onclick="switchTab(event, 'concepts')">🔑 Key Concepts</button>
+      <button class="tab-button" onclick="switchTab(event, 'recommendations')">💡 Recommendations</button>
+      <button class="tab-button" onclick="switchTab(event, 'legal')">⚖️ Legal Info</button>
+    </div>
+
+    <!-- Tab: Overview -->
+    <div id="overview" class="tab-content active">
+      <div class="quick-tip">
+        <strong>💡 What This Generator Does</strong>
+        Creates comprehensive token vesting agreements with cliff periods, termination provisions, change of control acceleration, securities compliance, KYC/AML requirements, on-chain mechanics, and tax provisions.
+      </div>
+
+      <div class="info-grid">
+        <div class="info-box">
+          <div class="info-box-title">⏱️ Time to Complete</div>
+          <div class="info-box-content">5-10 minutes to fill out all required fields and optional provisions</div>
+        </div>
+        <div class="info-box">
+          <div class="info-box-title">💰 Price</div>
+          <div class="info-box-content">$19.95 one-time payment via PayPal for instant DOCX download</div>
+        </div>
+        <div class="info-box">
+          <div class="info-box-title">📄 What You Get</div>
+          <div class="info-box-content">Fully customized agreement with all your specifications in editable DOCX format</div>
+        </div>
+        <div class="info-box">
+          <div class="info-box-title">⚖️ Legal Review</div>
+          <div class="info-box-content">Template requires attorney review before use in your jurisdiction</div>
+        </div>
+      </div>
+
+      <h3>What's Included</h3>
+      <ul>
+        <li><strong>Definitions Section:</strong> Clear definitions of all key terms (Tokens, Cliff, Vesting, Cause, Change of Control)</li>
+        <li><strong>Vesting Schedule:</strong> Customizable cliff period and vesting duration with multiple vesting types</li>
+        <li><strong>Termination Provisions:</strong> Standard, for-cause, and partial acceleration options</li>
+        <li><strong>Change of Control:</strong> Double-trigger, full acceleration, or no acceleration</li>
+        <li><strong>Securities Compliance:</strong> U.S. Person/Non-U.S. Person distinctions, accredited investor reps</li>
+        <li><strong>KYC/AML/Sanctions:</strong> Regulatory compliance requirements and identity verification</li>
+        <li><strong>On-Chain Mechanics:</strong> Gas fees, forks, airdrops, wallet security provisions</li>
+        <li><strong>Tax Provisions:</strong> Withholding mechanics, 83(b) election notice, W-9/W-8 requirements</li>
+      </ul>
+    </div>
+
+    <!-- Tab: Quick Guide -->
+    <div id="guide" class="tab-content">
+      <h3>7-Step Process</h3>
+      <ol class="step-list">
+        <li><strong>Company Information:</strong> Enter company name, address, and authorized signatory details</li>
+        <li><strong>Recipient Details:</strong> Recipient name, address, role, relationship to company, wallet address</li>
+        <li><strong>Token Details:</strong> Token name, symbol, amount, standard (ERC-20, etc.), smart contract address</li>
+        <li><strong>Vesting Schedule:</strong> Start date, cliff period (0-48 months), total vesting period, vesting type (linear/monthly/quarterly/yearly)</li>
+        <li><strong>Advanced Provisions:</strong> Termination rules and change of control acceleration</li>
+        <li><strong>Legal Provisions:</strong> Governing law, dispute resolution, optional provisions (KYC/AML, TGE conditions, on-chain mechanics, tax)</li>
+        <li><strong>Payment & Download:</strong> Complete all required fields, pay $19.95, receive instant DOCX download</li>
+      </ol>
+
+      <div class="warning-box">
+        <strong>⚠️ Before You Start</strong>
+        Have ready: company details, recipient information, token specifications, desired vesting schedule, and wallet address (if known). All required fields must be completed before payment option appears.
+      </div>
+    </div>
+
+    <!-- Tab: Key Concepts -->
+    <div id="concepts" class="tab-content">
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          <span><strong>Cliff Period</strong></span>
+          <span class="accordion-icon">▼</span>
+        </div>
+        <div class="accordion-content">
+          <p>Initial waiting period where <strong>NO tokens vest</strong>. If terminated during cliff, recipient gets zero tokens.</p>
+          <p><strong>Common cliff periods:</strong></p>
+          <ul>
+            <li>12 months for founders and key employees</li>
+            <li>6 months for advisors</li>
+            <li>0-3 months for consultants</li>
+            <li>0 months for immediate vesting start</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          <span><strong>Vesting Types</strong></span>
+          <span class="accordion-icon">▼</span>
+        </div>
+        <div class="accordion-content">
+          <p><strong>Linear (Continuous):</strong> Tokens vest every day. Fairest option, common for founders.</p>
+          <p><strong>Monthly:</strong> Equal portions vest monthly. Standard for employees, easier administration.</p>
+          <p><strong>Quarterly:</strong> Vest every 3 months. Good for advisors, reduces administrative overhead.</p>
+          <p><strong>Yearly:</strong> Annual vesting chunks. Rare, used for long-term strategic advisors.</p>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          <span><strong>Termination Provisions</strong></span>
+          <span class="accordion-icon">▼</span>
+        </div>
+        <div class="accordion-content">
+          <p><strong>Standard:</strong> Unvested forfeited, vested kept. Most balanced and common.</p>
+          <p><strong>For-Cause Forfeiture:</strong> ALL tokens forfeited (even vested) if terminated for fraud, theft, or gross misconduct.</p>
+          <p><strong>Partial Acceleration:</strong> 50% of unvested tokens vest on termination without cause. "Good leaver" provision for founders.</p>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          <span><strong>Change of Control</strong></span>
+          <span class="accordion-icon">▼</span>
+        </div>
+        <div class="accordion-content">
+          <p><strong>Double-Trigger:</strong> 100% vesting only if (1) acquisition occurs AND (2) terminated within 12 months. Most balanced.</p>
+          <p><strong>Full Acceleration:</strong> All tokens vest immediately on acquisition. Generous to team.</p>
+          <p><strong>No Acceleration:</strong> Vesting continues unchanged. Favors acquirer.</p>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          <span><strong>TGE Conditions</strong></span>
+          <span class="accordion-icon">▼</span>
+        </div>
+        <div class="accordion-content">
+          <p>Token Generation Event conditions make token delivery conditional on:</p>
+          <ul>
+            <li>TGE actually occurring</li>
+            <li>Compliance with securities/commodities laws</li>
+            <li>Recipient passing KYC/AML checks</li>
+          </ul>
+          <p><strong>Critical for pre-launch agreements</strong> to protect against regulatory uncertainty.</p>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          <span><strong>KYC/AML/Sanctions</strong></span>
+          <span class="accordion-icon">▼</span>
+        </div>
+        <div class="accordion-content">
+          <p>Regulatory compliance requirements:</p>
+          <ul>
+            <li>Recipient must provide government ID and proof of address</li>
+            <li>Confirm not on OFAC/UN/EU sanctions lists</li>
+            <li>Company can delay/withhold tokens if compliance not met</li>
+          </ul>
+          <p><strong>Highly recommended</strong> for all agreements to avoid regulatory issues.</p>
+        </div>
+      </div>
+
+      <div class="accordion">
+        <div class="accordion-header" onclick="toggleAccordion(this)">
+          <span><strong>U.S. vs Non-U.S. Person</strong></span>
+          <span class="accordion-icon">▼</span>
+        </div>
+        <div class="accordion-content">
+          <p><strong>U.S. Person:</strong> U.S. citizens, residents, or entities. Requires accredited investor status under Regulation D.</p>
+          <p><strong>Non-U.S. Person:</strong> Foreign individuals/entities. Subject to Regulation S (offshore transactions).</p>
+          <p><strong>Important:</strong> U.S. citizens living abroad are still U.S. Persons!</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Recommendations -->
+    <div id="recommendations" class="tab-content">
+      <h3>Recommendations by Role</h3>
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Role</th>
+            <th>Duration</th>
+            <th>Cliff</th>
+            <th>Vesting Type</th>
+            <th>Change of Control</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Founder</strong></td>
+            <td>48 months</td>
+            <td>12 months</td>
+            <td>Linear</td>
+            <td>Double-Trigger</td>
+          </tr>
+          <tr>
+            <td><strong>Employee</strong></td>
+            <td>48 months</td>
+            <td>12 months</td>
+            <td>Monthly</td>
+            <td>Double-Trigger</td>
+          </tr>
+          <tr>
+            <td><strong>Advisor</strong></td>
+            <td>24 months</td>
+            <td>6 months</td>
+            <td>Quarterly</td>
+            <td>No Acceleration</td>
+          </tr>
+          <tr>
+            <td><strong>Consultant</strong></td>
+            <td>12-24 months</td>
+            <td>0-3 months</td>
+            <td>Monthly</td>
+            <td>No Acceleration</td>
+          </tr>
+          <tr>
+            <td><strong>Investor</strong></td>
+            <td>12-36 months</td>
+            <td>0-6 months</td>
+            <td>Monthly</td>
+            <td>No Acceleration</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="quick-tip">
+        <strong>✅ Best Practices - Always Include:</strong>
+        <ul style="margin-top: 8px;">
+          <li>KYC/AML and TGE conditions for pre-launch tokens</li>
+          <li>On-chain mechanics section (gas fees, forks, wallet security)</li>
+          <li>Securities law representations appropriate to recipient status</li>
+          <li>Tax provisions including 83(b) election notice for U.S. recipients</li>
+          <li>Clear definition of "Cause" for termination</li>
+        </ul>
+      </div>
+
+      <div class="warning-box">
+        <strong>⚠️ Don't Skip:</strong>
+        <ul style="margin-top: 8px;">
+          <li>Securities law representations - critical for regulatory compliance</li>
+          <li>Tax withholding provisions for U.S. employees/founders</li>
+          <li>No employment rights clause - protects at-will employment status</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Tab: Legal Info -->
+    <div id="legal" class="tab-content">
+      <div class="warning-box">
+        <strong>⚠️ Attorney Review Required</strong>
+        This generator creates a template agreement. Token vesting agreements involve complex securities law, tax law, and regulatory compliance issues that vary by jurisdiction.
+      </div>
+
+      <h3>You Must Consult:</h3>
+      <ul>
+        <li><strong>Securities Attorney:</strong> Familiar with SEC regulations, Regulation D/S, and digital asset securities issues</li>
+        <li><strong>Tax Advisor:</strong> For 83(b) election guidance, withholding requirements, and tax treatment</li>
+        <li><strong>Crypto/Blockchain Attorney:</strong> Experienced with digital assets and token-specific legal issues</li>
+      </ul>
+
+      <h3>Key Legal Considerations</h3>
+      <p><strong>Securities Law:</strong> Tokens may be securities under the Howey Test. Ensure compliance with federal and state securities laws.</p>
+      <p><strong>Tax Treatment:</strong> U.S. recipients may need to file 83(b) election within 30 days. Failure to file can result in adverse tax consequences.</p>
+      <p><strong>KYC/AML:</strong> Required for regulatory compliance, especially for pre-TGE agreements and regulated token sales.</p>
+      <p><strong>Sanctions Screening:</strong> Recipients must not be on OFAC, UN, or EU sanctions lists.</p>
+
+      <h3>This Tool Is NOT:</h3>
+      <ul>
+        <li>A substitute for legal advice</li>
+        <li>Reviewed for your specific jurisdiction</li>
+        <li>Tailored to your unique business needs</li>
+        <li>A guarantee of regulatory compliance</li>
+      </ul>
+
+      <div class="quick-tip">
+        <strong>💡 After Purchase</strong>
+        Download your DOCX file, have it reviewed by qualified attorneys in your jurisdiction, customize as needed based on their advice, then execute with proper signatures.
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function switchTab(event, tabId) {
+      // Hide all tab contents
+      const tabContents = document.querySelectorAll('.tab-content');
+      tabContents.forEach(content => content.classList.remove('active'));
+
+      // Remove active class from all buttons
+      const tabButtons = document.querySelectorAll('.tab-button');
+      tabButtons.forEach(button => button.classList.remove('active'));
+
+      // Show selected tab
+      document.getElementById(tabId).classList.add('active');
+      event.currentTarget.classList.add('active');
+    }
+
+    function toggleAccordion(header) {
+      const accordion = header.parentElement;
+      const content = header.nextElementSibling;
+
+      accordion.classList.toggle('active');
+
+      if (content.classList.contains('active')) {
+        content.classList.remove('active');
+      } else {
+        content.classList.add('active');
+      }
+    }
+  </script>
+
+</body>
+</html>

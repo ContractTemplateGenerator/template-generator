@@ -151,6 +151,113 @@
       font-style: italic;
     }
 
+    .help-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      background: #667eea;
+      color: white;
+      border-radius: 50%;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: help;
+      margin-left: 6px;
+      position: relative;
+    }
+
+    .help-icon:hover {
+      background: #764ba2;
+    }
+
+    .tooltip {
+      position: relative;
+      display: inline-block;
+    }
+
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 280px;
+      background-color: #1e293b;
+      color: #fff;
+      text-align: left;
+      border-radius: 8px;
+      padding: 12px;
+      position: absolute;
+      z-index: 1000;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -140px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 12px;
+      line-height: 1.5;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .tooltip .tooltiptext::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #1e293b transparent transparent transparent;
+    }
+
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .expandable-help {
+      background: #f8f9ff;
+      border: 1px solid #e0e7ff;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    .expandable-help-header {
+      padding: 12px 15px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      color: #667eea;
+      font-size: 14px;
+      user-select: none;
+    }
+
+    .expandable-help-header:hover {
+      background: #f0f4ff;
+    }
+
+    .expandable-help-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      padding: 0 15px;
+    }
+
+    .expandable-help-content.active {
+      max-height: 1000px;
+      padding: 15px;
+      border-top: 1px solid #e0e7ff;
+    }
+
+    .expand-icon {
+      transition: transform 0.3s;
+      font-size: 12px;
+    }
+
+    .expandable-help.active .expand-icon {
+      transform: rotate(180deg);
+    }
+
     .radio-group {
       display: flex;
       flex-direction: column;
@@ -642,13 +749,25 @@
             </div>
 
             <div class="form-group">
-              <label class="form-label">Recipient Wallet Address</label>
+              <label class="form-label">
+                Recipient Wallet Address
+                <span class="tooltip">
+                  <span class="help-icon">?</span>
+                  <span class="tooltiptext">Enter the blockchain wallet address where tokens will be delivered. Leave blank if not yet known. Must match the token standard (e.g., ERC-20 address for Ethereum tokens).</span>
+                </span>
+              </label>
               <input type="text" class="form-input" id="walletAddress" placeholder="0x... or blockchain address">
               <div class="help-text">Recipient's wallet address for token delivery (if known)</div>
             </div>
 
             <div class="form-group">
-              <label class="form-label">Recipient Status</label>
+              <label class="form-label">
+                Recipient Status
+                <span class="tooltip">
+                  <span class="help-icon">?</span>
+                  <span class="tooltiptext"><strong>U.S. Person:</strong> U.S. citizens, residents, or entities. Requires accredited investor status.<br><br><strong>Non-U.S. Person:</strong> Foreign individuals/entities. Different securities law applies (Reg S).</span>
+                </span>
+              </label>
               <select class="form-select" id="recipientStatus">
                 <option value="us-person">U.S. Person</option>
                 <option value="non-us-person">Non-U.S. Person</option>
@@ -712,10 +831,18 @@
               <span>Vesting Schedule</span>
             </div>
 
-            <div class="info-box">
-              <div class="info-box-title">💡 Understanding Vesting Schedules</div>
-              <div class="info-box-content">
-                A cliff period delays initial vesting. Linear vesting releases tokens continuously, while interval vesting releases in chunks at regular periods.
+            <div class="expandable-help">
+              <div class="expandable-help-header" onclick="toggleHelp(this)">
+                <span>💡 Understanding Vesting Schedules</span>
+                <span class="expand-icon">▼</span>
+              </div>
+              <div class="expandable-help-content">
+                <p><strong>Cliff Period:</strong> Initial waiting period with NO vesting. Common: 12 months for founders, 6 months for advisors, 0-3 for consultants.</p>
+                <p><strong>Total Vesting Period:</strong> Includes cliff. Example: 12-month cliff + 48-month total = vesting starts month 12, complete month 48.</p>
+                <p><strong>Linear:</strong> Tokens vest daily. Fairest option. Common for founders.</p>
+                <p><strong>Monthly:</strong> Equal portions monthly. Standard for employees.</p>
+                <p><strong>Quarterly:</strong> Every 3 months. Good for advisors (less admin).</p>
+                <p><strong>Yearly:</strong> Annual chunks. Rare, used for long-term advisors.</p>
               </div>
             </div>
 
@@ -725,19 +852,37 @@
             </div>
 
             <div class="form-group">
-              <label class="form-label">Cliff Period (months)</label>
+              <label class="form-label">
+                Cliff Period (months)
+                <span class="tooltip">
+                  <span class="help-icon">?</span>
+                  <span class="tooltiptext">Initial period where NO tokens vest. If terminated during cliff, recipient gets zero tokens. After cliff, they get all tokens from the cliff date forward. Use 12 months for founders, 6 for advisors, 0-3 for consultants.</span>
+                </span>
+              </label>
               <input type="number" class="form-input" id="cliffMonths" value="12" min="0" max="48">
               <div class="help-text">Period before any tokens vest (0 for no cliff)</div>
             </div>
 
             <div class="form-group">
-              <label class="form-label">Total Vesting Period (months) <span class="required">*</span></label>
+              <label class="form-label">
+                Total Vesting Period (months) <span class="required">*</span>
+                <span class="tooltip">
+                  <span class="help-icon">?</span>
+                  <span class="tooltiptext">Total duration from start date until all tokens vest, INCLUDING the cliff period. Standard: 48 months for founders/employees, 24 months for advisors, 12-24 months for consultants.</span>
+                </span>
+              </label>
               <input type="number" class="form-input" id="totalMonths" value="48" min="1" max="120" required>
               <div class="help-text">Total duration including cliff period</div>
             </div>
 
             <div class="form-group">
-              <label class="form-label">Vesting Type <span class="required">*</span></label>
+              <label class="form-label">
+                Vesting Type <span class="required">*</span>
+                <span class="tooltip">
+                  <span class="help-icon">?</span>
+                  <span class="tooltiptext">How tokens are released after cliff. Linear = daily (most fair), Monthly = same day each month (standard), Quarterly = every 3 months (less admin), Yearly = annual (rare).</span>
+                </span>
+              </label>
               <div class="radio-group">
                 <label class="radio-option selected">
                   <input type="radio" name="vestingType" value="linear" checked>
@@ -778,8 +923,30 @@
               <span>Advanced Provisions</span>
             </div>
 
+            <div class="expandable-help">
+              <div class="expandable-help-header" onclick="toggleHelp(this)">
+                <span>💡 Termination & Change of Control</span>
+                <span class="expand-icon">▼</span>
+              </div>
+              <div class="expandable-help-content">
+                <p><strong>Standard Termination:</strong> Unvested forfeited, vested kept. Most common and balanced.</p>
+                <p><strong>For-Cause Forfeiture:</strong> ALL tokens forfeited (even vested) if fired for fraud/theft/gross misconduct. Harsh but protective.</p>
+                <p><strong>Partial Acceleration:</strong> 50% of unvested vest on termination without cause. "Good leaver" provision for founders.</p>
+                <hr style="margin: 10px 0; border: 0; border-top: 1px solid #e0e7ff;">
+                <p><strong>Double-Trigger:</strong> Vest only if acquired AND terminated within 12 months. Most balanced for acquisitions.</p>
+                <p><strong>Full Acceleration:</strong> All vest on acquisition. Generous to team, may reduce acquisition value.</p>
+                <p><strong>No Acceleration:</strong> Vesting continues unchanged. Favors acquirer.</p>
+              </div>
+            </div>
+
             <div class="form-group">
-              <label class="form-label">Termination Provisions</label>
+              <label class="form-label">
+                Termination Provisions
+                <span class="tooltip">
+                  <span class="help-icon">?</span>
+                  <span class="tooltiptext">What happens to tokens if service relationship ends. Standard = keep vested, lose unvested. For-Cause = lose everything if terminated for misconduct. Partial = 50% of unvested vest if terminated without cause.</span>
+                </span>
+              </label>
               <div class="radio-group">
                 <label class="radio-option selected">
                   <input type="radio" name="termination" value="standard" checked>
@@ -862,6 +1029,21 @@
             <div class="section-title">
               <span class="section-icon">⚖️</span>
               <span>Legal Provisions</span>
+            </div>
+
+            <div class="expandable-help">
+              <div class="expandable-help-header" onclick="toggleHelp(this)">
+                <span>💡 Legal & Compliance Provisions</span>
+                <span class="expand-icon">▼</span>
+              </div>
+              <div class="expandable-help-content">
+                <p><strong>KYC/AML/Sanctions:</strong> Required for regulatory compliance. Recipients must prove identity and confirm they're not on sanctions lists. HIGHLY RECOMMENDED.</p>
+                <p><strong>TGE Conditions:</strong> Makes token delivery conditional on tokens actually being created and complying with securities laws. CRITICAL for pre-launch agreements.</p>
+                <p><strong>On-Chain Mechanics:</strong> Addresses gas fees, forks, airdrops, wallet security. Prevents disputes about technical implementation. RECOMMENDED.</p>
+                <p><strong>No Employment Rights:</strong> Clarifies agreement doesn't guarantee continued employment. Standard risk management clause.</p>
+                <p><strong>Securities Law Reps:</strong> Required if tokens may be securities. Different language for U.S. vs Non-U.S. persons.</p>
+                <p><strong>Tax Provisions:</strong> Includes 83(b) election notice and withholding rights. REQUIRED for U.S. employees/founders.</p>
+              </div>
             </div>
 
             <div class="form-group">
@@ -1627,14 +1809,191 @@
       document.getElementById('vestingTimeline').innerHTML = html;
     }
 
-    // Generate button handler
-    document.getElementById('generateBtn').addEventListener('click', function() {
-      updatePreview();
-      document.getElementById('paymentModal').style.display = 'flex';
+    // Check form completion and enable PayPal button
+    function checkFormCompletion() {
+      const requiredFields = [
+        'companyName', 'companyAddress', 'signatoryName', 'signatoryTitle',
+        'recipientName', 'recipientAddress', 'recipientRole', 'relationship',
+        'tokenName', 'tokenSymbol', 'tokenAmount', 'startDate',
+        'cliffMonths', 'totalMonths', 'governingLaw'
+      ];
+
+      const allFilled = requiredFields.every(fieldId => {
+        const field = document.getElementById(fieldId);
+        return field && field.value && field.value.trim() !== '';
+      });
+
+      if (allFilled) {
+        renderPayPalButton();
+      } else {
+        document.getElementById('paypalButtonContainer').innerHTML =
+          '<div class="payment-disabled">Complete all required fields above to proceed to payment</div>';
+      }
+    }
+
+    // Render PayPal button
+    function renderPayPalButton() {
+      const container = document.getElementById('paypalButtonContainer');
+      container.innerHTML = '';
+
+      paypal.Buttons({
+        createOrder: function(data, actions) {
+          return actions.order.create({
+            purchase_units: [{
+              description: 'Token Vesting Agreement - Professional Template',
+              amount: {
+                value: '19.95'
+              }
+            }]
+          });
+        },
+        onApprove: function(data, actions) {
+          return actions.order.capture().then(function(details) {
+            // Collect form data
+            const formData = {
+              companyName: document.getElementById('companyName').value,
+              companyAddress: document.getElementById('companyAddress').value,
+              signatoryName: document.getElementById('signatoryName').value,
+              signatoryTitle: document.getElementById('signatoryTitle').value,
+              recipientName: document.getElementById('recipientName').value,
+              recipientAddress: document.getElementById('recipientAddress').value,
+              recipientRole: document.getElementById('recipientRole').value,
+              relationship: document.getElementById('relationship').value,
+              walletAddress: document.getElementById('walletAddress').value || 'Not provided',
+              recipientStatus: document.getElementById('recipientStatus').value,
+              tokenName: document.getElementById('tokenName').value,
+              tokenSymbol: document.getElementById('tokenSymbol').value,
+              tokenAmount: document.getElementById('tokenAmount').value,
+              tokenStandard: document.getElementById('tokenStandard').value,
+              contractAddress: document.getElementById('contractAddress').value || 'Not yet deployed',
+              tokenPrice: document.getElementById('tokenPrice').value || 'Not specified',
+              startDate: document.getElementById('startDate').value,
+              cliffMonths: document.getElementById('cliffMonths').value,
+              totalMonths: document.getElementById('totalMonths').value,
+              governingLaw: document.getElementById('governingLaw').value,
+              amount: 19.95,
+              paypalOrderId: details.id,
+              paypalPayerName: details.payer.name.given_name + ' ' + details.payer.name.surname,
+              paypalPayerEmail: details.payer.email_address
+            };
+
+            // Create email body
+            const emailBody = `
+NEW TOKEN VESTING AGREEMENT ORDER
+========================================
+
+PAYMENT DETAILS:
+- PayPal Order ID: ${formData.paypalOrderId}
+- Amount Paid: $${formData.amount}
+- PayPal Payer: ${formData.paypalPayerName} (${formData.paypalPayerEmail})
+
+COMPANY INFORMATION:
+- Company Name: ${formData.companyName}
+- Company Address: ${formData.companyAddress}
+- Signatory Name: ${formData.signatoryName}
+- Signatory Title: ${formData.signatoryTitle}
+
+RECIPIENT INFORMATION:
+- Recipient Name: ${formData.recipientName}
+- Recipient Address: ${formData.recipientAddress}
+- Role/Position: ${formData.recipientRole}
+- Relationship: ${formData.relationship}
+- Wallet Address: ${formData.walletAddress}
+- Status: ${formData.recipientStatus}
+
+TOKEN DETAILS:
+- Token Name: ${formData.tokenName}
+- Token Symbol: ${formData.tokenSymbol}
+- Token Amount: ${formData.tokenAmount}
+- Token Standard: ${formData.tokenStandard}
+- Smart Contract: ${formData.contractAddress}
+- Token Price: ${formData.tokenPrice}
+
+VESTING SCHEDULE:
+- Start Date: ${formData.startDate}
+- Cliff Period: ${formData.cliffMonths} months
+- Total Vesting Period: ${formData.totalMonths} months
+- Governing Law: ${formData.governingLaw}
+
+========================================
+This order was submitted automatically after successful PayPal payment.
+            `.trim();
+
+            // Send email using Web3Forms service
+            fetch('https://api.web3forms.com/submit', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+              },
+              body: JSON.stringify({
+                access_key: 'YOUR_WEB3FORMS_ACCESS_KEY_HERE',
+                subject: `New Token Vesting Agreement Order - ${formData.tokenSymbol}`,
+                from_name: formData.companyName,
+                email: formData.paypalPayerEmail,
+                message: emailBody,
+                to_email: 'owner@terms.law',
+                company_name: formData.companyName,
+                token_symbol: formData.tokenSymbol,
+                amount_paid: formData.amount,
+                paypal_order_id: formData.paypalOrderId
+              })
+            })
+            .then(response => response.json())
+            .then(data => {
+              console.log('Form submitted successfully:', data);
+            })
+            .catch(error => {
+              console.error('Error submitting form:', error);
+            });
+
+            // Show success message
+            document.getElementById('paymentSuccess').innerHTML = `
+              <div class="payment-success">
+                <div class="payment-success-icon">✓</div>
+                <strong>Payment Successful!</strong><br>
+                Order ID: ${details.id}<br><br>
+                Your token vesting agreement is ready. Check your email at ${details.payer.email_address} for details.<br>
+                You can now download your agreement using the "Download DOCX" button below.
+              </div>
+            `;
+            document.getElementById('paymentSuccess').style.display = 'block';
+
+            // Enable download button (you can implement DOCX generation here)
+            alert('Payment successful! Your order ID: ' + details.id + '\\n\\nYour agreement is ready. We will email you the download link shortly at: ' + details.payer.email_address);
+          });
+        },
+        onError: function(err) {
+          console.error('PayPal error:', err);
+          alert('Payment error. Please try again or contact owner@terms.law');
+        }
+      }).render('#paypalButtonContainer');
+    }
+
+    // Add event listeners to all form inputs to check completion
+    const allFormInputs = document.querySelectorAll('.form-input, .form-select, input[type="radio"], input[type="checkbox"]');
+    allFormInputs.forEach(input => {
+      input.addEventListener('change', checkFormCompletion);
+      input.addEventListener('input', checkFormCompletion);
     });
 
-    // Initialize preview
+    // Toggle expandable help sections
+    function toggleHelp(header) {
+      const helpSection = header.parentElement;
+      const content = header.nextElementSibling;
+
+      helpSection.classList.toggle('active');
+
+      if (content.classList.contains('active')) {
+        content.classList.remove('active');
+      } else {
+        content.classList.add('active');
+      }
+    }
+
+    // Initialize preview and check form
     updatePreview();
+    checkFormCompletion();
   </script>
 
 </body>
