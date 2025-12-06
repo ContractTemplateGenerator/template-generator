@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scope Creep & Endless Revisions Demand Letters | Drawing Boundaries</title>
+
+    <style>
+        .demand-letter-hub * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .demand-letter-hub {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+        }
+
+        .demand-letter-hub .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .demand-letter-hub .header {
+            background: linear-gradient(135deg, #db2777 0%, #be185d 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .demand-letter-hub .header p {
+            font-size: 18px;
+            opacity: 0.95;
+            max-width: 900px;
+            margin: 15px auto 0;
+        }
+
+        .demand-letter-hub .tab-nav-wrapper {
+            background: #f7fafc;
+            border-bottom: 3px solid #db2777;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 10px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .demand-letter-hub .tab-nav-track {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .demand-letter-hub .tab-nav {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            scrollbar-width: none;
+        }
+
+        .demand-letter-hub .tab-nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .demand-letter-hub .tab-button {
+            flex: 0 0 auto;
+            padding: 16px 20px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748b;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+        }
+
+        .demand-letter-hub .tab-button:hover {
+            background: #fce7f3;
+            color: #db2777;
+        }
+
+        .demand-letter-hub .tab-button.active {
+            color: #db2777;
+            border-bottom-color: #db2777;
+            background: white;
+        }
+
+        .demand-letter-hub .tab-nav-arrow {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1px solid #cbd5e1;
+            background: #fff;
+            color: #db2777;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            flex-shrink: 0;
+        }
+
+        .demand-letter-hub .tab-nav-arrow:hover {
+            background: #db2777;
+            color: white;
+        }
+
+        .demand-letter-hub .tab-nav-arrow[hidden] {
+            visibility: hidden;
+            opacity: 0;
+        }
+
+        .demand-letter-hub .tab-content {
+            display: none;
+            padding: 40px;
+            animation: fadeIn 0.5s;
+        }
+
+        .demand-letter-hub .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .demand-letter-hub .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #db2777;
+            margin: 30px 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .demand-letter-hub .subsection-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #be185d;
+            margin: 25px 0 15px;
+        }
+
+        .demand-letter-hub .card {
+            background: linear-gradient(135deg, #fce7f3 0%, #fdf2f8 100%);
+            border-left: 5px solid #db2777;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .demand-letter-hub .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #db2777;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .demand-letter-hub .card p,
+        .demand-letter-hub .tab-content > p {
+            margin: 15px 0;
+            line-height: 1.8;
+        }
+
+        .demand-letter-hub .checklist {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+            border: 2px solid #db2777;
+        }
+
+        .demand-letter-hub .checklist-item {
+            display: flex;
+            gap: 15px;
+            padding: 15px;
+            margin: 10px 0;
+            background: #fce7f3;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .demand-letter-hub .checklist-item:hover {
+            background: #fbcfe8;
+            transform: translateX(5px);
+        }
+
+        .demand-letter-hub .checklist-icon {
+            font-size: 24px;
+            color: #db2777;
+            flex-shrink: 0;
+        }
+
+        .demand-letter-hub .checklist-content strong {
+            color: #db2777;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .demand-letter-hub .snippet-card {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .demand-letter-hub .snippet-card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #db2777;
+            margin-bottom: 15px;
+        }
+
+        .demand-letter-hub .snippet-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #db2777;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.8;
+            white-space: pre-wrap;
+        }
+
+        .demand-letter-hub .warning-box {
+            background: #fef3c7;
+            border-left: 5px solid #f59e0b;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .demand-letter-hub .warning-box-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #f59e0b;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .demand-letter-hub .info-box {
+            background: #dbeafe;
+            border-left: 5px solid #3b82f6;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .demand-letter-hub .info-box-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #3b82f6;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .demand-letter-hub .cta-card {
+            background: linear-gradient(135deg, #db2777 0%, #be185d 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 35px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .demand-letter-hub .cta-card-title {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .demand-letter-hub .cta-card p {
+            font-size: 16px;
+            margin: 15px auto;
+            max-width: 700px;
+            opacity: 0.95;
+        }
+
+        .demand-letter-hub .cta-button {
+            display: inline-block;
+            background: white;
+            color: #db2777;
+            padding: 15px 35px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 16px;
+            margin: 15px 10px;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .demand-letter-hub .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .demand-letter-hub ul, .demand-letter-hub ol {
+            margin: 15px 0 15px 30px;
+            line-height: 1.8;
+        }
+
+        .demand-letter-hub li {
+            margin: 8px 0;
+        }
+
+        .demand-letter-hub strong {
+            color: #db2777;
+        }
+
+        .demand-letter-hub .faq-section {
+            margin: 30px 0;
+        }
+
+        .demand-letter-hub .faq-item {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .demand-letter-hub .faq-question {
+            width: 100%;
+            background: #f8fafc;
+            border: none;
+            padding: 20px;
+            text-align: left;
+            font-size: 16px;
+            font-weight: 600;
+            color: #db2777;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .demand-letter-hub .faq-question:hover {
+            background: #fce7f3;
+        }
+
+        .demand-letter-hub .faq-question::after {
+            content: '+';
+            font-size: 24px;
+            font-weight: 700;
+            color: #db2777;
+        }
+
+        .demand-letter-hub .faq-item.open .faq-question::after {
+            content: '−';
+        }
+
+        .demand-letter-hub .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .demand-letter-hub .faq-item.open .faq-answer {
+            max-height: 1000px;
+        }
+
+        .demand-letter-hub .faq-answer-content {
+            padding: 20px;
+            line-height: 1.8;
+        }
+
+        @media (max-width: 768px) {
+            .demand-letter-hub .header {
+                padding: 25px 20px;
+            }
+
+            .demand-letter-hub .tab-content {
+                padding: 25px 20px;
+            }
+
+            .demand-letter-hub .section-title {
+                font-size: 20px;
+            }
+
+            .demand-letter-hub .tab-button {
+                padding: 14px 16px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="demand-letter-hub">
+    <div class="container">
+        <div class="header">
+            <p>Strategies for demanding payment when scope creep, endless revisions, and out-of-scope requests exceed your contracted obligations</p>
+        </div>
+
+        <div class="tab-nav-wrapper" id="tabsWrapper">
+            <button class="tab-nav-arrow left" onclick="scrollTabs(event, -1)" aria-label="Scroll left">‹</button>
+            <div class="tab-nav-track">
+                <div class="tab-nav" id="tabNav">
+                    <button class="tab-button active" onclick="switchTab('sender', event)">🛡️ Provider Drawing Boundaries</button>
+                    <button class="tab-button" onclick="switchTab('recipient', event)">📨 Client Perspective</button>
+                    <button class="tab-button" onclick="switchTab('evidence', event)">📋 Evidence: SOW vs. Additions</button>
+                    <button class="tab-button" onclick="switchTab('settlement', event)">💰 Settlement: New SOW vs. Compromise</button>
+                    <button class="tab-button" onclick="switchTab('snippets', event)">✍️ Letter Snippets</button>
+                    <button class="tab-button" onclick="switchTab('services', event)">⚖️ Attorney Services</button>
+                </div>
+            </div>
+            <button class="tab-nav-arrow right" onclick="scrollTabs(event, 1)" aria-label="Scroll right">›</button>
+        </div>
+
+        <!-- Tab 1: Provider Drawing Boundaries -->
+        <div id="tab-sender" class="tab-content active">
+            <div class="section-title">🛡️ When Your Client Demands More Than the Contract Allows</div>
+
+            <p>Scope creep is one of the most common flashpoints in service relationships. The client asks for "just one quick tweak," then another, then another. Before long, you've delivered 150% of the contracted scope with no additional compensation. When you finally draw the line, the client may refuse to pay even for the original work, claiming you didn't finish the project.</p>
+
+            <p>This guide helps you demand payment for completed scope while establishing boundaries for out-of-scope requests.</p>
+
+            <div class="card">
+                <div class="card-title">⚖️ Legal Foundation</div>
+                <p><strong>Breach of Contract:</strong> When you complete the deliverables defined in the SOW, you have fulfilled your contractual obligations. The client's refusal to pay because you won't perform additional out-of-scope work is breach.</p>
+                <p><strong>Modification Requires Consideration:</strong> Under contract law, material changes to scope require mutual agreement and consideration. The client cannot unilaterally expand the scope and refuse payment because you decline unpaid additions.</p>
+                <p><strong>Unjust Enrichment:</strong> If you performed out-of-scope work that the client accepted and used, you may have claims for unjust enrichment or quantum meruit even without a written change order.</p>
+            </div>
+
+            <div class="subsection-title">Common Scope Creep Patterns</div>
+
+            <div class="checklist">
+                <div class="checklist-item">
+                    <div class="checklist-icon">🔁</div>
+                    <div class="checklist-content">
+                        <strong>Endless Revisions ("Can you just tweak this?")</strong>
+                        SOW specifies two revision rounds, but client is now requesting a seventh round of changes. Each round takes 5-10 hours.
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-icon">📦</div>
+                    <div class="checklist-content">
+                        <strong>Feature Additions ("While you're at it...")</strong>
+                        SOW defined 5 specific features. Client now expects 3 additional features "since we're already building this."
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-icon">🎯</div>
+                    <div class="checklist-content">
+                        <strong>Moving Goalposts ("That's not quite what I meant")</strong>
+                        You delivered exactly what was specified, but client now claims they "meant something different" and demands major revisions at no cost.
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-icon">⏱️</div>
+                    <div class="checklist-content">
+                        <strong>Retainer Overruns ("Just bill against the retainer")</strong>
+                        Client with 10-hour monthly retainer has consumed 40 hours this month, but resists approving an increase or paying for overages.
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-icon">🔧</div>
+                    <div class="checklist-content">
+                        <strong>Support Beyond Warranty ("Can you fix this real quick?")</strong>
+                        Post-launch support period expired, but client expects unlimited free troubleshooting and updates.
+                    </div>
+                </div>
+            </div>
+
+            <div class="subsection-title">Drawing the Boundary Line</div>
+
+            <p>When scope creep reaches the breaking point, your demand letter must accomplish three things:</p>
+
+            <ol>
+                <li><strong>Establish that original scope is complete:</strong> Prove you fulfilled the SOW deliverables as written.</li>
+                <li><strong>Document the scope expansion:</strong> List every out-of-scope request, when it was made, and how it exceeds the contract.</li>
+                <li><strong>Demand payment for completed work:</strong> Insist on payment for the original scope, regardless of whether the client wants additional work.</li>
+            </ol>
+
+            <div class="card">
+                <div class="card-title">📝 Key Components of Your Demand Letter</div>
+                <ol>
+                    <li><strong>Quote the SOW deliverables precisely:</strong> List every deliverable, acceptance criterion, and revision limit specified in the contract.</li>
+                    <li><strong>Prove completion:</strong> Attach delivery receipts, acceptance emails, or deployment confirmations showing you met each deliverable.</li>
+                    <li><strong>Document scope creep requests:</strong> Create a table showing each out-of-scope request, the date requested, your response (if any), and how it exceeds the SOW.</li>
+                    <li><strong>Distinguish defect-fixes from scope expansion:</strong> Clarify that you've always been willing to fix genuine bugs or defects, but you're not required to add features or make stylistic changes beyond the revision limits.</li>
+                    <li><strong>Demand payment for completed scope:</strong> State clearly that the client owes payment for the original SOW, and that additional work requires a change order with additional compensation.</li>
+                    <li><strong>Offer a path forward:</strong> If you're willing to continue the relationship, propose a new SOW or change order for the additional work at your standard rates.</li>
+                </ol>
+            </div>
+
+            <div class="warning-box">
+                <div class="warning-box-title">⚠️ Don't Continue Working Without Payment</div>
+                <p>The worst mistake is continuing to perform additional work while the client withholds payment for the original scope. This signals that you accept non-payment as the status quo.</p>
+                <p>Once you've drawn the boundary, stop all work until either the original invoice is paid or a new agreement is reached.</p>
+            </div>
+
+            <div class="subsection-title">Revision Limits and Quality Disputes</div>
+
+            <p>Clients often conflate revision limits with quality standards. They argue: "I'm entitled to revisions until I'm satisfied." But that's not how contracts work.</p>
+
+            <p><strong>Revisions vs. Defects:</strong></p>
+            <ul>
+                <li><strong>Defect:</strong> Work that doesn't meet the specifications in the SOW. Example: "The SOW required mobile responsiveness, but the site breaks on mobile."</li>
+                <li><strong>Revision:</strong> Work that meets specifications, but the client wants stylistic or subjective changes. Example: "Can you make the blue darker?"</li>
+            </ul>
+
+            <p>You're always obligated to fix genuine defects. But stylistic revisions are governed by the revision limits in your contract.</p>
+
+            <div class="info-box">
+                <div class="info-box-title">💡 Best Practice: Revision Round Documentation</div>
+                <p>Document each revision round clearly. When delivering revision 2 of 3, include language like: "This completes revision round 2 of 3 as specified in Section 4.2 of the SOW. One final revision round remains. Additional revisions beyond this limit will require a change order at $X per hour."</p>
+                <p>This creates a contemporaneous record that both parties understood the limits.</p>
+            </div>
+
+            <div class="subsection-title">Change Orders and Email Approvals</div>
+
+            <p>Your SOW should require written change orders for scope modifications. But even if it doesn't, email approvals can constitute binding change orders under contract law.</p>
+
+            <p><strong>Elements of a Valid Email Change Order:</strong></p>
+            <ul>
+                <li>Clear description of the additional work</li>
+                <li>Agreement on price or hourly rate</li>
+                <li>Affirmative acceptance by the client (reply saying "approved," "go ahead," or similar)</li>
+            </ul>
+
+            <p>If you quoted additional work via email and the client responded "sounds good, proceed," that's likely an enforceable change order.</p>
+
+            <div class="info-box">
+                <div class="info-box-title">💡 Protecting Your Payment Rights</div>
+                <p>Language for your next SOW: "Revisions are limited to [2] rounds of reasonable changes to deliverables that meet specifications. Changes that materially alter scope, add features, or exceed revision limits require a written change order and additional compensation. Provider may suspend work if Client requests exceed scope or revision limits without approved change order."</p>
+            </div>
+        </div>
+
+        <!-- Tab 2: Client Perspective -->
+        <div id="tab-recipient" class="tab-content">
+            <div class="section-title">📨 You Received a Scope Creep Demand Letter</div>
+
+            <p>You hired a vendor to complete a project. The work they delivered doesn't meet your expectations, so you've asked for corrections. Now the vendor is demanding payment and refusing to make further changes, claiming you're requesting work beyond the scope.</p>
+
+            <p>Here's how to evaluate whether the vendor's demand is justified or whether you have legitimate defenses.</p>
+
+            <div class="card">
+                <div class="card-title">🔍 First 48 Hours: Document Review</div>
+                <ol>
+                    <li><strong>Pull your SOW or contract:</strong> What exactly did the vendor agree to deliver? What quality standards, acceptance criteria, and revision limits were specified?</li>
+                    <li><strong>Review what was delivered:</strong> Does the delivered work meet the specifications in the contract, or are there genuine defects?</li>
+                    <li><strong>Examine your change requests:</strong> Go through every email where you requested changes. Are these changes fixing defects, or are they adding features or altering the design beyond what was specified?</li>
+                    <li><strong>Check revision limits:</strong> If your contract specifies a revision limit, how many rounds have been completed?</li>
+                    <li><strong>Look for change order discussions:</strong> Did the vendor ever quote you prices for additional work? Did you approve or reject those quotes?</li>
+                </ol>
+            </div>
+
+            <div class="subsection-title">Evaluating Your Defenses</div>
+
+            <div class="checklist">
+                <div class="checklist-item">
+                    <div class="checklist-icon">⚖️</div>
+                    <div class="checklist-content">
+                        <strong>Genuine Quality Defects</strong>
+                        If the work doesn't meet the specifications in the SOW, you have a legitimate defense. Document specific ways the deliverables fail to meet contractual requirements.
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-icon">📋</div>
+                    <div class="checklist-content">
+                        <strong>Incomplete Deliverables</strong>
+                        If the vendor delivered only 4 of 5 contracted features, they haven't fulfilled the contract. Payment isn't due until they complete the scope.
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-icon">⏰</div>
+                    <div class="checklist-content">
+                        <strong>Missed Deadlines (If Time Was of the Essence)</strong>
+                        If your contract made time of the essence and the vendor missed deadlines, you may have offset rights for damages you suffered from the delay.
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-icon">🚫</div>
+                    <div class="checklist-content">
+                        <strong>Vendor Refusing to Fix Bugs</strong>
+                        If there are genuine bugs (not stylistic preferences), and the vendor refuses to fix them, they're in breach. You may have the right to hire someone else to fix the issues and offset those costs.
+                    </div>
+                </div>
+            </div>
+
+            <div class="subsection-title">When You're Likely in the Wrong</div>
+
+            <p>Be honest with yourself. If these facts apply, the vendor likely has a strong case:</p>
+
+            <ul>
+                <li>The deliverables substantially match what was specified in the SOW</li>
+                <li>You approved or used the deliverables without objection</li>
+                <li>Your requested changes are stylistic ("make it pop more") rather than defect-based</li>
+                <li>You've exceeded the revision limits specified in the contract</li>
+                <li>You're asking for features that were never in the original scope</li>
+            </ul>
+
+            <p>In these situations, fighting the demand will cost you more in legal fees than paying the invoice and negotiating new terms for additional work.</p>
+
+            <div class="warning-box">
+                <div class="warning-box-title">⚠️ The "It's Not What I Pictured" Defense</div>
+                <p>This is rarely a valid defense. If the vendor delivered what the SOW specified, your subjective dissatisfaction isn't grounds to withhold payment. Contracts are based on objective specifications, not unstated expectations.</p>
+                <p>Exception: If the SOW was vague and the vendor knew or should have known your expectations, you may have arguments about ambiguity and course of dealing. But this is an uphill battle.</p>
+            </div>
+
+            <div class="subsection-title">Strategic Response Options</div>
+
+            <div class="checklist">
+                <div class="checklist-item">
+                    <div class="checklist-icon">✅</div>
+                    <div class="checklist-content">
+                        <strong>Pay and Move On</strong>
+                        If the vendor completed the scope and your requests were truly out-of-scope, pay the invoice. You can negotiate a new SOW for additional work with a different vendor if the relationship is damaged.
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-icon">🤝</div>
+                    <div class="checklist-content">
+                        <strong>Negotiate a Compromise</strong>
+                        Propose: "I'll pay the full invoice if you complete [X specific fixes]. These are genuine defects, not scope expansion." Get this in writing.
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-icon">📄</div>
+                    <div class="checklist-content">
+                        <strong>Accept Partial Delivery</strong>
+                        If only some deliverables have issues, offer to pay for the completed portions and either negotiate completion of the rest or mutually terminate the contract.
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-icon">⚖️</div>
+                    <div class="checklist-content">
+                        <strong>Document Defects and Defend</strong>
+                        If you genuinely believe the work is defective, document every defect in detail, explain how it fails to meet the SOW, and consult with counsel before refusing payment.
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-box-title">💡 Future-Proofing Your Next Contract</div>
+                <p>To avoid this situation in future engagements:</p>
+                <ul>
+                    <li>Include detailed acceptance criteria for each deliverable</li>
+                    <li>Specify whether revisions are unlimited or capped</li>
+                    <li>Define "defect" vs. "change request" clearly</li>
+                    <li>Include a formal acceptance process with sign-off requirements</li>
+                    <li>Reserve a percentage of payment until final acceptance</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Tab 3: Evidence: SOW vs. Additions -->
+        <div id="tab-evidence" class="tab-content">
+            <div class="section-title">📋 Evidence: Original SOW vs. Scope Additions</div>
+
+            <p>Winning a scope creep dispute requires meticulous documentation showing the line between contracted scope and client-requested additions. Here's what both parties need to gather.</p>
+
+            <div class="subsection-title">For Service Providers (Proving Scope Completion + Overages)</div>
+
+            <div class="checklist">
+                <div class="checklist-item">
+                    <div class="checklist-icon">📄</div>
+                    <div class="checklist-content">
+                        <strong>Original SOW with Deliverables List</strong>
+                        The foundation of your case. Highlight the specific deliverables, features, revisions allowed, and any exclusions or limitations.
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-icon">✅</div>
+                    <div class="checklist-content">
+                        <strong>Delivery and Acceptance Evidence</strong>
+                        Emails showing you delivered each contracted deliverable, client acknowledgments, deployed code, approval statements, or usage evidence.
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-icon">📊</div>
+                    <div class="checklist-content">
+                        <strong>Scope Creep Log</strong>
+                        Create a spreadsheet listing every out-of-scope request: Date, Request Description, How It Exceeds SOW, Time Spent, Your Response. This is your smoking gun.
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-icon">💬</div>
+                    <div class="checklist-content">
+                        <strong>Client Emails Requesting Additions</strong>
+                        Every "can you also," "while you're at it," and "just one quick thing" email. These prove the client knew they were requesting additional work.
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-icon">🔄</div>
+                    <div class="checklist-content">
+                        <strong>Revision Round Documentation</strong>
+                        If you have revision limits, document each round: "This is revision round 2 of 3" statements in delivery emails create a contemporaneous record.
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-icon">💰</div>
+                    <div class="checklist-content">
+                        <strong>Change Order Quotes and Responses</strong>
+                        Any emails where you quoted additional work and the client's responses (approved, rejected, or ignored). Approval can create binding change orders.
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-icon">⏱️</div>
+                    <div class="checklist-content">
+                        <strong>Time Tracking Records</strong>
+                        Time logs showing hours spent on original scope vs. out-of-scope requests. This quantifies the scope creep and supports unjust enrichment claims.
+                    </div>
+                </div>
+            </div>
+
+            <div class="subsection-title">For Clients (Proving Non-Performance or Defects)</div>
+
+            <div class="checklist">
+                <div class="checklist-item">
+                    <div class="checklist-icon">📋</div>
+                    <div class="checklist-content">
+                        <strong>SOW with Quality Standards</strong>
+                        Highlight acceptance criteria, quality standards, and any requirements the vendor failed to meet. Vague SOWs hurt your case.
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-icon">🔍</div>
+                    <div class="checklist-content">
+                        <strong>Defect Documentation</strong>
+                        Screenshots, bug reports, QA test results, and detailed descriptions of how the deliverables fail to meet the SOW specifications.
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-icon">📧</div>
+                    <div class="checklist-content">
+                        <strong>Timely Objections</strong>
+                        Emails where you raised quality concerns promptly after delivery. Delayed objections undermine your credibility.
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-icon">🚫</div>
+                    <div class="checklist-content">
+                        <strong>Vendor Refusals to Fix</strong>
+                        Evidence that you requested defect fixes and the vendor refused or ignored you. This supports your argument that the vendor breached first.
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-icon">💸</div>
+                    <div class="checklist-content">
+                        <strong>Third-Party Costs</strong>
+                        Invoices from other vendors hired to fix defects or complete missing scope. These support offset and damages claims.
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-icon">📅</div>
+                    <div class="checklist-content">
+                        <strong>Milestone and Deadline Evidence</strong>
+                        If the vendor missed deadlines and time was of the essence, document the deadlines, the delays, and any damages you suffered.
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">📊 Sample Scope Creep Log</div>
+                <p>Service providers should create a detailed log like this:</p>
+                <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                    <tr style="background: #db2777; color: white;">
+                        <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Date</th>
+                        <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Request</th>
+                        <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">How It Exceeds SOW</th>
+                        <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Hours</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; border: 1px solid #ddd;">3/15/24</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">Add user role management</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">SOW included only single-role users</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">12</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; border: 1px solid #ddd;">3/22/24</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">Fifth revision round</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">SOW allowed 3 revision rounds</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">8</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; border: 1px solid #ddd;">4/3/24</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">Integrate with Stripe</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">SOW specified PayPal only</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">16</td>
+                    </tr>
+                </table>
+                <p style="margin-top: 15px;"><strong>Total out-of-scope hours: 36</strong></p>
+            </div>
+
+            <div class="info-box">
+                <div class="info-box-title">💡 Contemporaneous Documentation Wins Cases</div>
+                <p>The strongest evidence is created in real-time, not reconstructed after the dispute arises. When the client requests something beyond scope, respond in writing: "This request would add [feature] which is not included in the SOW. I can complete this as a change order for $X. Please confirm if you'd like to proceed."</p>
+                <p>This creates a contemporaneous record that both parties understood the request exceeded scope.</p>
+            </div>
+        </div>
+
+        <!-- Tab 4: Settlement: New SOW vs. Compromise -->
+        <div id="tab-settlement" class="tab-content">
+            <div class="section-title">💰 Settlement Options: New SOW, Compromise, or Parting Ways</div>
+
+            <p>Scope creep disputes often damage the working relationship, making settlement more about clean separation than continued collaboration. But in some cases, a restructured engagement can work. Here are realistic settlement frameworks.</p>
+
+            <div class="card">
+                <div class="card-title">📊 Typical Settlement Patterns</div>
+                <ul>
+                    <li><strong>Strong provider case, client accepts reality:</strong> 85-100% payment for original scope, plus negotiated rate for any out-of-scope work already performed.</li>
+                    <li><strong>Legitimate defects mixed with scope creep:</strong> Provider completes defect fixes, client pays 75-90% of invoice, both parties release claims.</li>
+                    <li><strong>Relationship salvageable:</strong> Client pays original invoice, parties sign new SOW for additional work with clearer boundaries and higher rates.</li>
+                    <li><strong>Relationship destroyed:</strong> Compromise payment (60-80%), mutual release, provider hands over all work product, parties separate.</li>
+                </ul>
+            </div>
+
+            <div class="subsection-title">Settlement Framework 1: Pay and Restructure</div>
+
+            <p>If both parties want to continue the relationship, this approach works well:</p>
+
+            <ol>
+                <li><strong>Client pays outstanding invoice for original scope</strong> (100% or negotiated amount)</li>
+                <li><strong>Provider delivers any promised defect fixes</strong> (genuine bugs only, not stylistic changes)</li>
+                <li><strong>Parties sign new SOW for Phase 2</strong> covering the additional features client wants</li>
+                <li><strong>New SOW includes clearer boundaries:</strong> Specific revision limits, change order process, hourly rates for overages, formal acceptance procedures</li>
+            </ol>
+
+            <div class="info-box">
+                <div class="info-box-title">💡 Golden Bridge Language for Continuing</div>
+                <p>"I'm willing to continue this engagement if we can establish clearer boundaries. Here's what I propose: (1) You pay the $X outstanding invoice for Phase 1 within 10 days. (2) I'll provide one final revision round to address the [3 specific items] you've identified as defects. (3) We'll sign a new SOW for Phase 2 covering [additional features] at $Y. The new SOW will include a formal change order process to avoid future scope confusion."</p>
+            </div>
+
+            <div class="subsection-title">Settlement Framework 2: Compromise Payment and Part Ways</div>
+
+            <p>When the relationship is damaged beyond repair, clean separation is often best:</p>
+
+            <ol>
+                <li><strong>Client pays reduced amount</strong> (typically 70-85% of invoice if both parties have some fault)</li>
+                <li><strong>Provider delivers all work product and source files</strong> immediately upon payment</li>
+                <li><strong>Both parties sign mutual release</strong> waiving all claims arising from the engagement</li>
+                <li><strong>Non-disparagement clause</strong> prevents either party from trashing the other publicly</li>
+                <li><strong>Confidential settlement terms</strong> to avoid precedent concerns</li>
+            </ol>
+
+            <div class="card">
+                <div class="card-title">🤝 Sample Mutual Release Language</div>
+                <p>"In exchange for Client's payment of $[AMOUNT] by [DATE] and Provider's delivery of all work product including source files, the parties hereby release each other from any and all claims, damages, or liabilities arising from or related to the [PROJECT NAME] engagement, the SOW dated [DATE], and all services performed thereunder. This release is mutual, covers known and unknown claims, and is intended as a full and final resolution."</p>
+            </div>
+
+            <div class="subsection-title">Settlement Framework 3: Arbitration or Mediation Path</div>
+
+            <p>If direct negotiation fails, consider structured dispute resolution:</p>
+
+            <ul>
+                <li><strong>Mediation:</strong> Non-binding facilitated negotiation. Mediator helps both parties find middle ground. Success rate in commercial disputes: 60-70%.</li>
+                <li><strong>Binding Arbitration:</strong> If your SOW includes arbitration clause, this may be mandatory. Faster and cheaper than litigation, but still substantial costs.</li>
+                <li><strong>Informal Neutral Evaluation:</strong> Hire an experienced consultant in your industry to review the SOW and deliverables and opine on whether scope was met. Use this opinion to guide settlement negotiations.</li>
+            </ul>
+
+            <div class="subsection-title">Factors That Increase Provider Recovery</div>
+
+            <div class="checklist">
+                <div class="checklist-item">
+                    <div class="checklist-icon">✅</div>
+                    <div class="checklist-content">
+                        <strong>Detailed SOW with Specific Deliverables</strong>
+                        Vague SOWs hurt providers. "Build a website" is much weaker than "Build a 5-page responsive website with features X, Y, Z, allowing 2 revision rounds."
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-icon">💬</div>
+                    <div class="checklist-content">
+                        <strong>Client Acceptance Statements</strong>
+                        Emails where client said "looks great," used the work product, or deployed it without objection create strong evidence of satisfaction.
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-icon">📧</div>
+                    <div class="checklist-content">
+                        <strong>Real-Time Scope Objections</strong>
+                        If you flagged scope creep as it happened ("this is outside scope, would require change order"), you're in much stronger position than if you raised it for the first time after non-payment.
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-icon">⚖️</div>
+                    <div class="checklist-content">
+                        <strong>Industry-Standard Practices</strong>
+                        If your SOW terms (e.g., 2-3 revision rounds) align with industry norms, that strengthens your position. Arbitrators and judges often look to industry standards to interpret ambiguous contracts.
+                    </div>
+                </div>
+            </div>
+
+            <div class="subsection-title">Factors That Reduce Provider Recovery</div>
+
+            <div class="checklist">
+                <div class="checklist-item">
+                    <div class="checklist-icon">❌</div>
+                    <div class="checklist-content">
+                        <strong>No Pushback on Scope Creep Until Non-Payment</strong>
+                        If you performed 20 out-of-scope requests without objection, then suddenly demanded payment only when the client stopped paying, it looks opportunistic.
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-icon">📄</div>
+                    <div class="checklist-content">
+                        <strong>Vague or Missing SOW</strong>
+                        If deliverables aren't clearly defined, the client's subjective dissatisfaction carries more weight.
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-icon">🔧</div>
+                    <div class="checklist-content">
+                        <strong>Unresolved Bugs or Defects</strong>
+                        If there are genuine quality issues and you've refused to fix them, the client has leverage even if they've also requested out-of-scope work.
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-icon">🚫</div>
+                    <div class="checklist-content">
+                        <strong>Hostile or Unprofessional Communications</strong>
+                        If your emails demanding payment are aggressive or unprofessional, this undermines your credibility in arbitration or court.
+                    </div>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <div class="warning-box-title">⚠️ The Cost of Fighting</div>
+                <p>Litigation or arbitration over scope disputes rarely makes economic sense for projects under $50,000. Attorney's fees can quickly exceed the disputed invoice amount.</p>
+                <p>Before rejecting a compromise settlement, calculate: What will I actually recover after attorney's fees, after months of dispute, after the time drain on my business?</p>
+                <p>A 75% settlement today is often better than a 100% judgment 18 months from now minus $30K in legal fees.</p>
+            </div>
+        </div>
+
+        <!-- Tab 5: Letter Snippets -->
+        <div id="tab-snippets" class="tab-content">
+            <div class="section-title">✍️ Scope Creep Demand Letter Snippets</div>
+
+            <p>These snippets help you draft demand letters that establish scope completion while documenting client-requested additions. Customize with your specific facts and contract terms.</p>
+
+            <div class="snippet-card">
+                <div class="snippet-card-title">Opening – Establishing Scope Completion</div>
+                <div class="snippet-content">This letter constitutes formal demand for payment of $[AMOUNT] for services completed under our Statement of Work dated [DATE] (the "SOW").
+
+I have fulfilled all deliverables specified in the SOW, as detailed below. Your refusal to pay based on requests for additional out-of-scope work does not excuse payment for the completed contractual scope.</div>
+            </div>
+
+            <div class="snippet-card">
+                <div class="snippet-card-title">Contracted Scope vs. Delivered Work</div>
+                <div class="snippet-content">Section [X] of the SOW required the following deliverables:
+
+1. [Deliverable 1] – Delivered [DATE], accepted via your email of [DATE]
+2. [Deliverable 2] – Delivered [DATE], deployed to production [DATE]
+3. [Deliverable 3] – Delivered [DATE], with two revision rounds completed per SOW Section [X]
+
+Each deliverable met the specifications and acceptance criteria defined in the SOW. You accepted, used, and deployed these deliverables without objection at the time of delivery.</div>
+            </div>
+
+            <div class="snippet-card">
+                <div class="snippet-card-title">Documenting Scope Creep Requests</div>
+                <div class="snippet-content">After completing the contracted scope, you requested the following additional work, none of which was included in the SOW:
+
+• [DATE] – Request for [additional feature/revision beyond limit]
+• [DATE] – Request for [additional feature/revision beyond limit]
+• [DATE] – Request for [additional feature/revision beyond limit]
+
+I performed some of this additional work in good faith while we discussed a change order. However, your continued requests without approving additional compensation, and your refusal to pay even for the original scope, have made it impossible to continue.</div>
+            </div>
+
+            <div class="snippet-card">
+                <div class="snippet-card-title">Revision Limits Exceeded</div>
+                <div class="snippet-content">Section [X] of the SOW explicitly limited revisions to [2] rounds per deliverable. I completed both contracted revision rounds for each deliverable and documented this in my delivery emails dated [DATES].
+
+Your subsequent requests for a [third/fourth/fifth] round of revisions exceed the contractual limits and constitute requests for additional services requiring a change order and additional compensation.</div>
+            </div>
+
+            <div class="snippet-card">
+                <div class="snippet-card-title">Distinguishing Defects from Scope Changes</div>
+                <div class="snippet-content">I remain willing to correct any genuine defects—work that fails to meet the specifications in the SOW. However, your requests are not defect corrections; they are requests to:
+
+• Add features not included in the SOW ([list specific examples])
+• Make stylistic changes beyond the revision limits ([list examples])
+• Expand functionality beyond the agreed scope ([list examples])
+
+These are change requests, not defect fixes, and they require a change order under Section [X] of our agreement.</div>
+            </div>
+
+            <div class="snippet-card">
+                <div class="snippet-card-title">Change Order Process and Quotes</div>
+                <div class="snippet-content">On [DATE], I provided you with a change order quote for the additional work you requested, proposing $[AMOUNT] for [X hours] at my standard rate of $[RATE]/hour. You did not accept or respond to this quote.
+
+Section [X] of the SOW requires that scope changes be documented in written change orders signed by both parties. Without an executed change order, I am not obligated to perform work beyond the original scope.</div>
+            </div>
+
+            <div class="snippet-card">
+                <div class="snippet-card-title">Demand for Payment + Boundary for Future Work</div>
+                <div class="snippet-content">I demand payment of $[AMOUNT] for the completed SOW deliverables no later than [DATE].
+
+If you wish to engage me for the additional work you've requested, I am willing to discuss a new Statement of Work at my current rates, but only after the outstanding invoice is paid. I will not perform further work while payment for completed work remains outstanding.
+
+Alternatively, if you prefer to part ways, I will deliver all source files and work product immediately upon receipt of payment.</div>
+            </div>
+
+            <div class="snippet-card">
+                <div class="snippet-card-title">Golden Bridge – Offering Path Forward</div>
+                <div class="snippet-content">I prefer to resolve this matter professionally. I propose the following:
+
+Option 1: You pay the outstanding $[AMOUNT] invoice by [DATE]. I will then provide one final revision round addressing the [3 specific items] you identified as defects (not stylistic changes). We can then discuss a Phase 2 SOW for additional features.
+
+Option 2: You pay the outstanding invoice, and we part ways amicably. I will deliver all files, and both parties will execute a mutual release.
+
+Please respond by [DATE] to indicate which option you prefer, or propose an alternative resolution.</div>
+            </div>
+
+            <div class="snippet-card">
+                <div class="snippet-card-title">Closing with Litigation Warning</div>
+                <div class="snippet-content">If payment is not received or a settlement reached by [DATE], I will pursue all available remedies, including:
+
+• Filing a lawsuit for breach of contract
+• Seeking recovery of principal, interest, attorney's fees [if applicable per contract], and costs
+• [If applicable] Asserting a mechanics lien or bond claim
+• [If applicable] Initiating binding arbitration under Section [X] of our agreement
+
+I do not wish to take these steps, but I will do so if necessary to recover payment for work properly completed.
+
+Please contact me immediately to arrange payment or discuss resolution.
+
+Sincerely,
+[YOUR NAME]
+[YOUR TITLE]
+[CONTACT INFORMATION]</div>
+            </div>
+
+            <div class="subsection-title">Client Response Snippets</div>
+
+            <div class="snippet-card">
+                <div class="snippet-card-title">Response – Asserting Quality Defects</div>
+                <div class="snippet-content">I am in receipt of your demand letter dated [DATE]. I dispute your characterization that the scope was completed as specified.
+
+The following deliverables fail to meet the specifications in Section [X] of the SOW:
+
+1. [Specific defect and how it fails to meet SOW requirements]
+2. [Specific defect and how it fails to meet SOW requirements]
+3. [Specific defect and how it fails to meet SOW requirements]
+
+I raised these issues via email on [DATES], and you have not adequately addressed them. These are not "scope creep" requests; they are defect corrections that you are obligated to provide under the contract.
+
+I am willing to pay the invoice in full once these defects are corrected to meet the SOW specifications. Please provide a timeline for completing these corrections.
+
+[SIGNATURE BLOCK]</div>
+            </div>
+
+            <div class="snippet-card">
+                <div class="snippet-card-title">Response – Proposing Compromise Settlement</div>
+                <div class="snippet-content">I acknowledge receipt of your demand letter dated [DATE]. While I believe some of the requested work was within scope, I recognize that our SOW could have been more specific and that this has led to confusion.
+
+I propose the following resolution:
+
+• I will pay $[X] (representing [%] of your invoice) within [10] days
+• You will deliver all source files and work product
+• We will execute a mutual release of all claims arising from this engagement
+• Both parties agree to a mutual non-disparagement clause
+
+This proposal is made for settlement purposes only and constitutes no admission regarding liability or scope interpretation. If you do not accept by [DATE], I reserve all defenses.
+
+[SIGNATURE BLOCK]</div>
+            </div>
+        </div>
+
+        <!-- Tab 6: Attorney Services -->
+        <div id="tab-services" class="tab-content">
+            <div class="section-title">⚖️ How I Handle Scope Creep Disputes</div>
+
+            <p>I represent both service providers seeking payment when clients demand out-of-scope work, and clients defending against demands when deliverables don't meet expectations. My approach focuses on distinguishing genuine performance issues from scope expansion attempts.</p>
+
+            <div class="card">
+                <div class="card-title">For Service Providers</div>
+                <p><strong>Scope Analysis:</strong> I review your SOW, deliverables, and client communications to determine what was truly in scope vs. what the client requested beyond the contract.</p>
+                <p><strong>Evidence Development:</strong> I help you create scope creep logs, document acceptance evidence, and compile change order quotes to prove the client knew they were requesting additional work.</p>
+                <p><strong>Demand Letter Strategy:</strong> I draft demand letters that firmly establish scope completion while offering reasonable paths forward—either payment for original work, or restructured engagement with new SOW.</p>
+                <p><strong>Change Order Enforcement:</strong> If you performed out-of-scope work that the client approved via email or conduct, I help you recover compensation under unjust enrichment or implied contract theories.</p>
+            </div>
+
+            <div class="card">
+                <div class="card-title">For Clients (Recipients)</div>
+                <p><strong>Defect vs. Scope Analysis:</strong> I help you determine whether your requested changes are legitimate defect corrections or scope additions, and I assess the strength of the vendor's demand.</p>
+                <p><strong>Defense Strategy:</strong> If the work genuinely doesn't meet specifications, I help you document defects and assert your rights to withhold payment or demand correction.</p>
+                <p><strong>Settlement Negotiation:</strong> When both parties have some fault (vague SOW, some defects, some scope creep), I negotiate compromise settlements that minimize your costs and provide clean separation.</p>
+                <p><strong>Future Contract Improvements:</strong> I help you draft better SOWs for future engagements with clearer deliverables, acceptance criteria, and revision limits to avoid repeating this situation.</p>
+            </div>
+
+            <div class="subsection-title">Fee Structures</div>
+
+            <div class="checklist">
+                <div class="checklist-item">
+                    <div class="checklist-icon">📄</div>
+                    <div class="checklist-content">
+                        <strong>Demand Letter or Response</strong>
+                        Flat fee ranging from $2,000-$4,500 depending on SOW complexity, scope creep documentation, and evidence review required.
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-icon">💼</div>
+                    <div class="checklist-content">
+                        <strong>Settlement Negotiation</strong>
+                        Hourly billing for extended negotiation, mediation preparation, or structured settlement documentation.
+                    </div>
+                </div>
+                <div class="checklist-item">
+                    <div class="checklist-icon">⚖️</div>
+                    <div class="checklist-content">
+                        <strong>Litigation or Arbitration</strong>
+                        Hourly billing for representation in court or arbitration. For service providers with strong cases and fee-shifting provisions, I may consider hybrid fee arrangements.
+                    </div>
+                </div>
+            </div>
+
+            <div class="cta-card">
+                <div class="cta-card-title">Schedule a Scope Creep Strategy Call</div>
+                <p>Whether you're a service provider dealing with non-payment after scope creep, or a client facing a demand when deliverables don't meet expectations, I can help you evaluate your position and develop a cost-effective resolution strategy.</p>
+                <p>Use the Calendly link below to schedule a strategy call, or email me directly at <strong>owner@terms.law</strong>.</p>
+
+                <!-- Calendly link widget begin -->
+                <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+                <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+                <a href="" class="cta-button"
+                   onclick="Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting'});return false;">
+                  Schedule Strategy Call
+                </a>
+                <!-- Calendly link widget end -->
+            </div>
+
+            <div class="faq-section">
+                <div class="subsection-title">Frequently Asked Questions</div>
+
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFaq(this, event)">
+                        What if our SOW was vague and didn't specify revision limits?
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Vague SOWs hurt both parties but especially the service provider. Courts may interpret ambiguities against the drafter (usually the provider), but industry standards and course of dealing also matter. If you performed 2-3 revisions on similar projects, that may establish a reasonable limit. I help you gather evidence of industry norms and use that to support reasonable boundaries.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFaq(this, event)">
+                        Can I recover payment for out-of-scope work I already performed?
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Possibly, under unjust enrichment or quantum meruit theories. If the client requested the work, you performed it, and they accepted and used it, you may have claims for the reasonable value of those services even without a written change order. Evidence of the client's requests and usage is critical.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFaq(this, event)">
+                        The client says they won't pay until they're "completely satisfied." Are they right?
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Almost never. "Satisfaction" clauses must be interpreted reasonably and in good faith. The client can't withhold payment based on subjective dissatisfaction if you met the objective specifications in the SOW. There are narrow exceptions for creative work where subjective satisfaction was explicitly contracted for, but even then, the client must act in good faith.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFaq(this, event)">
+                        Should I continue working while negotiating payment?
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>No. Once you've drawn a boundary and demanded payment for completed work, continuing to perform additional work signals that you accept non-payment as the norm. Stop work until either the invoice is paid or you've reached a written agreement on how to proceed.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFaq(this, event)">
+                        How do I prevent this on my next project?
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Draft detailed SOWs with specific deliverables, acceptance criteria, and explicit revision limits. Include a change order process requiring written approval and additional compensation for scope changes. Document completion of each revision round in your delivery emails. And most importantly, raise scope concerns in real-time, not after the fact.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // Get element references once
+    const tabsWrapper = document.getElementById('tabsWrapper');
+    const tabNav = document.getElementById('tabNav');
+    const leftArrow = tabsWrapper ? tabsWrapper.querySelector('.tab-nav-arrow.left') : null;
+    const rightArrow = tabsWrapper ? tabsWrapper.querySelector('.tab-nav-arrow.right') : null;
+
+    // Anti-freeze arrow logic
+    function updateTabArrows() {
+        if (!tabNav || !leftArrow || !rightArrow) return;
+
+        const canScroll = tabNav.scrollWidth > tabNav.clientWidth + 5;
+        const atStart = tabNav.scrollLeft <= 5;
+        const atEnd = tabNav.scrollLeft + tabNav.clientWidth >= tabNav.scrollWidth - 5;
+
+        leftArrow.hidden = !canScroll || atStart;
+        rightArrow.hidden = !canScroll || atEnd;
+    }
+
+    // Scroll tabs left/right
+    function scrollTabs(event, direction) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
+        if (!tabNav) return;
+
+        const scrollAmount = direction > 0 ? 220 : -220;
+        tabNav.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        setTimeout(updateTabArrows, 320);
+    }
+
+    // Switch active tab - NO PAGE SCROLLING
+    function switchTab(tabId, event) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
+        // Update tab buttons
+        const tabs = document.querySelectorAll('.demand-letter-hub .tab-button');
+        tabs.forEach(tab => tab.classList.remove('active'));
+        if (event && event.currentTarget) {
+            event.currentTarget.classList.add('active');
+        }
+
+        // Update tab contents
+        const contents = document.querySelectorAll('.demand-letter-hub .tab-content');
+        contents.forEach(content => content.classList.remove('active'));
+        const targetContent = document.getElementById('tab-' + tabId);
+        if (targetContent) {
+            targetContent.classList.add('active');
+        }
+    }
+
+    // FAQ toggle
+    function toggleFaq(button, event) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
+        const faqItem = button.closest('.faq-item');
+        if (faqItem) {
+            faqItem.classList.toggle('open');
+        }
+    }
+
+    // Initialize
+    if (tabNav) {
+        tabNav.addEventListener('scroll', updateTabArrows);
+        window.addEventListener('resize', updateTabArrows);
+        window.addEventListener('load', updateTabArrows);
+        updateTabArrows();
+    }
+</script>
+
+</body>
+</html>

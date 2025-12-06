@@ -1,0 +1,2320 @@
+<!--
+⚠️ CRITICAL NOTES FOR FUTURE EDITS ⚠️
+1. NEVER USE h1, h2, h3, h4, h5, h6 TAGS! WordPress adds all heading tags to Table of Contents.
+   Always use styled divs with classes like "widget-title", "section-title", "card-title", etc.
+2. Tab functions MUST include event.preventDefault() and event.stopPropagation() for WordPress compatibility
+3. All onclick handlers MUST pass the event parameter
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Commerce Demand Letter Guide | Professional Legal Resource</title>
+    <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+    <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #1a202c;
+            background: #f7fafc;
+        }
+
+        .widget-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        /* Hero Section - Reduced Height */
+        .hero {
+            background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+            color: white;
+            padding: 30px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-title {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 15px;
+            opacity: 0.95;
+            margin-bottom: 20px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: 800;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        /* Tab Navigation */
+        .tab-nav-wrapper {
+            position: relative;
+            background: #f7fafc;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .tab-nav {
+            display: flex;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            scroll-behavior: smooth;
+        }
+
+        .tab-nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab-button {
+            flex: 0 0 auto;
+            padding: 12px 16px;
+            background: transparent;
+            border: none;
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+        }
+
+        .tab-button:hover {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .tab-button.active {
+            color: #b45309;
+            border-bottom-color: #f59e0b;
+            background: white;
+        }
+
+        .tab-nav-arrow {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 40px;
+            background: linear-gradient(90deg, #f7fafc 0%, rgba(247, 250, 252, 0) 100%);
+            border: none;
+            cursor: pointer;
+            z-index: 10;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #64748b;
+            transition: all 0.3s ease;
+        }
+
+        .tab-nav-arrow:hover {
+            color: #f59e0b;
+        }
+
+        .tab-nav-arrow.show {
+            display: flex;
+        }
+
+        .tab-nav-arrow.left {
+            left: 0;
+            background: linear-gradient(90deg, #f7fafc 60%, rgba(247, 250, 252, 0) 100%);
+        }
+
+        .tab-nav-arrow.right {
+            right: 0;
+            background: linear-gradient(270deg, #f7fafc 60%, rgba(247, 250, 252, 0) 100%);
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            padding: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #b45309;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #f59e0b;
+        }
+
+        .subsection-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 25px 0 15px 0;
+        }
+
+        .content-text {
+            color: #475569;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .card {
+            background: #f8f9ff;
+            border-left: 4px solid #f59e0b;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+
+        .card-content {
+            color: #475569;
+            line-height: 1.7;
+        }
+
+        .warning-box {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .success-box {
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .info-box {
+            background: #dbeafe;
+            border-left: 4px solid #3b82f6;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #f8fafc;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        tr:hover {
+            background: #f8f9ff;
+        }
+
+        ul, ol {
+            margin: 15px 0 15px 30px;
+            color: #475569;
+        }
+
+        li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #f59e0b;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn:hover {
+            background: #d97706;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+        }
+
+        .btn-secondary {
+            background: #64748b;
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
+        }
+
+        /* Generator Form */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .generated-output {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            min-height: 200px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            display: none;
+        }
+
+        .generated-output.active {
+            display: block;
+        }
+
+        /* Risk Analyzer */
+        .risk-option {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .risk-option:hover {
+            border-color: #f59e0b;
+            background: #fef3c7;
+        }
+
+        .risk-option input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .risk-result {
+            background: white;
+            border: 3px solid #f59e0b;
+            border-radius: 8px;
+            padding: 25px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .risk-result.active {
+            display: block;
+        }
+
+        .risk-score {
+            font-size: 48px;
+            font-weight: 800;
+            color: #f59e0b;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        /* Calendly Section */
+        .calendly-section {
+            background: #f8f9ff;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+
+        .calendly-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .calendly-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+
+        .calendly-subtitle {
+            color: #64748b;
+            font-size: 15px;
+        }
+
+        .pricing-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .pricing-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .pricing-card:hover {
+            border-color: #f59e0b;
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        .pricing-card-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+
+        .pricing-card-price {
+            font-size: 32px;
+            font-weight: 800;
+            color: #f59e0b;
+            margin: 15px 0;
+        }
+
+        .pricing-card-features {
+            text-align: left;
+            margin-top: 15px;
+        }
+
+        .pricing-card-features li {
+            margin-bottom: 8px;
+            color: #475569;
+        }
+
+        .attorney-badge {
+            display: inline-block;
+            background: #10b981;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                padding: 20px 15px;
+            }
+
+            .hero-title {
+                font-size: 22px;
+            }
+
+            .hero-subtitle {
+                font-size: 14px;
+            }
+
+            .stat-number {
+                font-size: 24px;
+            }
+
+            .stat-label {
+                font-size: 11px;
+            }
+
+            .tab-button {
+                padding: 10px 12px;
+                font-size: 12px;
+            }
+
+            .tab-nav-arrow {
+                width: 30px;
+                font-size: 18px;
+            }
+
+            .tab-content {
+                padding: 20px 15px;
+            }
+
+            .section-title {
+                font-size: 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="widget-container">
+        <!-- Hero Section -->
+        <div class="hero">
+            <div class="hero-content">
+                <div class="hero-title">⚖️ E-Commerce Demand Letter Resource Hub</div>
+                <p class="hero-subtitle">Attorney-grade legal guidance for online sellers dealing with supplier disputes, marketplace suspensions, payment holds, counterfeit claims, and customer conflicts</p>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-number">3.2%</span>
+                        <span class="stat-label">Avg. Chargeback Rate</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">$18K</span>
+                        <span class="stat-label">Avg. Supplier Dispute</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">45 Days</span>
+                        <span class="stat-label">PayPal Hold Duration</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">76%</span>
+                        <span class="stat-label">Settle Pre-Litigation</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="tab-nav-wrapper">
+            <button class="tab-nav-arrow left" onclick="scrollTabs('left')" aria-label="Scroll tabs left">‹</button>
+            <div class="tab-nav" id="tabNav">
+                <button class="tab-button active" onclick="switchTab('overview', event)">📋 Overview</button>
+                <button class="tab-button" onclick="switchTab('suppliers', event)">📦 Suppliers</button>
+                <button class="tab-button" onclick="switchTab('marketplace', event)">🏪 Marketplaces</button>
+                <button class="tab-button" onclick="switchTab('payment', event)">💳 Payment Holds</button>
+                <button class="tab-button" onclick="switchTab('customers', event)">👥 Customers</button>
+                <button class="tab-button" onclick="switchTab('counterfeit', event)">🚫 IP/Counterfeit</button>
+                <button class="tab-button" onclick="switchTab('generator', event)">✍️ Generator</button>
+                <button class="tab-button" onclick="switchTab('analyzer', event)">🎯 Risk Analyzer</button>
+                <button class="tab-button" onclick="switchTab('services', event)">⚖️ Legal Services</button>
+                <button class="tab-button" onclick="switchTab('prevention', event)">🛡️ Prevention</button>
+                <button class="tab-button" onclick="switchTab('faq', event)">❓ FAQ</button>
+            </div>
+            <button class="tab-nav-arrow right" onclick="scrollTabs('right')" aria-label="Scroll tabs right">›</button>
+        </div>
+
+        <!-- Tab 1: Overview -->
+        <div id="tab-overview" class="tab-content active">
+            <div class="section-title">🛒 E-Commerce Demand Letters: Strategic Overview</div>
+
+            <p class="content-text">E-commerce businesses face unique legal challenges across the entire supply chain—from overseas suppliers to marketplace platforms to end customers. Each dispute type requires specialized legal strategies and documentation.</p>
+
+            <div class="card">
+                <div class="card-title">⚖️ What This Resource Provides</div>
+                <div class="card-content">
+                    This is a comprehensive, attorney-grade resource hub covering all aspects of e-commerce demand letters. You'll find:
+                    <ul>
+                        <li><strong>Detailed analysis</strong> of each dispute type with real-world examples</li>
+                        <li><strong>Strategic guidance</strong> on when to send demand letters vs. escalate</li>
+                        <li><strong>Sample language</strong> and templates for common scenarios</li>
+                        <li><strong>Interactive tools</strong> including a demand letter generator and risk analyzer</li>
+                        <li><strong>Prevention strategies</strong> to minimize future disputes</li>
+                        <li><strong>Professional legal services</strong> when DIY approaches aren't sufficient</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="subsection-title">📊 Common E-Commerce Dispute Types</div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Dispute Type</th>
+                        <th>Avg. Amount</th>
+                        <th>Typical Duration</th>
+                        <th>Settlement Rate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Supplier/Vendor</strong></td>
+                        <td>$8K-$35K</td>
+                        <td>60-120 days</td>
+                        <td>65%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Marketplace Suspension</strong></td>
+                        <td>$12K-$50K (lost sales)</td>
+                        <td>30-90 days</td>
+                        <td>45%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Payment Processor Hold</strong></td>
+                        <td>$5K-$25K</td>
+                        <td>45-180 days</td>
+                        <td>70%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Customer Chargeback</strong></td>
+                        <td>$100-$2K</td>
+                        <td>30-90 days</td>
+                        <td>55%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Counterfeit/IP Claim</strong></td>
+                        <td>$10K-$100K</td>
+                        <td>90-365 days</td>
+                        <td>60%</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning-box">
+                <strong>⚠️ Critical Timing Issues:</strong><br>
+                E-commerce disputes often involve strict deadlines. Amazon appeal windows (17 days), chargeback response periods (7-10 days), and PayPal claim deadlines (20 days) can permanently affect your ability to recover funds or reinstate accounts. Acting quickly with proper documentation is essential.
+            </div>
+
+            <div class="subsection-title">📈 When to Use Demand Letters in E-Commerce</div>
+
+            <div class="card">
+                <div class="card-title">✅ Strong Candidates for Demand Letters</div>
+                <div class="card-content">
+                    <ul>
+                        <li><strong>Supplier breaches:</strong> Defective goods, late delivery, quantity shortfalls with clear documentation</li>
+                        <li><strong>Payment holds:</strong> Unjustified reserves, policy violations, frozen funds with no valid reason</li>
+                        <li><strong>Customer disputes:</strong> False chargebacks, return fraud, unjust negative reviews</li>
+                        <li><strong>Marketplace issues:</strong> Wrongful suspensions, competitor manipulation, policy misapplication</li>
+                        <li><strong>Contract breaches:</strong> Exclusive agreements violated, pricing terms not honored</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">⚠️ Weak Candidates for Demand Letters</div>
+                <div class="card-content">
+                    <ul>
+                        <li><strong>Overseas suppliers with no US presence:</strong> Enforcement is nearly impossible</li>
+                        <li><strong>Anonymous platforms:</strong> No identifiable defendant for future litigation</li>
+                        <li><strong>Small amounts (&lt;$500):</strong> Legal costs exceed recovery potential</li>
+                        <li><strong>No documentation:</strong> Verbal agreements, lost emails, missing invoices</li>
+                        <li><strong>Policy violations you committed:</strong> Fighting legitimate enforcement actions</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <strong>💡 Strategic Tip:</strong> The most effective e-commerce demand letters combine (1) specific damages calculations, (2) platform policy citations, (3) documented evidence, and (4) clear next steps. Generic threats without specifics rarely produce results and may damage your credibility with platforms.
+            </div>
+        </div>
+
+        <!-- Tab 2: Supplier Disputes -->
+        <div id="tab-suppliers" class="tab-content">
+            <div class="section-title">📦 Supplier & Vendor Demand Letters</div>
+
+            <p class="content-text">Supplier disputes are the foundation of most e-commerce legal problems—defective products cascade into customer complaints, returns, chargebacks, and potential product liability claims. A properly drafted demand letter can recover losses and prevent future issues.</p>
+
+            <div class="subsection-title">🎯 Common Supplier Dispute Scenarios</div>
+
+            <div class="card">
+                <div class="card-title">1. Defective Merchandise</div>
+                <div class="card-content">
+                    <strong>Issue:</strong> Supplier delivers products that don't meet specifications, are defective, or fail quality standards.<br><br>
+                    <strong>Your Losses:</strong>
+                    <ul>
+                        <li>Cost of defective inventory (often unsellable)</li>
+                        <li>Customer refunds and returns processing</li>
+                        <li>Marketplace penalties and account health degradation</li>
+                        <li>Replacement product costs and expedited shipping</li>
+                        <li>Lost sales during out-of-stock period</li>
+                        <li>Negative reviews damaging future sales</li>
+                    </ul>
+                    <strong>Demand Letter Strategy:</strong> Itemize each category of damages with documentation. Include inspection reports, customer complaints, marketplace penalties, and replacement costs. Demand full refund plus consequential damages.
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">2. Late Delivery / Missed Deadlines</div>
+                <div class="card-content">
+                    <strong>Issue:</strong> Supplier fails to deliver on time, causing stockouts during critical sales periods (holidays, Prime Day, etc.).<br><br>
+                    <strong>Your Losses:</strong>
+                    <ul>
+                        <li>Lost sales during peak selling season</li>
+                        <li>Expedited shipping costs to fulfill customer orders</li>
+                        <li>Late shipment rate penalties on Amazon/eBay</li>
+                        <li>Advertising spend wasted when products unavailable</li>
+                        <li>Opportunity cost of alternative suppliers</li>
+                    </ul>
+                    <strong>Demand Letter Strategy:</strong> Use marketplace sales data to prove lost revenue. Show PPC spend during stockout period. Cite liquidated damages clauses if present in contract. Demand compensation tied to specific, measurable losses.
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">3. Quantity Shortfalls</div>
+                <div class="card-content">
+                    <strong>Issue:</strong> Supplier delivers less than ordered quantity but charges full price, or uses incorrect weight/count.<br><br>
+                    <strong>Your Losses:</strong>
+                    <ul>
+                        <li>Overpayment for goods not received</li>
+                        <li>Stockout losses due to insufficient inventory</li>
+                        <li>Additional reorder costs (setup fees, shipping)</li>
+                    </ul>
+                    <strong>Demand Letter Strategy:</strong> Provide receiving documentation, inventory counts, third-party inspection reports. Calculate price-per-unit overpayment. Demand refund and discount on future orders.
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">4. Counterfeit or Unauthorized Products</div>
+                <div class="card-content">
+                    <strong>Issue:</strong> Supplier claims products are genuine but delivers counterfeits or gray market goods.<br><br>
+                    <strong>Your Losses:</strong>
+                    <ul>
+                        <li>Marketplace account suspension (potentially permanent)</li>
+                        <li>Inventory seizure by platform or brand owner</li>
+                        <li>Brand owner legal claims against you</li>
+                        <li>Lost seller account value and reputation</li>
+                        <li>Inability to sell seized inventory</li>
+                    </ul>
+                    <strong>Demand Letter Strategy:</strong> This is the highest-stakes scenario. Demand full refund plus all consequential damages from account suspension. Threaten fraud/misrepresentation claims. Consider criminal referral for wire fraud if supplier knowingly misrepresented authenticity.
+                </div>
+            </div>
+
+            <div class="subsection-title">📝 Essential Elements for Supplier Demand Letters</div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Element</th>
+                        <th>Purpose</th>
+                        <th>Documentation Needed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Purchase Order</strong></td>
+                        <td>Prove terms and specifications</td>
+                        <td>Signed PO, email confirmation, payment proof</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Quality Issues</strong></td>
+                        <td>Demonstrate defects</td>
+                        <td>Photos, inspection reports, customer complaints</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Damages Calculation</strong></td>
+                        <td>Quantify losses</td>
+                        <td>Sales data, refund reports, marketplace penalties</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mitigation Efforts</strong></td>
+                        <td>Show you minimized damages</td>
+                        <td>Replacement sourcing, customer communications</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Deadline & Consequences</strong></td>
+                        <td>Create urgency</td>
+                        <td>Clear payment deadline, next steps specified</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning-box">
+                <strong>⚠️ Overseas Supplier Challenges:</strong><br>
+                Many e-commerce businesses source from Chinese, Indian, or Southeast Asian suppliers. If your supplier has no US presence, legal enforcement is extremely difficult and expensive. Consider these factors:
+                <ul style="margin-top: 10px;">
+                    <li><strong>Alibaba Trade Assurance:</strong> File claim within coverage period</li>
+                    <li><strong>Credit card dispute:</strong> Charge back within 60-120 days</li>
+                    <li><strong>Inspection companies:</strong> Use SGS, Bureau Veritas for QC before payment</li>
+                    <li><strong>Escrow services:</strong> Hold payment until delivery verified</li>
+                    <li><strong>Letter of credit:</strong> Bank-intermediated payment for large orders</li>
+                </ul>
+                Demand letters to overseas suppliers work best when combined with payment reversal mechanisms, not as standalone tools.
+            </div>
+
+            <div class="success-box">
+                <strong>✅ Success Strategy - Certified Mail + Email:</strong><br>
+                For maximum effect, send demand letters via:<br>
+                1. <strong>Certified mail with return receipt</strong> (creates legal proof of delivery)<br>
+                2. <strong>Email to all known addresses</strong> (faster response, shows good faith)<br>
+                3. <strong>Portal messaging</strong> (Alibaba, trade platform) if applicable<br><br>
+                The combination demonstrates seriousness while preserving proof of delivery for potential litigation.
+            </div>
+        </div>
+
+        <!-- Tab 3: Marketplace Issues -->
+        <div id="tab-marketplace" class="tab-content">
+            <div class="section-title">🏪 Marketplace Suspension & Account Disputes</div>
+
+            <p class="content-text">Amazon, eBay, Etsy, and other marketplace suspensions can destroy e-commerce businesses overnight. While demand letters to the platforms themselves rarely work (they're not legally required to provide selling privileges), demand letters can be effective against third parties who caused wrongful suspensions.</p>
+
+            <div class="subsection-title">🎯 When Demand Letters Work for Marketplace Disputes</div>
+
+            <div class="card">
+                <div class="card-title">✅ Competitor Manipulation (Strong Case)</div>
+                <div class="card-content">
+                    <strong>Scenario:</strong> Competitor files false IP complaints, fake buyer accounts leave fraudulent negative reviews, or competitor manipulates platform algorithms to trigger your suspension.<br><br>
+                    <strong>Target of Demand Letter:</strong> The competitor (not the marketplace)<br><br>
+                    <strong>Legal Claims:</strong>
+                    <ul>
+                        <li><strong>Tortious interference:</strong> Intentional interference with business relationships</li>
+                        <li><strong>False statements:</strong> Fraudulent IP claims, fake reviews</li>
+                        <li><strong>Unfair competition:</strong> Deceptive business practices under state law</li>
+                        <li><strong>Defamation:</strong> If fake reviews damaged reputation</li>
+                    </ul>
+                    <strong>Demand Letter Strategy:</strong> Include evidence of competitor's involvement (IP addresses, account patterns, timing analysis). Demand retraction of false claims, monetary damages, and cease-and-desist.
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">⚠️ Platform Policy Disputes (Weak Case)</div>
+                <div class="card-content">
+                    <strong>Scenario:</strong> Amazon/eBay suspended you for alleged policy violations, performance metrics, or authenticity complaints.<br><br>
+                    <strong>Target of Demand Letter:</strong> The platform itself<br><br>
+                    <strong>Reality Check:</strong> Demand letters to platforms rarely work because:
+                    <ul>
+                        <li>Platform terms of service allow suspension at will</li>
+                        <li>You agreed to arbitration clauses</li>
+                        <li>No contract right to selling privileges</li>
+                        <li>Platforms have massive legal teams and don't respond to threats</li>
+                    </ul>
+                    <strong>Better Strategy:</strong> Focus on platform's internal appeal process, Performance Team escalations, and executive escalations rather than legal threats.
+                </div>
+            </div>
+
+            <div class="subsection-title">📊 Platform-Specific Considerations</div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Platform</th>
+                        <th>Appeal Window</th>
+                        <th>Common Suspension Causes</th>
+                        <th>Reinstatement Rate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Amazon</strong></td>
+                        <td>17 days typically</td>
+                        <td>Performance metrics, authenticity, IP complaints, restricted products</td>
+                        <td>~40%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>eBay</strong></td>
+                        <td>Varies (often none)</td>
+                        <td>Below Standard status, VeRO program, prohibited items</td>
+                        <td>~35%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Etsy</strong></td>
+                        <td>Usually immediate</td>
+                        <td>Handmade policy, trademark issues, transaction fraud</td>
+                        <td>~45%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Walmart</strong></td>
+                        <td>30 days</td>
+                        <td>Product quality, customer metrics, restricted categories</td>
+                        <td>~50%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Shopify</strong></td>
+                        <td>Immediate ban</td>
+                        <td>Prohibited products, high-risk industries, chargebacks</td>
+                        <td>~25%</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="subsection-title">🎯 Strategic Approaches to Marketplace Disputes</div>
+
+            <div class="card">
+                <div class="card-title">1. Internal Escalation First</div>
+                <div class="card-content">
+                    Before sending demand letters, exhaust internal remedies:
+                    <ul>
+                        <li><strong>Seller Performance Team:</strong> Submit detailed Plan of Action (POA)</li>
+                        <li><strong>Executive Escalations:</strong> jeff@amazon.com still works for serious cases</li>
+                        <li><strong>Brand Registry:</strong> Use if you're brand owner with more leverage</li>
+                        <li><strong>Selling Partner Support:</strong> Escalate through multiple tiers</li>
+                    </ul>
+                    Legal threats before exhausting these options can backfire by antagonizing platform staff.
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">2. Arbitration Demands</div>
+                <div class="card-content">
+                    Amazon and most platforms require binding arbitration. Strategic considerations:
+                    <ul>
+                        <li><strong>Cost deterrent:</strong> Filing arbitration ($1,500+ fees) gets attention</li>
+                        <li><strong>Settlement leverage:</strong> Platforms often settle to avoid arbitration costs</li>
+                        <li><strong>Limited remedies:</strong> Arbitrator can't order reinstatement, only damages</li>
+                        <li><strong>Mass arbitration:</strong> Consider if many sellers affected by same issue</li>
+                    </ul>
+                    Arbitration demand letters (stating intent to file) can prompt settlement discussions.
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">3. Third-Party Liability Claims</div>
+                <div class="card-content">
+                    Most effective demand letters target third parties who caused suspension:
+                    <ul>
+                        <li><strong>Brand owners:</strong> False or bad faith IP complaints</li>
+                        <li><strong>Competitors:</strong> Fraudulent negative reviews, manipulation</li>
+                        <li><strong>Service providers:</strong> Listing services, prep centers that violated policies</li>
+                        <li><strong>Suppliers:</strong> Sold inauthentic goods causing authenticity complaints</li>
+                    </ul>
+                    These parties don't have marketplace immunity and can be held liable for damages.
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <strong>⚠️ Critical Timing: Amazon's 17-Day Window</strong><br>
+                Amazon typically gives sellers 17 days to submit appeals. After that, your account may move to permanent suspension status with no further appeal rights. Don't waste time on demand letters to Amazon in the first 14 days—focus on perfecting your Plan of Action. Only consider legal escalation after appeal denials.
+            </div>
+
+            <div class="info-box">
+                <strong>💡 Professional Legal Services for Suspensions:</strong><br>
+                Marketplace suspensions often require specialized expertise in platform policies, not just general demand letter drafting. Professional assistance is particularly valuable for:
+                <ul style="margin-top: 10px;">
+                    <li>Accounts with $10K+ monthly revenue</li>
+                    <li>Suspensions involving IP/authenticity (high reinstatement difficulty)</li>
+                    <li>Multiple appeal denials</li>
+                    <li>Suspected competitor manipulation</li>
+                </ul>
+                See the "Legal Services" tab for consultation options.
+            </div>
+        </div>
+
+        <!-- Tab 4: Payment Holds -->
+        <div id="tab-payment" class="tab-content">
+            <div class="section-title">💳 Payment Processor Holds & Frozen Funds</div>
+
+            <p class="content-text">PayPal, Stripe, Square, and other payment processors routinely hold or freeze merchant funds—often without warning and with minimal explanation. These holds can last 45-180 days and represent an existential threat to cash flow.</p>
+
+            <div class="subsection-title">🎯 Common Payment Hold Scenarios</div>
+
+            <div class="card">
+                <div class="card-title">1. Reserve Holds (Rolling or Fixed)</div>
+                <div class="card-content">
+                    <strong>What It Is:</strong> Processor holds 10-30% of each transaction for 30-180 days as protection against chargebacks and refunds.<br><br>
+                    <strong>Common Triggers:</strong>
+                    <ul>
+                        <li>High-risk industries (supplements, electronics, digital goods)</li>
+                        <li>Sudden sales volume increase</li>
+                        <li>New merchant account (&lt;6 months)</li>
+                        <li>Previous chargeback history</li>
+                        <li>High average transaction amounts</li>
+                    </ul>
+                    <strong>Demand Letter Strategy:</strong> If reserve is excessive compared to actual risk (low refund/chargeback rate), document your low-risk profile and demand reduction or release. Most effective with 6+ months of clean processing history.
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">2. Account Freezes (Suspicious Activity)</div>
+                <div class="card-content">
+                    <strong>What It Is:</strong> Processor freezes entire account balance, often due to automated fraud detection systems.<br><br>
+                    <strong>Common Triggers:</strong>
+                    <ul>
+                        <li>Large single transactions (10x+ average)</li>
+                        <li>Rapid transaction volume increase</li>
+                        <li>International transactions from high-risk countries</li>
+                        <li>Customer complaints or chargebacks</li>
+                        <li>Match with prohibited business list</li>
+                    </ul>
+                    <strong>Demand Letter Strategy:</strong> Provide business documentation (incorporation docs, tax returns, inventory receipts) proving legitimacy. Demand specific explanation of "suspicious activity" and deadline for review. Cite breach of merchant agreement if hold is unjustified.
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">3. Policy Violation Termination</div>
+                <div class="card-content">
+                    <strong>What It Is:</strong> Processor terminates merchant account and holds funds for 180 days, claiming policy violations.<br><br>
+                    <strong>Common Violations Cited:</strong>
+                    <ul>
+                        <li>Selling prohibited items (weapons, CBD, adult content)</li>
+                        <li>Misrepresentation of business type</li>
+                        <li>Excessive chargebacks (&gt;1-2% of transactions)</li>
+                        <li>Delayed fulfillment / pre-sales</li>
+                        <li>Terms of Service violations</li>
+                    </ul>
+                    <strong>Demand Letter Strategy:</strong> Challenge specific violation claims with documentation showing compliance. If termination was wrongful, threaten breach of contract and tortious interference claims. Demand immediate release of funds or shortened hold period.
+                </div>
+            </div>
+
+            <div class="subsection-title">📊 Payment Processor Comparison</div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Processor</th>
+                        <th>Typical Hold Period</th>
+                        <th>Reserve Percentage</th>
+                        <th>Appeal Process</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>PayPal</strong></td>
+                        <td>180 days standard</td>
+                        <td>10-30%</td>
+                        <td>Email appeals, limited response</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Stripe</strong></td>
+                        <td>90-120 days</td>
+                        <td>20-30% high-risk</td>
+                        <td>Dashboard messaging, better communication</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Square</strong></td>
+                        <td>120 days</td>
+                        <td>10-25%</td>
+                        <td>Support tickets, phone escalation possible</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Authorize.net</strong></td>
+                        <td>60-90 days</td>
+                        <td>5-15%</td>
+                        <td>Bank-dependent, varies widely</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Shopify Payments</strong></td>
+                        <td>120-180 days</td>
+                        <td>10-30%</td>
+                        <td>Shopify support, Stripe backend</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="subsection-title">✉️ Demand Letter Strategy for Payment Holds</div>
+
+            <div class="card">
+                <div class="card-title">Essential Elements for Payment Processor Demands</div>
+                <div class="card-content">
+                    <ol>
+                        <li><strong>Specific hold amount and date:</strong> "$47,328.19 held since November 15, 2024"</li>
+                        <li><strong>Business documentation:</strong> Incorporation, tax returns, bank statements</li>
+                        <li><strong>Processing history:</strong> Low chargeback rate, high fulfillment rate, positive metrics</li>
+                        <li><strong>Customer satisfaction:</strong> Positive reviews, low refund rate</li>
+                        <li><strong>Harm caused by hold:</strong> Cannot pay suppliers, employee payroll delayed, credit damaged</li>
+                        <li><strong>Contractual breaches:</strong> Cite merchant agreement terms violated by processor</li>
+                        <li><strong>Regulatory complaints:</strong> Mention intent to file CFPB or state AG complaints</li>
+                        <li><strong>Deadline:</strong> 10-14 days typical, with escalation plan stated</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <strong>⚠️ PayPal's 180-Day Hold Is Usually Enforceable:</strong><br>
+                PayPal's User Agreement explicitly allows 180-day holds for risk management. Legal challenges rarely succeed unless you can prove:
+                <ul style="margin-top: 10px;">
+                    <li><strong>Arbitrary enforcement:</strong> Other similar merchants not subject to holds</li>
+                    <li><strong>False policy violation claims:</strong> Processor cited violations that didn't occur</li>
+                    <li><strong>Bad faith:</strong> Hold imposed to avoid paying out legitimate funds</li>
+                    <li><strong>State law violations:</strong> Unfair business practices under state law</li>
+                </ul>
+                Demand letters work best when combined with regulatory complaints (CFPB, FTC, state Attorney General).
+            </div>
+
+            <div class="success-box">
+                <strong>✅ Multi-Pronged Approach Works Best:</strong><br>
+                For payment holds over $10,000, use this strategy:
+                <ol style="margin-top: 10px;">
+                    <li><strong>Day 1-7:</strong> Exhaust internal appeals, provide all requested documentation</li>
+                    <li><strong>Day 8-14:</strong> Send demand letter via certified mail + email, citing specific breaches</li>
+                    <li><strong>Day 15:</strong> File CFPB complaint (www.consumerfinance.gov/complaint)</li>
+                    <li><strong>Day 20:</strong> File state Attorney General complaint</li>
+                    <li><strong>Day 30:</strong> Consult attorney for litigation evaluation</li>
+                </ol>
+                CFPB complaints often trigger processor reviews within 15 days, sometimes leading to early release.
+            </div>
+
+            <div class="info-box">
+                <strong>💡 Prevention: Diversify Payment Processors</strong><br>
+                Never rely on a single payment processor. Maintain accounts with 2-3 processors and rotate processing volume. If one freezes, you can continue operations with others while fighting the hold.
+            </div>
+        </div>
+
+        <!-- Tab 5: Customer Disputes -->
+        <div id="tab-customers" class="tab-content">
+            <div class="section-title">👥 Customer Disputes, Chargebacks & Fraud</div>
+
+            <p class="content-text">Customer disputes range from legitimate complaints to outright fraud. While you can't send demand letters to every difficult customer, certain scenarios justify formal legal demands—particularly fraud, defamation, and organized return fraud schemes.</p>
+
+            <div class="subsection-title">🎯 When to Send Customer Demand Letters</div>
+
+            <div class="card">
+                <div class="card-title">1. Chargeback Fraud (High Priority)</div>
+                <div class="card-content">
+                    <strong>Scenario:</strong> Customer receives product, confirms delivery, then files credit card chargeback claiming "item not received" or "unauthorized charge."<br><br>
+                    <strong>Your Evidence:</strong>
+                    <ul>
+                        <li>Delivery confirmation with signature</li>
+                        <li>IP address matching customer's location</li>
+                        <li>Customer messages confirming receipt</li>
+                        <li>Photos customer sent showing product</li>
+                        <li>No return initiated (proving they kept product)</li>
+                    </ul>
+                    <strong>Demand Letter Strategy:</strong> Demand withdrawal of chargeback, payment of chargeback fees ($15-25), and warning that you'll pursue criminal fraud charges and civil conversion claims if not resolved. Send to customer's verified address, not email alone.
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">2. Return Fraud / RUMS (Return Under Merchandise Standards)</div>
+                <div class="card-content">
+                    <strong>Scenario:</strong> Customer returns different item, damaged item (they damaged it), empty box, or counterfeit version of your product.<br><br>
+                    <strong>Your Evidence:</strong>
+                    <ul>
+                        <li>Photos of returned item showing differences</li>
+                        <li>Serial numbers don't match shipped product</li>
+                        <li>Weight discrepancy documentation</li>
+                        <li>Amazon SNS (Serial Number Scan) data if available</li>
+                    </ul>
+                    <strong>Demand Letter Strategy:</strong> Demand payment for actual product value (not refunded), return of genuine product, and compensation for processing costs. Threaten fraud and conversion claims. For organized fraud (multiple false returns), threaten criminal referral.
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">3. Defamatory Reviews</div>
+                <div class="card-content">
+                    <strong>Scenario:</strong> Customer leaves provably false review containing defamatory statements (not just opinions).<br><br>
+                    <strong>Defamatory vs. Opinion:</strong>
+                    <ul>
+                        <li>✅ <strong>Defamatory:</strong> "This seller sent me a counterfeit iPad" (false statement of fact)</li>
+                        <li>❌ <strong>Opinion:</strong> "Terrible customer service, product quality was poor" (opinion/subjective)</li>
+                        <li>✅ <strong>Defamatory:</strong> "Seller stole my credit card info and charged me twice" (false fact)</li>
+                        <li>❌ <strong>Opinion:</strong> "Overpriced and not worth the money" (opinion)</li>
+                    </ul>
+                    <strong>Demand Letter Strategy:</strong> Demand removal of defamatory content, public retraction, and damages for lost sales. Include evidence proving statements are false. Works best if you can identify customer's real identity.
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">4. Breach of Purchase Agreement</div>
+                <div class="card-content">
+                    <strong>Scenario:</strong> Customer violates terms of sale (resale restrictions, return period, warranty terms) and demands refund or makes claims.<br><br>
+                    <strong>Examples:</strong>
+                    <ul>
+                        <li>Customer damaged product through misuse, demands warranty replacement</li>
+                        <li>Customer exceeded 30-day return policy but demands full refund</li>
+                        <li>Customer resold product violating license terms</li>
+                        <li>B2B customer breached minimum purchase or exclusivity agreement</li>
+                    </ul>
+                    <strong>Demand Letter Strategy:</strong> Less effective for consumer transactions (courts favor consumers), more effective for B2B e-commerce where contracts are more enforceable.
+                </div>
+            </div>
+
+            <div class="subsection-title">⚖️ Legal Thresholds for Customer Demand Letters</div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Dispute Type</th>
+                        <th>Minimum Amount</th>
+                        <th>Success Rate</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Chargeback Fraud</strong></td>
+                        <td>$200+</td>
+                        <td>60-70%</td>
+                        <td>Strong if delivery confirmation exists</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Return Fraud</strong></td>
+                        <td>$300+</td>
+                        <td>50-60%</td>
+                        <td>Requires clear photo evidence</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Defamation</strong></td>
+                        <td>$1,000+ damages</td>
+                        <td>40-50%</td>
+                        <td>Must prove statements are false facts</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Contract Breach</strong></td>
+                        <td>$500+ (B2B)</td>
+                        <td>65-75%</td>
+                        <td>Much higher success in B2B context</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Organized Fraud Ring</strong></td>
+                        <td>$2,000+ total</td>
+                        <td>70-80%</td>
+                        <td>Multiple false returns = criminal fraud</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning-box">
+                <strong>⚠️ Cost-Benefit Analysis is Critical:</strong><br>
+                For most individual customer disputes under $500, the cost of sending demand letters (attorney time) exceeds potential recovery. Consider these factors:
+                <ul style="margin-top: 10px;">
+                    <li><strong>Clear fraud evidence:</strong> Worth pursuing at lower amounts</li>
+                    <li><strong>Repeat offender:</strong> Customer has pattern of fraud across multiple sellers</li>
+                    <li><strong>Precedent value:</strong> Fighting fraud deters future attempts</li>
+                    <li><strong>Emotional investment:</strong> Don't let anger drive uneconomical legal action</li>
+                </ul>
+                Generally, demand letters for customer disputes make sense above $300 with clear fraud evidence, or above $1,000 for any dispute type.
+            </div>
+
+            <div class="success-box">
+                <strong>✅ Chargeback Fraud Success Strategy:</strong><br>
+                <ol style="margin-top: 10px;">
+                    <li><strong>Win the chargeback first:</strong> Submit compelling evidence to payment processor</li>
+                    <li><strong>If you win:</strong> Send demand letter for chargeback fees + processing costs</li>
+                    <li><strong>If you lose:</strong> Send demand letter for product value + all fees, citing fraud</li>
+                    <li><strong>Report to IC3.gov:</strong> FBI Internet Crime Complaint Center for fraud over $500</li>
+                    <li><strong>Small claims court:</strong> Most economical enforcement for $1,500-$5,000 range</li>
+                </ol>
+            </div>
+
+            <div class="info-box">
+                <strong>💡 Professional Collections Agencies:</strong><br>
+                For established fraud cases (chargeback won by you, clear return fraud), consider using collection agencies rather than demand letters. Typical arrangement:
+                <ul style="margin-top: 10px;">
+                    <li><strong>Contingency fee:</strong> 25-40% of recovered amount</li>
+                    <li><strong>No upfront cost:</strong> Only pay if they collect</li>
+                    <li><strong>Credit bureau reporting:</strong> Damages customer's credit</li>
+                    <li><strong>Higher success rate:</strong> Consumers respond more to collections</li>
+                </ul>
+                This is often more cost-effective than attorney-drafted demand letters for consumer debts under $2,000.
+            </div>
+        </div>
+
+        <!-- Tab 6: Counterfeit & IP -->
+        <div id="tab-counterfeit" class="tab-content">
+            <div class="section-title">🚫 Counterfeit Claims & Intellectual Property Disputes</div>
+
+            <p class="content-text">IP-related disputes in e-commerce are particularly high-stakes because they can result in permanent account suspensions, inventory seizure, and significant legal liability. Demand letters play a critical role in both offensive (defending against false claims) and defensive (stopping infringers) scenarios.</p>
+
+            <div class="subsection-title">🎯 Offensive: Fighting False IP Claims</div>
+
+            <div class="card">
+                <div class="card-title">1. False Counterfeit Accusations</div>
+                <div class="card-content">
+                    <strong>Scenario:</strong> Brand owner falsely claims your genuine products are counterfeit, resulting in marketplace suspension or inventory seizure.<br><br>
+                    <strong>Your Evidence:</strong>
+                    <ul>
+                        <li>Authorized distributor agreements</li>
+                        <li>Invoices from authorized suppliers</li>
+                        <li>Letters of authenticity from manufacturer</li>
+                        <li>Photos showing genuine trademark labels, holograms, serial numbers</li>
+                        <li>Expert authentication (if available)</li>
+                    </ul>
+                    <strong>Demand Letter Strategy:</strong> Target the brand owner (not the marketplace). Demand immediate retraction of false claims, compensation for lost sales during suspension, inventory return, and public clearing of your reputation. Threaten claims for:
+                    <ul>
+                        <li><strong>Tortious interference:</strong> Intentional interference with business relationships</li>
+                        <li><strong>False statements:</strong> Fraudulent IP complaints</li>
+                        <li><strong>Abuse of process:</strong> Misuse of IP enforcement mechanisms</li>
+                        <li><strong>Damages:</strong> Lost profits, account reinstatement costs, inventory loss</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">2. Trademark Bullying / Gray Market Disputes</div>
+                <div class="card-content">
+                    <strong>Scenario:</strong> Brand owner claims trademark infringement when you're selling genuine products through legitimate gray market channels (parallel imports).<br><br>
+                    <strong>Legal Background:</strong> First Sale Doctrine generally allows resale of genuine trademarked goods. However, brands use various tactics:
+                    <ul>
+                        <li>Claiming products are "materially different" (international vs. US versions)</li>
+                        <li>Enforcing distribution agreements prohibiting resale</li>
+                        <li>Alleging trademark confusion due to listing variations</li>
+                    </ul>
+                    <strong>Demand Letter Strategy:</strong> Assert First Sale Doctrine rights, provide evidence of genuine products from legitimate sources, and demand cessation of baseless IP complaints. Consider counterclaims for abuse of process if brand has pattern of targeting legitimate resellers.
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">3. Patent Troll Shakedowns</div>
+                <div class="card-content">
+                    <strong>Scenario:</strong> Company with dubious patent sends demand letters claiming your products infringe, demanding licensing fees.<br><br>
+                    <strong>Red Flags for Patent Trolls:</strong>
+                    <ul>
+                        <li>No actual products, just licensing business</li>
+                        <li>Overly broad patent claims</li>
+                        <li>Targeting hundreds of small sellers, not just you</li>
+                        <li>Offering "settlement" for $3K-$10K (below defense costs)</li>
+                        <li>Patent covers obvious/prior art concepts</li>
+                    </ul>
+                    <strong>Demand Letter Response:</strong> Challenge patent validity, request detailed claim charts showing alleged infringement, demand proof of damages, and refuse settlement. Consider invalidity counterclaims or inter partes review (IPR) if patent is clearly invalid.
+                </div>
+            </div>
+
+            <div class="subsection-title">🎯 Defensive: Stopping Counterfeiters</div>
+
+            <div class="card">
+                <div class="card-title">When YOU Are the Brand Owner</div>
+                <div class="card-content">
+                    If you're a brand owner discovering counterfeit sellers on marketplaces:<br><br>
+                    <strong>Marketplace Tools (Use These First):</strong>
+                    <ul>
+                        <li><strong>Amazon Brand Registry:</strong> Report-a-Violation tool, Transparency program</li>
+                        <li><strong>eBay VeRO Program:</strong> Verified Rights Owner takedown system</li>
+                        <li><strong>Etsy IP Report:</strong> Intellectual property infringement reporting</li>
+                    </ul>
+                    <strong>Demand Letters to Counterfeiters:</strong> Send after marketplace removal to demand:
+                    <ul>
+                        <li>Disclosure of remaining inventory quantities and sources</li>
+                        <li>Destruction of counterfeit goods</li>
+                        <li>Compensation for trademark dilution and lost sales</li>
+                        <li>Permanent cease-and-desist</li>
+                    </ul>
+                    <strong>Challenges:</strong> Many counterfeiters operate overseas or use fake business registrations. Marketplace removal is usually more effective than demand letters for one-off sellers.
+                </div>
+            </div>
+
+            <div class="subsection-title">📊 IP Dispute Outcomes by Scenario</div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Dispute Type</th>
+                        <th>Demand Letter Target</th>
+                        <th>Success Rate</th>
+                        <th>Typical Resolution</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>False Counterfeit Claim (Genuine Goods)</strong></td>
+                        <td>Brand owner who made complaint</td>
+                        <td>65-70%</td>
+                        <td>Retraction, account reinstatement</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gray Market (First Sale)</strong></td>
+                        <td>Brand owner blocking resale</td>
+                        <td>50-60%</td>
+                        <td>Settlement allowing limited resale</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Patent Troll</strong></td>
+                        <td>NPE (non-practicing entity)</td>
+                        <td>40-50%</td>
+                        <td>Nuisance settlement or dismissal</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Actual Counterfeiter</strong></td>
+                        <td>Counterfeit seller</td>
+                        <td>30-40%</td>
+                        <td>Marketplace removal + small settlement</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Trademark Infringement (Clear Case)</strong></td>
+                        <td>Infringing seller</td>
+                        <td>75-85%</td>
+                        <td>Cease-and-desist compliance</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning-box">
+                <strong>⚠️ IP Disputes Can Escalate Quickly:</strong><br>
+                Intellectual property disputes carry the highest litigation risk in e-commerce. Consider:
+                <ul style="margin-top: 10px;">
+                    <li><strong>Statutory damages:</strong> Up to $150K per willfully infringed work for copyright</li>
+                    <li><strong>Treble damages:</strong> 3x actual damages for willful trademark infringement</li>
+                    <li><strong>Attorney fees:</strong> Prevailing party can recover legal costs in IP cases</li>
+                    <li><strong>Injunctions:</strong> Courts can permanently ban you from selling certain products</li>
+                </ul>
+                Don't engage in aggressive demand letter campaigns without solid legal footing. IP disputes are one area where attorney consultation before sending demands is critical.
+            </div>
+
+            <div class="success-box">
+                <strong>✅ Best Practices for IP Demand Letters:</strong><br>
+                <ol style="margin-top: 10px;">
+                    <li><strong>Document everything:</strong> Authentication letters, invoices, distribution agreements</li>
+                    <li><strong>Use registered agent addresses:</strong> Find counterparty's official legal address, not just Amazon storefront</li>
+                    <li><strong>Cite specific claims:</strong> Lanham Act §1125(a), state unfair competition laws</li>
+                    <li><strong>Quantify damages:</strong> Lost sales during suspension, inventory seizure value, reinstatement costs</li>
+                    <li><strong>Demand specifics:</strong> Written retraction, marketplace appeal support, monetary compensation</li>
+                    <li><strong>Set reasonable deadline:</strong> 14 days typical for IP demands</li>
+                    <li><strong>Follow through:</strong> If no response, actually file lawsuits (empty threats hurt credibility)</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Tab 7: Generator -->
+        <div id="tab-generator" class="tab-content">
+            <div class="section-title">✍️ E-Commerce Demand Letter Generator</div>
+
+            <p class="content-text">Use this basic generator to create a starting point for your e-commerce demand letter. This is a template tool—you should customize the language for your specific situation and consider professional legal review for high-value disputes.</p>
+
+            <div class="form-group">
+                <label class="form-label">Your Business Name</label>
+                <input type="text" class="form-input" id="gen-business-name" placeholder="ABC E-Commerce LLC">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Recipient Name/Business</label>
+                <input type="text" class="form-input" id="gen-recipient-name" placeholder="XYZ Supplier Inc.">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Recipient Address</label>
+                <input type="text" class="form-input" id="gen-recipient-address" placeholder="123 Main St, City, State ZIP">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Dispute Type</label>
+                <select class="form-select" id="gen-dispute-type">
+                    <option value="">-- Select Dispute Type --</option>
+                    <option value="supplier-defective">Supplier - Defective Products</option>
+                    <option value="supplier-late">Supplier - Late Delivery</option>
+                    <option value="supplier-quantity">Supplier - Quantity Shortfall</option>
+                    <option value="payment-hold">Payment Processor Hold</option>
+                    <option value="chargeback-fraud">Customer Chargeback Fraud</option>
+                    <option value="return-fraud">Customer Return Fraud</option>
+                    <option value="false-ip">False IP/Counterfeit Claim</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Amount in Dispute</label>
+                <input type="text" class="form-input" id="gen-amount" placeholder="$5,000">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Brief Description of Issue</label>
+                <textarea class="form-textarea" id="gen-description" placeholder="Describe what happened, when, and what you're demanding..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Deadline for Response (days)</label>
+                <select class="form-select" id="gen-deadline">
+                    <option value="7">7 days</option>
+                    <option value="10" selected>10 days</option>
+                    <option value="14">14 days</option>
+                    <option value="21">21 days</option>
+                </select>
+            </div>
+
+            <button class="btn" onclick="generateDemandLetter()">Generate Demand Letter</button>
+
+            <div class="generated-output" id="generated-letter"></div>
+
+            <button class="btn btn-secondary" id="copy-btn" onclick="copyToClipboard()" style="display: none; margin-top: 15px;">📋 Copy to Clipboard</button>
+
+            <div class="warning-box" style="margin-top: 30px;">
+                <strong>⚠️ Important Disclaimer:</strong><br>
+                This generator creates a basic template only. It is NOT a substitute for professional legal advice. For disputes involving:
+                <ul style="margin-top: 10px;">
+                    <li>Amounts over $5,000</li>
+                    <li>IP/counterfeit claims</li>
+                    <li>Marketplace account suspensions</li>
+                    <li>International parties</li>
+                </ul>
+                Consider consulting with a licensed attorney. See the "Legal Services" tab for consultation options.
+            </div>
+        </div>
+
+        <!-- Tab 8: Risk Analyzer -->
+        <div id="tab-analyzer" class="tab-content">
+            <div class="section-title">🎯 Demand Letter Risk Analyzer</div>
+
+            <p class="content-text">Answer the questions below to assess whether sending a demand letter makes sense for your situation, and what your likelihood of success might be.</p>
+
+            <div class="subsection-title">Question 1: What is the dispute amount?</div>
+            <label class="risk-option">
+                <input type="radio" name="q1" value="10" onclick="calculateRisk()">
+                <strong>Over $10,000</strong> - Economically justifies legal action
+            </label>
+            <label class="risk-option">
+                <input type="radio" name="q1" value="5" onclick="calculateRisk()">
+                <strong>$2,500 - $10,000</strong> - Moderate amount, consider cost-benefit
+            </label>
+            <label class="risk-option">
+                <input type="radio" name="q1" value="2" onclick="calculateRisk()">
+                <strong>$500 - $2,500</strong> - Small claims court may be better option
+            </label>
+            <label class="risk-option">
+                <input type="radio" name="q1" value="0" onclick="calculateRisk()">
+                <strong>Under $500</strong> - Usually not economical to pursue legally
+            </label>
+
+            <div class="subsection-title">Question 2: What evidence do you have?</div>
+            <label class="risk-option">
+                <input type="radio" name="q2" value="10" onclick="calculateRisk()">
+                <strong>Excellent:</strong> Written contracts, delivery confirmations, clear documentation
+            </label>
+            <label class="risk-option">
+                <input type="radio" name="q2" value="7" onclick="calculateRisk()">
+                <strong>Good:</strong> Email trails, photos, invoices, some documentation
+            </label>
+            <label class="risk-option">
+                <input type="radio" name="q2" value="3" onclick="calculateRisk()">
+                <strong>Fair:</strong> Verbal agreements, partial records, some gaps
+            </label>
+            <label class="risk-option">
+                <input type="radio" name="q2" value="0" onclick="calculateRisk()">
+                <strong>Poor:</strong> Little to no documentation, mostly verbal
+            </label>
+
+            <div class="subsection-title">Question 3: Where is the defendant located?</div>
+            <label class="risk-option">
+                <input type="radio" name="q3" value="10" onclick="calculateRisk()">
+                <strong>Same state</strong> - Easy to enforce judgment
+            </label>
+            <label class="risk-option">
+                <input type="radio" name="q3" value="7" onclick="calculateRisk()">
+                <strong>Different US state</strong> - Enforceable but more complex
+            </label>
+            <label class="risk-option">
+                <input type="radio" name="q3" value="3" onclick="calculateRisk()">
+                <strong>Canada/Europe</strong> - Difficult but possible enforcement
+            </label>
+            <label class="risk-option">
+                <input type="radio" name="q3" value="0" onclick="calculateRisk()">
+                <strong>China/Asia/No US presence</strong> - Nearly impossible to enforce
+            </label>
+
+            <div class="subsection-title">Question 4: What's your primary goal?</div>
+            <label class="risk-option">
+                <input type="radio" name="q4" value="10" onclick="calculateRisk()">
+                <strong>Monetary recovery</strong> - Defendant has assets to collect
+            </label>
+            <label class="risk-option">
+                <input type="radio" name="q4" value="8" onclick="calculateRisk()">
+                <strong>Stop ongoing harm</strong> - Injunction, cease-and-desist compliance
+            </label>
+            <label class="risk-option">
+                <input type="radio" name="q4" value="5" onclick="calculateRisk()">
+                <strong>Account reinstatement</strong> - Marketplace/platform restoration
+            </label>
+            <label class="risk-option">
+                <input type="radio" name="q4" value="3" onclick="calculateRisk()">
+                <strong>Principle/deterrence</strong> - Send a message, unlikely to collect
+            </label>
+
+            <div class="subsection-title">Question 5: Have you attempted informal resolution?</div>
+            <label class="risk-option">
+                <input type="radio" name="q5" value="10" onclick="calculateRisk()">
+                <strong>Yes, multiple attempts</strong> - Shows good faith, strengthens position
+            </label>
+            <label class="risk-option">
+                <input type="radio" name="q5" value="5" onclick="calculateRisk()">
+                <strong>Yes, one attempt</strong> - Some negotiation effort
+            </label>
+            <label class="risk-option">
+                <input type="radio" name="q5" value="2" onclick="calculateRisk()">
+                <strong>No, going straight to demand letter</strong> - May seem aggressive
+            </label>
+
+            <div class="subsection-title">Question 6: What type of defendant?</div>
+            <label class="risk-option">
+                <input type="radio" name="q6" value="10" onclick="calculateRisk()">
+                <strong>Established business with assets</strong> - Best collection potential
+            </label>
+            <label class="risk-option">
+                <input type="radio" name="q6" value="7" onclick="calculateRisk()">
+                <strong>Small business/sole proprietor</strong> - Moderate collection potential
+            </label>
+            <label class="risk-option">
+                <input type="radio" name="q6" value="4" onclick="calculateRisk()">
+                <strong>Individual consumer</strong> - Lower collection potential
+            </label>
+            <label class="risk-option">
+                <input type="radio" name="q6" value="1" onclick="calculateRisk()">
+                <strong>Unknown/anonymous seller</strong> - Very low collection potential
+            </label>
+
+            <div class="risk-result" id="risk-result">
+                <div style="text-align: center;">
+                    <div style="font-size: 20px; font-weight: 700; margin-bottom: 10px;">Your Risk Assessment Score</div>
+                    <div class="risk-score" id="risk-score">0/60</div>
+                    <div id="risk-assessment" style="font-size: 16px; margin: 20px 0; line-height: 1.8;"></div>
+                    <div id="risk-recommendation" style="background: #f8f9ff; padding: 20px; border-radius: 8px; text-align: left;"></div>
+                </div>
+            </div>
+
+            <div class="info-box" style="margin-top: 30px;">
+                <strong>💡 How to Interpret Your Score:</strong><br>
+                <strong>50-60 points:</strong> Excellent case for demand letter. Strong likelihood of success.<br>
+                <strong>35-49 points:</strong> Moderate case. Consider demand letter with realistic expectations.<br>
+                <strong>20-34 points:</strong> Weak case. Evaluate whether costs justify potential recovery.<br>
+                <strong>0-19 points:</strong> Poor case. Demand letter unlikely to be cost-effective.
+            </div>
+        </div>
+
+        <!-- Tab 9: Legal Services -->
+        <div id="tab-services" class="tab-content">
+            <div class="section-title">⚖️ Professional Legal Services</div>
+
+            <p class="content-text">I'm Sergei Tokmakov, Esq., a licensed California attorney specializing in e-commerce legal disputes. Unlike anonymous legal services or document mills, you'll work directly with me—a licensed attorney with deep expertise in online seller disputes, marketplace suspensions, and payment processor conflicts.</p>
+
+            <div class="attorney-badge">✓ Licensed Attorney - CA Bar #279869</div>
+
+            <div class="pricing-cards">
+                <div class="pricing-card">
+                    <div class="pricing-card-title">🎯 Basic Demand Letter</div>
+                    <div class="pricing-card-price">~$450</div>
+                    <div class="pricing-card-features">
+                        <strong>What's Included:</strong>
+                        <ul>
+                            <li>Attorney-drafted demand letter</li>
+                            <li>Legal analysis of your case</li>
+                            <li>Specific damages calculations</li>
+                            <li>Citations to applicable law</li>
+                            <li>Clear next steps outlined</li>
+                            <li>Sent via certified mail + email</li>
+                        </ul>
+                        <div style="margin-top: 15px; color: #64748b; font-size: 13px;">
+                            <strong>Best for:</strong> Clear-cut disputes, documented evidence, amounts $2,000-$10,000
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pricing-card" style="border: 3px solid #f59e0b;">
+                    <div style="text-align: center; background: #f59e0b; color: white; padding: 6px; margin: -20px -20px 15px -20px; font-weight: 700; font-size: 13px;">
+                        RECOMMENDED FOR SERIOUS CASES
+                    </div>
+                    <div class="pricing-card-title">💼 Demand Letter + Lawsuit Draft</div>
+                    <div class="pricing-card-price">~$900</div>
+                    <div class="pricing-card-features">
+                        <strong>What's Included:</strong>
+                        <ul>
+                            <li><strong>Everything in Basic, PLUS:</strong></li>
+                            <li>Draft lawsuit complaint prepared</li>
+                            <li>Ready to file if demand ignored</li>
+                            <li>Jurisdictional analysis</li>
+                            <li>Statute of limitations review</li>
+                            <li>Maximum leverage in negotiations</li>
+                            <li>Demonstrates serious intent</li>
+                        </ul>
+                        <div style="margin-top: 15px; color: #64748b; font-size: 13px;">
+                            <strong>Best for:</strong> High-stakes disputes, unresponsive counterparties, amounts $10,000+, need maximum leverage
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="success-box">
+                <strong>✅ Why the Demand Letter + Lawsuit Draft Combo is Most Effective:</strong><br>
+                When recipients know a lawsuit is already drafted and ready to file, settlement rates increase dramatically. You're not making empty threats—you're demonstrating that litigation will proceed immediately if they don't respond. This approach typically:
+                <ul style="margin-top: 10px;">
+                    <li><strong>Increases response rate</strong> from ~45% to ~75%</li>
+                    <li><strong>Speeds up settlement</strong> (recipients don't want to incur defense costs)</li>
+                    <li><strong>Improves settlement terms</strong> (shows you're serious, not bluffing)</li>
+                    <li><strong>Saves overall costs</strong> if litigation becomes necessary (complaint already drafted)</li>
+                </ul>
+            </div>
+
+            <div class="subsection-title">📧 Certified Mail + Email: Maximum Effect</div>
+            <p class="content-text">Both service options include dual delivery via <strong>certified mail with return receipt</strong> (creates legal proof of delivery) and <strong>email to all known addresses</strong> (faster response, shows good faith effort). This combination is the most effective approach for demand letters.</p>
+
+            <div class="calendly-section">
+                <div class="calendly-header">
+                    <div class="calendly-title">📅 Schedule a Consultation</div>
+                    <div class="calendly-subtitle">Free 30-minute case evaluation to discuss your e-commerce dispute</div>
+                </div>
+
+                <!-- Calendly inline widget begin -->
+                <div class="calendly-inline-widget" data-url="https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1" style="min-width:320px;height:700px;"></div>
+                <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
+                <!-- Calendly inline widget end -->
+            </div>
+
+            <div class="subsection-title">📞 Contact Information</div>
+            <div class="card">
+                <div class="card-content">
+                    <strong>Sergei Tokmakov, Esq.</strong><br>
+                    California Bar #279869<br>
+                    Email: <a href="mailto:owner@terms.law">owner@terms.law</a><br>
+                    Website: <a href="https://terms.law" target="_blank">terms.law</a>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <strong>💡 What to Prepare for Your Consultation:</strong>
+                <ul style="margin-top: 10px;">
+                    <li>Chronological summary of events</li>
+                    <li>All relevant documentation (contracts, emails, invoices)</li>
+                    <li>Damages calculation or estimate</li>
+                    <li>Defendant's contact information</li>
+                    <li>Your desired outcome</li>
+                </ul>
+                Having these materials organized will maximize the value of your free consultation.
+            </div>
+        </div>
+
+        <!-- Tab 10: Prevention -->
+        <div id="tab-prevention" class="tab-content">
+            <div class="section-title">🛡️ Preventing E-Commerce Disputes</div>
+
+            <p class="content-text">Prevention is exponentially cheaper than resolution. Implementing these practices reduces disputes by 50-70% while building sustainable business practices.</p>
+
+            <div class="subsection-title">📦 Supplier Relationship Best Practices</div>
+
+            <div class="card">
+                <div class="card-title">1. Quality Control Systems</div>
+                <div class="card-content">
+                    <ul>
+                        <li><strong>Pre-shipment inspections:</strong> Use SGS, Bureau Veritas, or similar</li>
+                        <li><strong>Sample approval:</strong> Never skip sample orders before bulk production</li>
+                        <li><strong>Detailed specifications:</strong> Written specs with photos, measurements, tolerances</li>
+                        <li><strong>Inspection rights:</strong> Contract terms allowing factory visits</li>
+                        <li><strong>Quality standards:</strong> AQL (Acceptable Quality Level) requirements in contracts</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">2. Payment Protection Mechanisms</div>
+                <div class="card-content">
+                    <ul>
+                        <li><strong>Alibaba Trade Assurance:</strong> Escrow protection for orders</li>
+                        <li><strong>Letters of credit:</strong> Bank-intermediated payment for large orders ($20K+)</li>
+                        <li><strong>Staged payments:</strong> 30% deposit, 70% on delivery verification</li>
+                        <li><strong>Credit card payments:</strong> Chargeback rights for small orders</li>
+                        <li><strong>Never use Western Union/wire:</strong> Zero recourse for fraud</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">3. Contract Essentials</div>
+                <div class="card-content">
+                    Every supplier relationship should have written agreements covering:
+                    <ul>
+                        <li><strong>Quality specifications:</strong> Detailed product requirements</li>
+                        <li><strong>Delivery deadlines:</strong> With liquidated damages for delays</li>
+                        <li><strong>Inspection rights:</strong> Your right to inspect before acceptance</li>
+                        <li><strong>Warranties:</strong> Product defect remedies and timelines</li>
+                        <li><strong>Liability caps:</strong> Consequential damages provisions</li>
+                        <li><strong>Jurisdiction:</strong> Which country's laws apply, where disputes resolved</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="subsection-title">🏪 Marketplace Account Protection</div>
+
+            <div class="card">
+                <div class="card-title">Performance Metrics Management</div>
+                <div class="card-content">
+                    <ul>
+                        <li><strong>Order defect rate:</strong> Keep below 1% (Amazon), below 2% (eBay)</li>
+                        <li><strong>Late shipment rate:</strong> Ship on time 95%+ consistently</li>
+                        <li><strong>Cancellation rate:</strong> Avoid pre-fulfillment cancellations</li>
+                        <li><strong>Valid tracking rate:</strong> Always use trackable shipping methods</li>
+                        <li><strong>Monitor daily:</strong> Check Seller Central/account health daily</li>
+                        <li><strong>Buffer inventory:</strong> Never let popular items go out of stock</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">IP Compliance & Authenticity</div>
+                <div class="card-content">
+                    <ul>
+                        <li><strong>Source verification:</strong> Buy only from authorized distributors</li>
+                        <li><strong>Letters of authenticity:</strong> Obtain for all brand-name products</li>
+                        <li><strong>Avoid counterfeits:</strong> "Too good to be true" prices are red flags</li>
+                        <li><strong>Brand relationships:</strong> Get written authorization for selling brands</li>
+                        <li><strong>Documentation retention:</strong> Keep invoices showing authorized sourcing</li>
+                        <li><strong>Amazon Transparency:</strong> Enroll if you're a brand owner</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="subsection-title">💳 Payment Processor Risk Management</div>
+
+            <div class="card">
+                <div class="card-title">Reducing Hold/Freeze Risk</div>
+                <div class="card-content">
+                    <ul>
+                        <li><strong>Gradual scaling:</strong> Increase volume gradually, not overnight spikes</li>
+                        <li><strong>Detailed product descriptions:</strong> Clear, accurate listing information</li>
+                        <li><strong>Transparent refund policy:</strong> Prominently displayed, fair terms</li>
+                        <li><strong>Fast fulfillment:</strong> Ship same-day or next-day when possible</li>
+                        <li><strong>Communication:</strong> Respond to customer inquiries within hours</li>
+                        <li><strong>Chargeback prevention:</strong> Get signature confirmation on high-value orders</li>
+                        <li><strong>Multiple processors:</strong> Maintain backup payment processors</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="subsection-title">👥 Customer Dispute Prevention</div>
+
+            <div class="card">
+                <div class="card-title">Reducing Chargebacks & Returns</div>
+                <div class="card-content">
+                    <ul>
+                        <li><strong>Accurate photos:</strong> Show exact product, not stock photos</li>
+                        <li><strong>Detailed descriptions:</strong> Dimensions, materials, limitations clearly stated</li>
+                        <li><strong>Proactive communication:</strong> Shipping updates, delivery confirmations</li>
+                        <li><strong>Quality packaging:</strong> Prevent damage in transit</li>
+                        <li><strong>Fair return policy:</strong> 30-day returns reduce chargeback risk</li>
+                        <li><strong>Excellent customer service:</strong> Resolve issues before chargebacks filed</li>
+                        <li><strong>Order confirmation emails:</strong> With contact info for questions</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Fraud Detection & Prevention</div>
+                <div class="card-content">
+                    <ul>
+                        <li><strong>Address verification:</strong> Match billing and shipping addresses</li>
+                        <li><strong>Signature required:</strong> For orders over $100-200</li>
+                        <li><strong>Fraud scoring:</strong> Use MaxMind, Signifyd, or similar services</li>
+                        <li><strong>Email/phone verification:</strong> Contact customers on high-risk orders</li>
+                        <li><strong>Limit quantities:</strong> Flag orders for 10+ of same item</li>
+                        <li><strong>IP geolocation:</strong> Flag if IP doesn't match shipping location</li>
+                        <li><strong>Blacklist known fraudsters:</strong> Maintain list of problematic customers</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="success-box">
+                <strong>✅ The 80/20 Rule for E-Commerce Dispute Prevention:</strong><br>
+                Focus on these high-impact actions that prevent 80% of disputes with 20% of effort:
+                <ol style="margin-top: 10px;">
+                    <li><strong>Sample orders before bulk</strong> (prevents supplier defect disasters)</li>
+                    <li><strong>Pre-shipment inspection</strong> (catches quality issues before receiving)</li>
+                    <li><strong>Same-day shipping</strong> (prevents late shipment rate issues)</li>
+                    <li><strong>Signature confirmation $100+</strong> (prevents "item not received" fraud)</li>
+                    <li><strong>Proactive customer communication</strong> (resolves issues before escalation)</li>
+                </ol>
+                These five practices alone prevent the majority of e-commerce legal disputes.
+            </div>
+        </div>
+
+        <!-- Tab 11: FAQ -->
+        <div id="tab-faq" class="tab-content">
+            <div class="section-title">❓ Frequently Asked Questions</div>
+
+            <div class="card">
+                <div class="card-title">Q: How much does it cost to send a demand letter?</div>
+                <div class="card-content">
+                    <strong>A:</strong> Professional attorney-drafted demand letters typically cost $300-$800 depending on complexity. DIY approaches can be free but may lack legal effectiveness. For e-commerce disputes over $2,000, professional drafting is usually worth the investment. The "Legal Services" tab has pricing details for my services.
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Q: What's the success rate of e-commerce demand letters?</div>
+                <div class="card-content">
+                    <strong>A:</strong> Success rates vary by dispute type:
+                    <ul>
+                        <li>Supplier disputes with documentation: 60-70%</li>
+                        <li>Payment processor holds: 45-55%</li>
+                        <li>Chargeback fraud: 55-65%</li>
+                        <li>Marketplace suspensions: 30-40% (highly variable)</li>
+                        <li>IP/counterfeit claims: 50-70% depending on strength</li>
+                    </ul>
+                    Key factors affecting success: quality of evidence, amount in dispute, defendant's location, legal merit of claims.
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Q: Should I send demand letters to overseas suppliers?</div>
+                <div class="card-content">
+                    <strong>A:</strong> Demand letters to overseas suppliers (especially China, India, Southeast Asia) have limited effectiveness unless combined with payment reversal mechanisms. Better strategies:
+                    <ul>
+                        <li>File Alibaba Trade Assurance claim (if used)</li>
+                        <li>Credit card chargeback (within 60-120 days)</li>
+                        <li>Use inspection companies BEFORE payment</li>
+                        <li>Letters of credit for future orders</li>
+                    </ul>
+                    Send demand letters mainly to establish record for payment disputes, not expecting direct compliance.
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Q: Can I send a demand letter to Amazon/eBay/Etsy?</div>
+                <div class="card-content">
+                    <strong>A:</strong> You can, but it rarely works. Marketplaces have broad contractual rights to suspend accounts and don't respond well to legal threats from sellers. Better approach:
+                    <ul>
+                        <li>Focus on platform's internal appeal process first</li>
+                        <li>Executive escalations (jeff@amazon.com)</li>
+                        <li>Send demand letters to THIRD PARTIES who caused suspension (competitors, false claimants)</li>
+                        <li>Consider arbitration demands (required by Amazon terms)</li>
+                    </ul>
+                    Legal action against platforms works best AFTER exhausting internal remedies.
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Q: What's the minimum amount to justify a demand letter?</div>
+                <div class="card-content">
+                    <strong>A:</strong> General guidelines:
+                    <ul>
+                        <li><strong>$2,000+:</strong> Usually economical for attorney-drafted demand letters</li>
+                        <li><strong>$500-$2,000:</strong> Consider DIY demand letter or small claims court</li>
+                        <li><strong>Under $500:</strong> Usually not worth legal costs unless clear fraud</li>
+                    </ul>
+                    Exceptions: Clear fraud cases, precedent value, or situations where deterrence is important may justify demand letters at lower amounts.
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Q: How long should I wait for a response?</div>
+                <div class="card-content">
+                    <strong>A:</strong> Typical deadlines in demand letters:
+                    <ul>
+                        <li><strong>10-14 days:</strong> Standard business deadline</li>
+                        <li><strong>7 days:</strong> Urgent situations (account suspensions, immediate harm)</li>
+                        <li><strong>21 days:</strong> Complex disputes requiring investigation</li>
+                    </ul>
+                    After deadline expires, wait 3-5 additional days before escalating (accounting for mail delays). If no response, proceed with next steps (litigation, arbitration, regulatory complaints).
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Q: Should I send via certified mail or email?</div>
+                <div class="card-content">
+                    <strong>A:</strong> <strong>Both!</strong> Maximum effectiveness comes from dual delivery:
+                    <ul>
+                        <li><strong>Certified mail with return receipt:</strong> Creates legal proof of delivery (required for some legal proceedings)</li>
+                        <li><strong>Email to all known addresses:</strong> Faster delivery, shows good faith, often gets faster response</li>
+                    </ul>
+                    This combination demonstrates seriousness while preserving proof for potential litigation. For marketplace disputes, also send via platform messaging systems when possible.
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Q: What if the recipient ignores my demand letter?</div>
+                <div class="card-content">
+                    <strong>A:</strong> Next steps depend on amount and situation:
+                    <ul>
+                        <li><strong>Under $10K:</strong> Small claims court (most economical)</li>
+                        <li><strong>$10K-$50K:</strong> Consider arbitration or limited civil court</li>
+                        <li><strong>Over $50K:</strong> Full litigation may be justified</li>
+                        <li><strong>Payment processors:</strong> File CFPB complaints</li>
+                        <li><strong>Fraud cases:</strong> Report to IC3.gov (FBI), state AG</li>
+                        <li><strong>Marketplace suspensions:</strong> File arbitration demand</li>
+                    </ul>
+                    Consult with attorney to evaluate best path forward based on specific facts.
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Q: Can I write my own demand letter or should I hire an attorney?</div>
+                <div class="card-content">
+                    <strong>A:</strong> Consider these factors:
+                    <br><br>
+                    <strong>DIY demand letter makes sense when:</strong>
+                    <ul>
+                        <li>Dispute under $2,000</li>
+                        <li>Very straightforward facts (clear breach, good documentation)</li>
+                        <li>First attempt to recover, testing responsiveness</li>
+                        <li>Low-risk situation (won't hurt to try)</li>
+                    </ul>
+                    <strong>Hire attorney when:</strong>
+                    <ul>
+                        <li>Dispute over $5,000</li>
+                        <li>Complex legal issues (IP claims, jurisdiction questions)</li>
+                        <li>High-stakes (account suspension, business survival)</li>
+                        <li>Need maximum leverage (ready to litigate)</li>
+                        <li>International parties involved</li>
+                    </ul>
+                    Poorly drafted demand letters can hurt your case by revealing weaknesses or showing lack of seriousness.
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Q: How long does it take to resolve disputes with demand letters?</div>
+                <div class="card-content">
+                    <strong>A:</strong> Typical timelines:
+                    <ul>
+                        <li><strong>Supplier disputes:</strong> 30-90 days from demand letter to settlement</li>
+                        <li><strong>Payment holds:</strong> 45-120 days (often tied to processor's hold period)</li>
+                        <li><strong>Chargeback fraud:</strong> 30-60 days</li>
+                        <li><strong>Marketplace suspensions:</strong> 14-45 days for appeals, longer for litigation</li>
+                        <li><strong>IP disputes:</strong> 60-180 days depending on complexity</li>
+                    </ul>
+                    If recipient ignores demand and you litigate, add 6-18 months for court resolution.
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Q: What should I do immediately after discovering a dispute?</div>
+                <div class="card-content">
+                    <strong>A:</strong> Take these immediate steps:
+                    <ol>
+                        <li><strong>Document everything:</strong> Screenshots, emails, photos, invoices</li>
+                        <li><strong>Preserve evidence:</strong> Don't delete emails, save conversations</li>
+                        <li><strong>Calculate damages:</strong> Itemize all losses with backup documentation</li>
+                        <li><strong>Review contracts/terms:</strong> Understand your legal rights</li>
+                        <li><strong>Attempt informal resolution:</strong> Email or call before legal escalation</li>
+                        <li><strong>Check deadlines:</strong> Amazon appeals (17 days), chargebacks (7-10 days), statutes of limitation</li>
+                        <li><strong>Consult attorney if high-stakes:</strong> Free consultations available (see "Legal Services" tab)</li>
+                    </ol>
+                    Acting quickly preserves options and evidence.
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Tab Navigation - WordPress Compatible
+        function switchTab(tabId, event) {
+            // Prevent default behavior and stop propagation for WordPress compatibility
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+
+            // Hide all tab contents
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+
+            // Deactivate all tabs
+            const tabs = document.querySelectorAll('.tab-button');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Show selected tab content
+            document.getElementById('tab-' + tabId).classList.add('active');
+
+            // Activate clicked tab
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
+        }
+
+        // Tab Scrolling
+        function scrollTabs(direction) {
+            const tabNav = document.getElementById('tabNav');
+            const scrollAmount = 200;
+
+            if (direction === 'left') {
+                tabNav.scrollLeft -= scrollAmount;
+            } else {
+                tabNav.scrollLeft += scrollAmount;
+            }
+
+            // Update arrow visibility after scroll
+            setTimeout(updateTabArrows, 100);
+        }
+
+        function updateTabArrows() {
+            const tabNav = document.getElementById('tabNav');
+            const leftArrow = document.querySelector('.tab-nav-arrow.left');
+            const rightArrow = document.querySelector('.tab-nav-arrow.right');
+
+            if (!tabNav || !leftArrow || !rightArrow) return;
+
+            const isScrollable = tabNav.scrollWidth > tabNav.clientWidth;
+            const isAtStart = tabNav.scrollLeft <= 0;
+            const isAtEnd = tabNav.scrollLeft + tabNav.clientWidth >= tabNav.scrollWidth - 1;
+
+            if (isScrollable) {
+                leftArrow.classList.toggle('show', !isAtStart);
+                rightArrow.classList.toggle('show', !isAtEnd);
+            } else {
+                leftArrow.classList.remove('show');
+                rightArrow.classList.remove('show');
+            }
+        }
+
+        // Initialize arrows on load and resize
+        window.addEventListener('load', updateTabArrows);
+        window.addEventListener('resize', updateTabArrows);
+
+        // Update arrows on scroll
+        const tabNav = document.getElementById('tabNav');
+        if (tabNav) {
+            tabNav.addEventListener('scroll', updateTabArrows);
+        }
+
+        // Demand Letter Generator
+        function generateDemandLetter() {
+            const businessName = document.getElementById('gen-business-name').value;
+            const recipientName = document.getElementById('gen-recipient-name').value;
+            const recipientAddress = document.getElementById('gen-recipient-address').value;
+            const disputeType = document.getElementById('gen-dispute-type').value;
+            const amount = document.getElementById('gen-amount').value;
+            const description = document.getElementById('gen-description').value;
+            const deadline = document.getElementById('gen-deadline').value;
+
+            if (!businessName || !recipientName || !recipientAddress || !disputeType || !amount || !description) {
+                alert('Please fill in all fields before generating.');
+                return;
+            }
+
+            const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            const deadlineDate = new Date();
+            deadlineDate.setDate(deadlineDate.getDate() + parseInt(deadline));
+            const formattedDeadline = deadlineDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+            let disputeTitle = '';
+            let legalBasis = '';
+
+            switch(disputeType) {
+                case 'supplier-defective':
+                    disputeTitle = 'Re: Defective Products and Breach of Contract';
+                    legalBasis = 'breach of contract, breach of implied warranty of merchantability, and violation of commercial sales law';
+                    break;
+                case 'supplier-late':
+                    disputeTitle = 'Re: Late Delivery and Breach of Contract';
+                    legalBasis = 'breach of contract and failure to meet agreed delivery terms';
+                    break;
+                case 'supplier-quantity':
+                    disputeTitle = 'Re: Quantity Shortfall and Breach of Contract';
+                    legalBasis = 'breach of contract and commercial fraud';
+                    break;
+                case 'payment-hold':
+                    disputeTitle = 'Re: Unjustified Account Hold and Breach of Merchant Agreement';
+                    legalBasis = 'breach of merchant services agreement and tortious interference with business relationships';
+                    break;
+                case 'chargeback-fraud':
+                    disputeTitle = 'Re: Fraudulent Chargeback and Demand for Payment';
+                    legalBasis = 'fraud, conversion, and unjust enrichment';
+                    break;
+                case 'return-fraud':
+                    disputeTitle = 'Re: Return Fraud and Demand for Payment';
+                    legalBasis = 'fraud, conversion, theft by deception, and unjust enrichment';
+                    break;
+                case 'false-ip':
+                    disputeTitle = 'Re: False Intellectual Property Claim and Demand for Damages';
+                    legalBasis = 'tortious interference with business relationships, abuse of process, and defamation';
+                    break;
+            }
+
+            const letter = `${today}
+
+${recipientName}
+${recipientAddress}
+
+${disputeTitle}
+
+Dear ${recipientName}:
+
+I am writing on behalf of ${businessName} regarding a serious dispute that requires immediate resolution. This letter constitutes formal legal notice and demand for payment.
+
+BACKGROUND AND DISPUTE
+
+${description}
+
+LOSSES AND DAMAGES
+
+As a direct result of the issues described above, ${businessName} has suffered losses in the amount of ${amount}. This figure represents [specify: product costs, lost sales, fees, penalties, and other consequential damages directly attributable to this matter].
+
+LEGAL BASIS FOR CLAIM
+
+Your actions constitute ${legalBasis}. ${businessName} has valid legal claims for full recovery of all losses and damages, plus applicable interest, costs, and attorney fees.
+
+DEMAND FOR RESOLUTION
+
+To avoid costly litigation, ${businessName} demands the following:
+
+1. Payment of ${amount} representing full compensation for losses described above
+2. [Additional specific remedies based on dispute type]
+3. Written confirmation that this matter is fully resolved
+
+This offer to settle is made in good faith to avoid the time and expense of formal legal proceedings. If we cannot reach resolution, ${businessName} is prepared to pursue all available legal remedies, including filing a lawsuit seeking the full amount of damages plus pre-judgment interest, post-judgment interest, court costs, and attorney fees.
+
+DEADLINE FOR RESPONSE
+
+You must respond to this demand by ${formattedDeadline}. Failure to respond or reach a satisfactory resolution by this date will result in ${businessName} proceeding with formal legal action without further notice.
+
+Please direct your response to:
+
+${businessName}
+[Your contact information]
+
+${businessName} reserves all rights and remedies available under law. Nothing in this letter should be construed as a waiver of any legal rights or claims.
+
+Time is of the essence. We expect your prompt attention to this matter.
+
+Sincerely,
+
+${businessName}
+
+
+---
+IMPORTANT NOTES:
+1. This is a template only. Customize specific damages, facts, and demands for your situation.
+2. Add your contact information in the appropriate section.
+3. Have this reviewed by a licensed attorney before sending for disputes over $5,000.
+4. Send via certified mail with return receipt AND email for maximum effectiveness.
+5. Keep copies of all documentation referenced in this letter.
+`;
+
+            document.getElementById('generated-letter').textContent = letter;
+            document.getElementById('generated-letter').classList.add('active');
+            document.getElementById('copy-btn').style.display = 'inline-block';
+        }
+
+        function copyToClipboard() {
+            const letterText = document.getElementById('generated-letter').textContent;
+            navigator.clipboard.writeText(letterText).then(function() {
+                const btn = document.getElementById('copy-btn');
+                const originalText = btn.textContent;
+                btn.textContent = '✓ Copied!';
+                setTimeout(function() {
+                    btn.textContent = originalText;
+                }, 2000);
+            });
+        }
+
+        // Risk Analyzer
+        function calculateRisk() {
+            const q1 = document.querySelector('input[name="q1"]:checked');
+            const q2 = document.querySelector('input[name="q2"]:checked');
+            const q3 = document.querySelector('input[name="q3"]:checked');
+            const q4 = document.querySelector('input[name="q4"]:checked');
+            const q5 = document.querySelector('input[name="q5"]:checked');
+            const q6 = document.querySelector('input[name="q6"]:checked');
+
+            if (!q1 || !q2 || !q3 || !q4 || !q5 || !q6) {
+                return; // Don't calculate until all questions answered
+            }
+
+            const score = parseInt(q1.value) + parseInt(q2.value) + parseInt(q3.value) +
+                         parseInt(q4.value) + parseInt(q5.value) + parseInt(q6.value);
+
+            let assessment = '';
+            let recommendation = '';
+
+            if (score >= 50) {
+                assessment = '<strong style="color: #10b981;">EXCELLENT CASE</strong><br>You have a strong case for sending a demand letter. High likelihood of success based on amount, evidence, location, and other factors.';
+                recommendation = `<strong>Recommended Next Steps:</strong><br>
+                1. Organize all documentation and evidence<br>
+                2. Calculate precise damages with backup documentation<br>
+                3. Consider professional attorney-drafted demand letter for maximum leverage<br>
+                4. Prepare to follow through with litigation if necessary (strong cases justify legal costs)<br>
+                5. Send via certified mail + email for maximum effect<br><br>
+                <strong>Expected Timeline:</strong> 30-60 days to resolution with demand letter.<br>
+                <strong>Estimated Success Rate:</strong> 70-85%`;
+            } else if (score >= 35) {
+                assessment = '<strong style="color: #f59e0b;">MODERATE CASE</strong><br>You have a reasonable case, but success is not guaranteed. Consider demand letter with realistic expectations about outcomes.';
+                recommendation = `<strong>Recommended Next Steps:</strong><br>
+                1. Strengthen documentation where possible (get written confirmations, photos, etc.)<br>
+                2. Attempt one more informal resolution before legal escalation<br>
+                3. Evaluate cost-benefit: is potential recovery worth legal costs?<br>
+                4. Consider DIY demand letter first, then attorney if no response<br>
+                5. Have backup plan (small claims court, regulatory complaints)<br><br>
+                <strong>Expected Timeline:</strong> 60-90 days, may require follow-up actions.<br>
+                <strong>Estimated Success Rate:</strong> 45-60%`;
+            } else if (score >= 20) {
+                assessment = '<strong style="color: #ef4444;">WEAK CASE</strong><br>Your case has significant challenges. Carefully evaluate whether the costs of pursuing this justify potential recovery.';
+                recommendation = `<strong>Recommended Alternatives:</strong><br>
+                1. Focus on informal resolution first (save legal costs)<br>
+                2. Consider regulatory complaints (CFPB, FTC, state AG) as lower-cost option<br>
+                3. Small claims court may be more economical than attorney fees<br>
+                4. Evaluate whether to write off loss vs. throwing good money after bad<br>
+                5. If proceeding, use DIY demand letter template, not expensive attorney<br><br>
+                <strong>Expected Timeline:</strong> 90+ days, likely requiring multiple approaches.<br>
+                <strong>Estimated Success Rate:</strong> 25-40%`;
+            } else {
+                assessment = '<strong style="color: #dc2626;">POOR CASE</strong><br>Based on your answers, a demand letter is unlikely to be cost-effective. Consider alternative approaches or accepting the loss.';
+                recommendation = `<strong>Alternatives to Consider:</strong><br>
+                1. <strong>Write it off:</strong> Legal costs likely exceed recovery potential<br>
+                2. <strong>Regulatory complaints:</strong> Free options (CFPB, FTC, state AG, BBB) may get attention<br>
+                3. <strong>Public reviews:</strong> Warn others while staying factual (avoid defamation)<br>
+                4. <strong>Learn from it:</strong> Implement prevention strategies for future (see Prevention tab)<br>
+                5. <strong>Move on:</strong> Sometimes cutting losses is the best business decision<br><br>
+                <strong>Reality Check:</strong> With weak documentation, small amounts, or overseas defendants, legal recovery is extremely difficult and expensive.<br>
+                <strong>Estimated Success Rate:</strong> Under 20%`;
+            }
+
+            document.getElementById('risk-score').textContent = score + '/60';
+            document.getElementById('risk-assessment').innerHTML = assessment;
+            document.getElementById('risk-recommendation').innerHTML = recommendation;
+            document.getElementById('risk-result').classList.add('active');
+        }
+    </script>
+</body>
+</html>

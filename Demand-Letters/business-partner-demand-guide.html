@@ -1,0 +1,2114 @@
+<!--
+⚠️ CRITICAL NOTES FOR FUTURE EDITS ⚠️
+1. NEVER USE h1, h2, h3, h4, h5, h6 TAGS! WordPress adds all heading tags to Table of Contents.
+   Always use styled divs with classes like "widget-title", "section-title", "card-title", etc.
+2. Tab functions MUST include event.preventDefault() and event.stopPropagation() for WordPress compatibility
+3. All onclick handlers MUST pass the event parameter
+4. Tab arrows implement "anti-freeze" pattern - arrows show/hide based on overflow
+5. CONTACT EMAIL: The only valid contact email is owner@terms.law - DO NOT use sergei@terms.law or any other email addresses
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Partner Demand Letters Guide | Legal Rights & Resources</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #1a202c;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+        }
+
+        .widget-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        /* Hero Section - Educational Focus */
+        .hero {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            color: white;
+            padding: 35px 30px 30px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-title {
+            font-size: 30px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 16px;
+            opacity: 0.95;
+            max-width: 850px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+
+        .attorney-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 13px;
+            margin-top: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* Tab Navigation with Anti-Freeze Arrows - WordPress Compatible */
+        .tab-nav-wrapper {
+            background: #f7fafc;
+            border-bottom: 3px solid #3b82f6;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 10px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .tab-nav-track {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .tab-nav {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            scroll-behavior: smooth;
+        }
+
+        .tab-nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab-button {
+            flex: 0 0 auto;
+            padding: 14px 18px;
+            background: transparent;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+        }
+
+        .tab-button:hover {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .tab-button.active {
+            color: #1e40af;
+            border-bottom-color: #3b82f6;
+            background: white;
+        }
+
+        /* Tab Navigation Arrows - Anti-Freeze Pattern */
+        .tab-nav-arrow {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1px solid #cbd5e1;
+            background: #fff;
+            color: #3b82f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            flex-shrink: 0;
+        }
+
+        .tab-nav-arrow:hover {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .tab-nav-arrow[hidden] {
+            visibility: hidden;
+            opacity: 0;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            padding: 35px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Section Titles */
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e40af;
+            margin: 0 0 25px 0;
+            padding-bottom: 12px;
+            border-bottom: 3px solid #e2e8f0;
+        }
+
+        .subsection-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e40af;
+            margin: 35px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        /* Cards */
+        .card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid #3b82f6;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-content {
+            line-height: 1.8;
+            color: #334155;
+        }
+
+        .card-content ul {
+            margin: 12px 0 12px 25px;
+            line-height: 1.9;
+        }
+
+        .card-content li {
+            margin: 8px 0;
+        }
+
+        .card-content strong {
+            color: #1e40af;
+        }
+
+        .card-content a {
+            color: #3b82f6;
+            text-decoration: underline;
+        }
+
+        .card-content a:hover {
+            color: #1e40af;
+        }
+
+        /* Alert Boxes */
+        .alert-box {
+            padding: 20px;
+            border-radius: 8px;
+            margin: 25px 0;
+            border-left: 4px solid;
+            line-height: 1.8;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            border-color: #3b82f6;
+            color: #1e3a8a;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            border-color: #f59e0b;
+            color: #92400e;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+
+        .alert-danger {
+            background: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+
+        .alert-box ul {
+            margin: 10px 0 0 20px;
+        }
+
+        /* Statute Boxes - For Legal References */
+        .statute-box {
+            background: #f1f5f9;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            font-size: 15px;
+        }
+
+        .statute-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 12px;
+        }
+
+        .statute-box p {
+            margin: 8px 0;
+            line-height: 1.8;
+        }
+
+        .statute-box ul {
+            margin: 10px 0 10px 25px;
+            line-height: 1.9;
+        }
+
+        /* Checklist Style */
+        .checklist {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .checklist-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 20px;
+        }
+
+        .checklist-item {
+            padding: 15px 0;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            gap: 15px;
+        }
+
+        .checklist-item:last-child {
+            border-bottom: none;
+        }
+
+        .checklist-icon {
+            color: #3b82f6;
+            font-weight: bold;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        /* Pricing Boxes - Moved to Services Tab */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .pricing-box {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border: 2px solid #3b82f6;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .pricing-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(59, 130, 246, 0.2);
+        }
+
+        .pricing-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 15px;
+        }
+
+        .price {
+            font-size: 48px;
+            font-weight: 800;
+            color: #3b82f6;
+            margin: 20px 0;
+        }
+
+        .pricing-box ul {
+            text-align: left;
+            margin: 20px 0;
+            line-height: 2;
+        }
+
+        .pricing-box li {
+            margin: 10px 0;
+            color: #334155;
+        }
+
+        /* Buttons */
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            color: white;
+            padding: 14px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+            margin: 10px 5px;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        /* Calendly Container */
+        .calendly-container {
+            margin: 30px 0;
+            background: #f8fafc;
+            padding: 25px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .calendly-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1e40af;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Comparison Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        th {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 24px;
+            }
+
+            .hero-subtitle {
+                font-size: 14px;
+            }
+
+            .tab-content {
+                padding: 20px;
+            }
+
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-title {
+                font-size: 20px;
+            }
+
+            table {
+                font-size: 14px;
+            }
+
+            th, td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="widget-container">
+        <!-- Hero Section - Educational Focus, No Pricing -->
+        <div class="hero">
+            <div class="hero-content">
+                <div class="hero-title">Business Partner Demand Letters:<br>Legal Rights & Strategy Guide</div>
+                <div class="hero-subtitle">
+                    A comprehensive resource for understanding your rights as a business partner, what to include in a demand letter, and when professional legal assistance can help resolve partnership disputes
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Navigation with Anti-Freeze Arrows -->
+        <div class="tab-nav-wrapper" id="tabsWrapper">
+            <button class="tab-nav-arrow left" onclick="scrollTabs(event, -1)" aria-label="Scroll tabs left">‹</button>
+            <div class="tab-nav-track">
+                <div class="tab-nav" id="tabNav">
+                    <button class="tab-button active" onclick="switchTab('legal-rights', event)">⚖️ Your Legal Rights</button>
+                    <button class="tab-button" onclick="switchTab('drafting-guide', event)">📝 Drafting Guide</button>
+                    <button class="tab-button" onclick="switchTab('scenarios', event)">🤝 Common Scenarios</button>
+                    <button class="tab-button" onclick="switchTab('statutes', event)">📚 Statutes & Case Law</button>
+                    <button class="tab-button" onclick="switchTab('checklist', event)">✅ Demand Letter Checklist</button>
+                    <button class="tab-button" onclick="switchTab('services', event)">💼 Services & Consultation</button>
+                    <button class="tab-button" onclick="switchTab('faq', event)">❓ FAQ</button>
+                </div>
+            </div>
+            <button class="tab-nav-arrow right" onclick="scrollTabs(event, 1)" aria-label="Scroll tabs right">›</button>
+        </div>
+
+        <!-- Tab Content -->
+
+        <!-- Legal Rights Tab -->
+        <div id="tab-legal-rights" class="tab-content active">
+            <div class="section-title">Understanding Your Rights as a Business Partner</div>
+
+            <div class="alert-box alert-info">
+                <strong>📌 About This Guide</strong><br>
+                This resource explains the legal rights available to business partners under California and Delaware law—the two most common jurisdictions for business entities. Whether you're a minority partner facing freeze-out tactics, an equal partner dealing with deadlock, or simply trying to understand your options, this guide provides the legal framework you need to know.
+            </div>
+
+            <div class="subsection-title">Statutory Information & Inspection Rights</div>
+
+            <div class="statute-box">
+                <div class="statute-title">📜 California Corporations — Corp Code § 1601</div>
+                <p><strong>Who Has Rights:</strong> Any shareholder of record (no minimum ownership percentage required).</p>
+                <p><strong>What You Can Inspect:</strong></p>
+                <ul>
+                    <li>Accounting books and records</li>
+                    <li>Minutes of shareholder meetings</li>
+                    <li>Minutes of board of directors meetings and committee meetings</li>
+                    <li>Records of any subsidiary corporations</li>
+                </ul>
+                <p><strong>How to Exercise:</strong> Written demand stating a "purpose reasonably related to your interests as a shareholder." Inspection at any reasonable time during business hours at the corporation's principal office.</p>
+                <p><strong>Key Point:</strong> These rights <strong>cannot be waived or restricted</strong> by articles of incorporation, bylaws, or shareholder agreements. They are substantive statutory rights.</p>
+                <p><strong>Enforcement:</strong> If corporation refuses, you can file summary enforcement action in Superior Court. Courts may award attorney fees to prevailing party.</p>
+                <p><strong>📖 Read the statute:</strong> <a href="https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CORP&sectionNum=1601" target="_blank">CA Corp Code § 1601</a></p>
+            </div>
+
+            <div class="statute-box">
+                <div class="statute-title">📜 California LLCs — Corp Code § 17704.10</div>
+                <p><strong>Who Has Rights:</strong> Any member of a California LLC.</p>
+                <p><strong>What Members Can Access:</strong></p>
+                <ul>
+                    <li>Current list of full names and last known addresses of all members and managers</li>
+                    <li>Copy of the LLC's operating agreement and any amendments</li>
+                    <li>Copy of the LLC's federal, state, and local tax returns for the past three years</li>
+                    <li>Copy of the LLC's financial statements (balance sheet, income statement, etc.)</li>
+                    <li>"Other information regarding the activities and financial condition of the limited liability company as is just and reasonable"</li>
+                </ul>
+                <p><strong>How to Exercise:</strong> Written demand. Members can make requests directly or through their attorney or agent.</p>
+                <p><strong>Penalties for Non-Compliance:</strong> LLC may be liable for per-day penalties for failure to provide information.</p>
+                <p><strong>Key Point:</strong> LLC member inspection rights are generally <strong>broader and easier to enforce</strong> than corporate shareholder rights.</p>
+                <p><strong>📖 Read the statute:</strong> <a href="https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?sectionNum=17704.10&lawCode=CORP" target="_blank">CA Corp Code § 17704.10</a></p>
+            </div>
+
+            <div class="statute-box">
+                <div class="statute-title">📜 Delaware Corporations — DGCL § 220</div>
+                <p><strong>Who Has Rights:</strong> Any stockholder (no minimum ownership threshold).</p>
+                <p><strong>What Can Be Inspected:</strong> Stock ledger, list of stockholders, and other books and records of the corporation.</p>
+                <p><strong>Procedural Requirements:</strong></p>
+                <ul>
+                    <li>Written demand <strong>under oath</strong></li>
+                    <li>State a <strong>proper purpose</strong> with <strong>reasonable particularity</strong></li>
+                    <li>Describe the documents sought with <strong>reasonable particularity</strong></li>
+                </ul>
+                <p><strong>Proper Purposes Recognized by Delaware Courts:</strong></p>
+                <ul>
+                    <li>Investigating mismanagement or waste of corporate assets</li>
+                    <li>Valuing shares for potential sale or buyout</li>
+                    <li>Investigating potential wrongdoing by officers or directors</li>
+                    <li>Determining whether to pursue derivative claims</li>
+                    <li>Communicating with other shareholders about corporate matters</li>
+                </ul>
+                <p><strong>Litigation Process:</strong> If corporation refuses, stockholder files § 220 action in Delaware Chancery Court. These cases typically resolve in 60–90 days—much faster than plenary litigation.</p>
+                <p><strong>Fee-Shifting:</strong> Delaware courts often award attorney fees to prevailing party.</p>
+                <p><strong>📖 Read the statute:</strong> <a href="https://delcode.delaware.gov/title8/c001/sc07/index.html#220" target="_blank">8 Del. C. § 220</a></p>
+            </div>
+
+            <div class="statute-box">
+                <div class="statute-title">📜 Delaware LLCs — 6 Del. C. § 18-305</div>
+                <p><strong>Default Rule:</strong> Members have the right to obtain information from the LLC and inspect books and records for purposes <strong>reasonably related to the member's interest</strong> as a member.</p>
+                <p><strong>Critical Distinction from Corporations:</strong> Unlike DGCL § 220 for corporations, Delaware LLC operating agreements <strong>can modify or even eliminate</strong> default inspection rights.</p>
+                <p><strong>Demand Letter Impact:</strong> Always review the operating agreement first. If it restricts inspection rights, you may need to rely more heavily on:</p>
+                <ul>
+                    <li>Fiduciary duty claims (if member-managed or if manager has fiduciary duties)</li>
+                    <li>Breach of contract claims under operating agreement</li>
+                    <li>California Family Code duties (if partner is also your spouse)</li>
+                </ul>
+                <p><strong>📖 Read the statute:</strong> <a href="https://delcode.delaware.gov/title6/c018/index.html#18-305" target="_blank">6 Del. C. § 18-305</a></p>
+            </div>
+
+            <div class="subsection-title">Fiduciary Duties Between Partners</div>
+
+            <div class="card">
+                <div class="card-title">🤝 What Are Fiduciary Duties?</div>
+                <div class="card-content">
+                    Partners, controlling shareholders, and managers in closely-held businesses owe each other <strong>fiduciary duties</strong>—the highest standard of care recognized by law. These duties exist even if your partnership agreement doesn't mention them explicitly.
+
+                    <p style="margin-top: 15px;"><strong>The Three Core Fiduciary Duties:</strong></p>
+                    <ul>
+                        <li><strong>Duty of Loyalty:</strong> Cannot use your position for personal benefit at the expense of other partners. No self-dealing, usurping business opportunities, or competing with the partnership without disclosure and consent.</li>
+                        <li><strong>Duty of Care:</strong> Must manage business affairs with reasonable prudence and diligence. Cannot be grossly negligent or reckless with partnership assets.</li>
+                        <li><strong>Duty of Good Faith and Fair Dealing:</strong> Must act honestly and fairly in all partnership matters. Cannot manipulate processes, withhold material information, or engage in oppressive conduct toward other partners.</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>What This Means in Practice:</strong></p>
+                    <ul>
+                        <li>Majority partner cannot freeze out minority by refusing distributions while taking excessive salary</li>
+                        <li>Managing partner cannot hide financial problems or misuse of funds</li>
+                        <li>Partners cannot secretly compete with the business or divert opportunities</li>
+                        <li>Controlling partner cannot force buyout at unfair price</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">⚖️ Key California Cases on Partner Fiduciary Duties</div>
+                <div class="card-content">
+                    <strong>Jones v. H.F. Ahmanson & Co. (1969) 1 Cal.3d 93</strong><br>
+                    Landmark California Supreme Court case establishing that controlling shareholders owe fiduciary duty to minority shareholders and may not use their control to benefit themselves to the detriment of the minority. Standard: majority must act in manner that is "fair, just, and equitable" toward minority.
+
+                    <p style="margin-top: 15px;"><strong>Enea v. Superior Court (2005) 132 Cal.App.4th 1559</strong><br>
+                    Controlling shareholder breached fiduciary duty by using control to benefit himself at expense of minority shareholder. Court emphasized that in closely-held corporations, majority shareholders stand in fiduciary relationship similar to partners.
+
+                    <p style="margin-top: 15px;"><strong>Jara v. Suprema Meats, Inc. (2004) 121 Cal.App.4th 1238</strong><br>
+                    "Freeze-out" case where majority shareholders systematically excluded minority from management, refused distributions, and engaged in self-dealing. Court held this violated fiduciary duties and awarded damages including punitive damages for oppressive conduct.
+                </div>
+            </div>
+
+            <div class="subsection-title">Remedies Available for Breach of Partner Duties</div>
+
+            <div class="card">
+                <div class="card-title">💼 What You Can Recover</div>
+                <div class="card-content">
+                    If your partner breaches their fiduciary duties or violates your statutory rights, California law provides multiple remedies:
+
+                    <ul>
+                        <li><strong>Accounting:</strong> Court-ordered examination of all business finances and transactions. Particularly useful when you've been denied access to records.</li>
+                        <li><strong>Monetary Damages:</strong> Compensation for actual losses caused by breach (lost distributions, diminished business value, etc.)</li>
+                        <li><strong>Restitution / Disgorgement:</strong> Partner must return improperly taken funds, excessive compensation, diverted business opportunities</li>
+                        <li><strong>Constructive Trust:</strong> Court can place misappropriated assets or profits in trust for the rightful owners</li>
+                        <li><strong>Forced Buyout at Fair Value:</strong> Court can order controlling partner to buy you out at independently appraised fair market value</li>
+                        <li><strong>Judicial Dissolution:</strong> In cases of deadlock, oppression, or persistent misconduct, court can dissolve the entity (CA Corp Code §§ 1800, 17707.03)</li>
+                        <li><strong>Attorney Fees:</strong> Many California statutes allow prevailing party to recover attorney fees (§ 1601 enforcement, dissolution actions, etc.)</li>
+                        <li><strong>Punitive Damages:</strong> Available in cases involving fraud, malice, or oppression</li>
+                    </ul>
+
+                    <div class="alert-box alert-info" style="margin-top: 20px;">
+                        <strong>💡 Strategy Tip:</strong> A well-drafted demand letter citing these specific remedies often motivates settlement. Partners and their attorneys understand that litigation could result in forced buyout, accounting, fee-shifting, and even dissolution—all expensive and disruptive outcomes.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Drafting Guide Tab -->
+        <div id="tab-drafting-guide" class="tab-content">
+            <div class="section-title">How to Draft an Effective Partner Demand Letter</div>
+
+            <div class="alert-box alert-info">
+                <strong>📝 About This Section</strong><br>
+                Whether you're drafting your own demand letter or working with an attorney, understanding the key components and strategy will help you create a more effective document. This section breaks down what to include and why each element matters.
+            </div>
+
+            <div class="subsection-title">The Purpose of a Partner Demand Letter</div>
+
+            <div class="card">
+                <div class="card-title">🎯 What a Demand Letter Accomplishes</div>
+                <div class="card-content">
+                    <strong>Primary Functions:</strong>
+                    <ul>
+                        <li><strong>Creates Legal Record:</strong> Establishes formal documentation of your claims, demands, and timeline for potential litigation</li>
+                        <li><strong>Demonstrates Seriousness:</strong> Shows you understand your rights and are prepared to pursue legal action</li>
+                        <li><strong>Provides Legal Foundation:</strong> Cites specific statutes, case law, and contractual provisions supporting your position</li>
+                        <li><strong>Forces Response:</strong> Sets clear deadline requiring partner to respond or face consequences</li>
+                        <li><strong>Opens Settlement Discussion:</strong> Often leads to negotiation that resolves dispute without litigation</li>
+                        <li><strong>Preserves Evidence:</strong> Includes spoliation warnings preventing partner from destroying documents</li>
+                        <li><strong>Establishes Bad Faith:</strong> If partner ignores reasonable demands, strengthens your position for attorney fees and sanctions</li>
+                    </ul>
+
+                    <strong>When to Send a Demand Letter:</strong>
+                    <ul>
+                        <li>After informal requests for information or resolution have failed</li>
+                        <li>Before filing expensive litigation (courts often expect you to attempt resolution)</li>
+                        <li>When you need to preserve evidence and create timeline for statute of limitations</li>
+                        <li>As prerequisite for certain legal actions (e.g., before derivative suit in some jurisdictions)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="subsection-title">Essential Components of a Partner Demand Letter</div>
+
+            <div class="card">
+                <div class="card-title">1️⃣ Clear Identification of Parties and Entity</div>
+                <div class="card-content">
+                    <strong>What to Include:</strong>
+                    <ul>
+                        <li>Your full legal name and role (e.g., "30% member of ABC Hospitality LLC")</li>
+                        <li>Recipient's full legal name and role (e.g., "70% member and Manager")</li>
+                        <li>Legal name of business entity and state of formation</li>
+                        <li>Entity type (corporation, LLC, general partnership, limited partnership)</li>
+                        <li>Your capital contributions and dates</li>
+                        <li>Documentation of your ownership (stock certificates, membership certificates, partnership agreement references)</li>
+                    </ul>
+
+                    <strong>Why This Matters:</strong> Establishes standing (your right to make demands) and identifies applicable law (CA vs DE, corp vs LLC).
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">2️⃣ Factual Background & Timeline</div>
+                <div class="card-content">
+                    <strong>What to Include:</strong>
+                    <ul>
+                        <li><strong>Formation details:</strong> When and how partnership was formed, initial capital contributions, roles and responsibilities</li>
+                        <li><strong>Your contributions:</strong> Money invested, work performed, specific responsibilities you handled</li>
+                        <li><strong>When problems started:</strong> Specific date when distributions stopped, access denied, harassment began, etc.</li>
+                        <li><strong>Pattern of conduct:</strong> Chronological list of specific incidents (with dates):
+                            <ul style="margin-left: 20px;">
+                                <li>Dates you requested financial information and were refused</li>
+                                <li>Distributions made to other partners but denied to you</li>
+                                <li>Excessive compensation taken by majority partner</li>
+                                <li>Instances of harassment, threats, or hostile conduct</li>
+                                <li>Unilateral decisions made without notice or consent</li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <strong>Drafting Tips:</strong>
+                    <ul>
+                        <li>Be specific with dates, amounts, and names</li>
+                        <li>Focus on objective facts, not emotional characterizations</li>
+                        <li>Attach supporting documents as exhibits (emails, texts, prior correspondence)</li>
+                        <li>Organize chronologically for easy reading</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">3️⃣ Legal Basis for Demands (The "Hooks")</div>
+                <div class="card-content">
+                    This is where you cite the specific statutes, case law, and contractual provisions that support your demands. This section transforms your letter from a complaint into a legal document.
+
+                    <p style="margin-top: 15px;"><strong>Statutory Hooks to Consider:</strong></p>
+                    <ul>
+                        <li><strong>Information Rights:</strong>
+                            <ul style="margin-left: 20px;">
+                                <li>CA Corp Code § 1601 (corporation inspection rights)</li>
+                                <li>CA Corp Code § 17704.10 (LLC member information rights)</li>
+                                <li>DGCL § 220 (Delaware corporation books and records)</li>
+                                <li>6 Del. C. § 18-305 (Delaware LLC member rights)</li>
+                            </ul>
+                        </li>
+                        <li><strong>Fiduciary Duty Claims:</strong>
+                            <ul style="margin-left: 20px;">
+                                <li>Jones v. H.F. Ahmanson & Co. (controlling shareholder duties)</li>
+                                <li>Jara v. Suprema Meats (freeze-out and oppression)</li>
+                                <li>Enea v. Superior Court (self-dealing and unfair conduct)</li>
+                            </ul>
+                        </li>
+                        <li><strong>Dissolution Rights:</strong>
+                            <ul style="margin-left: 20px;">
+                                <li>CA Corp Code § 1800 (involuntary dissolution of corporations)</li>
+                                <li>CA Corp Code § 17707.03 (judicial dissolution of LLCs)</li>
+                            </ul>
+                        </li>
+                        <li><strong>Partnership Agreement Violations:</strong>
+                            <ul style="margin-left: 20px;">
+                                <li>Cite specific sections violated (distribution provisions, management rights, buyout procedures)</li>
+                                <li>Note any mandatory dispute resolution procedures</li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>How to Use Legal Citations:</strong></p>
+                    Example: "Under California Corporations Code § 1601, as a shareholder of record, I have the absolute right to inspect and copy the corporation's accounting books, records, minutes, and financial statements for any purpose reasonably related to my interests as a shareholder. This right cannot be limited by the bylaws or shareholder agreement. The corporation's refusal to provide these records violates my statutory rights and subjects the corporation to a summary enforcement action with mandatory attorney fee recovery."
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">4️⃣ Specific Demands</div>
+                <div class="card-content">
+                    Be precise about what you want. Vague demands lead to vague responses.
+
+                    <p style="margin-top: 15px;"><strong>Common Demand Categories:</strong></p>
+
+                    <strong>A. Information/Document Demands:</strong>
+                    <ul>
+                        <li>Complete financial statements for past [3-5] years</li>
+                        <li>All federal, state, and local tax returns for past [3-5] years</li>
+                        <li>Bank statements for all business accounts</li>
+                        <li>General ledger and accounting records</li>
+                        <li>Profit and loss statements (monthly or quarterly)</li>
+                        <li>Balance sheets</li>
+                        <li>Accounts payable and receivable</li>
+                        <li>Contracts, leases, and loan agreements</li>
+                        <li>Payroll records showing compensation to all owners/managers</li>
+                        <li>Distribution records showing all payments to members/shareholders</li>
+                        <li>Minutes of all meetings (if available)</li>
+                        <li>Corporate/LLC resolutions</li>
+                    </ul>
+
+                    <strong>B. Monetary Demands:</strong>
+                    <ul>
+                        <li>Distribution of unpaid profits for [specific years/periods]</li>
+                        <li>Fair market value buyout (demand independent appraisal by mutually agreed appraiser)</li>
+                        <li>Reimbursement of personal funds advanced to business</li>
+                        <li>Return of excessive compensation taken by other partner(s)</li>
+                        <li>Accounting of all funds and transactions</li>
+                    </ul>
+
+                    <strong>C. Governance/Behavioral Demands:</strong>
+                    <ul>
+                        <li>Cessation of hostile conduct and harassment</li>
+                        <li>Inclusion in management decisions as required by agreement</li>
+                        <li>Written consent for major transactions going forward</li>
+                        <li>Mediation or neutral third-party valuation</li>
+                        <li>Appointment of independent accountant for financial review</li>
+                    </ul>
+
+                    <strong>D. Exit Demands:</strong>
+                    <ul>
+                        <li>Buyout at fair market value determined by appraisal</li>
+                        <li>If buyout refused, request for judicial dissolution</li>
+                        <li>Payment terms (lump sum vs. installments with interest)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">5️⃣ Clear Deadline and Consequences</div>
+                <div class="card-content">
+                    <strong>Setting the Deadline:</strong>
+                    <ul>
+                        <li><strong>10-14 days:</strong> Standard for most partnership disputes and information requests</li>
+                        <li><strong>7 days:</strong> Urgent situations (imminent improper transactions, suspected document destruction)</li>
+                        <li><strong>21 days:</strong> Complex buyout negotiations or extensive document requests</li>
+                    </ul>
+
+                    <strong>State the Consequences Clearly:</strong>
+                    <p style="margin-top: 10px;">Example language: "If you fail to provide the requested documents and respond substantively to this letter within fourteen (14) days of receipt, I will immediately file [choose appropriate action]:</p>
+                    <ul>
+                        <li>A petition for involuntary dissolution under CA Corporations Code § 1800</li>
+                        <li>A books-and-records enforcement action under § 1601 seeking attorney fees</li>
+                        <li>A civil complaint for breach of fiduciary duty, accounting, and damages</li>
+                        <li>A DGCL § 220 action in Delaware Chancery Court</li>
+                    </ul>
+
+                    <strong>Additional Warnings to Include:</strong>
+                    <ul>
+                        <li><strong>Fee-shifting warning:</strong> "Please note that California law provides for mandatory attorney fee recovery for prevailing parties in inspection-rights enforcement actions."</li>
+                        <li><strong>Spoliation warning:</strong> "You are hereby on notice to preserve all documents, emails, text messages, financial records, and electronic data related to [Company Name]. Destruction or alteration of evidence may result in adverse inference jury instructions, sanctions, and independent tort liability."</li>
+                        <li><strong>Good faith expectation:</strong> "This letter is sent in good faith effort to resolve these matters without litigation. However, continued refusal to honor my legal rights will leave me no choice but to pursue all available remedies."</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">6️⃣ Professional Tone (Even When Angry)</div>
+                <div class="card-content">
+                    <strong>Do:</strong>
+                    <ul>
+                        <li>Use formal business letter format</li>
+                        <li>State facts objectively and chronologically</li>
+                        <li>Cite specific statutes and cases</li>
+                        <li>Focus on legal rights and remedies</li>
+                        <li>Be clear and specific about what you want</li>
+                    </ul>
+
+                    <strong>Don't:</strong>
+                    <ul>
+                        <li>Use emotional language or personal attacks</li>
+                        <li>Make criminal accusations (unless supported by evidence and you're willing to report)</li>
+                        <li>Threaten actions you're not prepared to take</li>
+                        <li>Include irrelevant personal grievances</li>
+                        <li>Make legal conclusions without citing authority</li>
+                    </ul>
+
+                    <div class="alert-box alert-warning" style="margin-top: 15px;">
+                        <strong>⚠️ Remember:</strong> This letter may be read by a judge, jury, or mediator. Write it as if your audience is the court, not just your partner. Professional, fact-based, and legally grounded letters are taken seriously. Emotional rants are not.
+                    </div>
+                </div>
+            </div>
+
+            <div class="subsection-title">Delivery Methods</div>
+
+            <div class="card">
+                <div class="card-title">📬 How to Deliver Your Demand Letter</div>
+                <div class="card-content">
+                    <strong>Best Practice: Dual Delivery Method</strong>
+
+                    <p style="margin-top: 10px;"><strong>1. Certified Mail with Return Receipt Requested</strong></p>
+                    <ul>
+                        <li>Send to partner's home address and business address</li>
+                        <li>Creates legal proof of delivery (signed receipt)</li>
+                        <li>Required for certain legal proceedings</li>
+                        <li>Demonstrates seriousness</li>
+                        <li>Cost: approximately $8-10 per recipient</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>2. Email to All Known Addresses</strong></p>
+                    <ul>
+                        <li>Send to personal and business email addresses</li>
+                        <li>Ensures faster actual notice</li>
+                        <li>Shows good faith effort to communicate</li>
+                        <li>Often gets faster response than mail alone</li>
+                        <li>Save delivery confirmation and read receipts</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>If Partner Has Attorney:</strong></p>
+                    <ul>
+                        <li>Send copies to both partner AND their attorney</li>
+                        <li>Use certified mail and email for both recipients</li>
+                        <li>Attorney is more likely to recognize legal merit of properly drafted letter</li>
+                        <li>Often leads to more professional and productive negotiations</li>
+                    </ul>
+
+                    <div class="alert-box alert-success" style="margin-top: 15px;">
+                        <strong>💡 Pro Tip:</strong> The combination of certified mail (legal proof) and email (immediate notice) demonstrates both seriousness and good faith. Many partners who ignore emails take notice when certified mail arrives, and many who delay checking mail can't ignore email.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Common Scenarios Tab -->
+        <div id="tab-scenarios" class="tab-content">
+            <div class="section-title">Common Partnership Dispute Scenarios</div>
+
+            <div class="alert-box alert-info">
+                <strong>📌 Note on Examples</strong><br>
+                The scenarios below are composites based on common partnership dispute patterns. They do not describe any specific client matter. Many of these disputes originate from partnerships formed through platforms like Upwork, informal family arrangements, or quick handshake deals that later turn contentious.
+            </div>
+
+            <div class="card">
+                <div class="card-title">Scenario A: Seasonal Business Partner Freeze-Out</div>
+                <div class="card-content">
+                    <strong>Situation:</strong> 30% member of a motel LLC operating in a seasonal tourism area. Partnership formed two years ago with explicit understanding that minority partner would help manage the property. Majority partner (70%) initially welcomed involvement, but relationship has deteriorated:
+
+                    <ul>
+                        <li>Majority partner now claims minority "does nothing" despite minority having managed rates, dealt with third-party booking platforms, hired seasonal J-1 workers, and handled front desk issues</li>
+                        <li>Majority refuses to distribute 2024 profits, claiming need to "reinvest" in vague future projects</li>
+                        <li>Majority offers buyout at only original capital contribution (e.g., $50K invested, ignoring that business now worth $300K+)</li>
+                        <li>Majority exhibits pattern of yelling, hostile text messages, public humiliation in group chats with employees</li>
+                        <li>Minority partner now afraid to communicate with majority, has blocked text messages</li>
+                        <li>Majority says minority can "work 8 hours per week next summer" —  effectively squeezing out while refusing fair buyout</li>
+                    </ul>
+
+                    <strong>Legal Hooks for Demand Letter:</strong>
+                    <ul>
+                        <li><strong>CA Corp Code § 17704.10:</strong> Demand complete financial records, tax returns, P&Ls, distribution history</li>
+                        <li><strong>Fiduciary duty breach:</strong> Majority's pattern of oppression, refusal to distribute, and unfair buyout offer violates duties under Jones and Jara cases</li>
+                        <li><strong>Operating agreement review:</strong> Check distribution provisions (are distributions mandatory or discretionary?), buyout provisions (fair value or book value?), management authority</li>
+                        <li><strong>Dissolution threat:</strong> If operating agreement allows or under § 17707.03 for persistent unfairness</li>
+                    </ul>
+
+                    <strong>Demand Letter Strategy:</strong>
+                    <ol style="margin-left: 20px;">
+                        <li>Demand all financial records within 14 days (§ 17704.10 inspection rights)</li>
+                        <li>Demand distribution of retained profits or written justification under operating agreement</li>
+                        <li>Demand fair market value buyout determined by independent appraiser (not just return of capital)</li>
+                        <li>Document hostile conduct and frame as breach of fiduciary duty</li>
+                        <li>Reserve right to seek judicial dissolution if good-faith negotiations fail</li>
+                        <li>Attach draft complaint (premium service) showing causes of action for breach of duty, accounting, dissolution</li>
+                    </ol>
+
+                    <strong>Likely Outcome:</strong> Demand letter forces majority partner to either: (a) produce financials and engage in real buyout negotiations with appraiser, (b) agree to mediation, or (c) face expensive litigation with risk of forced dissolution and fee-shifting.
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Scenario B: Remote Partnership Formed via Upwork</div>
+                <div class="card-content">
+                    <strong>Situation:</strong> Two entrepreneurs meet on Upwork to collaborate on SaaS product. One is U.S.-based developer (55%), other is foreign-based designer/marketer (45%). They form Delaware LLC with basic operating agreement pulled from online template. Product launches successfully, generating $40K/month revenue.
+
+                    <p style="margin-top: 10px;"><strong>Problems emerge:</strong></p>
+                    <ul>
+                        <li>U.S. partner starts paying themselves $8K/month "management fee" without discussing with foreign partner</li>
+                        <li>U.S. partner stops responding to requests for financial information</li>
+                        <li>Foreign partner discovers U.S. partner has diverted clients to separate side business</li>
+                        <li>When foreign partner complains, U.S. partner says "you can leave for what you put in" (roughly $15K despite business now worth $500K+)</li>
+                        <li>Foreign partner unsure of rights and intimidated by U.S. legal system</li>
+                    </ul>
+
+                    <strong>Legal Hooks for Demand Letter:</strong>
+                    <ul>
+                        <li><strong>6 Del. C. § 18-305:</strong> Member information rights (inspect books, records, tax returns)</li>
+                        <li><strong>Operating agreement breach:</strong> Likely no provision authorizing unilateral management fee</li>
+                        <li><strong>Fiduciary duty breach:</strong> Self-dealing (excessive compensation) and usurping corporate opportunities (diverting clients)</li>
+                        <li><strong>Accounting claim:</strong> Right to full accounting of all revenues, expenses, and diversions</li>
+                    </ul>
+
+                    <strong>Demand Letter Strategy:</strong>
+                    <ol style="margin-left: 20px;">
+                        <li>Demand complete financial records including bank statements, client contracts, revenue reports</li>
+                        <li>Demand explanation and justification for "management fee" and return of amounts unauthorized by operating agreement</li>
+                        <li>Demand disclosure of all clients and projects, identification of any diverted opportunities</li>
+                        <li>Demand fair market value buyout or, alternatively, cessation of self-dealing and return to equal partnership</li>
+                        <li>Cite Delaware case law on manager fiduciary duties and accounting rights</li>
+                        <li>Note that jurisdiction for lawsuit could be Delaware (internal affairs) or wherever U.S. partner resides (personal jurisdiction for breach claims)</li>
+                    </ol>
+
+                    <strong>Special Consideration:</strong> Foreign partners are often at disadvantage in U.S. legal system, but a professional demand letter citing Delaware law and threatening Chancery Court action can level the playing field. Many U.S. partners become reasonable when they realize international partner has competent legal assistance.
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Scenario C: Family Hospitality Business — Verbal Promises Only</div>
+                <div class="card-content">
+                    <strong>Situation:</strong> Family friend invests $80K in restaurant or small hotel business based on verbal promise of "30-40% ownership." Owner gives informal profit distributions for first year, then stops. No operating agreement, no stock certificates, no written documentation except Venmo receipts showing "$80K investment — restaurant."
+
+                    <p style="margin-top: 10px;"><strong>Current status:</strong></p>
+                    <ul>
+                        <li>Owner now claims investor was just a "loan" and offers to pay back $80K with no interest, no share of profits</li>
+                        <li>Business is clearly profitable (busy every night, expanded hours, hired more staff)</li>
+                        <li>When investor asks for financial records, owner becomes hostile, accuses investor of being "greedy"</li>
+                        <li>Owner threatens to shut down business "and then nobody gets anything"</li>
+                    </ul>
+
+                    <strong>Legal Analysis:</strong>
+                    <p style="margin-top: 10px;">Even without written partnership agreement, California law recognizes partnerships based on:</p>
+                    <ul>
+                        <li>Intent to share profits (not just revenue)</li>
+                        <li>Joint control or management participation</li>
+                        <li>Contribution of capital with expectation of ownership</li>
+                    </ul>
+
+                    <p style="margin-top: 10px;">Evidence that can establish partnership:</p>
+                    <ul>
+                        <li>Venmo/wire descriptions saying "investment" not "loan"</li>
+                        <li>Text messages or emails discussing "ownership" or "profits"</li>
+                        <li>Tax returns showing investor as partner/member</li>
+                        <li>Prior profit distributions (showing intent to share profits)</li>
+                        <li>Investor participation in management decisions</li>
+                        <li>Business cards, signage, or documents listing investor as owner/partner</li>
+                    </ul>
+
+                    <strong>Legal Hooks for Demand Letter:</strong>
+                    <ul>
+                        <li><strong>Partnership by estoppel:</strong> Owner's conduct created partnership even without formal documentation</li>
+                        <li><strong>CA Corp Code §§ 16403-16404:</strong> Partner rights to information and accounting (if general partnership)</li>
+                        <li><strong>Breach of oral contract:</strong> Owner promised ownership in exchange for capital</li>
+                        <li><strong>Fraud/misrepresentation:</strong> If owner never intended to honor ownership promise</li>
+                        <li><strong>Unjust enrichment:</strong> Owner cannot keep both the $80K investment AND all the profits generated by that capital</li>
+                        <li><strong>Accounting claim:</strong> Court-ordered examination of all business finances to determine proper profit share</li>
+                    </ul>
+
+                    <strong>Demand Letter Strategy:</strong>
+                    <ol style="margin-left: 20px;">
+                        <li>Assert that partnership exists based on parties' conduct, intent, and profit-sharing</li>
+                        <li>Demand all financial records as partner under § 16403</li>
+                        <li>Demand accounting of all profits from date of investment</li>
+                        <li>Offer two resolutions: (a) formalize partnership with proper operating agreement and regular distributions, OR (b) buyout at fair value based on appraiser valuation</li>
+                        <li>If owner claims it was loan, demand promissory note, loan documents, and explanation why distributions were made (loans don't generate profit distributions)</li>
+                        <li>Note that threatening to shut down business to avoid paying investor is breach of fiduciary duty</li>
+                    </ol>
+
+                    <strong>Litigation Path:</strong> If demand letter fails, file complaint for: (1) declaratory relief establishing partnership exists, (2) accounting, (3) appointment of receiver if owner threatens to dissipate assets, (4) breach of fiduciary duty, (5) fraud if owner never intended to honor agreement.
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Scenario D: 50/50 Deadlock with Hostile Co-Founder</div>
+                <div class="card-content">
+                    <strong>Situation:</strong> Two equal co-founders (50/50 ownership) of tech startup. No tie-breaker provision in operating agreement. Business is successful but partners now hate each other and cannot agree on anything:
+
+                    <ul>
+                        <li>One partner wants to sell company to acquirer ($2M offer on table)</li>
+                        <li>Other partner refuses, wants to keep building</li>
+                        <li>Neither can make unilateral decisions under operating agreement</li>
+                        <li>Business operations suffering from paralysis</li>
+                        <li>Each partner accuses other of sabotage</li>
+                    </ul>
+
+                    <strong>Legal Hooks for Demand Letter:</strong>
+                    <ul>
+                        <li><strong>Deadlock / Dissolution:</strong> CA Corp Code § 1800(b)(4) for corporations, § 17707.03 for LLCs — entity can be dissolved when directors or members are deadlocked and cannot function</li>
+                        <li><strong>Judicial Dissolution:</strong> Court can order dissolution and sale of business assets, with proceeds divided per ownership</li>
+                        <li><strong>Buyout in lieu of dissolution:</strong> Court can order one partner to buy out the other at appraised fair value</li>
+                        <li><strong>Receiver appointment:</strong> If business operations are suffering, court can appoint neutral receiver to manage pending resolution</li>
+                    </ul>
+
+                    <strong>Demand Letter Strategy:</strong>
+                    <ol style="margin-left: 20px;">
+                        <li>Propose three resolution options:
+                            <ul style="margin-left: 20px;">
+                                <li>Option A: Agree to accept acquisition offer and split proceeds 50/50</li>
+                                <li>Option B: One partner buys out the other at independently appraised fair market value</li>
+                                <li>Option C: Mediation with business mediator to find creative solution (e.g., split business into two divisions, restructure with one partner in operating role only, etc.)</li>
+                            </ul>
+                        </li>
+                        <li>Set deadline for partner to choose option (21 days reasonable for complex business decision)</li>
+                        <li>State that if no agreement reached, will file petition for judicial dissolution under § 1800 or § 17707.03</li>
+                        <li>Note that dissolution proceeding will involve court-ordered sale (possibly fire sale prices), receiver fees, and attorney fees for both sides — expensive and destructive outcome that neither partner wants</li>
+                    </ol>
+
+                    <strong>Psychology of Deadlock Letters:</strong> When both partners have equal power, demand letter works by making clear that continued deadlock leads to dissolution (worst outcome for both). Often motivates settlement because neither wants to see business sold for less than its worth or deal with receiver controlling their company.
+                </div>
+            </div>
+        </div>
+
+        <!-- Statutes & Case Law Tab -->
+        <div id="tab-statutes" class="tab-content">
+            <div class="section-title">Statutory Authority & Key Cases</div>
+
+            <div class="alert-box alert-info">
+                <strong>📚 Using This Resource</strong><br>
+                This section provides direct links to the primary legal authorities governing partnership disputes. Use these when researching your rights, drafting demand letters, or discussing your case with an attorney. Understanding the actual statutes and leading cases gives you confidence that your demands are legally grounded, not just bluffing.
+            </div>
+
+            <div class="subsection-title">California Statutes</div>
+
+            <table>
+                <tr>
+                    <th>Statute</th>
+                    <th>What It Covers</th>
+                    <th>Link</th>
+                </tr>
+                <tr>
+                    <td><strong>Corp Code § 1601</strong></td>
+                    <td>Shareholder inspection rights for California corporations (books, records, minutes)</td>
+                    <td><a href="https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CORP&sectionNum=1601" target="_blank">Read Statute</a></td>
+                </tr>
+                <tr>
+                    <td><strong>Corp Code § 1602</strong></td>
+                    <td>Director inspection rights (broader than shareholder rights)</td>
+                    <td><a href="https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CORP&sectionNum=1602" target="_blank">Read Statute</a></td>
+                </tr>
+                <tr>
+                    <td><strong>Corp Code § 1800</strong></td>
+                    <td>Grounds for involuntary dissolution of corporations (fraud, mismanagement, deadlock, oppression)</td>
+                    <td><a href="https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CORP&sectionNum=1800" target="_blank">Read Statute</a></td>
+                </tr>
+                <tr>
+                    <td><strong>Corp Code § 17704.10</strong></td>
+                    <td>LLC member information rights (financial statements, tax returns, operating agreement, "other information just and reasonable")</td>
+                    <td><a href="https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?sectionNum=17704.10&lawCode=CORP" target="_blank">Read Statute</a></td>
+                </tr>
+                <tr>
+                    <td><strong>Corp Code § 17707.03</strong></td>
+                    <td>Judicial dissolution of LLCs (deadlock, oppression, waste, frustration of purpose)</td>
+                    <td><a href="https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?sectionNum=17707.03&lawCode=CORP" target="_blank">Read Statute</a></td>
+                </tr>
+                <tr>
+                    <td><strong>Corp Code §§ 16403-16404</strong></td>
+                    <td>General partnership information rights and partner duties</td>
+                    <td><a href="https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CORP&sectionNum=16403" target="_blank">Read § 16403</a> | <a href="https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CORP&sectionNum=16404" target="_blank">Read § 16404</a></td>
+                </tr>
+            </table>
+
+            <div class="subsection-title">Delaware Statutes</div>
+
+            <table>
+                <tr>
+                    <th>Statute</th>
+                    <th>What It Covers</th>
+                    <th>Link</th>
+                </tr>
+                <tr>
+                    <td><strong>DGCL § 220</strong></td>
+                    <td>Delaware corporation stockholder books and records inspection rights ("proper purpose" requirement)</td>
+                    <td><a href="https://delcode.delaware.gov/title8/c001/sc07/index.html#220" target="_blank">Read Statute</a></td>
+                </tr>
+                <tr>
+                    <td><strong>6 Del. C. § 18-305</strong></td>
+                    <td>Delaware LLC member access to records (default rule, can be modified by operating agreement)</td>
+                    <td><a href="https://delcode.delaware.gov/title6/c018/index.html#18-305" target="_blank">Read Statute</a></td>
+                </tr>
+                <tr>
+                    <td><strong>DGCL § 273</strong></td>
+                    <td>Dissolution of Delaware corporations for deadlock</td>
+                    <td><a href="https://delcode.delaware.gov/title8/c001/sc09/index.html#273" target="_blank">Read Statute</a></td>
+                </tr>
+                <tr>
+                    <td><strong>6 Del. C. § 18-802</strong></td>
+                    <td>Judicial dissolution of Delaware LLCs</td>
+                    <td><a href="https://delcode.delaware.gov/title6/c018/sc08/index.html#18-802" target="_blank">Read Statute</a></td>
+                </tr>
+            </table>
+
+            <div class="subsection-title">Leading California Cases on Fiduciary Duties</div>
+
+            <div class="card">
+                <div class="card-title">Jones v. H.F. Ahmanson & Co. (1969) 1 Cal.3d 93</div>
+                <div class="card-content">
+                    <strong>Court:</strong> California Supreme Court
+
+                    <p style="margin-top: 10px;"><strong>Holding:</strong> Controlling shareholders owe a fiduciary duty to minority shareholders. Majority shareholders may not use their control of corporate machinery to benefit themselves at the expense of minority shareholders.</p>
+
+                    <strong>Key Language:</strong> "Majority shareholders may not use their power to control corporate activities to benefit themselves alone or in a manner detrimental to the minority. Any use to which they put the corporation or their power to control the corporation must benefit all shareholders proportionately and must not conflict with the proper conduct of the corporation's business."
+
+                    <strong>Why It Matters:</strong> This is the foundational California case establishing that controlling partners/shareholders have fiduciary duties even if not explicitly stated in agreements. Demand letters regularly cite Jones for the proposition that majority control comes with legal responsibilities.
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Enea v. Superior Court (2005) 132 Cal.App.4th 1559</div>
+                <div class="card-content">
+                    <strong>Court:</strong> California Court of Appeal, First District
+
+                    <p style="margin-top: 10px;"><strong>Facts:</strong> Two brothers owned closely-held corporation. One brother (51% owner) forced merger that froze out minority brother (49% owner) without paying fair value.</p>
+
+                    <strong>Holding:</strong> Controlling shareholder breached fiduciary duty. In closely-held corporations, majority shareholders stand in fiduciary relationship similar to partners in partnership.
+
+                    <strong>Key Language:</strong> "In a close corporation, a breach of fiduciary duty may be found where the majority uses its control to benefit itself to the detriment of the minority."
+
+                    <strong>Why It Matters:</strong> Extends Jones principles specifically to closely-held corporations (like most small businesses). Establishes higher scrutiny for freeze-out mergers and transactions that benefit majority at minority's expense.
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Jara v. Suprema Meats, Inc. (2004) 121 Cal.App.4th 1238</div>
+                <div class="card-content">
+                    <strong>Court:</strong> California Court of Appeal, Second District
+
+                    <p style="margin-top: 10px;"><strong>Facts:</strong> Minority shareholder frozen out of management, denied access to information, excluded from decision-making. Majority shareholders paid themselves excessive salaries while claiming "no profits" available for distributions.
+
+                    <strong>Holding:</strong> Systematic exclusion and self-dealing violated fiduciary duties. Court awarded compensatory damages and punitive damages for oppressive conduct.
+
+                    <strong>Key Language:</strong> "A freeze-out of a minority shareholder from participation in the management of a corporation may breach the fiduciary duty owed by the majority to the minority."
+
+                    <strong>Why It Matters:</strong> This is the "freeze-out" case. If you're being excluded from management, denied information, and watching majority take excessive compensation, Jara is your key authority. Also notable for punitive damages award, showing courts will punish truly oppressive conduct.
+                </div>
+            </div>
+
+            <div class="subsection-title">Additional Helpful Resources</div>
+
+            <div class="card">
+                <div class="card-title">🔗 External Resources for Further Research</div>
+                <div class="card-content">
+                    <strong>Official Government Resources:</strong>
+                    <ul>
+                        <li><a href="https://leginfo.legislature.ca.gov/faces/codes.xhtml" target="_blank">California Legislative Information</a> — Search all California statutes</li>
+                        <li><a href="https://delcode.delaware.gov/" target="_blank">Delaware Code Online</a> — Search Delaware statutes</li>
+                        <li><a href="https://www.courts.ca.gov/selfhelp.htm" target="_blank">California Courts Self-Help Center</a> — Information on court procedures</li>
+                    </ul>
+
+                    <strong>Case Law Databases:</strong>
+                    <ul>
+                        <li><a href="https://law.justia.com/california/" target="_blank">Justia California Case Law</a> — Free searchable California appellate and supreme court decisions</li>
+                        <li><a href="https://casetext.com/" target="_blank">Casetext</a> — Free legal research with AI assistance (limited searches per month)</li>
+                    </ul>
+
+                    <strong>Law Firm Articles on Partnership Disputes:</strong>
+                    <ul>
+                        <li><a href="https://www.stimmel-law.com/en/articles/minority-shareholder-rights-california" target="_blank">Stimmel Law — Minority Shareholder Rights</a></li>
+                        <li><a href="https://www.adishianlaw.com/practice-areas/minority-shareholder-oppression/" target="_blank">Adishian Law — Minority Shareholder Oppression</a></li>
+                    </ul>
+
+                    <div class="alert-box alert-warning" style="margin-top: 15px;">
+                        <strong>⚠️ Disclaimer:</strong> These external resources are provided for educational purposes only. This guide and these links do not constitute legal advice. Partnership disputes involve complex fact-specific analysis. Consultation with a California-licensed attorney is recommended for your specific situation.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Checklist Tab -->
+        <div id="tab-checklist" class="tab-content">
+            <div class="section-title">Partner Demand Letter Checklist</div>
+
+            <div class="alert-box alert-success">
+                <strong>✅ Use This Checklist</strong><br>
+                Whether you're drafting your own demand letter or reviewing one prepared by an attorney, use this checklist to ensure all critical elements are included. A complete, well-structured demand letter is much more likely to produce results.
+            </div>
+
+            <div class="checklist">
+                <div class="checklist-title">📋 Pre-Drafting: Information Gathering</div>
+
+                <div class="checklist-item">
+                    <span class="checklist-icon">☐</span>
+                    <div><strong>Partnership documentation:</strong> Locate and review partnership agreement, LLC operating agreement, corporate bylaws, shareholder agreements, or any written contracts</div>
+                </div>
+
+                <div class="checklist-item">
+                    <span class="checklist-icon">☐</span>
+                    <div><strong>Ownership documentation:</strong> Gather stock certificates, membership certificates, capital contribution receipts, wire transfers showing investment</div>
+                </div>
+
+                <div class="checklist-item">
+                    <span class="checklist-icon">☐</span>
+                    <div><strong>Financial records (if any):</strong> Collect any tax returns, financial statements, bank statements, distribution records you currently have</div>
+                </div>
+
+                <div class="checklist-item">
+                    <span class="checklist-icon">☐</span>
+                    <div><strong>Communications:</strong> Save all emails, text messages, and written correspondence showing:
+                        <ul style="margin-left: 25px; margin-top: 5px;">
+                            <li>Your requests for information that were denied</li>
+                            <li>Hostile, threatening, or harassing messages from partner</li>
+                            <li>Discussions about distributions, buyout, or exit</li>
+                            <li>Evidence of self-dealing or improper conduct</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="checklist-item">
+                    <span class="checklist-icon">☐</span>
+                    <div><strong>Timeline:</strong> Create chronological list of key events:
+                        <ul style="margin-left: 25px; margin-top: 5px;">
+                            <li>Date partnership formed / capital contributed</li>
+                            <li>When distributions stopped</li>
+                            <li>When access to information was denied</li>
+                            <li>Specific dates of harassment or hostile conduct</li>
+                            <li>Dates of any buyout discussions</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="checklist-item">
+                    <span class="checklist-icon">☐</span>
+                    <div><strong>Identify entity type and state:</strong> Confirm whether business is:
+                        <ul style="margin-left: 25px; margin-top: 5px;">
+                            <li>California corporation, LLC, or general partnership</li>
+                            <li>Delaware corporation or LLC</li>
+                            <li>Other state entity (research applicable statutes)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="checklist-item">
+                    <span class="checklist-icon">☐</span>
+                    <div><strong>Recipient information:</strong> Gather:
+                        <ul style="margin-left: 25px; margin-top: 5px;">
+                            <li>Partner's full legal name, home address, business address</li>
+                            <li>Partner's attorney information (if known)</li>
+                            <li>Business entity's registered agent address</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="checklist">
+                <div class="checklist-title">📝 Letter Content: Essential Elements</div>
+
+                <div class="checklist-item">
+                    <span class="checklist-icon">☐</span>
+                    <div><strong>Proper heading and format:</strong>
+                        <ul style="margin-left: 25px; margin-top: 5px;">
+                            <li>Formal business letter format with date</li>
+                            <li>Your name and address</li>
+                            <li>Recipient's name and address</li>
+                            <li>"Re: Formal Demand for [Documents/Buyout/Accounting] — [Entity Name]"</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="checklist-item">
+                    <span class="checklist-icon">☐</span>
+                    <div><strong>Identification of parties and entity:</strong>
+                        <ul style="margin-left: 25px; margin-top: 5px;">
+                            <li>Your ownership percentage and role</li>
+                            <li>Recipient's ownership percentage and role</li>
+                            <li>Business entity name, type, and state of formation</li>
+                            <li>Date you acquired ownership and amount invested</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="checklist-item">
+                    <span class="checklist-icon">☐</span>
+                    <div><strong>Factual background section:</strong>
+                        <ul style="margin-left: 25px; margin-top: 5px;">
+                            <li>Formation of partnership and initial agreements</li>
+                            <li>Your capital contributions and role in business</li>
+                            <li>When and how problems started</li>
+                            <li>Specific incidents with dates (chronological order)</li>
+                            <li>Current status and why you're sending demand letter</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="checklist-item">
+                    <span class="checklist-icon">☐</span>
+                    <div><strong>Legal basis / authority section:</strong>
+                        <ul style="margin-left: 25px; margin-top: 5px;">
+                            <li>Cite applicable inspection-rights statute (§ 1601, § 17704.10, § 220, § 18-305)</li>
+                            <li>Reference fiduciary duty cases (Jones, Jara, Enea)</li>
+                            <li>Cite specific provisions of partnership/operating agreement violated</li>
+                            <li>Reference dissolution statutes if applicable (§ 1800, § 17707.03)</li>
+                            <li>Note any procedural requirements (e.g., DGCL § 220 requires "under oath")</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="checklist-item">
+                    <span class="checklist-icon">☐</span>
+                    <div><strong>Specific demands — clearly numbered or bulleted:</strong>
+                        <ul style="margin-left: 25px; margin-top: 5px;">
+                            <li>List of specific documents demanded (financials, tax returns, bank statements, contracts, etc.)</li>
+                            <li>Monetary demands (distributions owed, buyout at fair value, restitution, etc.)</li>
+                            <li>Governance demands (cessation of harassment, participation in decisions, mediation, etc.)</li>
+                            <li>Format/delivery requirements (e.g., "electronic copies via email and hard copies via mail")</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="checklist-item">
+                    <span class="checklist-icon">☐</span>
+                    <div><strong>Clear deadline:</strong>
+                        <ul style="margin-left: 25px; margin-top: 5px;">
+                            <li>Specific number of days (10, 14, or 21 days recommended)</li>
+                            <li>Date certain (e.g., "by [specific date]")</li>
+                            <li>Measured from date of receipt (for certified mail)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="checklist-item">
+                    <span class="checklist-icon">☐</span>
+                    <div><strong>Consequences of non-compliance:</strong>
+                        <ul style="margin-left: 25px; margin-top: 5px;">
+                            <li>Specific legal action you will take (§ 220 action, dissolution petition, civil complaint, etc.)</li>
+                            <li>Note potential for attorney fee recovery</li>
+                            <li>Reference remedies available (accounting, damages, dissolution, etc.)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="checklist-item">
+                    <span class="checklist-icon">☐</span>
+                    <div><strong>Spoliation / evidence preservation warning:</strong> "You are hereby on notice to preserve all documents, emails, text messages, financial records, and electronic data related to [Entity Name]. Destruction or alteration may result in sanctions and adverse inference."</div>
+                </div>
+
+                <div class="checklist-item">
+                    <span class="checklist-icon">☐</span>
+                    <div><strong>Good faith statement:</strong> "This letter is sent in good faith effort to resolve these matters without litigation" (shows reasonableness for potential fee awards)</div>
+                </div>
+
+                <div class="checklist-item">
+                    <span class="checklist-icon">☐</span>
+                    <div><strong>Professional closing:</strong>
+                        <ul style="margin-left: 25px; margin-top: 5px;">
+                            <li>Request for written response</li>
+                            <li>Contact information for reply</li>
+                            <li>Your signature</li>
+                            <li>Date</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="checklist">
+                <div class="checklist-title">📬 Delivery Requirements</div>
+
+                <div class="checklist-item">
+                    <span class="checklist-icon">☐</span>
+                    <div><strong>Certified mail, return receipt requested:</strong> Send to partner's home address AND business address</div>
+                </div>
+
+                <div class="checklist-item">
+                    <span class="checklist-icon">☐</span>
+                    <div><strong>Email delivery:</strong> Send to all known email addresses (personal and business)</div>
+                </div>
+
+                <div class="checklist-item">
+                    <span class="checklist-icon">☐</span>
+                    <div><strong>Copy to partner's attorney (if known):</strong> Send via certified mail and email</div>
+                </div>
+
+                <div class="checklist-item">
+                    <span class="checklist-icon">☐</span>
+                    <div><strong>Proof of delivery:</strong>
+                        <ul style="margin-left: 25px; margin-top: 5px;">
+                            <li>Save certified mail receipts and tracking numbers</li>
+                            <li>Save email delivery confirmations</li>
+                            <li>Keep return receipt "green cards" when received</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="checklist">
+                <div class="checklist-title">⏱️ After Sending: Follow-Up</div>
+
+                <div class="checklist-item">
+                    <span class="checklist-icon">☐</span>
+                    <div><strong>Track delivery:</strong> Monitor certified mail tracking to confirm delivery date</div>
+                </div>
+
+                <div class="checklist-item">
+                    <span class="checklist-icon">☐</span>
+                    <div><strong>Calendar deadline:</strong> Mark deadline date on calendar (count days from delivery, not mailing)</div>
+                </div>
+
+                <div class="checklist-item">
+                    <span class="checklist-icon">☐</span>
+                    <div><strong>Wait for response:</strong> Allow deadline to pass, plus 3-5 days grace period for mail delays</div>
+                </div>
+
+                <div class="checklist-item">
+                    <span class="checklist-icon">☐</span>
+                    <div><strong>Evaluate response (if any):</strong>
+                        <ul style="margin-left: 25px; margin-top: 5px;">
+                            <li>Full compliance: Documents provided, substantive negotiation begun</li>
+                            <li>Partial compliance: Some documents, need follow-up</li>
+                            <li>Deficient response: Excuses, delays, inadequate information</li>
+                            <li>No response: Complete silence past deadline</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="checklist-item">
+                    <span class="checklist-icon">☐</span>
+                    <div><strong>Next steps if non-compliance:</strong>
+                        <ul style="margin-left: 25px; margin-top: 5px;">
+                            <li>Consult with attorney about filing lawsuit or enforcement action</li>
+                            <li>Prepare to file complaint as threatened in demand letter</li>
+                            <li>Consider mediation if partner shows some willingness to negotiate</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert-box alert-warning" style="margin-top: 30px;">
+                <strong>⚠️ Common Mistakes to Avoid:</strong>
+                <ul>
+                    <li><strong>Don't threaten actions you won't actually take:</strong> If you say you'll file lawsuit, be prepared to do so</li>
+                    <li><strong>Don't include irrelevant personal grievances:</strong> Stick to facts and legal claims</li>
+                    <li><strong>Don't send via email only:</strong> Certified mail provides legal proof of delivery</li>
+                    <li><strong>Don't forget spoliation warning:</strong> Partners often "lose" records once litigation starts</li>
+                    <li><strong>Don't set unrealistic deadlines:</strong> 3 days looks unreasonable; 10-21 days is standard</li>
+                    <li><strong>Don't draft when angry:</strong> Sleep on it, revise for professional tone</li>
+                    <li><strong>Don't send without proofreading:</strong> Typos and errors undermine credibility</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Professional Services Tab -->
+        <div id="tab-services" class="tab-content">
+            <div class="section-title">Professional Demand Letter Services</div>
+
+            <div class="alert-box alert-info">
+                <strong>👨‍⚖️ Attorney-Drafted Demand Letters</strong><br>
+                While this guide provides educational information to help you understand your rights, many partnership disputes benefit from professional legal assistance. Attorney-drafted demand letters are taken more seriously by opposing parties and their counsel, cite applicable law accurately, and position your case properly if litigation becomes necessary.
+            </div>
+
+            <div class="card">
+                <div class="card-title">Why Professional Demand Letters Get Better Results</div>
+                <div class="card-content">
+                    <strong>Practical advantages of attorney-drafted letters:</strong>
+                    <ul>
+                        <li><strong>Credibility:</strong> Letters on attorney letterhead signal you have legal representation and are serious about pursuing remedies</li>
+                        <li><strong>Legal accuracy:</strong> Cites correct statutes, applicable case law, and proper procedural requirements for your jurisdiction</li>
+                        <li><strong>Jurisdictional expertise:</strong> California and Delaware law differ significantly; attorney ensures letter applies correct legal framework</li>
+                        <li><strong>Strategic positioning:</strong> Frames demands to preserve maximum leverage for negotiation or litigation</li>
+                        <li><strong>Opponent's attorney response:</strong> When your partner shows your letter to their attorney, professionally drafted letters get taken seriously (DIY letters often dismissed)</li>
+                        <li><strong>Foundation for litigation:</strong> If case proceeds to court, well-drafted demand letter strengthens your position for fee awards and sanctions</li>
+                        <li><strong>Avoids common mistakes:</strong> Professional letters avoid making statements that could hurt your case later</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="subsection-title">Service Options & Transparent Pricing</div>
+
+            <div class="pricing-grid">
+                <div class="pricing-box">
+                    <div class="pricing-title">📄 Professional Demand Letter</div>
+                    <div class="price">$450</div>
+                    <div style="text-align: left; font-size: 15px;">
+                        <strong>What's Included:</strong>
+                        <ul>
+                            <li>Attorney-drafted demand letter tailored to your specific situation and entity type</li>
+                            <li>Citations to applicable California or Delaware statutes</li>
+                            <li>References to relevant case law (Jones, Jara, Enea, etc.)</li>
+                            <li>Detailed list of specific demands (documents, buyout, distributions, etc.)</li>
+                            <li>Appropriate deadline and consequences for non-compliance</li>
+                            <li>Spoliation / evidence preservation notice</li>
+                            <li>One round of revisions based on your feedback</li>
+                            <li>Delivery via certified mail (return receipt) + email to all addresses</li>
+                            <li>Delivery confirmation and tracking provided to you</li>
+                            <li>Brief follow-up consultation after delivery to discuss any response</li>
+                        </ul>
+                        <div class="alert-box alert-info" style="margin-top: 15px; font-size: 14px;">
+                            <strong>Best for:</strong> Partners who need professional demand letter to establish legal record, demonstrate seriousness, and open settlement negotiations. Appropriate for most partnership disputes including freeze-outs, denied information access, and buyout negotiations.
+                        </div>
+                        <div style="margin-top: 15px; padding: 12px; background: white; border-radius: 6px; border: 1px solid #e2e8f0;">
+                            <strong>Typical turnaround:</strong> 3-5 business days from completed intake to delivery
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pricing-box" style="border-color: #f59e0b; border-width: 3px; position: relative;">
+                    <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #f59e0b; color: white; padding: 6px 20px; border-radius: 20px; font-weight: 700; font-size: 13px; white-space: nowrap;">MAXIMUM LEVERAGE</div>
+                    <div class="pricing-title" style="margin-top: 10px;">⚖️ Demand Letter + Draft Lawsuit</div>
+                    <div class="price">$900</div>
+                    <div style="text-align: left; font-size: 15px;">
+                        <strong>Everything in Professional Demand Letter, PLUS:</strong>
+                        <ul>
+                            <li><strong>Complete draft civil complaint ready to file</strong></li>
+                            <li>Causes of action tailored to your situation:
+                                <ul style="margin-left: 20px; font-size: 14px;">
+                                    <li>Breach of fiduciary duty (loyalty, care, good faith)</li>
+                                    <li>Breach of partnership/operating agreement</li>
+                                    <li>Accounting and constructive trust</li>
+                                    <li>Involuntary dissolution (if applicable)</li>
+                                    <li>Fraud, conversion, or misrepresentation (if supported by facts)</li>
+                                </ul>
+                            </li>
+                            <li>Fact section drafted from your intake questionnaire</li>
+                            <li>Prayer for relief specifying damages, restitution, fees, and equitable remedies</li>
+                            <li>Proper formatting for California Superior Court or Delaware Chancery Court</li>
+                            <li><strong>Draft lawsuit attached to demand letter as Exhibit A</strong> — shows partner you're ready to file immediately</li>
+                            <li>Creates maximum settlement pressure</li>
+                        </ul>
+                        <div class="alert-box alert-success" style="margin-top: 15px; font-size: 14px;">
+                            <strong>Best for:</strong> High-stakes disputes where you anticipate resistance or hostility. Partner sees draft complaint attached and understands you're not bluffing. Often motivates settlement when basic demand letter might be ignored. Also useful if you want to be ready to file immediately if partner doesn't respond.
+                        </div>
+                        <div style="margin-top: 15px; padding: 12px; background: white; border-radius: 6px; border: 1px solid #e2e8f0;">
+                            <strong>Typical turnaround:</strong> 5-7 business days from completed intake to delivery
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">📋 Process Overview</div>
+                <div class="card-content">
+                    <strong>Step 1: Initial Consultation</strong>
+                    <ul>
+                        <li>Schedule consultation via Calendly (see "Schedule Consultation" section below)</li>
+                        <li>Discuss your situation, ownership structure, and goals</li>
+                        <li>Determine which service package fits your needs</li>
+                        <li>Receive detailed intake questionnaire if moving forward</li>
+                    </ul>
+
+                    <strong>Step 2: Intake & Document Collection</strong>
+                    <ul>
+                        <li>Complete intake questionnaire covering partnership structure, timeline, specific incidents, and demands</li>
+                        <li>Provide documents you have (partnership agreement, communications, financial records, etc.)</li>
+                        <li>Don't worry if documentation is limited — lack of records is common in disputes</li>
+                    </ul>
+
+                    <strong>Step 3: Attorney Review & Drafting</strong>
+                    <ul>
+                        <li>Review your partnership/operating agreement and applicable state law</li>
+                        <li>Draft demand letter citing specific legal authorities</li>
+                        <li>Premium package: Draft complete complaint with tailored causes of action</li>
+                        <li>Turnaround: 3-5 days for standard package, 5-7 days for premium</li>
+                    </ul>
+
+                    <strong>Step 4: Your Review & Revisions</strong>
+                    <ul>
+                        <li>Review draft for accuracy and completeness</li>
+                        <li>Request any necessary clarifications or revisions</li>
+                        <li>One round of revisions included in flat fee</li>
+                    </ul>
+
+                    <strong>Step 5: Delivery</strong>
+                    <ul>
+                        <li>Certified mail with return receipt to partner (home and business addresses)</li>
+                        <li>Email to all known addresses</li>
+                        <li>Copies to partner's attorney if known</li>
+                        <li>You receive tracking numbers and delivery confirmations</li>
+                        <li>Premium package: Draft complaint attached as Exhibit A</li>
+                    </ul>
+
+                    <strong>Step 6: Follow-Up</strong>
+                    <ul>
+                        <li>Brief consultation after delivery to discuss any response</li>
+                        <li>If partner complies: You receive requested documents/resolution</li>
+                        <li>If partner ignores: Clean record for litigation with potential fee-shifting</li>
+                        <li>Litigation referrals available if needed (demand letter service does not include litigation representation)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="alert-box alert-warning">
+                <strong>⚖️ Important Service Terms & Disclaimers</strong>
+                <ul style="margin: 10px 0 0 20px; line-height: 1.9;">
+                    <li>These services provide <strong>demand letter drafting and delivery</strong> only, not full legal representation</li>
+                    <li>If litigation becomes necessary, you will need to retain litigation counsel separately (referrals available)</li>
+                    <li>Demand letters do not guarantee compliance, settlement, or any specific outcome</li>
+                    <li>Fees are flat-rate for drafting and delivery; follow-up negotiations beyond initial consultation or litigation support billed separately at hourly rates</li>
+                    <li>Premium package complaint is substantively complete but may need updates if case facts develop during negotiation period</li>
+                    <li>Attorney-client relationship formed only upon signed engagement letter and payment of fees</li>
+                    <li>Services available for California and Delaware entities; other states considered on case-by-case basis</li>
+                </ul>
+            </div>
+
+            <div class="card" style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); border-color: #3b82f6;">
+                <div class="card-title">✉️ Ready to Get Started?</div>
+                <div class="card-content">
+                    <strong>Option 1: Schedule Consultation</strong>
+                    <p style="margin: 10px 0;">Use the Calendly scheduler below to book a consultation. We'll discuss your situation and determine the best approach.</p>
+
+                    <strong>Option 2: Email Inquiry</strong>
+                    <p style="margin: 10px 0;">Email <strong><a href="mailto:owner@terms.law?subject=Partnership%20Demand%20Letter%20Inquiry" style="color: #1e40af;">owner@terms.law</a></strong> with:</p>
+                    <ul>
+                        <li>Brief description of your situation (2-3 paragraphs)</li>
+                        <li>Your ownership percentage and entity type</li>
+                        <li>State of formation (CA, DE, other)</li>
+                        <li>Key issues (denied information, hostile conduct, buyout dispute, etc.)</li>
+                        <li>Your preferred package (Professional $450 or Premium $900)</li>
+                    </ul>
+                    <p style="margin-top: 10px;">You'll receive intake questionnaire within 24 hours.</p>
+
+                </div>
+            </div>
+
+            <div class="subsection-title" style="margin-top: 40px;">Schedule Consultation</div>
+
+            <div class="alert-box alert-success">
+                <strong>📞 Book Your Consultation</strong>
+                <p style="margin-top: 10px;">
+                    Schedule a consultation to discuss your partnership dispute. During the call, we'll:
+                </p>
+                <ul style="margin: 10px 0 0 20px; line-height: 1.9;">
+                    <li>Review your partnership structure and ownership documentation</li>
+                    <li>Identify your legal rights under applicable California or Delaware law</li>
+                    <li>Discuss specific statutory authorities and case law relevant to your situation</li>
+                    <li>Evaluate your goals (information access, buyout, dissolution, etc.)</li>
+                    <li>Recommend whether professional demand letter would be helpful</li>
+                    <li>Explain the process, timeline, and flat-fee pricing</li>
+                    <li>Answer all your questions about partnership disputes and legal remedies</li>
+                </ul>
+            </div>
+
+            <div class="calendly-container">
+                <div class="calendly-title">📅 Select a Time Below</div>
+
+                <!-- Calendly inline widget begin -->
+                <div class="calendly-inline-widget" data-url="https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1" style="min-width:320px;height:700px;"></div>
+                <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
+                <!-- Calendly inline widget end -->
+            </div>
+
+            <div class="alert-box alert-info" style="margin-top: 30px;">
+                <strong>✉️ Prefer to Start via Email?</strong>
+                <p style="margin-top: 10px;">
+                    If you prefer email communication instead of scheduling a call, send your inquiry to: <strong><a href="mailto:owner@terms.law?subject=Partnership%20Demand%20Letter%20Inquiry" style="color: #1e40af; text-decoration: underline;">owner@terms.law</a></strong>
+                </p>
+                <p style="margin-top: 10px;">
+                    Include a brief description of your situation (ownership %, entity type, state of formation, key issues) and you'll receive the intake questionnaire within 24 hours.
+                </p>
+            </div>
+
+            <div class="card" style="margin-top: 30px;">
+                <div class="card-title">About the Attorney</div>
+                <div class="card-content">
+                    <strong>California-Licensed Attorney | Business & Partnership Disputes</strong>
+
+                    <p style="margin-top: 10px;">Practice areas include:</p>
+                    <ul>
+                        <li>Partnership and LLC member disputes (freeze-outs, denied information, buyout negotiations)</li>
+                        <li>Minority shareholder oppression and fiduciary duty claims</li>
+                        <li>Corporate books and records enforcement (CA § 1601, DE § 220)</li>
+                        <li>Business dissolution and accounting claims</li>
+                        <li>Contract disputes and demand letter strategy</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>Why clients choose this service for partnership demand letters:</strong></p>
+                    <ul>
+                        <li>Transparent flat-fee pricing (no surprise hourly bills for straightforward demand letters)</li>
+                        <li>Experience with both California and Delaware entity law</li>
+                        <li>Practical approach focused on achieving client's goals (exit, buyout, information access, etc.)</li>
+                        <li>Fast turnaround (3-7 days depending on package)</li>
+                        <li>Responsive communication throughout process</li>
+                        <li>Many clients originate from platforms like Upwork with informal partnership arrangements that later became contentious</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><em>Note: Demand letter services do not constitute full legal representation. If litigation becomes necessary, separate engagement for litigation representation or referral to litigation counsel will be discussed.</em></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ Tab -->
+        <div id="tab-faq" class="tab-content">
+            <div class="section-title">Frequently Asked Questions</div>
+
+            <div class="card">
+                <div class="card-title">Q: Do I need a written partnership agreement to have legal rights?</div>
+                <div class="card-content">
+                    <strong>A:</strong> No. Even without a written agreement, you have statutory rights and fiduciary protections under California or Delaware law. Many partnerships operate under verbal agreements or default statutory rules. Key rights that exist regardless of written agreements:
+                    <ul>
+                        <li>Inspection rights under § 1601 (CA corp), § 17704.10 (CA LLC), § 220 (DE corp), or § 18-305 (DE LLC)</li>
+                        <li>Fiduciary duties (loyalty, care, good faith) owed by controlling partners/shareholders</li>
+                        <li>Right to accounting of partnership finances</li>
+                        <li>Right to petition for dissolution in cases of deadlock or oppression</li>
+                    </ul>
+                    However, if you DO have a written partnership or operating agreement, bring it to your consultation as it may provide additional rights, restrict certain remedies, or require specific procedures (like arbitration).
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Q: What if my partner is a family member or spouse?</div>
+                <div class="card-content">
+                    <strong>A:</strong> Family and spousal partnerships are extremely common and often more contentious than arms-length business relationships. All the same partnership law applies, but spouse-partners may have additional rights:
+                    <ul>
+                        <li><strong>California Family Code § 721:</strong> Heightened disclosure duties between spouses (higher than ordinary fiduciary duty)</li>
+                        <li><strong>Family Code § 1101:</strong> Strong penalties (50-100% of asset value) for breach of marital fiduciary duty</li>
+                        <li><strong>Community property laws:</strong> May give you ownership rights even if you're not record shareholder</li>
+                    </ul>
+                    <p style="margin-top: 10px;">For spouse-partner disputes, see the related <a href="minority-spouse-shareholder-demand-guide.html" style="color: #3b82f6; text-decoration: underline;">Minority Spouse-Shareholder Demand Letter Guide</a> which covers the intersection of family law and corporate law.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Q: Will sending a demand letter make things worse with my partner?</div>
+                <div class="card-content">
+                    <strong>A:</strong> This is a very common concern, and it's understandable. However, consider:
+                    <ul>
+                        <li>If the relationship has deteriorated to the point where you need a demand letter, it's likely already broken</li>
+                        <li>Many partners only take minority seriously when formal legal process begins</li>
+                        <li>Professionally drafted demand letters often IMPROVE the situation by forcing partner (and their attorney) to recognize your legal rights</li>
+                        <li>Demand letters open settlement negotiations — many disputes resolve after demand letter without litigation</li>
+                        <li>Waiting and hoping things improve rarely works; patterns of oppression and freeze-out typically get worse over time</li>
+                        <li>Demand letters preserve your legal rights and create record for fee-shifting and sanctions if litigation becomes necessary</li>
+                    </ul>
+                    <strong>Bottom line:</strong> If you're already being frozen out, denied information, or treated hostilely, a demand letter typically doesn't make relationship worse (it's already bad) but DOES create leverage for resolution.
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Q: What if the business entity is in a different state than where I live?</div>
+                <div class="card-content">
+                    <strong>A:</strong> The state where the entity is <strong>formed</strong> (incorporated or organized) generally determines the law governing internal affairs like inspection rights and fiduciary duties. This is called the "internal affairs doctrine."
+                    <ul>
+                        <li><strong>California-formed entities:</strong> Governed by California Corporations Code regardless of where owners live</li>
+                        <li><strong>Delaware-formed entities:</strong> Governed by Delaware General Corporation Law or Delaware LLC Act</li>
+                        <li><strong>Other states:</strong> Each state has its own corporate/LLC code (generally similar to CA or DE with variations)</li>
+                    </ul>
+
+                    <p style="margin-top: 10px;"><strong>How this affects demand letters:</strong></p>
+                    <ul>
+                        <li>Demand letter cites statutes and case law from state of formation</li>
+                        <li>If litigation needed, internal affairs claims often filed in state of formation (but personal claims can be filed where defendants live)</li>
+                        <li>Your physical location matters for where to file lawsuit (jurisdiction) but not for which substantive law applies</li>
+                    </ul>
+
+                    <p style="margin-top: 10px;">Professional legal assistance is particularly valuable for out-of-state entities because you need letter citing correct state's law. DIY letters often cite wrong jurisdiction's statutes.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Q: My partnership was formed through Upwork or another online platform. Does that change anything legally?</div>
+                <div class="card-content">
+                    <strong>A:</strong> No, partnerships formed through Upwork, Fiverr, or other online platforms have the same legal rights and protections as traditional partnerships. Common patterns with online-platform partnerships:
+                    <ul>
+                        <li>Often start with informal collaboration, then formalize into LLC or corporation once project successful</li>
+                        <li>Frequently cross international borders (one partner U.S., other abroad)</li>
+                        <li>Typically use generic operating agreements from LegalZoom or Rocket Lawyer without customization</li>
+                        <li>Problems emerge when initial goodwill fades and one partner starts self-dealing</li>
+                    </ul>
+
+                    <p style="margin-top: 10px;"><strong>Special considerations for Upwork-origin partnerships:</strong></p>
+                    <ul>
+                        <li>Platform messaging may provide evidence of partnership intent, profit-sharing agreements, or promises made</li>
+                        <li>Payment history on platform can show initial collaboration before entity formation</li>
+                        <li>Foreign partners often intimidated by U.S. legal system — professional demand letter levels playing field</li>
+                        <li>Delaware entities common for tech/SaaS partnerships (due to investor preferences)</li>
+                    </ul>
+
+                    <p style="margin-top: 10px;">Many of my clients' partnership disputes originated from Upwork or similar platforms. These arrangements are just as legally enforceable as traditional partnerships.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Q: How much should I demand for a buyout?</div>
+                <div class="card-content">
+                    <strong>A:</strong> Buyout valuation depends on several factors:
+
+                    <p style="margin-top: 10px;"><strong>Key Valuation Factors:</strong></p>
+                    <ul>
+                        <li><strong>Partnership/operating agreement terms:</strong> May specify valuation method (book value, fair market value, appraisal, EBITDA multiple)</li>
+                        <li><strong>Your ownership percentage</strong></li>
+                        <li><strong>Business assets, revenue, and profitability</strong></li>
+                        <li><strong>Market comparables</strong> for similar businesses</li>
+                        <li><strong>Minority discount:</strong> Whether applicable (often disputed — Jara case suggests oppressive conduct forfeits discount)</li>
+                        <li><strong>Your leverage:</strong> Strength of fiduciary duty claims, dissolution threat, inspection rights</li>
+                    </ul>
+
+                    <p style="margin-top: 10px;"><strong>Typical Demand Letter Approach:</strong></p>
+                    <p>Rather than naming specific dollar amount (which you may not have enough information to calculate), demand letters typically request:</p>
+                    <ul>
+                        <li>"Fair market value as determined by independent certified business appraiser mutually agreed upon by parties"</li>
+                        <li>"Buyout pursuant to Section [X] of Operating Agreement" (cites specific valuation provision)</li>
+                        <li>"Appraisal under [standard] (e.g., IRS Revenue Ruling 59-60 for fair market value)"</li>
+                    </ul>
+
+                    <p style="margin-top: 10px;">During consultation, we'll discuss realistic valuation ranges based on your situation and whether to demand specific amount or appraisal process.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Q: Can I use the draft lawsuit from the Premium Package if my partner doesn't respond?</div>
+                <div class="card-content">
+                    <strong>A:</strong> Yes—that's the entire purpose of the Premium Package ($900). The draft complaint is:
+                    <ul>
+                        <li>Substantively complete with tailored causes of action</li>
+                        <li>Based on facts from your intake questionnaire</li>
+                        <li>Properly formatted for California Superior Court or Delaware Chancery Court</li>
+                        <li>Ready to file with minimal updates</li>
+                    </ul>
+
+                    <p style="margin-top: 10px;"><strong>What you'll need to do before filing:</strong></p>
+                    <ul>
+                        <li>Retain litigation counsel (separate engagement from demand letter service)</li>
+                        <li>Update complaint if new facts emerged during negotiation period</li>
+                        <li>Conform to local court formatting rules (some courts have specific margin/font requirements)</li>
+                        <li>Pay filing fees and arrange for service of process</li>
+                    </ul>
+
+                    <p style="margin-top: 10px;"><strong>Strategic value of attaching draft lawsuit:</strong></p>
+                    <p>When partner receives demand letter with draft complaint attached as Exhibit A, they see:</p>
+                    <ul>
+                        <li>You're not bluffing — complaint is ready to file</li>
+                        <li>Specific causes of action they'll face (breach of duty, accounting, dissolution, etc.)</li>
+                        <li>Potential remedies including damages, restitution, and attorney fees</li>
+                        <li>Your attorney has already done the work; filing will happen quickly if they don't respond</li>
+                    </ul>
+                    <p style="margin-top: 10px;">This creates significant settlement pressure. Many partners become reasonable when they see actual lawsuit ready to be filed.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Q: What documents will I need to provide for the intake?</div>
+                <div class="card-content">
+                    <strong>A:</strong> Provide whatever you have—even if incomplete. Common in partnership disputes that minority partner has been denied access to documents.
+
+                    <p style="margin-top: 10px;"><strong>Helpful documents (if available):</strong></p>
+                    <ul>
+                        <li><strong>Formation documents:</strong> Partnership agreement, LLC operating agreement, articles of incorporation, bylaws, shareholder agreements</li>
+                        <li><strong>Ownership proof:</strong> Stock certificates, membership certificates, capital contribution receipts, wire transfer records</li>
+                        <li><strong>Financial records:</strong> Tax returns, financial statements, bank statements, P&Ls you currently have</li>
+                        <li><strong>Communications:</strong> Emails, text messages, letters showing:
+                            <ul style="margin-left: 20px;">
+                                <li>Your requests for information that were denied</li>
+                                <li>Hostile or harassing messages</li>
+                                <li>Discussions about distributions, buyout, or management</li>
+                                <li>Evidence of self-dealing or improper conduct</li>
+                            </ul>
+                        </li>
+                        <li><strong>Distribution records:</strong> Checks, wire transfers, or records of any profit distributions made (or denied)</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>If you don't have much documentation:</strong></p>
+                    <p>That's fine and very common. We'll draft the demand letter to specifically request the missing records. Lack of documentation actually strengthens inspection-rights claims under § 1601 or § 17704.10.</p>
+
+                    <p style="margin-top: 10px;">The intake questionnaire will walk you through all relevant facts even if you don't have supporting documents.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Q: How long should I wait for a response before taking further action?</div>
+                <div class="card-content">
+                    <strong>A:</strong> Standard deadlines and response timeline:
+
+                    <p style="margin-top: 10px;"><strong>Typical Deadline in Demand Letter:</strong></p>
+                    <ul>
+                        <li><strong>10-14 days:</strong> Standard for most partnership disputes and information requests</li>
+                        <li><strong>7 days:</strong> Urgent situations (imminent improper transactions, suspected document destruction)</li>
+                        <li><strong>21 days:</strong> Complex buyout negotiations requiring appraisal or extensive document gathering</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>After Deadline Expires:</strong></p>
+                    <ul>
+                        <li>Wait additional 3-5 days grace period (accounts for mail delays, weekends, reasonable response time)</li>
+                        <li>If no response or inadequate response, evaluate next steps</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>Next Steps After Non-Compliance:</strong></p>
+                    <ul>
+                        <li><strong>Books & records enforcement:</strong> Fast-track motion in court for inspection rights (CA § 1601, DE § 220)</li>
+                        <li><strong>File lawsuit:</strong> If you have Premium package, complaint ready to file</li>
+                        <li><strong>Dissolution petition:</strong> Under CA § 1800 (corps) or § 17707.03 (LLCs) for oppression/deadlock</li>
+                        <li><strong>Mediation:</strong> If partner shows some willingness to negotiate but needs neutral facilitator</li>
+                    </ul>
+
+                    <p style="margin-top: 10px;">Brief follow-up consultation after deadline (included in demand letter service) will discuss appropriate next steps based on partner's response or lack thereof.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Q: Should I try mediation before sending a demand letter?</div>
+                <div class="card-content">
+                    <strong>A:</strong> Depends on the relationship and your partner's conduct:
+
+                    <p style="margin-top: 10px;"><strong>Consider mediation BEFORE demand letter if:</strong></p>
+                    <ul>
+                        <li>Relationship is strained but not yet hostile</li>
+                        <li>Partner has shown some willingness to discuss resolution</li>
+                        <li>Issues are primarily business disagreements rather than bad faith conduct</li>
+                        <li>Your operating agreement requires mediation before litigation</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>Send demand letter BEFORE mediation if:</strong></p>
+                    <ul>
+                        <li>Partner refuses to communicate or respond to informal requests</li>
+                        <li>Pattern of hostile conduct, threats, or harassment</li>
+                        <li>Evidence of self-dealing, fraud, or breach of fiduciary duty</li>
+                        <li>Partner has indicated they won't negotiate ("take it or leave it" buyout offer, complete refusal, etc.)</li>
+                        <li>You need documents first (can't mediate effectively without financial information)</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>Common approach:</strong></p>
+                    <p>Demand letter first (establishes your rights and requests documents), then propose mediation if partner responds but negotiations stall. Demand letter creates leverage that makes mediation more productive.</p>
+
+                    <p style="margin-top: 10px;">Some demand letters explicitly offer mediation as alternative: "Either provide documents and engage in good faith buyout negotiations within 14 days, OR agree to binding mediation with [mediator organization]. If neither option pursued, I will file [legal action]."</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Tab Navigation - WordPress Compatible with Anti-Freeze Arrows
+        function switchTab(tabId, event) {
+            // Prevent default behavior and stop propagation for WordPress compatibility
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+
+            // Hide all tab contents
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+
+            // Deactivate all tabs
+            const tabs = document.querySelectorAll('.tab-button');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Show selected tab content
+            const targetTab = document.getElementById('tab-' + tabId);
+            if (targetTab) {
+                targetTab.classList.add('active');
+            }
+
+            // Activate clicked tab
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
+
+            // DO NOT scroll page - causes jumpy behavior and poor UX
+            // Users can scroll manually if needed
+        }
+
+        // Anti-Freeze Pattern: Smart Arrow Display with [hidden] attribute
+        const tabsWrapper = document.getElementById('tabsWrapper');
+        const tabNav = document.getElementById('tabNav');
+        const leftArrow = tabsWrapper ? tabsWrapper.querySelector('.tab-nav-arrow.left') : null;
+        const rightArrow = tabsWrapper ? tabsWrapper.querySelector('.tab-nav-arrow.right') : null;
+
+        function updateTabArrows() {
+            if (!tabNav || !leftArrow || !rightArrow) return;
+
+            // Detect if container has overflow (with 5px tolerance)
+            const canScroll = tabNav.scrollWidth > tabNav.clientWidth + 5;
+
+            // Detect scroll positions (with 5px tolerance)
+            const atStart = tabNav.scrollLeft <= 5;
+            const atEnd = tabNav.scrollLeft + tabNav.clientWidth >= tabNav.scrollWidth - 5;
+
+            // Use [hidden] attribute instead of CSS classes for better WordPress compatibility
+            leftArrow.hidden = !canScroll || atStart;
+            rightArrow.hidden = !canScroll || atEnd;
+        }
+
+        // Tab Scrolling
+        function scrollTabs(event, direction) {
+            // Prevent default behavior and stop propagation for WordPress compatibility
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+
+            if (!tabNav) return;
+
+            const scrollAmount = direction > 0 ? 220 : -220;
+            tabNav.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+
+            // Update arrow visibility after scroll animation completes
+            setTimeout(updateTabArrows, 320);
+        }
+
+        // Initialize arrows on load, resize, and scroll
+        if (tabNav) {
+            tabNav.addEventListener('scroll', updateTabArrows);
+            window.addEventListener('resize', updateTabArrows);
+            window.addEventListener('load', updateTabArrows);
+            // Call immediately in case DOM is already loaded
+            updateTabArrows();
+        }
+
+        // Handle hash-based navigation (for internal links)
+        if (window.location.hash) {
+            const hash = window.location.hash.substring(1);
+            if (hash.startsWith('tab-')) {
+                const tabId = hash.replace('tab-', '');
+                setTimeout(() => switchTab(tabId, null), 100);
+            }
+        }
+    </script>
+</body>
+</html>

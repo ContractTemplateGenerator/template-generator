@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>California CAM Program Resource Hub</title>
+    <style>
+        :root {
+            --primary: #0f8b99;
+            --primary-dark: #0a6370;
+            --accent: #f9b234;
+            --soft-bg: #e8f6f8;
+            --soft-border: #c7e3e8;
+            --text-dark: #1c2a2f;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f2fbfd 0%, #dff1f7 100%);
+            color: var(--text-dark);
+            padding: 25px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 18px;
+            box-shadow: 0 20px 60px rgba(15, 139, 153, 0.15);
+            overflow: hidden;
+        }
+
+        .header {
+            padding: 40px;
+            background: linear-gradient(135deg, #0f8b99 0%, #136f8a 100%);
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 30px;
+            margin-bottom: 12px;
+        }
+
+        .header p {
+            font-size: 18px;
+            opacity: 0.95;
+            max-width: 900px;
+        }
+
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            border-bottom: 3px solid var(--soft-border);
+            background: #f7fbfc;
+        }
+
+        .tab-button {
+            flex: 1;
+            min-width: 180px;
+            padding: 18px 20px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            color: #4d5d63;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .tab-button:hover {
+            color: var(--primary);
+            background: rgba(15, 139, 153, 0.07);
+        }
+
+        .tab-button.active {
+            color: var(--primary);
+            background: white;
+            border-bottom: 3px solid var(--primary);
+            margin-bottom: -3px;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 40px;
+            animation: fade 0.4s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fade {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            font-size: 24px;
+            color: var(--primary);
+            margin-bottom: 18px;
+            font-weight: 700;
+        }
+
+        p {
+            margin-bottom: 15px;
+        }
+
+        ul {
+            margin: 15px 0 15px 25px;
+        }
+
+        .quick-facts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 18px;
+            margin: 25px 0;
+        }
+
+        .fact-card {
+            background: var(--soft-bg);
+            border: 1px solid var(--soft-border);
+            border-radius: 12px;
+            padding: 18px;
+            text-align: center;
+        }
+
+        .fact-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .fact-value {
+            font-weight: 700;
+            font-size: 20px;
+            color: var(--primary);
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .panel {
+            border: 1px solid #e3eaec;
+            border-radius: 12px;
+            padding: 20px;
+            background: #fbfdfe;
+        }
+
+        .panel h4 {
+            color: var(--primary-dark);
+            margin-bottom: 12px;
+        }
+
+        .alert-box {
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin: 25px 0;
+            border-left: 5px solid;
+        }
+
+        .alert-info { background: #e9f6ff; border-color: #1994ff; color: #0d4c75; }
+        .alert-success { background: #e8f7f1; border-color: #1f9d66; color: #0d5b3d; }
+        .alert-warning { background: #fff6e5; border-color: #f5a524; color: #8a5a05; }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 18px;
+            margin: 20px 0;
+        }
+
+        .mini-card {
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #ebedef;
+            background: #ffffff;
+            box-shadow: 0 10px 30px rgba(15,139,153,0.08);
+        }
+
+        .mini-card h5 {
+            margin-bottom: 6px;
+            color: var(--primary-dark);
+            font-size: 16px;
+        }
+
+        .mini-card span {
+            display: block;
+            font-size: 13px;
+            color: #7a8a90;
+            margin-bottom: 6px;
+        }
+
+        .timeline {
+            border-left: 3px solid var(--soft-border);
+            margin: 25px 0;
+            padding-left: 20px;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 18px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -31px;
+            top: 6px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 3px solid white;
+            background: var(--primary);
+            box-shadow: 0 0 0 3px var(--soft-bg);
+        }
+
+        .matrix {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 18px;
+            margin-top: 25px;
+        }
+
+        .matrix-card {
+            border-radius: 12px;
+            border: 1px solid #e4ebed;
+            padding: 18px;
+            background: #fcfefe;
+        }
+
+        .matrix-card h5 {
+            margin-bottom: 10px;
+            color: var(--primary-dark);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 15px;
+        }
+
+        th, td {
+            border: 1px solid #e4ebed;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background: #f0f7f8;
+            color: #0f5562;
+        }
+
+        .checklist {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            border: 1px dashed #b6d9de;
+            border-radius: 12px;
+            padding: 14px;
+        }
+
+        .check-item span {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .cta-panel {
+            border-radius: 14px;
+            background: linear-gradient(135deg, #0f8b99 0%, #136f8a 100%);
+            color: white;
+            padding: 35px;
+            margin-top: 25px;
+            box-shadow: 0 20px 40px rgba(15, 139, 153, 0.3);
+        }
+
+        .cta-panel .cta-button {
+            margin-top: 18px;
+            padding: 14px 30px;
+            border: none;
+            border-radius: 10px;
+            background: white;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .cta-panel .cta-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .faq {
+            margin-top: 25px;
+        }
+
+        .faq-item {
+            border-bottom: 1px solid #e4ebed;
+            padding: 16px 0;
+        }
+
+        .faq-item strong {
+            display: block;
+            color: var(--primary);
+            margin-bottom: 6px;
+        }
+
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tab-button {
+                width: 100%;
+            }
+
+            body {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>California CAM Program Command Center</h1>
+            <p>Put a sophisticated, compliant CAM program on top of your California shopping center or mixed-use article. This widget gives readers a visual map of the pain points, cost architecture, regulatory overlay, and the engagement path you can lead.</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="openTab(event, 'tab-overview')">📌 Snapshot</button>
+            <button class="tab-button" onclick="openTab(event, 'tab-costs')">🧮 Cost Pools</button>
+            <button class="tab-button" onclick="openTab(event, 'tab-mixeduse')">🏘️ Mixed-Use</button>
+            <button class="tab-button" onclick="openTab(event, 'tab-compliance')">⚖️ Compliance</button>
+            <button class="tab-button" onclick="openTab(event, 'tab-roadmap')">🚀 Action Plan</button>
+        </div>
+
+        <div id="tab-overview" class="tab-content active">
+            <p class="section-title">Why This CAM Hub Matters</p>
+            <p>Owners, asset managers, and in-house counsel launching (or cleaning up) a Common Area Maintenance program in California need a single place where leases, CC&Rs, residential overlays, and vendor contracts are aligned. This snapshot tees up the full article with the immediate business case.</p>
+
+            <div class="quick-facts">
+                <div class="fact-card">
+                    <div class="fact-icon">🧩</div>
+                    <div class="fact-value">3</div>
+                    <p>Typical CAM pools (Retail / Residential / Shared Core)</p>
+                </div>
+                <div class="fact-card">
+                    <div class="fact-icon">📅</div>
+                    <div class="fact-value">Jan 1, 2025</div>
+                    <p>SB 1103 compliance goes live for qualified commercial tenants</p>
+                </div>
+                <div class="fact-card">
+                    <div class="fact-icon">📈</div>
+                    <div class="fact-value">5% + CPI*</div>
+                    <p>AB 1482 rent cap (10% ceiling) on most residential add-ons</p>
+                </div>
+                <div class="fact-card">
+                    <div class="fact-icon">⏳</div>
+                    <div class="fact-value">30–60 Days</div>
+                    <p>Best practice window to issue CAM reconciliations after fiscal year-end</p>
+                </div>
+            </div>
+
+            <div class="two-column">
+                <div class="panel">
+                    <h4>Ideal Readers</h4>
+                    <ul>
+                        <li>California mixed-use owners formalizing their first CAM rollout</li>
+                        <li>Shopping centers balancing retail tenants with residential associations</li>
+                        <li>Family offices and asset managers inheriting legacy CAM language</li>
+                        <li>In-house GCs/CFOs needing a legal + operational playbook</li>
+                    </ul>
+                </div>
+                <div class="panel">
+                    <h4>Typical Pain Points</h4>
+                    <ul>
+                        <li>Leases, CC&Rs, and vendor contracts contradict one another</li>
+                        <li>Residential rent caps and utility laws ignored in CAM math</li>
+                        <li>Vendor SLAs don’t match the promises made to tenants</li>
+                        <li>No annual process for audits, gross-up adjustments, or notice</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="alert-box alert-success">
+                <strong>Authority Cue</strong>
+                <p>Open the article with this widget so readers instantly see that you design California CAM frameworks that survive SB 1103, AB 1482, Davis-Stirling, and the Thrifty Payless misrepresentation line of cases.</p>
+            </div>
+        </div>
+
+        <div id="tab-costs" class="tab-content">
+            <p class="section-title">Cost Pools, Budgets, and Reconciliations</p>
+            <p>Before tenants see the article’s statutes and war stories, give them a digestible layout of how the CAM math actually works.</p>
+
+            <div class="card-grid">
+                <div class="mini-card">
+                    <h5>Shared Core</h5>
+                    <span>Parking, site lighting, core systems</span>
+                    <p>Create a neutral pool funded proportionally by every use tied to the REA or CC&Rs.</p>
+                </div>
+                <div class="mini-card">
+                    <h5>Retail Pool</h5>
+                    <span>Retail-only marketing + storefront load</span>
+                    <p>Keep activations, promotions, and grease-trap work out of the residential books.</p>
+                </div>
+                <div class="mini-card">
+                    <h5>Residential Pool</h5>
+                    <span>Habitability + services</span>
+                    <p>Security, elevator uptime, amenity decks, water submeters—budgeted with AB 1482 in mind.</p>
+                </div>
+                <div class="mini-card">
+                    <h5>Admin & Caps</h5>
+                    <span>Management fee + controllable cap</span>
+                    <p>Spell out % caps, gross-up assumptions, and what happens with uncontrollable items (taxes, insurance).</p>
+                </div>
+            </div>
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <strong>Month 0</strong>
+                    <p>Lock budget + disclosure package that mirrors CC&Rs and future SB 1103 documentation.</p>
+                </div>
+                <div class="timeline-item">
+                    <strong>Months 1–11</strong>
+                    <p>Bill monthly estimates; track controllable vs uncontrollable categories in real time.</p>
+                </div>
+                <div class="timeline-item">
+                    <strong>Year-End + 30 Days</strong>
+                    <p>Finalize actuals, apply gross-up, prep back-up exhibits and optional audit windows.</p>
+                </div>
+                <div class="timeline-item">
+                    <strong>Year-End + 60 Days</strong>
+                    <p>Send reconciliation package + variance narrative; kick off tenant feedback loop.</p>
+                </div>
+            </div>
+
+            <div class="alert-box alert-info">
+                <strong>Checklist Preview</strong>
+                <p>Encourage readers to pull CAM definitions from their commercial leases, pair them with REA/association provisions, and note any SB 1103 "building operating cost" documentation gaps before they dive into the main article.</p>
+            </div>
+        </div>
+
+        <div id="tab-mixeduse" class="tab-content">
+            <p class="section-title">Mixed-Use + Residential Complications</p>
+            <p>Visualize the governance stack and the residential overlays that make mixed-use CAM programs uniquely sensitive.</p>
+
+            <div class="matrix">
+                <div class="matrix-card">
+                    <h5>Governance Stack</h5>
+                    <ul>
+                        <li>Master CC&Rs / REAs: define the site, cost shares, maintenance party</li>
+                        <li>Residential + commercial sub-associations: budget authority + caps</li>
+                        <li>Management agreements: who actually executes the plan</li>
+                    </ul>
+                </div>
+                <div class="matrix-card">
+                    <h5>Residential Overlay</h5>
+                    <ul>
+                        <li>AB 1482 rent caps + just cause</li>
+                        <li>SB 7 submeters / "just and reasonable" water billing</li>
+                        <li>Habitability = common areas (lighting, elevators, security)</li>
+                    </ul>
+                </div>
+                <div class="matrix-card">
+                    <h5>Operational Friction</h5>
+                    <ul>
+                        <li>Parking priority + delivery schedules</li>
+                        <li>Noise, odors, grease, trash enclosures</li>
+                        <li>EV chargers, solar, rideshare zones and capex pass-through rules</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="alert-box alert-warning">
+                <strong>Mixed-Use Gap</strong>
+                <p>Use this callout to foreshadow the article’s warning: when CC&Rs, leases, and budgets are drafted in isolation, you invite disputes between residents, retailers, and associations. The fix is coordinated documents plus recurring audits.</p>
+            </div>
+        </div>
+
+        <div id="tab-compliance" class="tab-content">
+            <p class="section-title">California Compliance Watchlist</p>
+            <p>Give readers a color-coded table of the statutes they will meet deeper in the article.</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Law</th>
+                        <th>Scope</th>
+                        <th>Impact on CAM / Operating Costs</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>SB 1103 (2025)</td>
+                        <td>Qualified commercial tenants: micro enterprises, small restaurants, nonprofits</td>
+                        <td>Requires documented allocation method for "building operating costs" (incl. CAM + non-metered utilities) and notice before changing tenant shares.</td>
+                    </tr>
+                    <tr>
+                        <td>AB 1482</td>
+                        <td>Most multi-family units (with exemptions)</td>
+                        <td>Caps rent + recurring fees (5% + CPI up to 10%), imposes just-cause and anti-retaliation obligations—residential CAM add-ons can trigger scrutiny.</td>
+                    </tr>
+                    <tr>
+                        <td>SB 7 / Civil Code 1954.201+</td>
+                        <td>New mixed-use + multi-family projects with water service post-2018</td>
+                        <td>Mandates submeters, usage-based billing, fee disclosure; undermines flat CAM allocations for water/sewer/stormwater.</td>
+                    </tr>
+                    <tr>
+                        <td>Thrifty Payless v. Americana</td>
+                        <td>California Court of Appeal (fraud/misrepresentation)</td>
+                        <td>CAM "estimates" in LOIs and leases must reflect reality—integration clauses won’t save misleading pro formas.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="checklist">
+                <div class="check-item">
+                    <span>☑︎</span>
+                    <p>Have you labeled which tenants fall under SB 1103 and stored the backup for their cost allocations?</p>
+                </div>
+                <div class="check-item">
+                    <span>☑︎</span>
+                    <p>Do your residential addenda explain how AB 1482 caps interact with CAM-style fees and reimbursements?</p>
+                </div>
+                <div class="check-item">
+                    <span>☑︎</span>
+                    <p>Can you show water/sewer math that complies with SB 7 and the "just and reasonable" billing standard?</p>
+                </div>
+                <div class="check-item">
+                    <span>☑︎</span>
+                    <p>Is every vendor contract’s SLA + insurance schedule mapped to the promises you make in leases and CC&Rs?</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-roadmap" class="tab-content">
+            <p class="section-title">Engagement Roadmap & CTA</p>
+            <p>Close the widget with the phases you typically run. This lets the reader envision a scoped engagement before hitting the CTA inside the article.</p>
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <strong>1. Inventory + Audit</strong>
+                    <p>Gather leases, CC&Rs/REAs, residential forms, vendor contracts, budgets, and prior reconciliations.</p>
+                </div>
+                <div class="timeline-item">
+                    <strong>2. CAM Architecture Memo</strong>
+                    <p>Document cost pools, allocation mechanics, statutory overlay, and funding gaps (caps vs vendor escalators).</p>
+                </div>
+                <div class="timeline-item">
+                    <strong>3. Document Refresh</strong>
+                    <p>Amend CC&Rs or association budgets, update lease exhibits for SB 1103, align residential forms with AB 1482/SB 7.</p>
+                </div>
+                <div class="timeline-item">
+                    <strong>4. Process Playbook</strong>
+                    <p>Deliver calendar, reconciliation template, tenant audit protocol, and vendor scorecard tied to SLAs.</p>
+                </div>
+                <div class="timeline-item">
+                    <strong>5. Ongoing Counsel</strong>
+                    <p>Annual CAM reviews, vendor renewals, and dispute triage—keep one brain across legal + operations.</p>
+                </div>
+            </div>
+
+            <div class="cta-panel">
+                <h3>Offer a "CAM Program Health Check"</h3>
+                <p>Invite the reader to send over their leases, CC&Rs, and last reconciliation for a quick issue-spotting memo—then upsell full implementation. Tie this CTA directly into the article’s final section.</p>
+                <a class="cta-button" href="#" onclick="Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting'});return false;">Book a CAM Program Strategy Call →</a>
+            </div>
+
+            <div class="faq">
+                <div class="faq-item">
+                    <strong>Can we retrofit a CAM system mid-lease?</strong>
+                    <p>Yes, but cost-allocation shifts usually require amendments or tailored notice. Your audit process and documentation can improve immediately, while economics get aligned as renewals come up.</p>
+                </div>
+                <div class="faq-item">
+                    <strong>Who owns CAM day-to-day?</strong>
+                    <p>Property management, accounting, and legal all do—but the article should point out why one coordinator (often outside counsel) keeps practices synced with the documents.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendly link widget begin -->
+    <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+    <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+    <!-- Calendly link widget end -->
+
+    <script>
+        function openTab(evt, tabId) {
+            const contents = document.querySelectorAll('.tab-content');
+            const buttons = document.querySelectorAll('.tab-button');
+            contents.forEach(c => c.classList.remove('active'));
+            buttons.forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            evt.currentTarget.classList.add('active');
+        }
+    </script>
+</body>
+</html>

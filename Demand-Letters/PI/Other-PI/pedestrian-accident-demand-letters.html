@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" name="width=device-width, initial-scale=1.0">
+    <title>Pedestrian Accident Demand Letters</title>
+</head>
+<body>
+
+<div class="demand-letter-hub">
+
+<style>
+.demand-letter-hub {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    line-height: 1.7;
+    color: #2c3e50;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #ffffff;
+}
+.demand-letter-hub * {
+    box-sizing: border-box;
+}
+.dl-header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 30px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    color: white;
+}
+.dl-title {
+    font-size: 2.5em;
+    font-weight: 700;
+    margin: 0 0 15px 0;
+    line-height: 1.2;
+}
+.dl-subtitle {
+    font-size: 1.2em;
+    opacity: 0.95;
+    margin: 0;
+    font-weight: 400;
+}
+.dl-tab-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 30px;
+    border-bottom: 3px solid #e0e0e0;
+    padding-bottom: 0;
+    position: relative;
+}
+.dl-tab-button {
+    background: #f8f9fa;
+    border: 2px solid #dee2e6;
+    border-bottom: none;
+    padding: 14px 24px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    color: #495057;
+    border-radius: 8px 8px 0 0;
+    transition: all 0.3s ease;
+    position: relative;
+    bottom: -3px;
+    white-space: nowrap;
+}
+.dl-tab-button:hover {
+    background: #e9ecef;
+    color: #212529;
+    transform: translateY(-2px);
+    bottom: -1px;
+}
+.dl-tab-button.active {
+    background: white;
+    color: #667eea;
+    border-color: #667eea;
+    border-bottom: 3px solid white;
+    bottom: -3px;
+}
+.dl-tab-content {
+    display: none;
+    animation: fadeIn 0.4s ease-in;
+}
+.dl-tab-content.active {
+    display: block;
+}
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.dl-section {
+    margin-bottom: 35px;
+    padding: 28px;
+    background: #ffffff;
+    border-radius: 10px;
+    border-left: 5px solid #667eea;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.dl-section-title {
+    font-size: 1.8em;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 0 0 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.dl-section-title::before {
+    content: "▸";
+    color: #667eea;
+    font-size: 1.2em;
+}
+.dl-content p {
+    margin: 0 0 15px 0;
+    font-size: 16px;
+    line-height: 1.7;
+}
+.dl-content ul,
+.dl-content ol {
+    margin: 15px 0;
+    padding-left: 25px;
+}
+.dl-content li {
+    margin-bottom: 12px;
+    line-height: 1.7;
+}
+.dl-content strong {
+    color: #1a202c;
+    font-weight: 600;
+}
+.dl-alert {
+    padding: 18px 22px;
+    border-radius: 8px;
+    margin: 20px 0;
+    border-left: 5px solid;
+    background: #f8f9fa;
+}
+.dl-alert-info {
+    border-left-color: #3498db;
+    background: #e8f4f8;
+}
+.dl-alert-warning {
+    border-left-color: #f39c12;
+    background: #fef5e7;
+}
+.dl-alert-success {
+    border-left-color: #27ae60;
+    background: #e8f8f5;
+}
+.dl-alert-danger {
+    border-left-color: #e74c3c;
+    background: #fdecea;
+}
+.dl-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin: 25px 0;
+}
+.dl-card {
+    padding: 22px;
+    background: white;
+    border-radius: 10px;
+    border: 2px solid #e0e0e0;
+    transition: all 0.3s ease;
+}
+.dl-card:hover {
+    border-color: #667eea;
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.15);
+    transform: translateY(-3px);
+}
+.dl-card-title {
+    font-size: 1.2em;
+    font-weight: 700;
+    color: #667eea;
+    margin: 0 0 12px 0;
+}
+.dl-card-content {
+    color: #4a5568;
+    line-height: 1.6;
+    font-size: 15px;
+}
+.dl-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 25px 0;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.dl-table th {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 16px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 15px;
+}
+.dl-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #e0e0e0;
+    color: #4a5568;
+}
+.dl-table tr:last-child td {
+    border-bottom: none;
+}
+.dl-table tr:hover {
+    background: #f8f9fa;
+}
+.dl-checklist {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+}
+.dl-checklist li {
+    padding: 12px 12px 12px 40px;
+    margin-bottom: 10px;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+    position: relative;
+    transition: all 0.2s ease;
+}
+.dl-checklist li:hover {
+    border-color: #667eea;
+    background: #f8f9ff;
+}
+.dl-checklist li::before {
+    content: "✓";
+    position: absolute;
+    left: 12px;
+    color: #27ae60;
+    font-weight: bold;
+    font-size: 18px;
+}
+.dl-steps {
+    counter-reset: step-counter;
+    list-style: none;
+    padding: 0;
+    margin: 25px 0;
+}
+.dl-steps li {
+    counter-increment: step-counter;
+    padding: 20px 20px 20px 70px;
+    margin-bottom: 20px;
+    background: white;
+    border-radius: 10px;
+    border-left: 5px solid #667eea;
+    position: relative;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+.dl-steps li::before {
+    content: counter(step-counter);
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 16px;
+}
+.dl-cta {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+    margin: 35px 0;
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+}
+.dl-cta-title {
+    font-size: 1.8em;
+    font-weight: 700;
+    margin: 0 0 15px 0;
+}
+.dl-cta-text {
+    font-size: 1.1em;
+    margin: 0 0 20px 0;
+    opacity: 0.95;
+}
+.dl-cta-button {
+    display: inline-block;
+    background: white;
+    color: #667eea;
+    padding: 14px 35px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    border: 2px solid white;
+}
+.dl-cta-button:hover {
+    background: transparent;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+.dl-faq {
+    margin-top: 40px;
+}
+.dl-faq-item {
+    margin-bottom: 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+    background: white;
+}
+.dl-faq-question {
+    width: 100%;
+    text-align: left;
+    padding: 20px;
+    background: #f8f9fa;
+    border: none;
+    font-size: 16px;
+    font-weight: 600;
+    color: #2c3e50;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+.dl-faq-question:hover {
+    background: #e9ecef;
+    color: #667eea;
+}
+.dl-faq-question::after {
+    content: "+";
+    font-size: 24px;
+    font-weight: bold;
+    color: #667eea;
+    transition: transform 0.3s ease;
+}
+.dl-faq-question.active::after {
+    transform: rotate(45deg);
+}
+.dl-faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+.dl-faq-answer-content {
+    padding: 20px;
+    color: #4a5568;
+    line-height: 1.7;
+    border-top: 1px solid #e0e0e0;
+}
+@media (max-width: 768px) {
+    .dl-title {
+        font-size: 1.8em;
+    }
+    .dl-subtitle {
+        font-size: 1em;
+    }
+    .dl-tab-button {
+        font-size: 13px;
+        padding: 10px 14px;
+    }
+    .dl-section {
+        padding: 20px;
+    }
+    .dl-section-title {
+        font-size: 1.4em;
+    }
+    .dl-grid {
+        grid-template-columns: 1fr;
+    }
+    .dl-table {
+        font-size: 14px;
+    }
+    .dl-table th,
+    .dl-table td {
+        padding: 10px;
+    }
+}
+</style>
+
+<div class="dl-header">
+    <div class="dl-title">Pedestrian Accident Demand Letters</div>
+    <div class="dl-subtitle">Comprehensive Guide for Pedestrian Injury Claims Against Negligent Drivers</div>
+</div>
+
+<div class="dl-tab-container">
+    <div class="dl-tab-nav">
+        <button class="dl-tab-button active" onclick="switchTab('tab1', event)">Pedestrian Rights & Duties</button>
+        <button class="dl-tab-button" onclick="switchTab('tab2', event)">Common Accident Scenarios</button>
+        <button class="dl-tab-button" onclick="switchTab('tab3', event)">Driver Liability & Negligence</button>
+        <button class="dl-tab-button" onclick="switchTab('tab4', event)">Severe Injury Patterns</button>
+        <button class="dl-tab-button" onclick="switchTab('tab5', event)">Building Your Demand</button>
+        <button class="dl-tab-button" onclick="switchTab('tab6', event)">Attorney Services</button>
+    </div>
+
+    <div id="tab1" class="dl-tab-content active">
+        <div class="dl-section">
+            <div class="dl-section-title">Legal Rights and Protections for Pedestrians</div>
+            <div class="dl-content">
+                <p>Pedestrians are the most vulnerable users of the roadway system. Unlike occupants of vehicles, pedestrians have no protective barriers—no steel frame, no airbags, no crumple zones. When a pedestrian is struck by a vehicle, the results are often catastrophic, even at low speeds. Because of this vulnerability, the law imposes heightened duties on drivers to protect pedestrians.</p>
+
+                <div class="dl-alert dl-alert-danger">
+                    <strong>Pedestrian Vulnerability:</strong> A pedestrian struck by a vehicle traveling just 25 mph has a 10% chance of death. At 40 mph, that risk increases to 80%. This extreme vulnerability is why pedestrians receive special legal protections and why pedestrian accident settlements are often substantial.
+                </div>
+
+                <p><strong>Core legal principles protecting pedestrians:</strong></p>
+                <ul>
+                    <li><strong>Absolute right of way in crosswalks:</strong> When a pedestrian is in a marked or unmarked crosswalk, drivers must yield. This duty is absolute and applies even if the pedestrian appears "suddenly."</li>
+                    <li><strong>Heightened duty of care:</strong> Drivers must exercise heightened caution in areas where pedestrians are likely to be present (school zones, residential areas, parking lots, shopping districts).</li>
+                    <li><strong>Duty to maintain lookout:</strong> Drivers must actively scan for pedestrians, especially when turning, backing up, or approaching intersections.</li>
+                    <li><strong>Children receive special protection:</strong> Drivers must anticipate that children may dart into the roadway and must exercise extra caution near schools, parks, and residential areas.</li>
+                    <li><strong>Elderly and disabled pedestrians:</strong> Drivers must account for slower crossing speeds and reduced mobility when elderly or disabled pedestrians are present.</li>
+                </ul>
+
+                <div class="dl-alert dl-alert-success">
+                    <strong>Demand Letter Strategy:</strong> Lead with the driver's duty to protect pedestrians. Emphasize that pedestrians are the most vulnerable road users and that drivers owe them the highest duty of care. This framing shifts the focus away from any alleged pedestrian error and onto the driver's failure to exercise reasonable caution.
+                </div>
+            </div>
+        </div>
+
+        <div class="dl-section">
+            <div class="dl-section-title">Pedestrian Duties and Comparative Fault Issues</div>
+            <div class="dl-content">
+                <p>While pedestrians enjoy strong legal protections, they also have duties to exercise reasonable care for their own safety. Insurers frequently attempt to reduce settlements by arguing that the pedestrian was jaywalking, failed to use a crosswalk, or crossed against a signal. Your demand letter must anticipate and rebut these arguments.</p>
+
+                <p><strong>Common comparative fault arguments and rebuttals:</strong></p>
+                <table class="dl-table">
+                    <thead>
+                        <tr>
+                            <th>Defense Argument</th>
+                            <th>Legal Standard</th>
+                            <th>Rebuttal Strategy</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Jaywalking</strong></td>
+                            <td>Crossing outside a marked crosswalk or at a location where crosswalks are not marked.</td>
+                            <td>Even if pedestrian was jaywalking, driver still has a duty to avoid hitting a pedestrian if possible. Jaywalking may reduce recovery under comparative negligence but does not bar recovery entirely.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Crossing Against Signal</strong></td>
+                            <td>Pedestrian crossed when "Don't Walk" signal was displayed or against a red light.</td>
+                            <td>Driver still has duty to yield to pedestrians actually in the crosswalk. Many courts hold that driver must yield even to pedestrians crossing against the signal if the pedestrian is visible and avoidable.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Dark Clothing / Not Visible</strong></td>
+                            <td>Pedestrian was wearing dark clothing at night or in low visibility conditions.</td>
+                            <td>Drivers have a duty to see what is there to be seen. If road was properly lit or pedestrian was visible to a careful driver, clothing color is irrelevant. Driver failed to maintain proper lookout.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Sudden Appearance</strong></td>
+                            <td>Pedestrian "darted out" or entered roadway suddenly.</td>
+                            <td>Drivers must anticipate pedestrians and be prepared to stop, especially near crosswalks, intersections, and residential areas. "Sudden appearance" often means driver was not maintaining proper lookout or was traveling too fast for conditions.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Pedestrian Was Intoxicated</strong></td>
+                            <td>Pedestrian was impaired by alcohol or drugs.</td>
+                            <td>Intoxication may support comparative fault, but driver still had duty to avoid hitting pedestrian. Focus on driver's violation of right-of-way or failure to maintain lookout as primary cause.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="dl-alert dl-alert-info">
+                    <strong>Pure vs. Modified Comparative Negligence:</strong> In pure comparative negligence states, a pedestrian can recover even if 99% at fault (recovery reduced by their percentage of fault). In modified comparative negligence states, recovery is barred if pedestrian is 50% or 51% at fault (depending on state). Know your state's rule and frame your argument accordingly.
+                </div>
+            </div>
+        </div>
+
+        <div class="dl-section">
+            <div class="dl-section-title">Crosswalk Law: Marked, Unmarked, and Implied Crosswalks</div>
+            <div class="dl-content">
+                <p>Most pedestrian accidents occur at or near crosswalks. Understanding crosswalk law is critical to establishing liability and rebutting comparative fault arguments.</p>
+
+                <div class="dl-grid">
+                    <div class="dl-card">
+                        <div class="dl-card-title">Marked Crosswalks</div>
+                        <div class="dl-card-content">
+                            <p>Designated crossing areas indicated by painted lines, signage, or signals. Pedestrians have absolute right of way in marked crosswalks. Drivers must yield to any pedestrian in the crosswalk.</p>
+                        </div>
+                    </div>
+                    <div class="dl-card">
+                        <div class="dl-card-title">Unmarked Crosswalks</div>
+                        <div class="dl-card-content">
+                            <p>At any intersection, there is an implied crosswalk even if no lines are painted. Pedestrians have the same right of way in unmarked crosswalks as in marked ones.</p>
+                        </div>
+                    </div>
+                    <div class="dl-card">
+                        <div class="dl-card-title">Mid-Block Crossings</div>
+                        <div class="dl-card-content">
+                            <p>Crossing between intersections where no crosswalk exists. In most states, pedestrians must yield to vehicles when crossing mid-block, but drivers still have a duty to avoid hitting pedestrians if possible.</p>
+                        </div>
+                    </div>
+                    <div class="dl-card">
+                        <div class="dl-card-title">Controlled Intersections</div>
+                        <div class="dl-card-content">
+                            <p>Crosswalks with traffic signals or stop signs. Pedestrians must obey signals ("Walk"/"Don't Walk"), but even if crossing against signal, drivers must yield if the pedestrian is in the crosswalk and visible.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dl-alert dl-alert-warning">
+                    <strong>Demand Letter Tip:</strong> If the accident occurred at an unmarked crosswalk, explicitly state that an implied crosswalk existed by law and that the pedestrian had the right of way. Many adjusters incorrectly assume that only marked crosswalks confer right-of-way protections.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab2" class="dl-tab-content">
+        <div class="dl-section">
+            <div class="dl-section-title">Common Pedestrian Accident Scenarios</div>
+            <div class="dl-content">
+                <p>Understanding the most common pedestrian accident scenarios will help you identify liability, anticipate defenses, and build a compelling demand letter. Most pedestrian accidents fall into predictable patterns involving driver inattention, failure to yield, or excessive speed.</p>
+
+                <div class="dl-alert dl-alert-info">
+                    <strong>NHTSA Data:</strong> According to the National Highway Traffic Safety Administration, 75% of pedestrian fatalities occur at non-intersection locations, and 73% occur in the dark. These statistics help rebut "jaywalking" defenses—most accidents occur where crosswalks don't exist, and drivers have a duty to see pedestrians even in low visibility.
+                </div>
+            </div>
+        </div>
+
+        <div class="dl-section">
+            <div class="dl-section-title">Crosswalk Accidents: Driver Failure to Yield</div>
+            <div class="dl-content">
+                <p>The most common—and most easily proven—pedestrian accident scenario is a driver failing to yield to a pedestrian in a crosswalk. This is a clear violation of the vehicle code in all 50 states and establishes negligence per se.</p>
+
+                <p><strong>How crosswalk accidents happen:</strong></p>
+                <ol class="dl-steps">
+                    <li><strong>Pedestrian Enters Crosswalk Lawfully:</strong> Pedestrian begins crossing in a marked or unmarked crosswalk, either with a "Walk" signal or after checking for oncoming traffic.</li>
+                    <li><strong>Driver Approaches Intersection:</strong> Driver approaches the crosswalk, either traveling straight or preparing to turn.</li>
+                    <li><strong>Driver Fails to Yield:</strong> Driver does not see the pedestrian, misjudges the pedestrian's speed, or simply fails to stop, and drives through the crosswalk.</li>
+                    <li><strong>Impact and Injury:</strong> Vehicle strikes the pedestrian, often throwing them onto the hood, windshield, or pavement. Injuries are typically severe even at low speeds.</li>
+                </ol>
+
+                <div class="dl-alert dl-alert-success">
+                    <strong>Liability is Clear:</strong> If the pedestrian was in a crosswalk and had the right of way, liability is straightforward. Cite the specific vehicle code section requiring drivers to yield, attach the police report (if driver was cited), and demand full compensation without reduction for comparative fault.
+                </div>
+
+                <p><strong>Variations of crosswalk accidents:</strong></p>
+                <ul>
+                    <li><strong>Left-turn strike:</strong> Driver turning left strikes pedestrian crossing in the crosswalk perpendicular to the turn</li>
+                    <li><strong>Right-turn strike:</strong> Driver turning right fails to check crosswalk and strikes pedestrian crossing from the right</li>
+                    <li><strong>Multi-lane crosswalk:</strong> Vehicle in one lane stops for pedestrian, but driver in adjacent lane does not see pedestrian and strikes them ("multiple threat" scenario)</li>
+                    <li><strong>Distracted driver:</strong> Driver is texting, on phone, or otherwise distracted and does not see pedestrian in crosswalk</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="dl-section">
+            <div class="dl-section-title">Parking Lot Accidents</div>
+            <div class="dl-content">
+                <p>Parking lot accidents are extremely common and almost always the fault of the driver. Drivers owe a heightened duty of care in parking lots because pedestrians are abundant and visibility is often limited. Despite low speeds, parking lot accidents can cause serious injuries due to the vulnerability of pedestrians.</p>
+
+                <p><strong>Common parking lot accident scenarios:</strong></p>
+                <div class="dl-grid">
+                    <div class="dl-card">
+                        <div class="dl-card-title">Backing Accidents</div>
+                        <div class="dl-card-content">
+                            <p>Driver backs out of parking space without checking mirrors or blind spots and strikes pedestrian walking behind the vehicle. Driver has absolute duty to ensure backing path is clear.</p>
+                        </div>
+                    </div>
+                    <div class="dl-card">
+                        <div class="dl-card-title">Pedestrian Struck at Crosswalk</div>
+                        <div class="dl-card-content">
+                            <p>Many parking lots have marked pedestrian crosswalks. Drivers must yield to pedestrians in these crosswalks just as on public streets. Failure to yield is negligence.</p>
+                        </div>
+                    </div>
+                    <div class="dl-card">
+                        <div class="dl-card-title">Distracted Driving</div>
+                        <div class="dl-card-content">
+                            <p>Driver is looking for parking space, checking phone, or otherwise distracted and strikes pedestrian. Duty to maintain lookout applies with heightened force in parking lots.</p>
+                        </div>
+                    </div>
+                    <div class="dl-card">
+                        <div class="dl-card-title">Excessive Speed</div>
+                        <div class="dl-card-content">
+                            <p>Driver is traveling too fast for parking lot conditions and cannot stop in time when pedestrian appears. Even 10-15 mph can be excessive given limited visibility and pedestrian traffic.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dl-alert dl-alert-warning">
+                    <strong>Surveillance Evidence:</strong> Many parking lot accidents are captured on store surveillance cameras. Obtain this footage immediately by sending a spoliation letter to the property owner and any tenants. Video evidence is often the most powerful proof of liability.
+                </div>
+            </div>
+        </div>
+
+        <div class="dl-section">
+            <div class="dl-section-title">Backing Accidents: Reversing Over Pedestrians</div>
+            <div class="dl-content">
+                <p>Backing accidents are particularly tragic because they are entirely preventable. Drivers have an absolute duty to ensure their backing path is clear before reversing. Failure to see a pedestrian while backing is not a defense—it is evidence of negligence.</p>
+
+                <p><strong>Where backing accidents occur:</strong></p>
+                <ul>
+                    <li>Residential driveways (backing out without checking for pedestrians, children, or neighbors)</li>
+                    <li>Parking lots (backing out of parking space without checking mirrors)</li>
+                    <li>Loading docks and commercial areas (trucks backing up without spotters)</li>
+                    <li>Street parking (parallel parking or backing into a space and striking pedestrian on sidewalk)</li>
+                </ul>
+
+                <div class="dl-alert dl-alert-danger">
+                    <strong>Child Victims:</strong> Many backing accidents involve small children who are not visible in the driver's mirrors or rear-view camera. These cases command the highest settlements due to the preventability of the injury and the lifelong impact on the child. Courts and juries are particularly unsympathetic to drivers who fail to ensure the area behind their vehicle is clear before backing.
+                </div>
+
+                <p><strong>Legal standard for backing accidents:</strong></p>
+                <p>Drivers who are backing have a duty to:</p>
+                <ul class="dl-checklist">
+                    <li>Check all mirrors and blind spots before beginning to reverse</li>
+                    <li>Continuously monitor the area behind the vehicle while backing</li>
+                    <li>Back at a speed that allows them to stop immediately if a hazard appears</li>
+                    <li>Use audible warning devices (backup beepers) on commercial vehicles</li>
+                    <li>Exercise heightened caution in areas where children are likely to be present</li>
+                </ul>
+
+                <div class="dl-alert dl-alert-info">
+                    <strong>Vehicle Code Violations:</strong> Most states have statutes prohibiting unsafe backing. For example, California Vehicle Code § 22106 requires drivers to ensure backing is safe before reversing. Violation of this statute is negligence per se and establishes liability.
+                </div>
+            </div>
+        </div>
+
+        <div class="dl-section">
+            <div class="dl-section-title">Distracted Driving: Texting, Phone Use, and Inattention</div>
+            <div class="dl-content">
+                <p>Distracted driving is a leading cause of pedestrian accidents. Drivers who are texting, talking on the phone, eating, adjusting the radio, or otherwise distracted are far less likely to see pedestrians—especially in crosswalks, parking lots, and residential areas.</p>
+
+                <p><strong>Evidence of distracted driving:</strong></p>
+                <table class="dl-table">
+                    <thead>
+                        <tr>
+                            <th>Evidence Type</th>
+                            <th>How to Obtain</th>
+                            <th>What It Proves</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Cell Phone Records</strong></td>
+                            <td>Subpoena driver's phone carrier for call/text records at time of accident.</td>
+                            <td>Proves driver was using phone at moment of impact. Strong evidence of negligence.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Police Report</strong></td>
+                            <td>Obtain police report immediately. Officer may have noted distraction or cited driver for cell phone use.</td>
+                            <td>Citation for distracted driving establishes negligence per se. Officer observations support distraction claim.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Witness Statements</strong></td>
+                            <td>Interview witnesses who saw driver before or after impact. Ask specifically about phone use, eating, etc.</td>
+                            <td>Eyewitness testimony that driver was looking down, holding phone, or not watching road supports negligence claim.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Driver's Own Statement</strong></td>
+                            <td>Review police report and insurance statement for driver's account of events.</td>
+                            <td>Drivers often admit they "didn't see" the pedestrian, which is evidence of inattention and negligence.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Surveillance Video</strong></td>
+                            <td>Obtain video from nearby businesses, traffic cameras, or dashcams.</td>
+                            <td>Video may show driver looking down or holding phone before impact. Most powerful evidence.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="dl-alert dl-alert-success">
+                    <strong>Demand Letter Strategy:</strong> If you have evidence of distracted driving, lead with this in your liability section. Distracted driving is universally condemned and creates significant settlement pressure. Even if the pedestrian was jaywalking, distracted driving is often found to be the primary cause of the accident.
+                </div>
+            </div>
+        </div>
+
+        <div class="dl-section">
+            <div class="dl-section-title">Left-Turn and Right-Turn Accidents at Intersections</div>
+            <div class="dl-content">
+                <p>Drivers making left or right turns at intersections frequently strike pedestrians who are crossing in the crosswalk. These accidents occur because the driver is focused on vehicular traffic and fails to check for pedestrians before completing the turn.</p>
+
+                <p><strong>Left-turn pedestrian strikes:</strong></p>
+                <ul>
+                    <li>Driver waits for oncoming traffic to clear, then turns left</li>
+                    <li>Driver is focused on finding a gap in oncoming traffic and does not check crosswalk for pedestrians</li>
+                    <li>Pedestrian is crossing perpendicular to the driver's turn path with the "Walk" signal</li>
+                    <li>Driver completes turn and strikes pedestrian in crosswalk</li>
+                </ul>
+
+                <p><strong>Right-turn pedestrian strikes ("right hook"):</strong></p>
+                <ul>
+                    <li>Driver approaches intersection and prepares to turn right</li>
+                    <li>Pedestrian is crossing from the right side (the direction the driver is turning toward)</li>
+                    <li>Driver checks left for oncoming traffic but fails to check right for pedestrians</li>
+                    <li>Driver turns right and strikes pedestrian in crosswalk</li>
+                </ul>
+
+                <div class="dl-alert dl-alert-info">
+                    <strong>Legal Standard:</strong> Drivers have a duty to yield to pedestrians in crosswalks before completing a turn. This duty applies even if the driver has a green light—the driver must still check for and yield to pedestrians who are lawfully in the crosswalk. Failure to do so is negligence.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab3" class="dl-tab-content">
+        <div class="dl-section">
+            <div class="dl-section-title">Establishing Driver Negligence in Pedestrian Accidents</div>
+            <div class="dl-content">
+                <p>The foundation of your pedestrian accident demand letter is proving that the driver breached a duty of care owed to your client and that this breach caused the collision and resulting injuries. In pedestrian cases, this typically involves showing that the driver failed to yield right of way, was distracted, was driving too fast for conditions, or failed to maintain a proper lookout.</p>
+
+                <p><strong>Elements of negligence in pedestrian cases:</strong></p>
+                <ol class="dl-steps">
+                    <li><strong>Duty:</strong> Drivers owe a duty of reasonable care to pedestrians, including a duty to yield in crosswalks, maintain a proper lookout, and exercise heightened caution in areas where pedestrians are present.</li>
+                    <li><strong>Breach:</strong> The driver breached this duty by failing to yield, driving while distracted, backing without ensuring the path was clear, or violating another traffic law.</li>
+                    <li><strong>Causation:</strong> The driver's breach directly caused the collision. Show that but for the driver's negligence, the accident would not have occurred.</li>
+                    <li><strong>Damages:</strong> Your client suffered physical, emotional, and economic harm as a direct result of being struck by the driver's vehicle.</li>
+                </ol>
+
+                <div class="dl-alert dl-alert-success">
+                    <strong>Negligence Per Se:</strong> If the driver violated a traffic statute (failure to yield to pedestrian in crosswalk, unsafe backing, distracted driving), this establishes negligence per se in most states. You do not need to prove the driver was "unreasonable"—the statutory violation itself establishes breach of duty.
+                </div>
+            </div>
+        </div>
+
+        <div class="dl-section">
+            <div class="dl-section-title">Common Traffic Violations in Pedestrian Accidents</div>
+            <div class="dl-content">
+                <p>Traffic citations issued to the driver are powerful evidence of liability. Even if no citation was issued, you can argue the driver violated a statute and is liable under the doctrine of negligence per se.</p>
+
+                <table class="dl-table">
+                    <thead>
+                        <tr>
+                            <th>Violation</th>
+                            <th>Typical Statute</th>
+                            <th>How It Establishes Liability</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Failure to Yield to Pedestrian in Crosswalk</strong></td>
+                            <td>Vehicle Code § [varies by state]</td>
+                            <td>Driver failed to stop and yield when pedestrian was in crosswalk. Violation establishes breach of duty and negligence per se.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Unsafe Backing</strong></td>
+                            <td>Vehicle Code § [varies by state]</td>
+                            <td>Driver backed without ensuring the path was clear, striking pedestrian. Statutory violation proving negligence.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Distracted Driving / Cell Phone Use</strong></td>
+                            <td>Vehicle Code § [varies by state]</td>
+                            <td>Driver was using phone while driving and struck pedestrian. Strong evidence of inattention and negligence.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Speeding or Driving Too Fast for Conditions</strong></td>
+                            <td>Vehicle Code § [varies by state]</td>
+                            <td>Driver was traveling at unsafe speed and could not stop when pedestrian appeared. Violation of basic speed law.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Failure to Stop at Stop Sign or Red Light</strong></td>
+                            <td>Vehicle Code § [varies by state]</td>
+                            <td>Driver ran stop sign or red light and struck pedestrian in crosswalk. Clear violation establishing liability.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Improper Turn</strong></td>
+                            <td>Vehicle Code § [varies by state]</td>
+                            <td>Driver made left or right turn without yielding to pedestrian in crosswalk. Violation of duty to yield before turning.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="dl-alert dl-alert-info">
+                    <strong>Demand Letter Strategy:</strong> Cite the specific vehicle code section violated and explain how the violation caused the collision. If the driver was cited, attach a copy of the citation or police report. If no citation was issued, argue that the evidence shows a violation occurred and negligence per se applies.
+                </div>
+            </div>
+        </div>
+
+        <div class="dl-section">
+            <div class="dl-section-title">The "I Didn't See Them" Defense: Admission of Negligence</div>
+            <div class="dl-content">
+                <p>The most common defense in pedestrian accidents is the driver's claim that they "didn't see" the pedestrian. This is not a legal defense—it is an admission that the driver failed to maintain a proper lookout, which is itself negligence.</p>
+
+                <p><strong>Why "I didn't see them" establishes liability:</strong></p>
+                <ul>
+                    <li>Drivers have a duty to see what is there to be seen</li>
+                    <li>Failure to see a pedestrian who is present and visible is evidence of breach of the duty to maintain a proper lookout</li>
+                    <li>Courts consistently hold that "failure to see what should have been seen" is negligence</li>
+                    <li>The duty to see includes actively scanning for pedestrians, especially near crosswalks, intersections, driveways, and parking lots</li>
+                </ul>
+
+                <div class="dl-alert dl-alert-success">
+                    <strong>Demand Letter Language:</strong> "Defendant's statement that he 'didn't see' my client is not a defense but an admission of negligence. Drivers have a duty to see what is there to be seen, especially pedestrians in crosswalks. My client was crossing lawfully in a marked crosswalk and was visible to any driver exercising reasonable care. Defendant's failure to see my client establishes breach of the duty to maintain a proper lookout."
+                </div>
+
+                <div class="dl-alert dl-alert-warning">
+                    <strong>Rebutting "Sudden Appearance":</strong> Drivers often claim the pedestrian "appeared suddenly" or "darted out." Challenge this by showing: (1) pedestrian was visible for several seconds before impact, (2) driver was not maintaining proper lookout, (3) driver was distracted or speeding, (4) pedestrian was in a crosswalk where driver should have been prepared to stop.</div>
+            </div>
+        </div>
+
+        <div class="dl-section">
+            <div class="dl-section-title">Rebutting Comparative Fault: When the Pedestrian Was Jaywalking</div>
+            <div class="dl-content">
+                <p>Insurance adjusters routinely attempt to reduce settlements by arguing that the pedestrian was comparatively at fault for jaywalking, crossing against a signal, or failing to use a crosswalk. While these factors may support some comparative fault, they do not bar recovery, and the driver's negligence is often the primary cause of the accident.</p>
+
+                <p><strong>Rebuttal strategies for jaywalking defense:</strong></p>
+                <ol class="dl-steps">
+                    <li><strong>Driver Still Had Duty to Avoid:</strong> Even if the pedestrian was jaywalking, the driver had a duty to avoid hitting the pedestrian if possible. Argue that the driver was distracted, speeding, or not maintaining a proper lookout, and that but for the driver's negligence, the accident would not have occurred.</li>
+                    <li><strong>No Nearby Crosswalk:</strong> If there was no crosswalk within a reasonable distance, the pedestrian's crossing was reasonable under the circumstances. Argue that the pedestrian had no practical alternative to crossing mid-block.</li>
+                    <li><strong>Driver's Conduct Was Worse:</strong> Argue that even if the pedestrian bears some fault for jaywalking, the driver's conduct (distracted driving, excessive speed, failure to maintain lookout) was more egregious and was the primary cause of the accident.</li>
+                    <li><strong>Pedestrian Was Visible:</strong> Present evidence that the pedestrian was visible for several seconds before impact, that lighting was adequate, and that a careful driver would have seen and avoided the pedestrian.</li>
+                    <li><strong>Comparative Fault Should Be Minimal:</strong> Even if some comparative fault applies, argue it should be no more than 10-20%. The driver's violation of the duty to maintain a proper lookout was the primary cause.</li>
+                </ol>
+
+                <div class="dl-alert dl-alert-info">
+                    <strong>Burden of Proof:</strong> In most states, the defendant bears the burden of proving the plaintiff's comparative fault. Do not simply deny comparative fault—demand that the insurer produce specific evidence. Speculation and unfounded assumptions ("pedestrian must have been wearing dark clothing") are insufficient.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab4" class="dl-tab-content">
+        <div class="dl-section">
+            <div class="dl-section-title">Catastrophic Injuries in Pedestrian Accidents</div>
+            <div class="dl-content">
+                <p>Pedestrians struck by vehicles suffer disproportionately severe injuries because they have no protective barriers. Even low-speed collisions (5-15 mph) can result in life-threatening injuries. Your demand letter must vividly convey the severity and permanence of your client's harm to justify a substantial settlement.</p>
+
+                <div class="dl-alert dl-alert-danger">
+                    <strong>Pedestrian Mortality Risk:</strong> Pedestrians account for only 3% of miles traveled but 17% of traffic fatalities. A pedestrian struck at 25 mph has a 10% chance of death; at 40 mph, the risk increases to 80%. This extreme vulnerability justifies high settlement values even when the collision occurred at moderate speed.
+                </div>
+
+                <p><strong>Most common catastrophic injuries in pedestrian accidents:</strong></p>
+                <table class="dl-table">
+                    <thead>
+                        <tr>
+                            <th>Injury Type</th>
+                            <th>Mechanism</th>
+                            <th>Long-Term Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Traumatic Brain Injury (TBI)</strong></td>
+                            <td>Head strikes vehicle hood, windshield, or pavement after being thrown by impact.</td>
+                            <td>Cognitive impairment, memory loss, personality changes, chronic headaches, inability to work, lifelong disability in severe cases.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Spinal Cord Injury</strong></td>
+                            <td>Impact to back or neck, or twisting injury as pedestrian is thrown.</td>
+                            <td>Paralysis (paraplegia or quadriplegia), loss of sensation, bowel/bladder dysfunction, lifetime medical care required.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Fractures and Orthopedic Injuries</strong></td>
+                            <td>Legs, arms, pelvis, ribs fractured from direct impact or when thrown to pavement.</td>
+                            <td>Multiple surgeries, hardware implantation, chronic pain, limited mobility, arthritis, inability to return to physical work.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Internal Injuries and Organ Damage</strong></td>
+                            <td>Blunt force trauma to abdomen or chest from vehicle impact.</td>
+                            <td>Emergency surgery required, prolonged hospitalization, risk of infection or internal bleeding, potential for chronic organ dysfunction.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Loss of Limb (Amputation)</strong></td>
+                            <td>Severe trauma to limb requiring surgical amputation, or limb crushed/severed by vehicle.</td>
+                            <td>Permanent disability, prosthetic limb required, inability to perform many activities of daily living, profound psychological impact.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Road Rash and Soft Tissue Injuries</strong></td>
+                            <td>Pedestrian slides across pavement after impact, tearing away skin.</td>
+                            <td>Permanent scarring, disfigurement, skin grafts required, infection risk, chronic pain. Multiple reconstructive surgeries may be needed.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="dl-section">
+            <div class="dl-section-title">Traumatic Brain Injury: The Silent Catastrophe</div>
+            <div class="dl-content">
+                <p>Traumatic brain injury (TBI) is one of the most common and most devastating injuries in pedestrian accidents. When a pedestrian is struck, their head often impacts the vehicle's hood or windshield, then strikes the pavement when they are thrown to the ground. These dual impacts can cause severe brain trauma even when external injuries appear minor.</p>
+
+                <p><strong>Types and severity of TBI in pedestrian accidents:</strong></p>
+                <ul>
+                    <li><strong>Mild TBI (Concussion):</strong> Temporary loss of consciousness, confusion, headaches, memory problems. Most recover within weeks to months, but some experience persistent symptoms (post-concussion syndrome).</li>
+                    <li><strong>Moderate TBI:</strong> Loss of consciousness for minutes to hours, skull fracture, bleeding in or around brain. Requires hospitalization and monitoring. Long-term cognitive and behavioral impairments common.</li>
+                    <li><strong>Severe TBI:</strong> Prolonged unconsciousness or coma, diffuse brain damage, permanent disability. Requires intensive rehabilitation and may result in permanent cognitive, physical, and emotional impairment.</li>
+                </ul>
+
+                <div class="dl-alert dl-alert-warning">
+                    <strong>Proving TBI Damages:</strong> Obtain neuropsychological testing to document cognitive deficits, memory impairment, and processing speed issues. This testing provides objective evidence of injury and supports large pain and suffering and future care awards. Also document impact on employment—many TBI victims cannot return to cognitively demanding jobs.
+                </div>
+
+                <p><strong>Long-term effects of TBI that drive damages:</strong></p>
+                <ul class="dl-checklist">
+                    <li>Permanent cognitive impairment (memory, attention, executive function)</li>
+                    <li>Personality and behavioral changes (irritability, depression, impulsivity)</li>
+                    <li>Chronic headaches and migraines</li>
+                    <li>Loss of earning capacity and inability to work in prior occupation</li>
+                    <li>Need for lifelong medical care, therapy, and medications</li>
+                    <li>Increased risk of dementia and Alzheimer's disease later in life</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="dl-section">
+            <div class="dl-section-title">Orthopedic Injuries and Fractures</div>
+            <div class="dl-content">
+                <p>Fractures are extremely common in pedestrian accidents because the pedestrian's body absorbs the full force of the vehicle's impact. The legs, pelvis, and arms are most commonly fractured, often requiring multiple surgeries, hardware implantation, and extensive physical therapy.</p>
+
+                <div class="dl-grid">
+                    <div class="dl-card">
+                        <div class="dl-card-title">Lower Extremity Fractures</div>
+                        <div class="dl-card-content">
+                            <p><strong>Injuries:</strong> Femur, tibia, fibula, ankle, foot fractures</p>
+                            <p><strong>Treatment:</strong> Open reduction internal fixation (ORIF) surgery, rods, plates, screws</p>
+                            <p><strong>Impact:</strong> Limited mobility, chronic pain, arthritis, inability to return to physical work</p>
+                        </div>
+                    </div>
+                    <div class="dl-card">
+                        <div class="dl-card-title">Pelvic Fractures</div>
+                        <div class="dl-card-content">
+                            <p><strong>Injuries:</strong> Fractures to pelvis, hip, acetabulum</p>
+                            <p><strong>Treatment:</strong> Often life-threatening due to internal bleeding. Requires emergency surgery, prolonged hospitalization</p>
+                            <p><strong>Impact:</strong> Permanent gait abnormality, chronic pain, sexual dysfunction, need for assistive devices</p>
+                        </div>
+                    </div>
+                    <div class="dl-card">
+                        <div class="dl-card-title">Upper Extremity Fractures</div>
+                        <div class="dl-card-content">
+                            <p><strong>Injuries:</strong> Arm, wrist, hand fractures (from throwing hands up defensively)</p>
+                            <p><strong>Treatment:</strong> Casting, surgery, physical therapy</p>
+                            <p><strong>Impact:</strong> Loss of grip strength, limited range of motion, inability to perform manual labor</p>
+                        </div>
+                    </div>
+                    <div class="dl-card">
+                        <div class="dl-card-title">Spinal Fractures</div>
+                        <div class="dl-card-content">
+                            <p><strong>Injuries:</strong> Vertebral compression fractures, fracture-dislocations</p>
+                            <p><strong>Treatment:</strong> Fusion surgery, bracing, pain management</p>
+                            <p><strong>Impact:</strong> Chronic back pain, limited mobility, risk of paralysis, inability to lift or bend</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dl-alert dl-alert-info">
+                    <strong>Economic Damages for Fractures:</strong> Document all surgeries, hardware costs, physical therapy, pain medications, and assistive devices. Obtain an orthopedic expert opinion on future surgeries (hardware removal, joint replacement, arthritis treatment) and loss of earning capacity if your client cannot return to physical work.
+                </div>
+            </div>
+        </div>
+
+        <div class="dl-section">
+            <div class="dl-section-title">Psychological Trauma and PTSD</div>
+            <div class="dl-content">
+                <p>In addition to physical injuries, pedestrian accident victims often suffer profound psychological trauma. Many develop post-traumatic stress disorder (PTSD), anxiety, depression, and phobias related to crossing streets or being near traffic. These psychological injuries are real, compensable, and should be included in your demand.</p>
+
+                <p><strong>Common psychological impacts of pedestrian accidents:</strong></p>
+                <ul>
+                    <li><strong>PTSD symptoms:</strong> Flashbacks, nightmares, hypervigilance, avoidance of traffic or the accident location</li>
+                    <li><strong>Anxiety and panic attacks:</strong> Fear of crossing streets, anxiety when near traffic, panic attacks triggered by car horns or engine sounds</li>
+                    <li><strong>Depression:</strong> Feelings of helplessness, loss of independence (especially if mobility is impaired), withdrawal from activities</li>
+                    <li><strong>Phobias:</strong> Specific phobia of cars, traffic, or crossing streets that interferes with daily life</li>
+                </ul>
+
+                <div class="dl-alert dl-alert-success">
+                    <strong>Documenting Psychological Injuries:</strong> Refer your client to a psychologist or psychiatrist for evaluation and treatment. Obtain a diagnosis (PTSD, major depressive disorder, anxiety disorder) and ongoing treatment records. Include therapy costs in your economic damages and the impact on quality of life in your non-economic damages.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab5" class="dl-tab-content">
+        <div class="dl-section">
+            <div class="dl-section-title">Building a Pedestrian Accident Demand Letter</div>
+            <div class="dl-content">
+                <p>A pedestrian accident demand letter must establish clear driver negligence, overcome potential comparative fault arguments, document severe injuries, and present a compelling damages narrative. Because pedestrians are the most vulnerable road users, your demand should emphasize the driver's heightened duty of care and the catastrophic nature of the injuries.</p>
+
+                <p><strong>Core structure of your demand letter:</strong></p>
+                <ol class="dl-steps">
+                    <li><strong>Introduction and Representation:</strong> Identify yourself, your client, the date of the accident, and state that you represent your client in seeking compensation for injuries caused by the defendant's negligence.</li>
+                    <li><strong>Factual Summary:</strong> Describe the accident in vivid detail, emphasizing your client's lawful conduct (crossing in crosswalk, obeying signals) and the driver's negligence (failure to yield, distracted driving, excessive speed).</li>
+                    <li><strong>Liability and Legal Framework:</strong> Establish the driver's negligence, cite violated statutes, and rebut any anticipated comparative fault arguments. Emphasize the driver's heightened duty to protect pedestrians.</li>
+                    <li><strong>Injuries and Medical Treatment:</strong> Provide a detailed narrative of your client's injuries, treatment, surgeries, ongoing care needs, and permanence of harm. Use medical terminology and attach supporting documentation.</li>
+                    <li><strong>Economic Damages:</strong> Itemize past and future medical expenses, lost wages, loss of earning capacity, and other financial losses.</li>
+                    <li><strong>Non-Economic Damages:</strong> Describe your client's pain and suffering, emotional distress, loss of enjoyment of life, permanent disability, and impact on relationships and quality of life.</li>
+                    <li><strong>Settlement Demand and Deadline:</strong> State your demand amount, justify it with comparable verdicts and settlements, and give a deadline for response (typically 30 days).</li>
+                </ol>
+
+                <div class="dl-alert dl-alert-success">
+                    <strong>Tone and Presentation:</strong> Your demand letter should convey the seriousness of the injuries and the clear liability of the driver. Include high-quality photos of the accident scene, injuries, and crosswalk/intersection. Attach medical records, police reports, and witness statements. Signal that you are prepared to litigate if necessary.
+                </div>
+            </div>
+        </div>
+
+        <div class="dl-section">
+            <div class="dl-section-title">Damages Calculation for Pedestrian Accidents</div>
+            <div class="dl-content">
+                <p>Pedestrian accident claims typically involve very high non-economic damages (pain and suffering) relative to economic damages because the injuries are so severe. Your demand letter should justify your damages calculation using a combination of economic harm, permanence of injury, and comparable verdicts.</p>
+
+                <p><strong>Components of your damages calculation:</strong></p>
+                <ul class="dl-checklist">
+                    <li><strong>Past Medical Expenses:</strong> Emergency room, ambulance, hospitalization, surgeries, medications, physical therapy—all documented with bills</li>
+                    <li><strong>Future Medical Expenses:</strong> Additional surgeries, ongoing physical therapy, pain management, mental health treatment, assistive devices</li>
+                    <li><strong>Lost Wages:</strong> Time missed from work due to injury, medical appointments, recovery. Documented with employer letters and pay stubs.</li>
+                    <li><strong>Loss of Earning Capacity:</strong> If permanent injuries prevent return to prior occupation or reduce earning potential. Supported by vocational expert opinion.</li>
+                    <li><strong>Pain and Suffering:</strong> Physical pain from injuries, emotional distress, loss of enjoyment of life, permanent disability. Typically 3-10x economic damages for catastrophic injuries.</li>
+                </ul>
+
+                <div class="dl-alert dl-alert-warning">
+                    <strong>Multiplier Method:</strong> For catastrophic injuries (TBI, spinal cord injury, amputation, pelvic fractures), pain and suffering awards can be 5-10x economic damages or higher. Justify your multiplier by citing comparable jury verdicts and emphasizing the permanence and severity of harm.
+                </div>
+
+                <div class="dl-card">
+                    <div class="dl-card-title">Sample Damages Summary</div>
+                    <div class="dl-card-content">
+                        <p><strong>Total Economic Damages: $425,000</strong></p>
+                        <ul>
+                            <li>Past medical expenses: $285,000 (ER, hospitalization, 4 surgeries, PT)</li>
+                            <li>Future medical expenses: $100,000 (additional surgeries, ongoing PT, pain management)</li>
+                            <li>Lost wages: $30,000 (6 months off work)</li>
+                            <li>Loss of earning capacity: $10,000 (reduced to part-time work due to disability)</li>
+                        </ul>
+                        <p><strong>Non-Economic Damages: $2,000,000</strong></p>
+                        <ul>
+                            <li>Severe traumatic brain injury with permanent cognitive impairment</li>
+                            <li>Bilateral leg fractures requiring multiple surgeries and permanent hardware</li>
+                            <li>Chronic pain requiring ongoing pain management</li>
+                            <li>PTSD, anxiety, and depression from the accident</li>
+                            <li>Loss of enjoyment of life (cannot walk without assistance, cannot return to hobbies)</li>
+                        </ul>
+                        <p><strong>Total Demand: $2,425,000</strong></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dl-section">
+            <div class="dl-section-title">Supporting Evidence to Include with Your Demand</div>
+            <div class="dl-content">
+                <p>A strong demand letter is supported by comprehensive documentation that proves liability and damages. Attach or reference the following evidence:</p>
+
+                <ul class="dl-checklist">
+                    <li>Police report (if driver was cited, this is critical evidence)</li>
+                    <li>Photos of accident scene, crosswalk, intersection, traffic controls</li>
+                    <li>Photos of vehicle damage (showing point of impact)</li>
+                    <li>Photos of your client's injuries (acute phase and healed scars)</li>
+                    <li>All medical records, bills, and prescription receipts</li>
+                    <li>Employer letter documenting lost wages and inability to return to work</li>
+                    <li>Vocational expert report on loss of earning capacity</li>
+                    <li>Economic expert report on future medical costs</li>
+                    <li>Witness statements supporting your client's account</li>
+                    <li>Surveillance video from nearby businesses or traffic cameras</li>
+                    <li>Cell phone records (if arguing driver was distracted)</li>
+                    <li>Accident reconstruction report (for disputed liability cases)</li>
+                    <li>Your client's personal statement describing impact on life</li>
+                </ul>
+
+                <div class="dl-alert dl-alert-info">
+                    <strong>Presentation Matters:</strong> Organize your supporting evidence with tabs or an index for easy reference. High-quality color photos of injuries and the accident scene are particularly effective. If you have surveillance video, include stills in the demand letter and offer to provide the full video upon request.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab6" class="dl-tab-content">
+        <div class="dl-section">
+            <div class="dl-section-title">Professional Legal Representation for Pedestrian Accident Victims</div>
+            <div class="dl-content">
+                <p>If you or a loved one has been injured as a pedestrian struck by a vehicle, I can help you navigate the complex claims process and maximize your compensation. I represent pedestrian accident victims throughout [State/Region] in claims against negligent drivers and their insurance companies.</p>
+
+                <p><strong>What I handle:</strong></p>
+                <ul class="dl-checklist">
+                    <li>Crosswalk accidents and failure to yield violations</li>
+                    <li>Parking lot pedestrian strikes and backing accidents</li>
+                    <li>Distracted driving accidents (texting, phone use)</li>
+                    <li>Left-turn and right-turn pedestrian strikes</li>
+                    <li>Hit-and-run pedestrian accidents</li>
+                    <li>Severe injuries: TBI, spinal cord injury, fractures, internal injuries</li>
+                    <li>Wrongful death claims for fatal pedestrian accidents</li>
+                    <li>Uninsured/underinsured motorist (UM/UIM) claims</li>
+                </ul>
+
+                <div class="dl-alert dl-alert-success">
+                    <strong>Why Pedestrian Cases Require Specialized Representation:</strong> Pedestrian accidents involve unique challenges—overcoming comparative fault arguments, proving severe injuries are proportionate to low-speed collisions, and obtaining surveillance evidence before it's destroyed. I understand these challenges and know how to build compelling demand letters that maximize recovery.
+                </div>
+            </div>
+        </div>
+
+        <div class="dl-cta">
+            <div class="dl-cta-title">Free Consultation for Pedestrian Accident Victims</div>
+            <div class="dl-cta-text">
+                If you've been injured as a pedestrian struck by a vehicle, contact me for a free consultation. I'll review your case, explain your rights, and give you a realistic assessment of what your claim is worth. You owe nothing unless I recover compensation for you.
+            </div>
+            <a href="mailto:owner@terms.law" class="dl-cta-button">Email: owner@terms.law</a>
+        </div>
+
+        <div class="dl-section">
+            <div class="dl-section-title">Frequently Asked Questions</div>
+            <div class="dl-content">
+                <div class="dl-faq">
+                    <div class="dl-faq-item">
+                        <button class="dl-faq-question" onclick="toggleFaq(this, event)">
+                            I was jaywalking when I was hit. Can I still recover compensation?
+                        </button>
+                        <div class="dl-faq-answer">
+                            <div class="dl-faq-answer-content">
+                                Yes. Even if you were jaywalking, the driver still had a duty to avoid hitting you if possible. In comparative negligence states, your recovery will be reduced by your percentage of fault, but you can still recover if the driver was primarily at fault. Jaywalking typically reduces recovery by 10-30%, not 100%.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dl-faq-item">
+                        <button class="dl-faq-question" onclick="toggleFaq(this, event)">
+                            The driver said they "didn't see me." Does that mean they're not at fault?
+                        </button>
+                        <div class="dl-faq-answer">
+                            <div class="dl-faq-answer-content">
+                                No. "I didn't see them" is an admission of negligence, not a defense. Drivers have a duty to see what is there to be seen, especially pedestrians in crosswalks. Failure to see a visible pedestrian establishes breach of the duty to maintain a proper lookout.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dl-faq-item">
+                        <button class="dl-faq-question" onclick="toggleFaq(this, event)">
+                            How much is my pedestrian accident case worth?
+                        </button>
+                        <div class="dl-faq-answer">
+                            <div class="dl-faq-answer-content">
+                                The value depends on the severity of your injuries, permanence of disability, medical expenses, lost wages, and impact on your life. Minor injuries with full recovery settle for $20,000-$75,000. Severe fractures requiring multiple surgeries settle for $100,000-$500,000. Catastrophic injuries (TBI, spinal cord injury, paralysis) can exceed $1,000,000-$5,000,000.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dl-faq-item">
+                        <button class="dl-faq-question" onclick="toggleFaq(this, event)">
+                            What if the driver's insurance isn't enough to cover my damages?
+                        </button>
+                        <div class="dl-faq-answer">
+                            <div class="dl-faq-answer-content">
+                                If your damages exceed the driver's policy limits, you may be able to recover additional compensation through your own uninsured/underinsured motorist (UM/UIM) coverage. If you don't have UM/UIM coverage, you may be able to pursue the driver's personal assets, though this is often not practical if the driver has limited assets.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dl-faq-item">
+                        <button class="dl-faq-question" onclick="toggleFaq(this, event)">
+                            Can I sue the city if the crosswalk was poorly marked or the intersection was dangerous?
+                        </button>
+                        <div class="dl-faq-answer">
+                            <div class="dl-faq-answer-content">
+                                Possibly. If inadequate signage, poor lighting, or dangerous road design contributed to your accident, you may have a claim against the government entity responsible for road maintenance. However, these claims have short notice deadlines (often 6 months or less) and require compliance with strict procedures. Consult with an attorney immediately if you believe road design was a factor.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dl-faq-item">
+                        <button class="dl-faq-question" onclick="toggleFaq(this, event)">
+                            The driver left the scene. Can I still recover compensation?
+                        </button>
+                        <div class="dl-faq-answer">
+                            <div class="dl-faq-answer-content">
+                                Yes. If the driver fled the scene (hit-and-run), you can file a claim under your own uninsured motorist (UM) coverage. If the driver is later identified, you can also pursue a claim against their insurance. Police should be investigating the hit-and-run, and you should provide any evidence (surveillance video, witness statements, vehicle description) to help identify the driver.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function switchTab(tabId, event) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
+    var button = event ? event.currentTarget : null;
+    var container = button
+        ? button.closest('.dl-tab-container')
+        : document.querySelector('.dl-tab-container');
+
+    if (!container) return;
+
+    var allContents = container.querySelectorAll('.dl-tab-content');
+    var allButtons = container.querySelectorAll('.dl-tab-button');
+
+    allContents.forEach(function(content) {
+        content.classList.remove('active');
+    });
+    allButtons.forEach(function(btn) {
+        btn.classList.remove('active');
+    });
+
+    var targetContent = document.getElementById(tabId);
+    if (targetContent) {
+        targetContent.classList.add('active');
+    }
+
+    if (button) {
+        button.classList.add('active');
+    }
+}
+
+function toggleFaq(button, event) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
+    var answer = button.nextElementSibling;
+    var isActive = button.classList.contains('active');
+
+    var allFaqButtons = document.querySelectorAll('.dl-faq-question');
+    var allFaqAnswers = document.querySelectorAll('.dl-faq-answer');
+
+    allFaqButtons.forEach(function(btn) {
+        btn.classList.remove('active');
+    });
+    allFaqAnswers.forEach(function(ans) {
+        ans.style.maxHeight = null;
+    });
+
+    if (!isActive) {
+        button.classList.add('active');
+        answer.style.maxHeight = answer.scrollHeight + "px";
+    }
+}
+</script>
+
+</div>
+
+</body>
+</html>

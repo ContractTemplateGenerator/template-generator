@@ -1,0 +1,2077 @@
+<!--
+⚠️ CRITICAL NOTES FOR FUTURE EDITS ⚠️
+1. NEVER USE h1, h2, h3, h4, h5, h6 TAGS! WordPress adds all heading tags to Table of Contents.
+   Always use styled divs with classes like "widget-title", "section-title", "card-title", etc.
+2. Tab functions MUST include event.preventDefault() and event.stopPropagation() for WordPress compatibility
+3. All onclick handlers MUST pass the event parameter
+4. Tab arrows implement "anti-freeze" pattern - arrows show/hide based on overflow
+5. CONTACT EMAIL: The only valid contact email is owner@terms.law - DO NOT use sergei@terms.law or any other email addresses
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foreign Asset Protection Trusts Guide | Offshore Trusts Explained</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #1a202c;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+        }
+
+        .widget-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%);
+            color: white;
+            padding: 35px 30px 30px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-title {
+            font-size: 30px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 16px;
+            opacity: 0.95;
+            max-width: 850px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+
+        .tab-nav-wrapper {
+            background: #f7fafc;
+            border-bottom: 3px solid #14b8a6;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 10px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .tab-nav-track {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .tab-nav {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            scroll-behavior: smooth;
+        }
+
+        .tab-nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab-button {
+            flex: 0 0 auto;
+            padding: 14px 18px;
+            background: transparent;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+        }
+
+        .tab-button:hover {
+            background: #ccfbf1;
+            color: #0f766e;
+        }
+
+        .tab-button.active {
+            color: #0f766e;
+            border-bottom-color: #14b8a6;
+            background: white;
+        }
+
+        .tab-nav-arrow {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1px solid #cbd5e1;
+            background: #fff;
+            color: #14b8a6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            flex-shrink: 0;
+        }
+
+        .tab-nav-arrow:hover {
+            background: #14b8a6;
+            color: white;
+        }
+
+        .tab-nav-arrow[hidden] {
+            visibility: hidden;
+            opacity: 0;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 35px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0f766e;
+            margin: 0 0 25px 0;
+            padding-bottom: 12px;
+            border-bottom: 3px solid #e2e8f0;
+        }
+
+        .subsection-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f766e;
+            margin: 35px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid #14b8a6;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f766e;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-content {
+            line-height: 1.8;
+            color: #334155;
+        }
+
+        .card-content ul {
+            margin: 12px 0 12px 25px;
+            line-height: 1.9;
+        }
+
+        .card-content li {
+            margin: 8px 0;
+        }
+
+        .card-content strong {
+            color: #0f766e;
+        }
+
+        .card-content a {
+            color: #14b8a6;
+            text-decoration: underline;
+        }
+
+        .card-content a:hover {
+            color: #0f766e;
+        }
+
+        .alert-box {
+            padding: 20px;
+            border-radius: 8px;
+            margin: 25px 0;
+            border-left: 4px solid;
+            line-height: 1.8;
+        }
+
+        .alert-info {
+            background: #e0f2fe;
+            border-color: #0ea5e9;
+            color: #075985;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            border-color: #f59e0b;
+            color: #92400e;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+
+        .alert-danger {
+            background: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+
+        .alert-box ul {
+            margin: 10px 0 0 20px;
+        }
+
+        .checklist {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .checklist-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f766e;
+            margin-bottom: 20px;
+        }
+
+        .checklist-item {
+            padding: 15px 0;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            gap: 15px;
+        }
+
+        .checklist-item:last-child {
+            border-bottom: none;
+        }
+
+        .checklist-icon {
+            color: #14b8a6;
+            font-weight: bold;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            font-size: 14px;
+        }
+
+        .comparison-table th {
+            background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%);
+            color: white;
+            padding: 12px 10px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .comparison-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: top;
+        }
+
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .pricing-box {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border: 2px solid #14b8a6;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .pricing-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(20, 184, 166, 0.2);
+        }
+
+        .pricing-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f766e;
+            margin-bottom: 15px;
+        }
+
+        .price {
+            font-size: 42px;
+            font-weight: 800;
+            color: #14b8a6;
+            margin: 20px 0;
+        }
+
+        .pricing-box ul {
+            text-align: left;
+            margin: 20px 0;
+            line-height: 2;
+            font-size: 14px;
+        }
+
+        .pricing-box li {
+            margin: 8px 0;
+            color: #334155;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%);
+            color: white;
+            padding: 14px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(20, 184, 166, 0.3);
+            margin: 10px 5px;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(20, 184, 166, 0.4);
+        }
+
+        .widget-box {
+            background: #f0fdfa;
+            border: 2px solid #14b8a6;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+
+        .widget-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f766e;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .widget-box label {
+            display: block;
+            margin: 15px 0;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .widget-box input[type="number"],
+        .widget-box input[type="text"],
+        .widget-box select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .widget-box input[type="radio"] {
+            margin-right: 8px;
+        }
+
+        .widget-box button {
+            background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+        }
+
+        .widget-box button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+        }
+
+        .widget-result {
+            background: white;
+            border: 2px solid #14b8a6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .wizard-step label {
+            display: block;
+            padding: 10px;
+            margin: 5px 0;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .wizard-step label:hover {
+            background: #f0fdfa;
+            border-color: #14b8a6;
+        }
+
+        .calendly-container {
+            margin: 30px 0;
+            background: #f8fafc;
+            padding: 25px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .calendly-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #0f766e;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 24px;
+            }
+
+            .hero-subtitle {
+                font-size: 14px;
+            }
+
+            .tab-content {
+                padding: 20px;
+            }
+
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-title {
+                font-size: 20px;
+            }
+
+            .comparison-table {
+                font-size: 12px;
+            }
+
+            .comparison-table th,
+            .comparison-table td {
+                padding: 8px 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="widget-container">
+        <div class="hero">
+            <div class="hero-content">
+                <div class="hero-title">Foreign Asset Protection Trusts<br>Complete Guide for High-Net-Worth Individuals</div>
+                <div class="hero-subtitle">
+                    A comprehensive attorney-level resource covering offshore trusts, jurisdictions, costs, benefits vs domestic trusts, formation process, and when FAPTs make sense for serious asset protection
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-nav-wrapper" id="tabsWrapper">
+            <button class="tab-nav-arrow left" onclick="scrollTabs(event, -1)" aria-label="Scroll tabs left">‹</button>
+            <div class="tab-nav-track">
+                <div class="tab-nav" id="tabNav">
+                    <button class="tab-button active" onclick="switchTab('what-is-fapt', event)">🌍 What is a FAPT?</button>
+                    <button class="tab-button" onclick="switchTab('benefits', event)">✨ Benefits vs Domestic</button>
+                    <button class="tab-button" onclick="switchTab('jurisdictions', event)">🏝️ Jurisdictions</button>
+                    <button class="tab-button" onclick="switchTab('types', event)">📋 Types of Structures</button>
+                    <button class="tab-button" onclick="switchTab('how-to-form', event)">🛠️ How to Form</button>
+                    <button class="tab-button" onclick="switchTab('costs', event)">💰 Costs & Economics</button>
+                    <button class="tab-button" onclick="switchTab('use-cases', event)">💡 Use Cases</button>
+                    <button class="tab-button" onclick="switchTab('limitations', event)">⚠️ Risks & Limits</button>
+                    <button class="tab-button" onclick="switchTab('tax-compliance', event)">📊 Tax & Compliance</button>
+                    <button class="tab-button" onclick="switchTab('qualify', event)">✅ Do I Qualify?</button>
+                    <button class="tab-button" onclick="switchTab('services', event)">💼 Services</button>
+                    <button class="tab-button" onclick="switchTab('faq', event)">❓ FAQ</button>
+                </div>
+            </div>
+            <button class="tab-nav-arrow right" onclick="scrollTabs(event, 1)" aria-label="Scroll tabs right">›</button>
+        </div>
+
+        <!-- What is a FAPT Tab -->
+        <div id="tab-what-is-fapt" class="tab-content active">
+            <div class="section-title">What is a Foreign Asset Protection Trust?</div>
+
+            <div class="alert-box alert-info">
+                <strong>🌍 In Simple Terms</strong><br>
+                A Foreign Asset Protection Trust (FAPT) is an irrevocable trust established in a foreign jurisdiction with debtor-friendly laws, designed to protect assets from future creditors, lawsuits, and judgments. The trust is governed by foreign law that does not recognize U.S. court judgments and makes it extremely difficult and expensive for creditors to reach the assets.
+            </div>
+
+            <div class="card">
+                <div class="card-title">🏛️ Legal Definition & Structure</div>
+                <div class="card-content">
+                    <strong>Core Concept:</strong> A FAPT (also called an "offshore APT" or "offshore asset protection trust") is an irrevocable, self-settled discretionary spendthrift trust formed in a foreign jurisdiction with protective trust law, where:
+
+                    <p style="margin-top: 15px;"><strong>Key Features:</strong></p>
+                    <ul>
+                        <li><strong>Settlor as Beneficiary:</strong> You (the settlor) can be a discretionary beneficiary—a structure historically void in the U.S. as to your own creditors</li>
+                        <li><strong>Independent Foreign Trustee:</strong> A licensed trustee in the foreign jurisdiction controls all distributions and trust decisions</li>
+                        <li><strong>Protective Foreign Law:</strong> The governing law (Cook Islands, Nevis, Belize, etc.) expressly:
+                            <ul style="margin-top: 8px;">
+                                <li>Rejects recognition and enforcement of foreign (U.S.) judgments</li>
+                                <li>Shortens limitation periods for fraudulent transfer claims (often 1-2 years)</li>
+                                <li>Raises creditor's burden of proof (often "beyond reasonable doubt" or "clear and convincing")</li>
+                                <li>Requires creditors to post substantial bonds ($25k-$50k+) before filing suit</li>
+                                <li>Mandates local counsel and litigation in the foreign jurisdiction</li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <div class="alert-box alert-warning" style="margin-top: 20px;">
+                        <strong>⚠️ Historical Context:</strong> Traditionally, U.S. law prohibited "self-settled spendthrift trusts" (where you create a trust for yourself and claim it's protected from your creditors). FAPTs are a deliberate workaround using foreign jurisdictions that allow such structures. Some U.S. states (Alaska, Nevada, South Dakota, Delaware) now also allow domestic APTs (DAPTs), but they have significant limitations compared to offshore trusts.
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">📜 Evolution: From Traditional Trusts to FAPTs</div>
+                <div class="card-content">
+                    <strong>The Traditional Rule:</strong> Under common law, you couldn't create a trust to shield your own assets from your own creditors. This was the "spendthrift trust" limitation—spendthrift protections only worked for third-party beneficiaries, not the settlor.
+
+                    <p style="margin-top: 15px;"><strong>The Offshore Solution (1980s-1990s):</strong></p>
+                    <ul>
+                        <li><strong>1984:</strong> Cook Islands enacts first modern asset protection trust statute</li>
+                        <li><strong>1990s:</strong> Nevis, Belize, Bahamas, and others follow with protective trust laws</li>
+                        <li><strong>Key Innovation:</strong> These jurisdictions explicitly allow self-settled trusts and refuse to recognize U.S. judgments</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>The Domestic Response (1997-Present):</strong></p>
+                    <ul>
+                        <li><strong>1997:</strong> Alaska becomes first U.S. state to allow domestic asset protection trusts (DAPTs)</li>
+                        <li><strong>2000s-2020s:</strong> ~17-20 states enact DAPT statutes (Nevada, South Dakota, Delaware, Wyoming, Tennessee, etc.)</li>
+                        <li><strong>The Problem:</strong> DAPTs remain vulnerable to:
+                            <ul style="margin-top: 8px;">
+                                <li>Full Faith and Credit challenges (other states' courts may not honor them)</li>
+                                <li>Federal bankruptcy lookback (10 years under 11 U.S.C. § 548(e))</li>
+                                <li>Public policy exceptions and judicial skepticism</li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>Today's Landscape:</strong> FAPTs remain the "gold standard" for serious asset protection because foreign jurisdictions are not bound by U.S. Full Faith and Credit, federal bankruptcy rules are harder to enforce internationally, and the practical barriers for creditors are enormous.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🔑 How It Actually Works: A Practical Example</div>
+                <div class="card-content">
+                    <strong>Scenario:</strong> Dr. Sarah Martinez, a California surgeon, is concerned about potential malpractice claims despite carrying insurance. She has $8M in liquid assets she wants to protect.
+
+                    <p style="margin-top: 15px;"><strong>What She Does:</strong></p>
+                    <ol style="line-height: 2;">
+                        <li><strong>Forms a Cook Islands Trust</strong> with a licensed Cook Islands trustee</li>
+                        <li><strong>Transfers $5M</strong> in brokerage accounts and liquid assets to the trust</li>
+                        <li><strong>Structures herself as a discretionary beneficiary</strong>—the trustee can distribute to her, but has no obligation to do so</li>
+                        <li><strong>Creates an underlying Cook Islands LLC</strong> owned 100% by the trust, which actually holds the brokerage accounts</li>
+                        <li><strong>Names herself LLC manager</strong> for day-to-day investment decisions, but the trustee owns the LLC</li>
+                    </ol>
+
+                    <p style="margin-top: 20px;"><strong>What Happens If She Gets Sued:</strong></p>
+                    <ul>
+                        <li><strong>Plaintiff wins $10M judgment in California:</strong> The California judgment is NOT automatically enforceable in Cook Islands</li>
+                        <li><strong>To reach the trust assets, creditor must:</strong>
+                            <ul style="margin-top: 8px;">
+                                <li>Hire Cook Islands attorney (no contingency fees)</li>
+                                <li>Post $25k-$50k bond to file suit</li>
+                                <li>Litigate entirely in Cook Islands courts under Cook Islands law</li>
+                                <li>Prove beyond reasonable doubt that the transfer was fraudulent (extremely high bar)</li>
+                                <li>Do all of this within 1-2 years of the original transfer (statute of limitations)</li>
+                            </ul>
+                        </li>
+                        <li><strong>Practical Result:</strong> Most creditors settle for pennies on the dollar rather than spend $100k-$500k+ for an uncertain outcome in a foreign court</li>
+                    </ul>
+
+                    <div class="alert-box alert-success" style="margin-top: 20px;">
+                        <strong>✅ Key Point:</strong> FAPTs don't make you "judgment proof"—U.S. courts can still enter judgments against you. But they make those judgments practically unenforceable against the trust assets, creating enormous settlement leverage.
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">⚖️ Legal Foundation: Why This Works</div>
+                <div class="card-content">
+                    <strong>The jurisdictional arbitrage:</strong>
+
+                    <p style="margin-top: 15px;"><strong>1. No Full Faith and Credit</strong></p>
+                    <ul>
+                        <li>U.S. Constitution requires states to honor each other's judgments</li>
+                        <li>Foreign countries have no such obligation—Cook Islands courts don't care about California judgments</li>
+                        <li>Creditor must start litigation from scratch in the foreign jurisdiction</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>2. Favorable Fraudulent Transfer Laws</strong></p>
+                    <ul>
+                        <li><strong>U.S. Law (UVTA/UFTA):</strong> Creditors typically have 4+ years to challenge transfers made with intent to defraud</li>
+                        <li><strong>Cook Islands / Nevis:</strong> Only 1-2 years from transfer, with much higher burden of proof</li>
+                        <li><strong>Federal Bankruptcy:</strong> 10-year lookback under 11 U.S.C. § 548(e), but harder to enforce against offshore assets</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>3. Procedural Barriers</strong></p>
+                    <ul>
+                        <li>Requirement to post bonds ($25k-$50k+)</li>
+                        <li>No contingency fee arrangements (creditor's lawyer must be paid upfront)</li>
+                        <li>Local counsel requirement (expensive)</li>
+                        <li>Travel and litigation costs in remote jurisdictions</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>4. High Evidentiary Standards</strong></p>
+                    <ul>
+                        <li>Cook Islands: often requires proof "beyond reasonable doubt" (criminal standard)</li>
+                        <li>Nevis: "clear and convincing evidence" at minimum</li>
+                        <li>U.S. Standard: typically "preponderance of evidence" (much lower)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Benefits Tab -->
+        <div id="tab-benefits" class="tab-content">
+            <div class="section-title">Benefits of FAPTs vs Domestic Asset Protection</div>
+
+            <div class="card">
+                <div class="card-title">📊 FAPT vs DAPT vs Traditional Planning: Comparison</div>
+                <div class="card-content">
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>Foreign APT (FAPT)</th>
+                                <th>Domestic APT (DAPT)</th>
+                                <th>Traditional Planning</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Self-Settled Protection</strong></td>
+                                <td>✅ Strong (foreign law allows)</td>
+                                <td>⚠️ Limited (vulnerable to challenges)</td>
+                                <td>❌ Not available</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Full Faith & Credit</strong></td>
+                                <td>✅ Not subject (foreign jurisdiction)</td>
+                                <td>❌ Subject (can be challenged in other states)</td>
+                                <td>N/A</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Fraudulent Transfer Window</strong></td>
+                                <td>✅ 1-2 years (very short)</td>
+                                <td>⚠️ 4+ years (state UVTA) + 10 years (federal § 548(e))</td>
+                                <td>4+ years (UVTA/UFTA)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Creditor Burden of Proof</strong></td>
+                                <td>✅ Very high (beyond reasonable doubt / clear & convincing)</td>
+                                <td>⚠️ Moderate (preponderance + heightened in some)</td>
+                                <td>Preponderance of evidence</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Litigation Barriers</strong></td>
+                                <td>✅ Enormous (foreign litigation, bonds, local counsel, no contingency)</td>
+                                <td>⚠️ Modest (still U.S. courts)</td>
+                                <td>Minimal</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Settlement Leverage</strong></td>
+                                <td>✅ Very high (creditors often settle cheaply)</td>
+                                <td>⚠️ Moderate (some deterrence)</td>
+                                <td>Low</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Setup Cost</strong></td>
+                                <td>❌ $15k-$50k+</td>
+                                <td>⚠️ $5k-$15k</td>
+                                <td>✅ $2k-$10k</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Annual Fees</strong></td>
+                                <td>❌ $3.5k-$10k+</td>
+                                <td>⚠️ $1k-$5k</td>
+                                <td>✅ $500-$2k</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Tax Complexity</strong></td>
+                                <td>❌ High (Forms 3520/3520-A, FBAR, FATCA)</td>
+                                <td>✅ Low (treated as domestic)</td>
+                                <td>✅ Minimal</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Reputational Optics</strong></td>
+                                <td>❌ "Offshore" stigma</td>
+                                <td>⚠️ Some skepticism</td>
+                                <td>✅ Neutral</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Track Record in Court</strong></td>
+                                <td>✅ Strong (hard to reach in practice)</td>
+                                <td>❌ Mixed (many unfavorable rulings)</td>
+                                <td>N/A</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Best For</strong></td>
+                                <td>$5M-$10M+ net worth, high litigation risk, willing to pay for serious protection</td>
+                                <td>$1M-$5M net worth, moderate risk, want some protection at lower cost</td>
+                                <td>Basic estate planning, probate avoidance, no asset protection needs</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">✅ Five Core Advantages of FAPTs Over DAPTs</div>
+                <div class="card-content">
+                    <div class="checklist">
+                        <div class="checklist-title">🌍 Why Go Offshore Instead of Domestic</div>
+                        <div class="checklist-item">
+                            <div class="checklist-icon">1️⃣</div>
+                            <div><strong>Jurisdictional Insulation</strong><br>
+                            Cook Islands, Nevis, Belize, and other offshore jurisdictions <strong>do not recognize U.S. judgments</strong>. A creditor with a $10M California judgment must start completely over in Cook Islands court, hiring local counsel, posting bonds, and litigating under Cook Islands law. DAPTs, by contrast, are subject to Full Faith and Credit—a Nevada DAPT can be challenged by a California creditor in California court under California law.</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-icon">2️⃣</div>
+                            <div><strong>Extremely Short Fraudulent Transfer Windows</strong><br>
+                            Offshore jurisdictions typically give creditors only <strong>1-2 years from the date of transfer</strong> to challenge it as fraudulent. After that, even if the transfer was made with questionable intent, the creditor is barred. Compare to U.S. state law (4+ years) and federal bankruptcy law (10 years for self-settled trusts under 11 U.S.C. § 548(e)).</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-icon">3️⃣</div>
+                            <div><strong>Crushing Procedural Hurdles</strong><br>
+                            Offshore jurisdictions stack the deck against creditors:
+                            <ul style="margin-top: 8px;">
+                                <li><strong>Bond Requirements:</strong> Often $25k-$50k+ just to file suit</li>
+                                <li><strong>No Contingency Fees:</strong> Creditor's lawyer must be paid upfront (expensive)</li>
+                                <li><strong>Local Counsel Required:</strong> Must hire Cook Islands / Nevis attorney</li>
+                                <li><strong>In-Person Litigation:</strong> Creditor must travel to remote islands for hearings</li>
+                                <li><strong>High Evidentiary Burden:</strong> "Beyond reasonable doubt" or "clear and convincing" standard for fraudulent intent</li>
+                            </ul>
+                            Result: Most creditors give up or settle for pennies rather than spend $100k-$500k on an uncertain foreign lawsuit.</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-icon">4️⃣</div>
+                            <div><strong>No Public Policy Exceptions</strong><br>
+                            U.S. courts have shown hostility to DAPTs, with judges in non-DAPT states refusing to honor them as "against public policy." Cook Islands and Nevis courts don't care about U.S. public policy—they're designed explicitly to protect settlors from foreign creditors. This makes FAPTs far more predictable and defensible than DAPTs.</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-icon">5️⃣</div>
+                            <div><strong>Settlement Forcing Mechanism</strong><br>
+                            FAPTs aren't magic shields that make you "judgment proof." What they do is create <strong>massive economic disincentives</strong> for creditors to pursue trust assets. In practice:
+                            <ul style="margin-top: 8px;">
+                                <li>DAPTs are often ignored or easily penetrated—they're "symbolic" protection</li>
+                                <li>FAPTs are "functional" shields—assets are practically unreachable, forcing settlements</li>
+                                <li>Creditors with $10M judgments routinely settle for $500k-$2M rather than chase offshore assets</li>
+                            </ul>
+                            This settlement leverage is the real value of FAPTs for high-net-worth individuals.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">⚠️ Why DAPTs Often Fail in Practice</div>
+                <div class="card-content">
+                    <strong>Despite 20+ states offering domestic APTs, they have serious vulnerabilities:</strong>
+
+                    <p style="margin-top: 15px;"><strong>1. Full Faith and Credit Challenges</strong></p>
+                    <ul>
+                        <li>U.S. Constitution requires states to recognize each other's judgments and laws</li>
+                        <li>If you live in California but form a Nevada DAPT, California courts may apply California law and ignore Nevada's protection</li>
+                        <li>Courts in non-DAPT states have repeatedly refused to honor DAPTs as "against public policy"</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>2. Federal Bankruptcy Override</strong></p>
+                    <ul>
+                        <li>11 U.S.C. § 548(e) allows bankruptcy trustees to void transfers to self-settled trusts made within 10 years with intent to defraud</li>
+                        <li>This federal law preempts state DAPT statutes in bankruptcy</li>
+                        <li>Many DAPT jurisdictions have no case law showing successful defense in bankruptcy</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>3. Judicial Skepticism</strong></p>
+                    <ul>
+                        <li>Judges are hostile to the idea that you can shield your own assets from your own creditors</li>
+                        <li>Courts scrutinize DAPTs closely and often find ways to penetrate them (retained control, fraudulent intent, public policy exceptions)</li>
+                        <li>Published cases show DAPTs failing more often than succeeding</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>4. Practical Example: In re Huber (2013)</strong></p>
+                    <ul>
+                        <li>Washington state residents formed Alaska DAPT</li>
+                        <li>Filed bankruptcy in Washington</li>
+                        <li>Bankruptcy court in Washington applied Washington law (not Alaska law) and voided the trust</li>
+                        <li>Result: DAPT provided zero protection</li>
+                    </ul>
+
+                    <div class="alert-box alert-danger" style="margin-top: 20px;">
+                        <strong>🚨 Bottom Line on DAPTs:</strong> Domestic APTs may have some value for moderate-risk planning in the $1M-$5M range, but they should not be relied upon as serious asset protection for high-net-worth individuals or high-risk professions. For real protection, you need a foreign jurisdiction not subject to U.S. courts' jurisdiction and policy preferences.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- More tabs will continue... -->
+        <div id="tab-jurisdictions" class="tab-content">
+            <div class="section-title">Offshore Trust Jurisdictions: Where to Form Your FAPT</div>
+
+            <div class="card">
+                <div class="card-title">🏝️ Comprehensive Jurisdiction Comparison</div>
+                <div class="card-content">
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th style="min-width: 100px;">Jurisdiction</th>
+                                <th style="min-width: 140px;">Foreign Judgment Recognition</th>
+                                <th style="min-width: 120px;">Fraudulent Transfer Window</th>
+                                <th style="min-width: 140px;">Creditor Burden & Bond</th>
+                                <th style="min-width: 140px;">Trust Industry & Stability</th>
+                                <th style="min-width: 100px;">Typical Setup Cost</th>
+                                <th style="min-width: 100px;">Annual Fees</th>
+                                <th style="min-width: 180px;">Notes & Recommendations</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Cook Islands</strong></td>
+                                <td>Foreign money judgments not directly enforceable. Creditor must re-litigate under Cook Islands law</td>
+                                <td>Very short, typically 1-2 years from cause of action or transfer</td>
+                                <td>High evidentiary standard (often beyond reasonable doubt). Courts can require substantial security deposit</td>
+                                <td>Longest APT track record (since 1984), mature trust industry, widely used in U.S. planning. Politically stable</td>
+                                <td>$20k-$50k+</td>
+                                <td>$5k-$10k+</td>
+                                <td>Considered "gold standard" for FAPTs. Most case law and professional infrastructure. Best for high-value ($5M+) cases</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Nevis</strong></td>
+                                <td>Does not recognize foreign judgments against Nevis trusts. Creditor must litigate locally from scratch</td>
+                                <td>Short limitation periods, 1-2 years after which claims barred</td>
+                                <td>Very high burden (often beyond reasonable doubt for fraudulent intent). Creditor must post significant bond ($25k+) to file</td>
+                                <td>Active APT jurisdiction, somewhat newer than Cook Islands but very protective statutes. Reasonably stable island economy</td>
+                                <td>$15k-$30k</td>
+                                <td>$3.5k-$7.5k</td>
+                                <td>Cost-effective alternative to Cook Islands with similar statutory protections. Popular for mid-market APT planning ($2M-$10M)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Belize</strong></td>
+                                <td>Strong firewall provisions restricting recognition of foreign judgments</td>
+                                <td>Short limitation periods under trust legislation</td>
+                                <td>Elevated standard on creditor. May require security to pursue claims</td>
+                                <td>Active offshore trust industry but less U.S. APT case law than Cook or Nevis. Somewhat more political risk</td>
+                                <td>$15k-$25k</td>
+                                <td>$3k-$6k</td>
+                                <td>Often used for lower to mid-range APT budgets. Good option when client has existing Belize relationships</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Cayman Islands</strong></td>
+                                <td>Firewall statutes limiting foreign judgments, though more nuanced than Cook/Nevis</td>
+                                <td>Protective but sometimes slightly longer than Cook or Nevis</td>
+                                <td>Strong asset protection provisions</td>
+                                <td>Major international trust center with deep professional infrastructure. High political/regulatory stability but subject to global pressure</td>
+                                <td>$25k-$60k+</td>
+                                <td>$6k-$12k+</td>
+                                <td>"Blue chip" financial center feel. Often used when client wants mainstream credibility, not niche APT focus</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Bahamas</strong></td>
+                                <td>Firewall legislation limiting foreign judgment enforcement</td>
+                                <td>Protective trust laws with reasonable limitation periods</td>
+                                <td>Elevated burden on creditors</td>
+                                <td>Established offshore trust center with strong professional industry. Politically stable with mature regulatory framework</td>
+                                <td>$20k-$45k</td>
+                                <td>$5k-$10k</td>
+                                <td>Strong reputation, proximity to U.S. Widely used for offshore trusts and banking</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Jersey / Guernsey</strong></td>
+                                <td>Firewall provisions, though embedded in broader European context</td>
+                                <td>Favorable limitation periods</td>
+                                <td>Professional trust industry standards</td>
+                                <td>Major international trust centers (Crown Dependencies). Very high regulatory standards and political stability</td>
+                                <td>$25k-$70k+</td>
+                                <td>$7k-$15k+</td>
+                                <td>Often used for ultra-high-net-worth clients wanting European sophistication. Higher costs, more regulatory oversight</td>
+                            </tr>
+                            <tr style="background: #fff3cd;">
+                                <td><strong>Nevada / South Dakota (DAPT comparator)</strong></td>
+                                <td>Subject to Full Faith and Credit within U.S.</td>
+                                <td>State statutes favorable but can be overridden by other states and bankruptcy courts. 10-year federal lookback (§ 548(e))</td>
+                                <td>Better than baseline U.S. law but still within U.S. policy framework</td>
+                                <td>Growing DAPT industry with some unfavorable outcomes for out-of-state debtors. Very stable politically and regulatory</td>
+                                <td>$5k-$15k</td>
+                                <td>$1k-$3k</td>
+                                <td>Useful comparison point. Lower cost but significantly weaker protection than offshore. Only consider if offshore is not feasible</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🎯 How to Choose the Right Jurisdiction</div>
+                <div class="card-content">
+                    <strong>Key factors to consider:</strong>
+
+                    <p style="margin-top: 15px;"><strong>1. Net Worth & Risk Level</strong></p>
+                    <ul>
+                        <li><strong>$2M-$5M, moderate risk:</strong> Nevis or Belize (cost-effective, strong protection)</li>
+                        <li><strong>$5M-$20M, high risk:</strong> Cook Islands or Nevis (gold standard, deep case law)</li>
+                        <li><strong>$20M+, ultra-high-net-worth:</strong> Cook Islands, Cayman, or Jersey/Guernsey (maximum protection and sophistication)</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>2. Creditor Profile</strong></p>
+                    <ul>
+                        <li><strong>Sophisticated institutional creditors:</strong> Cook Islands (longest track record, most case law)</li>
+                        <li><strong>Individual plaintiffs, contingency lawyers:</strong> Nevis (bond requirements and cost barriers extremely effective)</li>
+                        <li><strong>Government claims, regulatory:</strong> Consider multiple jurisdictions or specialized counsel</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>3. Industry Relationships & Banking</strong></p>
+                    <ul>
+                        <li>Some jurisdictions have better banking infrastructure and easier KYC/AML for U.S. clients</li>
+                        <li>Cayman and Bahamas often easier for mainstream U.S. banks to work with</li>
+                        <li>Cook Islands and Nevis more "boutique" but highly specialized for APTs</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>4. Professional Network</strong></p>
+                    <ul>
+                        <li>Your U.S. attorney's relationships with offshore trustees matter enormously</li>
+                        <li>Stick with jurisdictions where your counsel has established trustee relationships and track record</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>5. Regulatory & Political Stability</strong></p>
+                    <ul>
+                        <li><strong>Most Stable:</strong> Cook Islands (trust industry is main economy), Cayman, Jersey/Guernsey (Crown Dependencies)</li>
+                        <li><strong>Moderate:</strong> Nevis, Bahamas (stable but smaller economies)</li>
+                        <li><strong>Higher Risk:</strong> Belize (more political volatility, though trust laws remain strong)</li>
+                    </ul>
+
+                    <div class="alert-box alert-info" style="margin-top: 20px;">
+                        <strong>💡 My Recommendation:</strong> For most U.S. clients with $5M+ in serious litigation exposure, I typically recommend either <strong>Cook Islands</strong> (if budget allows and risk is very high) or <strong>Nevis</strong> (if seeking strong protection at moderate cost). Belize is a solid budget option for $2M-$5M clients. Cayman/Bahamas/Jersey are for clients who need mainstream credibility or have ultra-high net worth.
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">📊 Jurisdiction "Report Card"</div>
+                <div class="card-content">
+                    <strong>Quick comparison on key metrics (scale: ⭐ = Weak to ⭐⭐⭐⭐⭐ = Excellent):</strong>
+
+                    <table class="comparison-table" style="margin-top: 20px;">
+                        <thead>
+                            <tr>
+                                <th>Jurisdiction</th>
+                                <th>Asset Protection Strength</th>
+                                <th>Case Law Track Record</th>
+                                <th>Cost-Effectiveness</th>
+                                <th>Banking Ease</th>
+                                <th>Political Stability</th>
+                                <th>Overall Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Cook Islands</strong></td>
+                                <td>⭐⭐⭐⭐⭐</td>
+                                <td>⭐⭐⭐⭐⭐</td>
+                                <td>⭐⭐⭐</td>
+                                <td>⭐⭐⭐⭐</td>
+                                <td>⭐⭐⭐⭐⭐</td>
+                                <td>⭐⭐⭐⭐⭐ (Best for high-value)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Nevis</strong></td>
+                                <td>⭐⭐⭐⭐⭐</td>
+                                <td>⭐⭐⭐⭐</td>
+                                <td>⭐⭐⭐⭐⭐</td>
+                                <td>⭐⭐⭐⭐</td>
+                                <td>⭐⭐⭐⭐</td>
+                                <td>⭐⭐⭐⭐⭐ (Best cost-value ratio)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Belize</strong></td>
+                                <td>⭐⭐⭐⭐</td>
+                                <td>⭐⭐⭐</td>
+                                <td>⭐⭐⭐⭐⭐</td>
+                                <td>⭐⭐⭐</td>
+                                <td>⭐⭐⭐</td>
+                                <td>⭐⭐⭐⭐ (Good budget option)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Cayman</strong></td>
+                                <td>⭐⭐⭐⭐</td>
+                                <td>⭐⭐⭐⭐</td>
+                                <td>⭐⭐</td>
+                                <td>⭐⭐⭐⭐⭐</td>
+                                <td>⭐⭐⭐⭐⭐</td>
+                                <td>⭐⭐⭐⭐ (Blue-chip option)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Nevada DAPT</strong></td>
+                                <td>⭐⭐</td>
+                                <td>⭐⭐</td>
+                                <td>⭐⭐⭐⭐⭐</td>
+                                <td>⭐⭐⭐⭐⭐</td>
+                                <td>⭐⭐⭐⭐⭐</td>
+                                <td>⭐⭐ (Weak protection)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Types of Structures Tab -->
+        <div id="tab-types" class="tab-content">
+            <div class="section-title">Types of Foreign Trust Structures</div>
+
+            <div class="card">
+                <div class="card-title">🏗️ Main FAPT Structure Types</div>
+                <div class="card-content">
+                    <strong>There are several common architectures for offshore asset protection trusts:</strong>
+
+                    <p style="margin-top: 20px;"><strong>1. Classic Offshore APT (Trust Only)</strong></p>
+                    <ul>
+                        <li>Irrevocable, self-settled, spendthrift trust in Cook Islands/Nevis/Belize</li>
+                        <li>Independent licensed offshore trustee controls all assets and distributions</li>
+                        <li>Settlor is discretionary beneficiary (trustee MAY distribute, not MUST)</li>
+                        <li>Trust owns assets directly (brokerage accounts, investment portfolios in trust name)</li>
+                    </ul>
+                    <p style="margin-top: 10px;"><strong>Pros:</strong> Simplest structure, lower formation cost<br>
+                    <strong>Cons:</strong> Less day-to-day control for settlor, all decisions require trustee approval</p>
+
+                    <p style="margin-top: 20px;"><strong>2. Offshore Trust + Underlying LLC (Most Common)</strong></p>
+                    <ul>
+                        <li>Trust owns 100% of an offshore LLC (often same jurisdiction or complementary)</li>
+                        <li>LLC holds actual assets (brokerage accounts, investment portfolios, possibly real estate equity)</li>
+                        <li>Settlor often named as LLC manager for day-to-day operational decisions</li>
+                        <li>Trustee maintains ultimate control over LLC membership interests</li>
+                    </ul>
+                    <p style="margin-top: 10px;"><strong>Pros:</strong> Separates control (manager) from ownership (trustee), allows settlor more practical management while maintaining protection<br>
+                    <strong>Cons:</strong> More complex, higher setup costs, requires coordination between trust and LLC documentation</p>
+
+                    <p style="margin-top: 20px;"><strong>3. Hybrid / Bridge Trust</strong></p>
+                    <ul>
+                        <li>Starts as domestic trust for U.S. tax purposes (meets court/control tests)</li>
+                        <li>Registered offshore (e.g., Cook Islands) from inception</li>
+                        <li>Can "flip" to full offshore status upon trigger event (lawsuit filed, duress clause activated)</li>
+                        <li>Attempts to be "foreign for protection, domestic for tax"</li>
+                    </ul>
+                    <p style="margin-top: 10px;"><strong>Pros:</strong> Simpler U.S. tax reporting before flip, marketed as "best of both worlds"<br>
+                    <strong>Cons:</strong> More legally complex, uncertain whether courts will respect the hybrid nature, may be challenged as substance-over-form</p>
+
+                    <p style="margin-top: 20px;"><strong>4. Non-Self-Settled Offshore Trusts</strong></p>
+                    <ul>
+                        <li>Third-party beneficiary offshore trusts (for children, heirs, not settlor)</li>
+                        <li>Formed offshore for privacy, long-term asset protection, dynasty planning</li>
+                        <li>Structurally safer from fraudulent transfer issues (settlor not primary beneficiary)</li>
+                    </ul>
+                    <p style="margin-top: 10px;"><strong>Pros:</strong> Cleaner from fraudulent transfer standpoint, strong multi-generational protection<br>
+                    <strong>Cons:</strong> Settlor cannot be beneficiary, so no access to funds during lifetime</p>
+
+                    <div class="alert-box alert-info" style="margin-top: 20px;">
+                        <strong>💡 Recommended Structure:</strong> For most U.S. clients seeking practical asset protection, I recommend <strong>Structure #2: Offshore Trust + Underlying LLC</strong>. This allows the settlor to remain as LLC manager for investment decisions and day-to-day operations, while the offshore trustee owns the LLC membership interests, providing the necessary legal separation and protection.
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🔧 How the Trust + LLC Structure Actually Works</div>
+                <div class="card-content">
+                    <strong>Detailed example architecture:</strong>
+
+                    <p style="margin-top: 15px;"><strong>Parties & Roles:</strong></p>
+                    <ul>
+                        <li><strong>Dr. Martinez</strong> = Settlor and discretionary beneficiary of trust; Manager of LLC</li>
+                        <li><strong>Cook Islands Trust Company Ltd</strong> = Independent trustee of the trust; Owner of 100% of LLC membership interests</li>
+                        <li><strong>"Martinez Holdings LLC" (Cook Islands LLC)</strong> = Entity owned by trust, managed by Dr. Martinez</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>Asset Flow & Control:</strong></p>
+                    <ol style="line-height: 2;">
+                        <li>Dr. Martinez forms "The Martinez Asset Protection Trust" (irrevocable Cook Islands trust)</li>
+                        <li>Dr. Martinez forms "Martinez Holdings LLC" (Cook Islands LLC) owned 100% by the trust</li>
+                        <li>Dr. Martinez transfers $5M in liquid assets to LLC bank/brokerage accounts</li>
+                        <li>Dr. Martinez, as LLC Manager, makes day-to-day investment decisions (buy/sell stocks, rebalance portfolio, etc.)</li>
+                        <li>Cook Islands trustee, as LLC owner, maintains ultimate authority over major decisions (distributions, changes to LLC operating agreement, removal of manager)</li>
+                    </ol>
+
+                    <p style="margin-top: 15px;"><strong>What Happens in Lawsuit:</strong></p>
+                    <ul>
+                        <li><strong>Duress Clause Activates:</strong> When lawsuit filed or judgment entered, trust deed instructs trustee NOT to repatriate assets or comply with U.S. court orders</li>
+                        <li><strong>Dr. Martinez Loses Manager Role (if needed):</strong> Trustee can remove Dr. Martinez as LLC manager and appoint independent manager to demonstrate lack of control</li>
+                        <li><strong>Assets Remain Offshore:</strong> LLC accounts held at offshore banks or brokerages that don't recognize U.S. judgments</li>
+                        <li><strong>Creditor Must Sue in Cook Islands:</strong> No shortcut via U.S. courts</li>
+                    </ul>
+
+                    <div class="alert-box alert-warning" style="margin-top: 20px;">
+                        <strong>⚠️ Control vs Protection Trade-off:</strong> The more control you retain (manager powers, investment discretion, ability to force distributions), the more vulnerable the structure becomes to judicial attack. Courts can find that you have "de facto control" and order repatriation under contempt powers. The structure must balance practical management with legal separation.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Planning & Implementation Tab (combines How to Form, Costs, Use Cases) -->
+        <div id="tab-how-to-form" class="tab-content">
+            <div class="section-title">Planning & Implementation: How FAPTs Are Built</div>
+
+            <div class="card">
+                <div class="card-title">🛠️ Formation Process: Step-by-Step</div>
+                <div class="card-content">
+                    <div class="checklist">
+                        <div class="checklist-title">✅ How a FAPT is Actually Created</div>
+                        <div class="checklist-item">
+                            <div class="checklist-icon">1️⃣</div>
+                            <div><strong>Risk & Suitability Analysis</strong><br>
+                            Attorney reviews: net worth, creditor profile, timing (distance from any claims), jurisdictions involved, asset types, tax tolerance. Critical: ensure not being used to evade existing/imminent creditors (fraudulent transfer risk).</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-icon">2️⃣</div>
+                            <div><strong>Jurisdiction & Trustee Selection</strong><br>
+                            Choose Cook Islands/Nevis/Belize based on risk, budget, banking needs. Engage licensed, regulated offshore trustee. Review fee schedules and regulatory standing.</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-icon">3️⃣</div>
+                            <div><strong>Draft Trust Deed & LLC Documents</strong><br>
+                            Trust deed includes: spendthrift clauses, anti-duress provisions (trustee instructed not to comply with foreign court orders), choice of law (offshore jurisdiction), protector provisions, letters of wishes. LLC operating agreement coordinates with trust.</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-icon">4️⃣</div>
+                            <div><strong>Form Underlying LLC</strong><br>
+                            Incorporate LLC in same or companion jurisdiction. Transfer LLC membership interests (100%) into trust. Appoint settlor as LLC manager for day-to-day control.</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-icon">5️⃣</div>
+                            <div><strong>Funding & Account Setup</strong><br>
+                            Establish offshore bank/brokerage accounts in LLC name. Transfer liquid assets (stocks, bonds, cash) into LLC accounts. Document transfer dates carefully (starts fraudulent transfer clock).</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-icon">6️⃣</div>
+                            <div><strong>U.S. Tax Classification & Reporting Setup</strong><br>
+                            Determine if foreign trust for tax (typically yes). Obtain EIN for trust. Set up systems for Forms 3520, 3520-A, FBAR, FATCA compliance.</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-icon">7️⃣</div>
+                            <div><strong>Ongoing Governance</strong><br>
+                            Establish procedures: annual trustee accountings, beneficiary communications, investment management protocols, distribution request procedures, amendment process.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">💰 Realistic Cost Expectations</div>
+                <div class="card-content">
+                    <strong>Setup Costs (One-Time):</strong>
+                    <ul style="margin: 15px 0 15px 25px;">
+                        <li><strong>Legal Fees (U.S. Attorney):</strong> $15,000 - $35,000
+                            <ul style="margin-top: 5px;">
+                                <li>Simple offshore APT: $15k-$20k</li>
+                                <li>Standard trust + LLC structure: $25k-$35k</li>
+                                <li>Complex/high-value cases: $40k-$100k+</li>
+                            </ul>
+                        </li>
+                        <li><strong>Offshore Trustee Setup Fee:</strong> $3,000 - $8,000</li>
+                        <li><strong>LLC Formation:</strong> $1,500 - $3,500</li>
+                        <li><strong>Banking/Account Setup:</strong> $1,000 - $3,000</li>
+                    </ul>
+
+                    <p style="margin-top: 20px;"><strong>Total Typical Range: $20,000 - $50,000</strong></p>
+
+                    <p style="margin-top: 20px;"><strong>Annual Ongoing Costs:</strong></p>
+                    <ul style="margin: 10px 0 10px 25px;">
+                        <li><strong>Offshore Trustee Annual Fee:</strong> $3,500 - $10,000+</li>
+                        <li><strong>LLC Annual Renewal:</strong> $800 - $2,000</li>
+                        <li><strong>U.S. Tax Preparation (Forms 3520/3520-A/FBAR):</strong> $2,000 - $5,000</li>
+                        <li><strong>Legal Review/Updates:</strong> $1,000 - $3,000</li>
+                    </ul>
+
+                    <p style="margin-top: 20px;"><strong>Total Annual: $7,000 - $20,000+</strong></p>
+
+                    <div class="alert-box alert-info" style="margin-top: 20px;">
+                        <strong>💡 ROI Perspective:</strong> If a FAPT forces a $10M creditor to settle for $1M-$2M (90-80% reduction), the $50k setup + $150k over 10 years = $200k total cost produces $8M-$9M in value. For serious high-stakes litigation, the economics are compelling.
+                    </div>
+                </div>
+            </div>
+
+            <div class="widget-box">
+                <div class="widget-title">💵 FAPT Cost Estimator</div>
+                <form id="fapt-cost-form">
+                    <label>
+                        Exposed Net Worth (USD):
+                        <input type="number" id="netWorth" min="0" step="100000" placeholder="e.g., 5000000">
+                    </label>
+
+                    <label>
+                        Risk Profile:
+                        <select id="riskLevel">
+                            <option value="">Select...</option>
+                            <option value="low">Low (W2 employee, minimal liability)</option>
+                            <option value="moderate">Moderate (Business owner, landlord, some guarantees)</option>
+                            <option value="high">High (Doctor, developer, high-liability field)</option>
+                        </select>
+                    </label>
+
+                    <label>
+                        Current Threat Status:
+                        <select id="threatLevel">
+                            <option value="">Select...</option>
+                            <option value="none">No known or threatened claims</option>
+                            <option value="potential">Potential claims but nothing filed</option>
+                            <option value="active">Demand letter or lawsuit filed</option>
+                            <option value="judgment">Judgment entered</option>
+                        </select>
+                    </label>
+
+                    <button type="button" onclick="runFaptCostEstimate()">Estimate Costs</button>
+                </form>
+
+                <div id="fapt-cost-result" class="widget-result" style="display: none;"></div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">💡 Common Use Cases: Who Needs a FAPT?</div>
+                <div class="card-content">
+                    <strong>Ideal candidates for offshore asset protection trusts:</strong>
+
+                    <p style="margin-top: 15px;"><strong>1. Physicians & Surgeons</strong></p>
+                    <ul>
+                        <li>High malpractice exposure despite insurance</li>
+                        <li>$5M-$50M+ net worth in investments and real estate</li>
+                        <li>Concern about catastrophic claims exceeding policy limits</li>
+                        <li><strong>Example:</strong> Orthopedic surgeon with $15M net worth wants to protect assets accumulated over 25-year career from potential future claims</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>2. Real Estate Developers</strong></p>
+                    <ul>
+                        <li>Personal guarantees on development loans</li>
+                        <li>Construction defect liability exposure</li>
+                        <li>Partnership disputes and litigation</li>
+                        <li><strong>Example:</strong> Developer personally guaranteed $20M in loans; wants $8M liquid portfolio protected if project fails</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>3. Business Owners Pre-Liquidity Event</strong></p>
+                    <ul>
+                        <li>Expecting company sale or IPO in 2-5 years</li>
+                        <li>Want to lock up portion of existing wealth before event creates target</li>
+                        <li>Concerned about future product liability or employment claims</li>
+                        <li><strong>Example:</strong> SaaS founder with $10M in Bitcoin/stocks expects $50M exit in 3 years; protects current assets now before becoming visible target</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>4. High-Net-Worth in Plaintiff-Friendly States</strong></p>
+                    <ul>
+                        <li>California, Florida, Texas residents with large estates</li>
+                        <li>Concerned about liability from rental properties, car accidents, etc.</li>
+                        <li>Umbrella insurance insufficient for total exposure</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>5. Crypto/Public Equity Concentrated Wealth</strong></p>
+                    <ul>
+                        <li>Sudden wealth from cryptocurrency or stock grants</li>
+                        <li>High public profile creates litigation target</li>
+                        <li>Want to protect windfall from future unknown claims</li>
+                    </ul>
+
+                    <div class="alert-box alert-warning" style="margin-top: 20px;">
+                        <strong>⚠️ Not Suitable For:</strong>
+                        <ul>
+                            <li>Net worth under $2M (cost doesn't justify benefit)</li>
+                            <li>Existing judgment or imminent lawsuit (too late, fraudulent transfer issues)</li>
+                            <li>Unwilling to handle foreign reporting compliance</li>
+                            <li>Public company executives or regulated professionals where optics matter more than protection</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Limitations & Compliance Tab (combines Risks + Tax) -->
+        <div id="tab-limitations" class="tab-content">
+            <div class="section-title">Limitations, Risks & Compliance Requirements</div>
+
+            <div class="card">
+                <div class="card-title">⚠️ How U.S. Courts Actually Treat FAPTs</div>
+                <div class="card-content">
+                    <strong>FAPTs are not magic shields. U.S. courts have tools to pressure debtors:</strong>
+
+                    <p style="margin-top: 15px;"><strong>1. Contempt & "Impossibility" Doctrine</strong></p>
+                    <div class="alert-box alert-danger" style="margin-top: 10px;">
+                        <strong>Key Cases:</strong>
+                        <ul>
+                            <li><strong>FTC v. Affordable Media (Anderson)</strong> – Ninth Circuit upheld contempt sanctions when settlors claimed "impossibility" because Cook Islands trustee refused to repatriate under duress clause. Court didn't care that offshore law prevented compliance.</li>
+                            <li><strong>In re Lawrence</strong> – 11th Circuit upheld long-term incarceration for civil contempt when debtor claimed inability to repatriate from Jersey APT.</li>
+                        </ul>
+                        <strong>Lesson:</strong> While offshore law may hold, U.S. courts will pressure YOU personally via contempt as long as they believe impossibility is self-created.
+                    </div>
+
+                    <p style="margin-top: 20px;"><strong>2. Bankruptcy Code Override</strong></p>
+                    <ul>
+                        <li><strong>11 U.S.C. § 548(e):</strong> 10-year lookback for transfers to self-settled trusts with actual intent to defraud</li>
+                        <li>Bankruptcy courts routinely apply this aggressively to APTs regardless of offshore location</li>
+                        <li>Cases like <em>In re Mortensen</em> show courts piercing offshore structures in bankruptcy</li>
+                    </ul>
+
+                    <p style="margin-top: 20px;"><strong>3. Substance-Over-Form Challenges</strong></p>
+                    <ul>
+                        <li>Courts hostile where debtor retains de facto control (signatory powers, protector with broad authority, side letters)</li>
+                        <li>Transfers made after claims reasonably foreseeable = high scrutiny</li>
+                        <li><strong>Best Practice:</strong> Real control must be surrendered, structure implemented early (3-5+ years before any claim)</li>
+                    </ul>
+
+                    <div class="alert-box alert-info" style="margin-top: 20px;">
+                        <strong>💡 Reality Check:</strong> Offshore trusts work best when (1) formed early, before specific claims arise, (2) real control surrendered to independent trustee, (3) client willing to accept contempt risk if needed. They're settlement-forcing mechanisms, not absolute shields.
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🚨 Fraudulent Transfer Risk</div>
+                <div class="card-content">
+                    <strong>The biggest legal risk with FAPTs:</strong>
+
+                    <p style="margin-top: 15px;"><strong>When Transfers Are Vulnerable:</strong></p>
+                    <ul>
+                        <li><strong>After claim arises:</strong> Transferring assets after lawsuit filed, demand letter received, or incident occurred = strong presumption of fraudulent intent</li>
+                        <li><strong>"Reasonably foreseeable" claims:</strong> Doctor who had prior malpractice suit, developer on failing project, business owner facing obvious liability</li>
+                        <li><strong>Insolvency:</strong> Transferring assets when insolvent or becoming insolvent as result of transfer</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>Safe Harbor (Best Timing):</strong></p>
+                    <ul>
+                        <li><strong>5+ years before any claim:</strong> Generally safe from fraudulent transfer challenges</li>
+                        <li><strong>3-5 years:</strong> Moderate risk depending on foreseeability</li>
+                        <li><strong>1-3 years:</strong> High scrutiny if claim was foreseeable</li>
+                        <li><strong>After demand/lawsuit:</strong> Almost certainly fraudulent transfer</li>
+                    </ul>
+
+                    <div class="alert-box alert-danger" style="margin-top: 20px;">
+                        <strong>🚨 Critical Timing Rule:</strong> FAPTs must be implemented as <strong>proactive</strong> planning, not reactive crisis management. If you're calling because you just got sued, it's too late. The time to set up offshore protection is when everything is calm—5 years before you need it.
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">📊 U.S. Tax Classification & Reporting</div>
+                <div class="card-content">
+                    <strong>Complex U.S. tax and reporting requirements:</strong>
+
+                    <p style="margin-top: 15px;"><strong>1. Foreign vs Domestic Trust for Tax (Treas. Reg. § 301.7701-7)</strong></p>
+                    <ul>
+                        <li><strong>Court Test:</strong> Primary supervision by U.S. court?</li>
+                        <li><strong>Control Test:</strong> U.S. persons control all substantial decisions?</li>
+                        <li>If BOTH tests met = domestic trust (U.S. person for tax)</li>
+                        <li>Otherwise = foreign trust</li>
+                        <li><strong>Most FAPTs:</strong> Foreign trusts because offshore trustee controls substantial decisions</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>2. Grantor Trust Rules (IRC §§ 671-679)</strong></p>
+                    <ul>
+                        <li><strong>§ 679:</strong> If U.S. grantor + U.S. beneficiaries = grantor trust for U.S. tax purposes</li>
+                        <li><strong>Result:</strong> You (settlor) report all trust income on your personal return (Form 1040)</li>
+                        <li>No separate trust-level income tax while you're alive and beneficiary</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>3. Mandatory Filings</strong></p>
+                    <div class="checklist" style="margin-top: 15px;">
+                        <div class="checklist-item">
+                            <div class="checklist-icon">📋</div>
+                            <div><strong>Form 3520</strong> (Annual Return to Report Transactions with Foreign Trusts)<br>
+                            Filed by U.S. person who: created foreign trust, received distributions from foreign trust, or made transfers to foreign trust. Due with personal return (April 15 or extension).</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-icon">📋</div>
+                            <div><strong>Form 3520-A</strong> (Annual Information Return of Foreign Trust with U.S. Owner)<br>
+                            Filed by the foreign trust itself (prepared by trustee or U.S. owner). Provides detailed trust income, deductions, distributions. Due March 15.</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-icon">📋</div>
+                            <div><strong>FinCEN Form 114 (FBAR)</strong><br>
+                            Report foreign financial accounts if aggregate value exceeds $10,000 at any time during year. Due April 15 (automatic extension to October 15).</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-icon">📋</div>
+                            <div><strong>Form 8938 (FATCA - Statement of Specified Foreign Financial Assets)</strong><br>
+                            If total foreign assets exceed threshold ($50k-$600k depending on filing status). Filed with Form 1040.</div>
+                        </div>
+                    </div>
+
+                    <p style="margin-top: 20px;"><strong>4. Penalties for Non-Compliance</strong></p>
+                    <div class="alert-box alert-danger" style="margin-top: 10px;">
+                        <strong>🚨 Severe Penalties:</strong>
+                        <ul>
+                            <li><strong>Form 3520:</strong> Greater of $10,000 or 35% of gross reportable amount</li>
+                            <li><strong>Form 3520-A:</strong> $10,000 + $10,000 for each 30-day period after IRS notice (uncapped!)</li>
+                            <li><strong>FBAR:</strong> $10,000+ per violation (willful = 50% of account balance or $100k per violation)</li>
+                            <li><strong>Form 8938:</strong> $10,000 + continuing penalties</li>
+                        </ul>
+                        <strong>Bottom Line:</strong> Non-compliance can exceed the value of the planning. Must budget $2k-$5k annually for proper tax preparation.
+                    </div>
+
+                    <div class="alert-box alert-warning" style="margin-top: 20px;">
+                        <strong>⚠️ Warning About "No Reporting" Pitches:</strong> If an offshore promoter tells you "no Forms 3520, no FBAR, no taxes," they're either lying or structuring tax evasion. Legitimate FAPTs require full U.S. reporting. The value is asset protection, not tax avoidance.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Services Tab (with Qualify Widget, Pricing, Calendly) -->
+        <div id="tab-costs" class="tab-content">
+            <div class="section-title">FAPT Services & Qualification</div>
+
+            <div class="widget-box">
+                <div class="widget-title">✅ Do I Qualify for a Foreign Asset Protection Trust?</div>
+                <div id="fapt-qualify-wizard">
+                    <div class="wizard-step" data-step="1">
+                        <p><strong>1. Approximate total exposed net worth (USD):</strong></p>
+                        <label><input type="radio" name="nw" value="under2"> Under $2M</label>
+                        <label><input type="radio" name="nw" value="2to5"> $2M to $5M</label>
+                        <label><input type="radio" name="nw" value="5to10"> $5M to $10M</label>
+                        <label><input type="radio" name="nw" value="over10"> Over $10M</label>
+                        <button type="button" onclick="nextFaptStep()">Next →</button>
+                    </div>
+
+                    <div class="wizard-step" data-step="2" style="display:none;">
+                        <p><strong>2. Main professional/liability exposure:</strong></p>
+                        <label><input type="radio" name="risk" value="low"> Low (W2 employee, minimal liability)</label>
+                        <label><input type="radio" name="risk" value="moderate"> Moderate (Business owner, landlord, guarantees)</label>
+                        <label><input type="radio" name="risk" value="high"> High (Doctor, developer, high-liability field)</label>
+                        <button type="button" onclick="prevFaptStep()">← Back</button>
+                        <button type="button" onclick="nextFaptStep()">Next →</button>
+                    </div>
+
+                    <div class="wizard-step" data-step="3" style="display:none;">
+                        <p><strong>3. Current status of claims against you:</strong></p>
+                        <label><input type="radio" name="claims" value="none"> No known or threatened claims</label>
+                        <label><input type="radio" name="claims" value="potential"> Some potential claims but nothing filed</label>
+                        <label><input type="radio" name="claims" value="active"> Demand letter or lawsuit filed</label>
+                        <label><input type="radio" name="claims" value="judgment"> Judgment entered</label>
+                        <button type="button" onclick="prevFaptStep()">← Back</button>
+                        <button type="button" onclick="nextFaptStep()">Next →</button>
+                    </div>
+
+                    <div class="wizard-step" data-step="4" style="display:none;">
+                        <p><strong>4. Willingness to handle foreign reporting/compliance:</strong></p>
+                        <label><input type="radio" name="report" value="yes"> Yes, I can handle Forms 3520/FBAR and annual fees</label>
+                        <label><input type="radio" name="report" value="no"> No, I prefer minimal complexity</label>
+                        <button type="button" onclick="prevFaptStep()">← Back</button>
+                        <button type="button" onclick="finishFaptWizard()">See Result</button>
+                    </div>
+
+                    <div id="fapt-qualify-result" class="wizard-result" style="display:none;"></div>
+                </div>
+            </div>
+
+            <div class="alert-box alert-info">
+                <strong>👨‍⚖️ Lawyer-Led Service</strong><br>
+                I personally guide each client through offshore asset protection planning, providing customized legal advice tailored to your specific risk profile, jurisdiction needs, and compliance requirements. This is sophisticated planning that requires experienced counsel—not a DIY project or document service.
+            </div>
+
+            <div class="pricing-grid">
+                <div class="pricing-box">
+                    <div class="pricing-title">📋 FAPT Consultation & Analysis</div>
+                    <div class="price">$2,500</div>
+                    <div style="font-size: 13px; color: #64748b; margin: -10px 0 20px 0;">Risk assessment & jurisdiction recommendation</div>
+                    <ul>
+                        <li>✅ Comprehensive risk & suitability analysis</li>
+                        <li>✅ Fraudulent transfer timing review</li>
+                        <li>✅ Jurisdiction comparison (Cook Islands, Nevis, etc.)</li>
+                        <li>✅ Structure recommendation (trust only vs trust+LLC)</li>
+                        <li>✅ Cost-benefit analysis for your situation</li>
+                        <li>✅ Tax & reporting requirements overview</li>
+                        <li>✅ Written opinion letter</li>
+                    </ul>
+                    <a href="mailto:owner@terms.law?subject=FAPT%20Consultation%20Inquiry" class="cta-button">Schedule Consultation</a>
+                </div>
+
+                <div class="pricing-box" style="border-color: #0f766e; border-width: 3px;">
+                    <div style="background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%); color: white; padding: 8px; margin: -30px -30px 20px -30px; text-align: center; font-weight: 700; font-size: 14px;">
+                        ⭐ MOST COMMON
+                    </div>
+                    <div class="pricing-title">🏝️ Complete Cook Islands or Nevis FAPT</div>
+                    <div class="price">$28,500</div>
+                    <div style="font-size: 13px; color: #64748b; margin: -10px 0 20px 0;">Full offshore trust + LLC structure</div>
+                    <ul>
+                        <li>✅ U.S. legal counsel (planning, drafting, coordination)</li>
+                        <li>✅ Offshore trustee engagement & setup</li>
+                        <li>✅ Trust deed with duress provisions & asset protection clauses</li>
+                        <li>✅ Offshore LLC formation & operating agreement</li>
+                        <li>✅ Account opening coordination (offshore bank/brokerage)</li>
+                        <li>✅ U.S. tax structuring & compliance guidance</li>
+                        <li>✅ Funding instructions & transfer documentation</li>
+                        <li>✅ First-year compliance support</li>
+                    </ul>
+                    <a href="mailto:owner@terms.law?subject=Complete%20FAPT%20Structure%20Inquiry" class="cta-button">Get Started</a>
+                </div>
+
+                <div class="pricing-box">
+                    <div class="pricing-title">💼 Premium / Complex FAPT Planning</div>
+                    <div class="price">$45,000+</div>
+                    <div style="font-size: 13px; color: #64748b; margin: -10px 0 20px 0;">High-value or multi-jurisdictional structures</div>
+                    <ul>
+                        <li>✅ Everything in Complete Package, PLUS:</li>
+                        <li>✅ Multiple offshore entities (layered protection)</li>
+                        <li>✅ Multi-jurisdictional planning (Cayman, Jersey, etc.)</li>
+                        <li>✅ Coordination with existing domestic trusts</li>
+                        <li>✅ Business succession & entity restructuring</li>
+                        <li>✅ International tax planning</li>
+                        <li>✅ Ongoing governance & trustee liaison</li>
+                    </ul>
+                    <a href="mailto:owner@terms.law?subject=Premium%20FAPT%20Planning%20Inquiry" class="cta-button">Discuss Your Case</a>
+                </div>
+            </div>
+
+            <div class="calendly-container">
+                <div class="calendly-title">📅 Schedule Confidential FAPT Consultation</div>
+                <div style="text-align: center; margin-bottom: 20px; color: #64748b;">
+                    Discuss your specific situation, risk profile, and whether offshore asset protection makes sense for you. Completely confidential.
+                </div>
+                <!-- Calendly inline widget begin -->
+                <div class="calendly-inline-widget" data-url="https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1" style="min-width:320px;height:700px;"></div>
+                <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
+                <!-- Calendly inline widget end -->
+            </div>
+
+            <div class="card">
+                <div class="card-title">📞 Contact Information</div>
+                <div class="card-content" style="text-align: center; font-size: 16px;">
+                    <p><strong>Email:</strong> <a href="mailto:owner@terms.law">owner@terms.law</a></p>
+                    <p style="margin-top: 15px; color: #64748b;">Serving clients nationwide for offshore asset protection planning</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Services Tab (simplified, moved qualification widget to costs tab) -->
+        <div id="tab-services" class="tab-content">
+            <div class="section-title">Working with Counsel: What to Expect</div>
+
+            <div class="card">
+                <div class="card-title">📋 The FAPT Planning Process</div>
+                <div class="card-content">
+                    <div class="checklist">
+                        <div class="checklist-title">✅ Step-by-Step Engagement</div>
+                        <div class="checklist-item">
+                            <div class="checklist-icon">1️⃣</div>
+                            <div><strong>Initial Consultation (60-90 minutes)</strong><br>
+                            We discuss your assets, creditor profile, timing, goals. I explain jurisdiction options, structure choices, costs, tax implications. You decide if offshore planning makes sense.</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-icon">2️⃣</div>
+                            <div><strong>Risk Analysis & Written Opinion</strong><br>
+                            I prepare detailed risk analysis: fraudulent transfer timing, jurisdiction recommendation, structure design, cost-benefit. You receive written opinion letter you can rely on.</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-icon">3️⃣</div>
+                            <div><strong>Trustee Selection & Engagement</strong><br>
+                            I coordinate with licensed offshore trustees I've worked with (Cook Islands, Nevis). You meet trustee, review fees, establish relationship.</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-icon">4️⃣</div>
+                            <div><strong>Document Drafting</strong><br>
+                            I draft: trust deed, LLC operating agreement, letters of wishes, funding instructions. Offshore counsel reviews for compliance with local law. Typically 3-4 weeks.</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-icon">5️⃣</div>
+                            <div><strong>Execution & Formation</strong><br>
+                            You sign trust deed (typically via notary). Offshore trustee executes. LLC formed. Accounts opened. Typically 2-4 weeks.</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-icon">6️⃣</div>
+                            <div><strong>Funding & Transfer</strong><br>
+                            You transfer assets to LLC accounts per funding instructions. I document transfer dates and amounts (critical for fraudulent transfer clock). Typically 1-2 weeks.</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-icon">7️⃣</div>
+                            <div><strong>Tax Compliance Setup</strong><br>
+                            I coordinate with your CPA (or refer one experienced in offshore trusts) to set up Forms 3520/3520-A/FBAR systems. First year most complex; subsequent years routine.</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-icon">8️⃣</div>
+                            <div><strong>Ongoing Governance & Support</strong><br>
+                            Annual trustee accountings. Annual U.S. tax filings. Periodic review calls. Available for questions as they arise.</div>
+                        </div>
+                    </div>
+
+                    <div class="alert-box alert-info" style="margin-top: 25px;">
+                        <strong>⏱️ Typical Timeline:</strong> From initial consultation to funded, operational FAPT: 8-12 weeks. Can be expedited if needed, but best not to rush (looks reactive if litigation emerges shortly after formation).
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🤝 Why Work with Experienced FAPT Counsel</div>
+                <div class="card-content">
+                    <strong>Offshore asset protection is complex, high-stakes planning. Here's what matters:</strong>
+
+                    <p style="margin-top: 15px;"><strong>1. Established Offshore Relationships</strong></p>
+                    <ul>
+                        <li>I work with vetted, licensed trustees in Cook Islands and Nevis I've used for years</li>
+                        <li>Direct relationships mean faster setup, better fees, responsive service</li>
+                        <li>Avoid "promoter" arrangements where you're funneled to whoever pays highest referral fee</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>2. U.S. Court Experience</strong></p>
+                    <ul>
+                        <li>Understanding how U.S. courts actually treat FAPTs (contempt risk, substance-over-form challenges)</li>
+                        <li>Structuring to withstand judicial scrutiny, not just offshore law compliance</li>
+                        <li>Knowing when offshore protection is worth the risk vs when it's overkill or too late</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>3. Tax & Compliance Integration</strong></p>
+                    <ul>
+                        <li>Proper U.S. tax structuring from day one (grantor trust status, Forms 3520/3520-A)</li>
+                        <li>Coordination with your existing CPA or referral to offshore-experienced tax counsel</li>
+                        <li>Avoiding structures that create tax evasion red flags or IRS scrutiny</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>4. Honest Risk Assessment</strong></p>
+                    <ul>
+                        <li>I'll tell you if offshore planning is overkill for your situation (and save you $50k)</li>
+                        <li>I'll tell you if timing is bad (too close to a claim = fraudulent transfer)</li>
+                        <li>I'll tell you if a DAPT or traditional planning is more appropriate</li>
+                    </ul>
+
+                    <div class="alert-box alert-success" style="margin-top: 20px;">
+                        <strong>✅ You Want a Counselor, Not a Salesman:</strong> Promoters push offshore trusts to everyone. Good counsel tells you when you DON'T need one. My goal is the right solution for your risk profile and budget, not maximum fees.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Qualify Tab (moved widget content to costs/services tab, this becomes a landing tab) -->
+        <div id="tab-qualify" class="tab-content">
+            <div class="section-title">Is a Foreign Asset Protection Trust Right for You?</div>
+
+            <div class="card">
+                <div class="card-title">✅ Strong FAPT Candidates</div>
+                <div class="card-content">
+                    <strong>You are likely a good candidate if:</strong>
+                    <ul style="margin: 15px 0 15px 25px; line-height: 2;">
+                        <li>✅ Net worth $5M-$10M+ in exposed liquid assets</li>
+                        <li>✅ High-risk profession (doctor, developer, business owner with guarantees)</li>
+                        <li>✅ No current or imminent claims/lawsuits (planning 3-5+ years ahead)</li>
+                        <li>✅ Willing to handle foreign reporting compliance (Forms 3520, FBAR, etc.)</li>
+                        <li>✅ Comfortable with $20k-$50k setup + $7k-$20k annual costs</li>
+                        <li>✅ Want serious protection, not symbolic planning</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">❌ Not Good FAPT Candidates</div>
+                <div class="card-content">
+                    <strong>Offshore planning is NOT right for you if:</strong>
+                    <ul style="margin: 15px 0 15px 25px; line-height: 2;">
+                        <li>❌ Net worth under $2M (cost doesn't justify benefit—use insurance, LLCs, DAPTs)</li>
+                        <li>❌ Lawsuit already filed or demand letter received (too late—fraudulent transfer)</li>
+                        <li>❌ Claims reasonably foreseeable within 1-2 years (tight timing, high risk)</li>
+                        <li>❌ Unwilling to handle foreign reporting or annual compliance costs</li>
+                        <li>❌ Public company executive, politician, or role where "offshore" optics matter more than protection</li>
+                        <li>❌ Looking for tax avoidance (FAPTs don't reduce U.S. taxes, only protect assets)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="alert-box alert-info">
+                <strong>💡 Use the Interactive Qualification Tool:</strong> Visit the <a href="#" onclick="switchTab('costs', event); return false;"><strong>Services tab</strong></a> for an interactive qualification wizard that analyzes your specific situation and recommends whether a FAPT makes sense for you.
+            </div>
+
+            <div class="card">
+                <div class="card-title">🤔 Common "Should I or Shouldn't I?" Scenarios</div>
+                <div class="card-content">
+                    <strong>Scenario 1: "I'm a surgeon with $8M net worth, no current claims, but I'm worried about future malpractice."</strong><br>
+                    <span style="color: #10b981; font-weight: 600;">✅ Strong candidate.</span> High risk profession, sufficient assets, proactive timing. Offshore trust makes sense.
+
+                    <p style="margin-top: 15px;"><strong>Scenario 2: "I'm a landlord with $3M in rental properties and $500k liquid. No lawsuits."</strong><br>
+                    <span style="color: #f59e0b; font-weight: 600;">⚠️ Borderline.</span> Consider DAPT (Nevada, South Dakota) or strong LLC + insurance. FAPT may be overkill unless you have specific high-risk properties.</p>
+
+                    <p style="margin-top: 15px;"><strong>Scenario 3: "I just got sued for $5M. I have $2M in stocks. Can I protect them with a FAPT?"</strong><br>
+                    <span style="color: #ef4444; font-weight: 600;">❌ Too late.</span> Transferring assets after lawsuit = fraudulent transfer. Focus on defense and settlement, not asset protection planning.</p>
+
+                    <p style="margin-top: 15px;"><strong>Scenario 4: "I'm selling my business in 2 years for $20M. No current issues, but I'll be a visible target after the sale."</strong><br>
+                    <span style="color: #10b981; font-weight: 600;">✅ Excellent timing.</span> Set up FAPT NOW with current modest assets. After sale, transfer portion of proceeds. 2+ year gap before liquidity event = strong fraudulent transfer defense.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ Tab -->
+        <div id="tab-faq" class="tab-content">
+            <div class="section-title">Frequently Asked Questions</div>
+
+            <div class="card">
+                <div class="card-title">❓ Can I access my money if it's in an offshore trust?</div>
+                <div class="card-content">
+                    <strong>Yes, but indirectly through trustee.</strong> You don't have direct signatory authority (that would defeat the protection). But as a discretionary beneficiary, you can request distributions for living expenses, investments, etc. The trustee has discretion to approve. In practice, trustees approve routine requests. The structure is designed so you have practical access under normal circumstances, but a creditor cannot force distributions.
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">❓ What if the trustee steals my money or goes rogue?</div>
+                <div class="card-content">
+                    <strong>Work only with licensed, regulated trustees.</strong> Cook Islands and Nevis trustees are government-licensed, bonded, and regulated. They have professional indemnity insurance and regulatory oversight. Additionally:
+                    <ul style="margin-top: 10px;">
+                        <li>Use trustees your U.S. attorney has long-term relationships with</li>
+                        <li>Include "protector" provisions allowing you to remove and replace trustee (carefully scoped to not give you too much control)</li>
+                        <li>Annual accountings provide transparency</li>
+                        <li>Assets held at major offshore banks/brokerages (not with trustee directly)</li>
+                    </ul>
+                    Risk of trustee malfeasance is very low if you use established, vetted trustees rather than promoters or fly-by-night operators.
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">❓ How is this different from just hiding money in a secret offshore account?</div>
+                <div class="card-content">
+                    <strong>Completely different—and legal vs illegal.</strong>
+                    <ul style="margin-top: 10px;">
+                        <li><strong>FAPT:</strong> Fully disclosed to IRS (Forms 3520, FBAR), all income reported and taxed, assets in trust with independent trustee, legal structure recognized by offshore jurisdiction</li>
+                        <li><strong>Secret offshore account:</strong> Undisclosed, unreported income, tax evasion, violates FBAR/FATCA, criminal penalties</li>
+                    </ul>
+                    FAPTs are legitimate asset protection planning with full U.S. tax compliance. Anyone who tells you "no reporting, no taxes" is selling tax evasion, not asset protection.
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">❓ Can a FAPT protect me from IRS or criminal charges?</div>
+                <div class="card-content">
+                    <strong>No.</strong> FAPTs protect against civil creditors (lawsuits, judgments from private parties). They do NOT protect against:
+                    <ul style="margin-top: 10px;">
+                        <li>IRS tax claims</li>
+                        <li>Criminal restitution orders</li>
+                        <li>Child support or alimony</li>
+                        <li>Federal forfeiture</li>
+                    </ul>
+                    Attempting to use FAPTs to evade these obligations is criminal obstruction. FAPTs are for legitimate civil asset protection only.
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">❓ What happens if I get held in contempt for not repatriating assets?</div>
+                <div class="card-content">
+                    <strong>This is the real risk with FAPTs.</strong> Cases like <em>FTC v. Affordable Media</em> (Anderson) show U.S. courts will incarcerate debtors for civil contempt if they refuse to repatriate offshore assets. The debtor's claim of "impossibility" (trustee won't comply due to duress clause) may not save you.
+
+                    <p style="margin-top: 15px;"><strong>Reality:</strong></p>
+                    <ul>
+                        <li>Most cases settle before contempt becomes issue (creditors prefer $1M settlement to years of litigation)</li>
+                        <li>If you go to trial and lose, court may order repatriation</li>
+                        <li>If you refuse and claim impossibility, contempt risk is real</li>
+                        <li>Some clients accept limited jail time rather than surrender $5M-$10M</li>
+                    </ul>
+
+                    <strong>This is why FAPTs are for serious cases only.</strong> You must be willing to accept contempt risk in exchange for forcing settlement. Not suitable for risk-averse individuals.
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">❓ Can I set up a FAPT myself with online forms?</div>
+                <div class="card-content">
+                    <strong>Absolutely not.</strong> FAPTs are among the most complex planning structures:
+                    <ul style="margin-top: 10px;">
+                        <li>Requires coordination between U.S. and offshore counsel</li>
+                        <li>Must navigate fraudulent transfer laws, U.S. tax rules, offshore trust law</li>
+                        <li>Improper structure = worthless (easily pierced) or worse (tax evasion charges)</li>
+                        <li>Must be tailored to your risk profile, timing, assets</li>
+                    </ul>
+                    Online forms and promoter packages are dangerous. Work only with experienced U.S. counsel who has established offshore relationships and understands how U.S. courts treat these structures.
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">❓ How long does it take to set up?</div>
+                <div class="card-content">
+                    <strong>Typically 8-12 weeks from initial consultation to funded trust.</strong>
+                    <ul style="margin-top: 10px;">
+                        <li>Consultation & risk analysis: 1-2 weeks</li>
+                        <li>Trustee selection & engagement: 1-2 weeks</li>
+                        <li>Document drafting & review: 3-4 weeks</li>
+                        <li>Execution, formation, account opening: 2-4 weeks</li>
+                        <li>Funding: 1-2 weeks</li>
+                    </ul>
+                    Can be expedited if needed, but best not to rush (looks reactive if litigation emerges shortly after).
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">❓ Still have questions?</div>
+                <div class="card-content" style="text-align: center;">
+                    <p>Schedule a confidential consultation to discuss your specific situation.</p>
+                    <a href="mailto:owner@terms.law?subject=FAPT%20Question" class="cta-button" style="margin: 20px 5px;">Email Your Question</a>
+                    <a href="#" class="cta-button" style="margin: 20px 5px; background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%);" onclick="switchTab('costs', event); return false;">Schedule Consultation</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Tab switching function
+        function switchTab(tabId, event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+
+            const tabs = document.querySelectorAll('.tab-button');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            const targetTab = document.getElementById('tab-' + tabId);
+            if (targetTab) {
+                targetTab.classList.add('active');
+            }
+
+            const tabButtons = document.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => {
+                if (button.getAttribute('onclick').includes(tabId)) {
+                    button.classList.add('active');
+                }
+            });
+        }
+
+        // Cost Estimator Widget
+        function runFaptCostEstimate() {
+            const netWorth = parseFloat(document.getElementById('netWorth').value || '0');
+            const riskLevel = document.getElementById('riskLevel').value;
+            const threatLevel = document.getElementById('threatLevel').value;
+
+            if (!netWorth || !riskLevel || !threatLevel) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            let setupMin, setupMax, annualMin, annualMax, suitability;
+
+            if (threatLevel === 'active' || threatLevel === 'judgment') {
+                suitability = 'Too late - fraudulent transfer risk';
+                setupMin = 0; setupMax = 0; annualMin = 0; annualMax = 0;
+            } else if (netWorth < 2000000) {
+                suitability = 'Not recommended - insufficient assets';
+                setupMin = 0; setupMax = 0; annualMin = 0; annualMax = 0;
+            } else {
+                if (netWorth < 5000000) {
+                    setupMin = 20000; setupMax = 30000;
+                    annualMin = 7000; annualMax = 12000;
+                    suitability = 'Borderline - consider DAPT or hybrid';
+                } else if (netWorth < 15000000) {
+                    setupMin = 25000; setupMax = 40000;
+                    annualMin = 8000; annualMax = 15000;
+                    suitability = 'Good candidate';
+                } else {
+                    setupMin = 35000; setupMax = 65000;
+                    annualMin = 10000; annualMax = 25000;
+                    suitability = 'Strong candidate';
+                }
+
+                if (riskLevel === 'high') {
+                    suitability = 'Strong candidate';
+                }
+            }
+
+            const box = document.getElementById('fapt-cost-result');
+            box.innerHTML = `
+                <p style="font-size: 18px; font-weight: 700; color: #0f766e; margin-bottom: 15px;">${suitability}</p>
+                ${setupMin > 0 ? `
+                <p><strong>Estimated Setup Cost:</strong> $${setupMin.toLocaleString()} - $${setupMax.toLocaleString()}</p>
+                <p><strong>Estimated Annual Fees:</strong> $${annualMin.toLocaleString()} - $${annualMax.toLocaleString()}</p>
+                ` : '<p>FAPT not appropriate for your situation at this time.</p>'}
+                <p style="margin-top: 15px; font-size: 13px; color: #64748b;">These are educational estimates only, not quotes. Actual costs depend on jurisdiction, complexity, and trustee selection.</p>
+            `;
+            box.style.display = 'block';
+        }
+
+        // Qualification Wizard
+        let currentStep = 1;
+
+        function showStep(step) {
+            document.querySelectorAll('.wizard-step').forEach(function(div) {
+                div.style.display = (parseInt(div.getAttribute('data-step')) === step) ? 'block' : 'none';
+            });
+        }
+
+        function nextFaptStep() {
+            currentStep += 1;
+            showStep(currentStep);
+        }
+
+        function prevFaptStep() {
+            currentStep -= 1;
+            showStep(currentStep);
+        }
+
+        function finishFaptWizard() {
+            const nw = document.querySelector('input[name="nw"]:checked')?.value;
+            const risk = document.querySelector('input[name="risk"]:checked')?.value;
+            const claims = document.querySelector('input[name="claims"]:checked')?.value;
+            const report = document.querySelector('input[name="report"]:checked')?.value;
+
+            if (!nw || !risk || !claims || !report) {
+                alert('Please answer all questions');
+                return;
+            }
+
+            let score = 0;
+            if (nw === '5to10') score += 2;
+            if (nw === 'over10') score += 3;
+            if (risk === 'moderate') score += 1;
+            if (risk === 'high') score += 2;
+            if (claims === 'none') score += 1;
+            if (claims === 'potential') score += 0;
+            if (claims === 'active' || claims === 'judgment') score -= 5;
+            if (report === 'no') score -= 2;
+
+            let resultText = '';
+
+            if (nw === 'under2') {
+                resultText = '❌ <strong>Not Recommended:</strong> With under $2M net worth, an offshore trust is overkill. Focus on insurance, LLCs, and potentially a domestic APT (Nevada, South Dakota) at much lower cost.';
+            } else if (claims === 'active' || claims === 'judgment') {
+                resultText = '🚨 <strong>Too Late:</strong> With an active demand, lawsuit, or judgment, transferring assets now = fraudulent transfer. Focus on defense and settlement strategy, not asset protection planning.';
+            } else if (score <= 0) {
+                resultText = '⚠️ <strong>Borderline:</strong> You may not be an ideal FAPT candidate. Consider domestic APT, strong LLC structuring, or traditional planning. Schedule consultation to discuss alternatives.';
+            } else if (score <= 3) {
+                resultText = '✅ <strong>Possible Candidate:</strong> You may benefit from offshore planning, but detailed analysis needed. Factors like timing, cost tolerance, and specific risk profile matter. Consultation recommended.';
+            } else {
+                resultText = '✅ <strong>Strong Candidate:</strong> Based on your profile, you appear well-suited for a foreign asset protection trust. Next step: schedule consultation for detailed risk analysis and jurisdiction selection.';
+            }
+
+            const resultDiv = document.getElementById('fapt-qualify-result');
+            resultDiv.innerHTML = `
+                <div style="padding: 20px; background: white; border-radius: 8px;">
+                    <p style="font-size: 16px; margin-bottom: 15px;">${resultText}</p>
+                    <p style="font-size: 13px; color: #64748b; margin-top: 20px;">This tool provides educational guidance only. Suitability for offshore asset protection depends on detailed fact analysis, timing, and professional legal counsel.</p>
+                    <div style="text-align: center; margin-top: 20px;">
+                        <a href="mailto:owner@terms.law?subject=FAPT%20Consultation%20from%20Qualification%20Tool" class="cta-button">Schedule Consultation</a>
+                    </div>
+                </div>
+            `;
+            resultDiv.style.display = 'block';
+
+            document.querySelectorAll('.wizard-step').forEach(el => el.style.display = 'none');
+        }
+
+        // Anti-Freeze Pattern: Smart Arrow Display
+        const tabsWrapper = document.getElementById('tabsWrapper');
+        const tabNav = document.getElementById('tabNav');
+        const leftArrow = tabsWrapper ? tabsWrapper.querySelector('.tab-nav-arrow.left') : null;
+        const rightArrow = tabsWrapper ? tabsWrapper.querySelector('.tab-nav-arrow.right') : null;
+
+        function updateTabArrows() {
+            if (!tabNav || !leftArrow || !rightArrow) return;
+
+            const canScroll = tabNav.scrollWidth > tabNav.clientWidth + 5;
+            const atStart = tabNav.scrollLeft <= 5;
+            const atEnd = tabNav.scrollLeft + tabNav.clientWidth >= tabNav.scrollWidth - 5;
+
+            leftArrow.hidden = !canScroll || atStart;
+            rightArrow.hidden = !canScroll || atEnd;
+        }
+
+        function scrollTabs(event, direction) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+
+            if (!tabNav) return;
+
+            const scrollAmount = direction > 0 ? 220 : -220;
+            tabNav.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+
+            setTimeout(updateTabArrows, 320);
+        }
+
+        // Initialize arrows on page load
+        if (typeof document !== 'undefined') {
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', function() {
+                    updateTabArrows();
+                    if (tabNav) {
+                        tabNav.addEventListener('scroll', updateTabArrows);
+                    }
+                    window.addEventListener('resize', updateTabArrows);
+                });
+            } else {
+                updateTabArrows();
+                if (tabNav) {
+                    tabNav.addEventListener('scroll', updateTabArrows);
+                }
+                window.addEventListener('resize', updateTabArrows);
+            }
+        }
+    </script>
+</body>
+</html>
