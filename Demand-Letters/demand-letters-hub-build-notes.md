@@ -362,6 +362,17 @@ If left/right arrows are used to scroll a row of tab buttons:
 - Do not use sticky or fixed positioning that makes arrows float across unrelated content.
 - Do not duplicate arrows above and below the same tab row; they should appear once in a predictable place.
 
+### 3.4 Intent + persona filters on the Demand Letter Library page
+
+The master "Demand Letters" landing page now uses lightweight filters so visitors can signal whether they are sending or responding, what persona they fit, and the type of dispute. Implementation notes:
+
+- Intent toggle buttons live inside `.role-toggle` and use `data-intent="send|receive"`. Clicking simply updates button styling and toggles `body` classes `intent-send` / `intent-receive` so badges on the cards dim/brighten appropriately.
+- Persona chips use `.chip-button[data-persona]`. Only one persona should be active at a time; clicking an active chip clears the filter. Persona → clusters mappings are stored in `personaToClusters` inside the page JS.
+- Issue chips use `.chip-button[data-issue]`. They map to clusters via `issueToCluster`. If both persona and issue are selected, the issue drives the primary highlight while the persona reveals secondary clusters.
+- Every category card must have `data-cluster="cluster-key"` so the JS can add `.highlighted`, `.secondary`, or `.dimmed`. These classes only change presentation—no cards are ever removed from the DOM.
+- When launching a new cluster, update both the HTML `data-cluster` attribute and the JS mappings.
+- Keep this logic scoped to the landing page. Do not reuse the filter JS inside other widgets unless they follow the same markup.
+
 ---
 
 ## 4. Content structure for each hub
