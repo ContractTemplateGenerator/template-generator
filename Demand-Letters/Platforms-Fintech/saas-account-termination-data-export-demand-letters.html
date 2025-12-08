@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SaaS Account Termination & Data Export Demand Letters</title>
+    <style>
+        :root {
+            --primary: #0ea5e9;
+            --primary-dark: #0369a1;
+            --accent: #f43f5e;
+            --surface: #f0f9ff;
+            --text: #0f172a;
+        }
+
+        .demand-letter-hub * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        .demand-letter-hub {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            line-height: 1.7;
+            color: var(--text);
+            background: linear-gradient(135deg, #e0f2fe 0%, #fdf2f8 100%);
+            padding: 24px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 25px 50px rgba(14, 165, 233, 0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0ea5e9 0%, #14b8a6 100%);
+            color: #fff;
+            text-align: center;
+            padding: 52px 36px;
+        }
+
+        .header h1 { font-size: 2.4rem; margin-bottom: 12px; }
+        .header p { max-width: 900px; margin: 0 auto; opacity: 0.95; }
+
+        .tab-nav-wrapper {
+            background: #e0f2fe;
+            border-bottom: 3px solid var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 12px;
+            position: sticky;
+            top: 0;
+            z-index: 60;
+        }
+
+        .tab-nav-track { flex: 1; overflow: hidden; }
+        .tab-nav { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; scroll-behavior: smooth; }
+        .tab-nav::-webkit-scrollbar { display: none; }
+
+        .tab-button {
+            flex: 0 0 auto;
+            padding: 16px 22px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            font-weight: 600;
+            color: #475569;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.25s ease;
+        }
+
+        .tab-button:hover { color: var(--primary-dark); background: rgba(14,165,233,0.12); }
+        .tab-button.active { color: var(--primary-dark); border-bottom-color: var(--primary-dark); background: #fff; }
+
+        .tab-nav-arrow {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 1px solid rgba(14,165,233,0.4);
+            background: #fff;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 12px 24px rgba(14,165,233,0.25);
+        }
+
+        .tab-nav-arrow[hidden] { visibility: hidden; opacity: 0; }
+
+        .tab-content { display: none; padding: 40px; animation: fadeIn 0.45s ease; }
+        .tab-content.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+        .section-title { font-size: 1.9rem; color: var(--primary-dark); margin-bottom: 20px; }
+        .subsection-title { font-size: 1.2rem; font-weight: 600; margin: 24px 0 12px; }
+
+        .card {
+            border: 1px solid rgba(15,23,42,0.08);
+            border-radius: 14px;
+            padding: 24px;
+            margin-bottom: 20px;
+            background: var(--surface);
+        }
+
+        .info-card { background: #eff6ff; border-left: 5px solid var(--primary); }
+        .warning-card { background: #fef3c7; border-left: 5px solid var(--accent); }
+        .success-card { background: #dcfce7; border-left: 5px solid #16a34a; }
+
+        .grid-two { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        ul.styled-list { margin-left: 20px; }
+        ul.styled-list li { margin-bottom: 10px; }
+
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        table th, table td { border: 1px solid #e2e8f0; padding: 12px; text-align: left; }
+        table th { background: #bae6fd; color: var(--primary-dark); }
+
+        .sample-letter {
+            background: #0f172a;
+            color: #f8fafc;
+            padding: 24px;
+            border-radius: 12px;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+            margin: 20px 0;
+        }
+
+        .copy-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 18px;
+            background: var(--primary-dark);
+            color: #fff;
+            border: none;
+            border-radius: 999px;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: 0 12px 24px rgba(3,105,161,0.3);
+            transition: transform 0.2s ease;
+        }
+
+        .copy-button:hover { transform: translateY(-2px); }
+        .copy-button.copied { background: #16a34a; box-shadow: 0 12px 24px rgba(22,163,74,0.25); }
+
+        .cta-panel {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #1d4ed8 100%);
+            color: #fff;
+            border-radius: 18px;
+            padding: 32px;
+            margin: 20px 0 30px;
+            box-shadow: 0 25px 40px rgba(2, 132, 199, 0.25);
+        }
+
+        .faq-item { border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 12px; overflow: hidden; }
+        .faq-question { width: 100%; padding: 16px 20px; background: #f1f5f9; border: none; text-align: left; cursor: pointer; font-weight: 600; }
+        .faq-answer { display: none; padding: 18px 20px; background: #fff; }
+        .faq-item.open .faq-answer { display: block; }
+
+        @media (max-width: 768px) {
+            .demand-letter-hub { padding: 16px; }
+            .tab-content { padding: 28px 20px; }
+        }
+    </style>
+</head>
+<body>
+<div class="demand-letter-hub">
+    <div class="container">
+        <header class="header">
+            <h1>SaaS Account Termination & Data Export Demands</h1>
+            <p>When a SaaS vendor shuts down your workspace without notice, locks mission-critical data, or ignores GDPR/CCPA portability promises, a targeted demand letter aligns contract rights with data privacy obligations.</p>
+        </header>
+
+        <div class="tab-nav-wrapper" id="tabsWrapper">
+            <button class="tab-nav-arrow left" onclick="scrollTabs(event, -1)">‹</button>
+            <div class="tab-nav-track">
+                <div class="tab-nav" id="tabNav">
+                    <button class="tab-button active" onclick="switchTab('overview', event)">📊 Termination Overview</button>
+                    <button class="tab-button" onclick="switchTab('rights', event)">🛡️ Data Rights</button>
+                    <button class="tab-button" onclick="switchTab('evidence', event)">🧾 Evidence & Prep</button>
+                    <button class="tab-button" onclick="switchTab('strategy', event)">✍️ Letter Strategy</button>
+                    <button class="tab-button" onclick="switchTab('sample', event)">📄 Sample Letter</button>
+                    <button class="tab-button" onclick="switchTab('services', event)">👨‍⚖️ Attorney Services</button>
+                </div>
+            </div>
+            <button class="tab-nav-arrow right" onclick="scrollTabs(event, 1)">›</button>
+        </div>
+
+        <div id="tab-overview" class="tab-content active">
+            <div class="section-title">How SaaS Terminations Play Out</div>
+            <div class="info-card">
+                <strong>Common trigger events:</strong> vague "risk" flags, billing disputes, alleged abuse reports, or content moderation issues. Vendors often terminate first, explain later, and leave customers scrambling to export data before it is deleted.
+            </div>
+
+            <div class="subsection-title">Risk Matrix</div>
+            <table>
+                <tr>
+                    <th>Scenario</th>
+                    <th>Immediate Risk</th>
+                    <th>Demand Focus</th>
+                </tr>
+                <tr>
+                    <td>No notice termination</td>
+                    <td>Loss of mission-critical data</td>
+                    <td>Access window, data export in machine-readable format</td>
+                </tr>
+                <tr>
+                    <td>Account downgraded</td>
+                    <td>Limited features, partial data access</td>
+                    <td>Reinstatement or temporary upgrade during investigation</td>
+                </tr>
+                <tr>
+                    <td>Vendor claims policy violation</td>
+                    <td>Reputational harm, suspension of integrations</td>
+                    <td>Specific explanation, evidence review, mutual resolution</td>
+                </tr>
+                <tr>
+                    <td>Data held for unpaid invoices</td>
+                    <td>Vendor refuses export until payment</td>
+                    <td>Challenge as leverage or negotiate payment with guaranteed export</td>
+                </tr>
+            </table>
+
+            <div class="grid-two">
+                <div class="card">
+                    <h3>Mission-critical data categories</h3>
+                    <ul class="styled-list">
+                        <li>CRM records, subscription billing logs, customer tickets.</li>
+                        <li>Source code, repositories, CI/CD logs.</li>
+                        <li>Analytics dashboards, attribution data, marketing audiences.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Why letters work</h3>
+                    <ul class="styled-list">
+                        <li>Most vendors fear regulatory complaints for ignoring GDPR/CCPA portability rights.</li>
+                        <li>Demand letters document reliance and preserve claims for damages.</li>
+                        <li>Clear requests reduce back-and-forth with frontline support.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="warning-card">
+                <strong>Deletion clocks:</strong> Many SaaS contracts allow data deletion after 15-30 days. Send the letter quickly to preserve data and request suspension of deletion while the dispute is reviewed.
+            </div>
+        </div>
+
+        <div id="tab-rights" class="tab-content">
+            <div class="section-title">Contract & Privacy Data Rights</div>
+            <div class="subsection-title">Contractual Hooks</div>
+            <ul class="styled-list">
+                <li>Termination clause: Does it require notice, cure period, or specify grounds? Quote the clause.</li>
+                <li>Data retention/export section: Many ToS promise "commercially reasonable" export assistance.</li>
+                <li>Service-level or uptime commitments: Lockouts may breach availability obligations.</li>
+                <li>Choice of law and dispute resolution: Note governing law, arbitration, or forum selection.</li>
+            </ul>
+
+            <div class="subsection-title">Privacy & Portability</div>
+            <table>
+                <tr>
+                    <th>Regime</th>
+                    <th>Right</th>
+                    <th>Letter Application</th>
+                </tr>
+                <tr>
+                    <td>GDPR Article 20</td>
+                    <td>Receive personal data in structured, commonly used, machine-readable format</td>
+                    <td>Demand export of customer personal data across CRM, support, or analytics tables.</td>
+                </tr>
+                <tr>
+                    <td>GDPR Article 12/15</td>
+                    <td>Right of access and transparency</td>
+                    <td>Request detailed explanation of processing and a full copy of records.</td>
+                </tr>
+                <tr>
+                    <td>CCPA/CPRA §1798.130</td>
+                    <td>Access and data portability for California residents</td>
+                    <td>Ask for export in readily usable format and ability to transmit to another controller.</td>
+                </tr>
+                <tr>
+                    <td>FTC Act §5 / UDAP</td>
+                    <td>Prohibits deceptive representations</td>
+                    <td>Point out marketing promises about "download anytime" or "ownership of data" if broken.</td>
+                </tr>
+            </table>
+
+            <div class="success-card">
+                <strong>Even B2B data can be personal data.</strong> If the SaaS stores customer names, emails, or other identifiers, privacy statutes may apply regardless of business size.
+            </div>
+        </div>
+
+        <div id="tab-evidence" class="tab-content">
+            <div class="section-title">Evidence & Preparation</div>
+            <div class="grid-two">
+                <div class="card">
+                    <h3>Documents to gather</h3>
+                    <ul class="styled-list">
+                        <li>Master Subscription Agreement, Order Forms, DPAs, privacy policies.</li>
+                        <li>Screenshots of product pages promising export, uptime, or notice.</li>
+                        <li>Invoices, billing statements, proof of timely payments.</li>
+                        <li>Termination emails, support tickets, and chat transcripts.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Impact statement</h3>
+                    <ul class="styled-list">
+                        <li>Identify teams blocked (sales, support, dev) and deadlines missed.</li>
+                        <li>Quantify revenue at risk, churn, or compliance penalties.</li>
+                        <li>Explain regulatory obligations you must meet (tax records, consumer requests).</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="subsection-title">Technical Requests</div>
+            <ul class="styled-list">
+                <li>Read-only login or supervised export session.</li>
+                <li>Export of raw data via API or SFTP rather than PDF reports.</li>
+                <li>Extension of deletion date until 30 days after export completes.</li>
+                <li>Copy of audit logs showing what triggered termination.</li>
+            </ul>
+        </div>
+
+        <div id="tab-strategy" class="tab-content">
+            <div class="section-title">Letter Strategy & Escalation</div>
+            <div class="subsection-title">Structure</div>
+            <ol class="styled-list">
+                <li><strong>Introduction:</strong> Identify your company, account ID, and contract reference.</li>
+                <li><strong>Timeline:</strong> Subscription start, termination notice, communications, deadlines.</li>
+                <li><strong>Contract citations:</strong> Quote termination and data-export clauses, plus marketing statements if relevant.</li>
+                <li><strong>Privacy rights:</strong> Specify GDPR/CCPA applicability (data subjects, residency, processing location).</li>
+                <li><strong>Demands:</strong> Access window, export format, data preservation, explanation of termination grounds.</li>
+                <li><strong>Escalation:</strong> State intent to pursue contractual remedies, emergency relief, or complaints to regulators if ignored.</li>
+            </ol>
+
+            <div class="warning-card">
+                <strong>Be realistic:</strong> Some vendors will not reinstate accounts, but they almost always provide data once you cite privacy obligations and potential regulatory complaints.
+            </div>
+
+            <div class="subsection-title">Regulatory Escalation Targets</div>
+            <ul class="styled-list">
+                <li>Data Protection Authorities (EU/UK) for GDPR-covered data.</li>
+                <li>California Privacy Protection Agency for California customers.</li>
+                <li>FTC or state AG for misleading platform promises affecting U.S. users.</li>
+                <li>Arbitration or court seeking injunction to force export if refusal persists.</li>
+            </ul>
+        </div>
+
+        <div id="tab-sample" class="tab-content">
+            <div class="section-title">Sample SaaS Data Export Demand</div>
+            <button class="copy-button" onclick="copySampleLetter(event)">Copy sample language</button>
+            <div class="sample-letter" id="sampleLetter">[Date]
+
+Legal Department
+[Vendor Name]
+
+Re: Terminated Account #[ID] / Demand for Data Export and Explanation
+
+I represent [Company], a paying subscriber since [Year] to your [Product]. On [Termination Date] you disabled our account citing "[Reason]" and advised that all data may be deleted within [X] days. The Master Subscription Agreement (Section [#]) requires [notice/cure/export commitments], and your marketing materials state that customers may download their data at any time.
+
+Our workspace stores customer personal data, EU resident records, and California consumer information. As controller for this data, my client must comply with GDPR Articles 12 and 20 and Cal. Civ. Code §1798.130. Those statutes require you, as our processor/service provider, to provide personal data in a structured, commonly used, machine-readable format so the business can transmit it to another platform.
+
+Demand is made that no later than [Deadline]:
+1. Provide read-only access or supervised export for our team to download all contact, ticket, and analytics data.
+2. Deliver full exports (CSV/JSON) of the objects listed in Exhibit A via secure transfer.
+3. Preserve data and audit logs until 30 days after export completes and identify the contractual clause relied on for termination, with supporting facts.
+
+If you refuse, I will pursue injunctive relief under the Agreement and file complaints with the appropriate privacy regulators for failure to honor portability and misrepresentations about data access. I would prefer to resolve this directly and am available to coordinate a technical handoff.
+
+Communicate through owner@terms.law and confirm by [Date] that the export process is scheduled.
+
+Sincerely,
+Sergei Tokmakov
+Attorney for [Company]
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this, event)">Should I pay outstanding invoices before sending the letter?</button>
+                <div class="faq-answer">
+                    Determine whether invoices are valid. If the vendor is using termination to coerce payment, offer to escrow the disputed amount conditioned on full data export. Document your position either way.
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this, event)">What if the SaaS is outside the United States?</button>
+                <div class="faq-answer">
+                    Identify the contracting entity and governing law. GDPR rights apply if EU personal data is processed; many vendors also need U.S. market goodwill, so citing FTC/state law misrepresentation theories still provides leverage.
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-services" class="tab-content">
+            <div class="section-title">Attorney Services & Contact</div>
+            <div class="cta-panel">
+                <h2>Platform Lockout Response</h2>
+                <p>I help founders and ops teams unlock SaaS data, negotiate reinstatement, and file targeted complaints when vendors ignore portability commitments.</p>
+                <p>Reach me at <strong>owner@terms.law</strong> or via Calendly to discuss strategy.</p>
+                <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+                <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+                <a href="#" class="copy-button" onclick="Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting'});return false;">Schedule strategy call</a>
+            </div>
+
+            <div class="grid-two">
+                <div class="card">
+                    <h3>Representative Work</h3>
+                    <ul class="styled-list">
+                        <li>Emergency data-export demands for CRM, ticketing, and analytics platforms.</li>
+                        <li>Negotiating read-only access and transition timelines after termination.</li>
+                        <li>Preparing privacy regulator complaints that align with contractual claims.</li>
+                        <li>Pursuing arbitration or court relief when platforms refuse to cooperate.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Engagement Notes</h3>
+                    <ul class="styled-list">
+                        <li>Demand packages with evidence review typically range from $2,500-$5,000.</li>
+                        <li>Regulatory filings, arbitration, and litigation proceed on hourly billing with retainer.</li>
+                        <li>No free consultations. Calendly calls are reserved for teams ready to move forward.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const tabsWrapper = document.getElementById('tabsWrapper');
+    const tabNav = document.getElementById('tabNav');
+    const leftArrow = tabsWrapper ? tabsWrapper.querySelector('.tab-nav-arrow.left') : null;
+    const rightArrow = tabsWrapper ? tabsWrapper.querySelector('.tab-nav-arrow.right') : null;
+
+    function updateTabArrows() {
+        if (!tabNav || !leftArrow || !rightArrow) return;
+        const canScroll = tabNav.scrollWidth > tabNav.clientWidth + 5;
+        const atStart = tabNav.scrollLeft <= 5;
+        const atEnd = tabNav.scrollLeft + tabNav.clientWidth >= tabNav.scrollWidth - 5;
+        leftArrow.hidden = !canScroll || atStart;
+        rightArrow.hidden = !canScroll || atEnd;
+    }
+
+    function scrollTabs(event, direction) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        if (!tabNav) return;
+        const amount = direction > 0 ? 240 : -240;
+        tabNav.scrollBy({ left: amount, behavior: 'smooth' });
+        setTimeout(updateTabArrows, 320);
+    }
+
+    function switchTab(tabId, event) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        const buttons = document.querySelectorAll('.tab-button');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        if (event && event.currentTarget) event.currentTarget.classList.add('active');
+        const contents = document.querySelectorAll('.tab-content');
+        contents.forEach(content => content.classList.remove('active'));
+        const target = document.getElementById('tab-' + tabId);
+        if (target) target.classList.add('active');
+    }
+
+    async function copySampleLetter(event) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        const button = event ? event.currentTarget : null;
+        const sample = document.getElementById('sampleLetter');
+        if (!sample) return;
+        try {
+            await navigator.clipboard.writeText(sample.textContent.trim());
+            if (button) {
+                button.classList.add('copied');
+                button.textContent = 'Copied!';
+                setTimeout(() => {
+                    button.classList.remove('copied');
+                    button.textContent = 'Copy sample language';
+                }, 1800);
+            }
+        } catch (err) {
+            console.error('Clipboard copy failed', err);
+        }
+    }
+
+    function toggleFaq(button, event) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        const item = button.closest('.faq-item');
+        if (item) item.classList.toggle('open');
+    }
+
+    if (tabNav) {
+        tabNav.addEventListener('scroll', updateTabArrows);
+        window.addEventListener('resize', updateTabArrows);
+        window.addEventListener('load', updateTabArrows);
+        updateTabArrows();
+    }
+</script>
+</body>
+</html>

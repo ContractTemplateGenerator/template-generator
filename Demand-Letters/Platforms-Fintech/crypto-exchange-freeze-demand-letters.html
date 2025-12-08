@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Exchange Freeze Demand Letters | Compliance Review Playbook</title>
+    <style>
+        :root {
+            --primary: #22d3ee;
+            --primary-dark: #0e7490;
+            --accent: #facc15;
+            --surface: #ecfeff;
+            --text: #082f49;
+        }
+
+        .demand-letter-hub * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        .demand-letter-hub {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            line-height: 1.7;
+            color: var(--text);
+            background: linear-gradient(135deg, #e0f2fe 0%, #ecfccb 100%);
+            padding: 24px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 25px 40px rgba(14, 116, 144, 0.25);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0e7490 0%, #14b8a6 100%);
+            color: #fff;
+            text-align: center;
+            padding: 50px 36px;
+        }
+
+        .header h1 { font-size: 2.5rem; margin-bottom: 12px; }
+        .header p { max-width: 900px; margin: 0 auto; opacity: 0.95; }
+
+        .tab-nav-wrapper {
+            background: #cffafe;
+            border-bottom: 3px solid var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 12px;
+            position: sticky;
+            top: 0;
+            z-index: 60;
+        }
+
+        .tab-nav-track { flex: 1; overflow: hidden; }
+        .tab-nav { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; scroll-behavior: smooth; }
+        .tab-nav::-webkit-scrollbar { display: none; }
+
+        .tab-button {
+            flex: 0 0 auto;
+            padding: 16px 22px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            font-weight: 600;
+            color: #0f172a;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.25s ease;
+        }
+
+        .tab-button:hover { color: var(--primary-dark); background: rgba(14,116,144,0.1); }
+        .tab-button.active { color: var(--primary-dark); border-bottom-color: var(--primary-dark); background: #fff; }
+
+        .tab-nav-arrow {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 1px solid rgba(14,116,144,0.4);
+            background: #fff;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 12px 24px rgba(14,116,144,0.25);
+        }
+
+        .tab-nav-arrow[hidden] { visibility: hidden; opacity: 0; }
+
+        .tab-content { display: none; padding: 40px; animation: fadeIn 0.45s ease; }
+        .tab-content.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+        .section-title { font-size: 1.9rem; color: var(--primary-dark); margin-bottom: 20px; }
+        .subsection-title { font-size: 1.2rem; font-weight: 600; margin: 24px 0 12px; }
+
+        .card {
+            border: 1px solid rgba(8,47,73,0.1);
+            border-radius: 14px;
+            padding: 24px;
+            margin-bottom: 20px;
+            background: var(--surface);
+        }
+
+        .info-card { background: #e0f2fe; border-left: 5px solid var(--primary-dark); }
+        .warning-card { background: #fef9c3; border-left: 5px solid var(--accent); }
+        .success-card { background: #dcfce7; border-left: 5px solid #16a34a; }
+
+        .grid-two { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        ul.styled-list { margin-left: 20px; }
+        ul.styled-list li { margin-bottom: 10px; }
+
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        table th, table td { border: 1px solid #e2e8f0; padding: 12px; text-align: left; }
+        table th { background: #bae6fd; color: var(--primary-dark); }
+
+        .sample-letter {
+            background: #082f49;
+            color: #ecfeff;
+            padding: 24px;
+            border-radius: 12px;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+            margin: 20px 0;
+        }
+
+        .copy-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 18px;
+            background: var(--primary-dark);
+            color: #fff;
+            border: none;
+            border-radius: 999px;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: 0 12px 24px rgba(14,116,144,0.25);
+            transition: transform 0.2s ease;
+        }
+
+        .copy-button:hover { transform: translateY(-2px); }
+        .copy-button.copied { background: #16a34a; box-shadow: 0 12px 24px rgba(22,163,74,0.25); }
+
+        .cta-panel {
+            background: linear-gradient(135deg, #0e7490 0%, #075985 100%);
+            color: #fff;
+            border-radius: 18px;
+            padding: 30px;
+            margin: 20px 0 30px;
+            box-shadow: 0 25px 40px rgba(8,47,73,0.35);
+        }
+
+        .faq-item { border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 12px; overflow: hidden; }
+        .faq-question { width: 100%; padding: 16px 20px; background: #f1f5f9; border: none; text-align: left; cursor: pointer; font-weight: 600; }
+        .faq-answer { display: none; padding: 18px 20px; background: #fff; }
+        .faq-item.open .faq-answer { display: block; }
+
+        @media (max-width: 768px) {
+            .demand-letter-hub { padding: 16px; }
+            .tab-content { padding: 28px 20px; }
+        }
+    </style>
+</head>
+<body>
+<div class="demand-letter-hub">
+    <div class="container">
+        <header class="header">
+            <h1>Crypto Exchange Freeze Demand Letters</h1>
+            <p>Compliance reviews, AML holds, and OFAC screenings can freeze your fiat and crypto balances for weeks. Use this playbook to document legitimate source-of-funds, push for timelines, and escalate when a review drags on.</p>
+        </header>
+
+        <div class="tab-nav-wrapper" id="tabsWrapper">
+            <button class="tab-nav-arrow left" onclick="scrollTabs(event, -1)">‹</button>
+            <div class="tab-nav-track">
+                <div class="tab-nav" id="tabNav">
+                    <button class="tab-button active" onclick="switchTab('overview', event)">🔒 Why Accounts Freeze</button>
+                    <button class="tab-button" onclick="switchTab('compliance', event)">⚖️ Compliance Framework</button>
+                    <button class="tab-button" onclick="switchTab('evidence', event)">🕵️ Documentation</button>
+                    <button class="tab-button" onclick="switchTab('strategy', event)">✍️ Letter Strategy</button>
+                    <button class="tab-button" onclick="switchTab('sample', event)">📄 Sample Letter</button>
+                    <button class="tab-button" onclick="switchTab('services', event)">👨‍⚖️ Attorney Services</button>
+                </div>
+            </div>
+            <button class="tab-nav-arrow right" onclick="scrollTabs(event, 1)">›</button>
+        </div>
+
+        <div id="tab-overview" class="tab-content active">
+            <div class="section-title">Common Freeze Triggers</div>
+            <table>
+                <tr>
+                    <th>Trigger</th>
+                    <th>Exchange Action</th>
+                    <th>Resolution Window</th>
+                </tr>
+                <tr>
+                    <td>Large inbound transfer from new wallet</td>
+                    <td>Hold pending source-of-funds interview</td>
+                    <td>3-14 days if documents provided</td>
+                </tr>
+                <tr>
+                    <td>Rapid in-and-out transfers</td>
+                    <td>Flagged for layering/mixing risk</td>
+                    <td>7-30 days, sometimes permanent closure</td>
+                </tr>
+                <tr>
+                    <td>Link to sanctioned address</td>
+                    <td>Freeze or block until OFAC guidance</td>
+                    <td>Indefinite unless license granted</td>
+                </tr>
+                <tr>
+                    <td>Chargeback or scam victim report</td>
+                    <td>Hold fiat balances pending investigation</td>
+                    <td>Varies; often 30-60 days</td>
+                </tr>
+                <tr>
+                    <td>KYC mismatch or expired ID</td>
+                    <td>Account locked until documents updated</td>
+                    <td>24-72 hours once ID verified</td>
+                </tr>
+            </table>
+
+            <div class="grid-two">
+                <div class="card">
+                    <h3>Why demand letters matter</h3>
+                    <ul class="styled-list">
+                        <li>Escalate beyond front-line support to legal/compliance teams.</li>
+                        <li>Document cooperation and show that funds are legitimate.</li>
+                        <li>Create record for regulators if the freeze violates policies.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Realistic expectations</h3>
+                    <ul class="styled-list">
+                        <li>OFAC or law-enforcement holds cannot be overridden by a demand letter.</li>
+                        <li>Compliance teams can release funds once risk questions are answered.</li>
+                        <li>Letters can secure partial withdrawals or timelines when reviews drag on.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="warning-card">
+                <strong>Do not ask the exchange to violate AML obligations.</strong> Focus on transparency, documentation, and timelines instead of demanding immediate release without review.
+            </div>
+        </div>
+
+        <div id="tab-compliance" class="tab-content">
+            <div class="section-title">Regulatory & Contract Framework</div>
+            <div class="subsection-title">AML / BSA</div>
+            <ul class="styled-list">
+                <li>U.S. exchanges operate as money services businesses under the Bank Secrecy Act. They must monitor transactions, file Suspicious Activity Reports (SARs), and sometimes hold funds while reviews occur.</li>
+                <li>FinCEN guidance on convertible virtual currency lists red flags such as mixers, darknet markets, and rapid movement through new accounts.</li>
+            </ul>
+
+            <div class="subsection-title">Sanctions (OFAC)</div>
+            <ul class="styled-list">
+                <li>If funds are linked to sanctioned persons or jurisdictions, exchanges must block the property and report to OFAC within ten business days. Releases require OFAC authorization.</li>
+                <li>Demand letters can still request clarity: Is this a blocking obligation or an internal risk hold?</li>
+            </ul>
+
+            <div class="subsection-title">Exchange Agreements</div>
+            <ul class="styled-list">
+                <li>User agreements reserve broad rights to suspend or close accounts. Highlight conflicting sections that promise timely communication or withdrawal rights.</li>
+                <li>Most agreements require arbitration. Demand letters preserve the record and can lead to negotiated releases before arbitration is filed.</li>
+            </ul>
+
+            <div class="success-card">
+                <strong>Consumer protection overlay:</strong> Regulators scrutinize fintechs that freeze funds for months without explanation. Pointing to state UDAP standards and CFPB/FTC expectations on communication often moves compliance teams.
+            </div>
+        </div>
+
+        <div id="tab-evidence" class="tab-content">
+            <div class="section-title">Documentation Checklist</div>
+            <div class="grid-two">
+                <div class="card">
+                    <h3>Account History</h3>
+                    <ul class="styled-list">
+                        <li>Account opening date, KYC level, jurisdiction.</li>
+                        <li>Past volume, average balances, trading pairs used.</li>
+                        <li>Prior compliance reviews or tickets.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Source of Funds</h3>
+                    <ul class="styled-list">
+                        <li>Bank statements showing fiat deposits.</li>
+                        <li>On-chain explorers linking deposits to regulated exchanges.</li>
+                        <li>Invoices, payroll statements, or sale agreements for larger inflows.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="subsection-title">Communication Trail</div>
+            <ul class="styled-list">
+                <li>Support ticket numbers, email threads, chatbot transcripts.</li>
+                <li>Requests for documents and proof of your responses.</li>
+                <li>Any statements that funds would be released by a certain date.</li>
+            </ul>
+
+            <div class="subsection-title">Partner Bank Considerations</div>
+            <ul class="styled-list">
+                <li>If fiat balances sit with a partner bank, note the bank's identity. Some disputes fall under banking regulators or the CFPB.</li>
+                <li>Gather account and routing numbers, statements, and any FDIC references the exchange used in marketing.</li>
+            </ul>
+        </div>
+
+        <div id="tab-strategy" class="tab-content">
+            <div class="section-title">Letter Strategy</div>
+            <div class="subsection-title">Tone & Objectives</div>
+            <ul class="styled-list">
+                <li>Emphasize cooperation: "I am providing the following documents and request an updated review timeline."</li>
+                <li>Ask whether the freeze stems from sanctions, SAR obligations, or internal policy.</li>
+                <li>Request partial releases if certain assets are clearly unrelated to the flagged activity.</li>
+                <li>Document hardship (payroll, tax payments) without accusing the exchange of wrongdoing.</li>
+            </ul>
+
+            <div class="subsection-title">Key Sections</div>
+            <ol class="styled-list">
+                <li><strong>Background:</strong> Account age, verification level, transaction history.</li>
+                <li><strong>Freeze timeline:</strong> Dates of deposits, restriction notices, and support contacts.</li>
+                <li><strong>Compliance acknowledgment:</strong> Recognize AML/BSA duties while requesting clarity.</li>
+                <li><strong>Documentation summary:</strong> Highlight source-of-funds exhibits.</li>
+                <li><strong>Specific requests:</strong> Determination letter, release timeline, partial withdrawals, escalation contact.</li>
+                <li><strong>Escalation notice:</strong> Potential arbitration, regulator complaints, or legal claims for breach of contract/unfair practices if no response.</li>
+            </ol>
+
+            <div class="warning-card">
+                <strong>Law-enforcement holds:</strong> If the exchange states that law enforcement requested the freeze, ask for contact information and case number. They may only release funds when authorities permit it.
+            </div>
+        </div>
+
+        <div id="tab-sample" class="tab-content">
+            <div class="section-title">Sample Crypto Freeze Demand Letter</div>
+            <button class="copy-button" onclick="copySampleLetter(event)">Copy sample language</button>
+            <div class="sample-letter" id="sampleLetter">[Date]
+
+Compliance Department
+[Exchange Name]
+
+Re: Account #[ID] / Frozen balances totaling $[Amount]
+
+I am counsel for [Customer], an account holder since [Year] who completed Level [KYC] verification. On [Date] you restricted trading, withdrawals, and fiat transfers, citing "compliance review" ticket #[Ticket]. Our client promptly supplied requested documents on [Dates] (government ID, bank statements, purchase agreements) but has received no timeline for release.
+
+Our review of the account shows:
+• Deposits originated from [Bank/Exchange], a regulated financial institution.
+• On-chain analysis confirms funds came from wallets controlled by [Customer], not mixers or sanctioned addresses.
+• No law-enforcement notice or subpoena has been provided.
+
+My client respects your obligations under the Bank Secrecy Act, FinCEN guidance, and OFAC regulations. This letter requests clarification on whether the freeze is a sanctions block, SAR-related hold, or discretionary account closure, and asks that you release or allow staged withdrawals of funds not subject to a blocking requirement.
+
+Unless you identify a legal prohibition, please within seven (7) days:
+1. Provide a written explanation referencing the applicable section of the User Agreement and compliance policy;
+2. Confirm whether any portion of the funds are held due to an OFAC block or law-enforcement directive;
+3. Schedule a release of eligible fiat and crypto balances or provide a concrete timeline for review completion.
+
+If no response is received, I will pursue remedies for breach of contract and unfair practices, and elevate the matter to the relevant financial regulators. Contact owner@terms.law to coordinate. My client remains ready to supply any additional documentation you require.
+
+Sincerely,
+Sergei Tokmakov
+Attorney for [Customer]
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this, event)">Should I mention filing a regulator complaint?</button>
+                <div class="faq-answer">
+                    Yes, but keep it factual: identify the agency with jurisdiction (state banking department, CFPB for partner banks, or state AG for unfair practices) without threatening criminal charges.
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question" onclick="toggleFaq(this, event)">Can I demand compensation for trading losses?</button>
+                <div class="faq-answer">
+                    Most exchange agreements disclaim consequential damages. Focus on releasing funds; damages claims are difficult unless you can prove breach of specific contractual promises.
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-services" class="tab-content">
+            <div class="section-title">Attorney Services & Contact</div>
+            <div class="cta-panel">
+                <h2>Frozen Exchange Account Advocacy</h2>
+                <p>I represent traders, startups, and funds dealing with prolonged crypto exchange freezes, fiat holds, and compliance reviews.</p>
+                <p>Email <strong>owner@terms.law</strong> or use Calendly for a paid strategy session.</p>
+                <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+                <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+                <a href="#" class="copy-button" onclick="Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting'});return false;">Schedule strategy call</a>
+            </div>
+
+            <div class="grid-two">
+                <div class="card">
+                    <h3>Services</h3>
+                    <ul class="styled-list">
+                        <li>Compliance-focused demand letters with source-of-funds exhibits.</li>
+                        <li>Escalations to partner banks, regulators, and arbitration forums.</li>
+                        <li>Negotiating partial releases or staged withdrawals.</li>
+                        <li>Coordinating with forensic accountants for on-chain tracing.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Engagement Notes</h3>
+                    <ul class="styled-list">
+                        <li>Demand packages typically begin at $3,000 due to technical review.</li>
+                        <li>Arbitration, litigation, and regulator complaints proceed on hourly billing with retainer.</li>
+                        <li>No free consultations. Calendly calls are limited to clients ready to move forward.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const tabsWrapper = document.getElementById('tabsWrapper');
+    const tabNav = document.getElementById('tabNav');
+    const leftArrow = tabsWrapper ? tabsWrapper.querySelector('.tab-nav-arrow.left') : null;
+    const rightArrow = tabsWrapper ? tabsWrapper.querySelector('.tab-nav-arrow.right') : null;
+
+    function updateTabArrows() {
+        if (!tabNav || !leftArrow || !rightArrow) return;
+        const canScroll = tabNav.scrollWidth > tabNav.clientWidth + 5;
+        const atStart = tabNav.scrollLeft <= 5;
+        const atEnd = tabNav.scrollLeft + tabNav.clientWidth >= tabNav.scrollWidth - 5;
+        leftArrow.hidden = !canScroll || atStart;
+        rightArrow.hidden = !canScroll || atEnd;
+    }
+
+    function scrollTabs(event, direction) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        if (!tabNav) return;
+        const amount = direction > 0 ? 240 : -240;
+        tabNav.scrollBy({ left: amount, behavior: 'smooth' });
+        setTimeout(updateTabArrows, 320);
+    }
+
+    function switchTab(tabId, event) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        const buttons = document.querySelectorAll('.tab-button');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        if (event && event.currentTarget) event.currentTarget.classList.add('active');
+        const contents = document.querySelectorAll('.tab-content');
+        contents.forEach(content => content.classList.remove('active'));
+        const target = document.getElementById('tab-' + tabId);
+        if (target) target.classList.add('active');
+    }
+
+    async function copySampleLetter(event) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        const button = event ? event.currentTarget : null;
+        const sample = document.getElementById('sampleLetter');
+        if (!sample) return;
+        try {
+            await navigator.clipboard.writeText(sample.textContent.trim());
+            if (button) {
+                button.classList.add('copied');
+                button.textContent = 'Copied!';
+                setTimeout(() => {
+                    button.classList.remove('copied');
+                    button.textContent = 'Copy sample language';
+                }, 1800);
+            }
+        } catch (err) {
+            console.error('Clipboard copy failed', err);
+        }
+    }
+
+    function toggleFaq(button, event) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        const item = button.closest('.faq-item');
+        if (item) item.classList.toggle('open');
+    }
+
+    if (tabNav) {
+        tabNav.addEventListener('scroll', updateTabArrows);
+        window.addEventListener('resize', updateTabArrows);
+        window.addEventListener('load', updateTabArrows);
+        updateTabArrows();
+    }
+</script>
+</body>
+</html>
