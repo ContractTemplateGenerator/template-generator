@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demand Letter Library | Terms.Law</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ============================================
+       LIGHT THEME - WordPress Compatible
+       ============================================ */
+    :root {
+      --color-primary: #1e3a5f;
+      --color-primary-light: #2563eb;
+      --color-accent: #e91e8c;
+      --color-accent-light: #f472b6;
+
+      --color-bg: #ffffff;
+      --color-surface: #ffffff;
+      --color-surface-alt: #f8fafc;
+      --color-border: #e5e7eb;
+      --color-border-light: #f3f4f6;
+
+      --color-text: #1f2937;
+      --color-text-secondary: #4b5563;
+      --color-text-muted: #6b7280;
+
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-full: 9999px;
+
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      font-family: var(--font-sans);
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--color-text);
+      background: var(--color-bg);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ============================================
+       INTRO SECTION
+       ============================================ */
+    .intro-section {
+      padding: 32px 0 24px;
+      text-align: center;
+      border-bottom: 1px solid var(--color-border-light);
+      margin-bottom: 24px;
+    }
+
+    .intro-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--color-primary);
+      margin-bottom: 12px;
+    }
+
+    .intro-subtitle {
+      font-size: 1rem;
+      color: var(--color-text-secondary);
+      max-width: 700px;
+      margin: 0 auto 20px;
+    }
+
+    .intro-stats {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+
+    .intro-stat {
+      text-align: center;
+    }
+
+    .intro-stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color-accent);
+    }
+
+    .intro-stat-label {
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    /* ============================================
+       SEARCH & FILTER
+       ============================================ */
+    .search-section {
+      padding: 20px 0;
+      position: sticky;
+      top: 0;
+      background: var(--color-bg);
+      z-index: 50;
+      border-bottom: 1px solid var(--color-border-light);
+    }
+
+    .search-container {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .search-input-wrapper {
+      flex: 1;
+      min-width: 280px;
+      position: relative;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--color-text-muted);
+      font-size: 1rem;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 12px 16px 12px 42px;
+      font-size: 0.95rem;
+      font-family: var(--font-sans);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      background: var(--color-surface);
+      transition: all 0.2s ease;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--color-primary-light);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .filter-tabs {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .filter-tab {
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--color-text-secondary);
+      background: var(--color-surface-alt);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .filter-tab:hover {
+      background: var(--color-surface);
+      border-color: var(--color-primary-light);
+      color: var(--color-primary);
+    }
+
+    .filter-tab.active {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: #fff;
+    }
+
+    /* ============================================
+       CATEGORY GRID
+       ============================================ */
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 24px;
+      padding: 24px 0 48px;
+    }
+
+    .category-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      transition: all 0.2s ease;
+    }
+
+    .category-card:hover {
+      box-shadow: var(--shadow-lg);
+      border-color: var(--color-border);
+    }
+
+    .category-header {
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid var(--color-border-light);
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .category-icon {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, var(--color-surface-alt), var(--color-border-light));
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+
+    .category-info {
+      flex: 1;
+    }
+
+    .category-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--color-text);
+      margin-bottom: 4px;
+    }
+
+    .category-description {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      line-height: 1.5;
+    }
+
+    .category-count {
+      background: var(--color-surface-alt);
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--color-text-muted);
+    }
+
+    .category-guides {
+      padding: 12px 20px 20px;
+    }
+
+    .guide-list {
+      list-style: none;
+    }
+
+    .guide-list li {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--color-border-light);
+    }
+
+    .guide-list li:last-child {
+      border-bottom: none;
+    }
+
+    .guide-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--color-text-secondary);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.15s ease;
+    }
+
+    .guide-link:hover {
+      color: var(--color-primary);
+    }
+
+    .guide-link.coming-soon {
+      color: var(--color-text-muted);
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .guide-type-badge {
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      flex-shrink: 0;
+    }
+
+    .guide-type-badge.send {
+      background: rgba(16, 185, 129, 0.1);
+      color: #059669;
+    }
+
+    .guide-type-badge.respond {
+      background: rgba(239, 68, 68, 0.1);
+      color: #dc2626;
+    }
+
+    .coming-soon-badge {
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      background: var(--color-surface-alt);
+      color: var(--color-text-muted);
+      border-radius: var(--radius-full);
+    }
+
+    /* Show more link */
+    .show-more {
+      display: block;
+      text-align: center;
+      padding: 12px;
+      margin-top: 8px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--color-primary-light);
+      background: var(--color-surface-alt);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .show-more:hover {
+      background: rgba(37, 99, 235, 0.1);
+    }
+
+    /* ============================================
+       CTA SECTION
+       ============================================ */
+    .cta-section {
+      background: linear-gradient(135deg, var(--color-primary) 0%, #0f2744 100%);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      margin: 24px 0 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .cta-content h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .cta-content p {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.95rem;
+      max-width: 500px;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: #fff;
+      color: var(--color-primary);
+      border: none;
+    }
+
+    .btn-primary:hover {
+      background: #f8fafc;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    /* ============================================
+       FOOTER NOTE
+       ============================================ */
+    .footer-note {
+      text-align: center;
+      padding: 24px;
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+      border-top: 1px solid var(--color-border-light);
+    }
+
+    .footer-note a {
+      color: var(--color-primary-light);
+    }
+
+    /* ============================================
+       RESPONSIVE
+       ============================================ */
+    @media (max-width: 768px) {
+      .intro-title {
+        font-size: 1.5rem;
+      }
+
+      .categories-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .cta-section {
+        text-align: center;
+        justify-content: center;
+      }
+
+      .cta-buttons {
+        justify-content: center;
+      }
+
+      .search-container {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .filter-tabs {
+        justify-content: center;
+      }
+    }
+
+    /* Hidden class for filtering */
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Intro Section -->
+  <section class="intro-section">
+    <div class="container">
+      <h1 class="intro-title">Demand Letter Library</h1>
+      <p class="intro-subtitle">
+        150+ attorney-drafted guides covering how to send and respond to demand letters. Browse by category, find your situation, and take action.
+      </p>
+      <div class="intro-stats">
+        <div class="intro-stat">
+          <div class="intro-stat-value">150+</div>
+          <div class="intro-stat-label">Guides</div>
+        </div>
+        <div class="intro-stat">
+          <div class="intro-stat-value">13</div>
+          <div class="intro-stat-label">Categories</div>
+        </div>
+        <div class="intro-stat">
+          <div class="intro-stat-value">$450</div>
+          <div class="intro-stat-label">Custom Letters</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Search & Filter -->
+  <section class="search-section">
+    <div class="container">
+      <div class="search-container">
+        <div class="search-input-wrapper">
+          <span class="search-icon">🔍</span>
+          <input type="text" class="search-input" id="searchInput" placeholder="Search guides (e.g., 'landlord', 'refund', 'contractor')..." oninput="filterGuides()">
+        </div>
+        <div class="filter-tabs">
+          <button class="filter-tab active" data-filter="all" onclick="filterByCategory('all')">All</button>
+          <button class="filter-tab" data-filter="send" onclick="filterByCategory('send')">Send</button>
+          <button class="filter-tab" data-filter="respond" onclick="filterByCategory('respond')">Respond</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Categories Grid -->
+  <section class="container">
+    <div class="categories-grid" id="categoriesGrid">
+
+      <!-- Personal Injury & Insurance -->
+      <div class="category-card" data-category="injury">
+        <div class="category-header">
+          <div class="category-icon">🏥</div>
+          <div class="category-info">
+            <h3 class="category-title">Personal Injury & Insurance</h3>
+            <p class="category-description">Accident claims, injury demands, and insurance disputes</p>
+          </div>
+          <span class="category-count">12</span>
+        </div>
+        <div class="category-guides">
+          <ul class="guide-list">
+            <li><a href="https://terms.law/demand-letter-for-car-accident-injury-guide/" target="_blank" class="guide-link">Car accident injury claim <span class="guide-type-badge send">Send</span></a></li>
+            <li><a href="https://terms.law/slip-and-fall-demand-letters/" target="_blank" class="guide-link">Slip and fall premises liability <span class="guide-type-badge send">Send</span></a></li>
+            <li><a href="https://terms.law/insurance-bad-faith-demand-letter/" target="_blank" class="guide-link">Insurance bad faith claims <span class="guide-type-badge send">Send</span></a></li>
+            <li><a href="https://terms.law/how-to-respond-to-a-personal-injury-demand-letter/" target="_blank" class="guide-link">Responding to injury claims <span class="guide-type-badge respond">Respond</span></a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Employment & Workplace -->
+      <div class="category-card" data-category="employment">
+        <div class="category-header">
+          <div class="category-icon">💼</div>
+          <div class="category-info">
+            <h3 class="category-title">Employment & Workplace</h3>
+            <p class="category-description">Wage claims, discrimination, wrongful termination</p>
+          </div>
+          <span class="category-count">15</span>
+        </div>
+        <div class="category-guides">
+          <ul class="guide-list">
+            <li><a href="https://terms.law/unpaid-wages-demand-letters/" target="_blank" class="guide-link">Unpaid wages and overtime <span class="guide-type-badge send">Send</span></a></li>
+            <li><a href="https://terms.law/wrongful-termination-demand-letters/" target="_blank" class="guide-link">Wrongful termination <span class="guide-type-badge send">Send</span></a></li>
+            <li><a href="https://terms.law/workplace-discrimination-demand-letters/" target="_blank" class="guide-link">Workplace discrimination <span class="guide-type-badge send">Send</span></a></li>
+            <li><a href="https://terms.law/how-to-respond-to-an-employee-demand-letter/" target="_blank" class="guide-link">Responding as employer <span class="guide-type-badge respond">Respond</span></a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Consumer Protection -->
+      <div class="category-card" data-category="consumer">
+        <div class="category-header">
+          <div class="category-icon">🛒</div>
+          <div class="category-info">
+            <h3 class="category-title">Consumer Protection</h3>
+            <p class="category-description">Refunds, warranties, subscription disputes, fraud</p>
+          </div>
+          <span class="category-count">18</span>
+        </div>
+        <div class="category-guides">
+          <ul class="guide-list">
+            <li><a href="https://template.terms.law/Demand-Letters/Consumer/defective-product-refund-demand-letters.html" target="_blank" class="guide-link">Defective product refunds <span class="guide-type-badge send">Send</span></a></li>
+            <li><a href="https://template.terms.law/Demand-Letters/Consumer/unauthorized-subscription-charge-demand-letters.html" target="_blank" class="guide-link">Unauthorized subscription charges <span class="guide-type-badge send">Send</span></a></li>
+            <li><a href="https://template.terms.law/Demand-Letters/Consumer/auto-renewal-cancellation-demand-letters.html" target="_blank" class="guide-link">Auto-renewal disputes <span class="guide-type-badge send">Send</span></a></li>
+            <li><a href="https://template.terms.law/Demand-Letters/Consumer/timeshare-exit-rescission-demand-letters.html" target="_blank" class="guide-link">Timeshare exit/rescission <span class="guide-type-badge send">Send</span></a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Real Estate & Landlord-Tenant -->
+      <div class="category-card" data-category="realestate">
+        <div class="category-header">
+          <div class="category-icon">🏠</div>
+          <div class="category-info">
+            <h3 class="category-title">Real Estate & Landlord-Tenant</h3>
+            <p class="category-description">Security deposits, lease disputes, property issues</p>
+          </div>
+          <span class="category-count">14</span>
+        </div>
+        <div class="category-guides">
+          <ul class="guide-list">
+            <li><a href="https://terms.law/demand-letter-for-security-deposit-return/" target="_blank" class="guide-link">Security deposit return <span class="guide-type-badge send">Send</span></a></li>
+            <li><a href="https://terms.law/rent-increase-dispute-demand-letters/" target="_blank" class="guide-link">Rent increase disputes <span class="guide-type-badge send">Send</span></a></li>
+            <li><a href="https://terms.law/habitability-repair-demand-letters/" target="_blank" class="guide-link">Habitability & repair demands <span class="guide-type-badge send">Send</span></a></li>
+            <li><a href="https://terms.law/how-to-respond-to-landlord-tenant-demand-letter/" target="_blank" class="guide-link">Responding as landlord <span class="guide-type-badge respond">Respond</span></a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Contract & Business -->
+      <div class="category-card" data-category="business">
+        <div class="category-header">
+          <div class="category-icon">📋</div>
+          <div class="category-info">
+            <h3 class="category-title">Contract & Business Disputes</h3>
+            <p class="category-description">Breach of contract, vendor disputes, partnership issues</p>
+          </div>
+          <span class="category-count">16</span>
+        </div>
+        <div class="category-guides">
+          <ul class="guide-list">
+            <li><a href="https://terms.law/breach-of-contract-demand-letter-guide/" target="_blank" class="guide-link">Breach of contract <span class="guide-type-badge send">Send</span></a></li>
+            <li><a href="https://terms.law/non-payment-demand-letters/" target="_blank" class="guide-link">Non-payment/collections <span class="guide-type-badge send">Send</span></a></li>
+            <li><a href="https://template.terms.law/Demand-Letters/Business/shareholder-minority-oppression-demand-letters.html" target="_blank" class="guide-link">Shareholder disputes <span class="guide-type-badge send">Send</span></a></li>
+            <li><a href="https://terms.law/how-to-respond-breach-of-contract-demand-letter/" target="_blank" class="guide-link">Responding to breach claims <span class="guide-type-badge respond">Respond</span></a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Defamation & Privacy -->
+      <div class="category-card" data-category="defamation">
+        <div class="category-header">
+          <div class="category-icon">🛡️</div>
+          <div class="category-info">
+            <h3 class="category-title">Defamation & Privacy</h3>
+            <p class="category-description">Slander, libel, online reviews, data privacy</p>
+          </div>
+          <span class="category-count">8</span>
+        </div>
+        <div class="category-guides">
+          <ul class="guide-list">
+            <li><a href="https://terms.law/cease-and-desist-defamation-letters/" target="_blank" class="guide-link">Cease and desist for defamation <span class="guide-type-badge send">Send</span></a></li>
+            <li><a href="https://terms.law/online-review-defamation-demand-letters/" target="_blank" class="guide-link">Online review removal <span class="guide-type-badge send">Send</span></a></li>
+            <li><a href="https://terms.law/data-privacy-breach-demand-letters/" target="_blank" class="guide-link">Data privacy violations <span class="guide-type-badge send">Send</span></a></li>
+            <li><a href="https://terms.law/how-to-respond-to-a-defamation-demand-letter/" target="_blank" class="guide-link">Responding to defamation claims <span class="guide-type-badge respond">Respond</span></a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Family & Domestic -->
+      <div class="category-card" data-category="family">
+        <div class="category-header">
+          <div class="category-icon">👨‍👩‍👧</div>
+          <div class="category-info">
+            <h3 class="category-title">Family & Domestic</h3>
+            <p class="category-description">Child support, custody, spousal support, property</p>
+          </div>
+          <span class="category-count">9</span>
+        </div>
+        <div class="category-guides">
+          <ul class="guide-list">
+            <li><a href="https://template.terms.law/Demand-Letters/Family/child-support-enforcement-demand-letters.html" target="_blank" class="guide-link">Child support enforcement <span class="guide-type-badge send">Send</span></a></li>
+            <li><a href="https://template.terms.law/Demand-Letters/Family/custody-visitation-violation-demand-letters.html" target="_blank" class="guide-link">Custody/visitation violations <span class="guide-type-badge send">Send</span></a></li>
+            <li><a href="https://template.terms.law/Demand-Letters/Family/divorce-property-division-demand-letters.html" target="_blank" class="guide-link">Divorce property disputes <span class="guide-type-badge send">Send</span></a></li>
+            <li><a href="https://template.terms.law/Demand-Letters/Family/elder-financial-abuse-demand-letters.html" target="_blank" class="guide-link">Elder financial abuse <span class="guide-type-badge send">Send</span></a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Professional Malpractice -->
+      <div class="category-card" data-category="malpractice">
+        <div class="category-header">
+          <div class="category-icon">⚕️</div>
+          <div class="category-info">
+            <h3 class="category-title">Professional Liability</h3>
+            <p class="category-description">Medical, legal, accounting malpractice</p>
+          </div>
+          <span class="category-count">6</span>
+        </div>
+        <div class="category-guides">
+          <ul class="guide-list">
+            <li><a href="https://template.terms.law/Demand-Letters/Government-Professional/medical-malpractice-pre-litigation-demand-letters.html" target="_blank" class="guide-link">Medical malpractice <span class="guide-type-badge send">Send</span></a></li>
+            <li><a href="https://template.terms.law/Demand-Letters/Government-Professional/attorney-malpractice-demand-letters.html" target="_blank" class="guide-link">Attorney malpractice <span class="guide-type-badge send">Send</span></a></li>
+            <li><a href="https://template.terms.law/Demand-Letters/Government-Professional/accountant-tax-preparer-malpractice-demand-letters.html" target="_blank" class="guide-link">Accountant/tax preparer errors <span class="guide-type-badge send">Send</span></a></li>
+            <li><a href="https://template.terms.law/Demand-Letters/Government-Professional/licensing-board-complaint-leverage-demand-letters.html" target="_blank" class="guide-link">Licensing board complaints <span class="guide-type-badge send">Send</span></a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Intellectual Property -->
+      <div class="category-card" data-category="ip">
+        <div class="category-header">
+          <div class="category-icon">©️</div>
+          <div class="category-info">
+            <h3 class="category-title">Intellectual Property</h3>
+            <p class="category-description">Copyright, trademark, trade secrets</p>
+          </div>
+          <span class="category-count">7</span>
+        </div>
+        <div class="category-guides">
+          <ul class="guide-list">
+            <li><a href="https://terms.law/copyright-infringement-demand-letters/" target="_blank" class="guide-link">Copyright infringement <span class="guide-type-badge send">Send</span></a></li>
+            <li><a href="https://terms.law/trademark-infringement-cease-desist/" target="_blank" class="guide-link">Trademark cease and desist <span class="guide-type-badge send">Send</span></a></li>
+            <li><a href="https://template.terms.law/Demand-Letters/IP-Content/counterfeit-product-demand-letters.html" target="_blank" class="guide-link">Counterfeit products <span class="guide-type-badge send">Send</span></a></li>
+            <li><a href="https://terms.law/respond-to-copyright-demand-letter/" target="_blank" class="guide-link">Responding to IP claims <span class="guide-type-badge respond">Respond</span></a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Construction & Contractors -->
+      <div class="category-card" data-category="construction">
+        <div class="category-header">
+          <div class="category-icon">🔨</div>
+          <div class="category-info">
+            <h3 class="category-title">Construction & Contractors</h3>
+            <p class="category-description">Contractor disputes, liens, defective work</p>
+          </div>
+          <span class="category-count">8</span>
+        </div>
+        <div class="category-guides">
+          <ul class="guide-list">
+            <li><a href="https://terms.law/contractor-non-performance-demand-letters/" target="_blank" class="guide-link">Contractor non-performance <span class="guide-type-badge send">Send</span></a></li>
+            <li><a href="https://terms.law/construction-defect-demand-letters/" target="_blank" class="guide-link">Construction defects <span class="guide-type-badge send">Send</span></a></li>
+            <li><a href="https://terms.law/mechanics-lien-demand-letters/" target="_blank" class="guide-link">Mechanics lien disputes <span class="guide-type-badge send">Send</span></a></li>
+            <li><a href="https://terms.law/respond-contractor-demand-letter/" target="_blank" class="guide-link">Responding as contractor <span class="guide-type-badge respond">Respond</span></a></li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="container">
+    <div class="cta-section">
+      <div class="cta-content">
+        <h3>Need a Custom Demand Letter?</h3>
+        <p>Can't find your situation? I draft custom demand letters starting at $450. Tell me what happened and I'll tell you your options.</p>
+      </div>
+      <div class="cta-buttons">
+        <a href="mailto:owner@terms.law?subject=Custom%20Demand%20Letter%20Request" class="btn btn-primary">Email Me Your Case</a>
+        <a href="https://calendly.com/tokmakov/30min" target="_blank" class="btn btn-secondary">Book a Call</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer Note -->
+  <div class="footer-note">
+    <p>These guides provide general information, not legal advice. For specific situations, <a href="mailto:owner@terms.law">contact me directly</a>.</p>
+  </div>
+
+  <script>
+    // Filter by search
+    function filterGuides() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      const cards = document.querySelectorAll('.category-card');
+
+      cards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        card.classList.toggle('hidden', !text.includes(query));
+      });
+    }
+
+    // Filter by category (send/respond)
+    function filterByCategory(type) {
+      // Update active tab
+      document.querySelectorAll('.filter-tab').forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.filter === type);
+      });
+
+      const guides = document.querySelectorAll('.guide-list li');
+
+      guides.forEach(li => {
+        if (type === 'all') {
+          li.classList.remove('hidden');
+        } else {
+          const badge = li.querySelector('.guide-type-badge');
+          const guideType = badge ? badge.classList.contains(type) : false;
+          li.classList.toggle('hidden', !guideType);
+        }
+      });
+
+      // Hide empty cards
+      document.querySelectorAll('.category-card').forEach(card => {
+        const visibleGuides = card.querySelectorAll('.guide-list li:not(.hidden)');
+        card.classList.toggle('hidden', visibleGuides.length === 0);
+      });
+    }
+  </script>
+
+</body>
+</html>
