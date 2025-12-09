@@ -15,171 +15,466 @@
     gtag('config', 'G-901N2Y3CDZ');
   </script>
 
+  <!-- Hide header when in iframe (app shell handles nav) -->
+  <script>
+    if (window.self !== window.top) {
+      document.documentElement.classList.add('in-iframe');
+    }
+  </script>
+  <style>
+    html.in-iframe .site-header { display: none !important; }
+    html.in-iframe body { padding-top: 0 !important; }
+  </style>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
+    /* ============================================
+       CSS DESIGN SYSTEM - Matching Contracts Page
+       ============================================ */
     :root {
-      --color-gold: #c9a227;
-      --color-gold-light: #d4b545;
-      --color-gold-dark: #a68620;
-      --color-text: #111827;
-      --color-text-muted: #6b7280;
-      --color-bg: #f9fafb;
+      --color-primary: #2563eb;
+      --color-primary-dark: #1d4ed8;
+      --color-primary-light: #3b82f6;
+      --color-accent: #8b5cf6;
+      --color-accent-light: #a78bfa;
+      --color-success: #10b981;
+      --color-warning: #f59e0b;
+      --color-danger: #ef4444;
+
+      --color-bg: #f8fafc;
       --color-surface: #ffffff;
-      --color-border: #e5e7eb;
+      --color-border: #e2e8f0;
+      --color-border-light: #f1f5f9;
+      --color-text: #0f172a;
+      --color-text-secondary: #334155;
+      --color-text-muted: #64748b;
+      --color-text-light: #94a3b8;
+
+      --gradient-hero: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #312e81 100%);
+      --gradient-primary: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      --radius-full: 9999px;
+
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2rem;
+      --space-2xl: 3rem;
+      --space-3xl: 4rem;
+
       --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --max-width: 1280px;
+      --transition-fast: 150ms ease;
+      --transition-base: 200ms ease;
     }
 
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body { font-family: var(--font-sans); font-size: 16px; line-height: 1.6; color: var(--color-text); background: var(--color-bg); }
+    a { color: var(--color-primary); text-decoration: none; transition: color var(--transition-fast); }
+    a:hover { color: var(--color-primary-dark); }
+    .container { max-width: var(--max-width); margin: 0 auto; padding: 0 var(--space-lg); }
+
+    /* ============================================
+       HEADER - Dark Professional (Matching app.html)
+       ============================================ */
+    .site-header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
       padding: 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     }
 
-    body {
-      font-family: var(--font-sans);
-      background: var(--color-bg);
-      color: var(--color-text);
-      line-height: 1.6;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 1.5rem;
-    }
-
-    /* Hero */
-    .hero {
-      background: var(--color-surface);
-      padding: 3rem 0;
-      border-bottom: 1px solid var(--color-border);
-      text-align: center;
-    }
-
-    .hero h1 {
-      font-size: 2.5rem;
-      font-weight: 800;
-      color: var(--color-text);
-      margin-bottom: 0.5rem;
-    }
-
-    .hero p {
-      font-size: 1.1rem;
-      color: var(--color-text-muted);
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    /* Categories */
-    .categories {
-      padding: 2rem 0;
-    }
-
-    .category-pills {
+    .header-content {
       display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
+      align-items: center;
       justify-content: center;
-      margin-bottom: 2rem;
+      height: 52px;
+      max-width: var(--max-width);
+      margin: 0 auto;
     }
 
-    .category-pill {
-      padding: 0.5rem 1rem;
-      background: var(--color-surface);
-      border: 1px solid var(--color-border);
-      border-radius: 9999px;
-      color: var(--color-text);
+    .header-nav {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      height: 100%;
+    }
+
+    .nav-link {
+      color: #94a3b8;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 16px 24px;
+      transition: all 150ms ease;
+      text-decoration: none;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+    }
+
+    .nav-link:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-link.active {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
+      border-bottom-color: #3b82f6;
+    }
+
+    .nav-link.home-logo {
+      padding: 12px 20px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      text-transform: none;
+    }
+
+    .nav-link.home-logo .logo-text {
+      background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header-email-cta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: all 150ms ease;
+      text-decoration: none;
+      margin-left: 1.5rem;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+    }
+
+    .header-email-cta:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+      color: #fff;
+    }
+
+    /* ============================================
+       HERO SECTION
+       ============================================ */
+    .hero {
+      background: var(--gradient-hero);
+      padding: var(--space-3xl) 0 var(--space-2xl);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+
+    .hero-glow {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .hero-glow-1 { top: -200px; right: -100px; background: var(--color-primary); }
+    .hero-glow-2 { bottom: -300px; left: -200px; background: var(--color-accent); }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 700px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-xs) var(--space-md) var(--space-xs) var(--space-xs);
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: var(--radius-full);
+      color: #e2e8f0;
       font-size: 0.875rem;
+      margin-bottom: var(--space-lg);
+      backdrop-filter: blur(10px);
+    }
+
+    .hero-badge-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      background: var(--gradient-primary);
+      border-radius: var(--radius-full);
+      font-size: 0.9rem;
+    }
+
+    .hero-title {
+      font-size: clamp(2.5rem, 5vw, 3.5rem);
+      font-weight: 800;
+      color: white;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: var(--space-lg);
+    }
+
+    .hero-title-gradient {
+      background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #f472b6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-description {
+      font-size: 1.25rem;
+      color: #94a3b8;
+      max-width: 600px;
+      line-height: 1.7;
+    }
+
+    /* ============================================
+       FILTER BAR
+       ============================================ */
+    .filter-bar {
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--space-md) 0;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .filter-pills {
+      display: flex;
+      gap: var(--space-sm);
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    .filter-pill {
+      flex-shrink: 0;
+      padding: 8px 16px;
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-full);
+      color: var(--color-text-secondary);
+      font-size: 0.85rem;
       font-weight: 500;
       text-decoration: none;
-      transition: all 150ms ease;
+      transition: all var(--transition-fast);
+      white-space: nowrap;
     }
 
-    .category-pill:hover {
-      border-color: var(--color-gold);
-      background: #fffbeb;
+    .filter-pill:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+      background: #eff6ff;
     }
 
-    .category-pill.active {
-      background: var(--color-gold);
-      border-color: var(--color-gold);
+    .filter-pill.active {
+      background: var(--gradient-primary);
+      border-color: transparent;
       color: white;
     }
 
-    /* Popular Section */
+    /* ============================================
+       FEATURED SECTION
+       ============================================ */
+    .featured-section {
+      padding: var(--space-2xl) 0;
+      background: var(--color-surface);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-lg);
+    }
+
     .section-title {
       font-size: 1.5rem;
       font-weight: 700;
-      margin-bottom: 1.5rem;
+      color: var(--color-text);
+    }
+
+    .featured-card {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: var(--space-xl);
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      text-decoration: none;
+      color: inherit;
+      transition: all var(--transition-base);
+    }
+
+    .featured-card:hover {
+      box-shadow: var(--shadow-xl);
+      transform: translateY(-4px);
+      border-color: var(--color-primary-light);
+    }
+
+    .featured-content {
+      padding: var(--space-xl);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .featured-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      background: var(--gradient-primary);
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-radius: var(--radius-sm);
+      margin-bottom: var(--space-md);
+      width: fit-content;
+    }
+
+    .featured-card h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color-text);
+      margin-bottom: var(--space-sm);
+      line-height: 1.3;
+    }
+
+    .featured-card p {
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-lg);
+      line-height: 1.7;
+    }
+
+    .featured-meta {
+      display: flex;
+      gap: var(--space-lg);
+      font-size: 0.9rem;
+      color: var(--color-text-muted);
+    }
+
+    .featured-image {
+      background: linear-gradient(135deg, #eff6ff 0%, #e0e7ff 100%);
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      justify-content: center;
+      min-height: 280px;
+      font-size: 5rem;
     }
 
-    .section-title::before {
-      content: '';
-      width: 4px;
-      height: 24px;
-      background: var(--color-gold);
-      border-radius: 2px;
+    /* ============================================
+       ARTICLES GRID
+       ============================================ */
+    .articles-section {
+      padding: var(--space-2xl) 0 var(--space-3xl);
     }
 
-    /* Article Grid */
     .article-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 3rem;
+      gap: var(--space-lg);
     }
 
     .article-card {
       background: var(--color-surface);
       border: 1px solid var(--color-border);
-      border-radius: 12px;
+      border-radius: var(--radius-lg);
       overflow: hidden;
-      transition: all 200ms ease;
       text-decoration: none;
       color: inherit;
+      transition: all var(--transition-base);
     }
 
     .article-card:hover {
-      border-color: var(--color-gold);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      border-color: var(--color-primary-light);
+      box-shadow: var(--shadow-lg);
       transform: translateY(-2px);
     }
 
-    .article-card-image {
-      width: 100%;
-      height: 180px;
-      object-fit: cover;
-      background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+    .article-image {
+      height: 160px;
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      font-size: 3rem;
     }
 
-    .article-card-content {
-      padding: 1.25rem;
-    }
-
-    .article-card-category {
-      display: inline-block;
-      padding: 0.25rem 0.75rem;
-      background: #fef3c7;
-      color: var(--color-gold-dark);
-      font-size: 0.75rem;
+    .article-category {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      padding: 4px 10px;
+      background: white;
+      border-radius: var(--radius-sm);
+      font-size: 0.7rem;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.03em;
-      border-radius: 4px;
-      margin-bottom: 0.75rem;
+    }
+
+    .cat-demands { color: #dc2626; }
+    .cat-contracts { color: #7c3aed; }
+    .cat-incorporation { color: #059669; }
+    .cat-guides { color: #2563eb; }
+    .cat-ai { color: #db2777; }
+
+    .article-content {
+      padding: var(--space-lg);
     }
 
     .article-card h3 {
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: 700;
+      margin-bottom: var(--space-sm);
       line-height: 1.4;
-      margin-bottom: 0.5rem;
+      color: var(--color-text);
     }
 
     .article-card p {
@@ -191,220 +486,316 @@
       overflow: hidden;
     }
 
-    .article-card-meta {
+    .article-footer {
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      gap: 1rem;
-      margin-top: 1rem;
-      padding-top: 1rem;
+      margin-top: var(--space-md);
+      padding-top: var(--space-md);
       border-top: 1px solid var(--color-border);
       font-size: 0.8rem;
       color: var(--color-text-muted);
     }
 
-    /* Featured/Bestseller badge */
-    .badge-bestseller {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      padding: 0.25rem 0.75rem;
-      background: var(--color-gold);
-      color: white;
-      font-size: 0.7rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      border-radius: 4px;
-    }
-
-    .article-card-wrapper {
-      position: relative;
-    }
-
-    /* Document Generators Section */
-    .generators-section {
-      background: var(--color-surface);
-      padding: 3rem 0;
-      border-top: 1px solid var(--color-border);
-    }
-
-    .generators-iframe {
-      border: none;
-      border-radius: 8px;
-      width: 100%;
-      min-height: 900px;
-    }
-
-    /* Visit Blog CTA */
-    .blog-cta {
+    /* ============================================
+       CTA SECTION
+       ============================================ */
+    .cta-section {
+      padding: var(--space-3xl) 0;
+      background: var(--gradient-hero);
       text-align: center;
-      padding: 3rem 0;
-      background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+      position: relative;
+      overflow: hidden;
     }
 
-    .blog-cta h2 {
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+
+    .cta-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .cta-section h2 {
+      font-size: 2rem;
+      font-weight: 700;
       color: white;
-      font-size: 1.75rem;
-      margin-bottom: 0.5rem;
+      margin-bottom: var(--space-sm);
     }
 
-    .blog-cta p {
-      color: #9ca3af;
-      margin-bottom: 1.5rem;
+    .cta-section p {
+      font-size: 1.1rem;
+      color: #94a3b8;
+      margin-bottom: var(--space-xl);
     }
 
-    .blog-cta .btn {
+    .btn {
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
-      padding: 1rem 2rem;
-      background: var(--color-gold);
-      color: white;
+      gap: 8px;
+      padding: 14px 28px;
+      font-size: 1rem;
       font-weight: 600;
+      border-radius: var(--radius-md);
       text-decoration: none;
-      border-radius: 8px;
-      transition: all 150ms ease;
+      transition: all var(--transition-base);
+      border: none;
+      cursor: pointer;
     }
 
-    .blog-cta .btn:hover {
-      background: var(--color-gold-dark);
+    .btn-primary {
+      background: var(--gradient-primary);
+      color: white;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+    }
+
+    .btn-primary:hover {
       transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.45);
+      color: white;
     }
 
-    /* Responsive */
-    @media (max-width: 640px) {
-      .hero h1 {
-        font-size: 1.75rem;
-      }
-
-      .article-grid {
-        grid-template-columns: 1fr;
+    /* ============================================
+       RESPONSIVE
+       ============================================ */
+    @media (max-width: 768px) {
+      .hero-title { font-size: 2rem; }
+      .featured-card { grid-template-columns: 1fr; }
+      .featured-image { order: -1; min-height: 200px; }
+      .article-grid { grid-template-columns: 1fr; }
+      .header-nav .nav-link:not(.home-logo):not(.header-email-cta) {
+        display: none;
       }
     }
   </style>
 </head>
 <body>
 
+  <!-- HEADER - Dark Professional -->
+  <header class="site-header">
+    <div class="header-content">
+      <nav class="header-nav">
+        <a href="../index.html" class="nav-link home-logo" title="Home">
+          <span class="logo-text">Terms.Law</span>
+        </a>
+        <a href="../Demand-Letters/demand-letters-landing.html" class="nav-link">Demands</a>
+        <a href="../Templates/contract-library-landing.html" class="nav-link">Contracts</a>
+        <a href="../INC/formation-landing.html" class="nav-link">Incorporation</a>
+        <a href="#" class="nav-link active">Blog</a>
+        <a href="mailto:owner@terms.law" class="header-email-cta">Email</a>
+      </nav>
+    </div>
+  </header>
+
   <!-- HERO -->
   <section class="hero">
-    <div class="container">
-      <h1>Blog & Resources</h1>
-      <p>Legal guides, templates, and tools to help you handle disputes, draft contracts, and form your business.</p>
-    </div>
-  </section>
+    <div class="hero-glow hero-glow-1"></div>
+    <div class="hero-glow hero-glow-2"></div>
 
-  <!-- CATEGORIES -->
-  <section class="categories">
     <div class="container">
-      <div class="category-pills">
-        <a href="#all" class="category-pill active">All Resources</a>
-        <a href="https://terms.law/category/demand-letters/" class="category-pill" target="_top">Demand Letters</a>
-        <a href="https://terms.law/category/contracts/" class="category-pill" target="_top">Contracts</a>
-        <a href="https://terms.law/category/incorporation/" class="category-pill" target="_top">Incorporation</a>
-        <a href="https://terms.law/category/ai/" class="category-pill" target="_top">AI & Tech</a>
-        <a href="https://terms.law/category/guides/" class="category-pill" target="_top">Guides</a>
+      <div class="hero-content">
+        <div class="hero-badge">
+          <span class="hero-badge-icon">📚</span>
+          Legal Resources & Guides
+        </div>
+
+        <h1 class="hero-title">
+          Blog &<br>
+          <span class="hero-title-gradient">Resources</span>
+        </h1>
+
+        <p class="hero-description">
+          Practical legal guides, demand letter templates, contract tips, and business formation resources. Written by a California attorney with 13+ years of experience.
+        </p>
       </div>
     </div>
   </section>
 
-  <!-- POPULAR ARTICLES -->
-  <section class="popular-section">
+  <!-- FILTER BAR -->
+  <nav class="filter-bar">
     <div class="container">
-      <h2 class="section-title">Most Popular</h2>
+      <div class="filter-pills">
+        <a href="#all" class="filter-pill active">All Resources</a>
+        <a href="#demands" class="filter-pill">Demand Letters</a>
+        <a href="#contracts" class="filter-pill">Contracts</a>
+        <a href="#incorporation" class="filter-pill">Incorporation</a>
+        <a href="#ai" class="filter-pill">AI & Tech</a>
+        <a href="#guides" class="filter-pill">How-To Guides</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- FEATURED -->
+  <section class="featured-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Featured</h2>
+      </div>
+
+      <a href="../Demand-Letters/stripe-fund-holds/" class="featured-card">
+        <div class="featured-content">
+          <div class="featured-badge">Most Popular</div>
+          <h3>When Stripe Holds Your Money: The Definitive Legal Guide</h3>
+          <p>Step-by-step guide to recovering withheld funds from Stripe, including demand letter templates, arbitration strategies, and what actually works based on 100+ cases.</p>
+          <div class="featured-meta">
+            <span>📖 15 min read</span>
+            <span>⭐ 50K+ views</span>
+          </div>
+        </div>
+        <div class="featured-image">📄</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ARTICLES -->
+  <section class="articles-section" id="articles">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">All Resources</h2>
+      </div>
 
       <div class="article-grid">
-        <!-- Stripe Fund Holds - Bestseller -->
-        <a href="https://terms.law/2025/03/03/when-stripe-holds-your-money-the-definitive-legal-guide-to-getting-your-funds-released/" class="article-card" target="_top">
-          <div class="article-card-wrapper">
-            <img src="https://terms.law/wp-content/uploads/2025/03/stripe-fund-hold-recovery.jpg" alt="Stripe Fund Holds" class="article-card-image" onerror="this.style.background='linear-gradient(135deg, #635bff 0%, #a855f7 100%)'">
-            <span class="badge-bestseller">Bestseller</span>
+        <!-- Demand Letters -->
+        <a href="../Demand-Letters/bank-fees/" class="article-card" id="demands">
+          <div class="article-image">
+            <span class="article-category cat-demands">Demand Letters</span>
+            🏦
           </div>
-          <div class="article-card-content">
-            <span class="article-card-category">Demand Letters</span>
-            <h3>When Stripe Holds Your Money: The Definitive Legal Guide</h3>
-            <p>Step-by-step guide to recovering withheld funds from Stripe, including demand letter templates and arbitration strategies.</p>
-            <div class="article-card-meta">
-              <span>📖 15 min read</span>
-              <span>⭐ 50K+ views</span>
-            </div>
-          </div>
-        </a>
-
-        <!-- Bank Fees Guide -->
-        <a href="https://terms.law/2025/12/06/how-to-dispute-bank-fees-and-account-errors-demand-letter-guide/" class="article-card" target="_top">
-          <div class="article-card-wrapper">
-            <img src="../assets/logo-scales.png" alt="Bank Fees" class="article-card-image" style="object-fit: contain; padding: 2rem; background: #f9fafb;">
-          </div>
-          <div class="article-card-content">
-            <span class="article-card-category">Consumer</span>
+          <div class="article-content">
             <h3>How to Dispute Bank Fees and Account Errors</h3>
             <p>Demand letter guide for challenging unauthorized fees, overdraft charges, and banking errors.</p>
-            <div class="article-card-meta">
-              <span>📖 10 min read</span>
-              <span>🔥 New</span>
+            <div class="article-footer">
+              <span>10 min read</span>
+              <span>New</span>
             </div>
           </div>
         </a>
 
-        <!-- NDA Guide -->
-        <a href="https://terms.law/2024/04/15/nda-guide/" class="article-card" target="_top">
-          <div class="article-card-wrapper">
-            <img src="https://terms.law/wp-content/uploads/2024/04/nda-guide.jpg" alt="NDA Guide" class="article-card-image" onerror="this.style.background='linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%)'">
+        <a href="../Demand-Letters/demand-letter-mistakes/" class="article-card">
+          <div class="article-image">
+            <span class="article-category cat-demands">Demand Letters</span>
+            ⚠️
           </div>
-          <div class="article-card-content">
-            <span class="article-card-category">Contracts</span>
-            <h3>The Complete Guide to Non-Disclosure Agreements</h3>
-            <p>Everything you need to know about NDAs: when to use them, key clauses, and common mistakes.</p>
-            <div class="article-card-meta">
-              <span>📖 12 min read</span>
-              <span>⭐ Popular</span>
-            </div>
-          </div>
-        </a>
-
-        <!-- LLC Formation -->
-        <a href="https://terms.law/2024/06/01/llc-formation-guide/" class="article-card" target="_top">
-          <div class="article-card-wrapper">
-            <img src="https://terms.law/wp-content/uploads/2024/06/llc-formation.jpg" alt="LLC Formation" class="article-card-image" onerror="this.style.background='linear-gradient(135deg, #10b981 0%, #059669 100%)'">
-          </div>
-          <div class="article-card-content">
-            <span class="article-card-category">Incorporation</span>
-            <h3>LLC Formation: Delaware vs. Wyoming vs. Your Home State</h3>
-            <p>Comparing the pros and cons of popular LLC jurisdictions for startups and small businesses.</p>
-            <div class="article-card-meta">
-              <span>📖 8 min read</span>
-              <span>⭐ Popular</span>
-            </div>
-          </div>
-        </a>
-
-        <!-- Demand Letter Mistakes -->
-        <a href="https://terms.law/2025/10/18/common-mistakes-in-demand-letters-that-kill-your-leverage/" class="article-card" target="_top">
-          <div class="article-card-wrapper">
-            <img src="https://terms.law/wp-content/uploads/2025/10/demand-letter-mistakes.jpg" alt="Demand Letter Mistakes" class="article-card-image" onerror="this.style.background='linear-gradient(135deg, #ef4444 0%, #f97316 100%)'">
-          </div>
-          <div class="article-card-content">
-            <span class="article-card-category">Demand Letters</span>
+          <div class="article-content">
             <h3>Common Mistakes in Demand Letters That Kill Your Leverage</h3>
             <p>Avoid these critical errors that weaken your negotiating position and hurt your case.</p>
-            <div class="article-card-meta">
-              <span>📖 7 min read</span>
-              <span>⭐ Popular</span>
+            <div class="article-footer">
+              <span>7 min read</span>
+              <span>Popular</span>
             </div>
           </div>
         </a>
 
-        <!-- AI Contracts -->
-        <a href="https://terms.law/2025/01/15/ai-contracts-what-you-need-to-know/" class="article-card" target="_top">
-          <div class="article-card-wrapper">
-            <img src="https://terms.law/wp-content/uploads/2025/01/ai-contracts.jpg" alt="AI Contracts" class="article-card-image" onerror="this.style.background='linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)'">
+        <!-- Contracts -->
+        <a href="../Templates/nda-generator/" class="article-card" id="contracts">
+          <div class="article-image">
+            <span class="article-category cat-contracts">Contracts</span>
+            🔒
           </div>
-          <div class="article-card-content">
-            <span class="article-card-category">AI & Tech</span>
-            <h3>AI Contracts: Ownership, Licensing, and Liability</h3>
+          <div class="article-content">
+            <h3>The Complete Guide to Non-Disclosure Agreements</h3>
+            <p>Everything you need to know about NDAs: when to use them, key clauses, and common mistakes.</p>
+            <div class="article-footer">
+              <span>12 min read</span>
+              <span>Popular</span>
+            </div>
+          </div>
+        </a>
+
+        <a href="../Templates/consulting-agreement/" class="article-card">
+          <div class="article-image">
+            <span class="article-category cat-contracts">Contracts</span>
+            💼
+          </div>
+          <div class="article-content">
+            <h3>Consulting Agreement Essentials</h3>
+            <p>Key provisions every consulting agreement needs: scope, payment, IP ownership, and termination.</p>
+            <div class="article-footer">
+              <span>8 min read</span>
+              <span>Essential</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- Incorporation -->
+        <a href="../INC/delaware-llc/" class="article-card" id="incorporation">
+          <div class="article-image">
+            <span class="article-category cat-incorporation">Incorporation</span>
+            🏛️
+          </div>
+          <div class="article-content">
+            <h3>Delaware vs Wyoming vs Your Home State</h3>
+            <p>Comparing the pros and cons of popular LLC jurisdictions for startups and small businesses.</p>
+            <div class="article-footer">
+              <span>8 min read</span>
+              <span>Popular</span>
+            </div>
+          </div>
+        </a>
+
+        <a href="../INC/llc-to-corp/" class="article-card">
+          <div class="article-image">
+            <span class="article-category cat-incorporation">Incorporation</span>
+            🔄
+          </div>
+          <div class="article-content">
+            <h3>LLC to C-Corp Conversion Guide</h3>
+            <p>Converting your LLC to a corporation for fundraising. Tax implications and step-by-step process.</p>
+            <div class="article-footer">
+              <span>10 min read</span>
+              <span>Advanced</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- AI & Tech -->
+        <a href="../Templates/ai-terms-of-service/" class="article-card" id="ai">
+          <div class="article-image">
+            <span class="article-category cat-ai">AI & Tech</span>
+            🤖
+          </div>
+          <div class="article-content">
+            <h3>AI Contracts: Ownership, Licensing & Liability</h3>
             <p>Key contract considerations when building or using AI systems, including IP and data rights.</p>
-            <div class="article-card-meta">
-              <span>📖 10 min read</span>
-              <span>🔥 Trending</span>
+            <div class="article-footer">
+              <span>10 min read</span>
+              <span>Trending</span>
+            </div>
+          </div>
+        </a>
+
+        <a href="../Templates/saas-agreement/" class="article-card">
+          <div class="article-image">
+            <span class="article-category cat-ai">AI & Tech</span>
+            ☁️
+          </div>
+          <div class="article-content">
+            <h3>SaaS Agreement Builder</h3>
+            <p>Create customized software-as-a-service agreements with proper SLA, data handling, and limitation of liability.</p>
+            <div class="article-footer">
+              <span>Generator</span>
+              <span>Popular</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- Guides -->
+        <a href="../guides/small-claims/" class="article-card" id="guides">
+          <div class="article-image">
+            <span class="article-category cat-guides">Guides</span>
+            ⚖️
+          </div>
+          <div class="article-content">
+            <h3>California Small Claims Court Guide</h3>
+            <p>Complete walkthrough of the small claims process in California, from filing to judgment collection.</p>
+            <div class="article-footer">
+              <span>15 min read</span>
+              <span>Comprehensive</span>
             </div>
           </div>
         </a>
@@ -412,29 +803,16 @@
     </div>
   </section>
 
-  <!-- DOCUMENT GENERATORS -->
-  <section class="generators-section">
+  <!-- CTA -->
+  <section class="cta-section">
     <div class="container">
-      <h2 class="section-title">Free Document Generators</h2>
-      <p style="color: var(--color-text-muted); margin-bottom: 1.5rem;">Interactive tools to create customized legal documents with live preview.</p>
-
-      <iframe
-        class="generators-iframe"
-        src="../document-generator-cards/"
-        title="Document Generator Cards"
-        loading="lazy">
-      </iframe>
-    </div>
-  </section>
-
-  <!-- VISIT FULL BLOG CTA -->
-  <section class="blog-cta">
-    <div class="container">
-      <h2>Want More?</h2>
-      <p>Visit the full blog for 200+ articles, guides, and legal resources.</p>
-      <a href="https://terms.law/blog/" class="btn" target="_top">
-        Visit Full Blog →
-      </a>
+      <div class="cta-content">
+        <h2>Need Custom Legal Help?</h2>
+        <p>Get personalized advice for your specific situation.</p>
+        <a href="mailto:owner@terms.law" class="btn btn-primary">
+          Email Me Directly →
+        </a>
+      </div>
     </div>
   </section>
 
