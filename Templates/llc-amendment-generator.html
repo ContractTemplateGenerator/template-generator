@@ -1088,6 +1088,89 @@
       75% { background: #fbbf24; box-shadow: 0 0 8px rgba(251, 191, 36, 0.3); }
     }
 
+    /* Inline editing cursor */
+    .doc-highlight[contenteditable="true"] {
+      cursor: text;
+    }
+
+    .doc-highlight[contenteditable="true"]:focus {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 2px;
+      background: #fef9c3;
+    }
+
+    /* Full Edit Mode */
+    .full-edit-mode {
+      border: 2px dashed var(--color-primary) !important;
+      background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%) !important;
+    }
+
+    .full-edit-mode:focus {
+      outline: none;
+    }
+
+    .full-edit-mode .doc-highlight {
+      background: transparent;
+      border: none;
+    }
+
+    /* Edit Toolbar */
+    .edit-toolbar {
+      display: none;
+      align-items: center;
+      gap: 4px;
+      padding: 8px 12px;
+      background: var(--color-dark);
+      border-radius: var(--radius-md);
+      margin-top: var(--space-sm);
+    }
+
+    .edit-toolbar button {
+      padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: var(--radius-sm);
+      color: #fff;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .edit-toolbar button:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .edit-toolbar .cancel-btn {
+      background: rgba(220, 38, 38, 0.3);
+      border-color: rgba(220, 38, 38, 0.5);
+    }
+
+    .edit-toolbar .cancel-btn:hover {
+      background: rgba(220, 38, 38, 0.5);
+    }
+
+    .toolbar-divider {
+      width: 1px;
+      height: 20px;
+      background: rgba(255, 255, 255, 0.2);
+      margin: 0 4px;
+    }
+
+    /* Preview hint */
+    .preview-hint {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      font-weight: 400;
+      margin-left: var(--space-sm);
+    }
+
+    /* Edit mode button active state */
+    #editModeBtn.active {
+      background: var(--color-primary);
+      color: #fff;
+      border-color: var(--color-primary);
+    }
+
     .doc-paragraph {
       margin-bottom: 16px;
       text-align: justify;
@@ -1566,11 +1649,11 @@
         </div>
         <div class="form-group">
           <label class="form-label">LLC Legal Name</label>
-          <input type="text" class="form-input" id="llcName" placeholder="Acme Holdings LLC" oninput="updatePreview()">
+          <input type="text" class="form-input" id="llcName" placeholder="Acme Holdings LLC" oninput="trackFieldEdit('llcName')">
         </div>
         <div class="form-group">
           <label class="form-label">State of Formation</label>
-          <select class="form-select" id="llcState" onchange="updatePreview()">
+          <select class="form-select" id="llcState" onchange="trackFieldEdit('llcState')">
             <option value="">Select state...</option>
             <option value="Alabama">Alabama</option>
             <option value="Alaska">Alaska</option>
@@ -1631,11 +1714,11 @@
               <span class="help-tooltip">The date your original LLC Operating Agreement was signed. This helps identify which document you're amending.</span>
             </span>
           </label>
-          <input type="date" class="form-input" id="originalDate" onchange="updatePreview()">
+          <input type="date" class="form-input" id="originalDate" onchange="trackFieldEdit('originalDate')">
         </div>
         <div class="form-group">
           <label class="form-label">Amendment Number</label>
-          <select class="form-select" id="amendmentNumber" onchange="updatePreview()">
+          <select class="form-select" id="amendmentNumber" onchange="trackFieldEdit('amendmentNumber')">
             <option value="First">First Amendment</option>
             <option value="Second">Second Amendment</option>
             <option value="Third">Third Amendment</option>
@@ -1658,16 +1741,16 @@
             </div>
             <div class="form-group">
               <label class="form-label">Full Legal Name</label>
-              <input type="text" class="form-input new-member-name" placeholder="Jane Smith" oninput="updatePreview()">
+              <input type="text" class="form-input new-member-name" placeholder="Jane Smith" oninput="trackFieldEdit('newMembers')">
             </div>
             <div class="form-group">
               <label class="form-label">Address</label>
-              <input type="text" class="form-input new-member-address" placeholder="123 Main St, City, State ZIP" oninput="updatePreview()">
+              <input type="text" class="form-input new-member-address" placeholder="123 Main St, City, State ZIP" oninput="trackFieldEdit('newMembers')">
             </div>
             <div class="form-group">
               <label class="form-label">Ownership Percentage</label>
               <div class="percentage-input-group">
-                <input type="number" class="form-input new-member-percentage" value="25" min="0" max="100" step="0.01" oninput="updatePreview()">
+                <input type="number" class="form-input new-member-percentage" value="25" min="0" max="100" step="0.01" oninput="trackFieldEdit('newMembers')">
                 <span class="percentage-suffix">%</span>
                 <div class="percentage-bar">
                   <div class="percentage-fill" style="width: 25%;"></div>
@@ -1681,7 +1764,7 @@
                   <span class="help-tooltip">The amount of money or value the new member is contributing to join the LLC.</span>
                 </span>
               </label>
-              <input type="text" class="form-input new-member-contribution" placeholder="$50,000" oninput="updatePreview()">
+              <input type="text" class="form-input new-member-contribution" placeholder="$50,000" oninput="trackFieldEdit('newMembers')">
             </div>
           </div>
         </div>
@@ -1698,11 +1781,11 @@
         </div>
         <div class="form-group">
           <label class="form-label">Member Name</label>
-          <input type="text" class="form-input" id="removedMemberName" placeholder="John Doe" oninput="updatePreview()">
+          <input type="text" class="form-input" id="removedMemberName" placeholder="John Doe" oninput="trackFieldEdit('removedMemberName')">
         </div>
         <div class="form-group">
           <label class="form-label">Reason for Removal</label>
-          <select class="form-select" id="removalReason" onchange="updatePreview()">
+          <select class="form-select" id="removalReason" onchange="trackFieldEdit('removalReason')">
             <option value="voluntary">Voluntary Withdrawal</option>
             <option value="buyout">Buyout by Remaining Members</option>
             <option value="death">Death of Member</option>
@@ -1717,7 +1800,7 @@
               <span class="help-tooltip">The amount being paid to the departing member for their ownership interest.</span>
             </span>
           </label>
-          <input type="text" class="form-input" id="buyoutAmount" placeholder="$100,000" oninput="updatePreview()">
+          <input type="text" class="form-input" id="buyoutAmount" placeholder="$100,000" oninput="trackFieldEdit('buyoutAmount')">
         </div>
 
         <div class="info-box info-box-warning">
@@ -1756,7 +1839,7 @@
         </div>
         <div class="form-group" id="managerNameGroup">
           <label class="form-label">Manager Name(s)</label>
-          <input type="text" class="form-input" id="managerNames" placeholder="Jane Smith, John Doe" oninput="updatePreview()">
+          <input type="text" class="form-input" id="managerNames" placeholder="Jane Smith, John Doe" oninput="trackFieldEdit('managerNames')">
           <div class="form-hint">Enter multiple names separated by commas</div>
         </div>
 
@@ -1775,11 +1858,11 @@
         </div>
         <div class="form-group">
           <label class="form-label">Current LLC Name</label>
-          <input type="text" class="form-input" id="currentLLCName" placeholder="Old Name LLC" oninput="updatePreview()">
+          <input type="text" class="form-input" id="currentLLCName" placeholder="Old Name LLC" oninput="trackFieldEdit('currentLLCName')">
         </div>
         <div class="form-group">
           <label class="form-label">New LLC Name</label>
-          <input type="text" class="form-input" id="newLLCName" placeholder="New Name LLC" oninput="updatePreview()">
+          <input type="text" class="form-input" id="newLLCName" placeholder="New Name LLC" oninput="trackFieldEdit('newLLCName')">
         </div>
 
         <div class="info-box info-box-warning">
@@ -1804,12 +1887,12 @@
             </div>
             <div class="form-group">
               <label class="form-label">Full Legal Name</label>
-              <input type="text" class="form-input current-member-name" placeholder="John Smith" oninput="updatePreview()">
+              <input type="text" class="form-input current-member-name" placeholder="John Smith" oninput="trackFieldEdit('currentMembers')">
             </div>
             <div class="form-group">
               <label class="form-label">Updated Ownership Percentage</label>
               <div class="percentage-input-group">
-                <input type="number" class="form-input current-member-percentage" value="50" min="0" max="100" step="0.01" oninput="updateOwnershipBar(this); updatePreview()">
+                <input type="number" class="form-input current-member-percentage" value="50" min="0" max="100" step="0.01" oninput="updateOwnershipBar(this); trackFieldEdit('currentMembers')">
                 <span class="percentage-suffix">%</span>
                 <div class="percentage-bar">
                   <div class="percentage-fill" style="width: 50%;"></div>
@@ -1836,7 +1919,7 @@
           Effective Date
         </div>
         <div class="form-group">
-          <input type="date" class="form-input" id="effectiveDate" onchange="updatePreview()">
+          <input type="date" class="form-input" id="effectiveDate" onchange="trackFieldEdit('effectiveDate')">
           <div class="form-hint">When does this amendment take effect?</div>
         </div>
       </div>
@@ -1866,7 +1949,7 @@
           </div>
           <div class="form-group" style="margin-top: 12px;">
             <label class="form-label">Printed Name</label>
-            <input type="text" class="form-input" id="signerName1" placeholder="John Smith" oninput="updatePreview()">
+            <input type="text" class="form-input" id="signerName1" placeholder="John Smith" oninput="trackFieldEdit('signerName1')">
           </div>
         </div>
 
@@ -1887,7 +1970,7 @@
           </div>
           <div class="form-group" style="margin-top: 12px;">
             <label class="form-label">Printed Name</label>
-            <input type="text" class="form-input" id="signerName2" placeholder="Jane Doe" oninput="updatePreview()">
+            <input type="text" class="form-input" id="signerName2" placeholder="Jane Doe" oninput="trackFieldEdit('signerName2')">
           </div>
         </div>
       </div>
@@ -1900,8 +1983,12 @@
         <div class="preview-title">
           <span class="icon">📄</span>
           Live Document Preview
+          <span class="preview-hint">(click any highlighted text to edit inline)</span>
         </div>
         <div class="preview-actions">
+          <button class="btn btn-secondary btn-sm" id="editModeBtn" onclick="toggleFullEditMode()">
+            ✏️ Edit Mode
+          </button>
           <button class="btn btn-secondary btn-sm" onclick="copyDocument()">
             📋 Copy
           </button>
@@ -2008,6 +2095,10 @@
     let newMemberCount = 1;
     let currentMemberCount = 1;
 
+    // Edit mode state (must be before updatePreview)
+    let isFullEditMode = false;
+    let savedDocumentHTML = '';
+
     // Signature canvases
     const signatureData = {
       '1': { type: 'draw', data: null },
@@ -2113,16 +2204,16 @@
           </div>
           <div class="form-group">
             <label class="form-label">Full Legal Name</label>
-            <input type="text" class="form-input new-member-name" placeholder="Jane Smith" oninput="updatePreview()">
+            <input type="text" class="form-input new-member-name" placeholder="Jane Smith" oninput="trackFieldEdit('newMembers')">
           </div>
           <div class="form-group">
             <label class="form-label">Address</label>
-            <input type="text" class="form-input new-member-address" placeholder="123 Main St, City, State ZIP" oninput="updatePreview()">
+            <input type="text" class="form-input new-member-address" placeholder="123 Main St, City, State ZIP" oninput="trackFieldEdit('newMembers')">
           </div>
           <div class="form-group">
             <label class="form-label">Ownership Percentage</label>
             <div class="percentage-input-group">
-              <input type="number" class="form-input new-member-percentage" value="10" min="0" max="100" step="0.01" oninput="updatePreview()">
+              <input type="number" class="form-input new-member-percentage" value="10" min="0" max="100" step="0.01" oninput="trackFieldEdit('newMembers')">
               <span class="percentage-suffix">%</span>
               <div class="percentage-bar">
                 <div class="percentage-fill" style="width: 10%;"></div>
@@ -2131,7 +2222,7 @@
           </div>
           <div class="form-group">
             <label class="form-label">Capital Contribution</label>
-            <input type="text" class="form-input new-member-contribution" placeholder="$25,000" oninput="updatePreview()">
+            <input type="text" class="form-input new-member-contribution" placeholder="$25,000" oninput="trackFieldEdit('newMembers')">
           </div>
         </div>
       `;
@@ -2154,12 +2245,12 @@
           </div>
           <div class="form-group">
             <label class="form-label">Full Legal Name</label>
-            <input type="text" class="form-input current-member-name" placeholder="Member Name" oninput="updatePreview()">
+            <input type="text" class="form-input current-member-name" placeholder="Member Name" oninput="trackFieldEdit('currentMembers')">
           </div>
           <div class="form-group">
             <label class="form-label">Updated Ownership Percentage</label>
             <div class="percentage-input-group">
-              <input type="number" class="form-input current-member-percentage" value="25" min="0" max="100" step="0.01" oninput="updateOwnershipBar(this); updatePreview()">
+              <input type="number" class="form-input current-member-percentage" value="25" min="0" max="100" step="0.01" oninput="updateOwnershipBar(this); trackFieldEdit('currentMembers')">
               <span class="percentage-suffix">%</span>
               <div class="percentage-bar">
                 <div class="percentage-fill" style="width: 25%;"></div>
@@ -2294,28 +2385,48 @@
     // ============================================
     // DOCUMENT PREVIEW
     // ============================================
+
+    // Track which field was just edited (must be before updatePreview)
+    let lastEditedField = null;
+
+    function trackFieldEdit(fieldId) {
+      lastEditedField = fieldId;
+      updatePreview();
+    }
+
     function updatePreview() {
-      const llcName = document.getElementById('llcName').value || '[LLC NAME]';
-      const llcState = document.getElementById('llcState').value || '[STATE]';
+      // Don't update if in full edit mode (preserve user's custom edits)
+      if (isFullEditMode) return;
+
+      // Helper function for highlighted editable fields
+      const h = (value, placeholder, fieldId) => {
+        const isEmpty = !value || value.startsWith('[');
+        const displayValue = isEmpty ? `[${placeholder}]` : value;
+        const emptyClass = isEmpty ? ' empty' : '';
+        return `<span class="doc-highlight${emptyClass}" data-field="${fieldId}" contenteditable="true">${displayValue}</span>`;
+      };
+
+      const llcName = document.getElementById('llcName').value || '';
+      const llcState = document.getElementById('llcState').value || '';
       const originalDate = document.getElementById('originalDate').value ?
-        formatDate(document.getElementById('originalDate').value) : '[ORIGINAL DATE]';
+        formatDate(document.getElementById('originalDate').value) : '';
       const amendmentNumber = document.getElementById('amendmentNumber').value;
       const effectiveDate = document.getElementById('effectiveDate').value ?
-        formatDate(document.getElementById('effectiveDate').value) : '[EFFECTIVE DATE]';
+        formatDate(document.getElementById('effectiveDate').value) : '';
 
       let html = `
         <div class="doc-title">
           ${amendmentNumber} Amendment to<br>Operating Agreement
         </div>
         <div class="doc-subtitle">
-          of <span class="doc-highlight" data-field="llcName">${llcName}</span>
+          of ${h(llcName, 'LLC NAME', 'llcName')}
         </div>
 
         <p class="doc-paragraph">
           This ${amendmentNumber} Amendment to the Operating Agreement (this "<strong>Amendment</strong>")
-          of <span class="doc-highlight" data-field="llcName">${llcName}</span>, a <span class="doc-highlight" data-field="llcState">${llcState}</span>
+          of ${h(llcName, 'LLC NAME', 'llcName')}, a ${h(llcState, 'STATE', 'llcState')}
           limited liability company (the "<strong>Company</strong>"), is made and entered into effective
-          as of <span class="doc-highlight" data-field="effectiveDate">${effectiveDate}</span> (the "<strong>Effective Date</strong>"),
+          as of ${h(effectiveDate, 'EFFECTIVE DATE', 'effectiveDate')} (the "<strong>Effective Date</strong>"),
           by and among the undersigned Members of the Company.
         </p>
 
@@ -2323,12 +2434,12 @@
 
         <p class="doc-paragraph">
           <strong>WHEREAS</strong>, the Company was formed as a limited liability company under the laws
-          of the State of <span class="doc-highlight" data-field="llcState">${llcState}</span>;
+          of the State of ${h(llcState, 'STATE', 'llcState')};
         </p>
 
         <p class="doc-paragraph">
           <strong>WHEREAS</strong>, the Members entered into an Operating Agreement dated
-          <span class="doc-highlight" data-field="originalDate">${originalDate}</span> (the "<strong>Original Agreement</strong>"),
+          ${h(originalDate, 'ORIGINAL DATE', 'originalDate')} (the "<strong>Original Agreement</strong>"),
           as may have been previously amended;
         </p>
 
@@ -2376,10 +2487,10 @@
         newMembers.forEach(member => {
           html += `
             <li>
-              <strong><span class="doc-highlight">${member.name}</span></strong>,
-              with an address at <span class="doc-highlight">${member.address}</span>,
-              in exchange for a capital contribution of <span class="doc-highlight">${member.contribution}</span>,
-              shall hold a <span class="doc-highlight">${member.percentage}%</span> Membership Interest in the Company.
+              <strong>${h(member.name, 'MEMBER NAME', 'newMembers')}</strong>,
+              with an address at ${h(member.address, 'ADDRESS', 'newMembers')},
+              in exchange for a capital contribution of ${h(member.contribution, 'AMOUNT', 'newMembers')},
+              shall hold a ${h(member.percentage + '%', 'PERCENTAGE', 'newMembers')} Membership Interest in the Company.
             </li>
           `;
         });
@@ -2390,9 +2501,9 @@
 
       // Remove Member Amendment
       if (amendmentTypes.includes('remove-member')) {
-        const removedName = document.getElementById('removedMemberName').value || '[REMOVED MEMBER]';
+        const removedName = document.getElementById('removedMemberName').value || '';
         const reason = document.getElementById('removalReason').value;
-        const buyout = document.getElementById('buyoutAmount').value;
+        const buyout = document.getElementById('buyoutAmount').value || '';
 
         const reasonText = {
           'voluntary': 'voluntary withdrawal',
@@ -2405,7 +2516,7 @@
         html += `
           <p class="doc-paragraph">
             <span class="doc-section-num">1.${sectionNum}</span> <strong>Withdrawal of Member.</strong>
-            <span class="doc-highlight">${removedName}</span> is hereby removed as a Member of the Company
+            ${h(removedName, 'REMOVED MEMBER', 'removedMemberName')} is hereby removed as a Member of the Company
             due to ${reasonText}, effective as of the Effective Date.
           </p>
         `;
@@ -2414,8 +2525,8 @@
           html += `
             <p class="doc-paragraph doc-indent">
               In consideration for the transfer of their Membership Interest, the remaining Members shall
-              pay <span class="doc-highlight">${removedName}</span> the sum of
-              <span class="doc-highlight">${buyout}</span>, payable in accordance with the terms separately
+              pay ${h(removedName, 'REMOVED MEMBER', 'removedMemberName')} the sum of
+              ${h(buyout, 'BUYOUT AMOUNT', 'buyoutAmount')}, payable in accordance with the terms separately
               agreed upon by the parties.
             </p>
           `;
@@ -2425,7 +2536,7 @@
 
       // Change Management Amendment
       if (amendmentTypes.includes('change-management')) {
-        const managers = document.getElementById('managerNames').value || '[MANAGER NAME(S)]';
+        const managers = document.getElementById('managerNames').value || '';
 
         html += `
           <p class="doc-paragraph">
@@ -2439,7 +2550,7 @@
           html += `
             <p class="doc-paragraph doc-indent">
               The following individual(s) are hereby appointed as Manager(s) of the Company:
-              <span class="doc-highlight">${managers}</span>. The Manager(s) shall have full authority
+              ${h(managers, 'MANAGER NAME(S)', 'managerNames')}. The Manager(s) shall have full authority
               to manage the business and affairs of the Company in accordance with the Operating Agreement.
             </p>
           `;
@@ -2456,14 +2567,14 @@
 
       // Change Name Amendment
       if (amendmentTypes.includes('change-name')) {
-        const currentName = document.getElementById('currentLLCName').value || '[CURRENT NAME]';
-        const newName = document.getElementById('newLLCName').value || '[NEW NAME]';
+        const currentName = document.getElementById('currentLLCName').value || '';
+        const newName = document.getElementById('newLLCName').value || '';
 
         html += `
           <p class="doc-paragraph">
             <span class="doc-section-num">1.${sectionNum}</span> <strong>Change of Company Name.</strong>
-            The name of the Company shall be changed from "<span class="doc-highlight">${currentName}</span>"
-            to "<span class="doc-highlight">${newName}</span>", effective as of the Effective Date or
+            The name of the Company shall be changed from "${h(currentName, 'CURRENT NAME', 'currentLLCName')}"
+            to "${h(newName, 'NEW NAME', 'newLLCName')}", effective as of the Effective Date or
             upon approval by the Secretary of State, whichever is later.
           </p>
         `;
@@ -2494,8 +2605,8 @@
 
           currentMembers.forEach(member => {
             html += `
-              <li><span class="doc-highlight">${member.name}</span>:
-              <span class="doc-highlight">${member.percentage}%</span> Membership Interest</li>
+              <li>${h(member.name, 'MEMBER NAME', 'currentMembers')}:
+              ${h(member.percentage + '%', 'PERCENTAGE', 'currentMembers')} Membership Interest</li>
             `;
           });
 
@@ -2506,8 +2617,8 @@
               const percentage = entry.querySelector('.new-member-percentage').value;
               if (name) {
                 html += `
-                  <li><span class="doc-highlight">${name}</span>:
-                  <span class="doc-highlight">${percentage}%</span> Membership Interest</li>
+                  <li>${h(name, 'MEMBER NAME', 'newMembers')}:
+                  ${h(percentage + '%', 'PERCENTAGE', 'newMembers')} Membership Interest</li>
                 `;
               }
             });
@@ -2539,7 +2650,7 @@
         <p class="doc-paragraph">
           <span class="doc-section-num">2.3</span> <strong>Governing Law.</strong>
           This Amendment shall be governed by and construed in accordance with the laws of the
-          State of <span class="doc-highlight" data-field="llcState">${llcState}</span>, without regard to its
+          State of ${h(llcState, 'STATE', 'llcState')}, without regard to its
           conflict of laws principles.
         </p>
 
@@ -2562,7 +2673,7 @@
       `;
 
       // Signer 1
-      const signer1Name = document.getElementById('signerName1').value || '[MEMBER NAME]';
+      const signer1Name = document.getElementById('signerName1').value || '';
       html += `
         <div class="doc-signature-party">
           <p><strong>MEMBER:</strong></p>
@@ -2576,14 +2687,14 @@
 
       html += `
           <div class="doc-signature-line">
-            <span class="doc-highlight" data-field="signerName1">${signer1Name}</span><br>
-            Date: <span class="doc-highlight" data-field="effectiveDate">${effectiveDate}</span>
+            ${h(signer1Name, 'MEMBER NAME', 'signerName1')}<br>
+            Date: ${h(effectiveDate, 'DATE', 'effectiveDate')}
           </div>
         </div>
       `;
 
       // Signer 2
-      const signer2Name = document.getElementById('signerName2').value || '[MEMBER NAME]';
+      const signer2Name = document.getElementById('signerName2').value || '';
       html += `
         <div class="doc-signature-party">
           <p><strong>MEMBER:</strong></p>
@@ -2597,8 +2708,8 @@
 
       html += `
           <div class="doc-signature-line">
-            <span class="doc-highlight" data-field="signerName2">${signer2Name}</span><br>
-            Date: <span class="doc-highlight" data-field="effectiveDate">${effectiveDate}</span>
+            ${h(signer2Name, 'MEMBER NAME', 'signerName2')}<br>
+            Date: ${h(effectiveDate, 'DATE', 'effectiveDate')}
           </div>
         </div>
       `;
@@ -2608,6 +2719,235 @@
       document.getElementById('documentPreview').innerHTML = html;
       calculateOwnershipTotal();
       addHighlightClickHandlers();
+
+      // Flash the field that was just updated and scroll to it
+      if (lastEditedField) {
+        const highlight = document.querySelector(`.doc-highlight[data-field="${lastEditedField}"]`);
+        if (highlight) {
+          highlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          highlight.classList.add('flash');
+          setTimeout(() => highlight.classList.remove('flash'), 1500);
+        }
+        lastEditedField = null;
+      }
+    }
+
+    // ============================================
+    // INLINE EDITING IN PREVIEW
+    // ============================================
+
+    // Map data-field values to form input IDs and their type
+    const fieldInputMap = {
+      'llcName': { inputId: 'llcName', type: 'text' },
+      'llcState': { inputId: 'llcState', type: 'select' },
+      'originalDate': { inputId: 'originalDate', type: 'date' },
+      'amendmentNumber': { inputId: 'amendmentNumber', type: 'select' },
+      'effectiveDate': { inputId: 'effectiveDate', type: 'date' },
+      'removedMemberName': { inputId: 'removedMemberName', type: 'text' },
+      'removalReason': { inputId: 'removalReason', type: 'select' },
+      'buyoutAmount': { inputId: 'buyoutAmount', type: 'text' },
+      'managerNames': { inputId: 'managerNames', type: 'text' },
+      'currentLLCName': { inputId: 'currentLLCName', type: 'text' },
+      'newLLCName': { inputId: 'newLLCName', type: 'text' },
+      'signerName1': { inputId: 'signerName1', type: 'text' },
+      'signerName2': { inputId: 'signerName2', type: 'text' },
+      'newMembers': { inputId: null, type: 'complex' },
+      'currentMembers': { inputId: null, type: 'complex' }
+    };
+
+    // Setup inline editing
+    function setupInlineEditing() {
+      const docPreview = document.getElementById('documentPreview');
+
+      // Event delegation for blur events on contenteditable spans
+      docPreview.addEventListener('blur', function(e) {
+        if (e.target.classList.contains('doc-highlight') && e.target.dataset.field && !isFullEditMode) {
+          handleInlineEdit(e.target);
+        }
+      }, true);
+
+      // Handle Enter key to blur (submit)
+      docPreview.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && e.target.classList.contains('doc-highlight') && !isFullEditMode) {
+          e.preventDefault();
+          e.target.blur();
+        }
+      });
+
+      // Clear placeholder text on focus
+      docPreview.addEventListener('focus', function(e) {
+        if (e.target.classList.contains('doc-highlight') && e.target.classList.contains('empty')) {
+          const text = e.target.textContent;
+          if (text.startsWith('[') && text.endsWith(']')) {
+            e.target.textContent = '';
+            e.target.classList.remove('empty');
+          }
+        }
+      }, true);
+    }
+
+    // Handle inline edit - sync back to form inputs
+    function handleInlineEdit(element) {
+      const fieldId = element.dataset.field;
+      const newValue = element.textContent.trim();
+      const mapping = fieldInputMap[fieldId];
+
+      if (!mapping) return;
+
+      // Complex fields (members) - just show toast
+      if (mapping.type === 'complex') {
+        showToast('Use the form fields in the sidebar to edit member details');
+        updatePreview();
+        return;
+      }
+
+      const inputEl = document.getElementById(mapping.inputId);
+      if (!inputEl) return;
+
+      // Handle different input types
+      if (mapping.type === 'date') {
+        const parsedDate = parseDateString(newValue);
+        if (parsedDate) {
+          inputEl.value = parsedDate;
+        } else {
+          showToast('Invalid date format');
+        }
+      } else if (mapping.type === 'select') {
+        const options = Array.from(inputEl.options);
+        const matchedOption = options.find(opt =>
+          opt.text.toLowerCase() === newValue.toLowerCase() ||
+          opt.value.toLowerCase() === newValue.toLowerCase()
+        );
+        if (matchedOption) {
+          inputEl.value = matchedOption.value;
+        } else {
+          showToast('Please select from the dropdown in the sidebar');
+        }
+      } else {
+        // Text input - direct sync
+        inputEl.value = newValue;
+      }
+
+      updatePreview();
+    }
+
+    // Parse date string like "December 8, 2025" back to "2025-12-08"
+    function parseDateString(dateStr) {
+      try {
+        const date = new Date(dateStr);
+        if (isNaN(date.getTime())) return null;
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      } catch {
+        return null;
+      }
+    }
+
+    // Initialize inline editing
+    document.addEventListener('DOMContentLoaded', setupInlineEditing);
+
+    // ============================================
+    // FULL EDIT MODE
+    // ============================================
+    function toggleFullEditMode() {
+      const docBody = document.getElementById('documentPreview');
+      const toggleBtn = document.getElementById('editModeBtn');
+      const toolbar = document.querySelector('.preview-toolbar');
+
+      if (!isFullEditMode) {
+        // Enter full edit mode
+        isFullEditMode = true;
+        savedDocumentHTML = docBody.innerHTML;
+        docBody.contentEditable = 'true';
+        docBody.classList.add('full-edit-mode');
+        toggleBtn.innerHTML = '✓ Save Edits';
+        toggleBtn.classList.add('active');
+
+        // Show edit mode indicator
+        showToast('Full Edit Mode: You can now freely edit any text in the document');
+
+        // Add edit toolbar
+        if (!document.getElementById('editToolbar')) {
+          const editToolbar = document.createElement('div');
+          editToolbar.id = 'editToolbar';
+          editToolbar.className = 'edit-toolbar';
+          editToolbar.innerHTML = `
+            <button onclick="document.execCommand('bold')" title="Bold"><strong>B</strong></button>
+            <button onclick="document.execCommand('italic')" title="Italic"><em>I</em></button>
+            <button onclick="document.execCommand('underline')" title="Underline"><u>U</u></button>
+            <span class="toolbar-divider"></span>
+            <button onclick="document.execCommand('insertUnorderedList')" title="Bullet List">•</button>
+            <button onclick="document.execCommand('insertOrderedList')" title="Numbered List">1.</button>
+            <span class="toolbar-divider"></span>
+            <button onclick="addNewParagraph()" title="Add Paragraph">¶+</button>
+            <button onclick="addNewSection()" title="Add Section">§+</button>
+            <span class="toolbar-divider"></span>
+            <button onclick="cancelEditMode()" class="cancel-btn" title="Cancel">✕ Cancel</button>
+          `;
+          toolbar.appendChild(editToolbar);
+        }
+        document.getElementById('editToolbar').style.display = 'flex';
+      } else {
+        // Exit full edit mode and save
+        saveFullEdits();
+      }
+    }
+
+    function saveFullEdits() {
+      const docBody = document.getElementById('documentPreview');
+      const toggleBtn = document.getElementById('editModeBtn');
+
+      isFullEditMode = false;
+      docBody.contentEditable = 'false';
+      docBody.classList.remove('full-edit-mode');
+      toggleBtn.innerHTML = '✏️ Edit Mode';
+      toggleBtn.classList.remove('active');
+
+      if (document.getElementById('editToolbar')) {
+        document.getElementById('editToolbar').style.display = 'none';
+      }
+
+      showToast('Edits saved! Your custom changes have been preserved.');
+    }
+
+    function cancelEditMode() {
+      const docBody = document.getElementById('documentPreview');
+      const toggleBtn = document.getElementById('editModeBtn');
+
+      if (savedDocumentHTML) {
+        docBody.innerHTML = savedDocumentHTML;
+      }
+
+      isFullEditMode = false;
+      docBody.contentEditable = 'false';
+      docBody.classList.remove('full-edit-mode');
+      toggleBtn.innerHTML = '✏️ Edit Mode';
+      toggleBtn.classList.remove('active');
+
+      if (document.getElementById('editToolbar')) {
+        document.getElementById('editToolbar').style.display = 'none';
+      }
+
+      showToast('Changes discarded');
+      addHighlightClickHandlers();
+    }
+
+    function addNewParagraph() {
+      document.execCommand('insertHTML', false, '<p class="doc-paragraph">New paragraph text here...</p>');
+    }
+
+    function addNewSection() {
+      const sectionHTML = `
+        <p class="doc-clause-title">NEW SECTION TITLE</p>
+        <p class="doc-paragraph">
+          <span class="doc-section-num">X.X</span> <strong>Section Heading.</strong>
+          Enter your custom section text here. You can describe additional terms,
+          conditions, or provisions that apply to this amendment.
+        </p>
+      `;
+      document.execCommand('insertHTML', false, sectionHTML);
     }
 
     // ============================================
