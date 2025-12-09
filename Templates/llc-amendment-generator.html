@@ -2098,6 +2098,7 @@
     // Edit mode state (must be before updatePreview)
     let isFullEditMode = false;
     let savedDocumentHTML = '';
+    let hasCustomEdits = false; // Track if user made custom edits in full edit mode
 
     // Signature canvases
     const signatureData = {
@@ -2390,6 +2391,18 @@
     let lastEditedField = null;
 
     function trackFieldEdit(fieldId) {
+      // Warn user if they have custom edits that will be overwritten
+      if (hasCustomEdits) {
+        const proceed = confirm(
+          'You have custom edits in the document preview.\n\n' +
+          'Changing form inputs will regenerate the document and your custom edits will be lost.\n\n' +
+          'Click OK to regenerate, or Cancel to keep your edits.'
+        );
+        if (!proceed) {
+          return;
+        }
+        hasCustomEdits = false;
+      }
       lastEditedField = fieldId;
       updatePreview();
     }
@@ -2900,6 +2913,7 @@
       const toggleBtn = document.getElementById('editModeBtn');
 
       isFullEditMode = false;
+      hasCustomEdits = true; // Mark that user has custom edits to protect
       docBody.contentEditable = 'false';
       docBody.classList.remove('full-edit-mode');
       toggleBtn.innerHTML = '✏️ Edit Mode';
@@ -2921,6 +2935,7 @@
       }
 
       isFullEditMode = false;
+      hasCustomEdits = false; // Clear custom edits flag since we're restoring original
       docBody.contentEditable = 'false';
       docBody.classList.remove('full-edit-mode');
       toggleBtn.innerHTML = '✏️ Edit Mode';
