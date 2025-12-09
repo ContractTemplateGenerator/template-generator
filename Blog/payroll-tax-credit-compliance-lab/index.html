@@ -1,0 +1,2528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payroll Tax Credit Compliance Lab | Terms.Law - Sergei Tokmakov, Esq.</title>
+  <meta name="description" content="Interactive tool to evaluate payroll tax credit compliance. Check ERC, R&D credits, WOTC against IRS requirements. Identify promoter red flags and audit readiness.">
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-901N2Y3CDZ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-901N2Y3CDZ');
+  </script>
+
+  <!-- Hide header when in iframe -->
+  <script>
+    if (window.self !== window.top) {
+      document.documentElement.classList.add('in-iframe');
+    }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* ============================================
+       CSS DESIGN SYSTEM - Terms.Law Brand
+       ============================================ */
+    :root {
+      --color-primary: #2563eb;
+      --color-primary-dark: #1d4ed8;
+      --color-accent: #8b5cf6;
+      --color-accent-light: #a78bfa;
+      --color-success: #10b981;
+      --color-warning: #f59e0b;
+      --color-danger: #ef4444;
+
+      --color-bg: #f8fafc;
+      --color-surface: #ffffff;
+      --color-border: #e2e8f0;
+      --color-text: #0f172a;
+      --color-text-secondary: #334155;
+      --color-text-muted: #64748b;
+
+      --gradient-hero: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #312e81 100%);
+      --gradient-brand: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+      --gradient-header: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      --radius-full: 9999px;
+
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2rem;
+      --space-2xl: 3rem;
+
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --max-width: 1280px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body {
+      font-family: var(--font-sans);
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--color-text);
+      background: var(--color-bg);
+      min-height: 100vh;
+    }
+
+    html.in-iframe .site-header { display: none !important; }
+    html.in-iframe body { padding-top: 0 !important; }
+
+    .container { max-width: var(--max-width); margin: 0 auto; padding: 0 var(--space-lg); }
+
+    /* ============================================
+       HEADER - Dark Professional (Matching main site)
+       ============================================ */
+    .site-header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      padding: 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 52px;
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
+
+    .header-nav {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      height: 100%;
+    }
+
+    .nav-link {
+      color: #94a3b8;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 16px 24px;
+      transition: all 150ms ease;
+      text-decoration: none;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+    }
+
+    .nav-link:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-link.active {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
+      border-bottom-color: #3b82f6;
+    }
+
+    .nav-link.home-logo {
+      padding: 12px 20px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      text-transform: none;
+    }
+
+    .nav-link.home-logo .logo-text {
+      background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header-email-cta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: all 150ms ease;
+      text-decoration: none;
+      margin-left: 1.5rem;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+    }
+
+    .header-email-cta:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+      color: #fff;
+    }
+
+    /* ============================================
+       HERO SECTION
+       ============================================ */
+    .hero {
+      background: var(--gradient-hero);
+      padding: var(--space-2xl) 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-xs) var(--space-md);
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: var(--radius-full);
+      font-size: 0.85rem;
+      color: #e2e8f0;
+      margin-bottom: var(--space-lg);
+      backdrop-filter: blur(10px);
+    }
+
+    .hero-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.2;
+      margin-bottom: var(--space-md);
+      letter-spacing: -0.02em;
+    }
+
+    .hero-title .highlight {
+      background: var(--gradient-brand);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-subtitle {
+      font-size: 1.1rem;
+      color: #94a3b8;
+      line-height: 1.7;
+      margin-bottom: var(--space-lg);
+    }
+
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-2xl);
+      flex-wrap: wrap;
+    }
+
+    .hero-stat {
+      text-align: center;
+    }
+
+    .hero-stat-value {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .hero-stat-label {
+      font-size: 0.8rem;
+      color: #64748b;
+    }
+
+    /* ============================================
+       TAB NAVIGATION
+       ============================================ */
+    .tab-nav {
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      position: sticky;
+      top: 52px;
+      z-index: 90;
+    }
+
+    html.in-iframe .tab-nav { top: 0; }
+
+    .tab-nav-inner {
+      display: flex;
+      gap: 0;
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 var(--space-lg);
+      overflow-x: auto;
+    }
+
+    .tab-button {
+      padding: var(--space-md) var(--space-lg);
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      transition: all 150ms ease;
+      white-space: nowrap;
+    }
+
+    .tab-button:hover {
+      color: var(--color-text);
+      background: var(--color-bg);
+    }
+
+    .tab-button.active {
+      color: var(--color-primary);
+      border-bottom-color: var(--color-primary);
+    }
+
+    .tab-button .tab-icon {
+      margin-right: var(--space-sm);
+    }
+
+    /* ============================================
+       MAIN CONTENT AREA
+       ============================================ */
+    .main-content {
+      padding: var(--space-xl) 0 var(--space-2xl);
+      min-height: 60vh;
+    }
+
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ============================================
+       SECTION INTRO
+       ============================================ */
+    .section-intro {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      margin-bottom: var(--space-xl);
+    }
+
+    .section-intro h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--color-text);
+      margin-bottom: var(--space-sm);
+    }
+
+    .section-intro p {
+      color: var(--color-text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.7;
+      margin-bottom: var(--space-sm);
+    }
+
+    .section-intro p:last-child {
+      margin-bottom: 0;
+    }
+
+    .section-intro .legal-note {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      font-style: italic;
+    }
+
+    /* ============================================
+       CREDITS TABLE
+       ============================================ */
+    .credits-grid {
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: var(--space-xl);
+      align-items: start;
+    }
+
+    @media (max-width: 968px) {
+      .credits-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .credits-table-wrapper {
+      overflow-x: auto;
+    }
+
+    .credits-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--color-surface);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--color-border);
+    }
+
+    .credits-table th {
+      background: var(--color-bg);
+      padding: var(--space-md);
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .credits-table td {
+      padding: var(--space-md);
+      border-bottom: 1px solid var(--color-border);
+      font-size: 0.9rem;
+      vertical-align: top;
+    }
+
+    .credits-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .credits-table tr {
+      cursor: pointer;
+      transition: background 150ms ease;
+    }
+
+    .credits-table tr:hover {
+      background: var(--color-bg);
+    }
+
+    .credits-table tr.selected {
+      background: rgba(37, 99, 235, 0.05);
+    }
+
+    .credit-name {
+      font-weight: 600;
+      color: var(--color-text);
+    }
+
+    .credit-code {
+      font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+      font-size: 0.8rem;
+      color: var(--color-primary);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .status-badge.active {
+      background: rgba(16, 185, 129, 0.1);
+      color: #059669;
+    }
+
+    .status-badge.high_enforcement {
+      background: rgba(239, 68, 68, 0.1);
+      color: #dc2626;
+    }
+
+    .status-badge.sunset {
+      background: rgba(245, 158, 11, 0.1);
+      color: #d97706;
+    }
+
+    .status-badge.moratorium {
+      background: rgba(139, 92, 246, 0.1);
+      color: #7c3aed;
+    }
+
+    /* ============================================
+       CREDIT DETAIL PANEL
+       ============================================ */
+    .credit-detail {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      position: sticky;
+      top: 120px;
+    }
+
+    .credit-detail h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--color-text);
+      margin-bottom: var(--space-sm);
+      padding-bottom: var(--space-sm);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .credit-detail-section {
+      margin-bottom: var(--space-lg);
+    }
+
+    .credit-detail-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .credit-detail-section h4 {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-sm);
+    }
+
+    .credit-detail-section p {
+      font-size: 0.9rem;
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+    }
+
+    .credit-detail-section ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .credit-detail-section li {
+      font-size: 0.9rem;
+      color: var(--color-text-secondary);
+      padding: var(--space-xs) 0;
+      padding-left: var(--space-lg);
+      position: relative;
+    }
+
+    .credit-detail-section li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: var(--color-primary);
+      font-weight: bold;
+    }
+
+    .citation-list li::before {
+      content: '§';
+      color: var(--color-accent);
+    }
+
+    .open-wizard-btn {
+      display: block;
+      width: 100%;
+      padding: var(--space-md);
+      background: var(--gradient-brand);
+      border: none;
+      border-radius: var(--radius-md);
+      color: #fff;
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 150ms ease;
+      margin-top: var(--space-lg);
+    }
+
+    .open-wizard-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+    }
+
+    /* ============================================
+       WIZARD STYLES
+       ============================================ */
+    .wizard-container {
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: var(--space-xl);
+      align-items: start;
+    }
+
+    @media (max-width: 968px) {
+      .wizard-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .wizard-form {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+    }
+
+    .wizard-credit-select {
+      margin-bottom: var(--space-lg);
+      padding-bottom: var(--space-lg);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .wizard-credit-select label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--color-text);
+      margin-bottom: var(--space-sm);
+    }
+
+    .wizard-credit-select select {
+      width: 100%;
+      padding: var(--space-sm) var(--space-md);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      background: var(--color-surface);
+      cursor: pointer;
+    }
+
+    .wizard-question {
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      margin-bottom: var(--space-md);
+    }
+
+    .wizard-question-text {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--color-text);
+      margin-bottom: var(--space-sm);
+    }
+
+    .wizard-question-help {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-md);
+    }
+
+    .wizard-options {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+
+    .wizard-option {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-sm) var(--space-md);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 150ms ease;
+    }
+
+    .wizard-option:hover {
+      border-color: var(--color-primary);
+    }
+
+    .wizard-option.selected {
+      border-color: var(--color-primary);
+      background: rgba(37, 99, 235, 0.05);
+    }
+
+    .wizard-option input {
+      margin: 0;
+    }
+
+    .wizard-option span {
+      font-size: 0.9rem;
+      color: var(--color-text);
+    }
+
+    .multi-select-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+    }
+
+    .multi-option {
+      padding: var(--space-xs) var(--space-md);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-full);
+      font-size: 0.85rem;
+      color: var(--color-text);
+      cursor: pointer;
+      transition: all 150ms ease;
+    }
+
+    .multi-option:hover {
+      border-color: var(--color-primary);
+    }
+
+    .multi-option.selected {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: #fff;
+    }
+
+    .run-check-btn {
+      display: block;
+      width: 100%;
+      padding: var(--space-md);
+      background: var(--color-text);
+      border: none;
+      border-radius: var(--radius-md);
+      color: #fff;
+      font-family: var(--font-sans);
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 150ms ease;
+      margin-top: var(--space-lg);
+    }
+
+    .run-check-btn:hover {
+      background: #1e293b;
+    }
+
+    /* ============================================
+       RESULTS PANEL
+       ============================================ */
+    .results-panel {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      position: sticky;
+      top: 120px;
+    }
+
+    .results-panel h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--color-text);
+      margin-bottom: var(--space-md);
+    }
+
+    .risk-score-display {
+      text-align: center;
+      padding: var(--space-lg);
+      background: var(--color-bg);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-lg);
+    }
+
+    .risk-score-value {
+      font-size: 3rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .risk-score-value.low { color: var(--color-success); }
+    .risk-score-value.medium { color: var(--color-warning); }
+    .risk-score-value.high { color: var(--color-danger); }
+
+    .risk-score-label {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      margin-top: var(--space-sm);
+    }
+
+    .risk-band {
+      display: inline-block;
+      padding: var(--space-xs) var(--space-md);
+      border-radius: var(--radius-full);
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-top: var(--space-sm);
+    }
+
+    .risk-band.low {
+      background: rgba(16, 185, 129, 0.1);
+      color: #059669;
+    }
+
+    .risk-band.medium {
+      background: rgba(245, 158, 11, 0.1);
+      color: #d97706;
+    }
+
+    .risk-band.high {
+      background: rgba(239, 68, 68, 0.1);
+      color: #dc2626;
+    }
+
+    .results-summary {
+      font-size: 0.9rem;
+      color: var(--color-text-secondary);
+      line-height: 1.7;
+      margin-bottom: var(--space-lg);
+    }
+
+    .flag-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .flag-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-sm);
+      padding: var(--space-sm) 0;
+      font-size: 0.9rem;
+      color: var(--color-text-secondary);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .flag-item:last-child {
+      border-bottom: none;
+    }
+
+    .flag-icon {
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+
+    .flag-icon.warning {
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--color-warning);
+    }
+
+    .flag-icon.danger {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--color-danger);
+    }
+
+    .copy-results-btn {
+      display: block;
+      width: 100%;
+      padding: var(--space-sm) var(--space-md);
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      color: var(--color-text);
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 150ms ease;
+      margin-top: var(--space-lg);
+    }
+
+    .copy-results-btn:hover {
+      background: var(--color-border);
+    }
+
+    /* ============================================
+       PROMOTER ANALYZER
+       ============================================ */
+    .promoter-grid {
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: var(--space-xl);
+      align-items: start;
+    }
+
+    @media (max-width: 968px) {
+      .promoter-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .promoter-checklist {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+    }
+
+    .flag-check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-md);
+      padding: var(--space-md);
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-md);
+      cursor: pointer;
+      transition: all 150ms ease;
+    }
+
+    .flag-check-item:hover {
+      border-color: var(--color-warning);
+    }
+
+    .flag-check-item.checked {
+      border-color: var(--color-danger);
+      background: rgba(239, 68, 68, 0.03);
+    }
+
+    .flag-check-item input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .flag-check-content h4 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--color-text);
+      margin-bottom: var(--space-xs);
+    }
+
+    .flag-check-content p {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      line-height: 1.5;
+    }
+
+    .flag-weight {
+      flex-shrink: 0;
+      padding: 2px 8px;
+      background: rgba(239, 68, 68, 0.1);
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--color-danger);
+    }
+
+    /* ============================================
+       AUDIT READINESS
+       ============================================ */
+    .audit-grid {
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: var(--space-xl);
+      align-items: start;
+    }
+
+    @media (max-width: 968px) {
+      .audit-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .doc-category {
+      margin-bottom: var(--space-xl);
+    }
+
+    .doc-category h4 {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-md);
+      padding-bottom: var(--space-sm);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .doc-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-md);
+      padding: var(--space-md);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-sm);
+      cursor: pointer;
+      transition: all 150ms ease;
+    }
+
+    .doc-item:hover {
+      border-color: var(--color-success);
+    }
+
+    .doc-item.checked {
+      border-color: var(--color-success);
+      background: rgba(16, 185, 129, 0.03);
+    }
+
+    .doc-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .doc-content h5 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--color-text);
+      margin-bottom: var(--space-xs);
+    }
+
+    .doc-content p {
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      line-height: 1.5;
+    }
+
+    .readiness-meter {
+      margin-bottom: var(--space-lg);
+    }
+
+    .readiness-bar {
+      height: 12px;
+      background: var(--color-bg);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      margin-bottom: var(--space-sm);
+    }
+
+    .readiness-fill {
+      height: 100%;
+      background: var(--gradient-brand);
+      border-radius: var(--radius-full);
+      transition: width 300ms ease;
+    }
+
+    .readiness-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+    }
+
+    .readiness-label span:first-child {
+      color: var(--color-text-muted);
+    }
+
+    .readiness-label span:last-child {
+      font-weight: 700;
+      color: var(--color-text);
+    }
+
+    /* ============================================
+       FOOTER
+       ============================================ */
+    .site-footer {
+      background: var(--gradient-header);
+      padding: var(--space-xl) 0;
+      margin-top: var(--space-2xl);
+    }
+
+    .footer-content {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 var(--space-lg);
+    }
+
+    .footer-disclaimer {
+      color: #64748b;
+      font-size: 0.8rem;
+      line-height: 1.7;
+      margin-bottom: var(--space-lg);
+      padding-bottom: var(--space-lg);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .footer-disclaimer strong {
+      color: #94a3b8;
+    }
+
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--space-md);
+    }
+
+    .footer-copyright {
+      color: #64748b;
+      font-size: 0.85rem;
+    }
+
+    .footer-copyright a {
+      color: #94a3b8;
+      text-decoration: none;
+    }
+
+    .footer-copyright a:hover {
+      color: #fff;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: var(--space-lg);
+    }
+
+    .footer-links a {
+      color: #64748b;
+      font-size: 0.8rem;
+      text-decoration: none;
+    }
+
+    .footer-links a:hover {
+      color: #fff;
+    }
+
+    /* ============================================
+       RESPONSIVE
+       ============================================ */
+    @media (max-width: 768px) {
+      .header-nav {
+        display: none;
+      }
+
+      .hero-title {
+        font-size: 1.75rem;
+      }
+
+      .hero-stats {
+        gap: var(--space-lg);
+      }
+
+      .tab-button {
+        padding: var(--space-sm) var(--space-md);
+        font-size: 0.8rem;
+      }
+
+      .credit-detail,
+      .results-panel {
+        position: static;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="header-content">
+      <nav class="header-nav">
+        <a href="../../index.html" class="nav-link home-logo" title="Home">
+          <span class="logo-text">Terms.Law</span>
+        </a>
+        <a href="../../Demand-Letters/demand-letters-landing.html" class="nav-link">Demands</a>
+        <a href="../../Templates/contract-library-landing.html" class="nav-link">Contracts</a>
+        <a href="../../INC/formation-landing.html" class="nav-link">Incorporation</a>
+        <a href="../blog-landing.html" class="nav-link active">Blog</a>
+        <a href="mailto:owner@terms.law" class="header-email-cta">Email</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-badge">
+          <span>&#9878;</span>
+          Interactive Compliance Tool
+        </div>
+        <h1 class="hero-title">
+          Payroll Tax Credit<br>
+          <span class="highlight">Compliance Lab</span>
+        </h1>
+        <p class="hero-subtitle">
+          Evaluate whether a payroll tax credit is actually compliant with IRS requirements.
+          Check ERC, R&D credits, WOTC against statutory tests. Identify promoter red flags.
+          Built by a California-licensed attorney with 1,800+ projects.
+        </p>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <div class="hero-stat-value">4</div>
+            <div class="hero-stat-label">Credits Covered</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-value">20+</div>
+            <div class="hero-stat-label">Compliance Tests</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-value">12</div>
+            <div class="hero-stat-label">IRS Citations</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB NAVIGATION -->
+  <nav class="tab-nav">
+    <div class="tab-nav-inner">
+      <button class="tab-button active" data-tab="credits">
+        <span class="tab-icon">&#128218;</span>
+        Credits Map
+      </button>
+      <button class="tab-button" data-tab="wizard">
+        <span class="tab-icon">&#9989;</span>
+        Compliance Wizard
+      </button>
+      <button class="tab-button" data-tab="promoter">
+        <span class="tab-icon">&#9888;</span>
+        Promoter Risk
+      </button>
+      <button class="tab-button" data-tab="audit">
+        <span class="tab-icon">&#128196;</span>
+        Audit Readiness
+      </button>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    <div class="container">
+
+      <!-- TAB 1: CREDITS MAP -->
+      <div class="tab-panel active" id="credits-panel">
+        <div class="section-intro">
+          <h2>Payroll Tax Credits Reference</h2>
+          <p>
+            This table maps the main wage-based and payroll-related tax credits that appear in vendor marketing.
+            Each entry shows the statutory hook (Code section), the type of tax it reduces, and the current enforcement posture.
+            Click any row to see detailed eligibility tests, common disqualifiers, and key IRS guidance.
+          </p>
+          <p class="legal-note">
+            This reference is for general educational purposes. It does not constitute legal advice.
+            Consult a qualified tax attorney for advice on your specific situation.
+          </p>
+        </div>
+
+        <div class="credits-grid">
+          <div class="credits-table-wrapper">
+            <table class="credits-table" id="credits-table">
+              <thead>
+                <tr>
+                  <th>Credit Name</th>
+                  <th>Code Section(s)</th>
+                  <th>Tax Type</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="credits-tbody">
+                <!-- Populated by JavaScript -->
+              </tbody>
+            </table>
+          </div>
+
+          <div class="credit-detail" id="credit-detail">
+            <h3 id="detail-name">Select a credit</h3>
+            <div class="credit-detail-section">
+              <h4>Summary</h4>
+              <p id="detail-summary">Click on a credit in the table to see details.</p>
+            </div>
+            <div class="credit-detail-section">
+              <h4>Code Sections</h4>
+              <ul class="citation-list" id="detail-codes"></ul>
+            </div>
+            <div class="credit-detail-section">
+              <h4>Eligibility Tests</h4>
+              <ul id="detail-eligibility"></ul>
+            </div>
+            <div class="credit-detail-section">
+              <h4>Common Disqualifiers</h4>
+              <ul id="detail-disqualifiers"></ul>
+            </div>
+            <div class="credit-detail-section">
+              <h4>Key IRS Guidance</h4>
+              <ul class="citation-list" id="detail-guidance"></ul>
+            </div>
+            <div class="credit-detail-section">
+              <h4>Enforcement Notes</h4>
+              <p id="detail-enforcement"></p>
+            </div>
+            <button class="open-wizard-btn" id="open-wizard-btn">
+              Run Compliance Check &rarr;
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: COMPLIANCE WIZARD -->
+      <div class="tab-panel" id="wizard-panel">
+        <div class="section-intro">
+          <h2>Structured Compliance Triage</h2>
+          <p>
+            This wizard walks through the same questions I ask clients when evaluating whether a payroll tax credit
+            is on solid footing or drifting into "audit bait" territory. It highlights patterns that appear
+            frequently in IRS guidance and enforcement actions.
+          </p>
+          <p>
+            Answer honestly based on what your promoter or advisor is actually proposing, not what you wish they were saying.
+            The output helps you decide when to slow down and get a real, written opinion from a tax professional.
+          </p>
+          <p class="legal-note">
+            This tool does not replace tailored legal or tax advice. Results are educational only.
+          </p>
+        </div>
+
+        <div class="wizard-container">
+          <div class="wizard-form">
+            <div class="wizard-credit-select">
+              <label for="wizard-credit">Credit you are evaluating:</label>
+              <select id="wizard-credit">
+                <!-- Populated by JavaScript -->
+              </select>
+            </div>
+
+            <div id="wizard-questions">
+              <!-- Populated by JavaScript -->
+            </div>
+
+            <button class="run-check-btn" id="run-check-btn">
+              Run Compliance Check
+            </button>
+          </div>
+
+          <div class="results-panel" id="results-panel">
+            <h3>Compliance Summary</h3>
+            <div id="results-content">
+              <p style="color: var(--color-text-muted);">
+                Answer the questions and run the check to see a risk assessment for this credit claim.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: PROMOTER RISK -->
+      <div class="tab-panel" id="promoter-panel">
+        <div class="section-intro">
+          <h2>Promoter Risk Analysis</h2>
+          <p>
+            There are two different questions in payroll tax credit compliance. One is whether a given credit
+            exists in the Code and can apply to your facts. The other is whether the person selling it to you
+            is behaving like a professional advisor or like a contingency-fee bounty hunter.
+          </p>
+          <p>
+            This checklist focuses on the second question. It takes common red flags from recent IRS warnings
+            and turns them into a risk score. If you find yourself checking most of these boxes, that's a strong
+            signal to pause before signing anything.
+          </p>
+          <p class="legal-note">
+            Based on IRS "Dirty Dozen" alerts, ERC promoter warnings, and Circular 230 standards.
+          </p>
+        </div>
+
+        <div class="promoter-grid">
+          <div class="promoter-checklist" id="promoter-checklist">
+            <!-- Populated by JavaScript -->
+          </div>
+
+          <div class="results-panel" id="promoter-results">
+            <h3>Promoter Risk Score</h3>
+            <div id="promoter-results-content">
+              <p style="color: var(--color-text-muted);">
+                Check the red flags that apply to your situation to see a risk assessment.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: AUDIT READINESS -->
+      <div class="tab-panel" id="audit-panel">
+        <div class="section-intro">
+          <h2>Audit & Opinion Readiness</h2>
+          <p>
+            The strongest tax positions share two traits: a plausible reading of the law, and paperwork that
+            makes an auditor's job boring. This panel focuses on the second part.
+          </p>
+          <p>
+            For the credit you're evaluating, mark which documents you already have. The readiness score shows
+            how far you are from a file that can support a defensible filing. Low scores don't mean abandon the
+            credit—they mean slow down, gather missing records, and ensure any opinion is built on facts you can prove.
+          </p>
+          <p class="legal-note">
+            Documentation requirements based on IRS guidance and standard tax opinion practice.
+          </p>
+        </div>
+
+        <div class="audit-grid">
+          <div class="audit-checklist">
+            <div class="wizard-credit-select" style="margin-bottom: var(--space-xl);">
+              <label for="audit-credit">Credit you are evaluating:</label>
+              <select id="audit-credit">
+                <!-- Populated by JavaScript -->
+              </select>
+            </div>
+
+            <div id="audit-docs">
+              <!-- Populated by JavaScript -->
+            </div>
+          </div>
+
+          <div class="results-panel" id="audit-results">
+            <h3>Documentation Readiness</h3>
+            <div id="audit-results-content">
+              <div class="readiness-meter">
+                <div class="readiness-bar">
+                  <div class="readiness-fill" id="readiness-fill" style="width: 0%;"></div>
+                </div>
+                <div class="readiness-label">
+                  <span>Opinion Readiness</span>
+                  <span id="readiness-percent">0%</span>
+                </div>
+              </div>
+              <p style="color: var(--color-text-muted); font-size: 0.9rem;">
+                Select a credit and check off the documents you have to see your readiness score.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-disclaimer">
+        <strong>Attorney Advertising. Educational Resource Only.</strong><br>
+        This interactive tool is for general informational and educational purposes only. It does not constitute
+        legal advice, tax advice, or an attorney-client relationship. The information provided is general in nature
+        and may not apply to your specific situation. Tax law is complex and fact-specific. For advice on your
+        particular circumstances, consult a qualified tax attorney or CPA. No reliance should be placed on this
+        tool for making tax decisions. Past results do not guarantee future outcomes.
+      </div>
+      <div class="footer-bottom">
+        <div class="footer-copyright">
+          &copy; 2025 Sergei Tokmakov, Esq. &middot; <a href="https://terms.law">Terms.Law</a> &middot; California Bar #278441
+        </div>
+        <div class="footer-links">
+          <a href="https://terms.law/terms-of-service/">Terms</a>
+          <a href="https://terms.law/privacy-policy/">Privacy</a>
+          <a href="https://terms.law/disclaimer/">Disclaimer</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ============================================
+    // DATA: PAYROLL TAX CREDITS
+    // ============================================
+    const credits = [
+      {
+        id: "erc",
+        name: "Employee Retention Credit (ERC)",
+        codeSections: ["26 U.S.C. § 3134", "26 U.S.C. § 2301 (CARES Act)"],
+        taxType: "employment",
+        taxTypeLabel: "Employment Tax",
+        activeYears: { from: 2020, to: 2021 },
+        status: "high_enforcement",
+        statusLabel: "High Enforcement",
+        summary: "A refundable credit against employer Social Security taxes for qualified wages paid during specified COVID-19 periods. Originally enacted under the CARES Act (§ 2301), then extended and modified, with the current statutory home at 26 U.S.C. § 3134 for 2021 wages.",
+        eligibilityTests: [
+          {
+            id: "gov_order",
+            label: "Full or partial suspension by government order",
+            description: "Operations were fully or partially suspended due to a governmental order limiting commerce, travel, or group meetings related to COVID-19."
+          },
+          {
+            id: "gross_receipts",
+            label: "Significant decline in gross receipts",
+            description: "Gross receipts declined by the threshold amount (50% for 2020, 20% for 2021) compared to the same calendar quarter in 2019."
+          },
+          {
+            id: "recovery_startup",
+            label: "Recovery startup business (Q3-Q4 2021 only)",
+            description: "Business that began operations after February 15, 2020, with average annual gross receipts not exceeding $1 million. Limited to $50,000 credit per quarter."
+          },
+          {
+            id: "qualified_wages",
+            label: "Qualified wages properly calculated",
+            description: "Wages must meet the definition under § 3134(c), with different rules applying based on employer size (under/over 100 employees in 2020, under/over 500 in 2021)."
+          }
+        ],
+        disqualifiers: [
+          "Claiming ERC for wages also counted for PPP loan forgiveness (no double-dipping)",
+          "Relying solely on vague 'supply chain disruption' without a specific government order affecting your operations",
+          "Claiming quarters beyond the statutory end dates (most claims ended after Q3 2021)",
+          "Using inflated wage amounts or employee counts",
+          "Claiming as recovery startup while not meeting the gross receipts or start-date requirements"
+        ],
+        irsGuidance: [
+          "Notice 2021-20 (ERC guidance for 2020)",
+          "Notice 2021-23 (ERC guidance for Q1-Q2 2021)",
+          "Notice 2021-49 (ERC guidance for Q3-Q4 2021)",
+          "IRS ERC Frequently Asked Questions",
+          "IRS News Release IR-2024-169 (moratorium extension)",
+          "IRS 'Dirty Dozen' warnings on ERC mills"
+        ],
+        enforcementNotes: "The IRS has treated ERC as a high-risk area with aggressive enforcement. In September 2023, the IRS announced a moratorium on processing new ERC claims due to widespread fraud. The IRS has issued multiple warnings about promoters using aggressive marketing tactics. Criminal investigations are ongoing for fraudulent claims."
+      },
+      {
+        id: "rd_payroll",
+        name: "R&D Payroll Tax Credit Election (QSB)",
+        codeSections: ["26 U.S.C. § 41 (Research Credit)", "26 U.S.C. § 41(h) (Payroll Election)", "26 U.S.C. § 3111(f) (Application to FICA)"],
+        taxType: "employment",
+        taxTypeLabel: "Employment Tax",
+        activeYears: { from: 2016, to: null },
+        status: "active",
+        statusLabel: "Active",
+        summary: "Allows qualified small businesses (QSBs) to elect to apply a portion of the research credit under § 41 against employer Social Security taxes under § 3111(a), rather than against income tax. Expanded by the Inflation Reduction Act to allow offset against Medicare taxes as well.",
+        eligibilityTests: [
+          {
+            id: "qualified_research",
+            label: "Qualified research activities under § 41(d)",
+            description: "Activities must satisfy the four-part test: (1) permitted purpose, (2) technological in nature, (3) elimination of uncertainty, (4) process of experimentation."
+          },
+          {
+            id: "qsb_gross_receipts",
+            label: "Qualified small business gross receipts test",
+            description: "Gross receipts for the tax year must be less than $5 million, and no gross receipts in any tax year preceding the 5-tax-year period ending with the tax year."
+          },
+          {
+            id: "qsb_age",
+            label: "Entity must be in first 5 years of generating gross receipts",
+            description: "The business must not have had gross receipts for any taxable year before the 5-taxable-year period ending with the taxable year."
+          },
+          {
+            id: "payroll_cap",
+            label: "Annual cap on payroll credit election",
+            description: "The elected amount cannot exceed $250,000 per year (increased from $250,000 to $500,000 for tax years beginning after 2022 under IRA)."
+          }
+        ],
+        disqualifiers: [
+          "Activities that don't meet the four-part test (e.g., routine software maintenance, content creation, market research)",
+          "Exceeding the qualified small business gross receipts threshold",
+          "Business has more than 5 years of gross receipts history",
+          "Electing more than the annual cap allows",
+          "No contemporaneous documentation of research activities"
+        ],
+        irsGuidance: [
+          "Form 8974 Instructions (Qualified Small Business Payroll Tax Credit)",
+          "Form 6765 Instructions (Credit for Increasing Research Activities)",
+          "Treas. Reg. § 1.41-4 (Qualified research definition)",
+          "IRS guidance on research credit elections"
+        ],
+        enforcementNotes: "While not as visible as ERC enforcement, the R&D credit is subject to significant IRS scrutiny. The IRS has increased focus on whether activities truly meet the four-part test, particularly for software development. Contemporaneous documentation of technical uncertainty and experimentation is critical."
+      },
+      {
+        id: "wotc",
+        name: "Work Opportunity Tax Credit (WOTC)",
+        codeSections: ["26 U.S.C. § 51", "26 U.S.C. § 52 (Special Rules)"],
+        taxType: "income",
+        taxTypeLabel: "Income Tax (Wage-Based)",
+        activeYears: { from: 1996, to: null },
+        status: "active",
+        statusLabel: "Active",
+        summary: "A general business credit for hiring individuals from certain targeted groups who face significant barriers to employment. The credit is calculated as a percentage of qualified first-year wages, up to statutory caps depending on the target group.",
+        eligibilityTests: [
+          {
+            id: "targeted_group",
+            label: "Employee is member of a targeted group",
+            description: "Groups include veterans, TANF recipients, SNAP recipients, designated community residents, vocational rehabilitation referrals, ex-felons, SSI recipients, and long-term unemployment recipients."
+          },
+          {
+            id: "certification",
+            label: "Proper certification obtained (Form 8850)",
+            description: "IRS Form 8850 must be submitted to the state workforce agency within 28 days of the employee's start date for certification."
+          },
+          {
+            id: "minimum_hours",
+            label: "Minimum hours worked",
+            description: "Employee must work at least 120 hours for the minimum credit (25% of wages) or 400 hours for the full credit (40% of wages)."
+          },
+          {
+            id: "wage_limit",
+            label: "Qualified wages within statutory limits",
+            description: "First-year wages capped at $6,000 for most groups ($12,000-$24,000 for certain veterans)."
+          }
+        ],
+        disqualifiers: [
+          "Form 8850 not submitted within 28 days of start date",
+          "Employee does not meet the definition of a targeted group",
+          "Insufficient hours worked (under 120 hours)",
+          "Rehiring a former employee who worked for you previously",
+          "Employee is related to the employer or a majority owner"
+        ],
+        irsGuidance: [
+          "Form 5884 Instructions (Work Opportunity Credit)",
+          "Form 8850 Instructions (Pre-Screening Notice)",
+          "IRS Publication 954 (Tax Incentives for Distressed Communities)",
+          "DOL Employment and Training Administration WOTC guidance"
+        ],
+        enforcementNotes: "WOTC is generally lower risk than ERC, but the main compliance issue is ensuring proper certification timing. Claims are regularly denied when Form 8850 is submitted late or target group documentation is insufficient."
+      },
+      {
+        id: "fica_tip",
+        name: "FICA Tip Credit",
+        codeSections: ["26 U.S.C. § 45B"],
+        taxType: "income",
+        taxTypeLabel: "Income Tax (Wage-Based)",
+        activeYears: { from: 1994, to: null },
+        status: "active",
+        statusLabel: "Active",
+        summary: "A general business credit for food and beverage establishments equal to the employer's share of FICA taxes paid on tips exceeding the amount that would be owed at minimum wage. Designed to offset the employer's cost of paying FICA on employee tips.",
+        eligibilityTests: [
+          {
+            id: "food_beverage",
+            label: "Food or beverage establishment",
+            description: "Business must be engaged in providing food or beverages for consumption on or off the premises."
+          },
+          {
+            id: "tipped_employees",
+            label: "Employees who receive tips",
+            description: "Credit applies to wages paid to employees who customarily receive tips in the course of employment."
+          },
+          {
+            id: "excess_tips",
+            label: "Tips exceed minimum wage equivalent",
+            description: "Credit is calculated on tips that, when combined with wages, exceed what the employer would have paid at federal minimum wage."
+          },
+          {
+            id: "fica_paid",
+            label: "Employer FICA actually paid",
+            description: "Employer must have actually paid the FICA taxes on the tip wages claimed for the credit."
+          }
+        ],
+        disqualifiers: [
+          "Business is not a food or beverage establishment",
+          "Misclassifying service charges as tips (service charges imposed by employer are wages, not tips)",
+          "Including tips that are not 'excess' over minimum wage",
+          "Double-counting with other wage-based credits"
+        ],
+        irsGuidance: [
+          "Form 8846 Instructions (Credit for Employer Social Security and Medicare Taxes)",
+          "Rev. Rul. 2012-18 (distinguishing tips from service charges)",
+          "Treas. Reg. § 31.3121(q)-1 (Tips as wages)"
+        ],
+        enforcementNotes: "The main compliance issue is proper classification of tips vs. service charges. Automatic gratuities added by the employer are service charges (wages) and don't qualify. IRS has focused on this distinction in restaurant audits."
+      }
+    ];
+
+    // ============================================
+    // DATA: WIZARD QUESTIONS
+    // ============================================
+    const wizardQuestions = [
+      // ERC Questions
+      {
+        id: "erc_basis",
+        creditId: "erc",
+        step: 1,
+        question: "What is the main basis for the ERC claim being proposed?",
+        helpText: "Select the option that best matches how the promoter or advisor has described your eligibility.",
+        type: "singleChoice",
+        options: [
+          { value: "gov_order", label: "Specific government orders that restricted our operations" },
+          { value: "gross_receipts", label: "Documented decline in gross receipts compared to 2019" },
+          { value: "both", label: "Both government orders AND gross receipts decline" },
+          { value: "supply_chain", label: "General supply chain disruption or COVID impact (no specific order cited)" }
+        ],
+        weight: 3
+      },
+      {
+        id: "erc_quarters",
+        creditId: "erc",
+        step: 1,
+        question: "Which quarters are being claimed for ERC?",
+        helpText: "Select all quarters for which the promoter proposes claiming the credit.",
+        type: "multiChoice",
+        options: [
+          { value: "2020_q2", label: "2020 Q2" },
+          { value: "2020_q3", label: "2020 Q3" },
+          { value: "2020_q4", label: "2020 Q4" },
+          { value: "2021_q1", label: "2021 Q1" },
+          { value: "2021_q2", label: "2021 Q2" },
+          { value: "2021_q3", label: "2021 Q3" }
+        ]
+      },
+      {
+        id: "erc_ppp",
+        creditId: "erc",
+        step: 2,
+        question: "Did your business receive a PPP loan?",
+        helpText: "This matters because wages used for PPP forgiveness cannot also be used for ERC.",
+        type: "boolean"
+      },
+      {
+        id: "erc_wage_allocation",
+        creditId: "erc",
+        step: 2,
+        question: "If you received PPP, has the promoter explained how wages are allocated between PPP and ERC?",
+        helpText: "Proper allocation is required to avoid double-counting wages.",
+        type: "singleChoice",
+        options: [
+          { value: "detailed", label: "Yes, with detailed calculations showing which wages go to each" },
+          { value: "vague", label: "Vaguely mentioned, no detailed breakdown" },
+          { value: "not_mentioned", label: "Not mentioned at all" },
+          { value: "no_ppp", label: "N/A - No PPP loan received" }
+        ]
+      },
+      {
+        id: "erc_documentation",
+        creditId: "erc",
+        step: 3,
+        question: "What documentation has the promoter requested from you?",
+        helpText: "Thorough documentation review is a sign of a legitimate advisor.",
+        type: "multiChoice",
+        options: [
+          { value: "payroll", label: "Detailed payroll records" },
+          { value: "941s", label: "Forms 941 for all quarters" },
+          { value: "financials", label: "Financial statements / gross receipts data" },
+          { value: "gov_orders", label: "Copies of applicable government orders" },
+          { value: "ppp_docs", label: "PPP loan and forgiveness documentation" },
+          { value: "minimal", label: "Very little / just basic company info" }
+        ]
+      },
+      {
+        id: "erc_promoter_messaging",
+        creditId: "erc",
+        step: 3,
+        question: "Has the promoter used phrases like 'almost every business qualifies' or 'free money'?",
+        helpText: "This language is a major red flag identified in IRS warnings.",
+        type: "boolean"
+      },
+
+      // R&D Questions
+      {
+        id: "rd_activities",
+        creditId: "rd_payroll",
+        step: 1,
+        question: "What type of activities are being claimed as qualified research?",
+        helpText: "The activities must meet the four-part test under § 41(d).",
+        type: "multiChoice",
+        options: [
+          { value: "new_product", label: "Developing new products or technologies" },
+          { value: "improve_existing", label: "Improving existing products or processes" },
+          { value: "software_new", label: "New software development with technical uncertainty" },
+          { value: "software_maintain", label: "Software maintenance or bug fixes" },
+          { value: "content", label: "Content creation or design work" },
+          { value: "market_research", label: "Market research or surveys" }
+        ]
+      },
+      {
+        id: "rd_uncertainty",
+        creditId: "rd_payroll",
+        step: 1,
+        question: "Do your projects involve resolving technical uncertainty through experimentation?",
+        helpText: "This is a core requirement - you must be trying to achieve something where the method or capability is uncertain.",
+        type: "boolean"
+      },
+      {
+        id: "rd_documentation",
+        creditId: "rd_payroll",
+        step: 2,
+        question: "Do you have contemporaneous documentation of research activities?",
+        helpText: "Documentation created at the time of the research, not reconstructed later.",
+        type: "singleChoice",
+        options: [
+          { value: "detailed", label: "Yes - project descriptions, technical notes, time tracking" },
+          { value: "some", label: "Some records but not comprehensive" },
+          { value: "reconstructed", label: "We would need to reconstruct documentation" },
+          { value: "none", label: "No documentation of research activities" }
+        ]
+      },
+      {
+        id: "rd_qsb_status",
+        creditId: "rd_payroll",
+        step: 2,
+        question: "Does your business meet the qualified small business (QSB) requirements?",
+        helpText: "Under $5M gross receipts AND within first 5 years of having gross receipts.",
+        type: "singleChoice",
+        options: [
+          { value: "yes_certain", label: "Yes - we clearly meet both requirements" },
+          { value: "probably", label: "Probably, but haven't verified the exact thresholds" },
+          { value: "not_sure", label: "Not sure" },
+          { value: "no", label: "No - we exceed the thresholds" }
+        ]
+      },
+      {
+        id: "rd_time_tracking",
+        creditId: "rd_payroll",
+        step: 3,
+        question: "Do you track time spent on qualified research activities?",
+        helpText: "Time tracking is critical for calculating qualified research expenses.",
+        type: "singleChoice",
+        options: [
+          { value: "detailed", label: "Yes - detailed timesheets or project codes" },
+          { value: "estimates", label: "We can estimate based on project records" },
+          { value: "no", label: "No time tracking for research vs. other work" }
+        ]
+      },
+
+      // WOTC Questions
+      {
+        id: "wotc_certification",
+        creditId: "wotc",
+        step: 1,
+        question: "Was Form 8850 submitted within 28 days of each employee's start date?",
+        helpText: "This deadline is strict - missing it disqualifies the credit for that employee.",
+        type: "singleChoice",
+        options: [
+          { value: "yes", label: "Yes, for all employees being claimed" },
+          { value: "some", label: "For some but not all employees" },
+          { value: "late", label: "Submitted, but may have been late for some" },
+          { value: "not_sure", label: "Not sure when forms were submitted" }
+        ]
+      },
+      {
+        id: "wotc_documentation",
+        creditId: "wotc",
+        step: 1,
+        question: "Do you have target group certification from the state workforce agency?",
+        helpText: "The state agency must certify that each employee is a member of a targeted group.",
+        type: "boolean"
+      },
+      {
+        id: "wotc_hours",
+        creditId: "wotc",
+        step: 2,
+        question: "Have the employees worked the minimum required hours?",
+        helpText: "120 hours minimum (25% credit), 400 hours for full credit (40%).",
+        type: "singleChoice",
+        options: [
+          { value: "over_400", label: "Yes - over 400 hours" },
+          { value: "120_400", label: "Between 120 and 400 hours" },
+          { value: "under_120", label: "Under 120 hours" },
+          { value: "varies", label: "Varies by employee" }
+        ]
+      },
+
+      // FICA Tip Questions
+      {
+        id: "fica_establishment",
+        creditId: "fica_tip",
+        step: 1,
+        question: "Is your business a food or beverage establishment?",
+        helpText: "This credit only applies to food/beverage establishments.",
+        type: "boolean"
+      },
+      {
+        id: "fica_tip_vs_service",
+        creditId: "fica_tip",
+        step: 1,
+        question: "How are gratuities handled at your establishment?",
+        helpText: "The distinction between tips and service charges is critical for this credit.",
+        type: "singleChoice",
+        options: [
+          { value: "voluntary_tips", label: "Customers leave voluntary tips (no auto-gratuity)" },
+          { value: "mixed", label: "Mix of voluntary tips and automatic gratuities" },
+          { value: "service_charge", label: "Primarily automatic service charges" }
+        ]
+      },
+      {
+        id: "fica_reporting",
+        creditId: "fica_tip",
+        step: 2,
+        question: "Are employee tips properly reported and FICA taxes paid?",
+        helpText: "You must have actually paid the FICA taxes on tips to claim the credit.",
+        type: "singleChoice",
+        options: [
+          { value: "yes_all", label: "Yes - all tips reported and FICA paid" },
+          { value: "mostly", label: "Mostly - some tips may be unreported" },
+          { value: "not_sure", label: "Not sure about tip reporting compliance" }
+        ]
+      }
+    ];
+
+    // ============================================
+    // DATA: WIZARD RULES (Risk Scoring)
+    // ============================================
+    const wizardRules = [
+      // ERC Rules
+      {
+        id: "erc_supply_chain_only",
+        creditId: "erc",
+        conditions: [{ questionId: "erc_basis", value: "supply_chain" }],
+        effect: { riskDelta: 4, severity: "high", note: "ERC claims based solely on generic supply chain disruption without specific government orders are frequently cited in IRS warnings as improper." }
+      },
+      {
+        id: "erc_promoter_language",
+        creditId: "erc",
+        conditions: [{ questionId: "erc_promoter_messaging", value: true }],
+        effect: { riskDelta: 3, severity: "high", note: "'Everyone qualifies' messaging is explicitly identified by the IRS as a warning sign of an improper ERC promoter." }
+      },
+      {
+        id: "erc_minimal_docs",
+        creditId: "erc",
+        conditions: [{ questionId: "erc_documentation", includes: "minimal" }],
+        effect: { riskDelta: 3, severity: "high", note: "Legitimate ERC analysis requires detailed payroll, financial, and government order documentation. Minimal intake is a red flag." }
+      },
+      {
+        id: "erc_ppp_no_allocation",
+        creditId: "erc",
+        conditions: [{ questionId: "erc_ppp", value: true }, { questionId: "erc_wage_allocation", value: "not_mentioned" }],
+        effect: { riskDelta: 3, severity: "high", note: "If you received PPP and the promoter hasn't addressed wage allocation, there's a significant risk of improper double-counting." }
+      },
+      {
+        id: "erc_many_quarters",
+        creditId: "erc",
+        conditions: [{ questionId: "erc_quarters", minLength: 5 }],
+        effect: { riskDelta: 2, severity: "medium", note: "Claiming 5+ quarters of ERC requires very strong documentation for each period. Most businesses did not qualify for all available quarters." }
+      },
+      {
+        id: "erc_gov_order_good",
+        creditId: "erc",
+        conditions: [{ questionId: "erc_basis", value: "gov_order" }],
+        effect: { riskDelta: -1, severity: "positive", note: "Specific government order basis is the cleaner eligibility path, though documentation is still critical." }
+      },
+
+      // R&D Rules
+      {
+        id: "rd_no_uncertainty",
+        creditId: "rd_payroll",
+        conditions: [{ questionId: "rd_uncertainty", value: false }],
+        effect: { riskDelta: 4, severity: "high", note: "Technical uncertainty is a core requirement under § 41(d). Without it, activities don't qualify as research." }
+      },
+      {
+        id: "rd_maintenance",
+        creditId: "rd_payroll",
+        conditions: [{ questionId: "rd_activities", includes: "software_maintain" }],
+        effect: { riskDelta: 3, severity: "high", note: "Routine software maintenance and bug fixes generally do not qualify as research under the four-part test." }
+      },
+      {
+        id: "rd_content_market",
+        creditId: "rd_payroll",
+        conditions: [{ questionId: "rd_activities", includesAny: ["content", "market_research"] }],
+        effect: { riskDelta: 4, severity: "high", note: "Content creation and market research are explicitly excluded from qualified research under § 41(d)(4)." }
+      },
+      {
+        id: "rd_no_docs",
+        creditId: "rd_payroll",
+        conditions: [{ questionId: "rd_documentation", value: "none" }],
+        effect: { riskDelta: 4, severity: "high", note: "Without contemporaneous documentation, research credits are extremely difficult to defend on audit." }
+      },
+      {
+        id: "rd_reconstructed",
+        creditId: "rd_payroll",
+        conditions: [{ questionId: "rd_documentation", value: "reconstructed" }],
+        effect: { riskDelta: 2, severity: "medium", note: "Reconstructed documentation is viewed skeptically by the IRS. Contemporaneous records are strongly preferred." }
+      },
+      {
+        id: "rd_not_qsb",
+        creditId: "rd_payroll",
+        conditions: [{ questionId: "rd_qsb_status", value: "no" }],
+        effect: { riskDelta: 5, severity: "critical", note: "If you don't meet QSB thresholds, you cannot use the payroll tax credit election. The credit can only offset income tax." }
+      },
+      {
+        id: "rd_no_time",
+        creditId: "rd_payroll",
+        conditions: [{ questionId: "rd_time_tracking", value: "no" }],
+        effect: { riskDelta: 3, severity: "high", note: "Without time tracking, it's difficult to substantiate the amount of qualified research expenses." }
+      },
+
+      // WOTC Rules
+      {
+        id: "wotc_late_filing",
+        creditId: "wotc",
+        conditions: [{ questionId: "wotc_certification", value: "late" }],
+        effect: { riskDelta: 4, severity: "high", note: "The 28-day deadline for Form 8850 is strict. Late submissions disqualify the credit for those employees." }
+      },
+      {
+        id: "wotc_no_cert",
+        creditId: "wotc",
+        conditions: [{ questionId: "wotc_documentation", value: false }],
+        effect: { riskDelta: 4, severity: "high", note: "Without state workforce agency certification, the WOTC cannot be claimed." }
+      },
+      {
+        id: "wotc_under_hours",
+        creditId: "wotc",
+        conditions: [{ questionId: "wotc_hours", value: "under_120" }],
+        effect: { riskDelta: 5, severity: "critical", note: "Employees with under 120 hours do not qualify for any WOTC credit." }
+      },
+
+      // FICA Tip Rules
+      {
+        id: "fica_not_food",
+        creditId: "fica_tip",
+        conditions: [{ questionId: "fica_establishment", value: false }],
+        effect: { riskDelta: 5, severity: "critical", note: "The FICA tip credit under § 45B is only available to food and beverage establishments." }
+      },
+      {
+        id: "fica_service_charge",
+        creditId: "fica_tip",
+        conditions: [{ questionId: "fica_tip_vs_service", value: "service_charge" }],
+        effect: { riskDelta: 4, severity: "high", note: "Automatic service charges are wages, not tips, and do not qualify for the FICA tip credit (Rev. Rul. 2012-18)." }
+      }
+    ];
+
+    // ============================================
+    // DATA: PROMOTER RED FLAGS
+    // ============================================
+    const promoterFlags = [
+      {
+        id: "contingent_fee",
+        label: "Contingent fee based solely on percentage of credit",
+        description: "The promoter charges only a success-based fee that is a percentage of the projected credit, without a meaningful fixed-fee advisory component.",
+        weight: 3,
+        irsSource: "IRS News Release IR-2023-169"
+      },
+      {
+        id: "everyone_qualifies",
+        label: "'Almost everyone qualifies' or similar messaging",
+        description: "The promoter's materials or sales pitch suggests that nearly all businesses qualify without careful factual analysis.",
+        weight: 3,
+        irsSource: "IRS Dirty Dozen warning, 2023"
+      },
+      {
+        id: "minimal_intake",
+        label: "Minimal factual intake or document review",
+        description: "The promoter is prepared to file a claim based on a short call or simple questionnaire without reviewing detailed financial and payroll records.",
+        weight: 2,
+        irsSource: "IRS ERC Warning Signs"
+      },
+      {
+        id: "no_legal_theory",
+        label: "No written legal theory or opinion provided",
+        description: "The promoter will not provide a written explanation tying the credit to specific statutory provisions and IRS guidance.",
+        weight: 2,
+        irsSource: "Circular 230 § 10.37"
+      },
+      {
+        id: "aggressive_timeline",
+        label: "Pressure to sign immediately or miss out",
+        description: "High-pressure sales tactics with artificial urgency, often tied to 'limited time' offers.",
+        weight: 2,
+        irsSource: "IRS Dirty Dozen warning, 2023"
+      },
+      {
+        id: "discourages_advisors",
+        label: "Discourages involving your own CPA or attorney",
+        description: "The promoter resists or discourages parallel review by your existing advisors.",
+        weight: 3,
+        irsSource: "IRS ERC Warning Signs"
+      },
+      {
+        id: "generic_analysis",
+        label: "Generic analysis not specific to your business",
+        description: "The 'analysis' appears to be a template applied to every client with minimal customization to your actual facts.",
+        weight: 2,
+        irsSource: "IRS ERC Warning Signs"
+      },
+      {
+        id: "refund_advance",
+        label: "Offers to advance the refund (factoring the credit)",
+        description: "Third party offers immediate cash in exchange for assigning the refund, often taking a large percentage.",
+        weight: 2,
+        irsSource: "IRS Consumer Alert"
+      },
+      {
+        id: "no_audit_support",
+        label: "No commitment to audit support or representation",
+        description: "The promoter will not commit to standing behind their work if the IRS questions the claim.",
+        weight: 3,
+        irsSource: "Circular 230 standards"
+      }
+    ];
+
+    // ============================================
+    // DATA: DOCUMENTATION REQUIREMENTS
+    // ============================================
+    const documentationRequirements = [
+      // ERC
+      { id: "erc_payroll", creditId: "erc", category: "required", label: "Payroll registers for all claimed quarters", description: "Detailed payroll records showing wages paid to each employee.", weight: 3 },
+      { id: "erc_941s", creditId: "erc", category: "required", label: "Forms 941 and 941-X for all quarters", description: "Filed employment tax returns and any amended returns.", weight: 3 },
+      { id: "erc_gov_orders", creditId: "erc", category: "required", label: "Government orders (if claiming suspension)", description: "Copies or citations of government orders that restricted your operations.", weight: 3 },
+      { id: "erc_impact_memo", creditId: "erc", category: "required", label: "Description of operational impact", description: "Written explanation of how government orders affected your specific operations.", weight: 2 },
+      { id: "erc_gross_receipts", creditId: "erc", category: "required", label: "Gross receipts schedules (if claiming decline)", description: "Quarter-by-quarter comparison to 2019 showing percentage decline.", weight: 3 },
+      { id: "erc_ppp_docs", creditId: "erc", category: "recommended", label: "PPP loan and forgiveness documentation", description: "If you received PPP, documentation showing wage allocation between PPP and ERC.", weight: 2 },
+      { id: "erc_employee_count", creditId: "erc", category: "recommended", label: "Employee count documentation", description: "Records establishing whether you were over/under the employee threshold (100 in 2020, 500 in 2021).", weight: 1 },
+
+      // R&D
+      { id: "rd_project_desc", creditId: "rd_payroll", category: "required", label: "Project-level descriptions", description: "Narratives for each project describing technical uncertainty and experimentation.", weight: 3 },
+      { id: "rd_time_records", creditId: "rd_payroll", category: "required", label: "Time tracking or allocation records", description: "Timesheets, project codes, or similar records showing time on qualified activities.", weight: 3 },
+      { id: "rd_qsb_evidence", creditId: "rd_payroll", category: "required", label: "QSB status documentation", description: "Tax returns or financials showing you meet qualified small business thresholds.", weight: 3 },
+      { id: "rd_technical_docs", creditId: "rd_payroll", category: "recommended", label: "Technical documentation", description: "Design documents, specifications, prototypes, test results supporting the research narrative.", weight: 2 },
+      { id: "rd_prior_returns", creditId: "rd_payroll", category: "recommended", label: "Prior-year credit calculations", description: "Prior research credit calculations to show consistency.", weight: 1 },
+      { id: "rd_contracts", creditId: "rd_payroll", category: "recommended", label: "Contracts for funded research", description: "If any research was funded by others, contracts establishing rights to the research.", weight: 1 },
+
+      // WOTC
+      { id: "wotc_8850", creditId: "wotc", category: "required", label: "Form 8850 with submission proof", description: "Pre-screening notices with documentation of timely submission.", weight: 3 },
+      { id: "wotc_certification", creditId: "wotc", category: "required", label: "State agency certification letters", description: "Target group certification from the state workforce agency.", weight: 3 },
+      { id: "wotc_hours", creditId: "wotc", category: "required", label: "Hours worked documentation", description: "Payroll records showing hours worked by each credited employee.", weight: 2 },
+      { id: "wotc_wage_records", creditId: "wotc", category: "recommended", label: "First-year wage records", description: "Documentation of qualified first-year wages for each employee.", weight: 1 },
+
+      // FICA Tip
+      { id: "fica_tip_reports", creditId: "fica_tip", category: "required", label: "Tip reporting records (Form 4070)", description: "Employee tip reports and employer records of tips.", weight: 3 },
+      { id: "fica_payroll", creditId: "fica_tip", category: "required", label: "Payroll records showing FICA paid on tips", description: "Documentation that employer FICA was actually paid on reported tips.", weight: 3 },
+      { id: "fica_min_wage_calc", creditId: "fica_tip", category: "required", label: "Minimum wage calculation", description: "Calculation showing which tips exceed the minimum wage equivalent.", weight: 2 },
+      { id: "fica_service_policy", creditId: "fica_tip", category: "recommended", label: "Service charge vs. tip policy", description: "Written policy distinguishing voluntary tips from mandatory service charges.", weight: 1 }
+    ];
+
+    // ============================================
+    // STATE
+    // ============================================
+    let selectedCreditId = "erc";
+    let wizardAnswers = {};
+    let promoterChecks = {};
+    let auditChecks = {};
+
+    // ============================================
+    // TAB NAVIGATION
+    // ============================================
+    document.querySelectorAll('.tab-button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.tab + '-panel').classList.add('active');
+      });
+    });
+
+    // ============================================
+    // CREDITS MAP
+    // ============================================
+    function renderCreditsTable() {
+      const tbody = document.getElementById('credits-tbody');
+      tbody.innerHTML = credits.map(credit => `
+        <tr class="${credit.id === selectedCreditId ? 'selected' : ''}" data-credit-id="${credit.id}">
+          <td><span class="credit-name">${credit.name}</span></td>
+          <td><span class="credit-code">${credit.codeSections[0]}</span></td>
+          <td>${credit.taxTypeLabel}</td>
+          <td><span class="status-badge ${credit.status}">${credit.statusLabel}</span></td>
+        </tr>
+      `).join('');
+
+      tbody.querySelectorAll('tr').forEach(row => {
+        row.addEventListener('click', () => {
+          selectedCreditId = row.dataset.creditId;
+          renderCreditsTable();
+          renderCreditDetail();
+        });
+      });
+    }
+
+    function renderCreditDetail() {
+      const credit = credits.find(c => c.id === selectedCreditId);
+      if (!credit) return;
+
+      document.getElementById('detail-name').textContent = credit.name;
+      document.getElementById('detail-summary').textContent = credit.summary;
+      document.getElementById('detail-codes').innerHTML = credit.codeSections.map(c => `<li>${c}</li>`).join('');
+      document.getElementById('detail-eligibility').innerHTML = credit.eligibilityTests.map(t => `<li><strong>${t.label}:</strong> ${t.description}</li>`).join('');
+      document.getElementById('detail-disqualifiers').innerHTML = credit.disqualifiers.map(d => `<li>${d}</li>`).join('');
+      document.getElementById('detail-guidance').innerHTML = credit.irsGuidance.map(g => `<li>${g}</li>`).join('');
+      document.getElementById('detail-enforcement').textContent = credit.enforcementNotes;
+    }
+
+    document.getElementById('open-wizard-btn').addEventListener('click', () => {
+      document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.querySelector('[data-tab="wizard"]').classList.add('active');
+      document.getElementById('wizard-panel').classList.add('active');
+      document.getElementById('wizard-credit').value = selectedCreditId;
+      renderWizardQuestions();
+    });
+
+    // ============================================
+    // COMPLIANCE WIZARD
+    // ============================================
+    function populateCreditSelects() {
+      const selects = ['wizard-credit', 'audit-credit'];
+      selects.forEach(selectId => {
+        const select = document.getElementById(selectId);
+        if (select) {
+          select.innerHTML = credits.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+        }
+      });
+    }
+
+    function renderWizardQuestions() {
+      const creditId = document.getElementById('wizard-credit').value;
+      const questions = wizardQuestions.filter(q => q.creditId === creditId);
+      const container = document.getElementById('wizard-questions');
+
+      container.innerHTML = questions.map(q => {
+        let inputHtml = '';
+
+        if (q.type === 'boolean') {
+          const currentVal = wizardAnswers[q.id];
+          inputHtml = `
+            <div class="wizard-options">
+              <label class="wizard-option ${currentVal === true ? 'selected' : ''}">
+                <input type="radio" name="${q.id}" value="true" ${currentVal === true ? 'checked' : ''}>
+                <span>Yes</span>
+              </label>
+              <label class="wizard-option ${currentVal === false ? 'selected' : ''}">
+                <input type="radio" name="${q.id}" value="false" ${currentVal === false ? 'checked' : ''}>
+                <span>No</span>
+              </label>
+            </div>
+          `;
+        } else if (q.type === 'singleChoice') {
+          const currentVal = wizardAnswers[q.id];
+          inputHtml = `
+            <div class="wizard-options">
+              ${q.options.map(opt => `
+                <label class="wizard-option ${currentVal === opt.value ? 'selected' : ''}">
+                  <input type="radio" name="${q.id}" value="${opt.value}" ${currentVal === opt.value ? 'checked' : ''}>
+                  <span>${opt.label}</span>
+                </label>
+              `).join('')}
+            </div>
+          `;
+        } else if (q.type === 'multiChoice') {
+          const currentVal = wizardAnswers[q.id] || [];
+          inputHtml = `
+            <div class="multi-select-options">
+              ${q.options.map(opt => `
+                <button type="button" class="multi-option ${currentVal.includes(opt.value) ? 'selected' : ''}" data-question="${q.id}" data-value="${opt.value}">
+                  ${opt.label}
+                </button>
+              `).join('')}
+            </div>
+          `;
+        }
+
+        return `
+          <div class="wizard-question">
+            <div class="wizard-question-text">${q.question}</div>
+            ${q.helpText ? `<div class="wizard-question-help">${q.helpText}</div>` : ''}
+            ${inputHtml}
+          </div>
+        `;
+      }).join('');
+
+      // Add event listeners
+      container.querySelectorAll('input[type="radio"]').forEach(input => {
+        input.addEventListener('change', (e) => {
+          const qId = e.target.name;
+          let val = e.target.value;
+          if (val === 'true') val = true;
+          if (val === 'false') val = false;
+          wizardAnswers[qId] = val;
+          renderWizardQuestions();
+        });
+      });
+
+      container.querySelectorAll('.multi-option').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const qId = e.target.dataset.question;
+          const val = e.target.dataset.value;
+          if (!wizardAnswers[qId]) wizardAnswers[qId] = [];
+          if (wizardAnswers[qId].includes(val)) {
+            wizardAnswers[qId] = wizardAnswers[qId].filter(v => v !== val);
+          } else {
+            wizardAnswers[qId].push(val);
+          }
+          renderWizardQuestions();
+        });
+      });
+    }
+
+    document.getElementById('wizard-credit').addEventListener('change', () => {
+      wizardAnswers = {};
+      renderWizardQuestions();
+      document.getElementById('results-content').innerHTML = `
+        <p style="color: var(--color-text-muted);">
+          Answer the questions and run the check to see a risk assessment for this credit claim.
+        </p>
+      `;
+    });
+
+    document.getElementById('run-check-btn').addEventListener('click', () => {
+      const creditId = document.getElementById('wizard-credit').value;
+      const rules = wizardRules.filter(r => r.creditId === creditId);
+
+      let score = 0;
+      const triggeredFlags = [];
+
+      rules.forEach(rule => {
+        let matches = true;
+
+        for (const cond of rule.conditions) {
+          const answer = wizardAnswers[cond.questionId];
+
+          if (cond.value !== undefined) {
+            if (answer !== cond.value) matches = false;
+          } else if (cond.includes !== undefined) {
+            if (!Array.isArray(answer) || !answer.includes(cond.includes)) matches = false;
+          } else if (cond.includesAny !== undefined) {
+            if (!Array.isArray(answer) || !cond.includesAny.some(v => answer.includes(v))) matches = false;
+          } else if (cond.minLength !== undefined) {
+            if (!Array.isArray(answer) || answer.length < cond.minLength) matches = false;
+          }
+        }
+
+        if (matches) {
+          score += rule.effect.riskDelta;
+          if (rule.effect.riskDelta > 0) {
+            triggeredFlags.push(rule.effect);
+          }
+        }
+      });
+
+      let band = 'low';
+      if (score >= 3 && score < 6) band = 'medium';
+      if (score >= 6) band = 'high';
+
+      const bandLabels = { low: 'Low Risk', medium: 'Medium Risk', high: 'High Risk' };
+      const summaryTexts = {
+        low: 'Based on your answers, this credit claim appears to have a reasonable foundation. However, documentation and proper analysis are still critical. Consider getting a written opinion if the amounts are material.',
+        medium: 'Your answers indicate some potential compliance concerns that warrant closer examination. A detailed review of the underlying facts and documentation is strongly recommended before filing.',
+        high: 'Your answers reveal multiple red flags that align with patterns the IRS has specifically warned about. You should not proceed without an independent legal/tax opinion from a qualified professional.'
+      };
+
+      document.getElementById('results-content').innerHTML = `
+        <div class="risk-score-display">
+          <div class="risk-score-value ${band}">${score}</div>
+          <div class="risk-score-label">Risk Score</div>
+          <span class="risk-band ${band}">${bandLabels[band]}</span>
+        </div>
+        <p class="results-summary">${summaryTexts[band]}</p>
+        ${triggeredFlags.length > 0 ? `
+          <h4 style="font-size: 0.85rem; font-weight: 700; color: var(--color-text-muted); margin-bottom: var(--space-sm); text-transform: uppercase; letter-spacing: 0.05em;">Issues Identified</h4>
+          <ul class="flag-list">
+            ${triggeredFlags.map(f => `
+              <li class="flag-item">
+                <span class="flag-icon ${f.severity === 'high' || f.severity === 'critical' ? 'danger' : 'warning'}">!</span>
+                <span>${f.note}</span>
+              </li>
+            `).join('')}
+          </ul>
+        ` : ''}
+        <button class="copy-results-btn" onclick="copyResults()">Copy Results to Clipboard</button>
+      `;
+    });
+
+    function copyResults() {
+      const resultsText = document.getElementById('results-content').innerText;
+      navigator.clipboard.writeText(resultsText).then(() => {
+        alert('Results copied to clipboard');
+      });
+    }
+
+    // ============================================
+    // PROMOTER RISK
+    // ============================================
+    function renderPromoterChecklist() {
+      const container = document.getElementById('promoter-checklist');
+      container.innerHTML = promoterFlags.map(flag => `
+        <div class="flag-check-item ${promoterChecks[flag.id] ? 'checked' : ''}" data-flag-id="${flag.id}">
+          <input type="checkbox" ${promoterChecks[flag.id] ? 'checked' : ''}>
+          <div class="flag-check-content">
+            <h4>${flag.label}</h4>
+            <p>${flag.description}</p>
+          </div>
+          <span class="flag-weight">+${flag.weight}</span>
+        </div>
+      `).join('');
+
+      container.querySelectorAll('.flag-check-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+          if (e.target.tagName === 'INPUT') return;
+          const flagId = item.dataset.flagId;
+          promoterChecks[flagId] = !promoterChecks[flagId];
+          item.querySelector('input').checked = promoterChecks[flagId];
+          renderPromoterChecklist();
+          updatePromoterResults();
+        });
+
+        item.querySelector('input').addEventListener('change', (e) => {
+          const flagId = item.dataset.flagId;
+          promoterChecks[flagId] = e.target.checked;
+          renderPromoterChecklist();
+          updatePromoterResults();
+        });
+      });
+    }
+
+    function updatePromoterResults() {
+      let score = 0;
+      const checkedFlags = [];
+
+      promoterFlags.forEach(flag => {
+        if (promoterChecks[flag.id]) {
+          score += flag.weight;
+          checkedFlags.push(flag);
+        }
+      });
+
+      let band = 'low';
+      if (score >= 5 && score < 10) band = 'medium';
+      if (score >= 10) band = 'high';
+
+      const bandLabels = { low: 'Low Promoter Risk', medium: 'Medium Promoter Risk', high: 'High Promoter Risk' };
+      const summaryTexts = {
+        low: 'The promoter shows few warning signs. However, you should still verify their credentials and get any analysis in writing.',
+        medium: 'Several warning signs are present. Proceed with caution and consider getting an independent second opinion before signing anything.',
+        high: 'This promoter arrangement shows multiple red flags that match IRS warnings about improper credit promoters. You should strongly consider finding a different advisor or getting independent legal review before proceeding.'
+      };
+
+      document.getElementById('promoter-results-content').innerHTML = `
+        <div class="risk-score-display">
+          <div class="risk-score-value ${band}">${score}</div>
+          <div class="risk-score-label">Promoter Risk Score</div>
+          <span class="risk-band ${band}">${bandLabels[band]}</span>
+        </div>
+        <p class="results-summary">${summaryTexts[band]}</p>
+        ${checkedFlags.length > 0 ? `
+          <h4 style="font-size: 0.85rem; font-weight: 700; color: var(--color-text-muted); margin-bottom: var(--space-sm); text-transform: uppercase; letter-spacing: 0.05em;">Red Flags Present</h4>
+          <ul class="flag-list">
+            ${checkedFlags.map(f => `
+              <li class="flag-item">
+                <span class="flag-icon danger">!</span>
+                <span><strong>${f.label}</strong> (${f.irsSource})</span>
+              </li>
+            `).join('')}
+          </ul>
+        ` : ''}
+      `;
+    }
+
+    // ============================================
+    // AUDIT READINESS
+    // ============================================
+    function renderAuditDocs() {
+      const creditId = document.getElementById('audit-credit').value;
+      const docs = documentationRequirements.filter(d => d.creditId === creditId);
+      const container = document.getElementById('audit-docs');
+
+      const required = docs.filter(d => d.category === 'required');
+      const recommended = docs.filter(d => d.category === 'recommended');
+
+      container.innerHTML = `
+        <div class="doc-category">
+          <h4>Required Documentation</h4>
+          ${required.map(doc => `
+            <div class="doc-item ${auditChecks[doc.id] ? 'checked' : ''}" data-doc-id="${doc.id}">
+              <input type="checkbox" ${auditChecks[doc.id] ? 'checked' : ''}>
+              <div class="doc-content">
+                <h5>${doc.label}</h5>
+                <p>${doc.description}</p>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        <div class="doc-category">
+          <h4>Recommended Documentation</h4>
+          ${recommended.map(doc => `
+            <div class="doc-item ${auditChecks[doc.id] ? 'checked' : ''}" data-doc-id="${doc.id}">
+              <input type="checkbox" ${auditChecks[doc.id] ? 'checked' : ''}>
+              <div class="doc-content">
+                <h5>${doc.label}</h5>
+                <p>${doc.description}</p>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+
+      container.querySelectorAll('.doc-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+          if (e.target.tagName === 'INPUT') return;
+          const docId = item.dataset.docId;
+          auditChecks[docId] = !auditChecks[docId];
+          item.querySelector('input').checked = auditChecks[docId];
+          renderAuditDocs();
+          updateAuditResults();
+        });
+
+        item.querySelector('input').addEventListener('change', (e) => {
+          const docId = item.dataset.docId;
+          auditChecks[docId] = e.target.checked;
+          renderAuditDocs();
+          updateAuditResults();
+        });
+      });
+
+      updateAuditResults();
+    }
+
+    function updateAuditResults() {
+      const creditId = document.getElementById('audit-credit').value;
+      const docs = documentationRequirements.filter(d => d.creditId === creditId);
+
+      let totalWeight = 0;
+      let checkedWeight = 0;
+
+      docs.forEach(doc => {
+        totalWeight += doc.weight;
+        if (auditChecks[doc.id]) {
+          checkedWeight += doc.weight;
+        }
+      });
+
+      const percent = totalWeight > 0 ? Math.round((checkedWeight / totalWeight) * 100) : 0;
+      document.getElementById('readiness-fill').style.width = percent + '%';
+      document.getElementById('readiness-percent').textContent = percent + '%';
+
+      let summary = '';
+      if (percent < 30) {
+        summary = 'Major documentation gaps exist. You are not ready for a serious opinion or audit defense. Gather the required documents before proceeding.';
+      } else if (percent < 60) {
+        summary = 'Some documentation is in place, but significant gaps remain. A tax professional can work with this but will need more before issuing an opinion.';
+      } else if (percent < 80) {
+        summary = 'Good foundation. Most core documents are present. Focus on completing the remaining items for full audit readiness.';
+      } else {
+        summary = 'Strong documentation foundation. You are well-positioned for a defensible filing and opinion. Ensure documents are organized and accessible.';
+      }
+
+      document.getElementById('audit-results-content').innerHTML = `
+        <div class="readiness-meter">
+          <div class="readiness-bar">
+            <div class="readiness-fill" style="width: ${percent}%;"></div>
+          </div>
+          <div class="readiness-label">
+            <span>Opinion Readiness</span>
+            <span>${percent}%</span>
+          </div>
+        </div>
+        <p style="color: var(--color-text-secondary); font-size: 0.9rem; line-height: 1.6;">${summary}</p>
+      `;
+    }
+
+    document.getElementById('audit-credit').addEventListener('change', () => {
+      renderAuditDocs();
+    });
+
+    // ============================================
+    // INITIALIZE
+    // ============================================
+    populateCreditSelects();
+    renderCreditsTable();
+    renderCreditDetail();
+    renderWizardQuestions();
+    renderPromoterChecklist();
+    renderAuditDocs();
+  </script>
+</body>
+</html>
