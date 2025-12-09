@@ -263,6 +263,10 @@
       color: #fff;
     }
 
+    .hero-stat-value .counter {
+      display: inline-block;
+    }
+
     .hero-stat-label {
       font-size: 0.8rem;
       color: #64748b;
@@ -1175,15 +1179,15 @@
         </p>
         <div class="hero-stats">
           <div class="hero-stat">
-            <div class="hero-stat-value">4</div>
+            <div class="hero-stat-value"><span class="counter" data-target="4">0</span></div>
             <div class="hero-stat-label">Credits Covered</div>
           </div>
           <div class="hero-stat">
-            <div class="hero-stat-value">20+</div>
+            <div class="hero-stat-value"><span class="counter" data-target="20">0</span>+</div>
             <div class="hero-stat-label">Compliance Tests</div>
           </div>
           <div class="hero-stat">
-            <div class="hero-stat-value">12</div>
+            <div class="hero-stat-value"><span class="counter" data-target="12">0</span></div>
             <div class="hero-stat-label">IRS Citations</div>
           </div>
         </div>
@@ -2515,6 +2519,31 @@
     });
 
     // ============================================
+    // ANIMATED COUNTERS
+    // ============================================
+    function animateCounters() {
+      const counters = document.querySelectorAll('.counter');
+      counters.forEach(counter => {
+        const target = parseInt(counter.getAttribute('data-target'));
+        const duration = 2000;
+        const step = target / (duration / 16);
+        let current = 0;
+
+        const updateCounter = () => {
+          current += step;
+          if (current < target) {
+            counter.textContent = Math.floor(current).toLocaleString();
+            requestAnimationFrame(updateCounter);
+          } else {
+            counter.textContent = target.toLocaleString();
+          }
+        };
+
+        updateCounter();
+      });
+    }
+
+    // ============================================
     // INITIALIZE
     // ============================================
     populateCreditSelects();
@@ -2523,6 +2552,9 @@
     renderWizardQuestions();
     renderPromoterChecklist();
     renderAuditDocs();
+
+    // Run counter animation after a short delay
+    setTimeout(animateCounters, 500);
   </script>
 </body>
 </html>
