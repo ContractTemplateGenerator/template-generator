@@ -1169,6 +1169,19 @@
       75% { background: #fbbf24; box-shadow: 0 0 8px rgba(251, 191, 36, 0.3); }
     }
 
+    /* Flash animation for clause container divs */
+    div.flash, ul.flash, ol.flash {
+      animation: flashContainer 1.5s ease;
+      border-radius: 8px;
+    }
+
+    @keyframes flashContainer {
+      0%, 100% { background: transparent; }
+      25% { background: rgba(251, 191, 36, 0.2); box-shadow: 0 0 12px rgba(251, 191, 36, 0.3); }
+      50% { background: rgba(253, 230, 138, 0.3); }
+      75% { background: rgba(251, 191, 36, 0.15); box-shadow: 0 0 8px rgba(251, 191, 36, 0.2); }
+    }
+
     .doc-paragraph {
       margin-bottom: 16px;
       text-align: justify;
@@ -1803,7 +1816,7 @@
         <!-- Marking Requirement -->
         <div class="clause-toggle">
           <label class="clause-toggle-label">
-            <input type="checkbox" id="clauseMarking" onchange="updatePreview()">
+            <input type="checkbox" id="clauseMarking" onchange="scrollToClause('clauseMarking')">
             <span class="clause-toggle-switch"></span>
             <span class="clause-toggle-text">
               <strong>Require Marking</strong>
@@ -1815,7 +1828,7 @@
         <!-- Non-Solicitation -->
         <div class="clause-toggle">
           <label class="clause-toggle-label">
-            <input type="checkbox" id="clauseNonSolicitation" onchange="updatePreview()">
+            <input type="checkbox" id="clauseNonSolicitation" onchange="scrollToClause('clauseNonSolicitation')">
             <span class="clause-toggle-switch"></span>
             <span class="clause-toggle-text">
               <strong>Non-Solicitation</strong>
@@ -1827,7 +1840,7 @@
         <!-- Non-Circumvention -->
         <div class="clause-toggle">
           <label class="clause-toggle-label">
-            <input type="checkbox" id="clauseNonCircumvention" onchange="updatePreview()">
+            <input type="checkbox" id="clauseNonCircumvention" onchange="scrollToClause('clauseNonCircumvention')">
             <span class="clause-toggle-switch"></span>
             <span class="clause-toggle-text">
               <strong>Non-Circumvention</strong>
@@ -1839,7 +1852,7 @@
         <!-- Residuals -->
         <div class="clause-toggle">
           <label class="clause-toggle-label">
-            <input type="checkbox" id="clauseResiduals" onchange="updatePreview()">
+            <input type="checkbox" id="clauseResiduals" onchange="scrollToClause('clauseResiduals')">
             <span class="clause-toggle-switch"></span>
             <span class="clause-toggle-text">
               <strong>Residuals Clause</strong>
@@ -1851,7 +1864,7 @@
         <!-- Return of Materials -->
         <div class="clause-toggle">
           <label class="clause-toggle-label">
-            <input type="checkbox" id="clauseReturnMaterials" checked onchange="updatePreview()">
+            <input type="checkbox" id="clauseReturnMaterials" checked onchange="scrollToClause('clauseReturnMaterials')">
             <span class="clause-toggle-switch"></span>
             <span class="clause-toggle-text">
               <strong>Return of Materials</strong>
@@ -1863,7 +1876,7 @@
         <!-- No License -->
         <div class="clause-toggle">
           <label class="clause-toggle-label">
-            <input type="checkbox" id="clauseNoLicense" checked onchange="updatePreview()">
+            <input type="checkbox" id="clauseNoLicense" checked onchange="scrollToClause('clauseNoLicense')">
             <span class="clause-toggle-switch"></span>
             <span class="clause-toggle-text">
               <strong>No License Granted</strong>
@@ -1875,7 +1888,7 @@
         <!-- Standstill (for M&A) -->
         <div class="clause-toggle" id="standstillToggle" style="display: none;">
           <label class="clause-toggle-label">
-            <input type="checkbox" id="clauseStandstill" onchange="updatePreview()">
+            <input type="checkbox" id="clauseStandstill" onchange="scrollToClause('clauseStandstill')">
             <span class="clause-toggle-switch"></span>
             <span class="clause-toggle-text">
               <strong>Standstill Provision</strong>
@@ -2456,6 +2469,28 @@
     // Initialize scroll-to-view after DOM is ready
     document.addEventListener('DOMContentLoaded', setupScrollToView);
 
+    // Scroll to clause section when a clause toggle is changed
+    function scrollToClause(clauseId) {
+      // First update the preview to include/remove the clause
+      updatePreview();
+
+      // Then scroll to the clause if it was enabled
+      const checkbox = document.getElementById(clauseId);
+      if (checkbox && checkbox.checked) {
+        setTimeout(() => {
+          const docPreview = document.getElementById('documentPreview');
+          const docBody = document.querySelector('.document-body');
+          if (!docPreview || !docBody) return;
+
+          // Find the clause wrapper by data-field
+          const targetElement = docPreview.querySelector(`[data-field="${clauseId}"]`);
+          if (targetElement) {
+            scrollToAndFlash(targetElement, docBody);
+          }
+        }, 100);
+      }
+    }
+
     // ============================================
     // INLINE EDITING IN PREVIEW
     // ============================================
@@ -2910,12 +2945,14 @@
       // Non-Solicitation Clause
       if (clauses.nonSolicitation) {
         html += `
+        <div data-field="clauseNonSolicitation">
         <div class="doc-clause-title">ARTICLE ${num}. NON-SOLICITATION</div>
         <div class="doc-paragraph">
           <span class="doc-section-num">${num}.1</span> During the term of this Agreement and for a period of one (1) year following its termination, neither Party shall, directly or indirectly, solicit, recruit, or hire any employee of the other Party with whom such Party had contact or about whom such Party received Confidential Information in connection with the Purpose.
         </div>
         <div class="doc-paragraph">
           <span class="doc-section-num">${num}.2</span> This provision shall not restrict general advertising or recruitment efforts not specifically targeted at employees of the other Party.
+        </div>
         </div>
         `;
         num++;
@@ -2924,12 +2961,14 @@
       // Non-Circumvention Clause
       if (clauses.nonCircumvention) {
         html += `
+        <div data-field="clauseNonCircumvention">
         <div class="doc-clause-title">ARTICLE ${num}. NON-CIRCUMVENTION</div>
         <div class="doc-paragraph">
           <span class="doc-section-num">${num}.1</span> During the term of this Agreement and for a period of two (2) years following its termination, neither Party shall directly or indirectly contact, negotiate with, or enter into any agreement with any third party introduced by the other Party in connection with the Purpose, without the prior written consent of the introducing Party.
         </div>
         <div class="doc-paragraph">
           <span class="doc-section-num">${num}.2</span> Neither Party shall attempt to circumvent the other Party to avoid payment of fees, commissions, or other compensation that may be owed under any related agreement.
+        </div>
         </div>
         `;
         num++;
@@ -2938,12 +2977,14 @@
       // Residuals Clause
       if (clauses.residuals) {
         html += `
+        <div data-field="clauseResiduals">
         <div class="doc-clause-title">ARTICLE ${num}. RESIDUAL KNOWLEDGE</div>
         <div class="doc-paragraph">
           <span class="doc-section-num">${num}.1</span> Notwithstanding any other provision of this Agreement, either Party may use <span class="doc-defined-term">Residual Information</span> for any purpose. "Residual Information" means ideas, concepts, know-how, or techniques contained in the Confidential Information that are retained in the unaided memories of the Receiving Party's employees who have had access to the Confidential Information.
         </div>
         <div class="doc-paragraph">
           <span class="doc-section-num">${num}.2</span> An employee's memory is unaided if the employee has not intentionally memorized the Confidential Information for the purpose of retaining and subsequently using or disclosing it. This provision does not grant any license under any intellectual property rights.
+        </div>
         </div>
         `;
         num++;
@@ -2952,12 +2993,14 @@
       // No License Clause
       if (clauses.noLicense) {
         html += `
+        <div data-field="clauseNoLicense">
         <div class="doc-clause-title">ARTICLE ${num}. NO LICENSE OR OWNERSHIP</div>
         <div class="doc-paragraph">
           <span class="doc-section-num">${num}.1</span> Nothing in this Agreement shall be construed as granting any rights, by license or otherwise, to any Confidential Information, or to any patent, copyright, trademark, trade secret, or other intellectual property right of the Disclosing Party.
         </div>
         <div class="doc-paragraph">
           <span class="doc-section-num">${num}.2</span> All Confidential Information shall remain the exclusive property of the Disclosing Party, and the Receiving Party shall have no rights therein except the limited right to use such information solely for the Purpose.
+        </div>
         </div>
         `;
         num++;

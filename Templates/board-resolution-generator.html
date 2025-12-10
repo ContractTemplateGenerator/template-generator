@@ -874,6 +874,20 @@
       75% { background: #fbbf24; box-shadow: 0 0 8px rgba(251, 191, 36, 0.3); }
     }
 
+    /* Flash animation for div/list elements (for resolution type changes) */
+    div.flash,
+    ul.flash,
+    ol.flash {
+      animation: flashContainer 1.5s ease;
+    }
+
+    @keyframes flashContainer {
+      0%, 100% { background: transparent; }
+      25% { background: rgba(251, 191, 36, 0.2); box-shadow: 0 0 12px rgba(251, 191, 36, 0.3); }
+      50% { background: rgba(253, 230, 138, 0.3); }
+      75% { background: rgba(251, 191, 36, 0.2); }
+    }
+
     .doc-paragraph {
       margin-bottom: 16px;
       text-align: justify;
@@ -1453,6 +1467,8 @@
         document.getElementById('generalSection').style.display = 'block';
       }
 
+      // Track field for scroll-to-view
+      lastEditedField = 'resolutionContent';
       updatePreview();
     }
 
@@ -1581,7 +1597,9 @@
         <p class="doc-clause-title">Resolution</p>
       `;
 
-      // Add resolution content based on type
+      // Add resolution content based on type - wrapped in div for scroll-to-view
+      html += `<div data-field="resolutionContent">`;
+
       if (resolutionType === 'officer') {
         const officerName = document.getElementById('officerName').value || '';
         const officerTitle = document.getElementById('officerTitle').value;
@@ -1684,6 +1702,9 @@
         `;
       }
 
+      // Close resolution content wrapper
+      html += `</div>`;
+
       // Certification
       html += `
         <p class="doc-clause-title">Secretary's Certification</p>
@@ -1737,7 +1758,8 @@
 
       // Flash the field that was just updated and scroll to it
       if (lastEditedField) {
-        const highlight = document.querySelector(`.doc-highlight[data-field="${lastEditedField}"]`);
+        // Try to find any element with this data-field (not just .doc-highlight)
+        const highlight = document.querySelector(`[data-field="${lastEditedField}"]`);
         if (highlight) {
           highlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
           highlight.classList.add('flash');

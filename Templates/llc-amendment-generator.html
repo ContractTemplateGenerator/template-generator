@@ -1088,6 +1088,19 @@
       75% { background: #fbbf24; box-shadow: 0 0 8px rgba(251, 191, 36, 0.3); }
     }
 
+    /* Flash animation for container divs (amendment content blocks) */
+    div.flash, ul.flash, ol.flash {
+      animation: flashContainer 1.5s ease;
+      border-radius: 8px;
+    }
+
+    @keyframes flashContainer {
+      0%, 100% { background: transparent; }
+      25% { background: rgba(251, 191, 36, 0.2); box-shadow: 0 0 12px rgba(251, 191, 36, 0.3); }
+      50% { background: rgba(253, 230, 138, 0.3); }
+      75% { background: rgba(251, 191, 36, 0.15); box-shadow: 0 0 8px rgba(251, 191, 36, 0.2); }
+    }
+
     /* Inline editing cursor */
     .doc-highlight[contenteditable="true"] {
       cursor: text;
@@ -2140,6 +2153,8 @@
       }
 
       updateConditionalSections();
+      // Track field for scroll-to-view - scroll to amendment content
+      lastEditedField = 'amendmentContent';
       updatePreview();
     }
 
@@ -2474,6 +2489,9 @@
         <p class="doc-clause-title">Article 1. Amendments</p>
       `;
 
+      // Wrap amendment content for scroll-to-view
+      html += `<div data-field="amendmentContent">`;
+
       let sectionNum = 1;
 
       // Add Member Amendment
@@ -2642,6 +2660,9 @@
         }
       }
 
+      // Close amendment content wrapper
+      html += `</div>`;
+
       // Standard clauses
       html += `
         <p class="doc-clause-title">Article 2. General Provisions</p>
@@ -2735,7 +2756,8 @@
 
       // Flash the field that was just updated and scroll to it
       if (lastEditedField) {
-        const highlight = document.querySelector(`.doc-highlight[data-field="${lastEditedField}"]`);
+        // Use generic selector to find any element with data-field (not just .doc-highlight)
+        const highlight = document.querySelector(`[data-field="${lastEditedField}"]`);
         if (highlight) {
           highlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
           highlight.classList.add('flash');

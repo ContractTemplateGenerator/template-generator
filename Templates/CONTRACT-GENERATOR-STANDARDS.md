@@ -502,10 +502,57 @@ Working examples that follow these standards:
 
 1. `/Templates/nda-mutual-confidentiality-agreement.html` - Original implementation
 2. `/Templates/llc-amendment-generator.html` - Full featured with all protections
-3. `/Templates/board-resolution-generator.html` - Latest implementation with hasCustomEdits
+3. `/Templates/board-resolution-generator.html` - Multiple resolution types with hasCustomEdits
+4. `/Templates/ip-assignment-agreement-generator.html` - Founder IP transfer with consideration options
 
 ---
 
-*Document Version: 1.0*
+## GENERATOR STATUS TRACKING
+
+Use these CSS classes in `contract-library-landing.html` to indicate generator status:
+
+| Status | CSS Class | Description |
+|--------|-----------|-------------|
+| **New** | `new-tag` | Just launched, fully functional |
+| **Coming Soon** | `coming-soon` | Placeholder, not yet built |
+| **Essential** | (default blue) | Core document, high priority |
+| **Popular** | (default blue) | Frequently used |
+
+Example markup:
+```html
+<!-- Active generator -->
+<a href="ip-assignment-agreement-generator.html" class="category-template-item">
+  <span class="category-template-name">IP Assignment Agreement</span>
+  <span class="category-template-tag new-tag">New</span>
+</a>
+
+<!-- Placeholder -->
+<a href="#" class="category-template-item">
+  <span class="category-template-name">SAFE Agreement</span>
+  <span class="category-template-tag coming-soon">Coming Soon</span>
+</a>
+```
+
+---
+
+## BUILD PRIORITY (Startups, Corporations & LLCs)
+
+### Completed:
+- [x] LLC Amendment
+- [x] Board Resolutions
+- [x] IP Assignment Agreement
+
+### Next Up (by complexity - easiest first):
+- [ ] Written Consent (Board/Stockholder) - Short, template-based
+- [ ] Advisor Agreement - Standard FAST agreement format
+- [ ] Founders Agreement - Multi-party, equity splits
+- [ ] SAFE Agreement - YC standard with variations
+- [ ] Convertible Note - Financial terms, maturity
+- [ ] LLC Operating Agreement - Complex, multi-member
+- [ ] Corporate Bylaws - Lengthy, many sections
+
+---
+
+*Document Version: 1.1*
 *Last Updated: December 2024*
 *Author: Terms.Law Development Team*
