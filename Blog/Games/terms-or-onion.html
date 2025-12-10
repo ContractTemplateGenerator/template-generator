@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms or Onion? | terms.law</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --accent: #8b5cf6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg: #0f172a;
+            --bg2: #1e293b;
+            --muted: #94a3b8;
+            --light: #e2e8f0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(135deg, var(--bg), var(--bg2));
+            color: #fff;
+            min-height: 100vh;
+        }
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .nav { display: flex; align-items: center; height: 100%; }
+        .nav a {
+            color: var(--muted);
+            text-decoration: none;
+            padding: 16px 24px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.15s;
+        }
+        .nav a:hover { color: #fff; background: rgba(255,255,255,0.05); }
+        .nav a.active { color: #fff; border-bottom: 2px solid #3b82f6; }
+        .nav .logo {
+            font-size: 1.1rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: none;
+        }
+        /* Container */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        /* Screens */
+        .screen { display: none; }
+        .screen.active { display: block; }
+        /* Start Screen */
+        .title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            text-align: center;
+            margin: 30px 0 10px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .subtitle {
+            text-align: center;
+            color: var(--muted);
+            margin-bottom: 30px;
+        }
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 30px 0;
+        }
+        .stat { text-align: center; }
+        .stat-num { font-size: 2rem; font-weight: 700; color: var(--accent); }
+        .stat-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; }
+        .modes {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .mode {
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .mode:hover { border-color: var(--accent); }
+        .mode.selected { border-color: var(--primary); background: rgba(37,99,235,0.15); }
+        .mode-icon { font-size: 1.5rem; }
+        .mode-name { font-size: 0.8rem; margin-top: 5px; }
+        .warning {
+            background: rgba(239,68,68,0.1);
+            border: 1px solid rgba(239,68,68,0.3);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            color: var(--danger);
+            margin: 20px 0;
+        }
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(37,99,235,0.4); }
+        .btn-danger { background: linear-gradient(135deg, var(--danger), #dc2626); color: #fff; }
+        .btn-purple { background: linear-gradient(135deg, var(--accent), #7c3aed); color: #fff; }
+        .btn-success { background: linear-gradient(135deg, var(--success), #059669); color: #fff; }
+        .center { text-align: center; }
+        /* Game Screen */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+        .scores { display: flex; gap: 30px; }
+        .score-item { text-align: center; }
+        .score-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; }
+        .score-val { font-size: 1.5rem; font-weight: 700; }
+        .score-val.pts { color: var(--warning); }
+        .score-val.str { color: var(--success); }
+        .progress-bar {
+            flex: 1;
+            max-width: 200px;
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            margin: 0 20px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            transition: width 0.3s;
+        }
+        .qnum { color: var(--primary); font-weight: 600; }
+        .clause-box {
+            background: rgba(255,255,255,0.03);
+            border-left: 4px solid var(--accent);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 20px 0;
+            min-height: 150px;
+        }
+        .clause-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--light);
+        }
+        .answers {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        .answers .btn { min-width: 150px; }
+        .result {
+            display: none;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .result.correct { background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); }
+        .result.wrong { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); }
+        .result h3 { font-size: 1.5rem; margin-bottom: 10px; }
+        .result.correct h3 { color: var(--success); }
+        .result.wrong h3 { color: var(--danger); }
+        .verdict {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin: 10px 0;
+        }
+        .verdict.real { background: rgba(239,68,68,0.2); color: var(--danger); }
+        .verdict.satire { background: rgba(139,92,246,0.2); color: var(--accent); }
+        .explanation { color: var(--light); margin: 15px 0; line-height: 1.6; }
+        .source { background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; font-size: 0.85rem; color: var(--muted); }
+        .source a { color: var(--accent); }
+        /* End Screen */
+        .final-score {
+            font-size: 5rem;
+            font-weight: 800;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .grade { text-align: center; margin: 20px 0; }
+        .grade-icon { font-size: 4rem; }
+        .grade-title { font-size: 1.5rem; font-weight: 700; margin: 10px 0; }
+        .grade-sub { color: var(--muted); }
+        .end-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            background: rgba(0,0,0,0.2);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+        .end-stat { text-align: center; }
+        .end-stat .val { font-size: 1.5rem; font-weight: 700; }
+        .end-stat .val.good { color: var(--success); }
+        .end-stat .val.bad { color: var(--danger); }
+        .end-stat .lbl { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; }
+        .share-btns { display: flex; gap: 10px; justify-content: center; margin: 20px 0; }
+        .share-btns .btn { padding: 10px 20px; font-size: 0.85rem; }
+        @media (max-width: 600px) {
+            .modes { grid-template-columns: repeat(2, 1fr); }
+            .answers { flex-direction: column; }
+            .answers .btn { width: 100%; }
+            .nav a { padding: 12px 15px; font-size: 0.75rem; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <a href="../../index.html" class="logo">Terms.Law</a>
+            <a href="../../Demand-Letters/demand-letters-landing.html">Demands</a>
+            <a href="../../Templates/contract-library-landing.html">Contracts</a>
+            <a href="../../INC/formation-landing.html">Incorporation</a>
+            <a href="../blog-landing.html" class="active">Blog</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <!-- START SCREEN -->
+        <div class="screen active" id="startScreen">
+            <h1 class="title">Terms or Onion?</h1>
+            <p class="subtitle">Real terms of service are stranger than satire</p>
+
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-num" id="totalClauses">35</div>
+                    <div class="stat-label">Clauses</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-num">10</div>
+                    <div class="stat-label">Questions</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-num">100%</div>
+                    <div class="stat-label">Verified</div>
+                </div>
+            </div>
+
+            <div class="modes" id="modeGrid">
+                <div class="mode selected" data-mode="mixed" onclick="selectMode('mixed', this)">
+                    <div class="mode-icon">🎲</div>
+                    <div class="mode-name">Mixed</div>
+                </div>
+                <div class="mode" data-mode="privacy" onclick="selectMode('privacy', this)">
+                    <div class="mode-icon">👁️</div>
+                    <div class="mode-name">Privacy</div>
+                </div>
+                <div class="mode" data-mode="arbitration" onclick="selectMode('arbitration', this)">
+                    <div class="mode-icon">⚖️</div>
+                    <div class="mode-name">Can't Sue</div>
+                </div>
+                <div class="mode" data-mode="wtf" onclick="selectMode('wtf', this)">
+                    <div class="mode-icon">🤯</div>
+                    <div class="mode-name">WTF</div>
+                </div>
+            </div>
+
+            <div class="warning">Warning: The real ones are often worse than the fake ones.</div>
+
+            <div class="center">
+                <button class="btn btn-primary" onclick="startGame()">Start Game</button>
+            </div>
+        </div>
+
+        <!-- GAME SCREEN -->
+        <div class="screen" id="gameScreen">
+            <div class="top-bar">
+                <div class="scores">
+                    <div class="score-item">
+                        <div class="score-label">Points</div>
+                        <div class="score-val pts" id="score">0</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-label">Streak</div>
+                        <div class="score-val str" id="streak">0</div>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress" style="width: 10%"></div>
+                </div>
+                <div class="qnum"><span id="qCurrent">1</span>/10</div>
+            </div>
+
+            <div class="clause-box" id="clauseBox">
+                <p class="clause-text" id="clauseText">Loading...</p>
+            </div>
+
+            <div class="answers" id="answerBtns">
+                <button class="btn btn-danger" onclick="submitAnswer('real')">Real ToS</button>
+                <button class="btn btn-purple" onclick="submitAnswer('satire')">Satire</button>
+            </div>
+
+            <div class="result" id="resultBox">
+                <h3 id="resultTitle">Correct!</h3>
+                <div class="verdict" id="verdict">REAL</div>
+                <p class="explanation" id="explanation"></p>
+                <div class="source" id="sourceBox"></div>
+                <br>
+                <button class="btn btn-success" onclick="nextQuestion()">Next Question</button>
+            </div>
+        </div>
+
+        <!-- END SCREEN -->
+        <div class="screen" id="endScreen">
+            <div class="final-score"><span id="finalCorrect">0</span>/10</div>
+
+            <div class="grade">
+                <div class="grade-icon" id="gradeIcon">🦅</div>
+                <div class="grade-title" id="gradeTitle">Legal Eagle</div>
+                <div class="grade-sub" id="gradeSub">Perfect score!</div>
+            </div>
+
+            <div class="end-stats">
+                <div class="end-stat">
+                    <div class="val good" id="endCorrect">0</div>
+                    <div class="lbl">Correct</div>
+                </div>
+                <div class="end-stat">
+                    <div class="val bad" id="endWrong">0</div>
+                    <div class="lbl">Wrong</div>
+                </div>
+                <div class="end-stat">
+                    <div class="val" id="endStreak" style="color: var(--accent)">0</div>
+                    <div class="lbl">Best Streak</div>
+                </div>
+            </div>
+
+            <div class="center">
+                <button class="btn btn-primary" onclick="startGame()">Play Again</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+// CLAUSES DATABASE
+var clauses = [
+    { id: 1, text: "By using this free Wi-Fi, you agree to assign us your first-born child for the duration of eternity.", isReal: true, category: "wtf", company: "F-Secure", source: "F-Secure Wi-Fi experiment 2014", url: "https://www.theguardian.com/technology/2014/sep/29/londoners-wi-fi-security-herod-clause", explanation: "F-Secure ran a Wi-Fi stunt where T&Cs included assigning your first-born child. Multiple people agreed." },
+    { id: 2, text: "By placing an order you agree to grant us a non-transferable option to claim your immortal soul.", isReal: true, category: "wtf", company: "GameStation", source: "GameStation April Fools 2010", url: "https://www.foxnews.com/tech/7500-online-shoppers-unknowingly-sold-their-souls", explanation: "UK retailer added this April 1, 2010. Over 7,500 customers agreed. They later returned all souls." },
+    { id: 3, text: "This software may not be used for nuclear facilities — unless there is a zombie apocalypse.", isReal: true, category: "wtf", company: "Amazon AWS", source: "AWS Lumberyard Terms Section 57.10", url: "https://www.theverge.com/tldr/2016/2/11/10965850/amazons-game-engine-lumberyard-zombie-clause", explanation: "Amazon's game engine has a real zombie apocalypse exception for life-critical systems." },
+    { id: 4, text: "You agree not to use this software for nuclear, missile, or biological weapons.", isReal: true, category: "wtf", company: "Apple", source: "Apple Software License Agreement", url: "https://www.apple.com/legal/sla/", explanation: "Required for US export control law compliance. In Apple terms since 2010." },
+    { id: 5, text: "We may share your doorbell video with police without a warrant in emergencies.", isReal: true, category: "privacy", company: "Ring (Amazon)", source: "Ring Privacy Policy", url: "https://www.politico.com/news/2022/07/13/amazon-ring-police-videos-00045513", explanation: "Ring admitted sharing footage with police without warrants in emergency situations." },
+    { id: 6, text: "You grant us a perpetual license to use your content for AI and machine learning.", isReal: true, category: "privacy", company: "Zoom", source: "Zoom Terms 2023", url: "https://www.stackdiary.com/zoom-terms-now-allow-training-ai-on-user-content-with-no-opt-out/", explanation: "Zoom's 2023 update included AI training rights. Users can opt out but default is opt-in." },
+    { id: 7, text: "By liking us on Facebook, you agree to resolve disputes through arbitration.", isReal: true, category: "arbitration", company: "General Mills", source: "General Mills 2014 (reversed)", url: "https://www.nytimes.com/2014/04/17/business/media/general-mills-reverses-new-policy-on-lawsuits.html", explanation: "General Mills tried claiming Facebook likes = arbitration agreement. Reversed after backlash." },
+    { id: 8, text: "You waive your right to a jury trial and class action lawsuits.", isReal: true, category: "arbitration", company: "AT&T", source: "AT&T Terms of Service", url: "https://www.supremecourt.gov/opinions/10pdf/09-893.pdf", explanation: "Supreme Court upheld this in AT&T v. Concepcion 2011. Now standard across most companies." },
+    { id: 9, text: "Your genetic data may be shared with pharmaceutical companies for commercial use.", isReal: true, category: "privacy", company: "23andMe", source: "23andMe Privacy Statement", url: "https://www.nytimes.com/2018/07/25/business/23andme-glaxosmithkline-partnership.html", explanation: "23andMe sold database access to GlaxoSmithKline for $300 million in 2018." },
+    { id: 10, text: "We may access your content through manual review with or without notice.", isReal: true, category: "privacy", company: "Adobe", source: "Adobe Terms 2024", url: "https://www.theverge.com/2024/6/6/24172677/adobe-terms-of-service-update-firefly-generative-ai", explanation: "Adobe's 2024 update sparked outrage for granting access to user content for ML and moderation." },
+    { id: 11, text: "We may hold your funds for up to 180 days if we believe there's a risk.", isReal: true, category: "arbitration", company: "PayPal", source: "PayPal User Agreement", url: "https://www.paypal.com/us/legalhub/useragreement-full", explanation: "PayPal can freeze your money for 6 months based on their own risk assessment." },
+    { id: 12, text: "You grant us an irrevocable, perpetual license to your content for platforms not yet invented.", isReal: true, category: "privacy", company: "TikTok", source: "TikTok Terms of Service", url: "https://www.tiktok.com/legal/page/row/terms-of-service/en", explanation: "TikTok's license is irrevocable and perpetual. They can use content on future platforms." },
+    { id: 13, text: "Remote vehicle features will be disabled without an active subscription.", isReal: true, category: "wtf", company: "OnStar (GM)", source: "OnStar Terms", url: "https://www.thedrive.com/news/gm-is-disabling-apple-carplay-in-new-evs-to-make-money-off-subscriptions", explanation: "GM disables remote start when subscription lapses, even though hardware supports it." },
+    { id: 14, text: "Use of unauthorized coffee pods may result in the brewer refusing to function.", isReal: true, category: "wtf", company: "Keurig", source: "Keurig 2.0 2014", url: "https://www.theverge.com/2015/2/5/7986327/keurigs-attempt-to-drm-its-coffee-cups-totally-backfired", explanation: "Keurig added DRM to coffee makers. CEO later admitted: We were wrong." },
+    { id: 15, text: "If inactive for 2 years, we may delete your account including digital purchases.", isReal: true, category: "arbitration", company: "Microsoft", source: "Microsoft Services Agreement", url: "https://support.microsoft.com/en-us/account-billing/microsoft-account-inactivity-policy-eb70a515-4e3e-1074-c8a7-d81e1ae87767", explanation: "Microsoft can delete inactive accounts, potentially erasing your digital game library." },
+    { id: 16, text: "You may not publish benchmark or comparison test results of our software.", isReal: true, category: "wtf", company: "Intel", source: "Intel Software Terms", url: "https://www.tomshardware.com/news/intel-amd-benchmark-restrictions-licenses", explanation: "Intel threatens prosecution for publishing benchmark results to discourage AMD comparisons." },
+    { id: 17, text: "By tagging us, you give us perpetual rights to sell your photo with no compensation.", isReal: true, category: "privacy", company: "YSL Beauté", source: "YSL Posting Guidelines", url: "https://www.yslbeautyus.com/on/demandware.static/-/Sites-ysl-us-ng-Library/default/v75e7d0f3ae94f80a3b1de0d08c3a3b0e7cf8f8c2/legal/YSL%20Beaute%20Guidelines%20for%20Posting.pdf", explanation: "YSL grants themselves perpetual rights to sell your photos just for tagging them." },
+    { id: 18, text: "We reserve the right to monetize all content through ads, even if you earn nothing.", isReal: true, category: "privacy", company: "YouTube", source: "YouTube Terms 2020", url: "https://www.theverge.com/2020/11/18/21573870/youtube-ads-all-videos-terms-of-service-update", explanation: "YouTube runs ads on all videos. Non-partnered creators earn nothing from these ads." },
+    { id: 19, text: "A special consideration will be awarded to licensees who read this and contact us.", isReal: true, category: "wtf", company: "PC Pitstop", source: "PC Pitstop EULA 2005", url: "https://techtalk.pcmatic.com/2012/06/12/it-pays-to-read-license-agreements-7-years-later/", explanation: "PC Pitstop hid $1,000 prize in EULA. Took 5 months and 3,000 sales before someone claimed it." },
+    { id: 20, text: "We may take $2,500 from your account for spreading misinformation as we define it.", isReal: true, category: "wtf", company: "PayPal", source: "PayPal AUP 2022 (retracted)", url: "https://www.reuters.com/technology/paypal-says-utilised-incorrect-information-misinformation-policy-2022-10-10/", explanation: "PayPal's 2022 update allowed $2,500 fines for misinformation. Claimed published in error after backlash." },
+    { id: 21, text: "Our smart speaker continuously records all audio even when not activated.", isReal: false, category: "privacy", company: "Satire", source: "Made up", url: "", explanation: "While smart speakers send some audio to servers, continuous recording would be a major legal liability." },
+    { id: 22, text: "By using our sleep tracker, you grant us rights to monetize your dream vocalizations.", isReal: false, category: "privacy", company: "Satire", source: "Made up", url: "", explanation: "Sleep trackers collect movement data, but monetizing dream content would cross major privacy lines." },
+    { id: 23, text: "We may adjust prices based on your political views and social media activity.", isReal: false, category: "privacy", company: "Satire", source: "Made up", url: "", explanation: "Pricing based on political views would violate discrimination laws and cause PR disasters." },
+    { id: 24, text: "By using this service, you agree not to use competing services for 24 months.", isReal: false, category: "arbitration", company: "Satire", source: "Made up", url: "", explanation: "Consumer non-compete clauses would be absurd and unenforceable. You can use any service you want." },
+    { id: 25, text: "Upon your death, account debt becomes the responsibility of your next of kin.", isReal: false, category: "arbitration", company: "Satire", source: "Made up", url: "", explanation: "Debts can't be inherited by family members. A clause like this would be unenforceable." },
+    { id: 26, text: "We may use facial recognition to share your biometric data with advertisers.", isReal: false, category: "privacy", company: "Satire", source: "Made up", url: "", explanation: "Sharing biometric data with advertisers would violate Illinois BIPA and similar laws." },
+    { id: 27, text: "By using our journaling app, we own all your personal thoughts and reflections.", isReal: false, category: "privacy", company: "Satire", source: "Made up", url: "", explanation: "Apps claim licenses to content, not ownership of your inner life. This would be legally absurd." },
+    { id: 28, text: "You agree to pay $5,000 if you post a negative review without contacting support first.", isReal: false, category: "arbitration", company: "Satire", source: "Made up", url: "", explanation: "Non-disparagement clauses like this are now illegal under the Consumer Review Fairness Act 2016." },
+    { id: 29, text: "Changes to these terms apply retroactively to disputes that arose before the change.", isReal: false, category: "arbitration", company: "Satire", source: "Made up", url: "", explanation: "Retroactive contract terms face serious enforceability problems. New terms can't apply to past disputes." },
+    { id: 30, text: "By using our app, you consent to us creating a voice clone for use in advertisements.", isReal: false, category: "privacy", company: "Satire", source: "Made up", url: "", explanation: "Using voice clones for ads without specific consent would face legal challenges under publicity rights." },
+    { id: 31, text: "By accepting this Wi-Fi, you agree to 1,000 hours of community service including cleaning toilets.", isReal: true, category: "wtf", company: "Purple WiFi", source: "Purple WiFi 2017", url: "https://purple.ai/blogs/22000-people-agree-community-service-exchange-free-wifi/", explanation: "UK Wi-Fi provider added this clause. 22,000 people agreed before they revealed the experiment." },
+    { id: 32, text: "Disney+ trial signup means all disputes go to arbitration, including wrongful death.", isReal: true, category: "arbitration", company: "Disney", source: "Disney Terms", url: "https://www.nytimes.com/2024/08/14/business/disney-plus-wrongful-death-lawsuit.html", explanation: "In 2024, Disney tried forcing a wrongful death case to arbitration because widower had Disney+ trial." },
+    { id: 33, text: "Businesses may pay us to display your photos and likeness without compensation to you.", isReal: true, category: "privacy", company: "Instagram", source: "Instagram Terms 2012 (reversed)", url: "https://www.bbc.com/news/technology-20786068", explanation: "Instagram's 2012 terms said they could sell photos to advertisers. Reversed in 72 hours after backlash." },
+    { id: 34, text: "The bank agrees to 0% interest, no fees, and 3 million rubles penalty if it changes terms.", isReal: true, category: "wtf", company: "Tinkoff Bank", source: "Dmitry Agarkov case 2008", url: "https://www.telegraph.co.uk/finance/personalfinance/borrowing/creditcards/10231556/Man-who-created-own-credit-card-sues-bank.html", explanation: "Russian man rewrote credit card agreement. Bank signed without reading. Court ruled in his favor." },
+    { id: 35, text: "You give us an EXCLUSIVE perpetual license to sell your uploaded designs.", isReal: true, category: "privacy", company: "Cricut", source: "Cricut Terms", url: "https://cricut.com/en-us/legal/terms-of-use", explanation: "Cricut claims EXCLUSIVE license to designs, meaning they can control your own creative work." }
+];
+
+// GAME STATE
+var state = {
+    mode: 'mixed',
+    questions: [],
+    current: 0,
+    score: 0,
+    streak: 0,
+    maxStreak: 0,
+    correct: 0,
+    wrong: 0
+};
+
+// SELECT MODE
+function selectMode(mode, el) {
+    state.mode = mode;
+    document.querySelectorAll('.mode').forEach(function(m) { m.classList.remove('selected'); });
+    el.classList.add('selected');
+}
+
+// SHUFFLE ARRAY
+function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+}
+
+// BUILD ROUND
+function buildRound() {
+    var pool = clauses;
+    if (state.mode === 'privacy') {
+        pool = clauses.filter(function(c) { return c.category === 'privacy'; });
+    } else if (state.mode === 'arbitration') {
+        pool = clauses.filter(function(c) { return c.category === 'arbitration'; });
+    } else if (state.mode === 'wtf') {
+        pool = clauses.filter(function(c) { return c.category === 'wtf'; });
+    }
+    var real = shuffle(pool.filter(function(c) { return c.isReal; })).slice(0, 7);
+    var fake = shuffle(pool.filter(function(c) { return !c.isReal; })).slice(0, 3);
+    return shuffle(real.concat(fake)).slice(0, 10);
+}
+
+// START GAME
+function startGame() {
+    state.questions = buildRound();
+    state.current = 0;
+    state.score = 0;
+    state.streak = 0;
+    state.maxStreak = 0;
+    state.correct = 0;
+    state.wrong = 0;
+
+    document.getElementById('startScreen').classList.remove('active');
+    document.getElementById('endScreen').classList.remove('active');
+    document.getElementById('gameScreen').classList.add('active');
+
+    showQuestion();
+}
+
+// SHOW QUESTION
+function showQuestion() {
+    var q = state.questions[state.current];
+    document.getElementById('clauseText').textContent = q.text;
+    document.getElementById('qCurrent').textContent = state.current + 1;
+    document.getElementById('score').textContent = state.score;
+    document.getElementById('streak').textContent = state.streak;
+    document.getElementById('progress').style.width = ((state.current + 1) * 10) + '%';
+
+    document.getElementById('resultBox').style.display = 'none';
+    document.getElementById('answerBtns').style.display = 'flex';
+    document.getElementById('clauseBox').style.borderLeftColor = 'var(--accent)';
+}
+
+// SUBMIT ANSWER
+function submitAnswer(answer) {
+    var q = state.questions[state.current];
+    var correct = (answer === 'real' && q.isReal) || (answer === 'satire' && !q.isReal);
+
+    document.getElementById('answerBtns').style.display = 'none';
+
+    if (correct) {
+        state.score += 100 + (state.streak * 10);
+        state.streak++;
+        state.correct++;
+        if (state.streak > state.maxStreak) state.maxStreak = state.streak;
+        document.getElementById('resultTitle').textContent = '✓ Correct!';
+        document.getElementById('resultBox').className = 'result correct';
+    } else {
+        state.streak = 0;
+        state.wrong++;
+        document.getElementById('resultTitle').textContent = '✗ Wrong!';
+        document.getElementById('resultBox').className = 'result wrong';
+    }
+
+    document.getElementById('score').textContent = state.score;
+    document.getElementById('streak').textContent = state.streak;
+
+    document.getElementById('verdict').textContent = q.isReal ? 'REAL' : 'SATIRE';
+    document.getElementById('verdict').className = 'verdict ' + (q.isReal ? 'real' : 'satire');
+    document.getElementById('explanation').textContent = q.explanation;
+    if (q.isReal && q.url) {
+        document.getElementById('sourceBox').innerHTML = '<strong>' + q.company + '</strong> — ' + q.source + ' <a href="' + q.url + '" target="_blank" style="color: var(--accent);">[Source]</a>';
+    } else if (q.isReal) {
+        document.getElementById('sourceBox').innerHTML = '<strong>' + q.company + '</strong> — ' + q.source;
+    } else {
+        document.getElementById('sourceBox').innerHTML = 'Made up for this game';
+    }
+
+    document.getElementById('clauseBox').style.borderLeftColor = q.isReal ? 'var(--danger)' : 'var(--accent)';
+    document.getElementById('resultBox').style.display = 'block';
+
+    var nextBtn = document.querySelector('#resultBox .btn');
+    nextBtn.textContent = state.current >= 9 ? 'See Results' : 'Next Question';
+}
+
+// NEXT QUESTION
+function nextQuestion() {
+    state.current++;
+    if (state.current >= 10) {
+        showEnd();
+    } else {
+        showQuestion();
+    }
+}
+
+// SHOW END
+function showEnd() {
+    document.getElementById('gameScreen').classList.remove('active');
+    document.getElementById('endScreen').classList.add('active');
+
+    document.getElementById('finalCorrect').textContent = state.correct;
+    document.getElementById('endCorrect').textContent = state.correct;
+    document.getElementById('endWrong').textContent = state.wrong;
+    document.getElementById('endStreak').textContent = state.maxStreak;
+
+    var pct = state.correct * 10;
+    var grades = [
+        { min: 100, icon: '🦅', title: 'Legal Eagle', sub: 'Perfect! You read every ToS.' },
+        { min: 80, icon: '🔍', title: 'Fine Print Detective', sub: 'You could be a ToS consultant.' },
+        { min: 60, icon: '🛡️', title: 'Privacy Guardian', sub: 'Sharp instincts!' },
+        { min: 40, icon: '🤔', title: 'Cautious Clicker', sub: 'Reality is stranger than fiction.' },
+        { min: 20, icon: '😅', title: 'Click-Happy', sub: 'Slow down before clicking Agree...' },
+        { min: 0, icon: '💀', title: 'Terms Victim', sub: 'Check your immortal soul.' }
+    ];
+
+    var grade = grades[5];
+    for (var i = 0; i < grades.length; i++) {
+        if (pct >= grades[i].min) { grade = grades[i]; break; }
+    }
+
+    document.getElementById('gradeIcon').textContent = grade.icon;
+    document.getElementById('gradeTitle').textContent = grade.title;
+    document.getElementById('gradeSub').textContent = grade.sub;
+}
+
+// INIT
+document.getElementById('totalClauses').textContent = clauses.length;
+</script>
+</body>
+</html>

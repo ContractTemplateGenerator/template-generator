@@ -1,0 +1,2536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demand Dial - Legal Negotiation Simulator | terms.law</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        /* Header - matches terms.law */
+        .site-header {
+            background: #111;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+        }
+
+        .site-header .logo {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .site-header .logo span {
+            color: #4a9eff;
+        }
+
+        .site-header nav {
+            display: flex;
+            gap: 24px;
+        }
+
+        .site-header nav a {
+            color: #aaa;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        .site-header nav a:hover,
+        .site-header nav a.active {
+            color: #fff;
+        }
+
+        /* Game Container */
+        .game-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        /* Title Screen */
+        .title-screen {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .title-screen h1 {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #ff6b6b, #ffa500, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.2); }
+        }
+
+        .title-screen .dial-icon {
+            font-size: 5rem;
+            margin: 30px 0;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .title-screen p {
+            font-size: 1.2rem;
+            color: #aaa;
+            max-width: 600px;
+            margin: 0 auto 40px;
+            line-height: 1.6;
+        }
+
+        .scenario-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .scenario-card {
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .scenario-card:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: #4a9eff;
+            transform: translateY(-4px);
+        }
+
+        .scenario-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+        }
+
+        .scenario-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .scenario-card p {
+            font-size: 0.9rem;
+            color: #888;
+            margin-bottom: 12px;
+        }
+
+        .scenario-card .amount {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #4a9eff;
+        }
+
+        /* Game Screen */
+        .game-screen {
+            display: none;
+        }
+
+        .game-screen.active {
+            display: block;
+        }
+
+        /* Scoreboard */
+        .scoreboard {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .score-card {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .score-card .label {
+            font-size: 0.8rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .score-card .value {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .score-card.your-net .value {
+            color: #4ade80;
+        }
+
+        .score-card.their-cost .value {
+            color: #f87171;
+        }
+
+        .score-card.relationship .value {
+            color: #fbbf24;
+        }
+
+        .score-card .change {
+            font-size: 0.85rem;
+            margin-top: 4px;
+        }
+
+        .score-card .change.positive {
+            color: #4ade80;
+        }
+
+        .score-card .change.negative {
+            color: #f87171;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            height: 8px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #4a9eff, #6366f1);
+            height: 100%;
+            border-radius: 8px;
+            transition: width 0.5s ease;
+        }
+
+        /* Scenario Display */
+        .scenario-panel {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 24px;
+        }
+
+        .scenario-panel .stage-badge {
+            display: inline-block;
+            background: #4a9eff;
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .scenario-panel h2 {
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+            color: #fff;
+        }
+
+        .scenario-panel .narrative {
+            font-size: 1.05rem;
+            line-height: 1.7;
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+
+        .scenario-panel .legal-note {
+            background: rgba(74, 158, 255, 0.1);
+            border-left: 3px solid #4a9eff;
+            padding: 12px 16px;
+            border-radius: 0 8px 8px 0;
+            margin-top: 16px;
+        }
+
+        .scenario-panel .legal-note .label {
+            font-size: 0.75rem;
+            color: #4a9eff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .scenario-panel .legal-note p {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        /* Choices */
+        .choices {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .choice-btn {
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.15);
+            border-radius: 12px;
+            padding: 20px 24px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        .choice-btn:hover {
+            background: rgba(74, 158, 255, 0.15);
+            border-color: #4a9eff;
+        }
+
+        .choice-btn .choice-title {
+            font-weight: 600;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .choice-btn .choice-cost {
+            font-size: 0.85rem;
+            color: #f87171;
+            font-weight: 600;
+        }
+
+        .choice-btn .choice-cost.free {
+            color: #4ade80;
+        }
+
+        .choice-btn .choice-desc {
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        /* Result Screen */
+        .result-screen {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .result-screen.active {
+            display: block;
+        }
+
+        .result-screen .result-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+        }
+
+        .result-screen h2 {
+            font-size: 2rem;
+            margin-bottom: 16px;
+        }
+
+        .result-screen .result-summary {
+            font-size: 1.1rem;
+            color: #aaa;
+            max-width: 500px;
+            margin: 0 auto 30px;
+            line-height: 1.6;
+        }
+
+        .final-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            max-width: 600px;
+            margin: 0 auto 30px;
+        }
+
+        .final-stat {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .final-stat .label {
+            font-size: 0.8rem;
+            color: #888;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .final-stat .value {
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4a9eff, #6366f1);
+            border: none;
+            color: #fff;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin: 8px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(74, 158, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.2);
+            color: #fff;
+            padding: 12px 28px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin: 8px;
+        }
+
+        .btn-secondary:hover {
+            border-color: #fff;
+            background: rgba(255,255,255,0.05);
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .title-screen h1 {
+                font-size: 2.5rem;
+            }
+
+            .scoreboard {
+                grid-template-columns: 1fr;
+            }
+
+            .final-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="site-header">
+        <a href="../../../index.html" class="logo">terms<span>.law</span></a>
+        <nav>
+            <a href="../../../index.html">Home</a>
+            <a href="../../../Demand-Letters/demand-letters-landing.html">Demand Letters</a>
+            <a href="../../../Templates/contract-library-landing.html">Templates</a>
+            <a href="../../../INC/formation-landing.html">Formation</a>
+            <a href="../../blog-landing.html" class="active">Blog</a>
+        </nav>
+    </header>
+
+    <div class="game-container">
+        <!-- Title Screen -->
+        <div id="title-screen" class="title-screen">
+            <div class="dial-icon">&#9878;</div>
+            <h1>Demand Dial</h1>
+            <p>Master the art of legal negotiation. Navigate demand letters, weigh escalation costs, and learn when to push and when to settle. Real costs. Real strategy. Real California law.</p>
+
+            <h3 style="color: #888; margin-bottom: 16px;">Choose Your Scenario</h3>
+
+            <div class="scenario-cards">
+                <div class="scenario-card" onclick="startScenario('security_deposit')">
+                    <div class="icon">&#127968;</div>
+                    <h3>Security Deposit Battle</h3>
+                    <p>Your landlord kept your deposit after a clean move-out. Time to get it back.</p>
+                    <div class="amount">$2,400 at stake</div>
+                </div>
+
+                <div class="scenario-card" onclick="startScenario('unpaid_wages')">
+                    <div class="icon">&#128176;</div>
+                    <h3>Unpaid Wages</h3>
+                    <p>Your former employer hasn't paid your final paycheck. CA law is on your side.</p>
+                    <div class="amount">$3,200 at stake</div>
+                </div>
+
+                <div class="scenario-card" onclick="startScenario('tech_services')">
+                    <div class="icon">&#128187;</div>
+                    <h3>Tech Services Invoice</h3>
+                    <p>A client owes you for completed web development work. They've gone silent.</p>
+                    <div class="amount">$15,000 at stake</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="game-screen">
+            <div class="scoreboard">
+                <div class="score-card your-net">
+                    <div class="label">Your Net Recovery</div>
+                    <div class="value" id="your-net">$0</div>
+                    <div class="change" id="your-net-change"></div>
+                </div>
+                <div class="score-card their-cost">
+                    <div class="label">Their Total Cost</div>
+                    <div class="value" id="their-cost">$0</div>
+                    <div class="change" id="their-cost-change"></div>
+                </div>
+                <div class="score-card relationship">
+                    <div class="label">Relationship</div>
+                    <div class="value" id="relationship">100%</div>
+                    <div class="change" id="relationship-change"></div>
+                </div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+            </div>
+
+            <div class="scenario-panel fade-in" id="scenario-panel">
+                <span class="stage-badge" id="stage-badge">Stage 1</span>
+                <h2 id="node-title">Loading...</h2>
+                <div class="narrative" id="node-narrative">Loading scenario...</div>
+                <div class="legal-note" id="legal-note" style="display: none;">
+                    <div class="label">&#9878; Legal Context</div>
+                    <p id="legal-note-text"></p>
+                </div>
+            </div>
+
+            <div class="choices" id="choices">
+                <!-- Choices rendered here -->
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result-screen" class="result-screen">
+            <div class="result-icon" id="result-icon">&#127942;</div>
+            <h2 id="result-title">Scenario Complete!</h2>
+            <p class="result-summary" id="result-summary">You've completed the negotiation.</p>
+
+            <div class="final-stats">
+                <div class="final-stat">
+                    <div class="label">Your Net</div>
+                    <div class="value" id="final-net" style="color: #4ade80;">$0</div>
+                </div>
+                <div class="final-stat">
+                    <div class="label">Their Cost</div>
+                    <div class="value" id="final-their" style="color: #f87171;">$0</div>
+                </div>
+                <div class="final-stat">
+                    <div class="label">Relationship</div>
+                    <div class="value" id="final-relationship" style="color: #fbbf24;">0%</div>
+                </div>
+            </div>
+
+            <div id="result-analysis" style="text-align: left; background: rgba(255,255,255,0.05); border-radius: 12px; padding: 24px; margin-bottom: 24px; max-width: 600px; margin-left: auto; margin-right: auto;">
+                <h4 style="margin-bottom: 12px; color: #4a9eff;">Analysis</h4>
+                <p id="analysis-text" style="color: #aaa; line-height: 1.6;"></p>
+            </div>
+
+            <button class="btn-primary" onclick="showTitleScreen()">Try Another Scenario</button>
+            <button class="btn-secondary" onclick="restartScenario()">Replay This Scenario</button>
+        </div>
+    </div>
+
+    <script>
+        // Game State
+        var gameState = {
+            scenario: null,
+            currentNode: null,
+            yourNet: 0,
+            yourCosts: 0,
+            theirCost: 0,
+            relationship: 100,
+            history: [],
+            stakeAmount: 0
+        };
+
+        // Scenarios Data
+        var scenarios = {
+            security_deposit: {
+                name: "Security Deposit Battle",
+                stakeAmount: 2400,
+                startNode: "sd_start",
+                nodes: {
+                    sd_start: {
+                        stage: 1,
+                        title: "The Empty Mailbox",
+                        narrative: "It's been 21 days since you moved out of your apartment at 1847 Oak Street. Under California law, your landlord had exactly 21 days to return your $2,400 security deposit or provide an itemized statement of deductions. Your mailbox remains empty. You have photos from move-out day showing the unit in pristine condition.",
+                        legalNote: "California Civil Code \u00A7 1950.5(g): Landlords must return deposits within 21 days. Bad faith retention allows tenant to recover up to 2x the deposit amount.",
+                        choices: [
+                            {
+                                text: "Send a polite email reminder",
+                                desc: "Low pressure, maintains relationship",
+                                cost: 0,
+                                effects: { theirCost: 0, relationship: -5 },
+                                next: "sd_email_sent"
+                            },
+                            {
+                                text: "Send a formal demand letter yourself",
+                                desc: "Cite the law, set a deadline",
+                                cost: 0,
+                                effects: { theirCost: 50, relationship: -15 },
+                                next: "sd_self_demand"
+                            },
+                            {
+                                text: "Hire an attorney to send demand letter",
+                                desc: "Maximum pressure, shows you're serious",
+                                cost: 450,
+                                effects: { theirCost: 200, relationship: -25 },
+                                next: "sd_attorney_demand"
+                            }
+                        ]
+                    },
+                    sd_email_sent: {
+                        stage: 2,
+                        title: "Radio Silence",
+                        narrative: "A week passes. No response to your email. You check online and see your landlord has listed the unit for rent at $200/month higher than what you paid. They're clearly active - just ignoring you.",
+                        legalNote: "Documentation is key. Screenshot the listing as evidence they're not incapacitated or unreachable.",
+                        choices: [
+                            {
+                                text: "Send a formal demand letter yourself",
+                                desc: "Escalate with legal citations",
+                                cost: 0,
+                                effects: { theirCost: 50, relationship: -10 },
+                                next: "sd_self_demand"
+                            },
+                            {
+                                text: "Hire an attorney for demand letter",
+                                desc: "Time to get serious",
+                                cost: 450,
+                                effects: { theirCost: 200, relationship: -20 },
+                                next: "sd_attorney_demand"
+                            },
+                            {
+                                text: "File in small claims court directly",
+                                desc: "Skip the letters, go straight to court",
+                                cost: 75,
+                                effects: { theirCost: 300, relationship: -40 },
+                                next: "sd_small_claims_filed"
+                            }
+                        ]
+                    },
+                    sd_self_demand: {
+                        stage: 2,
+                        title: "Your Letter Lands",
+                        narrative: "You send a certified letter citing Civil Code \u00A7 1950.5 and demanding return of your $2,400 within 10 days. Three days later, you get a response: your landlord claims you left 'excessive damage' and owes you nothing. They provide no photos or receipts.",
+                        legalNote: "An itemized statement with documentation is required for any deductions. Vague claims of 'damage' without specifics violate the statute.",
+                        choices: [
+                            {
+                                text: "Respond pointing out their violations",
+                                desc: "Explain they need documentation",
+                                cost: 0,
+                                effects: { theirCost: 25, relationship: -5 },
+                                next: "sd_back_and_forth"
+                            },
+                            {
+                                text: "Hire attorney to respond",
+                                desc: "Let a professional apply pressure",
+                                cost: 450,
+                                effects: { theirCost: 200, relationship: -15 },
+                                next: "sd_attorney_response"
+                            },
+                            {
+                                text: "File in small claims court",
+                                desc: "Their response shows bad faith",
+                                cost: 75,
+                                effects: { theirCost: 300, relationship: -30 },
+                                next: "sd_small_claims_filed"
+                            }
+                        ]
+                    },
+                    sd_attorney_demand: {
+                        stage: 2,
+                        title: "Legal Letterhead Gets Attention",
+                        narrative: "Your attorney sends a demand on official letterhead, citing the 21-day rule and warning of bad faith penalties (2x damages). Within 48 hours, the landlord's own attorney responds, offering to return $1,800 - claiming $600 in 'cleaning and repairs.'",
+                        legalNote: "The quick response shows they know they're exposed. But $600 in deductions still requires itemization with receipts.",
+                        choices: [
+                            {
+                                text: "Accept $1,800 settlement",
+                                desc: "Get most of your money now",
+                                cost: 0,
+                                effects: { yourNet: 1800, theirCost: 1800, relationship: 0 },
+                                next: "sd_settle_1800"
+                            },
+                            {
+                                text: "Counter: Full $2,400 or we file",
+                                desc: "Demand everything, cite lack of itemization",
+                                cost: 0,
+                                effects: { theirCost: 100, relationship: -10 },
+                                next: "sd_counter_full"
+                            },
+                            {
+                                text: "Counter: $2,100 to close this out",
+                                desc: "Meet in the middle",
+                                cost: 0,
+                                effects: { theirCost: 50, relationship: -5 },
+                                next: "sd_counter_2100"
+                            }
+                        ]
+                    },
+                    sd_back_and_forth: {
+                        stage: 3,
+                        title: "The Runaround",
+                        narrative: "Your landlord responds with a blurry photo of what appears to be a small scuff on a wall and a receipt for $800 in 'professional cleaning.' The receipt is from their cousin's cleaning company. This feels like fabricated evidence.",
+                        legalNote: "Inflated or fabricated deductions can constitute bad faith, potentially doubling your recovery under \u00A7 1950.5(l).",
+                        choices: [
+                            {
+                                text: "File in small claims court",
+                                desc: "You have enough evidence of bad faith",
+                                cost: 75,
+                                effects: { theirCost: 300, relationship: -25 },
+                                next: "sd_small_claims_filed"
+                            },
+                            {
+                                text: "Hire attorney to file lawsuit",
+                                desc: "Go for the 2x bad faith penalty",
+                                cost: 450,
+                                effects: { theirCost: 500, relationship: -35 },
+                                next: "sd_attorney_lawsuit"
+                            },
+                            {
+                                text: "Offer to settle for $2,000",
+                                desc: "Try to end this without court",
+                                cost: 0,
+                                effects: { theirCost: 0, relationship: 5 },
+                                next: "sd_offer_2000"
+                            }
+                        ]
+                    },
+                    sd_attorney_response: {
+                        stage: 3,
+                        title: "Attorney Pressure Works",
+                        narrative: "Your attorney responds with a detailed letter explaining exactly why their 'damage' claims fail legally and threatening to seek the 2x bad faith penalty. The landlord's tone changes dramatically - they now offer $2,000 'to make this go away.'",
+                        legalNote: "When facing 2x penalties ($4,800 potential exposure), settling for the deposit amount often makes sense for landlords.",
+                        choices: [
+                            {
+                                text: "Accept $2,000",
+                                desc: "Good recovery, case closed",
+                                cost: 0,
+                                effects: { yourNet: 2000, theirCost: 2000, relationship: 0 },
+                                next: "sd_settle_2000"
+                            },
+                            {
+                                text: "Demand full $2,400",
+                                desc: "You want every penny",
+                                cost: 0,
+                                effects: { theirCost: 50, relationship: -10 },
+                                next: "sd_demand_full_attorney"
+                            },
+                            {
+                                text: "Demand $2,400 + attorney fees",
+                                desc: "They should pay for making you hire a lawyer",
+                                cost: 0,
+                                effects: { theirCost: 100, relationship: -15 },
+                                next: "sd_demand_full_plus_fees"
+                            }
+                        ]
+                    },
+                    sd_small_claims_filed: {
+                        stage: 4,
+                        title: "See You in Court",
+                        narrative: "You file in small claims court for $2,400 plus the bad faith penalty. The landlord is served. A week before the hearing, you receive a call: they want to settle. They offer $2,800 - more than the deposit - to avoid court.",
+                        legalNote: "Defendants often settle before hearings to avoid the time cost and uncertainty of trial. Small claims judgments also become public record.",
+                        choices: [
+                            {
+                                text: "Accept $2,800 settlement",
+                                desc: "More than your deposit, guaranteed money",
+                                cost: 0,
+                                effects: { yourNet: 2800, theirCost: 2800, relationship: -5 },
+                                next: "sd_settle_2800"
+                            },
+                            {
+                                text: "Demand $3,500 or go to trial",
+                                desc: "Push for more given their bad faith",
+                                cost: 0,
+                                effects: { theirCost: 100, relationship: -10 },
+                                next: "sd_demand_3500"
+                            },
+                            {
+                                text: "Go to trial anyway",
+                                desc: "Seek the full 2x penalty in court",
+                                cost: 0,
+                                effects: { theirCost: 400, relationship: -20 },
+                                next: "sd_trial"
+                            }
+                        ]
+                    },
+                    sd_attorney_lawsuit: {
+                        stage: 4,
+                        title: "Lawsuit Filed",
+                        narrative: "Your attorney files in Limited Civil Court, seeking $4,800 (2x the deposit) plus attorney fees. The landlord hires their own attorney. Before the first hearing, their lawyer reaches out: they'll pay $3,200 to settle everything, including your attorney fees.",
+                        legalNote: "Litigation costs add up quickly. The landlord is now facing $1,000+ in their own attorney fees on top of potential judgment.",
+                        choices: [
+                            {
+                                text: "Accept $3,200",
+                                desc: "Strong recovery, covers your costs",
+                                cost: 0,
+                                effects: { yourNet: 3200, theirCost: 4200, relationship: 0 },
+                                next: "sd_settle_3200"
+                            },
+                            {
+                                text: "Counter with $4,000",
+                                desc: "Push for more, you have a strong case",
+                                cost: 0,
+                                effects: { theirCost: 100, relationship: -5 },
+                                next: "sd_counter_4000"
+                            },
+                            {
+                                text: "Proceed to trial",
+                                desc: "Go for the full judgment",
+                                cost: 200,
+                                effects: { theirCost: 800, relationship: -20 },
+                                next: "sd_full_trial"
+                            }
+                        ]
+                    },
+                    sd_offer_2000: {
+                        stage: 4,
+                        title: "Settlement Offer",
+                        narrative: "You offer to settle for $2,000. The landlord counters with $1,500, claiming they 'can't afford more.' You know they just raised the rent on your old unit by $200/month.",
+                        choices: [
+                            {
+                                text: "Accept $1,500",
+                                desc: "Take the certain money",
+                                cost: 0,
+                                effects: { yourNet: 1500, theirCost: 1500, relationship: 10 },
+                                next: "sd_settle_1500"
+                            },
+                            {
+                                text: "Hold firm at $2,000",
+                                desc: "Your offer was already a compromise",
+                                cost: 0,
+                                effects: { theirCost: 25, relationship: -5 },
+                                next: "sd_hold_2000"
+                            },
+                            {
+                                text: "File in small claims court",
+                                desc: "They're not negotiating in good faith",
+                                cost: 75,
+                                effects: { theirCost: 300, relationship: -30 },
+                                next: "sd_small_claims_filed"
+                            }
+                        ]
+                    },
+                    // Terminal Nodes
+                    sd_settle_1800: {
+                        stage: 5,
+                        title: "Settlement: $1,800",
+                        narrative: "You accept the $1,800 settlement. The check arrives within a week. You lost $600 from your original deposit, but avoided any legal costs and closed the matter quickly.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#128176;",
+                            title: "Settled for $1,800",
+                            yourNet: 1350,
+                            theirCost: 1800,
+                            relationship: 60,
+                            analysis: "You recovered 75% of your deposit without court costs. However, the landlord's 'deductions' were likely improper - with more pressure, you might have recovered the full amount. Your attorney fee was $450, netting you $1,350."
+                        }
+                    },
+                    sd_settle_2000: {
+                        stage: 5,
+                        title: "Settlement: $2,000",
+                        narrative: "The $2,000 settlement is signed. After your attorney fees, you net $1,550. The landlord learned that tenants who know their rights aren't easy targets.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#128176;",
+                            title: "Settled for $2,000",
+                            yourNet: 1550,
+                            theirCost: 2000,
+                            relationship: 50,
+                            analysis: "Good recovery at 83% of your deposit. The attorney fee investment ($450) paid off by getting a quicker, higher settlement than you likely would have achieved alone. Net: $1,550."
+                        }
+                    },
+                    sd_settle_2800: {
+                        stage: 5,
+                        title: "Settlement: $2,800",
+                        narrative: "You accept $2,800 - more than your original deposit. The threat of a bad faith judgment was enough. After court fees, you net $2,725.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#127942;",
+                            title: "Victory: $2,800",
+                            yourNet: 2725,
+                            theirCost: 2800,
+                            relationship: 35,
+                            analysis: "Excellent result! You recovered 117% of your deposit. The $75 court filing fee was a great investment. This is near the optimal outcome without going through a full trial."
+                        }
+                    },
+                    sd_settle_3200: {
+                        stage: 5,
+                        title: "Settlement: $3,200",
+                        narrative: "The settlement agreement is signed: $3,200 paid to you, case dismissed. After attorney fees, you net $2,750. The landlord paid over $4,200 total including their own lawyer.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#127942;",
+                            title: "Strong Victory: $3,200",
+                            yourNet: 2750,
+                            theirCost: 4200,
+                            relationship: 20,
+                            analysis: "Outstanding result. You recovered 133% of your deposit and all your legal costs. The landlord learned an expensive lesson about wrongful deposit retention. Their total cost: over $4,200."
+                        }
+                    },
+                    sd_settle_1500: {
+                        stage: 5,
+                        title: "Settlement: $1,500",
+                        narrative: "You accept $1,500 to close the matter. It's less than you hoped for, but you avoided legal fees and the hassle of court.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#128176;",
+                            title: "Settled for $1,500",
+                            yourNet: 1500,
+                            theirCost: 1500,
+                            relationship: 70,
+                            analysis: "You recovered 63% of your deposit with no legal costs. However, you likely left money on the table - the landlord's bad faith was clear, and more pressure would have yielded a better result."
+                        }
+                    },
+                    sd_counter_full: {
+                        stage: 3,
+                        title: "Standing Firm",
+                        narrative: "You demand the full $2,400, citing their failure to provide proper itemization. Their attorney responds that they'll pay $2,200 to 'avoid further dispute.' Final offer.",
+                        choices: [
+                            {
+                                text: "Accept $2,200",
+                                desc: "Only $200 short of full recovery",
+                                cost: 0,
+                                effects: { yourNet: 2200, theirCost: 2200, relationship: 0 },
+                                next: "sd_settle_2200"
+                            },
+                            {
+                                text: "Reject - file in small claims",
+                                desc: "Principle matters, go to court",
+                                cost: 75,
+                                effects: { theirCost: 300, relationship: -20 },
+                                next: "sd_small_claims_filed"
+                            }
+                        ]
+                    },
+                    sd_counter_2100: {
+                        stage: 3,
+                        title: "Quick Resolution",
+                        narrative: "They agree to $2,100. A check arrives within 5 business days. After your attorney fee, you net $1,650. Quick and clean.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#128176;",
+                            title: "Settled for $2,100",
+                            yourNet: 1650,
+                            theirCost: 2100,
+                            relationship: 55,
+                            analysis: "Solid recovery of 88% of your deposit. The attorney fee ($450) was worth it - you got a fast resolution with minimal hassle. Net: $1,650."
+                        }
+                    },
+                    sd_settle_2200: {
+                        stage: 5,
+                        title: "Settlement: $2,200",
+                        narrative: "You accept $2,200. After the $450 attorney fee, you net $1,750. The landlord paid $2,400+ including their attorney time.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#128176;",
+                            title: "Settled for $2,200",
+                            yourNet: 1750,
+                            theirCost: 2400,
+                            relationship: 45,
+                            analysis: "Very good result. You recovered 92% of your deposit and netted $1,750. Pushing for the full amount might have gotten slightly more, but this was efficient."
+                        }
+                    },
+                    sd_demand_full_attorney: {
+                        stage: 4,
+                        title: "Pushing for Full Recovery",
+                        narrative: "Your attorney demands the full $2,400. The landlord agrees after 24 hours of silence - they don't want to risk court. You get a check for the full amount.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#127942;",
+                            title: "Full Recovery: $2,400",
+                            yourNet: 1950,
+                            theirCost: 2400,
+                            relationship: 35,
+                            analysis: "You recovered 100% of your deposit. After the $450 attorney fee, you net $1,950. Standing firm worked - they were bluffing with the $2,000 offer."
+                        }
+                    },
+                    sd_demand_full_plus_fees: {
+                        stage: 4,
+                        title: "All or Nothing",
+                        narrative: "Your demand for $2,400 plus attorney fees ($2,850 total) is rejected. They offer a final $2,400 'take it or leave it.' Pushing further means filing suit.",
+                        choices: [
+                            {
+                                text: "Accept $2,400",
+                                desc: "Full deposit back",
+                                cost: 0,
+                                effects: { yourNet: 2400, theirCost: 2400, relationship: 0 },
+                                next: "sd_settle_2400_final"
+                            },
+                            {
+                                text: "File lawsuit for penalties",
+                                desc: "Seek bad faith damages",
+                                cost: 450,
+                                effects: { theirCost: 800, relationship: -25 },
+                                next: "sd_full_trial"
+                            }
+                        ]
+                    },
+                    sd_settle_2400_final: {
+                        stage: 5,
+                        title: "Full Deposit Returned",
+                        narrative: "You accept the full $2,400. After attorney fees, you net $1,950. Complete recovery of what was rightfully yours.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#127942;",
+                            title: "Full Recovery: $2,400",
+                            yourNet: 1950,
+                            theirCost: 2400,
+                            relationship: 30,
+                            analysis: "Perfect recovery of your deposit. The $450 attorney fee was an investment in getting what you deserved without months of back-and-forth."
+                        }
+                    },
+                    sd_demand_3500: {
+                        stage: 5,
+                        title: "Pushing Higher",
+                        narrative: "You demand $3,500 or you'll go to trial. After a tense few days, they agree to $3,200 - wanting to avoid the courtroom.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#127942;",
+                            title: "Victory: $3,200",
+                            yourNet: 3125,
+                            theirCost: 3200,
+                            relationship: 25,
+                            analysis: "Excellent negotiation! You recovered 133% of your deposit. After the $75 filing fee, you net $3,125. Your willingness to go to trial paid off."
+                        }
+                    },
+                    sd_trial: {
+                        stage: 5,
+                        title: "Day in Court",
+                        narrative: "You present your evidence: photos of the clean apartment, the landlord's failure to provide itemization within 21 days, the suspicious 'cousin's cleaning company' receipt. The judge awards you $3,600 - the deposit plus 50% bad faith penalty.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#127942;",
+                            title: "Court Victory: $3,600",
+                            yourNet: 3525,
+                            theirCost: 3600,
+                            relationship: 10,
+                            analysis: "Strong court victory! The judge found partial bad faith and awarded a 50% penalty. After your $75 filing fee, you net $3,525. You could have gotten 2x with more evidence, but this is still excellent."
+                        }
+                    },
+                    sd_counter_4000: {
+                        stage: 5,
+                        title: "Counter Accepted",
+                        narrative: "They agree to $4,000 to avoid trial. After your total attorney fees ($900), you net $3,100. The landlord's total cost exceeds $5,000 with their own lawyer.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#127942;",
+                            title: "Strong Victory: $4,000",
+                            yourNet: 3100,
+                            theirCost: 5000,
+                            relationship: 15,
+                            analysis: "Outstanding result. You recovered 167% of your deposit. The landlord's bad faith cost them dearly - over $5,000 total. Your persistence paid off."
+                        }
+                    },
+                    sd_full_trial: {
+                        stage: 5,
+                        title: "Full Trial",
+                        narrative: "The case goes to trial. You present overwhelming evidence of bad faith retention. The judge awards $4,800 - the full 2x penalty - plus $1,200 in attorney fees. Total judgment: $6,000.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#127881;",
+                            title: "Maximum Victory: $6,000",
+                            yourNet: 4900,
+                            theirCost: 8000,
+                            relationship: 0,
+                            analysis: "Maximum possible outcome! The 2x bad faith penalty plus attorney fees. After your legal costs (~$1,100), you net $4,900. The landlord's total cost: ~$8,000 with their own attorney fees. They'll think twice before wrongfully keeping another deposit."
+                        }
+                    },
+                    sd_hold_2000: {
+                        stage: 5,
+                        title: "Standoff",
+                        narrative: "You hold firm at $2,000. After a week of silence, the landlord caves. They send a check for $2,000 with a note complaining about 'difficult tenants.'",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#127942;",
+                            title: "Settled for $2,000",
+                            yourNet: 2000,
+                            theirCost: 2000,
+                            relationship: 40,
+                            analysis: "You recovered 83% of your deposit with no legal costs at all. Good patience and negotiation. You could have pushed harder, but this was a solid outcome."
+                        }
+                    }
+                }
+            },
+
+            unpaid_wages: {
+                name: "Unpaid Wages",
+                stakeAmount: 3200,
+                startNode: "uw_start",
+                nodes: {
+                    uw_start: {
+                        stage: 1,
+                        title: "Final Paycheck Missing",
+                        narrative: "You quit your job at TechFlow Solutions two weeks ago with proper notice. Your final paycheck of $3,200 (including unused PTO) was due within 72 hours under California law. It's now been 14 days. HR says they're 'processing it' but can't give a date. You know waiting penalties add up at your daily wage rate.",
+                        legalNote: "California Labor Code \u00A7\u00A7 201-203: Final wages due within 72 hours of resignation (immediately if fired). Waiting time penalties: up to 30 days of daily wages for willful failure to pay.",
+                        choices: [
+                            {
+                                text: "Call HR again and document everything",
+                                desc: "Give them one more chance, build paper trail",
+                                cost: 0,
+                                effects: { theirCost: 0, relationship: 0 },
+                                next: "uw_call_hr"
+                            },
+                            {
+                                text: "Send formal demand letter",
+                                desc: "Cite Labor Code, set 5-day deadline",
+                                cost: 0,
+                                effects: { theirCost: 100, relationship: -15 },
+                                next: "uw_demand_letter"
+                            },
+                            {
+                                text: "File complaint with Labor Commissioner",
+                                desc: "Free government process, but takes months",
+                                cost: 0,
+                                effects: { theirCost: 500, relationship: -30 },
+                                next: "uw_labor_commissioner"
+                            }
+                        ]
+                    },
+                    uw_call_hr: {
+                        stage: 2,
+                        title: "The Runaround Continues",
+                        narrative: "You call HR and record the call (California allows one-party consent). The rep admits your paycheck 'should have gone out' but claims accounting had a 'system issue.' They promise it will be mailed 'by end of week.' You're now at day 14 - waiting time penalties are $400/day based on your salary.",
+                        legalNote: "At $3,200/2 weeks = ~$228/day, you've already accrued $2,280 in potential waiting time penalties (10 days x $228).",
+                        choices: [
+                            {
+                                text: "Wait until end of week as promised",
+                                desc: "See if they follow through",
+                                cost: 0,
+                                effects: { theirCost: 0, relationship: 5 },
+                                next: "uw_wait_week"
+                            },
+                            {
+                                text: "Send demand letter for wages + penalties",
+                                desc: "They've had enough chances",
+                                cost: 0,
+                                effects: { theirCost: 100, relationship: -20 },
+                                next: "uw_demand_with_penalties"
+                            },
+                            {
+                                text: "Hire employment attorney",
+                                desc: "Many work on contingency for wage claims",
+                                cost: 0,
+                                effects: { theirCost: 200, relationship: -25 },
+                                next: "uw_hire_attorney"
+                            }
+                        ]
+                    },
+                    uw_wait_week: {
+                        stage: 3,
+                        title: "Broken Promises",
+                        narrative: "End of week comes and goes. No check. You call again - now they claim they're 'verifying your PTO balance' and need another week. This is day 19. Penalties continue accumulating. They're either incompetent or deliberately stalling.",
+                        legalNote: "Deliberate stalling to reduce cash outflow is 'willful' failure to pay, maximizing your penalty claim.",
+                        choices: [
+                            {
+                                text: "Demand letter with penalty calculation",
+                                desc: "Show them exactly what they owe",
+                                cost: 0,
+                                effects: { theirCost: 100, relationship: -20 },
+                                next: "uw_demand_calculated"
+                            },
+                            {
+                                text: "File with Labor Commissioner",
+                                desc: "Go through official channels",
+                                cost: 0,
+                                effects: { theirCost: 600, relationship: -35 },
+                                next: "uw_labor_commissioner"
+                            },
+                            {
+                                text: "Hire employment attorney",
+                                desc: "Contingency fee means no upfront cost",
+                                cost: 0,
+                                effects: { theirCost: 300, relationship: -30 },
+                                next: "uw_hire_attorney"
+                            }
+                        ]
+                    },
+                    uw_demand_letter: {
+                        stage: 2,
+                        title: "Demand Sent",
+                        narrative: "You send a certified letter demanding your $3,200 within 5 days, citing Labor Code \u00A7\u00A7 201 and 203. You mention the waiting time penalties accumulating. Within 3 days, you receive a FedEx package: a check for $3,200. No acknowledgment of penalties.",
+                        legalNote: "They paid the base wages but ignored the accrued penalties. You may have a claim for those additional amounts.",
+                        choices: [
+                            {
+                                text: "Cash the check, move on",
+                                desc: "You got your wages, let it go",
+                                cost: 0,
+                                effects: { yourNet: 3200, theirCost: 3200, relationship: -5 },
+                                next: "uw_cash_move_on"
+                            },
+                            {
+                                text: "Cash check, then demand penalties",
+                                desc: "You're owed more and they know it",
+                                cost: 0,
+                                effects: { yourNet: 3200, theirCost: 3300, relationship: -20 },
+                                next: "uw_demand_penalties"
+                            },
+                            {
+                                text: "Return check, demand full amount with penalties",
+                                desc: "All or nothing approach",
+                                cost: 0,
+                                effects: { theirCost: 200, relationship: -30 },
+                                next: "uw_return_check"
+                            }
+                        ]
+                    },
+                    uw_demand_with_penalties: {
+                        stage: 3,
+                        title: "Penalty Demand",
+                        narrative: "Your demand letter calculates: $3,200 wages + $2,280 penalties (10 days x $228/day) = $5,480 total. You give them 5 days. On day 4, their lawyer calls offering $4,000 'to resolve everything and avoid litigation.'",
+                        legalNote: "The quick response shows they know they're exposed. $4,000 is less than your calculation but more than just wages.",
+                        choices: [
+                            {
+                                text: "Accept $4,000",
+                                desc: "Bird in hand, no legal fees",
+                                cost: 0,
+                                effects: { yourNet: 4000, theirCost: 4500, relationship: -10 },
+                                next: "uw_settle_4000"
+                            },
+                            {
+                                text: "Counter with $5,000",
+                                desc: "Split the difference",
+                                cost: 0,
+                                effects: { theirCost: 100, relationship: -15 },
+                                next: "uw_counter_5000"
+                            },
+                            {
+                                text: "Demand full $5,480",
+                                desc: "That's what the law says you're owed",
+                                cost: 0,
+                                effects: { theirCost: 200, relationship: -25 },
+                                next: "uw_demand_full"
+                            }
+                        ]
+                    },
+                    uw_hire_attorney: {
+                        stage: 3,
+                        title: "Attorney on Board",
+                        narrative: "You find an employment attorney who works on contingency (33% of recovery). She sends a demand for wages ($3,200) plus maximum waiting time penalties ($6,840 - 30 days x $228). Total demand: $10,040. The company's lawyer responds within a week offering $6,500.",
+                        legalNote: "Attorney involvement often accelerates settlements. Companies want to avoid the publicity and risk of employment litigation.",
+                        choices: [
+                            {
+                                text: "Accept $6,500",
+                                desc: "You'd net ~$4,355 after attorney fee",
+                                cost: 0,
+                                effects: { yourNet: 4355, theirCost: 8000, relationship: -20 },
+                                next: "uw_settle_6500"
+                            },
+                            {
+                                text: "Counter with $8,000",
+                                desc: "Push for more, you'd net ~$5,360",
+                                cost: 0,
+                                effects: { theirCost: 500, relationship: -25 },
+                                next: "uw_counter_8000"
+                            },
+                            {
+                                text: "File lawsuit",
+                                desc: "Go for the maximum in court",
+                                cost: 0,
+                                effects: { theirCost: 2000, relationship: -40 },
+                                next: "uw_file_lawsuit"
+                            }
+                        ]
+                    },
+                    uw_labor_commissioner: {
+                        stage: 3,
+                        title: "Official Complaint Filed",
+                        narrative: "You file a wage claim with the California Labor Commissioner. It's free but slow - you're told the hearing will be in 4-6 months. The company is notified of the claim. Two weeks later, you receive a settlement offer: $4,500 to withdraw the claim.",
+                        legalNote: "Labor Commissioner complaints become public record. Many companies settle quickly to avoid this exposure.",
+                        choices: [
+                            {
+                                text: "Accept $4,500",
+                                desc: "Good return with no cost to you",
+                                cost: 0,
+                                effects: { yourNet: 4500, theirCost: 4500, relationship: -25 },
+                                next: "uw_settle_4500"
+                            },
+                            {
+                                text: "Counter with $6,000",
+                                desc: "You know they want this to go away",
+                                cost: 0,
+                                effects: { theirCost: 200, relationship: -30 },
+                                next: "uw_counter_6000_lc"
+                            },
+                            {
+                                text: "Wait for the hearing",
+                                desc: "Let the Commissioner decide",
+                                cost: 0,
+                                effects: { theirCost: 500, relationship: -35 },
+                                next: "uw_lc_hearing"
+                            }
+                        ]
+                    },
+                    uw_demand_calculated: {
+                        stage: 4,
+                        title: "Numbers Don't Lie",
+                        narrative: "Your letter itemizes: $3,200 wages + $4,332 penalties (19 days x $228) = $7,532 owed. You give them 7 days or you'll file with the Labor Commissioner and seek attorney fees. Day 5 brings an offer: $5,500 settlement.",
+                        choices: [
+                            {
+                                text: "Accept $5,500",
+                                desc: "72% of your calculated amount, no fees",
+                                cost: 0,
+                                effects: { yourNet: 5500, theirCost: 5500, relationship: -20 },
+                                next: "uw_settle_5500"
+                            },
+                            {
+                                text: "Counter with $6,500",
+                                desc: "Meet in the middle",
+                                cost: 0,
+                                effects: { theirCost: 100, relationship: -25 },
+                                next: "uw_counter_6500"
+                            },
+                            {
+                                text: "File with Labor Commissioner",
+                                desc: "They had their chance",
+                                cost: 0,
+                                effects: { theirCost: 500, relationship: -40 },
+                                next: "uw_labor_commissioner"
+                            }
+                        ]
+                    },
+                    // Terminal Nodes
+                    uw_cash_move_on: {
+                        stage: 4,
+                        title: "Case Closed",
+                        narrative: "You cash the $3,200 check and move on with your life. You left money on the table, but you also avoided any additional hassle.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#128176;",
+                            title: "Recovered Wages Only",
+                            yourNet: 3200,
+                            theirCost: 3200,
+                            relationship: 60,
+                            analysis: "You got your base wages with minimal friction. However, you waived approximately $2,000-5,000 in waiting time penalties. Sometimes peace of mind is worth it, but the employer faced no real consequence for breaking the law."
+                        }
+                    },
+                    uw_demand_penalties: {
+                        stage: 4,
+                        title: "Double Dipping",
+                        narrative: "After cashing the check, you send a demand for waiting time penalties. Their lawyer argues cashing the check was 'accord and satisfaction.' After some back-and-forth, they offer $1,000 more to go away.",
+                        choices: [
+                            {
+                                text: "Accept $1,000 more",
+                                desc: "Total recovery: $4,200",
+                                cost: 0,
+                                effects: { yourNet: 1000, theirCost: 1000, relationship: -10 },
+                                next: "uw_additional_1000"
+                            },
+                            {
+                                text: "File with Labor Commissioner",
+                                desc: "Push for full penalties",
+                                cost: 0,
+                                effects: { theirCost: 500, relationship: -30 },
+                                next: "uw_lc_after_cash"
+                            }
+                        ]
+                    },
+                    uw_additional_1000: {
+                        stage: 5,
+                        title: "A Little Extra",
+                        narrative: "You accept the additional $1,000. Total recovery: $4,200. Not bad for a few letters.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#128176;",
+                            title: "Recovered $4,200 Total",
+                            yourNet: 4200,
+                            theirCost: 4500,
+                            relationship: 45,
+                            analysis: "You recovered your wages plus $1,000 in penalties. Not the maximum, but a 31% bonus on top of your owed wages with no legal fees. Reasonably efficient."
+                        }
+                    },
+                    uw_lc_after_cash: {
+                        stage: 5,
+                        title: "Labor Commissioner Claim",
+                        narrative: "The Labor Commissioner reviews your case. Despite having cashed the initial check, you're awarded an additional $2,500 in waiting time penalties. The company is also fined.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#127942;",
+                            title: "Recovered $5,700 Total",
+                            yourNet: 5700,
+                            theirCost: 7500,
+                            relationship: 20,
+                            analysis: "The Labor Commissioner found in your favor. Total recovery: $5,700 ($3,200 wages + $2,500 penalties). The company also faced regulatory penalties. Good use of government resources."
+                        }
+                    },
+                    uw_settle_4000: {
+                        stage: 4,
+                        title: "Quick Settlement",
+                        narrative: "You accept $4,000. The check arrives in 3 days. You got your wages plus some penalty compensation without legal fees.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#128176;",
+                            title: "Settled for $4,000",
+                            yourNet: 4000,
+                            theirCost: 4500,
+                            relationship: 50,
+                            analysis: "25% above your base wages with no attorney fees. A decent outcome, though you could have pushed harder given their clear liability."
+                        }
+                    },
+                    uw_counter_5000: {
+                        stage: 4,
+                        title: "Counter Accepted",
+                        narrative: "They agree to $5,000. Their lawyer sends a release agreement and a check. Done.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#127942;",
+                            title: "Settled for $5,000",
+                            yourNet: 5000,
+                            theirCost: 5500,
+                            relationship: 40,
+                            analysis: "56% above your base wages with no legal fees. Good negotiation - you pushed back effectively without overreaching."
+                        }
+                    },
+                    uw_demand_full: {
+                        stage: 4,
+                        title: "Holding the Line",
+                        narrative: "You insist on $5,480. They counter with $5,200 'final offer.' Take it or file.",
+                        choices: [
+                            {
+                                text: "Accept $5,200",
+                                desc: "Close enough, move on",
+                                cost: 0,
+                                effects: { yourNet: 5200, theirCost: 5200, relationship: -5 },
+                                next: "uw_settle_5200"
+                            },
+                            {
+                                text: "File with Labor Commissioner",
+                                desc: "Principle matters",
+                                cost: 0,
+                                effects: { theirCost: 500, relationship: -30 },
+                                next: "uw_lc_principle"
+                            }
+                        ]
+                    },
+                    uw_settle_5200: {
+                        stage: 5,
+                        title: "Close Enough",
+                        narrative: "You accept $5,200 and sign the release. 95% of your demanded amount without litigation.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#127942;",
+                            title: "Settled for $5,200",
+                            yourNet: 5200,
+                            theirCost: 5500,
+                            relationship: 35,
+                            analysis: "Excellent outcome. 63% above your base wages with no legal fees. You maximized your return while avoiding the uncertainty and time of formal proceedings."
+                        }
+                    },
+                    uw_lc_principle: {
+                        stage: 5,
+                        title: "Commissioner's Award",
+                        narrative: "After 4 months, the Labor Commissioner awards you $6,200: base wages plus partial penalties plus interest. The company is also cited for labor violations.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#127942;",
+                            title: "Commissioner Award: $6,200",
+                            yourNet: 6200,
+                            theirCost: 8000,
+                            relationship: 10,
+                            analysis: "You got more than their final offer, validating your stance. The 4-month wait was worth an extra $1,000. The company now has a labor violation on record."
+                        }
+                    },
+                    uw_settle_6500: {
+                        stage: 4,
+                        title: "Attorney Settlement",
+                        narrative: "You accept $6,500. After your attorney's 33% contingency fee, you net $4,355. Case closed in 3 weeks.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#127942;",
+                            title: "Settled for $6,500 (Net: $4,355)",
+                            yourNet: 4355,
+                            theirCost: 8000,
+                            relationship: 35,
+                            analysis: "Your net is 36% above your base wages. The attorney fee seems steep, but she got you $2,000+ more than you'd likely have gotten alone. Their total cost (~$8,000 with legal fees) sends a message."
+                        }
+                    },
+                    uw_counter_8000: {
+                        stage: 4,
+                        title: "Pushing Higher",
+                        narrative: "Your attorney counters with $8,000. After some negotiation, they agree to $7,500. You net $5,025 after the 33% attorney fee.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#127942;",
+                            title: "Settled for $7,500 (Net: $5,025)",
+                            yourNet: 5025,
+                            theirCost: 10000,
+                            relationship: 25,
+                            analysis: "Strong result. You net 57% above your base wages. The company's total cost (~$10,000) will make them think twice about late final paychecks in the future."
+                        }
+                    },
+                    uw_file_lawsuit: {
+                        stage: 5,
+                        title: "Courtroom Victory",
+                        narrative: "Your case goes to trial. The judge awards $3,200 wages + $6,840 full waiting time penalties + $4,000 attorney fees = $14,040. The company's reputation takes a hit from the public judgment.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#127881;",
+                            title: "Court Victory: $14,040 (Net: $6,886)",
+                            yourNet: 6886,
+                            theirCost: 20000,
+                            relationship: 0,
+                            analysis: "Maximum outcome! After attorney fees (33% of wages+penalties, not the fee award), you net $6,886 - more than double your base wages. The company paid ~$20,000 total and has a public judgment against them."
+                        }
+                    },
+                    uw_settle_4500: {
+                        stage: 4,
+                        title: "Labor Commissioner Settlement",
+                        narrative: "You withdraw your claim in exchange for $4,500. No fees, no waiting. Clean resolution.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#127942;",
+                            title: "Settled for $4,500",
+                            yourNet: 4500,
+                            theirCost: 4500,
+                            relationship: 40,
+                            analysis: "41% above your base wages with zero fees. The Labor Commissioner process gave you leverage you wouldn't have had otherwise. Efficient use of government resources."
+                        }
+                    },
+                    uw_counter_6000_lc: {
+                        stage: 4,
+                        title: "Counter Accepted",
+                        narrative: "They agree to $6,000 to make the Labor Commissioner claim disappear. Done in a week.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#127942;",
+                            title: "Settled for $6,000",
+                            yourNet: 6000,
+                            theirCost: 6500,
+                            relationship: 30,
+                            analysis: "88% above your base wages with no fees. The Labor Commissioner threat was powerful leverage. Excellent outcome."
+                        }
+                    },
+                    uw_lc_hearing: {
+                        stage: 5,
+                        title: "Commissioner's Decision",
+                        narrative: "Four months later, you appear before the Labor Commissioner. After reviewing the evidence, you're awarded $8,500: full wages, partial penalties (20 days), and interest.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#127942;",
+                            title: "Commissioner Award: $8,500",
+                            yourNet: 8500,
+                            theirCost: 10000,
+                            relationship: 10,
+                            analysis: "166% above your base wages with zero fees! The waiting time was worth it. The company also faces regulatory scrutiny for its wage practices."
+                        }
+                    },
+                    uw_settle_5500: {
+                        stage: 5,
+                        title: "Settled",
+                        narrative: "You accept $5,500. Check arrives in 5 days. Clean break.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#127942;",
+                            title: "Settled for $5,500",
+                            yourNet: 5500,
+                            theirCost: 5500,
+                            relationship: 35,
+                            analysis: "72% above your base wages with no fees. Strong self-advocacy. Your detailed demand letter showing the penalty calculation gave them reason to settle reasonably."
+                        }
+                    },
+                    uw_counter_6500: {
+                        stage: 5,
+                        title: "Split the Difference",
+                        narrative: "They agree to $6,000. Done. You sign a mutual release and get your check.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#127942;",
+                            title: "Settled for $6,000",
+                            yourNet: 6000,
+                            theirCost: 6000,
+                            relationship: 30,
+                            analysis: "88% above your base wages with no fees or waiting. Excellent negotiation and self-advocacy. This is near-optimal for representing yourself."
+                        }
+                    },
+                    uw_return_check: {
+                        stage: 3,
+                        title: "All or Nothing",
+                        narrative: "You return the check with a letter demanding $5,000 (wages + penalties) or you'll file with the Labor Commissioner. Bold move. A week later, they call: $4,200 final offer.",
+                        choices: [
+                            {
+                                text: "Accept $4,200",
+                                desc: "You pushed and got more",
+                                cost: 0,
+                                effects: { yourNet: 4200, theirCost: 4200, relationship: -10 },
+                                next: "uw_settle_4200"
+                            },
+                            {
+                                text: "File Labor Commissioner complaint",
+                                desc: "They're still lowballing you",
+                                cost: 0,
+                                effects: { theirCost: 500, relationship: -35 },
+                                next: "uw_labor_commissioner"
+                            }
+                        ]
+                    },
+                    uw_settle_4200: {
+                        stage: 4,
+                        title: "Settled",
+                        narrative: "You accept $4,200. Risky move returning the check, but it got you an extra $1,000.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#128176;",
+                            title: "Settled for $4,200",
+                            yourNet: 4200,
+                            theirCost: 4500,
+                            relationship: 45,
+                            analysis: "31% above your base wages with no fees. Your bold move of returning the check signaled you wouldn't be pushed around. It worked, but there was risk - they could have called your bluff."
+                        }
+                    }
+                }
+            },
+
+            tech_services: {
+                name: "Tech Services Invoice",
+                stakeAmount: 15000,
+                startNode: "ts_start",
+                nodes: {
+                    ts_start: {
+                        stage: 1,
+                        title: "The Silent Client",
+                        narrative: "Three months ago, you finished a web development project for Meridian Corp. They signed off on the work, launched the site, and then... stopped responding. The invoice for $15,000 remains unpaid at 90 days overdue. Your contract specifies net-30 payment terms and includes a provision for collection costs.",
+                        legalNote: "Commercial debts over $10,000 are outside small claims jurisdiction in California. You'll need Limited Civil Court or alternative strategies.",
+                        choices: [
+                            {
+                                text: "Send a formal demand letter",
+                                desc: "Professional escalation, document everything",
+                                cost: 0,
+                                effects: { theirCost: 100, relationship: -15 },
+                                next: "ts_demand"
+                            },
+                            {
+                                text: "Hire an attorney for demand letter",
+                                desc: "Legal letterhead gets attention",
+                                cost: 450,
+                                effects: { theirCost: 300, relationship: -25 },
+                                next: "ts_attorney_demand"
+                            },
+                            {
+                                text: "Offer a payment plan",
+                                desc: "Maybe they're having cash flow issues",
+                                cost: 0,
+                                effects: { theirCost: 0, relationship: 10 },
+                                next: "ts_offer_plan"
+                            }
+                        ]
+                    },
+                    ts_demand: {
+                        stage: 2,
+                        title: "Breaking Silence",
+                        narrative: "Your certified letter demands payment within 10 days, citing your contract terms. On day 8, you get an email: 'We've had some internal restructuring. We can offer $8,000 to settle this matter.' That's barely half what you're owed.",
+                        legalNote: "Lowball settlement offers often indicate they know they owe the full amount but want to see if you'll take less to avoid hassle.",
+                        choices: [
+                            {
+                                text: "Accept $8,000",
+                                desc: "Something is better than nothing",
+                                cost: 0,
+                                effects: { yourNet: 8000, theirCost: 8000, relationship: 5 },
+                                next: "ts_settle_8000"
+                            },
+                            {
+                                text: "Counter with $12,000",
+                                desc: "Meet in the middle",
+                                cost: 0,
+                                effects: { theirCost: 50, relationship: -5 },
+                                next: "ts_counter_12000"
+                            },
+                            {
+                                text: "Demand full $15,000 plus interest",
+                                desc: "You have a contract, enforce it",
+                                cost: 0,
+                                effects: { theirCost: 100, relationship: -15 },
+                                next: "ts_demand_full"
+                            },
+                            {
+                                text: "Hire attorney to respond",
+                                desc: "Time to escalate properly",
+                                cost: 450,
+                                effects: { theirCost: 300, relationship: -20 },
+                                next: "ts_attorney_response"
+                            }
+                        ]
+                    },
+                    ts_attorney_demand: {
+                        stage: 2,
+                        title: "Legal Pressure",
+                        narrative: "Your attorney's demand letter on official letterhead references breach of contract and hints at litigation. Within 48 hours, Meridian's CEO calls you directly: 'Look, we don't have $15,000 right now. But we can do $10,000 this week and $3,000 next month. $13,000 total.'",
+                        legalNote: "Direct executive outreach often signals they want to settle without attorneys running up the bill. But payment plans carry risk.",
+                        choices: [
+                            {
+                                text: "Accept $13,000 payment plan",
+                                desc: "Gets you most of the money",
+                                cost: 0,
+                                effects: { theirCost: 50, relationship: 5 },
+                                next: "ts_accept_plan_13k"
+                            },
+                            {
+                                text: "Counter: $12,000 now, in one payment",
+                                desc: "Bird in hand",
+                                cost: 0,
+                                effects: { theirCost: 100, relationship: -5 },
+                                next: "ts_counter_12k_now"
+                            },
+                            {
+                                text: "Demand full $15,000",
+                                desc: "That's what the contract says",
+                                cost: 0,
+                                effects: { theirCost: 150, relationship: -20 },
+                                next: "ts_push_15k"
+                            }
+                        ]
+                    },
+                    ts_offer_plan: {
+                        stage: 2,
+                        title: "Olive Branch",
+                        narrative: "You offer a payment plan: $5,000/month for 3 months. The response: 'Thanks for understanding. We can do $3,000/month for 4 months - $12,000 total.' They want a $3,000 discount for the 'flexibility.'",
+                        choices: [
+                            {
+                                text: "Accept $12,000 over 4 months",
+                                desc: "At least it's structured payments",
+                                cost: 0,
+                                effects: { theirCost: 0, relationship: 15 },
+                                next: "ts_payment_plan_12k"
+                            },
+                            {
+                                text: "Counter: $4,000/month for 4 months ($16,000)",
+                                desc: "Add interest for the payment plan privilege",
+                                cost: 0,
+                                effects: { theirCost: 50, relationship: -5 },
+                                next: "ts_counter_plan_16k"
+                            },
+                            {
+                                text: "Reject - send formal demand for $15,000",
+                                desc: "Nice try, but you're owed the full amount",
+                                cost: 0,
+                                effects: { theirCost: 100, relationship: -25 },
+                                next: "ts_demand_after_plan"
+                            }
+                        ]
+                    },
+                    ts_counter_12000: {
+                        stage: 3,
+                        title: "Negotiation Dance",
+                        narrative: "They respond: 'We can do $10,000. That's our absolute maximum.' Still a $5,000 haircut. But litigation would cost you thousands in attorney fees for a case this size.",
+                        legalNote: "For a $15,000 dispute, limited civil litigation could cost $5,000-15,000 in attorney fees. Cost-benefit matters.",
+                        choices: [
+                            {
+                                text: "Accept $10,000",
+                                desc: "Cut your losses",
+                                cost: 0,
+                                effects: { yourNet: 10000, theirCost: 10000, relationship: 0 },
+                                next: "ts_settle_10000"
+                            },
+                            {
+                                text: "Final counter: $11,500",
+                                desc: "One more push",
+                                cost: 0,
+                                effects: { theirCost: 25, relationship: -5 },
+                                next: "ts_counter_11500"
+                            },
+                            {
+                                text: "Hire attorney to sue",
+                                desc: "Principle matters, and you'll seek fees",
+                                cost: 500,
+                                effects: { theirCost: 1000, relationship: -35 },
+                                next: "ts_file_suit"
+                            }
+                        ]
+                    },
+                    ts_demand_full: {
+                        stage: 3,
+                        title: "Full Amount Demanded",
+                        narrative: "You respond demanding $15,000 plus $450 in late fees per your contract. They go silent for two weeks. Then: 'If you sue, we'll counterclaim for code defects. It'll cost both of us more than the invoice.' A threat, or bluff?",
+                        legalNote: "Counterclaim threats are often bluster when the client already signed off on the work. But litigation is unpredictable.",
+                        choices: [
+                            {
+                                text: "Call their bluff - hire attorney to sue",
+                                desc: "They signed off, you have the paper trail",
+                                cost: 500,
+                                effects: { theirCost: 2000, relationship: -40 },
+                                next: "ts_sue_counterclaim"
+                            },
+                            {
+                                text: "Offer $13,000 settlement",
+                                desc: "Step back from the brink",
+                                cost: 0,
+                                effects: { theirCost: 50, relationship: 5 },
+                                next: "ts_offer_13000"
+                            },
+                            {
+                                text: "Use a collections agency",
+                                desc: "Let professionals collect",
+                                cost: 0,
+                                effects: { theirCost: 500, relationship: -50 },
+                                next: "ts_collections"
+                            }
+                        ]
+                    },
+                    ts_attorney_response: {
+                        stage: 3,
+                        title: "Attorney on Attorney",
+                        narrative: "Your attorney responds to their lowball offer with a demand for full payment plus interest plus attorney fees - now $16,500. The company's CFO calls your lawyer: 'We'll wire $13,500 today to end this. Final offer.'",
+                        choices: [
+                            {
+                                text: "Accept $13,500",
+                                desc: "Strong recovery after legal fees",
+                                cost: 0,
+                                effects: { yourNet: 13500, theirCost: 14000, relationship: -10 },
+                                next: "ts_settle_13500"
+                            },
+                            {
+                                text: "Push for $15,000 minimum",
+                                desc: "Your original invoice amount",
+                                cost: 0,
+                                effects: { theirCost: 200, relationship: -20 },
+                                next: "ts_push_15_from_13"
+                            },
+                            {
+                                text: "File lawsuit for $16,500",
+                                desc: "They're not taking you seriously",
+                                cost: 450,
+                                effects: { theirCost: 2000, relationship: -40 },
+                                next: "ts_file_suit"
+                            }
+                        ]
+                    },
+                    ts_accept_plan_13k: {
+                        stage: 3,
+                        title: "Structured Settlement",
+                        narrative: "You accept the payment plan: $10,000 now, $3,000 in 30 days. The first payment arrives on time. The second... is 2 weeks late but arrives. Total: $13,000.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#128176;",
+                            title: "Recovered $13,000",
+                            yourNet: 12550,
+                            theirCost: 13500,
+                            relationship: 45,
+                            analysis: "After attorney fees ($450), you net $12,550 - 84% of the original invoice. The payment plan worked out, though the risk was real. You preserved a potential future client relationship."
+                        }
+                    },
+                    ts_counter_12k_now: {
+                        stage: 3,
+                        title: "Cash in Hand",
+                        narrative: "They agree to $12,000 as a single payment, wired within 48 hours. It arrives on time. Deal done.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#127942;",
+                            title: "Settled for $12,000",
+                            yourNet: 11550,
+                            theirCost: 12500,
+                            relationship: 40,
+                            analysis: "After attorney fees ($450), you net $11,550 - 77% of your invoice. A guaranteed lump sum avoids the risk of payment plan default. Efficient resolution."
+                        }
+                    },
+                    ts_push_15k: {
+                        stage: 3,
+                        title: "Standing Firm",
+                        narrative: "You demand the full $15,000. Silence for a week. Then their attorney sends a formal letter: 'Client disputes the quality of work delivered. We're prepared to litigate if necessary.' Ball's in your court.",
+                        choices: [
+                            {
+                                text: "Accept $13,000 to avoid litigation risk",
+                                desc: "Compromise in the face of threat",
+                                cost: 0,
+                                effects: { yourNet: 13000, theirCost: 13500, relationship: -5 },
+                                next: "ts_compromise_13k"
+                            },
+                            {
+                                text: "File lawsuit",
+                                desc: "You have their sign-off, call the bluff",
+                                cost: 450,
+                                effects: { theirCost: 2000, relationship: -40 },
+                                next: "ts_file_suit"
+                            },
+                            {
+                                text: "Threaten to report to business bureaus",
+                                desc: "Reputation pressure",
+                                cost: 0,
+                                effects: { theirCost: 100, relationship: -30 },
+                                next: "ts_reputation_threat"
+                            }
+                        ]
+                    },
+                    // More nodes for the tech scenario
+                    ts_settle_8000: {
+                        stage: 4,
+                        title: "Quick Settlement",
+                        narrative: "You accept $8,000 to end the matter. The wire arrives in 3 days. You move on to paying clients.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#128176;",
+                            title: "Settled for $8,000",
+                            yourNet: 8000,
+                            theirCost: 8000,
+                            relationship: 55,
+                            analysis: "You recovered 53% of your invoice with no legal costs. Objectively, you left significant money on the table. But sometimes avoiding collection hassle has real value for your business and mental health."
+                        }
+                    },
+                    ts_settle_10000: {
+                        stage: 4,
+                        title: "Acceptable Settlement",
+                        narrative: "You accept $10,000. Wire arrives within a week. Not full value, but no legal fees either.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#128176;",
+                            title: "Settled for $10,000",
+                            yourNet: 10000,
+                            theirCost: 10000,
+                            relationship: 45,
+                            analysis: "67% recovery with no legal costs. Better than the first offer, reasonable given litigation costs for a $15k dispute would eat into any additional recovery."
+                        }
+                    },
+                    ts_counter_11500: {
+                        stage: 4,
+                        title: "Final Push",
+                        narrative: "You counter with $11,500. After 3 days of silence: 'Fine. $11,000 and we're done.' Take it or litigate.",
+                        choices: [
+                            {
+                                text: "Accept $11,000",
+                                desc: "Pretty close to your counter",
+                                cost: 0,
+                                effects: { yourNet: 11000, theirCost: 11000, relationship: 0 },
+                                next: "ts_settle_11000"
+                            },
+                            {
+                                text: "File lawsuit",
+                                desc: "They can afford more",
+                                cost: 500,
+                                effects: { theirCost: 2000, relationship: -40 },
+                                next: "ts_file_suit"
+                            }
+                        ]
+                    },
+                    ts_settle_11000: {
+                        stage: 5,
+                        title: "Settled",
+                        narrative: "Wire for $11,000 arrives. You release all claims. Done.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#128176;",
+                            title: "Settled for $11,000",
+                            yourNet: 11000,
+                            theirCost: 11000,
+                            relationship: 40,
+                            analysis: "73% recovery with no legal costs. Your persistent negotiation got you $3,000 more than their first offer. Solid self-advocacy."
+                        }
+                    },
+                    ts_payment_plan_12k: {
+                        stage: 4,
+                        title: "Payment Plan Accepted",
+                        narrative: "You accept $3,000/month for 4 months. Months 1 and 2 pay on time. Month 3 is late. Month 4 never comes. You're owed $3,000 still.",
+                        choices: [
+                            {
+                                text: "Write off the $3,000",
+                                desc: "You got $9,000, move on",
+                                cost: 0,
+                                effects: { yourNet: 9000, theirCost: 9000, relationship: -20 },
+                                next: "ts_writeoff_3k"
+                            },
+                            {
+                                text: "Demand the final payment",
+                                desc: "Send a stern letter",
+                                cost: 0,
+                                effects: { theirCost: 50, relationship: -15 },
+                                next: "ts_chase_3k"
+                            },
+                            {
+                                text: "Small claims for $3,000",
+                                desc: "This portion fits small claims",
+                                cost: 75,
+                                effects: { theirCost: 300, relationship: -40 },
+                                next: "ts_small_claims_3k"
+                            }
+                        ]
+                    },
+                    ts_writeoff_3k: {
+                        stage: 5,
+                        title: "Partial Recovery",
+                        narrative: "You write off the remaining $3,000. Total recovery: $9,000. Lesson learned about payment plans.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#128176;",
+                            title: "Recovered $9,000",
+                            yourNet: 9000,
+                            theirCost: 9000,
+                            relationship: 15,
+                            analysis: "60% recovery. The payment plan failed as they often do with distressed clients. Upfront settlements are usually worth the discount to avoid this risk."
+                        }
+                    },
+                    ts_chase_3k: {
+                        stage: 5,
+                        title: "Final Recovery",
+                        narrative: "Your demand letter works. The final $3,000 arrives with a terse apology. Total: $12,000.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#128176;",
+                            title: "Recovered $12,000",
+                            yourNet: 12000,
+                            theirCost: 12000,
+                            relationship: 30,
+                            analysis: "80% recovery after chasing the final payment. Payment plans require active management. You preserved an okay relationship despite the hassle."
+                        }
+                    },
+                    ts_small_claims_3k: {
+                        stage: 5,
+                        title: "Small Claims Victory",
+                        narrative: "Small claims court awards you $3,000 plus the $75 filing fee. The judgment is paid within 30 days. Total recovery: $12,000 + $75 = $12,075.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#127942;",
+                            title: "Recovered $12,075",
+                            yourNet: 12000,
+                            theirCost: 12375,
+                            relationship: 10,
+                            analysis: "80% recovery. The small claims threat (and victory) for the final portion sent a message. This relationship is likely over, but you got paid."
+                        }
+                    },
+                    ts_counter_plan_16k: {
+                        stage: 3,
+                        title: "Interest Counteroffer",
+                        narrative: "They reject $16,000 but offer a middle ground: $3,500/month for 4 months = $14,000. That's almost full recovery for the payment plan delay.",
+                        choices: [
+                            {
+                                text: "Accept $14,000 over 4 months",
+                                desc: "Near-full recovery",
+                                cost: 0,
+                                effects: { theirCost: 0, relationship: 5 },
+                                next: "ts_plan_14k"
+                            },
+                            {
+                                text: "Counter: $11,000 now, single payment",
+                                desc: "Prefer certainty over time",
+                                cost: 0,
+                                effects: { theirCost: 50, relationship: -5 },
+                                next: "ts_single_11k"
+                            }
+                        ]
+                    },
+                    ts_plan_14k: {
+                        stage: 5,
+                        title: "Payment Plan Completed",
+                        narrative: "All four payments arrive on time. Total recovery: $14,000. The relationship even survives - they reach out about a new project.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#127942;",
+                            title: "Recovered $14,000",
+                            yourNet: 14000,
+                            theirCost: 14000,
+                            relationship: 70,
+                            analysis: "93% recovery with no legal costs and a preserved relationship. Your flexibility paid off - they may be a paying client again. Best outcome for the collaborative approach."
+                        }
+                    },
+                    ts_single_11k: {
+                        stage: 4,
+                        title: "Lump Sum Settlement",
+                        narrative: "They agree to $11,000 immediate wire transfer. Money hits your account in 2 business days.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#128176;",
+                            title: "Settled for $11,000",
+                            yourNet: 11000,
+                            theirCost: 11000,
+                            relationship: 45,
+                            analysis: "73% recovery, guaranteed immediately. You traded potential upside for certainty. Reasonable choice given payment plan risks."
+                        }
+                    },
+                    ts_demand_after_plan: {
+                        stage: 3,
+                        title: "Back to Hardball",
+                        narrative: "Your formal demand for $15,000 after rejecting their payment plan offer surprises them. They respond with $11,500 'one-time offer.'",
+                        choices: [
+                            {
+                                text: "Accept $11,500",
+                                desc: "Better than their payment plan total",
+                                cost: 0,
+                                effects: { yourNet: 11500, theirCost: 11500, relationship: 0 },
+                                next: "ts_settle_11500"
+                            },
+                            {
+                                text: "Hire attorney",
+                                desc: "Push for more",
+                                cost: 450,
+                                effects: { theirCost: 500, relationship: -30 },
+                                next: "ts_attorney_escalate"
+                            }
+                        ]
+                    },
+                    ts_settle_11500: {
+                        stage: 4,
+                        title: "Settled",
+                        narrative: "You accept $11,500. Wire arrives in 5 business days.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#128176;",
+                            title: "Settled for $11,500",
+                            yourNet: 11500,
+                            theirCost: 11500,
+                            relationship: 35,
+                            analysis: "77% recovery with no legal fees. Your hardball switch from the payment plan discussion likely scared them. Good negotiation tactic."
+                        }
+                    },
+                    ts_attorney_escalate: {
+                        stage: 4,
+                        title: "Attorney Escalation",
+                        narrative: "Your attorney's demand gets immediate results: $13,000 settlement offer within 3 days.",
+                        choices: [
+                            {
+                                text: "Accept $13,000",
+                                desc: "Good recovery after fees",
+                                cost: 0,
+                                effects: { yourNet: 13000, theirCost: 13500, relationship: -5 },
+                                next: "ts_settle_13000"
+                            },
+                            {
+                                text: "Push for $14,500",
+                                desc: "One more push",
+                                cost: 0,
+                                effects: { theirCost: 100, relationship: -15 },
+                                next: "ts_push_14500"
+                            }
+                        ]
+                    },
+                    ts_settle_13000: {
+                        stage: 5,
+                        title: "Settled",
+                        narrative: "You accept $13,000. After attorney fees, you net $12,550.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#127942;",
+                            title: "Settled for $13,000 (Net: $12,550)",
+                            yourNet: 12550,
+                            theirCost: 14000,
+                            relationship: 30,
+                            analysis: "84% net recovery. The attorney fee was worth it - you got $1,500 more than their prior offer. Professional pressure works."
+                        }
+                    },
+                    ts_push_14500: {
+                        stage: 5,
+                        title: "Final Push",
+                        narrative: "They counter with $14,000 'truly final.' Take it or file.",
+                        choices: [
+                            {
+                                text: "Accept $14,000",
+                                desc: "Very strong recovery",
+                                cost: 0,
+                                effects: { yourNet: 14000, theirCost: 14500, relationship: 0 },
+                                next: "ts_settle_14000"
+                            },
+                            {
+                                text: "File lawsuit",
+                                desc: "Go for judgment",
+                                cost: 450,
+                                effects: { theirCost: 2000, relationship: -50 },
+                                next: "ts_file_suit"
+                            }
+                        ]
+                    },
+                    ts_settle_14000: {
+                        stage: 5,
+                        title: "Strong Settlement",
+                        narrative: "You accept $14,000. Net after attorney fees: $13,550. Outstanding recovery.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#127942;",
+                            title: "Settled for $14,000 (Net: $13,550)",
+                            yourNet: 13550,
+                            theirCost: 15000,
+                            relationship: 25,
+                            analysis: "90% net recovery. Persistent escalation worked perfectly. The attorney fee investment paid off many times over."
+                        }
+                    },
+                    ts_sue_counterclaim: {
+                        stage: 4,
+                        title: "Lawsuit Filed",
+                        narrative: "Your attorney files suit. They file a counterclaim for 'defective work' as threatened. After initial discovery (their sign-off document is devastating to their case), their attorney calls to settle: $14,000 plus they drop the counterclaim.",
+                        choices: [
+                            {
+                                text: "Accept $14,000",
+                                desc: "Strong recovery, end the drama",
+                                cost: 0,
+                                effects: { yourNet: 14000, theirCost: 18000, relationship: -10 },
+                                next: "ts_settle_14000_post_suit"
+                            },
+                            {
+                                text: "Push to trial",
+                                desc: "You want fees too",
+                                cost: 500,
+                                effects: { theirCost: 5000, relationship: -60 },
+                                next: "ts_trial"
+                            }
+                        ]
+                    },
+                    ts_settle_14000_post_suit: {
+                        stage: 5,
+                        title: "Post-Suit Settlement",
+                        narrative: "You accept $14,000. After all attorney fees (~$1,000), you net $13,000. Their cost including their own lawyer: ~$18,000.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#127942;",
+                            title: "Settled for $14,000 (Net: $13,000)",
+                            yourNet: 13000,
+                            theirCost: 18000,
+                            relationship: 5,
+                            analysis: "87% net recovery despite their counterclaim bluff. Filing suit called their bluff effectively. Their total cost was significantly more than just paying your invoice."
+                        }
+                    },
+                    ts_trial: {
+                        stage: 5,
+                        title: "Trial Victory",
+                        narrative: "The case goes to trial. You win a judgment for $15,000 plus $4,500 in attorney fees plus $2,100 in interest = $21,600. Their counterclaim is dismissed with prejudice.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#127881;",
+                            title: "Judgment: $21,600 (Net: $18,600)",
+                            yourNet: 18600,
+                            theirCost: 35000,
+                            relationship: 0,
+                            analysis: "Maximum victory! You recovered 124% of your original invoice net of all fees. Their total cost (~$35,000) will make them think twice about stiffing contractors. Worth the fight."
+                        }
+                    },
+                    ts_offer_13000: {
+                        stage: 4,
+                        title: "Stepping Back",
+                        narrative: "You offer to settle for $13,000 to avoid litigation. They accept quickly. Wire arrives in 3 days.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#128176;",
+                            title: "Settled for $13,000",
+                            yourNet: 13000,
+                            theirCost: 13000,
+                            relationship: 40,
+                            analysis: "87% recovery with no legal fees. Your willingness to compromise slightly after their counterclaim threat was strategically sound. Good outcome."
+                        }
+                    },
+                    ts_collections: {
+                        stage: 4,
+                        title: "Collections Agency",
+                        narrative: "You send the debt to a commercial collections agency. They take a 25% cut if successful. After 2 months of aggressive collection calls, the client pays $12,000. The agency keeps $3,000.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#128176;",
+                            title: "Recovered $9,000 Net",
+                            yourNet: 9000,
+                            theirCost: 12500,
+                            relationship: 0,
+                            analysis: "60% recovery after the agency fee. Collections agencies are effective but expensive. The relationship is completely burned - they'll never work with you again."
+                        }
+                    },
+                    ts_settle_13500: {
+                        stage: 4,
+                        title: "Settled with Counsel",
+                        narrative: "You accept $13,500. After attorney fees ($450), you net $13,050. Clean resolution.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#127942;",
+                            title: "Settled for $13,500 (Net: $13,050)",
+                            yourNet: 13050,
+                            theirCost: 14500,
+                            relationship: 35,
+                            analysis: "87% net recovery. The attorney involvement got you significantly more than their initial $8,000 offer. Professional representation paid for itself several times over."
+                        }
+                    },
+                    ts_push_15_from_13: {
+                        stage: 4,
+                        title: "Holding Firm",
+                        narrative: "You push for the full $15,000. They come back with $14,000 'absolute final.' Last chance before litigation.",
+                        choices: [
+                            {
+                                text: "Accept $14,000",
+                                desc: "93% of invoice",
+                                cost: 0,
+                                effects: { yourNet: 14000, theirCost: 14500, relationship: -5 },
+                                next: "ts_accept_14k_final"
+                            },
+                            {
+                                text: "File lawsuit",
+                                desc: "Want the full amount plus fees",
+                                cost: 450,
+                                effects: { theirCost: 2500, relationship: -45 },
+                                next: "ts_file_suit"
+                            }
+                        ]
+                    },
+                    ts_accept_14k_final: {
+                        stage: 5,
+                        title: "Near-Complete Recovery",
+                        narrative: "You accept $14,000. After attorney fees ($450 initial + responses), you net ~$13,100. Excellent result.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#127942;",
+                            title: "Settled for $14,000 (Net: $13,100)",
+                            yourNet: 13100,
+                            theirCost: 15000,
+                            relationship: 30,
+                            analysis: "87% net recovery of your original invoice. Persistent escalation through counsel worked. This is near-optimal without the risk and cost of trial."
+                        }
+                    },
+                    ts_file_suit: {
+                        stage: 5,
+                        title: "Litigation Victory",
+                        narrative: "The lawsuit proceeds. Before trial, they settle for $16,500 (full invoice + interest + partial fees). You net $14,500 after all attorney costs.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#127942;",
+                            title: "Pre-Trial Settlement: $16,500 (Net: $14,500)",
+                            yourNet: 14500,
+                            theirCost: 22000,
+                            relationship: 10,
+                            analysis: "97% net recovery. Filing suit demonstrated you wouldn't back down. Their total cost (~$22,000 with their own legal fees) far exceeded just paying your invoice. Principle vindicated."
+                        }
+                    },
+                    ts_reputation_threat: {
+                        stage: 4,
+                        title: "Reputation Pressure",
+                        narrative: "You mention you'll post honest reviews about their payment practices and report to the BBB if not resolved. Within 24 hours: 'We'll pay $12,000 to resolve this, including any agreement not to post negative reviews.'",
+                        choices: [
+                            {
+                                text: "Accept $12,000",
+                                desc: "Quick resolution",
+                                cost: 0,
+                                effects: { yourNet: 12000, theirCost: 12000, relationship: -10 },
+                                next: "ts_settle_12000"
+                            },
+                            {
+                                text: "Counter with $14,000",
+                                desc: "They're clearly worried",
+                                cost: 0,
+                                effects: { theirCost: 50, relationship: -20 },
+                                next: "ts_counter_14000_rep"
+                            }
+                        ]
+                    },
+                    ts_settle_12000: {
+                        stage: 5,
+                        title: "Settled",
+                        narrative: "You accept $12,000 and sign a mutual non-disparagement clause. Wire arrives in 2 days.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#128176;",
+                            title: "Settled for $12,000",
+                            yourNet: 12000,
+                            theirCost: 12000,
+                            relationship: 20,
+                            analysis: "80% recovery with no legal fees. The reputation threat was effective leverage. Some would call this aggressive, but you're owed the money."
+                        }
+                    },
+                    ts_counter_14000_rep: {
+                        stage: 5,
+                        title: "Pushing the Leverage",
+                        narrative: "They counter with $13,000 'final.' You accept. Money arrives promptly.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#127942;",
+                            title: "Settled for $13,000",
+                            yourNet: 13000,
+                            theirCost: 13000,
+                            relationship: 10,
+                            analysis: "87% recovery with no legal fees. The reputation leverage worked better than threats often do. You've likely burned this bridge, but you got most of your money."
+                        }
+                    },
+                    ts_compromise_13k: {
+                        stage: 4,
+                        title: "Pragmatic Compromise",
+                        narrative: "You accept $13,000 to avoid litigation risk. Wire arrives in a week. After attorney fees, you net $12,100.",
+                        isTerminal: true,
+                        result: {
+                            icon: "&#127942;",
+                            title: "Settled for $13,000 (Net: $12,100)",
+                            yourNet: 12100,
+                            theirCost: 14000,
+                            relationship: 25,
+                            analysis: "81% net recovery. Their counterclaim threat was likely a bluff, but litigation is always uncertain. This was a reasonable risk-adjusted decision."
+                        }
+                    }
+                }
+            }
+        };
+
+        // Helper functions
+        function formatMoney(amount) {
+            return '$' + amount.toLocaleString();
+        }
+
+        function showScreen(screenId) {
+            document.getElementById('title-screen').classList.remove('active');
+            document.getElementById('title-screen').style.display = screenId === 'title-screen' ? 'block' : 'none';
+            document.getElementById('game-screen').classList.remove('active');
+            document.getElementById('game-screen').style.display = screenId === 'game-screen' ? 'block' : 'none';
+            document.getElementById('result-screen').classList.remove('active');
+            document.getElementById('result-screen').style.display = screenId === 'result-screen' ? 'block' : 'none';
+
+            if (screenId === 'game-screen') {
+                document.getElementById('game-screen').classList.add('active');
+            } else if (screenId === 'result-screen') {
+                document.getElementById('result-screen').classList.add('active');
+            }
+        }
+
+        function showTitleScreen() {
+            showScreen('title-screen');
+        }
+
+        function startScenario(scenarioId) {
+            var scenario = scenarios[scenarioId];
+            gameState = {
+                scenario: scenarioId,
+                currentNode: scenario.startNode,
+                yourNet: 0,
+                yourCosts: 0,
+                theirCost: 0,
+                relationship: 100,
+                history: [],
+                stakeAmount: scenario.stakeAmount
+            };
+
+            showScreen('game-screen');
+            renderNode();
+        }
+
+        function restartScenario() {
+            startScenario(gameState.scenario);
+        }
+
+        function renderNode() {
+            var scenario = scenarios[gameState.scenario];
+            var node = scenario.nodes[gameState.currentNode];
+
+            if (!node) {
+                console.error('Node not found:', gameState.currentNode);
+                return;
+            }
+
+            // Update progress
+            var progress = (node.stage / 5) * 100;
+            document.getElementById('progress-fill').style.width = progress + '%';
+
+            // Update scoreboard
+            document.getElementById('your-net').textContent = formatMoney(gameState.yourNet);
+            document.getElementById('their-cost').textContent = formatMoney(gameState.theirCost);
+            document.getElementById('relationship').textContent = gameState.relationship + '%';
+
+            // Update stage badge
+            document.getElementById('stage-badge').textContent = 'Stage ' + node.stage;
+
+            // Update scenario content
+            document.getElementById('node-title').textContent = node.title;
+            document.getElementById('node-narrative').textContent = node.narrative;
+
+            // Legal note
+            var legalNoteEl = document.getElementById('legal-note');
+            if (node.legalNote) {
+                legalNoteEl.style.display = 'block';
+                document.getElementById('legal-note-text').textContent = node.legalNote;
+            } else {
+                legalNoteEl.style.display = 'none';
+            }
+
+            // Terminal node
+            if (node.isTerminal) {
+                showResult(node.result);
+                return;
+            }
+
+            // Render choices
+            var choicesHtml = '';
+            for (var i = 0; i < node.choices.length; i++) {
+                var choice = node.choices[i];
+                var costDisplay = choice.cost > 0 ? '-' + formatMoney(choice.cost) : 'Free';
+                var costClass = choice.cost > 0 ? '' : 'free';
+
+                choicesHtml += '<button class="choice-btn" onclick="selectChoice(' + i + ')">' +
+                    '<div class="choice-title">' +
+                        '<span>' + choice.text + '</span>' +
+                        '<span class="choice-cost ' + costClass + '">' + costDisplay + '</span>' +
+                    '</div>' +
+                    '<div class="choice-desc">' + choice.desc + '</div>' +
+                '</button>';
+            }
+            document.getElementById('choices').innerHTML = choicesHtml;
+
+            // Animate panel
+            var panel = document.getElementById('scenario-panel');
+            panel.classList.remove('fade-in');
+            void panel.offsetWidth; // Trigger reflow
+            panel.classList.add('fade-in');
+        }
+
+        function selectChoice(choiceIndex) {
+            var scenario = scenarios[gameState.scenario];
+            var node = scenario.nodes[gameState.currentNode];
+            var choice = node.choices[choiceIndex];
+
+            // Apply effects
+            gameState.yourCosts += choice.cost || 0;
+
+            if (choice.effects) {
+                if (choice.effects.yourNet) {
+                    gameState.yourNet = choice.effects.yourNet - gameState.yourCosts;
+                }
+                if (choice.effects.theirCost) {
+                    gameState.theirCost += choice.effects.theirCost;
+                }
+                if (choice.effects.relationship) {
+                    gameState.relationship = Math.max(0, Math.min(100, gameState.relationship + choice.effects.relationship));
+                }
+            }
+
+            // Record history
+            gameState.history.push({
+                node: gameState.currentNode,
+                choice: choiceIndex
+            });
+
+            // Move to next node
+            gameState.currentNode = choice.next;
+            renderNode();
+        }
+
+        function showResult(result) {
+            showScreen('result-screen');
+
+            document.getElementById('result-icon').innerHTML = result.icon;
+            document.getElementById('result-title').textContent = result.title;
+
+            var stake = scenarios[gameState.scenario].stakeAmount;
+            var netAfterCosts = result.yourNet;
+            var percentage = Math.round((netAfterCosts / stake) * 100);
+
+            document.getElementById('result-summary').textContent =
+                'You recovered ' + formatMoney(netAfterCosts) + ' (' + percentage + '% of the ' + formatMoney(stake) + ' at stake)';
+
+            document.getElementById('final-net').textContent = formatMoney(netAfterCosts);
+            document.getElementById('final-their').textContent = formatMoney(result.theirCost);
+            document.getElementById('final-relationship').textContent = result.relationship + '%';
+
+            document.getElementById('analysis-text').textContent = result.analysis;
+        }
+    </script>
+</body>
+</html>

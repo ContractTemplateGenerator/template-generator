@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Term Sheet Negotiator - Startup Fundraising Simulator | terms.law</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a0a2e 50%, #0a1a2e 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        .site-header {
+            background: #111;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+        }
+        .site-header .logo { font-size: 1.4rem; font-weight: 700; color: #fff; text-decoration: none; }
+        .site-header .logo span { color: #4a9eff; }
+        .site-header nav { display: flex; gap: 24px; }
+        .site-header nav a { color: #aaa; text-decoration: none; font-size: 0.95rem; transition: color 0.2s; }
+        .site-header nav a:hover, .site-header nav a.active { color: #fff; }
+
+        .game-container { max-width: 1000px; margin: 0 auto; padding: 30px 20px; }
+
+        /* Screens */
+        .screen { display: none; }
+        .screen.active { display: block; }
+
+        /* Title Screen */
+        .title-screen { text-align: center; padding: 40px 20px; }
+        .title-screen .rocket-icon { font-size: 4rem; margin-bottom: 20px; animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        .title-screen h1 {
+            font-size: 3rem; margin-bottom: 10px;
+            background: linear-gradient(135deg, #8b5cf6, #06b6d4, #8b5cf6);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .title-screen .subtitle { font-size: 1.3rem; color: #888; margin-bottom: 30px; }
+        .title-screen > p { font-size: 1.1rem; color: #aaa; max-width: 650px; margin: 0 auto 40px; line-height: 1.6; }
+
+        .mode-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; max-width: 700px; margin: 0 auto; }
+        .mode-card {
+            background: rgba(255,255,255,0.03); border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 20px; padding: 30px; cursor: pointer; transition: all 0.3s; text-align: left;
+        }
+        .mode-card:hover { background: rgba(139, 92, 246, 0.1); border-color: #8b5cf6; transform: translateY(-4px); }
+        .mode-card .icon { font-size: 2.5rem; margin-bottom: 16px; }
+        .mode-card h3 { font-size: 1.3rem; margin-bottom: 10px; }
+        .mode-card p { font-size: 0.95rem; color: #888; margin: 0; }
+
+        /* Dashboard */
+        .dashboard { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .stat-card { background: rgba(0,0,0,0.3); border-radius: 12px; padding: 16px; text-align: center; }
+        .stat-card .label { font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .stat-card .value { font-size: 1.4rem; font-weight: 700; }
+        .stat-card .sub { font-size: 0.8rem; color: #666; margin-top: 4px; }
+        .stat-card.ownership .value { color: #8b5cf6; }
+        .stat-card.valuation .value { color: #06b6d4; }
+        .stat-card.control .value { color: #f59e0b; }
+        .stat-card.investor .value { color: #10b981; }
+
+        /* Exit Simulator */
+        .exit-simulator { background: rgba(0,0,0,0.3); border-radius: 16px; padding: 24px; margin-bottom: 24px; }
+        .exit-simulator h3 { margin-bottom: 16px; color: #06b6d4; }
+        .exit-slider-container { margin-bottom: 20px; }
+        .exit-slider-label { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .exit-slider { width: 100%; height: 8px; border-radius: 4px; background: rgba(255,255,255,0.1); appearance: none; outline: none; }
+        .exit-slider::-webkit-slider-thumb { appearance: none; width: 24px; height: 24px; border-radius: 50%; background: #8b5cf6; cursor: pointer; }
+        .payout-breakdown { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        .payout-card { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 16px; }
+        .payout-card .label { font-size: 0.8rem; color: #888; margin-bottom: 4px; }
+        .payout-card .amount { font-size: 1.3rem; font-weight: 700; }
+        .payout-card .percent { font-size: 0.85rem; color: #888; }
+        .payout-card.founder .amount { color: #8b5cf6; }
+        .payout-card.investor .amount { color: #10b981; }
+
+        /* Term Sections */
+        .term-section { background: rgba(255,255,255,0.03); border-radius: 16px; padding: 24px; margin-bottom: 20px; }
+        .term-section h3 { font-size: 1.1rem; color: #8b5cf6; margin-bottom: 16px; }
+        .term-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.05); flex-wrap: wrap; gap: 12px; }
+        .term-row:last-child { border-bottom: none; }
+        .term-info { flex: 1; min-width: 200px; }
+        .term-name { font-weight: 600; margin-bottom: 4px; }
+        .term-desc { font-size: 0.85rem; color: #888; }
+        .term-value { font-size: 0.95rem; color: #06b6d4; padding: 6px 12px; background: rgba(6, 182, 212, 0.1); border-radius: 6px; }
+        .term-btn { background: rgba(139, 92, 246, 0.2); border: 1px solid rgba(139, 92, 246, 0.4); color: #8b5cf6; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; }
+        .term-btn:hover { background: rgba(139, 92, 246, 0.3); border-color: #8b5cf6; }
+
+        /* Tutorial */
+        .tutorial-panel { background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 16px; padding: 24px; margin-bottom: 24px; }
+        .tutorial-panel h3 { color: #8b5cf6; margin-bottom: 12px; }
+        .tutorial-panel > p { color: #aaa; line-height: 1.6; margin-bottom: 16px; }
+        .tutorial-nav { display: flex; gap: 12px; flex-wrap: wrap; }
+        .tutorial-nav button { background: rgba(139, 92, 246, 0.2); border: 1px solid rgba(139, 92, 246, 0.4); color: #8b5cf6; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; }
+        .tutorial-nav button:hover { background: rgba(139, 92, 246, 0.3); }
+        .tutorial-nav button.active { background: #8b5cf6; color: #fff; }
+        .tutorial-content { background: rgba(255,255,255,0.03); border-radius: 16px; padding: 24px; margin-bottom: 24px; }
+        .tutorial-content h4 { color: #8b5cf6; margin-bottom: 16px; font-size: 1.2rem; }
+        .tutorial-content p { color: #aaa; line-height: 1.6; margin-bottom: 16px; }
+        .comparison-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+        .comparison-table th, .comparison-table td { padding: 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .comparison-table th { color: #888; font-weight: 500; font-size: 0.85rem; }
+        .good { color: #10b981; }
+        .bad { color: #ef4444; }
+
+        /* Actions */
+        .actions { display: flex; gap: 12px; margin-top: 24px; justify-content: center; flex-wrap: wrap; }
+        .btn-primary {
+            background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+            border: none; color: #fff; padding: 14px 32px; border-radius: 8px;
+            font-size: 1rem; font-weight: 600; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3); }
+        .btn-secondary {
+            background: transparent; border: 2px solid rgba(255,255,255,0.2); color: #fff;
+            padding: 12px 28px; border-radius: 8px; font-size: 1rem; cursor: pointer; transition: all 0.2s;
+        }
+        .btn-secondary:hover { border-color: #fff; background: rgba(255,255,255,0.05); }
+
+        /* Result Screen */
+        .result-screen { text-align: center; padding: 40px 20px; }
+        .result-icon { font-size: 5rem; margin-bottom: 20px; }
+        .result-screen h2 { font-size: 2rem; margin-bottom: 16px; }
+        .result-summary { font-size: 1.1rem; color: #aaa; max-width: 600px; margin: 0 auto 30px; line-height: 1.6; }
+        .final-breakdown { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; max-width: 500px; margin: 0 auto 30px; }
+        .final-box { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 20px; }
+        .final-box .label { font-size: 0.8rem; color: #888; margin-bottom: 8px; }
+        .final-box .value { font-size: 1.8rem; font-weight: 700; }
+        .lesson-card { background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 12px; padding: 24px; max-width: 600px; margin: 0 auto 30px; text-align: left; }
+        .lesson-card h4 { color: #8b5cf6; margin-bottom: 12px; }
+        .lesson-card p { color: #aaa; line-height: 1.6; }
+
+        /* Modal */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 100; justify-content: center; align-items: center; padding: 20px; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: #1a1a2e; border-radius: 20px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 30px; position: relative; }
+        .modal-close { position: absolute; top: 16px; right: 16px; background: none; border: none; color: #888; font-size: 1.5rem; cursor: pointer; }
+        .modal h3 { font-size: 1.4rem; margin-bottom: 8px; }
+        .modal-desc { color: #888; margin-bottom: 16px; }
+        .current-terms { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 12px 16px; margin: 16px 0; }
+        .current-terms .label { font-size: 0.75rem; color: #888; text-transform: uppercase; }
+        .current-terms .value { font-size: 1.1rem; color: #06b6d4; }
+        .option-card { background: rgba(255,255,255,0.03); border: 2px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 16px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s; }
+        .option-card:hover { border-color: #8b5cf6; background: rgba(139, 92, 246, 0.1); }
+        .option-card.selected { border-color: #8b5cf6; background: rgba(139, 92, 246, 0.15); }
+        .option-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .option-title { font-weight: 600; }
+        .option-impact { font-size: 0.85rem; padding: 4px 8px; border-radius: 4px; }
+        .option-impact.positive { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+        .option-impact.negative { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        .option-impact.neutral { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+        .option-desc { font-size: 0.9rem; color: #888; line-height: 1.5; }
+        .option-tradeoff { font-size: 0.85rem; color: #f59e0b; margin-top: 8px; font-style: italic; }
+
+        @media (max-width: 768px) {
+            .dashboard { grid-template-columns: repeat(2, 1fr); }
+            .payout-breakdown { grid-template-columns: 1fr; }
+            .title-screen h1 { font-size: 2rem; }
+            .final-breakdown { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <a href="../../../index.html" class="logo">terms<span>.law</span></a>
+        <nav>
+            <a href="../../../index.html">Home</a>
+            <a href="../../../Demand-Letters/demand-letters-landing.html">Demand Letters</a>
+            <a href="../../../Templates/contract-library-landing.html">Templates</a>
+            <a href="../../../INC/formation-landing.html">Formation</a>
+            <a href="../../blog-landing.html" class="active">Blog</a>
+        </nav>
+    </header>
+
+    <div class="game-container">
+        <!-- Title Screen -->
+        <div id="title-screen" class="screen active">
+            <div class="title-screen">
+                <div class="rocket-icon">&#128640;</div>
+                <h1>Term Sheet Negotiator</h1>
+                <p class="subtitle">Startup Fundraising Simulator</p>
+                <p>Learn the hidden economics of venture capital. Negotiate liquidation preferences, anti-dilution provisions, board seats, and more. See exactly how each term affects your payout at different exit valuations.</p>
+
+                <div class="mode-cards">
+                    <div class="mode-card" onclick="window.gameApp.startTutorial()">
+                        <div class="icon">&#128218;</div>
+                        <h3>Tutorial Mode</h3>
+                        <p>Learn each term with interactive examples. See how 1x vs 2x liquidation preferences change your payout at a $20M exit.</p>
+                    </div>
+
+                    <div class="mode-card" onclick="window.gameApp.startNegotiation()">
+                        <div class="icon">&#129309;</div>
+                        <h3>Full Negotiation</h3>
+                        <p>Negotiate a complete term sheet with a VC. Every choice has trade-offs. Can you maximize founder value?</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tutorial Screen -->
+        <div id="tutorial-screen" class="screen">
+            <div class="tutorial-panel">
+                <h3>&#128218; Tutorial: Understanding Term Sheets</h3>
+                <p>Welcome! Let's learn how term sheet provisions affect founder economics. Select a topic below to explore.</p>
+                <div class="tutorial-nav" id="tutorial-nav">
+                    <button class="active" onclick="window.gameApp.showTutorial('liquidation')">Liquidation Preferences</button>
+                    <button onclick="window.gameApp.showTutorial('antidilution')">Anti-Dilution</button>
+                    <button onclick="window.gameApp.showTutorial('participation')">Participation Rights</button>
+                    <button onclick="window.gameApp.showTutorial('board')">Board Control</button>
+                    <button onclick="window.gameApp.showTutorial('vesting')">Founder Vesting</button>
+                </div>
+            </div>
+
+            <div class="tutorial-content" id="tutorial-content"></div>
+
+            <div class="actions">
+                <button class="btn-secondary" onclick="window.gameApp.showTitle()">Back to Menu</button>
+                <button class="btn-primary" onclick="window.gameApp.startNegotiation()">Start Full Negotiation</button>
+            </div>
+        </div>
+
+        <!-- Negotiation Screen -->
+        <div id="negotiation-screen" class="screen">
+            <div class="dashboard">
+                <div class="stat-card ownership">
+                    <div class="label">Your Ownership</div>
+                    <div class="value" id="ownership-pct">75%</div>
+                    <div class="sub">Post-money</div>
+                </div>
+                <div class="stat-card valuation">
+                    <div class="label">Post-Money Valuation</div>
+                    <div class="value">$8M</div>
+                    <div class="sub">$2M raise</div>
+                </div>
+                <div class="stat-card control">
+                    <div class="label">Board Control</div>
+                    <div class="value" id="board-control">2 of 3</div>
+                    <div class="sub">Founder majority</div>
+                </div>
+                <div class="stat-card investor">
+                    <div class="label">Investor Friendliness</div>
+                    <div class="value" id="investor-score">50</div>
+                    <div class="sub">Neutral terms</div>
+                </div>
+            </div>
+
+            <div class="exit-simulator">
+                <h3>&#128202; Exit Payout Simulator</h3>
+                <div class="exit-slider-container">
+                    <div class="exit-slider-label">
+                        <span>Exit Valuation:</span>
+                        <span id="exit-valuation-display">$20M</span>
+                    </div>
+                    <input type="range" class="exit-slider" id="exit-slider" min="5" max="200" value="20" oninput="window.gameApp.updateExit()">
+                </div>
+                <div class="payout-breakdown">
+                    <div class="payout-card founder">
+                        <div class="label">Founder Payout</div>
+                        <div class="amount" id="founder-payout">$15M</div>
+                        <div class="percent" id="founder-percent">75% of exit</div>
+                    </div>
+                    <div class="payout-card investor">
+                        <div class="label">Investor Payout</div>
+                        <div class="amount" id="investor-payout">$5M</div>
+                        <div class="percent" id="investor-percent">2.5x return</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="term-section">
+                <h3>&#128176; Economics</h3>
+                <div class="term-row">
+                    <div class="term-info">
+                        <div class="term-name">Liquidation Preference</div>
+                        <div class="term-desc">How much investors get paid first before common shares</div>
+                    </div>
+                    <div class="term-value" id="liq-pref-value">1x Non-Participating</div>
+                    <button class="term-btn" onclick="window.gameApp.openModal('liq_pref')">Negotiate</button>
+                </div>
+                <div class="term-row">
+                    <div class="term-info">
+                        <div class="term-name">Anti-Dilution Protection</div>
+                        <div class="term-desc">What happens if future rounds are at a lower valuation</div>
+                    </div>
+                    <div class="term-value" id="anti-dilution-value">Weighted Average</div>
+                    <button class="term-btn" onclick="window.gameApp.openModal('anti_dilution')">Negotiate</button>
+                </div>
+                <div class="term-row">
+                    <div class="term-info">
+                        <div class="term-name">Option Pool</div>
+                        <div class="term-desc">Shares reserved for future employees, dilutes founders</div>
+                    </div>
+                    <div class="term-value" id="option-pool-value">10%</div>
+                    <button class="term-btn" onclick="window.gameApp.openModal('option_pool')">Negotiate</button>
+                </div>
+            </div>
+
+            <div class="term-section">
+                <h3>&#9878; Governance</h3>
+                <div class="term-row">
+                    <div class="term-info">
+                        <div class="term-name">Board Composition</div>
+                        <div class="term-desc">Who controls company decisions</div>
+                    </div>
+                    <div class="term-value" id="board-value">2 Founder, 1 Investor</div>
+                    <button class="term-btn" onclick="window.gameApp.openModal('board')">Negotiate</button>
+                </div>
+                <div class="term-row">
+                    <div class="term-info">
+                        <div class="term-name">Protective Provisions</div>
+                        <div class="term-desc">Investor veto rights over major decisions</div>
+                    </div>
+                    <div class="term-value" id="protective-value">Standard</div>
+                    <button class="term-btn" onclick="window.gameApp.openModal('protective')">Negotiate</button>
+                </div>
+                <div class="term-row">
+                    <div class="term-info">
+                        <div class="term-name">Founder Vesting</div>
+                        <div class="term-desc">How your shares vest over time</div>
+                    </div>
+                    <div class="term-value" id="vesting-value">4yr/1yr cliff</div>
+                    <button class="term-btn" onclick="window.gameApp.openModal('vesting')">Negotiate</button>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="btn-secondary" onclick="window.gameApp.showTitle()">Cancel Deal</button>
+                <button class="btn-primary" onclick="window.gameApp.closeDeal()">Close the Round</button>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result-screen" class="screen">
+            <div class="result-screen">
+                <div class="result-icon" id="result-icon">&#128640;</div>
+                <h2 id="result-title">Deal Closed!</h2>
+                <p class="result-summary" id="result-summary">You've negotiated your Series Seed term sheet.</p>
+
+                <div class="final-breakdown">
+                    <div class="final-box">
+                        <div class="label">Your Ownership</div>
+                        <div class="value" id="final-ownership" style="color: #8b5cf6;">75%</div>
+                    </div>
+                    <div class="final-box">
+                        <div class="label">At $50M Exit</div>
+                        <div class="value" id="final-payout" style="color: #10b981;">$36M</div>
+                    </div>
+                </div>
+
+                <div class="lesson-card">
+                    <h4>Key Takeaways</h4>
+                    <p id="lesson-text"></p>
+                </div>
+
+                <div class="actions">
+                    <button class="btn-secondary" onclick="window.gameApp.showTitle()">New Game</button>
+                    <button class="btn-primary" onclick="window.gameApp.startNegotiation()">Renegotiate</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal-overlay" id="modal-overlay">
+            <div class="modal">
+                <button class="modal-close" onclick="window.gameApp.closeModal()">&times;</button>
+                <h3 id="modal-title">Negotiate Term</h3>
+                <p class="modal-desc" id="modal-desc"></p>
+                <div class="current-terms">
+                    <div class="label">Current Term</div>
+                    <div class="value" id="modal-current"></div>
+                </div>
+                <div id="modal-options"></div>
+                <div class="actions" style="margin-top: 24px;">
+                    <button class="btn-secondary" onclick="window.gameApp.closeModal()">Keep Current</button>
+                    <button class="btn-primary" onclick="window.gameApp.acceptTerm()">Accept Change</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    (function() {
+        // State
+        var state = {
+            ownership: 75,
+            investorScore: 50,
+            selectedOption: null,
+            currentTerm: null,
+            terms: {
+                liq_pref: '1x_non_participating',
+                anti_dilution: 'weighted_average',
+                option_pool: 10,
+                board: '2_1',
+                protective: 'standard',
+                vesting: '4_1'
+            }
+        };
+
+        // Term data
+        var termData = {
+            liq_pref: {
+                title: 'Liquidation Preference',
+                desc: 'Determines how much investors get paid before common shareholders (founders) in an exit.',
+                options: [
+                    { id: '1x_non_participating', title: '1x Non-Participating', impact: 'neutral', impactText: 'Standard', desc: 'Investors get 1x their investment back OR convert to common stock (whichever is higher).', tradeoff: null, investorChange: 0 },
+                    { id: '1x_participating', title: '1x Participating', impact: 'negative', impactText: 'Investor-friendly', desc: 'Investors get 1x back PLUS their pro-rata share of remaining proceeds.', tradeoff: 'Costs you 5-15% of exit proceeds', investorChange: 20 },
+                    { id: '2x_non_participating', title: '2x Non-Participating', impact: 'negative', impactText: 'Aggressive', desc: 'Investors get 2x their investment before common shares.', tradeoff: 'Need higher exit for founders to see returns', investorChange: 15 },
+                    { id: '2x_participating', title: '2x Participating', impact: 'negative', impactText: 'Very Aggressive', desc: 'Investors get 2x their investment PLUS pro-rata share.', tradeoff: 'Massive dilution of founder economics', investorChange: 35 }
+                ]
+            },
+            anti_dilution: {
+                title: 'Anti-Dilution Protection',
+                desc: 'If the company raises at a lower valuation later, this protects investor share price.',
+                options: [
+                    { id: 'none', title: 'No Protection', impact: 'positive', impactText: 'Founder-friendly', desc: 'Investors take full dilution in a down round.', tradeoff: 'Hard to get - most investors require some protection', investorChange: -15 },
+                    { id: 'weighted_average', title: 'Weighted Average', impact: 'neutral', impactText: 'Standard', desc: 'New price is weighted average of old and new prices.', tradeoff: null, investorChange: 0 },
+                    { id: 'full_ratchet', title: 'Full Ratchet', impact: 'negative', impactText: 'Aggressive', desc: 'If any shares are sold cheaper, ALL investor shares adjust to new low price.', tradeoff: 'Can devastate founder ownership in a down round', investorChange: 20 }
+                ]
+            },
+            option_pool: {
+                title: 'Employee Option Pool',
+                desc: 'Shares set aside for future employee equity. Typically comes from founder ownership pre-money.',
+                options: [
+                    { id: 5, title: '5% Option Pool', impact: 'positive', impactText: 'Founder-friendly', desc: 'Minimal pool - you\'ll need to expand it later.', tradeoff: 'May struggle to hire with limited equity', investorChange: -10, ownershipChange: 5 },
+                    { id: 10, title: '10% Option Pool', impact: 'neutral', impactText: 'Standard', desc: 'Typical seed-stage pool.', tradeoff: null, investorChange: 0, ownershipChange: 0 },
+                    { id: 15, title: '15% Option Pool', impact: 'negative', impactText: 'Large', desc: 'Large pool dilutes founders but gives hiring flexibility.', tradeoff: 'Extra 5% dilution to founders', investorChange: 10, ownershipChange: -5 },
+                    { id: 20, title: '20% Option Pool', impact: 'negative', impactText: 'Very Large', desc: 'Unusually large pool.', tradeoff: 'Significant founder dilution', investorChange: 20, ownershipChange: -10 }
+                ]
+            },
+            board: {
+                title: 'Board Composition',
+                desc: 'Who gets seats on the board of directors and controls major company decisions.',
+                options: [
+                    { id: '2_0', title: '2 Founders Only', impact: 'positive', impactText: 'Maximum Control', desc: 'No investor board seat. Full founder control.', tradeoff: 'Investors may push back', investorChange: -20 },
+                    { id: '2_1', title: '2 Founders, 1 Investor', impact: 'neutral', impactText: 'Standard', desc: 'Founder-controlled board with investor representation.', tradeoff: null, investorChange: 0 },
+                    { id: '2_1_1', title: '2F, 1I, 1 Independent', impact: 'neutral', impactText: 'Balanced', desc: 'Four-person board with neutral independent member.', tradeoff: 'Independent could swing either way', investorChange: 5 },
+                    { id: '1_1_1', title: '1 Each + Independent', impact: 'negative', impactText: 'Less Control', desc: 'No founder majority.', tradeoff: 'Loss of founder control', investorChange: 25 }
+                ]
+            },
+            protective: {
+                title: 'Protective Provisions',
+                desc: 'Major decisions that require investor approval (veto rights).',
+                options: [
+                    { id: 'minimal', title: 'Minimal', impact: 'positive', impactText: 'Founder-friendly', desc: 'Only sale of company and new senior stock require approval.', tradeoff: 'Investors may push for more', investorChange: -15 },
+                    { id: 'standard', title: 'Standard', impact: 'neutral', impactText: 'Standard', desc: 'Sale, new senior stock, major debt, changing bylaws require approval.', tradeoff: null, investorChange: 0 },
+                    { id: 'extensive', title: 'Extensive', impact: 'negative', impactText: 'Restrictive', desc: 'Long list including major contracts and hiring.', tradeoff: 'Slows operations significantly', investorChange: 20 }
+                ]
+            },
+            vesting: {
+                title: 'Founder Vesting',
+                desc: 'How founder shares vest over time.',
+                options: [
+                    { id: '3_0', title: '3 Year, No Cliff', impact: 'positive', impactText: 'Founder-friendly', desc: 'Shorter vesting, immediate pro-rata vesting.', tradeoff: 'Investors may want longer commitment', investorChange: -10 },
+                    { id: '4_1', title: '4 Year, 1 Year Cliff', impact: 'neutral', impactText: 'Standard', desc: '25% vests after 1 year, then monthly.', tradeoff: null, investorChange: 0 },
+                    { id: '4_1_accel', title: '4 Year + Single Trigger', impact: 'positive', impactText: 'Protected', desc: 'Standard vesting but 100% vests on acquisition.', tradeoff: 'Acquirers may not like this', investorChange: -5 },
+                    { id: '4_1_double', title: '4 Year + Double Trigger', impact: 'neutral', impactText: 'Compromise', desc: 'Accelerates only if acquired AND terminated.', tradeoff: null, investorChange: 0 }
+                ]
+            }
+        };
+
+        // Tutorial content
+        var tutorialContent = {
+            liquidation: {
+                title: 'Liquidation Preferences: Who Gets Paid First',
+                html: '<p>When your company is sold, investors with liquidation preferences get paid <strong>before</strong> common stockholders (founders and employees).</p><h4 style="color:#8b5cf6;margin:20px 0 12px;">Example: $20M Exit, $2M Raised</h4><table class="comparison-table"><tr><th>Term</th><th>Investor Gets</th><th>Founder Gets</th></tr><tr><td>1x Non-Participating</td><td class="good">$5M (25%)</td><td class="good">$15M (75%)</td></tr><tr><td>1x Participating</td><td class="bad">$6.5M</td><td>$13.5M</td></tr><tr><td>2x Participating</td><td class="bad">$8M</td><td class="bad">$12M</td></tr></table><p style="color:#888;font-size:0.9rem;">The participation feature is what really hurts founders.</p>'
+            },
+            antidilution: {
+                title: 'Anti-Dilution: Down Round Protection',
+                html: '<p>If your next round is at a lower valuation, anti-dilution provisions adjust investor share counts.</p><h4 style="color:#8b5cf6;margin:20px 0 12px;">Example: Raised $2M at $10/share, down round at $5/share</h4><table class="comparison-table"><tr><th>Protection</th><th>What Happens</th><th>Impact</th></tr><tr><td>None</td><td>Investor keeps 200K shares</td><td class="good">No extra dilution</td></tr><tr><td>Weighted Average</td><td>Investor gets ~280K shares</td><td>Moderate dilution</td></tr><tr><td>Full Ratchet</td><td>Investor gets 400K shares</td><td class="bad">Severe dilution</td></tr></table>'
+            },
+            participation: {
+                title: 'Participation Rights: The Double Dip',
+                html: '<p>Participation lets investors take their liquidation preference AND participate in remaining proceeds.</p><h4 style="color:#8b5cf6;margin:20px 0 12px;">$30M Exit Example (25% investor ownership)</h4><table class="comparison-table"><tr><th>Scenario</th><th>Calculation</th><th>Investor Gets</th></tr><tr><td>Non-Participating</td><td>25% of $30M</td><td>$7.5M</td></tr><tr><td>1x Participating</td><td>$2M + 25% of $28M</td><td class="bad">$9M</td></tr></table><p style="color:#f59e0b;font-size:0.9rem;">That $1.5M difference comes from founder pockets.</p>'
+            },
+            board: {
+                title: 'Board Control: Who Decides Your Company\'s Fate',
+                html: '<p>The board makes major decisions: hiring/firing CEO, approving budgets, M&A decisions.</p><h4 style="color:#8b5cf6;margin:20px 0 12px;">Common Board Structures</h4><table class="comparison-table"><tr><th>Structure</th><th>Control</th><th>Notes</th></tr><tr><td>2 Founder, 0 Investor</td><td class="good">Full control</td><td>Best case</td></tr><tr><td>2 Founder, 1 Investor</td><td class="good">Founder majority</td><td>Standard for seed</td></tr><tr><td>1F, 1I, 1 Independent</td><td class="bad">No majority</td><td>Avoid at seed</td></tr></table>'
+            },
+            vesting: {
+                title: 'Founder Vesting: Golden Handcuffs',
+                html: '<p>Investors require founder vesting so you can\'t just take the money and leave.</p><h4 style="color:#8b5cf6;margin:20px 0 12px;">Vesting Terms</h4><table class="comparison-table"><tr><th>Term</th><th>What It Means</th></tr><tr><td>4-Year Vesting</td><td>Shares vest over 4 years</td></tr><tr><td>1-Year Cliff</td><td>Nothing vests until year 1</td></tr><tr><td>Single Trigger</td><td>All shares vest on acquisition</td></tr><tr><td>Double Trigger</td><td>Vest on acquisition + termination</td></tr></table><p style="color:#888;font-size:0.9rem;">Negotiate credit for time already spent on company.</p>'
+            }
+        };
+
+        // Helper functions
+        function showScreen(id) {
+            var screens = document.querySelectorAll('.screen');
+            for (var i = 0; i < screens.length; i++) {
+                screens[i].classList.remove('active');
+            }
+            document.getElementById(id).classList.add('active');
+        }
+
+        function formatMoney(amount) {
+            if (amount >= 1000000) return '$' + (amount / 1000000).toFixed(1) + 'M';
+            if (amount >= 1000) return '$' + (amount / 1000).toFixed(0) + 'K';
+            return '$' + amount;
+        }
+
+        function updateDashboard() {
+            document.getElementById('ownership-pct').textContent = state.ownership + '%';
+            document.getElementById('investor-score').textContent = state.investorScore;
+
+            var boardText = { '2_0': '2 of 2', '2_1': '2 of 3', '2_1_1': '2 of 4', '1_1_1': '1 of 3' };
+            document.getElementById('board-control').textContent = boardText[state.terms.board] || '2 of 3';
+
+            var liqText = { '1x_non_participating': '1x Non-Part', '1x_participating': '1x Part', '2x_non_participating': '2x Non-Part', '2x_participating': '2x Part' };
+            document.getElementById('liq-pref-value').textContent = liqText[state.terms.liq_pref] || state.terms.liq_pref;
+
+            var antiText = { 'none': 'None', 'weighted_average': 'Weighted Avg', 'full_ratchet': 'Full Ratchet' };
+            document.getElementById('anti-dilution-value').textContent = antiText[state.terms.anti_dilution] || state.terms.anti_dilution;
+
+            document.getElementById('option-pool-value').textContent = state.terms.option_pool + '%';
+
+            var boardDisplayText = { '2_0': '2 Founder, 0 Inv', '2_1': '2 Founder, 1 Inv', '2_1_1': '2F, 1I, 1 Ind', '1_1_1': '1 Each + Ind' };
+            document.getElementById('board-value').textContent = boardDisplayText[state.terms.board] || state.terms.board;
+
+            var protText = { 'minimal': 'Minimal', 'standard': 'Standard', 'extensive': 'Extensive' };
+            document.getElementById('protective-value').textContent = protText[state.terms.protective] || state.terms.protective;
+
+            var vestText = { '3_0': '3yr/No cliff', '4_1': '4yr/1yr cliff', '4_1_accel': '4yr+Single', '4_1_double': '4yr+Double' };
+            document.getElementById('vesting-value').textContent = vestText[state.terms.vesting] || state.terms.vesting;
+        }
+
+        function updateExit() {
+            var exitValue = parseInt(document.getElementById('exit-slider').value) * 1000000;
+            document.getElementById('exit-valuation-display').textContent = '$' + (exitValue / 1000000) + 'M';
+
+            var invested = 2000000;
+            var investorOwnership = 25;
+            var liqPref = state.terms.liq_pref;
+            var multiplier = liqPref.indexOf('2x') >= 0 ? 2 : 1;
+            var participating = liqPref.indexOf('participating') >= 0 && liqPref.indexOf('non') < 0;
+
+            var preferenceAmount = invested * multiplier;
+            var conversionValue = (investorOwnership / 100) * exitValue;
+            var investorPayout, founderPayout;
+
+            if (participating) {
+                if (exitValue <= preferenceAmount) {
+                    investorPayout = exitValue;
+                    founderPayout = 0;
+                } else {
+                    var remainder = exitValue - preferenceAmount;
+                    investorPayout = preferenceAmount + (investorOwnership / 100) * remainder;
+                    founderPayout = exitValue - investorPayout;
+                }
+            } else {
+                investorPayout = Math.max(conversionValue, Math.min(preferenceAmount, exitValue));
+                founderPayout = Math.max(0, exitValue - investorPayout);
+            }
+
+            document.getElementById('founder-payout').textContent = formatMoney(founderPayout);
+            document.getElementById('investor-payout').textContent = formatMoney(investorPayout);
+            document.getElementById('founder-percent').textContent = Math.round((founderPayout / exitValue) * 100) + '% of exit';
+            document.getElementById('investor-percent').textContent = (investorPayout / invested).toFixed(1) + 'x return';
+        }
+
+        // Public API
+        window.gameApp = {
+            showTitle: function() {
+                showScreen('title-screen');
+            },
+
+            startTutorial: function() {
+                showScreen('tutorial-screen');
+                this.showTutorial('liquidation');
+            },
+
+            showTutorial: function(topic) {
+                var content = tutorialContent[topic];
+                if (!content) return;
+
+                var buttons = document.querySelectorAll('#tutorial-nav button');
+                for (var i = 0; i < buttons.length; i++) {
+                    buttons[i].classList.remove('active');
+                }
+                event.target.classList.add('active');
+
+                document.getElementById('tutorial-content').innerHTML = '<h4>' + content.title + '</h4>' + content.html;
+            },
+
+            startNegotiation: function() {
+                state.ownership = 75;
+                state.investorScore = 50;
+                state.terms = {
+                    liq_pref: '1x_non_participating',
+                    anti_dilution: 'weighted_average',
+                    option_pool: 10,
+                    board: '2_1',
+                    protective: 'standard',
+                    vesting: '4_1'
+                };
+                showScreen('negotiation-screen');
+                updateDashboard();
+                updateExit();
+            },
+
+            updateExit: updateExit,
+
+            openModal: function(termId) {
+                var term = termData[termId];
+                if (!term) return;
+
+                state.currentTerm = termId;
+                state.selectedOption = null;
+
+                document.getElementById('modal-title').textContent = 'Negotiate: ' + term.title;
+                document.getElementById('modal-desc').textContent = term.desc;
+
+                var currentOpt = null;
+                for (var i = 0; i < term.options.length; i++) {
+                    if (term.options[i].id == state.terms[termId]) {
+                        currentOpt = term.options[i];
+                        break;
+                    }
+                }
+                document.getElementById('modal-current').textContent = currentOpt ? currentOpt.title : state.terms[termId];
+
+                var html = '';
+                for (var j = 0; j < term.options.length; j++) {
+                    var opt = term.options[j];
+                    var selected = opt.id == state.terms[termId] ? ' selected' : '';
+                    html += '<div class="option-card' + selected + '" onclick="window.gameApp.selectOption(\'' + opt.id + '\')" data-id="' + opt.id + '">';
+                    html += '<div class="option-header"><span class="option-title">' + opt.title + '</span>';
+                    html += '<span class="option-impact ' + opt.impact + '">' + opt.impactText + '</span></div>';
+                    html += '<div class="option-desc">' + opt.desc + '</div>';
+                    if (opt.tradeoff) html += '<div class="option-tradeoff">' + opt.tradeoff + '</div>';
+                    html += '</div>';
+                }
+                document.getElementById('modal-options').innerHTML = html;
+                document.getElementById('modal-overlay').classList.add('active');
+            },
+
+            selectOption: function(optId) {
+                state.selectedOption = optId;
+                var cards = document.querySelectorAll('.option-card');
+                for (var i = 0; i < cards.length; i++) {
+                    cards[i].classList.remove('selected');
+                    if (cards[i].getAttribute('data-id') == optId) {
+                        cards[i].classList.add('selected');
+                    }
+                }
+            },
+
+            closeModal: function() {
+                document.getElementById('modal-overlay').classList.remove('active');
+                state.currentTerm = null;
+                state.selectedOption = null;
+            },
+
+            acceptTerm: function() {
+                if (!state.selectedOption || !state.currentTerm) {
+                    this.closeModal();
+                    return;
+                }
+
+                var term = termData[state.currentTerm];
+                var opt = null;
+                for (var i = 0; i < term.options.length; i++) {
+                    if (term.options[i].id == state.selectedOption) {
+                        opt = term.options[i];
+                        break;
+                    }
+                }
+
+                if (opt) {
+                    state.terms[state.currentTerm] = state.selectedOption;
+                    if (opt.ownershipChange) state.ownership = Math.max(0, Math.min(100, state.ownership + opt.ownershipChange));
+                    if (opt.investorChange) state.investorScore = Math.max(0, Math.min(100, state.investorScore + opt.investorChange));
+                }
+
+                this.closeModal();
+                updateDashboard();
+                updateExit();
+            },
+
+            closeDeal: function() {
+                var exitValue = 50000000;
+                var invested = 2000000;
+                var investorOwnership = 25;
+                var liqPref = state.terms.liq_pref;
+                var multiplier = liqPref.indexOf('2x') >= 0 ? 2 : 1;
+                var participating = liqPref.indexOf('participating') >= 0 && liqPref.indexOf('non') < 0;
+
+                var preferenceAmount = invested * multiplier;
+                var conversionValue = (investorOwnership / 100) * exitValue;
+                var investorPayout, founderPayout;
+
+                if (participating) {
+                    var remainder = exitValue - preferenceAmount;
+                    investorPayout = preferenceAmount + (investorOwnership / 100) * remainder;
+                    founderPayout = exitValue - investorPayout;
+                } else {
+                    investorPayout = Math.max(conversionValue, Math.min(preferenceAmount, exitValue));
+                    founderPayout = exitValue - investorPayout;
+                }
+
+                document.getElementById('final-ownership').textContent = state.ownership + '%';
+                document.getElementById('final-payout').textContent = formatMoney(founderPayout);
+
+                var lessons = [];
+                if (participating) lessons.push('Participating liquidation preference cost you significant exit proceeds.');
+                if (state.terms.anti_dilution === 'full_ratchet') lessons.push('Full ratchet anti-dilution is very dangerous in a down round.');
+                if (state.terms.option_pool >= 15) lessons.push('Large option pool means more founder dilution.');
+                if (state.terms.board === '1_1_1') lessons.push('Without board majority, you\'ve given up significant control.');
+                if (state.investorScore > 70) lessons.push('Your terms are very investor-friendly.');
+                if (state.investorScore < 30) lessons.push('You negotiated very founder-friendly terms.');
+                if (lessons.length === 0) lessons.push('You negotiated relatively balanced terms.');
+
+                document.getElementById('lesson-text').textContent = lessons.join(' ');
+
+                var title = 'Deal Closed!';
+                var icon = '&#128640;';
+                if (founderPayout > 35000000) { title = 'Excellent Negotiation!'; icon = '&#127942;'; }
+                else if (founderPayout < 30000000) { title = 'Deal Closed - But At What Cost?'; icon = '&#128172;'; }
+
+                document.getElementById('result-title').textContent = title;
+                document.getElementById('result-icon').innerHTML = icon;
+                document.getElementById('result-summary').textContent = 'At a $50M exit, you would receive ' + formatMoney(founderPayout) + ' while investors receive ' + formatMoney(investorPayout) + '.';
+
+                showScreen('result-screen');
+            }
+        };
+
+        // Initialize tutorial content on load
+        document.getElementById('tutorial-content').innerHTML = '<h4>' + tutorialContent.liquidation.title + '</h4>' + tutorialContent.liquidation.html;
+    })();
+    </script>
+</body>
+</html>
