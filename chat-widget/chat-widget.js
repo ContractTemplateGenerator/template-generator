@@ -175,6 +175,7 @@
       display: flex;
       flex-direction: column;
       background: #f8fafc;
+      overflow-y: auto;
     }
     .tl-intro-header {
       text-align: center;
