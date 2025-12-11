@@ -16,6 +16,7 @@
   let visitorId = localStorage.getItem('termslaw_chat_id') || generateId();
   let visitorName = '';
   let visitorEmail = '';
+  let visitorTopic = '';
   let lastMessageTimestamp = 0;
   let pollInterval = null;
 
@@ -209,6 +210,7 @@
     }
     .tl-chat-intro h4 { font-size: 1rem; color: #0f172a; margin-bottom: 8px; }
     .tl-chat-intro p { font-size: 0.85rem; color: #64748b; margin-bottom: 16px; line-height: 1.5; }
+    .tl-intro-tagline { text-align: center; font-size: 0.85rem; color: #64748b; margin-bottom: 16px; }
     .tl-chat-intro-form { display: flex; flex-direction: column; gap: 12px; }
     .tl-chat-intro-input {
       padding: 12px 16px;
@@ -219,6 +221,22 @@
       outline: none;
     }
     .tl-chat-intro-input:focus { border-color: #1e3a5f; }
+    .tl-chat-intro-select {
+      padding: 12px 16px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      outline: none;
+      background: white;
+      cursor: pointer;
+      appearance: none;
+      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12"><path fill="%2364748b" d="M6 8L1 3h10z"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+    }
+    .tl-chat-intro-select:focus { border-color: #1e3a5f; }
+    .tl-chat-intro-select:invalid { color: #94a3b8; }
     .tl-email-hint {
       font-size: 0.75rem;
       color: #94a3b8;
@@ -349,12 +367,19 @@
           <div class="tl-intro-name">Sergei Tokmakov, Esq.</div>
           <div class="tl-intro-credentials">California State Bar #342637</div>
         </div>
-        <h4>Quick question? I'm here to help.</h4>
-        <p>This is a direct line to me personally — not a chatbot, not a call center. I handle contracts, demand letters, business formation, and IP matters for startups and small businesses.</p>
+        <p class="tl-intro-tagline">Direct line to a California business attorney — not a chatbot.</p>
         <form class="tl-chat-intro-form" id="tlIntroForm">
           <input type="text" class="tl-chat-intro-input" id="tlVisitorName" placeholder="Your first name" required>
-          <input type="email" class="tl-chat-intro-input" id="tlVisitorEmail" placeholder="Email (for follow-up if I step away)">
-          <div class="tl-email-hint" id="tlEmailHint">Without email, I can only respond while you're in this chat</div>
+          <select class="tl-chat-intro-select" id="tlVisitorTopic" required>
+            <option value="" disabled selected>What do you need help with?</option>
+            <option value="demand">Demand Letter</option>
+            <option value="contract">Contract Review or Drafting</option>
+            <option value="startup">Startup / Business Formation</option>
+            <option value="ip">IP / Trademark / Copyright</option>
+            <option value="dispute">Business Dispute</option>
+            <option value="other">Other Legal Matter</option>
+          </select>
+          <input type="email" class="tl-chat-intro-input" id="tlVisitorEmail" placeholder="Email (optional, for follow-up)">
           <button type="submit" class="tl-chat-intro-btn">Start Conversation</button>
         </form>
       </div>
@@ -471,22 +496,33 @@
     event.preventDefault();
     visitorName = document.getElementById('tlVisitorName').value.trim();
     visitorEmail = document.getElementById('tlVisitorEmail').value.trim();
-    if (!visitorName) return;
+    visitorTopic = document.getElementById('tlVisitorTopic').value;
+    if (!visitorName || !visitorTopic) return;
 
     chatStarted = true;
     document.getElementById('tlChatIntro').style.display = 'none';
     document.getElementById('tlChatMessages').style.display = 'flex';
     document.getElementById('tlChatInputArea').style.display = 'block';
 
-    // Add personalized welcome message based on status
-    let welcomeMsg;
-    if (currentStatus === 'online') {
-      welcomeMsg = `Hi ${visitorName}! Tell me about your case — demand letter, contract review, startup formation, IP issue, or other business matter.`;
-    } else if (currentStatus === 'available') {
-      welcomeMsg = `Hi ${visitorName}! I'll see your message shortly. Tell me about your case — demand letter, contract, startup, IP, or other business matter.`;
-    } else {
-      welcomeMsg = `Hi ${visitorName}, I'm not at my desk but I check messages periodically. Tell me about your case — demand letter, contract, startup, IP, or other business matter.${visitorEmail ? " I'll follow up by email." : ""}`;
+    // Topic-specific prompts asking for relevant details
+    const topicPrompts = {
+      demand: `Hi ${visitorName}! For your demand letter, please tell me: (1) What happened? (2) Who owes you / wronged you? (3) What amount or action are you seeking?`,
+      contract: `Hi ${visitorName}! For your contract matter, please tell me: (1) What type of contract? (2) Reviewing existing or drafting new? (3) Any specific concerns or clauses?`,
+      startup: `Hi ${visitorName}! For your startup/business formation: (1) What type of business? (2) How many founders/owners? (3) Which state are you forming in?`,
+      ip: `Hi ${visitorName}! For your IP matter, please tell me: (1) Trademark, copyright, or patent issue? (2) Are you protecting your own IP or dealing with infringement? (3) Brief description of the IP involved.`,
+      dispute: `Hi ${visitorName}! For your business dispute: (1) Who is the dispute with? (2) What is it about? (3) What outcome are you hoping for?`,
+      other: `Hi ${visitorName}! Please describe your legal matter and I'll let you know how I can help.`
+    };
+
+    let welcomeMsg = topicPrompts[visitorTopic] || topicPrompts.other;
+
+    // Add status context if not online
+    if (currentStatus === 'available') {
+      welcomeMsg = `Hi ${visitorName}! I'll see your message shortly. ` + welcomeMsg.substring(welcomeMsg.indexOf('!') + 2);
+    } else if (currentStatus !== 'online') {
+      welcomeMsg = `Hi ${visitorName}, I'm not at my desk but I check messages periodically. ` + welcomeMsg.substring(welcomeMsg.indexOf('!') + 2) + (visitorEmail ? " I'll follow up by email." : "");
     }
+
     addMessageToUI(welcomeMsg, 'tl-sergei');
 
     document.getElementById('tlChatInput').focus();
@@ -511,6 +547,7 @@
           visitorId,
           visitorName,
           visitorEmail,
+          visitorTopic,
           message,
           page: window.location.href
         })

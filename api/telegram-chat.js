@@ -127,7 +127,7 @@ function handleSetStatus(req, res) {
 
 // Visitor sends message to Sergei
 async function handleSendMessage(req, res) {
-  const { visitorId, message, visitorName, visitorEmail, page } = req.body;
+  const { visitorId, message, visitorName, visitorEmail, visitorTopic, page } = req.body;
 
   if (!visitorId || !message) {
     return res.status(400).json({ error: 'visitorId and message required' });
@@ -139,6 +139,7 @@ async function handleSendMessage(req, res) {
       messages: [],
       visitorName: visitorName || 'Anonymous',
       visitorEmail: visitorEmail || null,
+      visitorTopic: visitorTopic || null,
       page: page || 'Unknown page',
       startedAt: Date.now()
     });
@@ -155,9 +156,19 @@ async function handleSendMessage(req, res) {
   const isNewConversation = conv.messages.length === 1;
   let telegramMessage;
 
+  const topicLabels = {
+    demand: '📝 Demand Letter',
+    contract: '📄 Contract',
+    startup: '🚀 Startup/Formation',
+    ip: '💡 IP/Trademark',
+    dispute: '⚖️ Business Dispute',
+    other: '❓ Other'
+  };
+
   if (isNewConversation) {
     telegramMessage = `🆕 *New Chat*\n\n` +
       `👤 *Visitor:* ${conv.visitorName}\n` +
+      (conv.visitorTopic ? `📋 *Topic:* ${topicLabels[conv.visitorTopic] || conv.visitorTopic}\n` : '') +
       (conv.visitorEmail ? `📧 *Email:* ${conv.visitorEmail}\n` : '') +
       `📄 *Page:* ${conv.page}\n` +
       `🆔 *ID:* \`${visitorId}\`\n\n` +
