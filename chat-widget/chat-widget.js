@@ -442,9 +442,9 @@
       if (chatStarted) {
         statusNotice.className = 'tl-status-notice tl-away';
         if (visitorEmail) {
-          statusNotice.innerHTML = "I've stepped away, but I'll email you at <strong>" + visitorEmail + "</strong> when I'm back. Feel free to leave your question.";
+          statusNotice.innerHTML = "I'm not at my desk but check messages periodically. Please describe your legal matter and I'll email you at <strong>" + visitorEmail + "</strong>.";
         } else {
-          statusNotice.innerHTML = "I'm not at my desk right now. Leave a message and check back later, or <a href='#' onclick=\"Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting'});return false;\" style='color: #7c6a2f; text-decoration: underline;'>schedule a call</a> for a guaranteed response.";
+          statusNotice.innerHTML = "I'm not at my desk but check messages periodically. Please describe your legal matter, or <a href='#' onclick=\"Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting'});return false;\" style='color: #7c6a2f; text-decoration: underline;'>schedule a call</a>.";
         }
         statusNotice.style.display = 'block';
       } else {
@@ -486,7 +486,7 @@
     } else if (currentStatus === 'available') {
       welcomeMsg = `Hi ${visitorName}! I'll see your message shortly. Please describe your legal matter.`;
     } else {
-      welcomeMsg = `Hi ${visitorName}, I'm away right now but I'll see your message when I return.${visitorEmail ? " I'll follow up by email." : ""}`;
+      welcomeMsg = `Hi ${visitorName}, I'm not at my desk but I check messages periodically. Please describe your legal matter.${visitorEmail ? " I'll follow up by email." : ""}`;
     }
     addMessageToUI(welcomeMsg, 'tl-sergei');
 
