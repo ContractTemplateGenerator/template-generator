@@ -422,7 +422,7 @@
     } else if (currentStatus === 'available') {
       buttonStatus.classList.add('tl-available');
       headerStatus.classList.add('tl-available');
-      statusText.textContent = 'Usually responds quickly';
+      statusText.textContent = 'I respond quickly';
 
       if (chatStarted) {
         statusNotice.className = 'tl-status-notice tl-available';
