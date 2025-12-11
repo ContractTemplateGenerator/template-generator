@@ -2330,6 +2330,55 @@
       let currentSearch = '';
 
       // ============================================
+      // SEARCH SYNONYMS - Maps common terms to related content
+      // ============================================
+      const searchSynonyms = {
+        // Cofounder/Founder terms -> Partner content
+        'cofounder': ['partner', 'shareholder', 'founder', 'co-founder', 'equity', 'ownership', 'minority owner'],
+        'co-founder': ['partner', 'shareholder', 'founder', 'cofounder', 'equity', 'ownership', 'minority owner'],
+        'founder': ['partner', 'shareholder', 'cofounder', 'co-founder', 'equity', 'startup'],
+        'startup': ['partner', 'shareholder', 'founder', 'cofounder', 'equity', 'tech', 'ip'],
+        'equity': ['partner', 'shareholder', 'ownership', 'stock', 'membership'],
+        'vesting': ['equity', 'stock', 'founder', 'partner'],
+        // IP/Code terms
+        'code': ['ip', 'trade secret', 'software', 'source code', 'confidentiality'],
+        'source code': ['ip', 'trade secret', 'software', 'code', 'confidentiality'],
+        'software': ['ip', 'trade secret', 'code', 'source code', 'tech'],
+        'ip theft': ['trade secret', 'misappropriation', 'confidentiality', 'ip'],
+        'intellectual property': ['ip', 'trade secret', 'copyright', 'patent', 'trademark'],
+        // Business relationship terms
+        'business partner': ['partner', 'shareholder', 'llc member', 'minority owner'],
+        'llc member': ['partner', 'shareholder', 'member', 'ownership'],
+        'shareholder dispute': ['partner', 'shareholder', 'minority owner', 'oppression'],
+        'squeeze out': ['minority owner', 'oppression', 'freeze out', 'partner'],
+        'freeze out': ['minority owner', 'oppression', 'squeeze out', 'partner'],
+        // Employment/Contractor crossover
+        'employee theft': ['trade secret', 'confidentiality', 'ip', 'poaching'],
+        'departing employee': ['trade secret', 'confidentiality', 'ip', 'noncompete'],
+        'competitor': ['trade secret', 'unfair competition', 'poaching', 'noncompete']
+      };
+
+      // Expand search term with synonyms
+      function expandSearchTerm(term) {
+        const lowerTerm = term.toLowerCase();
+        let expandedTerms = [lowerTerm];
+
+        // Check for exact matches in synonym map
+        if (searchSynonyms[lowerTerm]) {
+          expandedTerms = expandedTerms.concat(searchSynonyms[lowerTerm]);
+        }
+
+        // Check for partial matches (e.g., "cofound" matches "cofounder")
+        Object.keys(searchSynonyms).forEach(key => {
+          if (key.includes(lowerTerm) || lowerTerm.includes(key)) {
+            expandedTerms = expandedTerms.concat(searchSynonyms[key]);
+          }
+        });
+
+        return [...new Set(expandedTerms)]; // Remove duplicates
+      }
+
+      // ============================================
       // SEARCH FUNCTIONALITY
       // ============================================
       searchInput.addEventListener('input', function() {
@@ -2373,15 +2422,21 @@
           // Category filter
           const matchesCategory = currentFilter === 'all' || category.includes(currentFilter);
 
-          // Search filter
-          let matchesSearch = !currentSearch || cardText.includes(currentSearch);
+          // Search filter with synonym expansion
+          const expandedTerms = currentSearch ? expandSearchTerm(currentSearch) : [];
+          let matchesSearch = !currentSearch;
           let matchingGuidesInCard = 0;
 
-          // If searching, highlight matching guides and dim non-matching
+          // If searching, check against all expanded terms
           if (currentSearch) {
+            // Check if card text matches any expanded term
+            const cardMatches = expandedTerms.some(term => cardText.includes(term));
+
             guideLinks.forEach(li => {
               const linkText = li.textContent.toLowerCase();
-              if (linkText.includes(currentSearch)) {
+              // Check if guide matches any expanded term
+              const guideMatches = expandedTerms.some(term => linkText.includes(term));
+              if (guideMatches) {
                 li.classList.add('match');
                 li.classList.remove('no-match');
                 matchingGuidesInCard++;
@@ -2391,10 +2446,13 @@
               }
             });
 
-            // Card matches if any guide matches OR card title/desc matches
-            matchesSearch = matchingGuidesInCard > 0 ||
-                           card.querySelector('.category-card-title').textContent.toLowerCase().includes(currentSearch) ||
-                           card.querySelector('.category-card-desc').textContent.toLowerCase().includes(currentSearch);
+            // Card matches if any guide matches OR card title/desc matches any expanded term
+            const titleText = card.querySelector('.category-card-title').textContent.toLowerCase();
+            const descText = card.querySelector('.category-card-desc').textContent.toLowerCase();
+            const titleMatches = expandedTerms.some(term => titleText.includes(term));
+            const descMatches = expandedTerms.some(term => descText.includes(term));
+
+            matchesSearch = matchingGuidesInCard > 0 || titleMatches || descMatches || cardMatches;
           } else {
             // Clear all highlights when no search
             guideLinks.forEach(li => {
