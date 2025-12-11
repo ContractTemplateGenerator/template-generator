@@ -34,7 +34,7 @@
       statusAway: 'Usually replies in hours',
       licensed: 'Licensed',
       realPerson: 'Real Person',
-      private: 'Private',
+      private: 'Confidential',
       helpQuestion: 'What can I help you with?',
       clickHint: 'Click to continue — no sign-up needed',
       back: 'Back',
