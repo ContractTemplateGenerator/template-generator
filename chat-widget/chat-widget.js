@@ -332,7 +332,7 @@
     </button>
     <div class="tl-chat-window" id="tlChatWindow">
       <div class="tl-chat-header">
-        <div class="tl-chat-avatar"><img src="/chat-widget/sergei_small.jpg" alt="Sergei Tokmakov"></div>
+        <div class="tl-chat-avatar"><img src="https://terms.law/chat-widget/sergei_small.jpg" alt="Sergei Tokmakov"></div>
         <div class="tl-chat-header-info">
           <div class="tl-chat-header-name">Sergei Tokmakov, Esq.<span class="tl-human-badge">Real Person</span></div>
           <div class="tl-chat-header-tagline">California Business Attorney</div>
@@ -345,7 +345,7 @@
       <div class="tl-status-notice" id="tlStatusNotice" style="display: none;"></div>
       <div class="tl-chat-intro" id="tlChatIntro">
         <div class="tl-intro-header">
-          <div class="tl-intro-photo"><img src="/chat-widget/sergei_small.jpg" alt="Sergei Tokmakov"></div>
+          <div class="tl-intro-photo"><img src="https://terms.law/chat-widget/sergei_small.jpg" alt="Sergei Tokmakov"></div>
           <div class="tl-intro-name">Sergei Tokmakov, Esq.</div>
           <div class="tl-intro-credentials">California State Bar #342637</div>
         </div>
@@ -426,9 +426,9 @@
       if (chatStarted) {
         statusNotice.className = 'tl-status-notice tl-available';
         if (lateHours) {
-          statusNotice.textContent = 'I work with international clients and check messages regularly. Please describe your legal matter.';
+          statusNotice.textContent = 'I work with international clients and check messages regularly. Demand letters, contracts, startups, IP — tell me what you need.';
         } else {
-          statusNotice.textContent = 'I\'m around but may not respond instantly. Please describe your legal matter.';
+          statusNotice.textContent = 'I\'m around but may not respond instantly. Demand letters, contracts, startups, IP — tell me what you need.';
         }
         statusNotice.style.display = 'block';
       } else {
@@ -441,9 +441,9 @@
       if (chatStarted) {
         statusNotice.className = 'tl-status-notice tl-away';
         if (visitorEmail) {
-          statusNotice.innerHTML = "I'm not at my desk but check messages periodically. Please describe your legal matter and I'll email you at <strong>" + visitorEmail + "</strong>.";
+          statusNotice.innerHTML = "I'm not at my desk but check messages periodically. Demand letters, contracts, startups, IP — tell me what you need. I'll email you at <strong>" + visitorEmail + "</strong>.";
         } else {
-          statusNotice.innerHTML = "I'm not at my desk but check messages periodically. Please describe your legal matter, or <a href='#' onclick=\"Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting'});return false;\" style='color: #7c6a2f; text-decoration: underline;'>schedule a call</a>.";
+          statusNotice.innerHTML = "I'm not at my desk but check messages periodically. Demand letters, contracts, startups, IP — tell me what you need, or <a href='#' onclick=\"Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting'});return false;\" style='color: #7c6a2f; text-decoration: underline;'>schedule a call</a>.";
         }
         statusNotice.style.display = 'block';
       } else {
@@ -481,11 +481,11 @@
     // Add personalized welcome message based on status
     let welcomeMsg;
     if (currentStatus === 'online') {
-      welcomeMsg = `Hi ${visitorName}! Please briefly describe your legal matter.`;
+      welcomeMsg = `Hi ${visitorName}! Tell me about your case — demand letter, contract review, startup formation, IP issue, or other business matter.`;
     } else if (currentStatus === 'available') {
-      welcomeMsg = `Hi ${visitorName}! I'll see your message shortly. Please describe your legal matter.`;
+      welcomeMsg = `Hi ${visitorName}! I'll see your message shortly. Tell me about your case — demand letter, contract, startup, IP, or other business matter.`;
     } else {
-      welcomeMsg = `Hi ${visitorName}, I'm not at my desk but I check messages periodically. Please describe your legal matter.${visitorEmail ? " I'll follow up by email." : ""}`;
+      welcomeMsg = `Hi ${visitorName}, I'm not at my desk but I check messages periodically. Tell me about your case — demand letter, contract, startup, IP, or other business matter.${visitorEmail ? " I'll follow up by email." : ""}`;
     }
     addMessageToUI(welcomeMsg, 'tl-sergei');
 
