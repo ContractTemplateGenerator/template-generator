@@ -11,7 +11,7 @@
 
   // State
   let isOpen = false;
-  let isOnline = false;
+  let currentStatus = 'away'; // 'online' | 'available' | 'away'
   let chatStarted = false;
   let visitorId = localStorage.getItem('termslaw_chat_id') || generateId();
   let visitorName = '';
@@ -65,10 +65,15 @@
       border: 2px solid white;
       transition: background 0.3s ease;
     }
-    .tl-chat-status.tl-online { background: #10b981; animation: tl-pulse 2s infinite; }
-    @keyframes tl-pulse {
+    .tl-chat-status.tl-online { background: #10b981; animation: tl-pulse-green 2s infinite; }
+    .tl-chat-status.tl-available { background: #f59e0b; animation: tl-pulse-amber 2s infinite; }
+    @keyframes tl-pulse-green {
       0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
       50% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+    }
+    @keyframes tl-pulse-amber {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+      50% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
     }
     .tl-chat-window {
       position: fixed;
@@ -124,6 +129,7 @@
     .tl-chat-header-status { font-size: 0.8rem; opacity: 0.9; display: flex; align-items: center; gap: 6px; margin-top: 4px; }
     .tl-status-dot { width: 8px; height: 8px; border-radius: 50%; background: #6b7280; }
     .tl-status-dot.tl-online { background: #4ade80; }
+    .tl-status-dot.tl-available { background: #fbbf24; }
     .tl-chat-messages {
       flex: 1;
       overflow-y: auto;
@@ -260,21 +266,26 @@
     }
     .tl-chat-send-btn:hover { background: #2d5a87; transform: scale(1.05); }
     .tl-chat-send-btn svg { width: 20px; height: 20px; fill: white; }
-    .tl-offline-notice {
-      background: #fef9e7;
-      color: #7c6a2f;
+    .tl-status-notice {
       padding: 12px 16px;
       font-size: 0.8rem;
       line-height: 1.4;
-      border-bottom: 1px solid #f5e6a3;
+      border-bottom: 1px solid;
     }
-    .tl-late-notice {
+    .tl-status-notice.tl-away {
+      background: #fef9e7;
+      color: #7c6a2f;
+      border-color: #f5e6a3;
+    }
+    .tl-status-notice.tl-available {
+      background: #fffbeb;
+      color: #92400e;
+      border-color: #fde68a;
+    }
+    .tl-status-notice.tl-late {
       background: #f0f9ff;
       color: #1e5a8a;
-      padding: 10px 16px;
-      font-size: 0.75rem;
-      line-height: 1.4;
-      border-bottom: 1px solid #bae0fd;
+      border-color: #bae0fd;
     }
     .tl-human-badge {
       display: inline-flex;
@@ -299,8 +310,20 @@
   styleEl.textContent = styles;
   document.head.appendChild(styleEl);
 
+  // Inject Calendly for scheduling popup (if not already loaded)
+  if (!window.Calendly) {
+    const calendlyCSS = document.createElement('link');
+    calendlyCSS.href = 'https://assets.calendly.com/assets/external/widget.css';
+    calendlyCSS.rel = 'stylesheet';
+    document.head.appendChild(calendlyCSS);
+
+    const calendlyJS = document.createElement('script');
+    calendlyJS.src = 'https://assets.calendly.com/assets/external/widget.js';
+    calendlyJS.async = true;
+    document.head.appendChild(calendlyJS);
+  }
+
   // Create HTML
-  const lateHours = isLateHoursPT();
   const html = `
     <button class="tl-chat-button" id="tlChatButton">
       <span class="tl-chat-status" id="tlButtonStatus"></span>
@@ -319,10 +342,7 @@
           </div>
         </div>
       </div>
-      <div class="tl-late-notice" id="tlLateNotice" style="display: none;">
-        Yes, I'm actually online right now. I keep flexible hours to accommodate clients across time zones.
-      </div>
-      <div class="tl-offline-notice" id="tlOfflineNotice" style="display: none;"></div>
+      <div class="tl-status-notice" id="tlStatusNotice" style="display: none;"></div>
       <div class="tl-chat-intro" id="tlChatIntro">
         <div class="tl-intro-header">
           <div class="tl-intro-photo">ST</div>
@@ -365,10 +385,10 @@
     try {
       const response = await fetch(`${API_BASE}?action=status`);
       const data = await response.json();
-      isOnline = data.online;
+      currentStatus = data.status || (data.online ? 'online' : 'away');
       updateStatusUI();
     } catch (error) {
-      isOnline = false;
+      currentStatus = 'away';
       updateStatusUI();
     }
   }
@@ -377,32 +397,57 @@
     const buttonStatus = document.getElementById('tlButtonStatus');
     const headerStatus = document.getElementById('tlHeaderStatus');
     const statusText = document.getElementById('tlStatusText');
-    const offlineNotice = document.getElementById('tlOfflineNotice');
-    const lateNotice = document.getElementById('tlLateNotice');
+    const statusNotice = document.getElementById('tlStatusNotice');
     const lateHours = isLateHoursPT();
 
-    if (isOnline) {
+    // Reset classes
+    buttonStatus.classList.remove('tl-online', 'tl-available');
+    headerStatus.classList.remove('tl-online', 'tl-available');
+    statusNotice.classList.remove('tl-away', 'tl-available', 'tl-late');
+
+    if (currentStatus === 'online') {
       buttonStatus.classList.add('tl-online');
       headerStatus.classList.add('tl-online');
       statusText.textContent = 'Available now';
-      offlineNotice.style.display = 'none';
-      // Show late hours notice if online during odd hours
+
+      // Late hours notice for online status
       if (lateHours && chatStarted) {
-        lateNotice.style.display = 'block';
+        statusNotice.className = 'tl-status-notice tl-late';
+        statusNotice.textContent = 'I work with international clients, so my hours are flexible.';
+        statusNotice.style.display = 'block';
+      } else {
+        statusNotice.style.display = 'none';
+      }
+    } else if (currentStatus === 'available') {
+      buttonStatus.classList.add('tl-available');
+      headerStatus.classList.add('tl-available');
+      statusText.textContent = 'Usually responds quickly';
+
+      if (chatStarted) {
+        statusNotice.className = 'tl-status-notice tl-available';
+        if (lateHours) {
+          statusNotice.textContent = 'I work with international clients and check messages regularly. Leave your question and I\'ll get back to you shortly.';
+        } else {
+          statusNotice.textContent = 'I\'m around but may not respond instantly. Leave your question and I\'ll get back to you shortly.';
+        }
+        statusNotice.style.display = 'block';
+      } else {
+        statusNotice.style.display = 'none';
       }
     } else {
-      buttonStatus.classList.remove('tl-online');
-      headerStatus.classList.remove('tl-online');
+      // away
       statusText.textContent = 'Away';
-      lateNotice.style.display = 'none';
+
       if (chatStarted) {
-        // Customize offline message based on whether they provided email
+        statusNotice.className = 'tl-status-notice tl-away';
         if (visitorEmail) {
-          offlineNotice.innerHTML = "I've stepped away, but I'll email you at <strong>" + visitorEmail + "</strong> when I'm back. Feel free to leave your question.";
+          statusNotice.innerHTML = "I've stepped away, but I'll email you at <strong>" + visitorEmail + "</strong> when I'm back. Feel free to leave your question.";
         } else {
-          offlineNotice.innerHTML = "I'm not at my desk right now. Leave a message and check back later, or <a href='https://terms.law/consultation' style='color: #7c6a2f; text-decoration: underline;'>schedule a consultation</a> for a guaranteed response.";
+          statusNotice.innerHTML = "I'm not at my desk right now. Leave a message and check back later, or <a href='#' onclick=\"Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting'});return false;\" style='color: #7c6a2f; text-decoration: underline;'>schedule a call</a> for a guaranteed response.";
         }
-        offlineNotice.style.display = 'block';
+        statusNotice.style.display = 'block';
+      } else {
+        statusNotice.style.display = 'none';
       }
     }
   }
@@ -433,10 +478,15 @@
     document.getElementById('tlChatMessages').style.display = 'flex';
     document.getElementById('tlChatInputArea').style.display = 'block';
 
-    // Add personalized welcome message
-    const welcomeMsg = isOnline
-      ? `Hi ${visitorName}! I'm here. What can I help you with?`
-      : `Hi ${visitorName}, I'm away right now but I'll see your message when I return.${visitorEmail ? " I'll follow up by email." : ""}`;
+    // Add personalized welcome message based on status
+    let welcomeMsg;
+    if (currentStatus === 'online') {
+      welcomeMsg = `Hi ${visitorName}! What can I help you with?`;
+    } else if (currentStatus === 'available') {
+      welcomeMsg = `Hi ${visitorName}! I'll see your message shortly. What's on your mind?`;
+    } else {
+      welcomeMsg = `Hi ${visitorName}, I'm away right now but I'll see your message when I return.${visitorEmail ? " I'll follow up by email." : ""}`;
+    }
     addMessageToUI(welcomeMsg, 'tl-sergei');
 
     document.getElementById('tlChatInput').focus();
@@ -486,7 +536,7 @@
       try {
         const response = await fetch(`${API_BASE}?action=getMessages&visitorId=${visitorId}&since=${lastMessageTimestamp}`);
         const data = await response.json();
-        isOnline = data.online;
+        currentStatus = data.status || (data.online ? 'online' : 'away');
         updateStatusUI();
         if (data.messages) {
           data.messages.forEach(msg => {

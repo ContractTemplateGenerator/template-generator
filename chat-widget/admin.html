@@ -20,7 +20,7 @@
       border-radius: 16px;
       padding: 32px;
       width: 100%;
-      max-width: 400px;
+      max-width: 420px;
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     }
     h1 {
@@ -42,8 +42,11 @@
     .status-display.online {
       background: linear-gradient(135deg, #d1fae5, #a7f3d0);
     }
-    .status-display.offline {
-      background: linear-gradient(135deg, #fee2e2, #fecaca);
+    .status-display.available {
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+    }
+    .status-display.away {
+      background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
     }
     .status-indicator {
       width: 80px;
@@ -54,44 +57,69 @@
       align-items: center;
       justify-content: center;
       font-size: 2.5rem;
+      color: white;
     }
     .status-display.online .status-indicator {
       background: #10b981;
       box-shadow: 0 0 0 8px rgba(16, 185, 129, 0.2);
     }
-    .status-display.offline .status-indicator {
-      background: #ef4444;
-      box-shadow: 0 0 0 8px rgba(239, 68, 68, 0.2);
+    .status-display.available .status-indicator {
+      background: #f59e0b;
+      box-shadow: 0 0 0 8px rgba(245, 158, 11, 0.2);
+    }
+    .status-display.away .status-indicator {
+      background: #6b7280;
+      box-shadow: 0 0 0 8px rgba(107, 114, 128, 0.2);
     }
     .status-text {
       font-size: 1.25rem;
       font-weight: 700;
       color: #0f172a;
     }
-    .toggle-btn {
-      width: 100%;
-      padding: 16px 24px;
-      font-size: 1rem;
+    .status-description {
+      font-size: 0.85rem;
+      color: #64748b;
+      margin-top: 4px;
+    }
+    .status-buttons {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .status-btn {
+      flex: 1;
+      padding: 14px 12px;
+      font-size: 0.9rem;
       font-weight: 600;
       border: none;
       border-radius: 8px;
       cursor: pointer;
       transition: all 0.2s ease;
-      margin-bottom: 12px;
     }
-    .toggle-btn.go-online {
+    .status-btn.online {
       background: #10b981;
       color: white;
     }
-    .toggle-btn.go-online:hover {
+    .status-btn.online:hover {
       background: #059669;
     }
-    .toggle-btn.go-offline {
-      background: #ef4444;
+    .status-btn.available {
+      background: #f59e0b;
       color: white;
     }
-    .toggle-btn.go-offline:hover {
-      background: #dc2626;
+    .status-btn.available:hover {
+      background: #d97706;
+    }
+    .status-btn.away {
+      background: #6b7280;
+      color: white;
+    }
+    .status-btn.away:hover {
+      background: #4b5563;
+    }
+    .status-btn.active {
+      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.2);
+      transform: scale(0.98);
     }
     .setup-btn {
       width: 100%;
@@ -165,17 +193,23 @@
 
     <input type="password" class="secret-input" id="secretInput" placeholder="Enter admin secret" value="sergei2024">
 
-    <div class="status-display offline" id="statusDisplay">
+    <div class="status-display away" id="statusDisplay">
       <div class="status-indicator" id="statusIndicator">?</div>
       <div class="status-text" id="statusText">Checking...</div>
+      <div class="status-description" id="statusDescription"></div>
     </div>
 
-    <button class="toggle-btn go-online" id="goOnlineBtn" onclick="setOnline(true)">
-      Go Online
-    </button>
-    <button class="toggle-btn go-offline" id="goOfflineBtn" onclick="setOnline(false)">
-      Go Offline
-    </button>
+    <div class="status-buttons">
+      <button class="status-btn online" onclick="setStatus('online')">
+        Online
+      </button>
+      <button class="status-btn available" onclick="setStatus('available')">
+        Available
+      </button>
+      <button class="status-btn away" onclick="setStatus('away')">
+        Away
+      </button>
+    </div>
 
     <button class="setup-btn" onclick="setupWebhook()">
       Setup Telegram Webhook (one-time)
@@ -187,11 +221,15 @@
       <h3>Telegram Commands</h3>
       <div class="command">
         <span>/online</span>
-        <span class="command-desc">Go online</span>
+        <span class="command-desc">Green - at desk</span>
       </div>
       <div class="command">
-        <span>/offline</span>
-        <span class="command-desc">Go offline</span>
+        <span>/available</span>
+        <span class="command-desc">Amber - around</span>
+      </div>
+      <div class="command">
+        <span>/away</span>
+        <span class="command-desc">Gray - offline</span>
       </div>
       <div class="command">
         <span>/status</span>
@@ -209,13 +247,31 @@
       ? 'http://localhost:3000/api/telegram-chat'
       : 'https://template-generator-aob3.vercel.app/api/telegram-chat';
 
-    let currentStatus = false;
+    let currentStatus = 'away';
+
+    const statusConfig = {
+      online: {
+        emoji: '&#10003;',
+        text: 'ONLINE',
+        description: 'Green dot - visitors see you\'re at your desk'
+      },
+      available: {
+        emoji: '&#126;',
+        text: 'AVAILABLE',
+        description: 'Amber dot - visitors know you\'ll respond soon'
+      },
+      away: {
+        emoji: '&#10005;',
+        text: 'AWAY',
+        description: 'Gray dot - visitors see you\'re offline'
+      }
+    };
 
     async function checkStatus() {
       try {
         const response = await fetch(`${API_BASE}?action=status`);
         const data = await response.json();
-        currentStatus = data.online;
+        currentStatus = data.status || (data.online ? 'online' : 'away');
         updateUI();
       } catch (error) {
         showMessage('Failed to check status', 'error');
@@ -226,29 +282,35 @@
       const display = document.getElementById('statusDisplay');
       const indicator = document.getElementById('statusIndicator');
       const text = document.getElementById('statusText');
+      const description = document.getElementById('statusDescription');
 
-      if (currentStatus) {
-        display.className = 'status-display online';
-        indicator.textContent = '✓';
-        text.textContent = 'You are ONLINE';
-      } else {
-        display.className = 'status-display offline';
-        indicator.textContent = '✗';
-        text.textContent = 'You are OFFLINE';
-      }
+      const config = statusConfig[currentStatus] || statusConfig.away;
+
+      display.className = `status-display ${currentStatus}`;
+      indicator.innerHTML = config.emoji;
+      text.textContent = `You are ${config.text}`;
+      description.textContent = config.description;
+
+      // Update button active states
+      document.querySelectorAll('.status-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.classList.contains(currentStatus)) {
+          btn.classList.add('active');
+        }
+      });
     }
 
-    async function setOnline(online) {
+    async function setStatus(newStatus) {
       const secret = document.getElementById('secretInput').value;
 
       try {
-        const response = await fetch(`${API_BASE}?action=setOnline&online=${online}&secret=${encodeURIComponent(secret)}`);
+        const response = await fetch(`${API_BASE}?action=setStatus&newStatus=${newStatus}&secret=${encodeURIComponent(secret)}`);
         const data = await response.json();
 
         if (data.error) {
           showMessage(data.error, 'error');
         } else {
-          currentStatus = data.online;
+          currentStatus = data.status;
           updateUI();
           showMessage(data.message, 'success');
         }
@@ -265,7 +327,7 @@
         const data = await response.json();
 
         if (data.success) {
-          showMessage('Webhook set up successfully! URL: ' + data.webhookUrl, 'success');
+          showMessage('Webhook set up successfully!', 'success');
         } else {
           showMessage('Webhook setup failed: ' + JSON.stringify(data), 'error');
         }

@@ -9,8 +9,11 @@ const TELEGRAM_API = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}`;
 // For production, use Vercel KV or similar
 const conversations = new Map();
 
-// Online status (controlled via /api/telegram-chat?action=setOnline&online=true)
-let isOnline = false;
+// Status: 'online' | 'available' | 'away'
+// online = actively at desk (green)
+// available = around but not actively watching (amber) - good for late hours
+// away = offline (gray)
+let status = 'away';
 let lastActivity = Date.now();
 
 export default async function handler(req, res) {
@@ -33,6 +36,9 @@ export default async function handler(req, res) {
       case 'setOnline':
         return handleSetOnline(req, res);
 
+      case 'setStatus':
+        return handleSetStatus(req, res);
+
       case 'send':
         return handleSendMessage(req, res);
 
@@ -46,7 +52,7 @@ export default async function handler(req, res) {
         return handleSetupWebhook(req, res);
 
       default:
-        return res.status(400).json({ error: 'Unknown action', validActions: ['status', 'setOnline', 'send', 'getMessages', 'webhook', 'setupWebhook'] });
+        return res.status(400).json({ error: 'Unknown action', validActions: ['status', 'setOnline', 'setStatus', 'send', 'getMessages', 'webhook', 'setupWebhook'] });
     }
   } catch (error) {
     console.error('Telegram chat error:', error);
@@ -54,34 +60,69 @@ export default async function handler(req, res) {
   }
 }
 
-// Get online status
+// Get status
 function handleStatus(req, res) {
-  // Auto-offline after 3 hours of no activity
+  // Auto-away after 3 hours of no activity
   const threeHours = 3 * 60 * 60 * 1000;
   if (Date.now() - lastActivity > threeHours) {
-    isOnline = false;
+    status = 'away';
   }
 
   return res.status(200).json({
-    online: isOnline,
+    status: status,
+    online: status !== 'away', // backwards compatibility
     lastActivity: lastActivity
   });
 }
 
-// Set online/offline status (admin only - add auth in production)
+// Legacy setOnline handler (backwards compatible)
 function handleSetOnline(req, res) {
   const { online, secret } = { ...req.query, ...req.body };
 
-  // Simple secret check - in production use proper auth
   const expectedSecret = process.env.CHAT_ADMIN_SECRET || 'sergei2024';
   if (secret !== expectedSecret) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  isOnline = online === 'true' || online === true;
+  const isOnline = online === 'true' || online === true;
+  status = isOnline ? 'online' : 'away';
   lastActivity = Date.now();
 
-  return res.status(200).json({ online: isOnline, message: isOnline ? 'You are now online' : 'You are now offline' });
+  return res.status(200).json({
+    status: status,
+    online: status !== 'away',
+    message: isOnline ? 'You are now online' : 'You are now offline'
+  });
+}
+
+// New setStatus handler with three states
+function handleSetStatus(req, res) {
+  const { newStatus, secret } = { ...req.query, ...req.body };
+
+  const expectedSecret = process.env.CHAT_ADMIN_SECRET || 'sergei2024';
+  if (secret !== expectedSecret) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  const validStatuses = ['online', 'available', 'away'];
+  if (!validStatuses.includes(newStatus)) {
+    return res.status(400).json({ error: 'Invalid status', validStatuses });
+  }
+
+  status = newStatus;
+  lastActivity = Date.now();
+
+  const messages = {
+    online: 'You are now online (green)',
+    available: 'You are now available (amber)',
+    away: 'You are now away (gray)'
+  };
+
+  return res.status(200).json({
+    status: status,
+    online: status !== 'away',
+    message: messages[status]
+  });
 }
 
 // Visitor sends message to Sergei
@@ -146,7 +187,8 @@ async function handleSendMessage(req, res) {
   return res.status(200).json({
     success: true,
     messageId: telegramResult.result.message_id,
-    online: isOnline
+    status: status,
+    online: status !== 'away'
   });
 }
 
@@ -160,7 +202,7 @@ function handleGetMessages(req, res) {
 
   const conv = conversations.get(visitorId);
   if (!conv) {
-    return res.status(200).json({ messages: [], online: isOnline });
+    return res.status(200).json({ messages: [], status: status, online: status !== 'away' });
   }
 
   const sinceTimestamp = parseInt(since) || 0;
@@ -168,7 +210,8 @@ function handleGetMessages(req, res) {
 
   return res.status(200).json({
     messages: newMessages,
-    online: isOnline
+    status: status,
+    online: status !== 'away'
   });
 }
 
@@ -184,7 +227,7 @@ async function handleTelegramWebhook(req, res) {
     // If replying to a message, extract visitor ID
     if (replyTo && replyTo.text) {
       const idMatch = replyTo.text.match(/🆔 \*ID:\* `([^`]+)`/) ||
-                      replyTo.text.match(/\(([a-f0-9-]+)\)/);
+                      replyTo.text.match(/\(([a-f0-9_-]+)\)/i);
 
       if (idMatch) {
         const visitorId = idMatch[1];
@@ -215,19 +258,28 @@ async function handleTelegramWebhook(req, res) {
 
     // Handle commands
     if (text === '/online') {
-      isOnline = true;
+      status = 'online';
       lastActivity = Date.now();
-      await sendTelegramMessage('✅ You are now *online*. Visitors can see you\'re available.');
-    } else if (text === '/offline') {
-      isOnline = false;
-      await sendTelegramMessage('🔴 You are now *offline*. Visitors will see offline status.');
+      await sendTelegramMessage('🟢 You are now *online*. Green status - visitors see you\'re at your desk.');
+    } else if (text === '/available') {
+      status = 'available';
+      lastActivity = Date.now();
+      await sendTelegramMessage('🟡 You are now *available*. Amber status - visitors know you\'ll respond soon.');
+    } else if (text === '/away' || text === '/offline') {
+      status = 'away';
+      await sendTelegramMessage('⚫ You are now *away*. Gray status - visitors see you\'re offline.');
     } else if (text === '/status') {
       const activeChats = conversations.size;
+      const statusEmoji = { online: '🟢', available: '🟡', away: '⚫' };
       await sendTelegramMessage(
         `📊 *Status*\n\n` +
-        `Online: ${isOnline ? '🟢 Yes' : '🔴 No'}\n` +
+        `Status: ${statusEmoji[status]} ${status}\n` +
         `Active chats: ${activeChats}\n` +
-        `Last activity: ${new Date(lastActivity).toLocaleString()}`
+        `Last activity: ${new Date(lastActivity).toLocaleString()}\n\n` +
+        `Commands:\n` +
+        `/online - Green (at desk)\n` +
+        `/available - Amber (around)\n` +
+        `/away - Gray (offline)`
       );
     }
   }
