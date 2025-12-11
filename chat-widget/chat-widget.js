@@ -236,7 +236,7 @@
       <div class="tl-chat-header">
         <div class="tl-chat-avatar">ST</div>
         <div class="tl-chat-header-info">
-          <div class="tl-chat-header-name">Sergei Tokmakov</div>
+          <div class="tl-chat-header-name">Sergei Tokmakov, Esq.</div>
           <div class="tl-chat-header-status">
             <span class="tl-status-dot" id="tlHeaderStatus"></span>
             <span id="tlStatusText">Checking...</span>
