@@ -189,13 +189,12 @@
       border-radius: 50%;
       margin: 0 auto 12px;
       background: linear-gradient(135deg, #1e3a5f, #2d5a87);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 1.5rem;
-      font-weight: 700;
-      font-family: 'Georgia', serif;
+      overflow: hidden;
+    }
+    .tl-intro-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
     .tl-intro-name {
       font-size: 1.1rem;
@@ -333,7 +332,7 @@
     </button>
     <div class="tl-chat-window" id="tlChatWindow">
       <div class="tl-chat-header">
-        <div class="tl-chat-avatar">ST</div>
+        <div class="tl-chat-avatar"><img src="/chat-widget/sergei_small.jpg" alt="Sergei Tokmakov"></div>
         <div class="tl-chat-header-info">
           <div class="tl-chat-header-name">Sergei Tokmakov, Esq.<span class="tl-human-badge">Real Person</span></div>
           <div class="tl-chat-header-tagline">California Business Attorney</div>
@@ -346,7 +345,7 @@
       <div class="tl-status-notice" id="tlStatusNotice" style="display: none;"></div>
       <div class="tl-chat-intro" id="tlChatIntro">
         <div class="tl-intro-header">
-          <div class="tl-intro-photo">ST</div>
+          <div class="tl-intro-photo"><img src="/chat-widget/sergei_small.jpg" alt="Sergei Tokmakov"></div>
           <div class="tl-intro-name">Sergei Tokmakov, Esq.</div>
           <div class="tl-intro-credentials">California State Bar #342637</div>
         </div>
