@@ -178,40 +178,7 @@
       background: #f8fafc;
       overflow-y: auto;
     }
-    .tl-intro-header {
-      text-align: center;
-      padding-bottom: 16px;
-      border-bottom: 1px solid #e2e8f0;
-      margin-bottom: 16px;
-    }
-    .tl-intro-photo {
-      width: 72px;
-      height: 72px;
-      border-radius: 50%;
-      margin: 0 auto 12px;
-      background: linear-gradient(135deg, #1e3a5f, #2d5a87);
-      overflow: hidden;
-    }
-    .tl-intro-photo img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .tl-intro-name {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: #0f172a;
-      font-family: 'Georgia', serif;
-    }
-    .tl-intro-credentials {
-      font-size: 0.8rem;
-      color: #64748b;
-      margin-top: 4px;
-    }
-    .tl-chat-intro h4 { font-size: 1rem; color: #0f172a; margin-bottom: 8px; }
-    .tl-chat-intro p { font-size: 0.85rem; color: #64748b; margin-bottom: 16px; line-height: 1.5; }
-    .tl-intro-tagline { text-align: center; font-size: 0.85rem; color: #64748b; margin-bottom: 16px; }
-    .tl-chat-intro-form { display: flex; flex-direction: column; gap: 12px; }
+        .tl-chat-intro-form { display: flex; flex-direction: column; gap: 12px; }
     .tl-chat-intro-input {
       padding: 12px 16px;
       border: 1px solid #e2e8f0;
@@ -362,12 +329,6 @@
       </div>
       <div class="tl-status-notice" id="tlStatusNotice" style="display: none;"></div>
       <div class="tl-chat-intro" id="tlChatIntro">
-        <div class="tl-intro-header">
-          <div class="tl-intro-photo"><img src="https://template.terms.law/chat-widget/sergei_small.jpg" alt="Sergei Tokmakov"></div>
-          <div class="tl-intro-name">Sergei Tokmakov, Esq.</div>
-          <div class="tl-intro-credentials">California State Bar #342637</div>
-        </div>
-        <p class="tl-intro-tagline">Direct line to a California business attorney — not a chatbot.</p>
         <form class="tl-chat-intro-form" id="tlIntroForm">
           <input type="text" class="tl-chat-intro-input" id="tlVisitorName" placeholder="Your first name" required>
           <select class="tl-chat-intro-select" id="tlVisitorTopic" required>
