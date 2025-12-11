@@ -1,6 +1,7 @@
 /**
  * Terms.Law Live Chat Widget - Premium Attorney Edition
  * Streamlined, click-driven experience - minimal typing required
+ * Supports English, Russian, and Spanish
  */
 
 (function() {
@@ -20,48 +21,200 @@
   let lastMessageTimestamp = 0;
   let pollInterval = null;
   let step = 0; // 0: topic, 1: subtopic, 2: chat
+  let currentLang = localStorage.getItem('termslaw_lang') || 'en';
 
   localStorage.setItem('termslaw_chat_id', visitorId);
 
-  // Streamlined practice areas with click-through subtopics
-  const topics = {
-    demand: {
-      icon: '📝',
-      label: 'Demand Letter',
-      desc: 'Collect money owed',
-      subtopics: ['Unpaid invoice', 'Contractor issue', 'Security deposit', 'Refund needed', 'Other debt']
+  // Language translations
+  const translations = {
+    en: {
+      tipText: 'Chat with Sergei',
+      statusOnline: 'Available now',
+      statusAvailable: 'Quick response',
+      statusAway: 'Usually replies in hours',
+      licensed: 'Licensed',
+      realPerson: 'Real Person',
+      private: 'Private',
+      helpQuestion: 'What can I help you with?',
+      clickHint: 'Click to continue — no sign-up needed',
+      back: 'Back',
+      situationHint: 'What best describes your situation?',
+      namePlaceholder: 'Your first name',
+      startChat: 'Start Chat',
+      typeMessage: 'Type a message...',
+      awayNotice: "I'm away but will see your message soon",
+      availableNotice: "I'm around and will respond shortly",
+      connectionError: 'Connection error. Please try again.',
+      greeting: (name, topic, subtopic, isAway) =>
+        `Hi ${name}! ${isAway ? "I'm not at my desk right now, but I'll see your message and get back to you soon. " : ''}I see you need help with: **${topic}** → "${subtopic}".\n\nTell me more about your situation and I'll let you know how I can help.`
     },
-    contract: {
-      icon: '📄',
-      label: 'Contract',
-      desc: 'Review or draft',
-      subtopics: ['Review before signing', 'Draft new contract', 'Exit/terminate contract', 'Negotiate terms', 'NDA needed']
+    ru: {
+      tipText: 'Чат с Сергеем',
+      statusOnline: 'Онлайн',
+      statusAvailable: 'Скоро отвечу',
+      statusAway: 'Обычно отвечаю в течение часов',
+      licensed: 'Лицензия',
+      realPerson: 'Живой человек',
+      private: 'Конфиденциально',
+      helpQuestion: 'Чем могу помочь?',
+      clickHint: 'Нажмите чтобы продолжить — регистрация не нужна',
+      back: 'Назад',
+      situationHint: 'Что лучше описывает вашу ситуацию?',
+      namePlaceholder: 'Ваше имя',
+      startChat: 'Начать чат',
+      typeMessage: 'Введите сообщение...',
+      awayNotice: 'Я сейчас отошёл, но скоро увижу ваше сообщение',
+      availableNotice: 'Я рядом и скоро отвечу',
+      connectionError: 'Ошибка соединения. Попробуйте ещё раз.',
+      greeting: (name, topic, subtopic, isAway) =>
+        `Привет, ${name}! ${isAway ? 'Я сейчас не у компьютера, но скоро увижу ваше сообщение. ' : ''}Вижу, вам нужна помощь с: **${topic}** → "${subtopic}".\n\nРасскажите подробнее о вашей ситуации.`
     },
-    startup: {
-      icon: '🚀',
-      label: 'Business Formation',
-      desc: 'LLC, Corp, Partnership',
-      subtopics: ['Form an LLC', 'Form a Corporation', 'Partnership agreement', 'Operating agreement', 'Equity/ownership split']
-    },
-    ip: {
-      icon: '💡',
-      label: 'IP & Trademark',
-      desc: 'Protect your brand',
-      subtopics: ['Register trademark', 'Copyright issue', 'Someone copied me', 'Received C&D letter', 'License my IP']
-    },
-    dispute: {
-      icon: '⚖️',
-      label: 'Business Dispute',
-      desc: 'Resolve conflicts',
-      subtopics: ['Partner/co-founder issue', 'Customer dispute', 'Vendor problem', 'Employment matter', 'Lawsuit threat']
-    },
-    other: {
-      icon: '💬',
-      label: 'Something Else',
-      desc: 'Other legal help',
-      subtopics: ['General question', 'Not sure what I need', 'Need a referral', 'Quick consultation']
+    es: {
+      tipText: 'Chatea con Sergei',
+      statusOnline: 'Disponible ahora',
+      statusAvailable: 'Respuesta rápida',
+      statusAway: 'Suele responder en horas',
+      licensed: 'Licenciado',
+      realPerson: 'Persona real',
+      private: 'Privado',
+      helpQuestion: '¿En qué puedo ayudarte?',
+      clickHint: 'Haz clic para continuar — sin registro',
+      back: 'Atrás',
+      situationHint: '¿Qué describe mejor tu situación?',
+      namePlaceholder: 'Tu nombre',
+      startChat: 'Iniciar chat',
+      typeMessage: 'Escribe un mensaje...',
+      awayNotice: 'No estoy ahora, pero veré tu mensaje pronto',
+      availableNotice: 'Estoy cerca y responderé pronto',
+      connectionError: 'Error de conexión. Inténtalo de nuevo.',
+      greeting: (name, topic, subtopic, isAway) =>
+        `¡Hola ${name}! ${isAway ? 'No estoy en mi escritorio ahora, pero veré tu mensaje pronto. ' : ''}Veo que necesitas ayuda con: **${topic}** → "${subtopic}".\n\nCuéntame más sobre tu situación.`
     }
   };
+
+  // Get current translation
+  const t = () => translations[currentLang];
+
+  // Streamlined practice areas with click-through subtopics (multilingual)
+  const topicsData = {
+    en: {
+      demand: {
+        icon: '📝',
+        label: 'Demand Letter',
+        desc: 'Collect money owed',
+        subtopics: ['Unpaid invoice', 'Contractor issue', 'Security deposit', 'Refund needed', 'Other debt']
+      },
+      contract: {
+        icon: '📄',
+        label: 'Contract',
+        desc: 'Review or draft',
+        subtopics: ['Review before signing', 'Draft new contract', 'Exit/terminate contract', 'Negotiate terms', 'NDA needed']
+      },
+      startup: {
+        icon: '🚀',
+        label: 'Business Formation',
+        desc: 'LLC, Corp, Partnership',
+        subtopics: ['Form an LLC', 'Form a Corporation', 'Partnership agreement', 'Operating agreement', 'Equity/ownership split']
+      },
+      ip: {
+        icon: '💡',
+        label: 'IP & Trademark',
+        desc: 'Protect your brand',
+        subtopics: ['Register trademark', 'Copyright issue', 'Someone copied me', 'Received C&D letter', 'License my IP']
+      },
+      dispute: {
+        icon: '⚖️',
+        label: 'Business Dispute',
+        desc: 'Resolve conflicts',
+        subtopics: ['Partner/co-founder issue', 'Customer dispute', 'Vendor problem', 'Employment matter', 'Lawsuit threat']
+      },
+      other: {
+        icon: '💬',
+        label: 'Something Else',
+        desc: 'Other legal help',
+        subtopics: ['General question', 'Not sure what I need', 'Need a referral', 'Quick consultation']
+      }
+    },
+    ru: {
+      demand: {
+        icon: '📝',
+        label: 'Претензионное письмо',
+        desc: 'Взыскание долга',
+        subtopics: ['Неоплаченный счёт', 'Проблема с подрядчиком', 'Залоговый депозит', 'Нужен возврат', 'Другой долг']
+      },
+      contract: {
+        icon: '📄',
+        label: 'Договор',
+        desc: 'Проверка или составление',
+        subtopics: ['Проверить перед подписанием', 'Составить новый договор', 'Расторгнуть договор', 'Согласовать условия', 'Нужен NDA']
+      },
+      startup: {
+        icon: '🚀',
+        label: 'Регистрация бизнеса',
+        desc: 'LLC, Корпорация, Партнёрство',
+        subtopics: ['Создать LLC', 'Создать корпорацию', 'Партнёрское соглашение', 'Операционное соглашение', 'Распределение долей']
+      },
+      ip: {
+        icon: '💡',
+        label: 'Интеллектуальная собственность',
+        desc: 'Защита бренда',
+        subtopics: ['Регистрация товарного знака', 'Вопрос авторских прав', 'Кто-то скопировал меня', 'Получил C&D письмо', 'Лицензирование']
+      },
+      dispute: {
+        icon: '⚖️',
+        label: 'Бизнес-спор',
+        desc: 'Разрешение конфликтов',
+        subtopics: ['Проблема с партнёром', 'Спор с клиентом', 'Проблема с поставщиком', 'Трудовой вопрос', 'Угроза иска']
+      },
+      other: {
+        icon: '💬',
+        label: 'Другое',
+        desc: 'Другая юридическая помощь',
+        subtopics: ['Общий вопрос', 'Не уверен что нужно', 'Нужна рекомендация', 'Быстрая консультация']
+      }
+    },
+    es: {
+      demand: {
+        icon: '📝',
+        label: 'Carta de demanda',
+        desc: 'Cobrar deuda',
+        subtopics: ['Factura impaga', 'Problema con contratista', 'Depósito de seguridad', 'Necesito reembolso', 'Otra deuda']
+      },
+      contract: {
+        icon: '📄',
+        label: 'Contrato',
+        desc: 'Revisar o redactar',
+        subtopics: ['Revisar antes de firmar', 'Redactar nuevo contrato', 'Terminar contrato', 'Negociar términos', 'Necesito NDA']
+      },
+      startup: {
+        icon: '🚀',
+        label: 'Formación de empresa',
+        desc: 'LLC, Corp, Sociedad',
+        subtopics: ['Formar una LLC', 'Formar una corporación', 'Acuerdo de socios', 'Acuerdo operativo', 'División de acciones']
+      },
+      ip: {
+        icon: '💡',
+        label: 'Propiedad intelectual',
+        desc: 'Protege tu marca',
+        subtopics: ['Registrar marca', 'Tema de derechos de autor', 'Alguien me copió', 'Recibí carta de cese', 'Licenciar mi PI']
+      },
+      dispute: {
+        icon: '⚖️',
+        label: 'Disputa comercial',
+        desc: 'Resolver conflictos',
+        subtopics: ['Problema con socio', 'Disputa con cliente', 'Problema con proveedor', 'Asunto laboral', 'Amenaza de demanda']
+      },
+      other: {
+        icon: '💬',
+        label: 'Otro tema',
+        desc: 'Otra ayuda legal',
+        subtopics: ['Pregunta general', 'No sé qué necesito', 'Necesito referencia', 'Consulta rápida']
+      }
+    }
+  };
+
+  // Get topics for current language
+  const topics = () => topicsData[currentLang];
 
   const styles = `
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -311,6 +464,30 @@
     }
     .tl-foot a { color: #888; text-decoration: none; }
 
+    /* Language toggle */
+    .tl-lang {
+      display: flex; justify-content: center; gap: 8px;
+      padding: 8px; background: #f8fafc;
+      border-bottom: 1px solid #eee;
+    }
+    .tl-lang-btn {
+      width: 32px; height: 22px; border-radius: 4px;
+      border: 2px solid transparent; cursor: pointer;
+      background-size: cover; background-position: center;
+      opacity: 0.6; transition: all 0.2s ease;
+    }
+    .tl-lang-btn:hover { opacity: 0.9; transform: scale(1.1); }
+    .tl-lang-btn.active { opacity: 1; border-color: #1a1a2e; transform: scale(1.1); }
+    .tl-lang-btn.en {
+      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30"><rect fill="%23002868" width="60" height="30"/><g fill="%23fff"><rect width="60" height="3.5" y="3.5"/><rect width="60" height="3.5" y="10.5"/><rect width="60" height="3.5" y="17.5"/><rect width="60" height="3.5" y="24.5"/></g><rect fill="%23bf0a30" width="60" height="3.5" y="7"/><rect fill="%23bf0a30" width="60" height="3.5" y="14"/><rect fill="%23bf0a30" width="60" height="3.5" y="21"/><rect fill="%23002868" width="24" height="16"/></svg>');
+    }
+    .tl-lang-btn.ru {
+      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 9 6"><rect fill="%23fff" width="9" height="3"/><rect fill="%230039a6" y="2" width="9" height="2"/><rect fill="%23d52b1e" y="4" width="9" height="2"/></svg>');
+    }
+    .tl-lang-btn.es {
+      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3 2"><rect fill="%23006847" width="1" height="2"/><rect fill="%23fff" x="1" width="1" height="2"/><rect fill="%23ce1126" x="2" width="1" height="2"/></svg>');
+    }
+
     @media (max-width: 480px) {
       .tl-win { bottom: 0; right: 0; left: 0; width: 100%; max-width: 100%; border-radius: 20px 20px 0 0; }
       .tl-fab { bottom: 16px; right: 16px; width: 60px; height: 60px; }
@@ -343,13 +520,14 @@
   let messages = [];
 
   function render() {
-    const statusText = currentStatus === 'online' ? 'Available now' :
-                       currentStatus === 'available' ? 'Quick response' : 'Usually replies in hours';
+    const tr = t();
+    const statusText = currentStatus === 'online' ? tr.statusOnline :
+                       currentStatus === 'available' ? tr.statusAvailable : tr.statusAway;
 
     widget.innerHTML = `
       <button class="tl-fab ${isOpen ? 'open' : ''}" id="fab">
         <span class="tl-fab-status ${currentStatus}"></span>
-        <span class="tl-tip">Chat with Sergei</span>
+        <span class="tl-tip">${tr.tipText}</span>
       </button>
       <div class="tl-win ${isOpen ? 'open' : ''}">
         <div class="tl-head">
@@ -382,21 +560,28 @@
   }
 
   function renderTopics() {
+    const tr = t();
+    const topicsList = topics();
     return `
+      <div class="tl-lang">
+        <button class="tl-lang-btn en ${currentLang === 'en' ? 'active' : ''}" data-lang="en" title="English"></button>
+        <button class="tl-lang-btn ru ${currentLang === 'ru' ? 'active' : ''}" data-lang="ru" title="Русский"></button>
+        <button class="tl-lang-btn es ${currentLang === 'es' ? 'active' : ''}" data-lang="es" title="Español"></button>
+      </div>
       <div class="tl-trust">
-        <span class="g"><svg viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg> Licensed</span>
-        <span class="b"><svg viewBox="0 0 20 20"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/></svg> Real Person</span>
-        <span class="p"><svg viewBox="0 0 20 20"><path d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"/></svg> Private</span>
+        <span class="g"><svg viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg> ${tr.licensed}</span>
+        <span class="b"><svg viewBox="0 0 20 20"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/></svg> ${tr.realPerson}</span>
+        <span class="p"><svg viewBox="0 0 20 20"><path d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"/></svg> ${tr.private}</span>
       </div>
       <div class="tl-step">
-        <div class="tl-q">What can I help you with?</div>
-        <div class="tl-hint">Click to continue — no sign-up needed</div>
+        <div class="tl-q">${tr.helpQuestion}</div>
+        <div class="tl-hint">${tr.clickHint}</div>
         <div class="tl-topics">
-          ${Object.entries(topics).map(([k, t]) => `
+          ${Object.entries(topicsList).map(([k, tp]) => `
             <div class="tl-topic" data-topic="${k}">
-              <div class="tl-topic-icon">${t.icon}</div>
-              <div class="tl-topic-label">${t.label}</div>
-              <div class="tl-topic-desc">${t.desc}</div>
+              <div class="tl-topic-icon">${tp.icon}</div>
+              <div class="tl-topic-label">${tp.label}</div>
+              <div class="tl-topic-desc">${tp.desc}</div>
             </div>
           `).join('')}
         </div>
@@ -405,37 +590,39 @@
   }
 
   function renderSubtopics() {
-    const t = topics[visitorTopic];
+    const tr = t();
+    const topicData = topics()[visitorTopic];
     return `
       <div class="tl-step">
         <div class="tl-back" id="back">
           <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-          Back
+          ${tr.back}
         </div>
-        <div class="tl-q">${t.icon} ${t.label}</div>
-        <div class="tl-hint">What best describes your situation?</div>
+        <div class="tl-q">${topicData.icon} ${topicData.label}</div>
+        <div class="tl-hint">${tr.situationHint}</div>
         <div class="tl-subs">
-          ${t.subtopics.map(s => `<div class="tl-sub" data-sub="${s}">${s}</div>`).join('')}
+          ${topicData.subtopics.map(s => `<div class="tl-sub" data-sub="${s}">${s}</div>`).join('')}
         </div>
         <div class="tl-name-row">
-          <input class="tl-name-in" id="nameIn" placeholder="Your first name" value="${visitorName}">
-          <button class="tl-go" id="startBtn" ${!visitorName && !visitorSubtopic ? 'disabled' : ''}>Start Chat</button>
+          <input class="tl-name-in" id="nameIn" placeholder="${tr.namePlaceholder}" value="${visitorName}">
+          <button class="tl-go" id="startBtn" ${!visitorName && !visitorSubtopic ? 'disabled' : ''}>${tr.startChat}</button>
         </div>
       </div>
     `;
   }
 
   function renderChat() {
+    const tr = t();
     let notice = '';
     if (currentStatus === 'away') {
       notice = `<div class="tl-notice away">
         <svg viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.5 2.5a1 1 0 101.414-1.414L11 9.586V6z"/></svg>
-        I'm away but will see your message soon${visitorEmail ? '. I\'ll reply to ' + visitorEmail : ''}
+        ${tr.awayNotice}${visitorEmail ? '. ' + visitorEmail : ''}
       </div>`;
     } else if (currentStatus === 'available') {
       notice = `<div class="tl-notice available">
         <svg viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>
-        I'm around and will respond shortly
+        ${tr.availableNotice}
       </div>`;
     }
 
@@ -444,7 +631,7 @@
         ${notice}
         <div class="tl-msgs" id="msgs"></div>
         <div class="tl-input-bar">
-          <input class="tl-chat-in" id="chatIn" placeholder="Type a message...">
+          <input class="tl-chat-in" id="chatIn" placeholder="${tr.typeMessage}">
           <button class="tl-send" id="sendBtn">
             <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
           </button>
@@ -458,6 +645,15 @@
     const close = document.getElementById('close');
     if (fab) fab.onclick = () => { isOpen = !isOpen; render(); };
     if (close) close.onclick = () => { isOpen = false; render(); };
+
+    // Language toggle
+    document.querySelectorAll('.tl-lang-btn').forEach(el => {
+      el.onclick = () => {
+        currentLang = el.dataset.lang;
+        localStorage.setItem('termslaw_lang', currentLang);
+        render();
+      };
+    });
 
     // Topic cards
     document.querySelectorAll('.tl-topic').forEach(el => {
@@ -532,15 +728,10 @@
     step = 2;
     render();
 
-    const t = topics[visitorTopic];
-    let greeting = `Hi ${visitorName}! `;
-
-    if (currentStatus !== 'online') {
-      greeting += `I'm not at my desk right now, but I'll see your message and get back to you soon. `;
-    }
-
-    greeting += `I see you need help with: **${t.label}** → "${visitorSubtopic}".\n\n`;
-    greeting += `Tell me more about your situation and I'll let you know how I can help.`;
+    const tr = t();
+    const topicData = topics()[visitorTopic];
+    const isAway = currentStatus !== 'online';
+    const greeting = tr.greeting(visitorName, topicData.label, visitorSubtopic, isAway);
 
     setTimeout(() => addMessage(greeting, 's'), 400);
     startPolling();
@@ -591,7 +782,7 @@
         })
       });
     } catch (e) {
-      addMessage('Connection error. Please try again.', 'sys');
+      addMessage(t().connectionError, 'sys');
     }
   }
 
