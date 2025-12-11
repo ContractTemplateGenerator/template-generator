@@ -8,10 +8,11 @@
 
   // Configuration
   const API_BASE = 'https://template-generator-aob3.vercel.app/api/telegram-chat';
+  const PHOTO_URL = 'https://template.terms.law/chat-widget/sergei_small.jpg';
 
   // State
   let isOpen = false;
-  let currentStatus = 'away'; // 'online' | 'available' | 'away'
+  let currentStatus = 'away';
   let chatStarted = false;
   let visitorId = localStorage.getItem('termslaw_chat_id') || generateId();
   let visitorName = '';
@@ -22,107 +23,132 @@
 
   localStorage.setItem('termslaw_chat_id', visitorId);
 
-  // Check if it's late night in California (10pm - 6am PT)
-  function isLateHoursPT() {
-    const now = new Date();
-    const pt = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
-    const hour = pt.getHours();
-    return hour >= 22 || hour < 6;
-  }
-
-  // Inject styles - Premium custom design
+  // Inject styles - Highly personalized attorney chat design
   const styles = `
     @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&display=swap');
 
+    /* Floating button - Photo-based, not generic icon */
     .tl-chat-button {
       position: fixed;
       bottom: 28px;
       right: 28px;
-      width: 64px;
-      height: 64px;
-      border-radius: 20px;
-      background: linear-gradient(145deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-      border: 1px solid rgba(255, 215, 0, 0.15);
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: url('${PHOTO_URL}') center/cover;
+      border: 3px solid white;
       cursor: pointer;
       box-shadow:
-        0 8px 32px rgba(15, 52, 96, 0.4),
-        0 0 0 1px rgba(255, 255, 255, 0.05),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        0 4px 24px rgba(0, 0, 0, 0.25),
+        0 0 0 1px rgba(0, 0, 0, 0.05);
       display: flex;
-      align-items: center;
-      justify-content: center;
+      align-items: flex-end;
+      justify-content: flex-end;
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       z-index: 999999;
+      overflow: visible;
     }
     .tl-chat-button:hover {
-      transform: translateY(-3px) scale(1.02);
+      transform: scale(1.08);
       box-shadow:
-        0 12px 40px rgba(15, 52, 96, 0.5),
-        0 0 0 1px rgba(255, 215, 0, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(0, 0, 0, 0.08);
     }
-    .tl-chat-button svg { width: 26px; height: 26px; fill: rgba(255, 255, 255, 0.9); }
-    .tl-chat-button .tl-close-icon { display: none; }
-    .tl-chat-button.tl-open .tl-chat-icon { display: none; }
-    .tl-chat-button.tl-open .tl-close-icon { display: block; }
     .tl-chat-button.tl-open {
-      border-radius: 50%;
-      width: 56px;
-      height: 56px;
+      transform: scale(0.9);
+      opacity: 0.7;
     }
 
+    /* Status indicator on button */
     .tl-chat-status {
       position: absolute;
-      top: -2px;
-      right: -2px;
-      width: 16px;
-      height: 16px;
+      bottom: 2px;
+      right: 2px;
+      width: 18px;
+      height: 18px;
       border-radius: 50%;
-      background: #4b5563;
-      border: 3px solid #1a1a2e;
+      background: #6b7280;
+      border: 3px solid white;
       transition: all 0.3s ease;
     }
     .tl-chat-status.tl-online {
-      background: #10b981;
-      box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
-      animation: tl-glow-green 2s ease-in-out infinite;
+      background: #22c55e;
+      box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.3);
+      animation: tl-pulse 2s ease-in-out infinite;
     }
     .tl-chat-status.tl-available {
-      background: #f59e0b;
-      box-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
-      animation: tl-glow-amber 2s ease-in-out infinite;
+      background: #eab308;
+      box-shadow: 0 0 0 3px rgba(234, 179, 8, 0.3);
     }
-    @keyframes tl-glow-green {
-      0%, 100% { box-shadow: 0 0 8px rgba(16, 185, 129, 0.4); }
-      50% { box-shadow: 0 0 16px rgba(16, 185, 129, 0.7); }
-    }
-    @keyframes tl-glow-amber {
-      0%, 100% { box-shadow: 0 0 8px rgba(245, 158, 11, 0.4); }
-      50% { box-shadow: 0 0 16px rgba(245, 158, 11, 0.7); }
+    @keyframes tl-pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
     }
 
+    /* "Chat with me" tooltip on hover */
+    .tl-chat-button::before {
+      content: 'Chat with Sergei';
+      position: absolute;
+      right: 80px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #1a1a2e;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 500;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .tl-chat-button::after {
+      content: '';
+      position: absolute;
+      right: 72px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 8px solid transparent;
+      border-left-color: #1a1a2e;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+    .tl-chat-button:hover::before,
+    .tl-chat-button:hover::after {
+      opacity: 1;
+      visibility: visible;
+    }
+    .tl-chat-button.tl-open::before,
+    .tl-chat-button.tl-open::after {
+      display: none;
+    }
+
+    /* Main chat window */
     .tl-chat-window {
       position: fixed;
-      bottom: 108px;
+      bottom: 112px;
       right: 28px;
       width: 400px;
       max-width: calc(100vw - 56px);
-      height: 560px;
+      height: 580px;
       max-height: calc(100vh - 140px);
-      background: linear-gradient(180deg, #fefefe 0%, #f8f9fa 100%);
+      background: #ffffff;
       border-radius: 24px;
       box-shadow:
-        0 25px 80px rgba(0, 0, 0, 0.15),
-        0 10px 30px rgba(0, 0, 0, 0.1),
-        0 0 0 1px rgba(0, 0, 0, 0.05);
+        0 25px 80px rgba(0, 0, 0, 0.18),
+        0 10px 30px rgba(0, 0, 0, 0.12);
       display: flex;
       flex-direction: column;
       overflow: hidden;
       z-index: 999998;
       opacity: 0;
       visibility: hidden;
-      transform: translateY(24px) scale(0.92);
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      transform: translateY(20px) scale(0.95);
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
     .tl-chat-window.tl-open {
@@ -131,373 +157,431 @@
       transform: translateY(0) scale(1);
     }
 
+    /* Header with large photo and personal touch */
     .tl-chat-header {
-      background: linear-gradient(145deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      background: linear-gradient(165deg, #1a1a2e 0%, #16213e 100%);
       color: white;
-      padding: 20px 24px;
+      padding: 0;
+      position: relative;
+    }
+
+    /* Top bar with close hint */
+    .tl-header-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 20px 0;
+      font-size: 0.7rem;
+      opacity: 0.6;
+    }
+
+    /* Profile section */
+    .tl-header-profile {
       display: flex;
       align-items: center;
       gap: 16px;
-      position: relative;
-      overflow: hidden;
-    }
-    .tl-chat-header::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: url('data:image/svg+xml,<svg width="60" height="60" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grain" patternUnits="userSpaceOnUse" width="60" height="60"><circle cx="30" cy="30" r="1" fill="rgba(255,215,0,0.03)"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grain)"/></svg>');
-      pointer-events: none;
-    }
-    .tl-chat-header::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 24px;
-      right: 24px;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.2), transparent);
+      padding: 16px 24px 20px;
     }
 
-    .tl-chat-avatar {
-      width: 56px;
-      height: 56px;
-      border-radius: 16px;
-      background: linear-gradient(135deg, #2d3748, #1a202c);
-      border: 2px solid rgba(255, 215, 0, 0.2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      position: relative;
-      flex-shrink: 0;
-    }
-    .tl-chat-avatar img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .tl-chat-avatar-status {
-      position: absolute;
-      bottom: -2px;
-      right: -2px;
-      width: 14px;
-      height: 14px;
+    .tl-header-photo {
+      width: 72px;
+      height: 72px;
       border-radius: 50%;
-      background: #4b5563;
-      border: 2px solid #1a1a2e;
+      background: url('${PHOTO_URL}') center/cover;
+      border: 3px solid rgba(255,255,255,0.2);
+      flex-shrink: 0;
+      position: relative;
     }
-    .tl-chat-avatar-status.tl-online { background: #10b981; }
-    .tl-chat-avatar-status.tl-available { background: #f59e0b; }
+    .tl-header-photo-status {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #6b7280;
+      border: 3px solid #1a1a2e;
+    }
+    .tl-header-photo-status.tl-online { background: #22c55e; }
+    .tl-header-photo-status.tl-available { background: #eab308; }
 
-    .tl-chat-header-info { flex: 1; position: relative; z-index: 1; }
-    .tl-chat-header-name {
-      font-size: 1.1rem;
-      font-weight: 600;
+    .tl-header-info {
+      flex: 1;
+    }
+    .tl-header-name {
       font-family: 'Cormorant Garamond', Georgia, serif;
-      letter-spacing: 0.01em;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      font-size: 1.4rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: 4px;
     }
-    .tl-chat-header-tagline {
+    .tl-header-title {
       font-size: 0.8rem;
-      opacity: 0.7;
-      margin-top: 3px;
-      font-weight: 400;
-      letter-spacing: 0.02em;
+      opacity: 0.8;
+      margin-bottom: 2px;
     }
-    .tl-chat-header-status {
+    .tl-header-bar {
       font-size: 0.75rem;
+      opacity: 0.6;
+    }
+    .tl-header-bar a {
+      color: inherit;
+      text-decoration: none;
+    }
+    .tl-header-bar a:hover {
+      text-decoration: underline;
+    }
+    .tl-header-status {
       display: flex;
       align-items: center;
       gap: 8px;
-      margin-top: 6px;
-      padding: 4px 0;
+      margin-top: 8px;
+      font-size: 0.8rem;
     }
-    .tl-status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #4b5563;
-    }
-    .tl-status-dot.tl-online { background: #4ade80; box-shadow: 0 0 8px rgba(74, 222, 128, 0.5); }
-    .tl-status-dot.tl-available { background: #fbbf24; box-shadow: 0 0 8px rgba(251, 191, 36, 0.5); }
-
-    .tl-verified-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05));
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      color: #6ee7b7;
-      padding: 3px 8px;
-      border-radius: 6px;
-      font-size: 0.65rem;
-      font-weight: 600;
-      font-family: 'Inter', sans-serif;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-    .tl-verified-badge svg {
+    .tl-status-indicator {
       width: 10px;
       height: 10px;
-      fill: currentColor;
+      border-radius: 50%;
+      background: #6b7280;
+    }
+    .tl-status-indicator.tl-online {
+      background: #4ade80;
+      box-shadow: 0 0 8px rgba(74, 222, 128, 0.6);
+    }
+    .tl-status-indicator.tl-available {
+      background: #facc15;
+      box-shadow: 0 0 8px rgba(250, 204, 21, 0.6);
     }
 
+    /* Handwritten-style signature line */
+    .tl-header-signature {
+      padding: 12px 24px;
+      background: rgba(255,255,255,0.03);
+      border-top: 1px solid rgba(255,255,255,0.08);
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-style: italic;
+      font-size: 0.9rem;
+      opacity: 0.85;
+    }
+
+    /* Status notice bar */
+    .tl-status-notice {
+      padding: 14px 20px;
+      font-size: 0.82rem;
+      line-height: 1.5;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .tl-status-notice svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      margin-top: 0;
+    }
+    .tl-status-notice.tl-away {
+      background: #fef9c3;
+      color: #854d0e;
+      border-bottom: 1px solid #fde047;
+    }
+    .tl-status-notice.tl-away svg { fill: #ca8a04; }
+    .tl-status-notice.tl-available {
+      background: #f0fdf4;
+      color: #166534;
+      border-bottom: 1px solid #bbf7d0;
+    }
+    .tl-status-notice.tl-available svg { fill: #22c55e; }
+
+    /* Intro section */
     .tl-chat-intro {
-      padding: 0;
       flex: 1;
       display: flex;
       flex-direction: column;
-      background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%);
       overflow-y: auto;
+      background: #fafafa;
     }
 
-    .tl-intro-welcome {
-      padding: 24px 24px 20px;
-      text-align: center;
-      border-bottom: 1px solid #e5e7eb;
-      background: white;
-    }
-    .tl-intro-welcome h3 {
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: 1.35rem;
-      font-weight: 600;
-      color: #1a1a2e;
-      margin: 0 0 8px;
-      letter-spacing: -0.01em;
-    }
-    .tl-intro-welcome p {
-      font-size: 0.9rem;
-      color: #64748b;
-      margin: 0;
-      line-height: 1.5;
-    }
-
-    .tl-trust-signals {
+    /* Trust banner */
+    .tl-trust-banner {
       display: flex;
       justify-content: center;
-      gap: 16px;
-      padding: 16px 24px;
-      background: #f8f9fa;
-      border-bottom: 1px solid #e5e7eb;
+      gap: 20px;
+      padding: 16px 20px;
+      background: white;
+      border-bottom: 1px solid #f0f0f0;
     }
     .tl-trust-item {
       display: flex;
       align-items: center;
       gap: 6px;
       font-size: 0.72rem;
-      color: #64748b;
+      color: #666;
       font-weight: 500;
     }
     .tl-trust-item svg {
       width: 14px;
       height: 14px;
-      fill: #10b981;
     }
+    .tl-trust-item.tl-verified svg { fill: #22c55e; }
+    .tl-trust-item.tl-human svg { fill: #3b82f6; }
+    .tl-trust-item.tl-secure svg { fill: #8b5cf6; }
 
-    .tl-chat-intro-form {
+    /* Form */
+    .tl-intro-form {
+      padding: 24px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      padding: 20px 24px 24px;
+      gap: 16px;
     }
-    .tl-chat-intro-input, .tl-chat-intro-select {
-      padding: 14px 18px;
-      border: 1.5px solid #e2e8f0;
+    .tl-form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .tl-form-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #444;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .tl-form-input, .tl-form-select {
+      padding: 14px 16px;
+      border: 2px solid #e5e5e5;
       border-radius: 12px;
-      font-size: 0.95rem;
+      font-size: 1rem;
       font-family: inherit;
       outline: none;
-      background: white;
       transition: all 0.2s ease;
+      background: white;
     }
-    .tl-chat-intro-input:focus, .tl-chat-intro-select:focus {
-      border-color: #0f3460;
-      box-shadow: 0 0 0 3px rgba(15, 52, 96, 0.1);
+    .tl-form-input:focus, .tl-form-select:focus {
+      border-color: #1a1a2e;
+      box-shadow: 0 0 0 3px rgba(26, 26, 46, 0.1);
     }
-    .tl-chat-intro-select {
+    .tl-form-select {
       cursor: pointer;
       appearance: none;
-      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12"><path fill="%2364748b" d="M6 8L1 3h10z"/></svg>');
+      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="%23666" d="M8 11L3 6h10z"/></svg>');
       background-repeat: no-repeat;
-      background-position: right 18px center;
+      background-position: right 14px center;
     }
-    .tl-chat-intro-select:invalid { color: #94a3b8; }
+    .tl-form-hint {
+      font-size: 0.75rem;
+      color: #888;
+      margin-top: 2px;
+    }
 
-    .tl-chat-intro-btn {
+    .tl-submit-btn {
       padding: 16px 24px;
-      background: linear-gradient(145deg, #1a1a2e 0%, #0f3460 100%);
+      background: linear-gradient(145deg, #1a1a2e 0%, #2d3a5a 100%);
       color: white;
       border: none;
-      border-radius: 12px;
+      border-radius: 14px;
       font-size: 1rem;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.3s ease;
+      margin-top: 8px;
       position: relative;
       overflow: hidden;
-      letter-spacing: 0.01em;
     }
-    .tl-chat-intro-btn::before {
+    .tl-submit-btn::before {
       content: '';
       position: absolute;
       top: 0;
       left: -100%;
       width: 100%;
       height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-      transition: left 0.5s ease;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+      transition: left 0.6s ease;
     }
-    .tl-chat-intro-btn:hover::before { left: 100%; }
-    .tl-chat-intro-btn:hover {
+    .tl-submit-btn:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(15, 52, 96, 0.3);
+      box-shadow: 0 8px 24px rgba(26, 26, 46, 0.35);
+    }
+    .tl-submit-btn:hover::before {
+      left: 100%;
     }
 
-    .tl-email-note {
-      font-size: 0.75rem;
-      color: #94a3b8;
-      text-align: center;
-      margin-top: -6px;
-    }
-
+    /* Messages area */
     .tl-chat-messages {
       flex: 1;
       overflow-y: auto;
       padding: 20px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%);
+      gap: 16px;
+      background: linear-gradient(180deg, #f8f8f8 0%, #ffffff 100%);
     }
-    .tl-chat-message {
-      max-width: 82%;
+
+    /* Message bubbles with attorney branding */
+    .tl-message {
+      display: flex;
+      gap: 12px;
+      animation: tl-fadeUp 0.35s ease;
+    }
+    @keyframes tl-fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .tl-message.tl-from-visitor {
+      flex-direction: row-reverse;
+    }
+    .tl-message-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: #ddd;
+    }
+    .tl-message.tl-from-sergei .tl-message-avatar {
+      background: url('${PHOTO_URL}') center/cover;
+      border: 2px solid #e5e5e5;
+    }
+    .tl-message.tl-from-visitor .tl-message-avatar {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+    .tl-message-content {
+      max-width: 75%;
+    }
+    .tl-message-bubble {
       padding: 12px 16px;
       border-radius: 18px;
       font-size: 0.9rem;
       line-height: 1.55;
-      animation: tl-msgIn 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    @keyframes tl-msgIn {
-      from { opacity: 0; transform: translateY(12px) scale(0.95); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
+    .tl-message.tl-from-sergei .tl-message-bubble {
+      background: white;
+      color: #1a1a2e;
+      border: 1px solid #e8e8e8;
+      border-bottom-left-radius: 6px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
     }
-    .tl-chat-message.tl-visitor {
-      align-self: flex-end;
-      background: linear-gradient(145deg, #1a1a2e, #0f3460);
+    .tl-message.tl-from-visitor .tl-message-bubble {
+      background: linear-gradient(145deg, #1a1a2e, #2d3a5a);
       color: white;
       border-bottom-right-radius: 6px;
     }
-    .tl-chat-message.tl-sergei {
-      align-self: flex-start;
-      background: white;
-      color: #1e293b;
-      border: 1px solid #e5e7eb;
-      border-bottom-left-radius: 6px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    .tl-message-name {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #888;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
     }
-    .tl-chat-message.tl-system {
-      align-self: center;
-      background: transparent;
-      color: #94a3b8;
-      font-size: 0.8rem;
-      padding: 8px;
-      text-align: center;
+    .tl-message.tl-from-visitor .tl-message-name {
+      text-align: right;
     }
 
+    .tl-message-system {
+      text-align: center;
+      font-size: 0.8rem;
+      color: #999;
+      padding: 8px;
+    }
+
+    /* Input area */
     .tl-chat-input-area {
       padding: 16px 20px;
       background: white;
-      border-top: 1px solid #e5e7eb;
+      border-top: 1px solid #f0f0f0;
     }
-    .tl-chat-input-wrapper { display: flex; gap: 10px; }
+    .tl-input-wrapper {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
     .tl-chat-input {
       flex: 1;
-      padding: 14px 20px;
-      border: 1.5px solid #e2e8f0;
+      padding: 14px 18px;
+      border: 2px solid #e5e5e5;
       border-radius: 24px;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       font-family: inherit;
       outline: none;
       transition: all 0.2s ease;
     }
     .tl-chat-input:focus {
-      border-color: #0f3460;
-      box-shadow: 0 0 0 3px rgba(15, 52, 96, 0.08);
+      border-color: #1a1a2e;
+      box-shadow: 0 0 0 3px rgba(26, 26, 46, 0.08);
     }
-    .tl-chat-send-btn {
+    .tl-send-btn {
       width: 48px;
       height: 48px;
       border-radius: 50%;
-      background: linear-gradient(145deg, #1a1a2e, #0f3460);
+      background: linear-gradient(145deg, #1a1a2e, #2d3a5a);
       border: none;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.3s ease;
+      transition: all 0.2s ease;
       flex-shrink: 0;
     }
-    .tl-chat-send-btn:hover {
+    .tl-send-btn:hover {
       transform: scale(1.08);
-      box-shadow: 0 4px 16px rgba(15, 52, 96, 0.3);
+      box-shadow: 0 4px 16px rgba(26, 26, 46, 0.3);
     }
-    .tl-chat-send-btn svg { width: 20px; height: 20px; fill: white; }
+    .tl-send-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: white;
+      margin-left: 2px;
+    }
 
-    .tl-status-notice {
-      padding: 14px 20px;
-      font-size: 0.8rem;
-      line-height: 1.5;
-      border-bottom: 1px solid;
+    /* Typing indicator */
+    .tl-typing {
       display: flex;
-      align-items: flex-start;
-      gap: 10px;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 0;
+      color: #888;
+      font-size: 0.8rem;
     }
-    .tl-status-notice svg {
-      width: 16px;
-      height: 16px;
-      flex-shrink: 0;
-      margin-top: 1px;
+    .tl-typing-dots {
+      display: flex;
+      gap: 3px;
     }
-    .tl-status-notice.tl-away {
-      background: linear-gradient(135deg, #fffbeb, #fef3c7);
-      color: #92400e;
-      border-color: #fde68a;
+    .tl-typing-dots span {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #ccc;
+      animation: tl-typing 1.4s infinite;
     }
-    .tl-status-notice.tl-away svg { fill: #f59e0b; }
-    .tl-status-notice.tl-available {
-      background: linear-gradient(135deg, #f0fdf4, #dcfce7);
-      color: #166534;
-      border-color: #bbf7d0;
+    .tl-typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .tl-typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes tl-typing {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-4px); }
     }
-    .tl-status-notice.tl-available svg { fill: #22c55e; }
-    .tl-status-notice.tl-late {
-      background: linear-gradient(135deg, #eff6ff, #dbeafe);
-      color: #1e40af;
-      border-color: #bfdbfe;
-    }
-    .tl-status-notice.tl-late svg { fill: #3b82f6; }
 
-    .tl-powered {
+    /* Footer */
+    .tl-footer {
       padding: 10px;
       text-align: center;
       font-size: 0.65rem;
-      color: #94a3b8;
-      background: #f8f9fa;
-      border-top: 1px solid #e5e7eb;
-      letter-spacing: 0.02em;
+      color: #aaa;
+      background: #fafafa;
+      border-top: 1px solid #f0f0f0;
     }
-    .tl-powered a {
-      color: #64748b;
+    .tl-footer a {
+      color: #888;
       text-decoration: none;
-      font-weight: 500;
     }
-    .tl-powered a:hover { text-decoration: underline; }
+    .tl-footer a:hover {
+      text-decoration: underline;
+    }
 
+    /* Mobile */
     @media (max-width: 480px) {
       .tl-chat-window {
         bottom: 0;
@@ -509,7 +593,16 @@
         max-height: 100%;
         border-radius: 0;
       }
-      .tl-chat-button { bottom: 20px; right: 20px; }
+      .tl-chat-button {
+        bottom: 20px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+      }
+      .tl-chat-button::before,
+      .tl-chat-button::after {
+        display: none;
+      }
     }
   `;
 
@@ -518,7 +611,7 @@
   styleEl.textContent = styles;
   document.head.appendChild(styleEl);
 
-  // Inject Calendly for scheduling popup (if not already loaded)
+  // Inject Calendly
   if (!window.Calendly) {
     const calendlyCSS = document.createElement('link');
     calendlyCSS.href = 'https://assets.calendly.com/assets/external/widget.css';
@@ -535,76 +628,80 @@
   const html = `
     <button class="tl-chat-button" id="tlChatButton">
       <span class="tl-chat-status" id="tlButtonStatus"></span>
-      <svg class="tl-chat-icon" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>
-      <svg class="tl-close-icon" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
     </button>
     <div class="tl-chat-window" id="tlChatWindow">
       <div class="tl-chat-header">
-        <div class="tl-chat-avatar">
-          <img src="https://template.terms.law/chat-widget/sergei_small.jpg" alt="Attorney">
-          <span class="tl-chat-avatar-status" id="tlAvatarStatus"></span>
+        <div class="tl-header-topbar">
+          <span>DIRECT LINE</span>
+          <span style="cursor:pointer;" onclick="document.getElementById('tlChatButton').click()">✕</span>
         </div>
-        <div class="tl-chat-header-info">
-          <div class="tl-chat-header-name">
-            Sergei Tokmakov, Esq.
-            <span class="tl-verified-badge">
-              <svg viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>
-              Verified
-            </span>
+        <div class="tl-header-profile">
+          <div class="tl-header-photo">
+            <span class="tl-header-photo-status" id="tlPhotoStatus"></span>
           </div>
-          <div class="tl-chat-header-tagline"><a href="https://apps.calbar.ca.gov/attorney/Licensee/Detail/279869" target="_blank" style="color: inherit; text-decoration: none; opacity: 0.7;">California State Bar #279869</a></div>
-          <div class="tl-chat-header-status">
-            <span class="tl-status-dot" id="tlHeaderStatus"></span>
-            <span id="tlStatusText">Checking...</span>
+          <div class="tl-header-info">
+            <div class="tl-header-name">Sergei Tokmakov</div>
+            <div class="tl-header-title">Business Attorney</div>
+            <div class="tl-header-bar"><a href="https://apps.calbar.ca.gov/attorney/Licensee/Detail/279869" target="_blank">CA Bar #279869</a></div>
+            <div class="tl-header-status">
+              <span class="tl-status-indicator" id="tlStatusIndicator"></span>
+              <span id="tlStatusText">Checking...</span>
+            </div>
           </div>
         </div>
+        <div class="tl-header-signature">"Messages here come directly to my phone."</div>
       </div>
       <div class="tl-status-notice" id="tlStatusNotice" style="display: none;"></div>
       <div class="tl-chat-intro" id="tlChatIntro">
-        <div class="tl-intro-welcome">
-          <h3>Direct Line to Your Attorney</h3>
-          <p>This goes straight to my phone — no assistants, no bots, no delays.</p>
-        </div>
-        <div class="tl-trust-signals">
-          <div class="tl-trust-item">
+        <div class="tl-trust-banner">
+          <div class="tl-trust-item tl-verified">
             <svg viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>
-            Licensed Attorney
+            Licensed
           </div>
-          <div class="tl-trust-item">
-            <svg viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>
+          <div class="tl-trust-item tl-human">
+            <svg viewBox="0 0 20 20"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/></svg>
             Real Person
           </div>
-          <div class="tl-trust-item">
-            <svg viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>
-            Confidential
+          <div class="tl-trust-item tl-secure">
+            <svg viewBox="0 0 20 20"><path d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"/></svg>
+            Private
           </div>
         </div>
-        <form class="tl-chat-intro-form" id="tlIntroForm">
-          <input type="text" class="tl-chat-intro-input" id="tlVisitorName" placeholder="Your first name" required>
-          <select class="tl-chat-intro-select" id="tlVisitorTopic" required>
-            <option value="" disabled selected>What brings you here today?</option>
-            <option value="demand">Demand Letter</option>
-            <option value="contract">Contract Review or Drafting</option>
-            <option value="startup">Startup / Business Formation</option>
-            <option value="ip">IP / Trademark / Copyright</option>
-            <option value="dispute">Business Dispute</option>
-            <option value="other">Other Legal Matter</option>
-          </select>
-          <input type="email" class="tl-chat-intro-input" id="tlVisitorEmail" placeholder="Email for follow-up (optional)">
-          <span class="tl-email-note">I'll only use this to continue our conversation</span>
-          <button type="submit" class="tl-chat-intro-btn">Start Conversation</button>
+        <form class="tl-intro-form" id="tlIntroForm">
+          <div class="tl-form-group">
+            <label class="tl-form-label">Your Name</label>
+            <input type="text" class="tl-form-input" id="tlVisitorName" placeholder="First name" required>
+          </div>
+          <div class="tl-form-group">
+            <label class="tl-form-label">What Can I Help With?</label>
+            <select class="tl-form-select" id="tlVisitorTopic" required>
+              <option value="" disabled selected>Select a topic...</option>
+              <option value="demand">Demand Letter</option>
+              <option value="contract">Contract Review / Drafting</option>
+              <option value="startup">Startup / Business Formation</option>
+              <option value="ip">Trademark / Copyright / IP</option>
+              <option value="dispute">Business Dispute</option>
+              <option value="other">Something Else</option>
+            </select>
+          </div>
+          <div class="tl-form-group">
+            <label class="tl-form-label">Email <span style="opacity:0.5;text-transform:none;font-weight:400">(optional)</span></label>
+            <input type="email" class="tl-form-input" id="tlVisitorEmail" placeholder="For follow-up if I'm away">
+            <span class="tl-form-hint">I'll only use this to continue our conversation</span>
+          </div>
+          <button type="submit" class="tl-submit-btn">Send Message to Sergei</button>
         </form>
       </div>
       <div class="tl-chat-messages" id="tlChatMessages" style="display: none;"></div>
       <div class="tl-chat-input-area" id="tlChatInputArea" style="display: none;">
-        <div class="tl-chat-input-wrapper">
-          <input type="text" class="tl-chat-input" id="tlChatInput" placeholder="Type your message...">
-          <button class="tl-chat-send-btn" id="tlSendBtn">
+        <div class="tl-input-wrapper">
+          <input type="text" class="tl-chat-input" id="tlChatInput" placeholder="Type a message...">
+          <button class="tl-send-btn" id="tlSendBtn">
             <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
           </button>
         </div>
       </div>
-      <div class="tl-powered">Direct chat by <a href="https://terms.law" target="_blank">Terms.Law</a></div>
+      <div class="tl-footer">Direct chat powered by <a href="https://terms.law" target="_blank">Terms.Law</a></div>
     </div>
   `;
 
@@ -617,6 +714,10 @@
   // Helper functions
   function generateId() {
     return 'v_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now().toString(36);
+  }
+
+  function getInitial() {
+    return visitorName ? visitorName.charAt(0).toUpperCase() : '?';
   }
 
   async function checkStatus() {
@@ -633,50 +734,47 @@
 
   function updateStatusUI() {
     const buttonStatus = document.getElementById('tlButtonStatus');
-    const headerStatus = document.getElementById('tlHeaderStatus');
-    const avatarStatus = document.getElementById('tlAvatarStatus');
+    const photoStatus = document.getElementById('tlPhotoStatus');
+    const statusIndicator = document.getElementById('tlStatusIndicator');
     const statusText = document.getElementById('tlStatusText');
     const statusNotice = document.getElementById('tlStatusNotice');
 
-    // Reset classes
+    // Reset
     buttonStatus.classList.remove('tl-online', 'tl-available');
-    headerStatus.classList.remove('tl-online', 'tl-available');
-    avatarStatus.classList.remove('tl-online', 'tl-available');
-    statusNotice.classList.remove('tl-away', 'tl-available', 'tl-late');
+    photoStatus.classList.remove('tl-online', 'tl-available');
+    statusIndicator.classList.remove('tl-online', 'tl-available');
 
-    const clockIcon = '<svg viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.5 2.5a1 1 0 101.414-1.414L11 9.586V6z"/></svg>';
-    const checkIcon = '<svg viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>';
+    const clockIcon = '<svg viewBox="0 0 20 20" style="width:18px;height:18px;fill:#ca8a04;flex-shrink:0;"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.5 2.5a1 1 0 101.414-1.414L11 9.586V6z"/></svg>';
+    const checkIcon = '<svg viewBox="0 0 20 20" style="width:18px;height:18px;fill:#22c55e;flex-shrink:0;"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>';
 
     if (currentStatus === 'online') {
       buttonStatus.classList.add('tl-online');
-      headerStatus.classList.add('tl-online');
-      avatarStatus.classList.add('tl-online');
+      photoStatus.classList.add('tl-online');
+      statusIndicator.classList.add('tl-online');
       statusText.textContent = 'Available now';
-
       statusNotice.style.display = 'none';
     } else if (currentStatus === 'available') {
       buttonStatus.classList.add('tl-available');
-      headerStatus.classList.add('tl-available');
-      avatarStatus.classList.add('tl-available');
-      statusText.textContent = 'I respond quickly';
+      photoStatus.classList.add('tl-available');
+      statusIndicator.classList.add('tl-available');
+      statusText.textContent = 'Responds quickly';
 
       if (chatStarted) {
         statusNotice.className = 'tl-status-notice tl-available';
-        statusNotice.innerHTML = checkIcon + '<span>I\'m around but may not respond instantly. Go ahead and describe your situation.</span>';
+        statusNotice.innerHTML = checkIcon + '<span>I\'m around and will see your message shortly.</span>';
         statusNotice.style.display = 'flex';
       } else {
         statusNotice.style.display = 'none';
       }
     } else {
-      // away
-      statusText.textContent = 'I check messages periodically';
+      statusText.textContent = 'Usually responds within hours';
 
       if (chatStarted) {
         statusNotice.className = 'tl-status-notice tl-away';
         if (visitorEmail) {
-          statusNotice.innerHTML = clockIcon + '<span>I\'m not at my desk but I\'ll see your message. I\'ll follow up at <strong>' + visitorEmail + '</strong>.</span>';
+          statusNotice.innerHTML = clockIcon + '<span>I\'m away but will see this. I\'ll follow up at <strong>' + visitorEmail + '</strong>.</span>';
         } else {
-          statusNotice.innerHTML = clockIcon + '<span>I\'m not at my desk but I check messages periodically. Describe your situation or <a href="#" onclick="Calendly.initPopupWidget({url: \'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting\'});return false;" style="color: inherit; text-decoration: underline;">schedule a call</a>.</span>';
+          statusNotice.innerHTML = clockIcon + '<span>I\'m away but check messages regularly. You can also <a href="#" onclick="Calendly.initPopupWidget({url: \'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting\'});return false;" style="color:#854d0e;text-decoration:underline;">schedule a call</a>.</span>';
         }
         statusNotice.style.display = 'flex';
       } else {
@@ -712,30 +810,64 @@
     document.getElementById('tlChatMessages').style.display = 'flex';
     document.getElementById('tlChatInputArea').style.display = 'block';
 
-    // Topic-specific prompts asking for relevant details
     const topicPrompts = {
-      demand: `Hi ${visitorName}! For your demand letter, please tell me: (1) What happened? (2) Who owes you / wronged you? (3) What amount or action are you seeking?`,
-      contract: `Hi ${visitorName}! For your contract matter: (1) What type of contract? (2) Reviewing existing or drafting new? (3) Any specific concerns or clauses?`,
-      startup: `Hi ${visitorName}! For your startup/business formation: (1) What type of business? (2) How many founders/owners? (3) Which state are you forming in?`,
-      ip: `Hi ${visitorName}! For your IP matter: (1) Trademark, copyright, or patent? (2) Protecting your own IP or dealing with infringement? (3) Brief description of the IP involved.`,
-      dispute: `Hi ${visitorName}! For your business dispute: (1) Who is the dispute with? (2) What is it about? (3) What outcome are you hoping for?`,
-      other: `Hi ${visitorName}! Please describe your legal matter and I'll let you know how I can help.`
+      demand: `Hi ${visitorName}! For your demand letter, please share: (1) What happened? (2) Who owes you / wronged you? (3) What amount or outcome are you seeking?`,
+      contract: `Hi ${visitorName}! For your contract matter: (1) What type of contract? (2) Reviewing or drafting? (3) Any specific concerns?`,
+      startup: `Hi ${visitorName}! For business formation: (1) What type of business? (2) How many founders? (3) Which state?`,
+      ip: `Hi ${visitorName}! For your IP matter: (1) Trademark, copyright, or patent? (2) Protecting your IP or handling infringement? (3) Brief description?`,
+      dispute: `Hi ${visitorName}! For your dispute: (1) Who's it with? (2) What's it about? (3) What outcome do you want?`,
+      other: `Hi ${visitorName}! Tell me about your legal matter and I'll let you know how I can help.`
     };
 
     let welcomeMsg = topicPrompts[visitorTopic] || topicPrompts.other;
 
-    // Add status context if not online
     if (currentStatus === 'available') {
       welcomeMsg = `Hi ${visitorName}! I'll see your message shortly. ` + welcomeMsg.substring(welcomeMsg.indexOf('!') + 2);
     } else if (currentStatus !== 'online') {
-      welcomeMsg = `Hi ${visitorName}, I'm not at my desk but I check messages regularly. ` + welcomeMsg.substring(welcomeMsg.indexOf('!') + 2) + (visitorEmail ? " I'll follow up by email." : "");
+      welcomeMsg = `Hi ${visitorName}, I'm away but I check messages regularly. ` + welcomeMsg.substring(welcomeMsg.indexOf('!') + 2) + (visitorEmail ? " I'll follow up by email." : "");
     }
 
-    addMessageToUI(welcomeMsg, 'tl-sergei');
-
+    addMessage(welcomeMsg, 'sergei');
     document.getElementById('tlChatInput').focus();
     updateStatusUI();
     startPolling();
+  }
+
+  function addMessage(text, from) {
+    const container = document.getElementById('tlChatMessages');
+    const msgDiv = document.createElement('div');
+
+    if (from === 'system') {
+      msgDiv.className = 'tl-message-system';
+      msgDiv.textContent = text;
+    } else {
+      msgDiv.className = `tl-message tl-from-${from}`;
+      const avatarDiv = document.createElement('div');
+      avatarDiv.className = 'tl-message-avatar';
+      if (from === 'visitor') {
+        avatarDiv.textContent = getInitial();
+      }
+
+      const contentDiv = document.createElement('div');
+      contentDiv.className = 'tl-message-content';
+
+      const nameDiv = document.createElement('div');
+      nameDiv.className = 'tl-message-name';
+      nameDiv.textContent = from === 'sergei' ? 'Sergei' : visitorName;
+
+      const bubbleDiv = document.createElement('div');
+      bubbleDiv.className = 'tl-message-bubble';
+      bubbleDiv.textContent = text;
+
+      contentDiv.appendChild(nameDiv);
+      contentDiv.appendChild(bubbleDiv);
+      msgDiv.appendChild(avatarDiv);
+      msgDiv.appendChild(contentDiv);
+    }
+
+    container.appendChild(msgDiv);
+    container.scrollTop = container.scrollHeight;
+    if (from !== 'system') lastMessageTimestamp = Date.now();
   }
 
   async function sendMessage() {
@@ -744,7 +876,7 @@
     if (!message) return;
 
     input.value = '';
-    addMessageToUI(message, 'tl-visitor');
+    addMessage(message, 'visitor');
 
     try {
       await fetch(API_BASE, {
@@ -761,18 +893,8 @@
         })
       });
     } catch (error) {
-      addMessageToUI('Connection error. Please try again.', 'tl-system');
+      addMessage('Connection error. Please try again.', 'system');
     }
-  }
-
-  function addMessageToUI(text, type) {
-    const messagesContainer = document.getElementById('tlChatMessages');
-    const messageEl = document.createElement('div');
-    messageEl.className = `tl-chat-message ${type}`;
-    messageEl.textContent = text;
-    messagesContainer.appendChild(messageEl);
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    if (type !== 'tl-system') lastMessageTimestamp = Date.now();
   }
 
   function startPolling() {
@@ -786,7 +908,7 @@
         if (data.messages) {
           data.messages.forEach(msg => {
             if (msg.from === 'sergei') {
-              addMessageToUI(msg.text, 'tl-sergei');
+              addMessage(msg.text, 'sergei');
             }
             if (msg.timestamp > lastMessageTimestamp) {
               lastMessageTimestamp = msg.timestamp;
