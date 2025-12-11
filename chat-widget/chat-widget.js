@@ -437,7 +437,7 @@
       }
     } else {
       // away
-      statusText.textContent = 'Away';
+      statusText.textContent = 'Checking messages periodically';
 
       if (chatStarted) {
         statusNotice.className = 'tl-status-notice tl-away';
