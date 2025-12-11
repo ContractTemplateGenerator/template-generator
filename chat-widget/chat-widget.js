@@ -21,6 +21,14 @@
 
   localStorage.setItem('termslaw_chat_id', visitorId);
 
+  // Check if it's late night in California (10pm - 6am PT)
+  function isLateHoursPT() {
+    const now = new Date();
+    const pt = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+    const hour = pt.getHours();
+    return hour >= 22 || hour < 6;
+  }
+
   // Inject styles
   const styles = `
     .tl-chat-button {
@@ -30,18 +38,18 @@
       width: 60px;
       height: 60px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      background: linear-gradient(135deg, #1e3a5f, #2d5a87);
       border: none;
       cursor: pointer;
-      box-shadow: 0 4px 20px rgba(37, 99, 235, 0.4);
+      box-shadow: 0 4px 20px rgba(30, 58, 95, 0.4);
       display: flex;
       align-items: center;
       justify-content: center;
       transition: all 0.3s ease;
       z-index: 999999;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: 'Georgia', 'Times New Roman', serif;
     }
-    .tl-chat-button:hover { transform: scale(1.1); box-shadow: 0 6px 28px rgba(37, 99, 235, 0.5); }
+    .tl-chat-button:hover { transform: scale(1.1); box-shadow: 0 6px 28px rgba(30, 58, 95, 0.5); }
     .tl-chat-button svg { width: 28px; height: 28px; fill: white; }
     .tl-chat-button .tl-close-icon { display: none; }
     .tl-chat-button.tl-open .tl-chat-icon { display: none; }
@@ -85,7 +93,7 @@
     }
     .tl-chat-window.tl-open { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
     .tl-chat-header {
-      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      background: linear-gradient(135deg, #1e3a5f, #2d5a87);
       color: white;
       padding: 16px 20px;
       display: flex;
@@ -93,19 +101,27 @@
       gap: 12px;
     }
     .tl-chat-avatar {
-      width: 44px;
-      height: 44px;
+      width: 48px;
+      height: 48px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.2);
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="%23f8fafc"/><circle cx="50" cy="38" r="18" fill="%231e3a5f"/><ellipse cx="50" cy="75" rx="28" ry="20" fill="%231e3a5f"/></svg>') center/cover;
+      border: 2px solid rgba(255,255,255,0.3);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 1rem;
       font-weight: 700;
+      overflow: hidden;
+    }
+    .tl-chat-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
     .tl-chat-header-info { flex: 1; }
-    .tl-chat-header-name { font-size: 1rem; font-weight: 700; }
-    .tl-chat-header-status { font-size: 0.8rem; opacity: 0.9; display: flex; align-items: center; gap: 6px; }
+    .tl-chat-header-name { font-size: 1rem; font-weight: 700; font-family: 'Georgia', serif; }
+    .tl-chat-header-tagline { font-size: 0.75rem; opacity: 0.85; margin-top: 2px; }
+    .tl-chat-header-status { font-size: 0.8rem; opacity: 0.9; display: flex; align-items: center; gap: 6px; margin-top: 4px; }
     .tl-status-dot { width: 8px; height: 8px; border-radius: 50%; background: #6b7280; }
     .tl-status-dot.tl-online { background: #4ade80; }
     .tl-chat-messages {
@@ -128,7 +144,7 @@
     @keyframes tl-msgIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     .tl-chat-message.tl-visitor {
       align-self: flex-end;
-      background: #2563eb;
+      background: #1e3a5f;
       color: white;
       border-bottom-right-radius: 4px;
     }
@@ -145,16 +161,48 @@
       color: #64748b;
       font-size: 0.8rem;
       padding: 8px;
+      text-align: center;
     }
     .tl-chat-intro {
       padding: 20px;
       flex: 1;
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      background: #f8fafc;
     }
-    .tl-chat-intro h4 { font-size: 1.1rem; color: #0f172a; margin-bottom: 4px; }
-    .tl-chat-intro p { font-size: 0.85rem; color: #64748b; margin-bottom: 16px; }
+    .tl-intro-header {
+      text-align: center;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #e2e8f0;
+      margin-bottom: 16px;
+    }
+    .tl-intro-photo {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      margin: 0 auto 12px;
+      background: linear-gradient(135deg, #1e3a5f, #2d5a87);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.5rem;
+      font-weight: 700;
+      font-family: 'Georgia', serif;
+    }
+    .tl-intro-name {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #0f172a;
+      font-family: 'Georgia', serif;
+    }
+    .tl-intro-credentials {
+      font-size: 0.8rem;
+      color: #64748b;
+      margin-top: 4px;
+    }
+    .tl-chat-intro h4 { font-size: 1rem; color: #0f172a; margin-bottom: 8px; }
+    .tl-chat-intro p { font-size: 0.85rem; color: #64748b; margin-bottom: 16px; line-height: 1.5; }
     .tl-chat-intro-form { display: flex; flex-direction: column; gap: 12px; }
     .tl-chat-intro-input {
       padding: 12px 16px;
@@ -164,10 +212,15 @@
       font-family: inherit;
       outline: none;
     }
-    .tl-chat-intro-input:focus { border-color: #2563eb; }
+    .tl-chat-intro-input:focus { border-color: #1e3a5f; }
+    .tl-email-hint {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      margin-top: -8px;
+    }
     .tl-chat-intro-btn {
       padding: 12px 20px;
-      background: #2563eb;
+      background: #1e3a5f;
       color: white;
       border: none;
       border-radius: 8px;
@@ -176,7 +229,7 @@
       cursor: pointer;
       transition: background 0.2s ease;
     }
-    .tl-chat-intro-btn:hover { background: #1d4ed8; }
+    .tl-chat-intro-btn:hover { background: #2d5a87; }
     .tl-chat-input-area {
       padding: 12px 16px;
       background: white;
@@ -192,12 +245,12 @@
       font-family: inherit;
       outline: none;
     }
-    .tl-chat-input:focus { border-color: #2563eb; }
+    .tl-chat-input:focus { border-color: #1e3a5f; }
     .tl-chat-send-btn {
       width: 44px;
       height: 44px;
       border-radius: 50%;
-      background: #2563eb;
+      background: #1e3a5f;
       border: none;
       cursor: pointer;
       display: flex;
@@ -205,14 +258,35 @@
       justify-content: center;
       transition: all 0.2s ease;
     }
-    .tl-chat-send-btn:hover { background: #1d4ed8; transform: scale(1.05); }
+    .tl-chat-send-btn:hover { background: #2d5a87; transform: scale(1.05); }
     .tl-chat-send-btn svg { width: 20px; height: 20px; fill: white; }
     .tl-offline-notice {
-      background: #fef3c7;
-      color: #92400e;
-      padding: 10px 16px;
+      background: #fef9e7;
+      color: #7c6a2f;
+      padding: 12px 16px;
       font-size: 0.8rem;
-      text-align: center;
+      line-height: 1.4;
+      border-bottom: 1px solid #f5e6a3;
+    }
+    .tl-late-notice {
+      background: #f0f9ff;
+      color: #1e5a8a;
+      padding: 10px 16px;
+      font-size: 0.75rem;
+      line-height: 1.4;
+      border-bottom: 1px solid #bae0fd;
+    }
+    .tl-human-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #ecfdf5;
+      color: #047857;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      margin-left: 8px;
     }
     @media (max-width: 480px) {
       .tl-chat-window { bottom: 0; right: 0; left: 0; width: 100%; max-width: 100%; height: 100%; max-height: 100%; border-radius: 0; }
@@ -226,6 +300,7 @@
   document.head.appendChild(styleEl);
 
   // Create HTML
+  const lateHours = isLateHoursPT();
   const html = `
     <button class="tl-chat-button" id="tlChatButton">
       <span class="tl-chat-status" id="tlButtonStatus"></span>
@@ -236,31 +311,37 @@
       <div class="tl-chat-header">
         <div class="tl-chat-avatar">ST</div>
         <div class="tl-chat-header-info">
-          <div class="tl-chat-header-name">Sergei Tokmakov, Esq.</div>
+          <div class="tl-chat-header-name">Sergei Tokmakov, Esq.<span class="tl-human-badge">Real Person</span></div>
+          <div class="tl-chat-header-tagline">California Business Attorney</div>
           <div class="tl-chat-header-status">
             <span class="tl-status-dot" id="tlHeaderStatus"></span>
             <span id="tlStatusText">Checking...</span>
           </div>
         </div>
       </div>
-      <div class="tl-offline-notice" id="tlOfflineNotice" style="display: none;">
-        Sergei is currently offline. Leave a message and he'll respond via email.
+      <div class="tl-late-notice" id="tlLateNotice" style="display: none;">
+        Yes, I'm actually online right now. I keep flexible hours to accommodate clients across time zones.
       </div>
+      <div class="tl-offline-notice" id="tlOfflineNotice" style="display: none;"></div>
       <div class="tl-chat-intro" id="tlChatIntro">
-        <h4>Have a quick question?</h4>
-        <p>I'm a California attorney. Ask me about contracts, demand letters, business formation, or IP issues.</p>
+        <div class="tl-intro-header">
+          <div class="tl-intro-photo">ST</div>
+          <div class="tl-intro-name">Sergei Tokmakov, Esq.</div>
+          <div class="tl-intro-credentials">California State Bar #342637</div>
+        </div>
+        <h4>Quick question? I'm here to help.</h4>
+        <p>This is a direct line to me personally — not a chatbot, not a call center. I handle contracts, demand letters, business formation, and IP matters for startups and small businesses.</p>
         <form class="tl-chat-intro-form" id="tlIntroForm">
-          <input type="text" class="tl-chat-intro-input" id="tlVisitorName" placeholder="Your name" required>
-          <input type="email" class="tl-chat-intro-input" id="tlVisitorEmail" placeholder="Your email (optional)">
-          <button type="submit" class="tl-chat-intro-btn">Start Chat</button>
+          <input type="text" class="tl-chat-intro-input" id="tlVisitorName" placeholder="Your first name" required>
+          <input type="email" class="tl-chat-intro-input" id="tlVisitorEmail" placeholder="Email (for follow-up if I step away)">
+          <div class="tl-email-hint" id="tlEmailHint">Without email, I can only respond while you're in this chat</div>
+          <button type="submit" class="tl-chat-intro-btn">Start Conversation</button>
         </form>
       </div>
-      <div class="tl-chat-messages" id="tlChatMessages" style="display: none;">
-        <div class="tl-chat-message tl-system">Chat started. Sergei will respond shortly.</div>
-      </div>
+      <div class="tl-chat-messages" id="tlChatMessages" style="display: none;"></div>
       <div class="tl-chat-input-area" id="tlChatInputArea" style="display: none;">
         <div class="tl-chat-input-wrapper">
-          <input type="text" class="tl-chat-input" id="tlChatInput" placeholder="Type a message...">
+          <input type="text" class="tl-chat-input" id="tlChatInput" placeholder="Type your message...">
           <button class="tl-chat-send-btn" id="tlSendBtn">
             <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
           </button>
@@ -297,17 +378,32 @@
     const headerStatus = document.getElementById('tlHeaderStatus');
     const statusText = document.getElementById('tlStatusText');
     const offlineNotice = document.getElementById('tlOfflineNotice');
+    const lateNotice = document.getElementById('tlLateNotice');
+    const lateHours = isLateHoursPT();
 
     if (isOnline) {
       buttonStatus.classList.add('tl-online');
       headerStatus.classList.add('tl-online');
-      statusText.textContent = 'Online now';
+      statusText.textContent = 'Available now';
       offlineNotice.style.display = 'none';
+      // Show late hours notice if online during odd hours
+      if (lateHours && chatStarted) {
+        lateNotice.style.display = 'block';
+      }
     } else {
       buttonStatus.classList.remove('tl-online');
       headerStatus.classList.remove('tl-online');
       statusText.textContent = 'Away';
-      if (chatStarted) offlineNotice.style.display = 'block';
+      lateNotice.style.display = 'none';
+      if (chatStarted) {
+        // Customize offline message based on whether they provided email
+        if (visitorEmail) {
+          offlineNotice.innerHTML = "I've stepped away, but I'll email you at <strong>" + visitorEmail + "</strong> when I'm back. Feel free to leave your question.";
+        } else {
+          offlineNotice.innerHTML = "I'm not at my desk right now. Leave a message and check back later, or <a href='https://terms.law/consultation' style='color: #7c6a2f; text-decoration: underline;'>schedule a consultation</a> for a guaranteed response.";
+        }
+        offlineNotice.style.display = 'block';
+      }
     }
   }
 
@@ -336,7 +432,15 @@
     document.getElementById('tlChatIntro').style.display = 'none';
     document.getElementById('tlChatMessages').style.display = 'flex';
     document.getElementById('tlChatInputArea').style.display = 'block';
+
+    // Add personalized welcome message
+    const welcomeMsg = isOnline
+      ? `Hi ${visitorName}! I'm here. What can I help you with?`
+      : `Hi ${visitorName}, I'm away right now but I'll see your message when I return.${visitorEmail ? " I'll follow up by email." : ""}`;
+    addMessageToUI(welcomeMsg, 'tl-sergei');
+
     document.getElementById('tlChatInput').focus();
+    updateStatusUI(); // Update to show appropriate notices
     startPolling();
   }
 
