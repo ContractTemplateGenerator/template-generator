@@ -39,14 +39,12 @@
       clickHint: 'Click to continue — no sign-up needed',
       back: 'Back',
       situationHint: 'What best describes your situation?',
-      namePlaceholder: 'Your first name',
-      startChat: 'Start Chat',
       typeMessage: 'Type a message...',
       awayNotice: "I'm away but will see your message soon",
       availableNotice: "I'm around and will respond shortly",
       connectionError: 'Connection error. Please try again.',
-      greeting: (name, topic, subtopic, isAway) =>
-        `Hi ${name}! ${isAway ? "I'm not at my desk right now, but I'll see your message and get back to you soon. " : ''}I see you need help with: **${topic}** → "${subtopic}".\n\nTell me more about your situation and I'll let you know how I can help.`
+      greeting: (topic, subtopic, isAway) =>
+        `Hi! ${isAway ? "I'm not at my desk right now, but I'll see your message and get back to you soon. " : ''}I see you need help with: **${topic}** → "${subtopic}".\n\nTell me more about your situation and I'll let you know how I can help.`
     },
     ru: {
       tipText: 'Чат с Сергеем',
@@ -60,14 +58,12 @@
       clickHint: 'Нажмите чтобы продолжить — регистрация не нужна',
       back: 'Назад',
       situationHint: 'Что лучше описывает вашу ситуацию?',
-      namePlaceholder: 'Ваше имя',
-      startChat: 'Начать чат',
       typeMessage: 'Введите сообщение...',
       awayNotice: 'Я сейчас отошёл, но скоро увижу ваше сообщение',
       availableNotice: 'Я рядом и скоро отвечу',
       connectionError: 'Ошибка соединения. Попробуйте ещё раз.',
-      greeting: (name, topic, subtopic, isAway) =>
-        `Привет, ${name}! ${isAway ? 'Я сейчас не у компьютера, но скоро увижу ваше сообщение. ' : ''}Вижу, вам нужна помощь с: **${topic}** → "${subtopic}".\n\nРасскажите подробнее о вашей ситуации.`
+      greeting: (topic, subtopic, isAway) =>
+        `Привет! ${isAway ? 'Я сейчас не у компьютера, но скоро увижу ваше сообщение. ' : ''}Вижу, вам нужна помощь с: **${topic}** → "${subtopic}".\n\nРасскажите подробнее о вашей ситуации.`
     },
     es: {
       tipText: 'Chatea con Sergei',
@@ -81,14 +77,12 @@
       clickHint: 'Haz clic para continuar — sin registro',
       back: 'Atrás',
       situationHint: '¿Qué describe mejor tu situación?',
-      namePlaceholder: 'Tu nombre',
-      startChat: 'Iniciar chat',
       typeMessage: 'Escribe un mensaje...',
       awayNotice: 'No estoy ahora, pero veré tu mensaje pronto',
       availableNotice: 'Estoy cerca y responderé pronto',
       connectionError: 'Error de conexión. Inténtalo de nuevo.',
-      greeting: (name, topic, subtopic, isAway) =>
-        `¡Hola ${name}! ${isAway ? 'No estoy en mi escritorio ahora, pero veré tu mensaje pronto. ' : ''}Veo que necesitas ayuda con: **${topic}** → "${subtopic}".\n\nCuéntame más sobre tu situación.`
+      greeting: (topic, subtopic, isAway) =>
+        `¡Hola! ${isAway ? 'No estoy en mi escritorio ahora, pero veré tu mensaje pronto. ' : ''}Veo que necesitas ayuda con: **${topic}** → "${subtopic}".\n\nCuéntame más sobre tu situación.`
     }
   };
 
@@ -306,7 +300,7 @@
     .tl-close:hover { background: rgba(255,255,255,0.2); }
     .tl-close svg { width: 14px; height: 14px; fill: white; }
 
-    .tl-body { background: #f8fafc; }
+    .tl-body { background: #f8fafc; max-height: 450px; overflow-y: auto; }
 
     /* Trust strip */
     .tl-trust {
@@ -373,25 +367,6 @@
     }
     .tl-back:hover { color: #1a1a2e; }
     .tl-back svg { width: 14px; height: 14px; fill: currentColor; }
-
-    /* Name input (only shown once) */
-    .tl-name-row {
-      display: flex; gap: 8px; margin-top: 16px;
-      padding-top: 16px; border-top: 1px solid #eee;
-    }
-    .tl-name-in {
-      flex: 1; padding: 12px 14px;
-      border: 2px solid #e5e7eb; border-radius: 10px;
-      font: 14px Inter, sans-serif; outline: none;
-    }
-    .tl-name-in:focus { border-color: #1a1a2e; }
-    .tl-go {
-      padding: 12px 20px; background: #1a1a2e; color: white;
-      border: none; border-radius: 10px; font: 600 14px Inter;
-      cursor: pointer; transition: all 0.2s;
-    }
-    .tl-go:hover { background: #2d3a5a; }
-    .tl-go:disabled { opacity: 0.5; cursor: not-allowed; }
 
     /* Chat view */
     .tl-chat { display: flex; flex-direction: column; height: 420px; }
@@ -603,10 +578,6 @@
         <div class="tl-subs">
           ${topicData.subtopics.map(s => `<div class="tl-sub" data-sub="${s}">${s}</div>`).join('')}
         </div>
-        <div class="tl-name-row">
-          <input class="tl-name-in" id="nameIn" placeholder="${tr.namePlaceholder}" value="${visitorName}">
-          <button class="tl-go" id="startBtn" ${!visitorName && !visitorSubtopic ? 'disabled' : ''}>${tr.startChat}</button>
-        </div>
       </div>
     `;
   }
@@ -668,44 +639,13 @@
     const back = document.getElementById('back');
     if (back) back.onclick = () => { step = 0; render(); };
 
-    // Subtopic selection - auto progresses when clicked AND name is filled
+    // Subtopic selection - starts chat immediately
     document.querySelectorAll('.tl-sub').forEach(el => {
       el.onclick = () => {
         visitorSubtopic = el.dataset.sub;
-        const nameIn = document.getElementById('nameIn');
-        if (nameIn) visitorName = nameIn.value.trim();
-
-        // Auto-start if name is filled
-        if (visitorName) {
-          startChat();
-        } else {
-          // Highlight name field
-          if (nameIn) {
-            nameIn.focus();
-            nameIn.style.borderColor = '#ef4444';
-            setTimeout(() => nameIn.style.borderColor = '', 1500);
-          }
-        }
-        render();
+        startChat();
       };
     });
-
-    // Name input enables start button
-    const nameIn = document.getElementById('nameIn');
-    const startBtn = document.getElementById('startBtn');
-    if (nameIn) {
-      nameIn.oninput = () => {
-        visitorName = nameIn.value.trim();
-        if (startBtn) startBtn.disabled = !visitorName;
-      };
-      nameIn.onkeypress = (e) => {
-        if (e.key === 'Enter' && visitorName && visitorSubtopic) startChat();
-      };
-    }
-    if (startBtn) startBtn.onclick = () => {
-      if (nameIn) visitorName = nameIn.value.trim();
-      if (visitorName) startChat();
-    };
 
     // Chat
     const chatIn = document.getElementById('chatIn');
@@ -731,7 +671,7 @@
     const tr = t();
     const topicData = topics()[visitorTopic];
     const isAway = currentStatus !== 'online';
-    const greeting = tr.greeting(visitorName, topicData.label, visitorSubtopic, isAway);
+    const greeting = tr.greeting(topicData.label, visitorSubtopic, isAway);
 
     setTimeout(() => addMessage(greeting, 's'), 400);
     startPolling();
@@ -754,7 +694,7 @@
     } else {
       div.className = `tl-msg ${from}`;
       div.innerHTML = `
-        <div class="tl-msg-ava">${from === 'v' ? (visitorName ? visitorName[0].toUpperCase() : '?') : ''}</div>
+        <div class="tl-msg-ava">${from === 'v' ? '?' : ''}</div>
         <div class="tl-msg-bub">${text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>')}</div>
       `;
     }
