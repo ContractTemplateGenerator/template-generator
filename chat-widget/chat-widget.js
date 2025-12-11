@@ -552,7 +552,7 @@
               Verified
             </span>
           </div>
-          <div class="tl-chat-header-tagline">California State Bar #342637</div>
+          <div class="tl-chat-header-tagline"><a href="https://apps.calbar.ca.gov/attorney/Licensee/Detail/279869" target="_blank" style="color: inherit; text-decoration: none; opacity: 0.7;">California State Bar #279869</a></div>
           <div class="tl-chat-header-status">
             <span class="tl-status-dot" id="tlHeaderStatus"></span>
             <span id="tlStatusText">Checking...</span>
@@ -637,7 +637,6 @@
     const avatarStatus = document.getElementById('tlAvatarStatus');
     const statusText = document.getElementById('tlStatusText');
     const statusNotice = document.getElementById('tlStatusNotice');
-    const lateHours = isLateHoursPT();
 
     // Reset classes
     buttonStatus.classList.remove('tl-online', 'tl-available');
@@ -647,7 +646,6 @@
 
     const clockIcon = '<svg viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.5 2.5a1 1 0 101.414-1.414L11 9.586V6z"/></svg>';
     const checkIcon = '<svg viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>';
-    const globeIcon = '<svg viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zM4.332 8.027a6.012 6.012 0 011.912-2.706C6.512 5.73 6.974 6 7.5 6A1.5 1.5 0 019 7.5V8a2 2 0 004 0 2 2 0 011.523-1.943A5.977 5.977 0 0116 10c0 .34-.028.675-.083 1H15a2 2 0 00-2 2v2.197A5.973 5.973 0 0110 16v-2a2 2 0 00-2-2 2 2 0 01-2-2 2 2 0 00-1.668-1.973z"/></svg>';
 
     if (currentStatus === 'online') {
       buttonStatus.classList.add('tl-online');
@@ -655,13 +653,7 @@
       avatarStatus.classList.add('tl-online');
       statusText.textContent = 'Available now';
 
-      if (lateHours && chatStarted) {
-        statusNotice.className = 'tl-status-notice tl-late';
-        statusNotice.innerHTML = globeIcon + '<span>I work with international clients, so my hours are flexible.</span>';
-        statusNotice.style.display = 'flex';
-      } else {
-        statusNotice.style.display = 'none';
-      }
+      statusNotice.style.display = 'none';
     } else if (currentStatus === 'available') {
       buttonStatus.classList.add('tl-available');
       headerStatus.classList.add('tl-available');
@@ -670,11 +662,7 @@
 
       if (chatStarted) {
         statusNotice.className = 'tl-status-notice tl-available';
-        if (lateHours) {
-          statusNotice.innerHTML = checkIcon + '<span>I work with international clients and check messages regularly.</span>';
-        } else {
-          statusNotice.innerHTML = checkIcon + '<span>I\'m around but may not respond instantly. Go ahead and describe your situation.</span>';
-        }
+        statusNotice.innerHTML = checkIcon + '<span>I\'m around but may not respond instantly. Go ahead and describe your situation.</span>';
         statusNotice.style.display = 'flex';
       } else {
         statusNotice.style.display = 'none';
