@@ -427,9 +427,9 @@
       if (chatStarted) {
         statusNotice.className = 'tl-status-notice tl-available';
         if (lateHours) {
-          statusNotice.textContent = 'I work with international clients and check messages regularly. Leave your question and I\'ll get back to you shortly.';
+          statusNotice.textContent = 'I work with international clients and check messages regularly. Please describe your legal matter.';
         } else {
-          statusNotice.textContent = 'I\'m around but may not respond instantly. Leave your question and I\'ll get back to you shortly.';
+          statusNotice.textContent = 'I\'m around but may not respond instantly. Please describe your legal matter.';
         }
         statusNotice.style.display = 'block';
       } else {
@@ -482,9 +482,9 @@
     // Add personalized welcome message based on status
     let welcomeMsg;
     if (currentStatus === 'online') {
-      welcomeMsg = `Hi ${visitorName}! What can I help you with?`;
+      welcomeMsg = `Hi ${visitorName}! Please briefly describe your legal matter.`;
     } else if (currentStatus === 'available') {
-      welcomeMsg = `Hi ${visitorName}! I'll see your message shortly. What's on your mind?`;
+      welcomeMsg = `Hi ${visitorName}! I'll see your message shortly. Please describe your legal matter.`;
     } else {
       welcomeMsg = `Hi ${visitorName}, I'm away right now but I'll see your message when I return.${visitorEmail ? " I'll follow up by email." : ""}`;
     }
