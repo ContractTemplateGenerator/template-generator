@@ -325,61 +325,43 @@
             let lastValue = '';
             let isRemoteUpdate = false;
 
-            // Sync editor -> Yjs with proper character-level diff
+            // Simple approach: just sync the full text
+            let syncing = false;
+
+            // Editor -> Yjs
             editor.addEventListener('input', () => {
-                if (isRemoteUpdate) return;
+                if (syncing) return;
+                syncing = true;
 
-                const newValue = editor.value;
-                const oldValue = lastValue;
+                const content = editor.value;
+                console.log('LOCAL INPUT:', content.substring(0, 30) + '...');
 
-                // Find common prefix
-                let start = 0;
-                while (start < oldValue.length && start < newValue.length && oldValue[start] === newValue[start]) {
-                    start++;
-                }
+                ydoc.transact(() => {
+                    ytext.delete(0, ytext.length);
+                    ytext.insert(0, content);
+                }, 'local');
 
-                // Find common suffix
-                let oldEnd = oldValue.length;
-                let newEnd = newValue.length;
-                while (oldEnd > start && newEnd > start && oldValue[oldEnd - 1] === newValue[newEnd - 1]) {
-                    oldEnd--;
-                    newEnd--;
-                }
-
-                // Apply diff to Yjs
-                const deleteCount = oldEnd - start;
-                const insertText = newValue.slice(start, newEnd);
-
-                if (deleteCount > 0 || insertText.length > 0) {
-                    ydoc.transact(() => {
-                        if (deleteCount > 0) {
-                            ytext.delete(start, deleteCount);
-                        }
-                        if (insertText.length > 0) {
-                            ytext.insert(start, insertText);
-                        }
-                    });
-                }
-
-                lastValue = newValue;
+                syncing = false;
             });
 
-            // Sync Yjs -> editor
+            // Yjs -> Editor (only for remote changes)
             ytext.observe(event => {
-                if (event.transaction.local) return;
+                console.log('YTEXT OBSERVE - local:', event.transaction.local, 'origin:', event.transaction.origin);
 
-                isRemoteUpdate = true;
+                // Skip if this was our own change
+                if (event.transaction.origin === 'local') {
+                    console.log('Skipping local change');
+                    return;
+                }
 
+                syncing = true;
                 const cursorPos = editor.selectionStart;
                 const newContent = ytext.toString();
+                console.log('REMOTE UPDATE:', newContent.substring(0, 30) + '...');
+
                 editor.value = newContent;
-                lastValue = newContent;
-
-                // Restore cursor position
-                const newPos = Math.min(cursorPos, newContent.length);
-                editor.setSelectionRange(newPos, newPos);
-
-                isRemoteUpdate = false;
+                editor.setSelectionRange(Math.min(cursorPos, newContent.length), Math.min(cursorPos, newContent.length));
+                syncing = false;
             });
 
             // Initialize lastValue
