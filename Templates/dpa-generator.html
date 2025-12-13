@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Processing Agreement (DPA) Generator | Terms.Law</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #1e40af; --primary-dark: #1e3a8a; --accent: #f59e0b; --background: #f8fafc; --surface: #ffffff; --text: #1e293b; --text-light: #64748b; --border: #e2e8f0; --success: #10b981; --warning: #f59e0b; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--background); color: var(--text); line-height: 1.6; }
+        .navbar { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); padding: 1rem 2rem; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .nav-container { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .nav-brand { display: flex; align-items: center; gap: 1rem; }
+        .nav-logo { font-size: 1.5rem; font-weight: 700; color: white; text-decoration: none; }
+        .nav-divider { color: rgba(255,255,255,0.5); }
+        .nav-title { color: rgba(255,255,255,0.9); font-size: 1rem; }
+        .nav-links { display: flex; gap: 1.5rem; }
+        .nav-links a { color: rgba(255,255,255,0.85); text-decoration: none; font-size: 0.9rem; font-weight: 500; }
+        .nav-links a:hover { color: white; }
+        .main-container { max-width: 1400px; margin: 0 auto; padding: 2rem; display: grid; grid-template-columns: 420px 1fr; gap: 2rem; align-items: start; }
+        .form-panel { background: var(--surface); border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); position: sticky; top: 80px; max-height: calc(100vh - 100px); overflow-y: auto; }
+        .form-header { padding: 1.5rem; border-bottom: 1px solid var(--border); background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 12px 12px 0 0; }
+        .form-header h2 { font-size: 1.25rem; color: var(--primary); margin-bottom: 0.25rem; }
+        .form-header p { font-size: 0.85rem; color: var(--text-light); }
+        .form-content { padding: 1.5rem; }
+        .form-section { margin-bottom: 1.5rem; }
+        .section-title { font-size: 0.9rem; font-weight: 600; color: var(--primary); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--border); }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 0.375rem; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.625rem 0.875rem; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; font-family: inherit; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(30,64,175,0.1); }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+        .checkbox-group { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0; }
+        .checkbox-group input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary); }
+        .checkbox-group label { margin-bottom: 0; cursor: pointer; }
+        .form-actions { padding: 1.5rem; border-top: 1px solid var(--border); }
+        .btn { padding: 0.875rem 1.5rem; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 0.5rem; border: none; width: 100%; }
+        .btn-primary { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(30,64,175,0.3); }
+        .btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+        .btn-success { background: linear-gradient(135deg, var(--success) 0%, #059669 100%); color: white; }
+        .preview-panel { background: var(--surface); border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .preview-header { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        .preview-header h3 { font-size: 1rem; }
+        .preview-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .preview-actions .btn { padding: 0.5rem 1rem; font-size: 0.85rem; width: auto; }
+        .edit-mode-toggle { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: #fef3c7; border-radius: 8px; font-size: 0.85rem; color: #92400e; }
+        .document-container { padding: 2rem; max-width: 850px; margin: 0 auto; }
+        .document { background: white; padding: 3rem; border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.05); line-height: 1.8; font-size: 14px; }
+        .document h1 { text-align: center; font-size: 1.5rem; margin-bottom: 1.5rem; }
+        .document h2 { font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 0.75rem; }
+        .document p { margin-bottom: 1rem; text-align: justify; }
+        .document ul, .document ol { margin-left: 1.5rem; margin-bottom: 1rem; }
+        .document li { margin-bottom: 0.5rem; }
+        .document .parties { text-align: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+        .document .subsection { margin-left: 1.5rem; margin-bottom: 0.5rem; }
+        .signature-block { margin-top: 3rem; display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
+        .signature-party h4 { margin-bottom: 0.5rem; font-weight: 600; }
+        .signature-line { border-top: 1px solid var(--text); margin-top: 3rem; padding-top: 0.5rem; }
+        .signature-field { margin-top: 1rem; }
+        .signature-field span { display: block; font-size: 0.85rem; color: var(--text-light); }
+        .doc-highlight { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 1px 4px; border-radius: 3px; border-bottom: 2px solid var(--accent); }
+        .doc-highlight:hover { background: linear-gradient(135deg, #fde68a 0%, #fcd34d 100%); }
+        .doc-highlight:focus { outline: none; box-shadow: 0 0 0 3px rgba(245,158,11,0.3); }
+        @keyframes highlightPulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245,158,11,0.7); } 50% { transform: scale(1.02); box-shadow: 0 0 0 8px rgba(245,158,11,0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245,158,11,0); } }
+        .field-highlight-animation { animation: highlightPulse 0.6s ease-out; background: linear-gradient(135deg, #fde047 0%, #facc15 100%) !important; }
+        .full-edit-mode .document { border: 2px dashed var(--warning); }
+        .full-edit-warning { display: none; background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; font-size: 0.85rem; color: #92400e; }
+        .full-edit-mode .full-edit-warning { display: block; }
+        @media print { .navbar, .form-panel, .preview-header, .full-edit-warning { display: none !important; } .main-container { display: block; padding: 0; } .document { border: none; box-shadow: none; padding: 0; } .doc-highlight { background: none !important; border: none !important; padding: 0 !important; } }
+        @media (max-width: 1024px) { .main-container { grid-template-columns: 1fr; } .form-panel { position: relative; top: 0; max-height: none; } }
+        @media (max-width: 640px) { .navbar { padding: 1rem; } .nav-links { display: none; } .main-container { padding: 1rem; } .document { padding: 1.5rem; } .signature-block { grid-template-columns: 1fr; gap: 2rem; } }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a href="https://terms.law" class="nav-logo">Terms.Law</a>
+                <span class="nav-divider">|</span>
+                <span class="nav-title">Data Processing Agreement Generator</span>
+            </div>
+            <div class="nav-links">
+                <a href="/Templates/contract-library-landing.html">Contract Library</a>
+                <a href="/Blog/">Blog</a>
+                <a href="https://terms.law">Home</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="form-panel">
+            <div class="form-header">
+                <h2>🔐 Data Processing Agreement</h2>
+                <p>Generate a GDPR-compliant DPA for data processors and controllers</p>
+            </div>
+
+            <div class="form-content">
+                <div class="form-section">
+                    <div class="section-title">Data Controller (Customer)</div>
+                    <div class="form-group">
+                        <label for="controllerName">Company Name</label>
+                        <input type="text" id="controllerName" placeholder="Customer Corp" oninput="trackFieldEdit('controllerName')">
+                    </div>
+                    <div class="form-group">
+                        <label for="controllerAddress">Address</label>
+                        <input type="text" id="controllerAddress" placeholder="123 Main St, City, Country" oninput="trackFieldEdit('controllerAddress')">
+                    </div>
+                    <div class="form-group">
+                        <label for="controllerContact">DPO/Privacy Contact</label>
+                        <input type="text" id="controllerContact" placeholder="Data Protection Officer" oninput="trackFieldEdit('controllerContact')">
+                    </div>
+                    <div class="form-group">
+                        <label for="controllerEmail">Contact Email</label>
+                        <input type="email" id="controllerEmail" placeholder="privacy@customer.com" oninput="trackFieldEdit('controllerEmail')">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">Data Processor (Service Provider)</div>
+                    <div class="form-group">
+                        <label for="processorName">Company Name</label>
+                        <input type="text" id="processorName" placeholder="SaaS Provider Inc." oninput="trackFieldEdit('processorName')">
+                    </div>
+                    <div class="form-group">
+                        <label for="processorAddress">Address</label>
+                        <input type="text" id="processorAddress" placeholder="456 Tech Ave, City, Country" oninput="trackFieldEdit('processorAddress')">
+                    </div>
+                    <div class="form-group">
+                        <label for="processorContact">DPO/Privacy Contact</label>
+                        <input type="text" id="processorContact" placeholder="Privacy Officer" oninput="trackFieldEdit('processorContact')">
+                    </div>
+                    <div class="form-group">
+                        <label for="processorEmail">Contact Email</label>
+                        <input type="email" id="processorEmail" placeholder="privacy@provider.com" oninput="trackFieldEdit('processorEmail')">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">Processing Details</div>
+                    <div class="form-group">
+                        <label for="effectiveDate">Effective Date</label>
+                        <input type="date" id="effectiveDate" oninput="trackFieldEdit('effectiveDate')">
+                    </div>
+                    <div class="form-group">
+                        <label for="serviceName">Service/Product Name</label>
+                        <input type="text" id="serviceName" placeholder="CloudApp Platform" oninput="trackFieldEdit('serviceName')">
+                    </div>
+                    <div class="form-group">
+                        <label for="processingPurpose">Purpose of Processing</label>
+                        <textarea id="processingPurpose" placeholder="To provide cloud-based software services including data storage, analytics, and user management..." oninput="trackFieldEdit('processingPurpose')"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="processingDuration">Processing Duration</label>
+                        <select id="processingDuration" onchange="trackFieldEdit('processingDuration')">
+                            <option value="agreement">Duration of the main service agreement</option>
+                            <option value="1year">1 year</option>
+                            <option value="2years">2 years</option>
+                            <option value="3years">3 years</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">Categories of Data Subjects</div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="dsCustomers" checked onchange="trackFieldEdit('dsCustomers')">
+                        <label for="dsCustomers">Controller's customers/end users</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="dsEmployees" onchange="trackFieldEdit('dsEmployees')">
+                        <label for="dsEmployees">Controller's employees</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="dsContractors" onchange="trackFieldEdit('dsContractors')">
+                        <label for="dsContractors">Contractors/vendors</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="dsProspects" onchange="trackFieldEdit('dsProspects')">
+                        <label for="dsProspects">Business prospects/leads</label>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">Categories of Personal Data</div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="pdIdentity" checked onchange="trackFieldEdit('pdIdentity')">
+                        <label for="pdIdentity">Identity data (name, username, ID)</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="pdContact" checked onchange="trackFieldEdit('pdContact')">
+                        <label for="pdContact">Contact data (email, phone, address)</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="pdFinancial" onchange="trackFieldEdit('pdFinancial')">
+                        <label for="pdFinancial">Financial data (payment info, billing)</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="pdTechnical" checked onchange="trackFieldEdit('pdTechnical')">
+                        <label for="pdTechnical">Technical data (IP, browser, device)</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="pdUsage" checked onchange="trackFieldEdit('pdUsage')">
+                        <label for="pdUsage">Usage data (activity logs, preferences)</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="pdSensitive" onchange="trackFieldEdit('pdSensitive')">
+                        <label for="pdSensitive">Special category data (health, biometric)</label>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">Data Transfers</div>
+                    <div class="form-group">
+                        <label for="dataLocation">Primary Data Storage Location</label>
+                        <select id="dataLocation" onchange="trackFieldEdit('dataLocation')">
+                            <option value="EU">European Union</option>
+                            <option value="US">United States</option>
+                            <option value="UK">United Kingdom</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="transfersOutsideEU" onchange="trackFieldEdit('transfersOutsideEU')">
+                        <label for="transfersOutsideEU">Data may be transferred outside EEA</label>
+                    </div>
+                    <div class="form-group" id="transferMechanismGroup" style="display: none;">
+                        <label for="transferMechanism">Transfer Mechanism</label>
+                        <select id="transferMechanism" onchange="trackFieldEdit('transferMechanism')">
+                            <option value="scc">Standard Contractual Clauses (SCCs)</option>
+                            <option value="adequacy">Adequacy Decision</option>
+                            <option value="bcr">Binding Corporate Rules</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">Sub-Processors</div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="usesSubprocessors" checked onchange="trackFieldEdit('usesSubprocessors')">
+                        <label for="usesSubprocessors">Processor uses sub-processors</label>
+                    </div>
+                    <div class="form-group">
+                        <label for="subprocessorApproval">Sub-Processor Authorization</label>
+                        <select id="subprocessorApproval" onchange="trackFieldEdit('subprocessorApproval')">
+                            <option value="general">General written authorization</option>
+                            <option value="specific">Specific prior written authorization required</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="subprocessorNotice">Notice Period for New Sub-Processors (days)</label>
+                        <input type="number" id="subprocessorNotice" placeholder="30" value="30" oninput="trackFieldEdit('subprocessorNotice')">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">Security Measures</div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="secEncryption" checked onchange="trackFieldEdit('secEncryption')">
+                        <label for="secEncryption">Encryption (at rest and in transit)</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="secAccess" checked onchange="trackFieldEdit('secAccess')">
+                        <label for="secAccess">Access controls and authentication</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="secAudit" checked onchange="trackFieldEdit('secAudit')">
+                        <label for="secAudit">Audit logging</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="secBackup" checked onchange="trackFieldEdit('secBackup')">
+                        <label for="secBackup">Regular backups</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="secPentest" onchange="trackFieldEdit('secPentest')">
+                        <label for="secPentest">Regular penetration testing</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="secCertifications" onchange="trackFieldEdit('secCertifications')">
+                        <label for="secCertifications">Security certifications (SOC 2, ISO 27001)</label>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">Breach Notification</div>
+                    <div class="form-group">
+                        <label for="breachNotifyTime">Notification Timeframe (hours)</label>
+                        <select id="breachNotifyTime" onchange="trackFieldEdit('breachNotifyTime')">
+                            <option value="24">24 hours</option>
+                            <option value="48">48 hours</option>
+                            <option value="72" selected>72 hours (GDPR requirement)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">Audit Rights</div>
+                    <div class="form-group">
+                        <label for="auditFrequency">Controller Audit Rights</label>
+                        <select id="auditFrequency" onchange="trackFieldEdit('auditFrequency')">
+                            <option value="annual">Annual audit right</option>
+                            <option value="reasonable">Upon reasonable request</option>
+                            <option value="quarterly">Quarterly audit right</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="auditNotice">Audit Notice Period (days)</label>
+                        <input type="number" id="auditNotice" placeholder="30" value="30" oninput="trackFieldEdit('auditNotice')">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn btn-primary" onclick="updatePreview()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    Generate DPA
+                </button>
+            </div>
+        </div>
+
+        <div class="preview-panel" id="previewPanel">
+            <div class="preview-header">
+                <h3>Document Preview</h3>
+                <div class="preview-actions">
+                    <div class="edit-mode-toggle">
+                        <input type="checkbox" id="fullEditMode" onchange="toggleFullEditMode()">
+                        <label for="fullEditMode">Full Edit Mode</label>
+                    </div>
+                    <button class="btn btn-secondary" onclick="printDocument()">Print</button>
+                    <button class="btn btn-success" onclick="downloadWord()">Download Word</button>
+                </div>
+            </div>
+            <div class="document-container">
+                <div class="full-edit-warning">⚠️ <strong>Full Edit Mode:</strong> Edit directly. Changes won't sync to form.</div>
+                <div class="document" id="documentPreview">
+                    <p style="text-align: center; color: var(--text-light); padding: 3rem;">Fill in the form and click "Generate DPA" to preview.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let lastEditedField = null;
+        let hasCustomEdits = false;
+
+        document.getElementById('transfersOutsideEU').addEventListener('change', function() {
+            document.getElementById('transferMechanismGroup').style.display = this.checked ? 'block' : 'none';
+        });
+
+        function trackFieldEdit(fieldId) {
+            if (hasCustomEdits && !confirm('Regenerating will overwrite custom edits. Continue?')) return;
+            hasCustomEdits = false;
+            lastEditedField = fieldId;
+            updatePreview();
+        }
+
+        function toggleFullEditMode() {
+            const isEnabled = document.getElementById('fullEditMode').checked;
+            const panel = document.getElementById('previewPanel');
+            const doc = document.getElementById('documentPreview');
+            panel.classList.toggle('full-edit-mode', isEnabled);
+            doc.contentEditable = isEnabled;
+            if (isEnabled) doc.addEventListener('input', () => hasCustomEdits = true);
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '[DATE]';
+            return new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        }
+
+        function updatePreview() {
+            const controllerName = document.getElementById('controllerName').value.trim() || '[CONTROLLER NAME]';
+            const controllerAddress = document.getElementById('controllerAddress').value.trim() || '[CONTROLLER ADDRESS]';
+            const controllerContact = document.getElementById('controllerContact').value.trim() || '[DPO/CONTACT]';
+            const controllerEmail = document.getElementById('controllerEmail').value.trim() || '[EMAIL]';
+
+            const processorName = document.getElementById('processorName').value.trim() || '[PROCESSOR NAME]';
+            const processorAddress = document.getElementById('processorAddress').value.trim() || '[PROCESSOR ADDRESS]';
+            const processorContact = document.getElementById('processorContact').value.trim() || '[DPO/CONTACT]';
+            const processorEmail = document.getElementById('processorEmail').value.trim() || '[EMAIL]';
+
+            const effectiveDate = formatDate(document.getElementById('effectiveDate').value);
+            const serviceName = document.getElementById('serviceName').value.trim() || '[SERVICE NAME]';
+            const processingPurpose = document.getElementById('processingPurpose').value.trim() || '[Processing purpose to be specified]';
+            const processingDuration = document.getElementById('processingDuration').value;
+
+            // Data subjects
+            let dataSubjects = [];
+            if (document.getElementById('dsCustomers').checked) dataSubjects.push("Controller's customers and end users");
+            if (document.getElementById('dsEmployees').checked) dataSubjects.push("Controller's employees");
+            if (document.getElementById('dsContractors').checked) dataSubjects.push("Contractors and vendors");
+            if (document.getElementById('dsProspects').checked) dataSubjects.push("Business prospects and leads");
+
+            // Personal data categories
+            let personalData = [];
+            if (document.getElementById('pdIdentity').checked) personalData.push("Identity data (name, username, user ID)");
+            if (document.getElementById('pdContact').checked) personalData.push("Contact data (email address, phone number, postal address)");
+            if (document.getElementById('pdFinancial').checked) personalData.push("Financial data (payment information, billing details)");
+            if (document.getElementById('pdTechnical').checked) personalData.push("Technical data (IP address, browser type, device information)");
+            if (document.getElementById('pdUsage').checked) personalData.push("Usage data (activity logs, preferences, feature usage)");
+            if (document.getElementById('pdSensitive').checked) personalData.push("Special category data (as specifically authorized)");
+
+            const dataLocation = document.getElementById('dataLocation').value;
+            const transfersOutsideEU = document.getElementById('transfersOutsideEU').checked;
+            const transferMechanism = document.getElementById('transferMechanism').value;
+
+            const usesSubprocessors = document.getElementById('usesSubprocessors').checked;
+            const subprocessorApproval = document.getElementById('subprocessorApproval').value;
+            const subprocessorNotice = document.getElementById('subprocessorNotice').value || '30';
+
+            // Security measures
+            let securityMeasures = [];
+            if (document.getElementById('secEncryption').checked) securityMeasures.push("Encryption of Personal Data at rest and in transit using industry-standard protocols");
+            if (document.getElementById('secAccess').checked) securityMeasures.push("Access controls, authentication mechanisms, and role-based permissions");
+            if (document.getElementById('secAudit').checked) securityMeasures.push("Comprehensive audit logging and monitoring");
+            if (document.getElementById('secBackup').checked) securityMeasures.push("Regular automated backups with secure off-site storage");
+            if (document.getElementById('secPentest').checked) securityMeasures.push("Regular penetration testing and vulnerability assessments");
+            if (document.getElementById('secCertifications').checked) securityMeasures.push("Maintenance of industry security certifications (e.g., SOC 2, ISO 27001)");
+
+            const breachNotifyTime = document.getElementById('breachNotifyTime').value;
+            const auditFrequency = document.getElementById('auditFrequency').value;
+            const auditNotice = document.getElementById('auditNotice').value || '30';
+
+            // Duration text
+            let durationText = 'the duration of the underlying service agreement between the parties';
+            if (processingDuration === '1year') durationText = 'one (1) year from the Effective Date';
+            if (processingDuration === '2years') durationText = 'two (2) years from the Effective Date';
+            if (processingDuration === '3years') durationText = 'three (3) years from the Effective Date';
+
+            // Transfer mechanism text
+            let transferText = '';
+            if (transfersOutsideEU) {
+                if (transferMechanism === 'scc') transferText = 'Standard Contractual Clauses (SCCs) as adopted by the European Commission';
+                if (transferMechanism === 'adequacy') transferText = 'an adequacy decision by the European Commission';
+                if (transferMechanism === 'bcr') transferText = 'Binding Corporate Rules approved by the relevant supervisory authority';
+            }
+
+            // Sub-processor section
+            let subprocessorSection = '';
+            if (usesSubprocessors) {
+                const approvalText = subprocessorApproval === 'general'
+                    ? 'Controller provides general written authorization for Processor to engage sub-processors'
+                    : 'Processor shall obtain specific prior written authorization from Controller before engaging any sub-processor';
+                subprocessorSection = `
+                    <h2>7. Sub-Processors</h2>
+                    <p>7.1 <strong>Authorization.</strong> ${approvalText}. A current list of sub-processors is maintained at Processor's website or available upon request.</p>
+                    <p>7.2 <strong>Notice.</strong> Processor shall provide Controller with at least <span class="doc-highlight" contenteditable="true" data-field="subprocessorNotice">${subprocessorNotice}</span> days' prior written notice before engaging a new sub-processor or making changes to existing sub-processors.</p>
+                    <p>7.3 <strong>Objection.</strong> Controller may object to a new sub-processor on reasonable grounds related to data protection. If the parties cannot resolve the objection, Controller may terminate the affected services without penalty.</p>
+                    <p>7.4 <strong>Sub-Processor Obligations.</strong> Processor shall ensure that each sub-processor is bound by written data protection obligations no less protective than those in this DPA, including appropriate technical and organizational security measures.</p>
+                    <p>7.5 <strong>Liability.</strong> Processor shall remain fully liable to Controller for the performance of its sub-processors' obligations.</p>
+                `;
+            }
+
+            // Transfer section
+            let transferSection = '';
+            if (transfersOutsideEU) {
+                transferSection = `
+                    <h2>8. International Data Transfers</h2>
+                    <p>8.1 <strong>Transfer Restrictions.</strong> Processor shall not transfer Personal Data to a country outside the European Economic Area (EEA) or the United Kingdom unless appropriate safeguards are in place as required by applicable data protection laws.</p>
+                    <p>8.2 <strong>Transfer Mechanism.</strong> For transfers of Personal Data outside the EEA, the parties agree to rely on ${transferText}.</p>
+                    <p>8.3 <strong>Supplementary Measures.</strong> Where required by applicable law or guidance from supervisory authorities, Processor shall implement supplementary technical, organizational, and contractual measures to ensure an equivalent level of protection.</p>
+                    <p>8.4 <strong>Transfer Impact Assessments.</strong> Upon Controller's request, Processor shall provide information necessary for Controller to conduct transfer impact assessments.</p>
+                `;
+            }
+
+            const documentHTML = `
+                <h1>DATA PROCESSING AGREEMENT</h1>
+
+                <div class="parties">
+                    <p>This Data Processing Agreement ("DPA") is entered into as of <span class="doc-highlight" contenteditable="true" data-field="effectiveDate">${effectiveDate}</span> (the "Effective Date")</p>
+                    <p><strong>by and between</strong></p>
+                    <p><span class="doc-highlight" contenteditable="true" data-field="controllerName">${controllerName}</span> ("Controller" or "Customer")<br>
+                    <span class="doc-highlight" contenteditable="true" data-field="controllerAddress">${controllerAddress}</span></p>
+                    <p><strong>and</strong></p>
+                    <p><span class="doc-highlight" contenteditable="true" data-field="processorName">${processorName}</span> ("Processor" or "Service Provider")<br>
+                    <span class="doc-highlight" contenteditable="true" data-field="processorAddress">${processorAddress}</span></p>
+                </div>
+
+                <h2>1. Definitions</h2>
+                <p>1.1 <strong>"Applicable Data Protection Laws"</strong> means all applicable laws relating to data protection and privacy, including the General Data Protection Regulation (EU) 2016/679 ("GDPR"), the UK GDPR, and any implementing legislation.</p>
+                <p>1.2 <strong>"Personal Data"</strong> means any information relating to an identified or identifiable natural person that is processed by Processor on behalf of Controller in connection with the Services.</p>
+                <p>1.3 <strong>"Processing"</strong> means any operation performed on Personal Data, including collection, recording, organization, structuring, storage, adaptation, retrieval, consultation, use, disclosure, erasure, or destruction.</p>
+                <p>1.4 <strong>"Data Subject"</strong> means the identified or identifiable natural person to whom Personal Data relates.</p>
+                <p>1.5 <strong>"Personal Data Breach"</strong> means a breach of security leading to the accidental or unlawful destruction, loss, alteration, unauthorized disclosure of, or access to Personal Data.</p>
+                <p>1.6 <strong>"Services"</strong> means <span class="doc-highlight" contenteditable="true" data-field="serviceName">${serviceName}</span> and related services provided by Processor to Controller.</p>
+
+                <h2>2. Scope and Purpose</h2>
+                <p>2.1 <strong>Purpose of Processing.</strong> Controller engages Processor to process Personal Data for the following purpose: <span class="doc-highlight" contenteditable="true" data-field="processingPurpose">${processingPurpose}</span></p>
+                <p>2.2 <strong>Duration.</strong> This DPA shall remain in effect for ${durationText}, unless terminated earlier in accordance with its terms or the underlying service agreement.</p>
+                <p>2.3 <strong>Nature of Processing.</strong> The processing activities include: collection, storage, organization, retrieval, use, disclosure by transmission, and erasure of Personal Data as necessary to provide the Services.</p>
+
+                <h2>3. Categories of Data</h2>
+                <p>3.1 <strong>Data Subjects.</strong> The Personal Data processed concerns the following categories of Data Subjects:</p>
+                <ul>${dataSubjects.map(ds => `<li>${ds}</li>`).join('')}</ul>
+                <p>3.2 <strong>Types of Personal Data.</strong> The following categories of Personal Data may be processed:</p>
+                <ul>${personalData.map(pd => `<li>${pd}</li>`).join('')}</ul>
+                <p>3.3 <strong>Data Location.</strong> Personal Data will be stored primarily in <span class="doc-highlight" contenteditable="true" data-field="dataLocation">${dataLocation === 'EU' ? 'the European Union' : dataLocation === 'US' ? 'the United States' : dataLocation === 'UK' ? 'the United Kingdom' : '[LOCATION]'}</span>.</p>
+
+                <h2>4. Processor Obligations</h2>
+                <p>4.1 <strong>Instructions.</strong> Processor shall process Personal Data only on documented instructions from Controller, unless required by applicable law. If Processor believes an instruction infringes Applicable Data Protection Laws, it shall promptly notify Controller.</p>
+                <p>4.2 <strong>Confidentiality.</strong> Processor shall ensure that persons authorized to process Personal Data are subject to appropriate confidentiality obligations.</p>
+                <p>4.3 <strong>Security.</strong> Processor shall implement and maintain appropriate technical and organizational measures to ensure a level of security appropriate to the risk, including:</p>
+                <ul>${securityMeasures.map(sm => `<li>${sm}</li>`).join('')}</ul>
+                <p>4.4 <strong>Assistance.</strong> Processor shall assist Controller in:</p>
+                <ul>
+                    <li>Responding to Data Subject requests to exercise their rights under Applicable Data Protection Laws;</li>
+                    <li>Ensuring compliance with Controller's obligations regarding security, breach notification, data protection impact assessments, and prior consultations with supervisory authorities;</li>
+                    <li>Providing information necessary to demonstrate compliance with this DPA.</li>
+                </ul>
+                <p>4.5 <strong>Deletion/Return.</strong> Upon termination of the Services, Processor shall, at Controller's choice, delete or return all Personal Data and delete existing copies, unless retention is required by applicable law.</p>
+
+                <h2>5. Personal Data Breach Notification</h2>
+                <p>5.1 <strong>Notification.</strong> Processor shall notify Controller without undue delay, and in any event within <span class="doc-highlight" contenteditable="true" data-field="breachNotifyTime">${breachNotifyTime}</span> hours, after becoming aware of a Personal Data Breach affecting Controller's Personal Data.</p>
+                <p>5.2 <strong>Information.</strong> The notification shall include, to the extent available:</p>
+                <ul>
+                    <li>A description of the nature of the breach, including categories and approximate number of Data Subjects and Personal Data records affected;</li>
+                    <li>The name and contact details of Processor's data protection officer or other contact;</li>
+                    <li>A description of the likely consequences of the breach;</li>
+                    <li>A description of measures taken or proposed to address the breach and mitigate its effects.</li>
+                </ul>
+                <p>5.3 <strong>Cooperation.</strong> Processor shall cooperate with Controller in investigating and remediating the breach and in complying with any notification requirements to supervisory authorities or Data Subjects.</p>
+
+                <h2>6. Audit Rights</h2>
+                <p>6.1 <strong>Audit.</strong> Processor shall make available to Controller all information necessary to demonstrate compliance with this DPA and allow for and contribute to audits, including inspections, conducted by Controller or an auditor mandated by Controller.</p>
+                <p>6.2 <strong>Frequency.</strong> Controller may conduct audits ${auditFrequency === 'annual' ? 'once per calendar year' : auditFrequency === 'quarterly' ? 'once per calendar quarter' : 'upon reasonable request'}.</p>
+                <p>6.3 <strong>Notice.</strong> Controller shall provide at least <span class="doc-highlight" contenteditable="true" data-field="auditNotice">${auditNotice}</span> days' prior written notice before conducting an on-site audit.</p>
+                <p>6.4 <strong>Certifications.</strong> Controller may rely on third-party audit reports, certifications (e.g., SOC 2, ISO 27001), or other evidence of compliance in lieu of conducting its own audit.</p>
+
+                ${subprocessorSection}
+                ${transferSection}
+
+                <h2>${usesSubprocessors ? (transfersOutsideEU ? '9' : '8') : (transfersOutsideEU ? '8' : '7')}. Controller Obligations</h2>
+                <p>Controller warrants that:</p>
+                <ul>
+                    <li>It has the legal basis to provide Personal Data to Processor for processing as described in this DPA;</li>
+                    <li>It has provided any required notices and obtained any required consents from Data Subjects;</li>
+                    <li>Its instructions to Processor comply with Applicable Data Protection Laws;</li>
+                    <li>It will cooperate with Processor in fulfilling any Data Subject requests or regulatory inquiries.</li>
+                </ul>
+
+                <h2>${usesSubprocessors ? (transfersOutsideEU ? '10' : '9') : (transfersOutsideEU ? '9' : '8')}. Liability and Indemnification</h2>
+                <p>Each party's liability under this DPA shall be subject to the limitations and exclusions of liability set forth in the underlying service agreement between the parties. Each party shall indemnify the other for any fines, penalties, or damages arising from its breach of this DPA or Applicable Data Protection Laws.</p>
+
+                <h2>${usesSubprocessors ? (transfersOutsideEU ? '11' : '10') : (transfersOutsideEU ? '10' : '9')}. General Provisions</h2>
+                <p><strong>Governing Law.</strong> This DPA shall be governed by the laws applicable to the underlying service agreement, unless Applicable Data Protection Laws require otherwise.</p>
+                <p><strong>Conflicts.</strong> In the event of any conflict between this DPA and the underlying service agreement, this DPA shall prevail with respect to data protection matters.</p>
+                <p><strong>Severability.</strong> If any provision of this DPA is found to be invalid or unenforceable, the remaining provisions shall continue in full force and effect.</p>
+                <p><strong>Amendments.</strong> This DPA may only be amended in writing signed by both parties.</p>
+
+                <p><strong>IN WITNESS WHEREOF</strong>, the parties have executed this Data Processing Agreement as of the Effective Date.</p>
+
+                <div class="signature-block">
+                    <div class="signature-party">
+                        <h4>DATA CONTROLLER:</h4>
+                        <p><strong><span class="doc-highlight" contenteditable="true" data-field="controllerName">${controllerName}</span></strong></p>
+                        <div class="signature-line"><span>Signature</span></div>
+                        <div class="signature-field"><span>Name: <span class="doc-highlight" contenteditable="true" data-field="controllerContact">${controllerContact}</span></span></div>
+                        <div class="signature-field"><span>Title: ____________________</span></div>
+                        <div class="signature-field"><span>Date: ____________________</span></div>
+                    </div>
+                    <div class="signature-party">
+                        <h4>DATA PROCESSOR:</h4>
+                        <p><strong><span class="doc-highlight" contenteditable="true" data-field="processorName">${processorName}</span></strong></p>
+                        <div class="signature-line"><span>Signature</span></div>
+                        <div class="signature-field"><span>Name: <span class="doc-highlight" contenteditable="true" data-field="processorContact">${processorContact}</span></span></div>
+                        <div class="signature-field"><span>Title: ____________________</span></div>
+                        <div class="signature-field"><span>Date: ____________________</span></div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('documentPreview').innerHTML = documentHTML;
+            setupInlineEditing();
+
+            if (lastEditedField) {
+                setTimeout(() => {
+                    const el = document.querySelector(`[data-field="${lastEditedField}"]`);
+                    if (el) {
+                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        el.classList.add('field-highlight-animation');
+                        setTimeout(() => el.classList.remove('field-highlight-animation'), 1500);
+                    }
+                    lastEditedField = null;
+                }, 50);
+            }
+        }
+
+        function setupInlineEditing() {
+            document.querySelectorAll('.doc-highlight[data-field]').forEach(field => {
+                field.addEventListener('blur', function() {
+                    const input = document.getElementById(this.dataset.field);
+                    if (input) input.value = this.textContent.trim();
+                    hasCustomEdits = true;
+                });
+            });
+        }
+
+        function printDocument() { window.print(); }
+
+        function downloadWord() {
+            const content = document.getElementById('documentPreview').innerHTML;
+            const controller = document.getElementById('controllerName').value.trim() || 'Controller';
+            const processor = document.getElementById('processorName').value.trim() || 'Processor';
+            const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>DPA - ${controller} and ${processor}</title>
+                <style>body{font-family:'Times New Roman',serif;font-size:12pt;line-height:1.6;margin:1in;}
+                h1{text-align:center;font-size:16pt;}h2{font-size:12pt;margin-top:18pt;}
+                p{margin-bottom:6pt;text-align:justify;}ul,ol{margin-left:24pt;}
+                .parties{text-align:center;margin-bottom:24pt;}.signature-block{margin-top:36pt;}
+                .signature-party{display:inline-block;width:45%;vertical-align:top;}
+                .signature-line{border-top:1px solid black;margin-top:48pt;padding-top:6pt;}
+                .doc-highlight{background:none;border:none;padding:0;}</style></head>
+                <body>${content}</body></html>`;
+            const blob = new Blob([html], { type: 'application/msword' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `DPA_${controller.replace(/[^a-z0-9]/gi, '_')}_${processor.replace(/[^a-z0-9]/gi, '_')}.doc`;
+            a.click();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('effectiveDate').value = new Date().toISOString().split('T')[0];
+        });
+    </script>
+</body>
+</html>

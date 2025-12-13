@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service Generator | Terms.Law</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e40af;
+            --primary-dark: #1e3a8a;
+            --accent: #f59e0b;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--background); color: var(--text); line-height: 1.6; }
+        .navbar { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); padding: 1rem 2rem; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .nav-container { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .nav-brand { display: flex; align-items: center; gap: 1rem; }
+        .nav-logo { font-size: 1.5rem; font-weight: 700; color: white; text-decoration: none; }
+        .nav-divider { color: rgba(255,255,255,0.5); }
+        .nav-title { color: rgba(255,255,255,0.9); font-size: 1rem; }
+        .nav-links { display: flex; gap: 1.5rem; }
+        .nav-links a { color: rgba(255,255,255,0.85); text-decoration: none; font-size: 0.9rem; font-weight: 500; }
+        .nav-links a:hover { color: white; }
+        .main-container { max-width: 1400px; margin: 0 auto; padding: 2rem; display: grid; grid-template-columns: 420px 1fr; gap: 2rem; align-items: start; }
+        .form-panel { background: var(--surface); border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); position: sticky; top: 80px; max-height: calc(100vh - 100px); overflow-y: auto; }
+        .form-header { padding: 1.5rem; border-bottom: 1px solid var(--border); background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 12px 12px 0 0; }
+        .form-header h2 { font-size: 1.25rem; color: var(--primary); margin-bottom: 0.25rem; }
+        .form-header p { font-size: 0.85rem; color: var(--text-light); }
+        .form-content { padding: 1.5rem; }
+        .form-section { margin-bottom: 1.5rem; }
+        .section-title { font-size: 0.9rem; font-weight: 600; color: var(--primary); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--border); }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 0.375rem; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.625rem 0.875rem; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; font-family: inherit; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(30,64,175,0.1); }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+        .checkbox-group { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0; }
+        .checkbox-group input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary); }
+        .checkbox-group label { margin-bottom: 0; cursor: pointer; }
+        .form-actions { padding: 1.5rem; border-top: 1px solid var(--border); }
+        .btn { padding: 0.875rem 1.5rem; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 0.5rem; border: none; width: 100%; }
+        .btn-primary { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(30,64,175,0.3); }
+        .btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+        .btn-success { background: linear-gradient(135deg, var(--success) 0%, #059669 100%); color: white; }
+        .preview-panel { background: var(--surface); border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .preview-header { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        .preview-header h3 { font-size: 1rem; }
+        .preview-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .preview-actions .btn { padding: 0.5rem 1rem; font-size: 0.85rem; width: auto; }
+        .edit-mode-toggle { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: #fef3c7; border-radius: 8px; font-size: 0.85rem; color: #92400e; }
+        .document-container { padding: 2rem; max-width: 850px; margin: 0 auto; }
+        .document { background: white; padding: 3rem; border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.05); line-height: 1.8; font-size: 14px; }
+        .document h1 { text-align: center; font-size: 1.5rem; margin-bottom: 1.5rem; }
+        .document h2 { font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 0.75rem; }
+        .document p { margin-bottom: 1rem; text-align: justify; }
+        .document ul { margin-left: 1.5rem; margin-bottom: 1rem; }
+        .document li { margin-bottom: 0.5rem; }
+        .doc-highlight { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 1px 4px; border-radius: 3px; border-bottom: 2px solid var(--accent); }
+        .doc-highlight:hover { background: linear-gradient(135deg, #fde68a 0%, #fcd34d 100%); }
+        .doc-highlight:focus { outline: none; box-shadow: 0 0 0 3px rgba(245,158,11,0.3); }
+        @keyframes highlightPulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245,158,11,0.7); } 50% { transform: scale(1.02); box-shadow: 0 0 0 8px rgba(245,158,11,0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245,158,11,0); } }
+        .field-highlight-animation { animation: highlightPulse 0.6s ease-out; background: linear-gradient(135deg, #fde047 0%, #facc15 100%) !important; }
+        .full-edit-mode .document { border: 2px dashed var(--warning); }
+        .full-edit-warning { display: none; background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; font-size: 0.85rem; color: #92400e; }
+        .full-edit-mode .full-edit-warning { display: block; }
+        @media print { .navbar, .form-panel, .preview-header, .full-edit-warning { display: none !important; } .main-container { display: block; padding: 0; } .document { border: none; box-shadow: none; padding: 0; } .doc-highlight { background: none !important; border: none !important; padding: 0 !important; } }
+        @media (max-width: 1024px) { .main-container { grid-template-columns: 1fr; } .form-panel { position: relative; top: 0; max-height: none; } }
+        @media (max-width: 640px) { .navbar { padding: 1rem; } .nav-links { display: none; } .main-container { padding: 1rem; } .document { padding: 1.5rem; } }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a href="https://terms.law" class="nav-logo">Terms.Law</a>
+                <span class="nav-divider">|</span>
+                <span class="nav-title">Terms of Service Generator</span>
+            </div>
+            <div class="nav-links">
+                <a href="/Templates/contract-library-landing.html">Contract Library</a>
+                <a href="/Blog/">Blog</a>
+                <a href="https://terms.law">Home</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="form-panel">
+            <div class="form-header">
+                <h2>📋 Terms of Service Details</h2>
+                <p>Generate customized Terms of Service for your website or application</p>
+            </div>
+
+            <div class="form-content">
+                <div class="form-section">
+                    <div class="section-title">Company Information</div>
+                    <div class="form-group">
+                        <label for="companyName">Company/Website Name</label>
+                        <input type="text" id="companyName" placeholder="Acme Inc." oninput="trackFieldEdit('companyName')">
+                    </div>
+                    <div class="form-group">
+                        <label for="websiteUrl">Website URL</label>
+                        <input type="text" id="websiteUrl" placeholder="https://www.example.com" oninput="trackFieldEdit('websiteUrl')">
+                    </div>
+                    <div class="form-group">
+                        <label for="contactEmail">Contact Email</label>
+                        <input type="email" id="contactEmail" placeholder="legal@example.com" oninput="trackFieldEdit('contactEmail')">
+                    </div>
+                    <div class="form-group">
+                        <label for="companyAddress">Business Address</label>
+                        <input type="text" id="companyAddress" placeholder="123 Main St, City, State ZIP" oninput="trackFieldEdit('companyAddress')">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">Service Type</div>
+                    <div class="form-group">
+                        <label for="serviceType">Primary Service Type</label>
+                        <select id="serviceType" onchange="trackFieldEdit('serviceType')">
+                            <option value="website">Website/Blog</option>
+                            <option value="saas">SaaS/Web Application</option>
+                            <option value="ecommerce">E-Commerce</option>
+                            <option value="marketplace">Marketplace</option>
+                            <option value="mobile">Mobile App</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="serviceDescription">Brief Service Description</label>
+                        <textarea id="serviceDescription" placeholder="Describe what your service provides..." oninput="trackFieldEdit('serviceDescription')"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">User Requirements</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="minAge">Minimum Age</label>
+                            <select id="minAge" onchange="trackFieldEdit('minAge')">
+                                <option value="13">13 years (COPPA)</option>
+                                <option value="16">16 years</option>
+                                <option value="18" selected>18 years</option>
+                                <option value="21">21 years</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="requiresAccount">Account Required?</label>
+                            <select id="requiresAccount" onchange="trackFieldEdit('requiresAccount')">
+                                <option value="yes">Yes</option>
+                                <option value="optional">Optional</option>
+                                <option value="no">No</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="allowsUserContent" checked onchange="trackFieldEdit('allowsUserContent')">
+                        <label for="allowsUserContent">Users can post/upload content</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="allowsComments" onchange="trackFieldEdit('allowsComments')">
+                        <label for="allowsComments">Users can post comments</label>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">Payment & Subscriptions</div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="hasPaidFeatures" onchange="trackFieldEdit('hasPaidFeatures'); togglePaymentFields()">
+                        <label for="hasPaidFeatures">Service has paid features or subscriptions</label>
+                    </div>
+                    <div id="paymentFields" style="display: none;">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="hasSubscriptions" onchange="trackFieldEdit('hasSubscriptions')">
+                            <label for="hasSubscriptions">Recurring subscription billing</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="hasRefunds" onchange="trackFieldEdit('hasRefunds')">
+                            <label for="hasRefunds">Offer refunds</label>
+                        </div>
+                        <div class="form-group">
+                            <label for="refundPeriod">Refund Period (days)</label>
+                            <input type="number" id="refundPeriod" placeholder="30" value="30" oninput="trackFieldEdit('refundPeriod')">
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="hasFreeTrial" onchange="trackFieldEdit('hasFreeTrial')">
+                            <label for="hasFreeTrial">Offer free trial</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">Intellectual Property</div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="userContentLicense" checked onchange="trackFieldEdit('userContentLicense')">
+                        <label for="userContentLicense">Obtain license to user-generated content</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="dmcaCompliance" checked onchange="trackFieldEdit('dmcaCompliance')">
+                        <label for="dmcaCompliance">Include DMCA takedown procedure</label>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">Legal Provisions</div>
+                    <div class="form-group">
+                        <label for="governingLaw">Governing Law (State)</label>
+                        <select id="governingLaw" onchange="trackFieldEdit('governingLaw')">
+                            <option value="California">California</option>
+                            <option value="Delaware">Delaware</option>
+                            <option value="New York">New York</option>
+                            <option value="Texas">Texas</option>
+                            <option value="Florida">Florida</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="disputeResolution">Dispute Resolution</label>
+                        <select id="disputeResolution" onchange="trackFieldEdit('disputeResolution')">
+                            <option value="arbitration">Binding Arbitration</option>
+                            <option value="litigation">Court Litigation</option>
+                            <option value="smallClaims">Small Claims + Arbitration</option>
+                        </select>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="classActionWaiver" checked onchange="trackFieldEdit('classActionWaiver')">
+                        <label for="classActionWaiver">Include class action waiver</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="indemnification" checked onchange="trackFieldEdit('indemnification')">
+                        <label for="indemnification">Include indemnification clause</label>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">Additional Provisions</div>
+                    <div class="form-group">
+                        <label for="lastUpdated">Last Updated Date</label>
+                        <input type="date" id="lastUpdated" oninput="trackFieldEdit('lastUpdated')">
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="includePrivacyRef" checked onchange="trackFieldEdit('includePrivacyRef')">
+                        <label for="includePrivacyRef">Reference Privacy Policy</label>
+                    </div>
+                    <div class="form-group" id="privacyUrlGroup">
+                        <label for="privacyUrl">Privacy Policy URL</label>
+                        <input type="text" id="privacyUrl" placeholder="/privacy" oninput="trackFieldEdit('privacyUrl')">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn btn-primary" onclick="updatePreview()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    Generate Terms of Service
+                </button>
+            </div>
+        </div>
+
+        <div class="preview-panel" id="previewPanel">
+            <div class="preview-header">
+                <h3>Document Preview</h3>
+                <div class="preview-actions">
+                    <div class="edit-mode-toggle">
+                        <input type="checkbox" id="fullEditMode" onchange="toggleFullEditMode()">
+                        <label for="fullEditMode">Full Edit Mode</label>
+                    </div>
+                    <button class="btn btn-secondary" onclick="printDocument()">Print</button>
+                    <button class="btn btn-success" onclick="downloadWord()">Download Word</button>
+                </div>
+            </div>
+            <div class="document-container">
+                <div class="full-edit-warning">⚠️ <strong>Full Edit Mode:</strong> Edit directly. Changes won't sync to form.</div>
+                <div class="document" id="documentPreview">
+                    <p style="text-align: center; color: var(--text-light); padding: 3rem;">Fill in the form and click "Generate Terms of Service" to preview.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let lastEditedField = null;
+        let hasCustomEdits = false;
+
+        function togglePaymentFields() {
+            document.getElementById('paymentFields').style.display = document.getElementById('hasPaidFeatures').checked ? 'block' : 'none';
+        }
+
+        function trackFieldEdit(fieldId) {
+            if (hasCustomEdits && !confirm('Regenerating will overwrite custom edits. Continue?')) return;
+            hasCustomEdits = false;
+            lastEditedField = fieldId;
+            updatePreview();
+        }
+
+        function toggleFullEditMode() {
+            const isEnabled = document.getElementById('fullEditMode').checked;
+            const panel = document.getElementById('previewPanel');
+            const doc = document.getElementById('documentPreview');
+            panel.classList.toggle('full-edit-mode', isEnabled);
+            doc.contentEditable = isEnabled;
+            if (isEnabled) doc.addEventListener('input', () => hasCustomEdits = true);
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            return new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        }
+
+        function updatePreview() {
+            const companyName = document.getElementById('companyName').value.trim() || '[COMPANY NAME]';
+            const websiteUrl = document.getElementById('websiteUrl').value.trim() || '[WEBSITE URL]';
+            const contactEmail = document.getElementById('contactEmail').value.trim() || '[EMAIL]';
+            const companyAddress = document.getElementById('companyAddress').value.trim() || '[ADDRESS]';
+            const serviceType = document.getElementById('serviceType').value;
+            const serviceDescription = document.getElementById('serviceDescription').value.trim() || '[service description]';
+            const minAge = document.getElementById('minAge').value;
+            const requiresAccount = document.getElementById('requiresAccount').value;
+            const allowsUserContent = document.getElementById('allowsUserContent').checked;
+            const allowsComments = document.getElementById('allowsComments').checked;
+            const hasPaidFeatures = document.getElementById('hasPaidFeatures').checked;
+            const hasSubscriptions = document.getElementById('hasSubscriptions').checked;
+            const hasRefunds = document.getElementById('hasRefunds').checked;
+            const refundPeriod = document.getElementById('refundPeriod').value || '30';
+            const hasFreeTrial = document.getElementById('hasFreeTrial').checked;
+            const userContentLicense = document.getElementById('userContentLicense').checked;
+            const dmcaCompliance = document.getElementById('dmcaCompliance').checked;
+            const governingLaw = document.getElementById('governingLaw').value;
+            const disputeResolution = document.getElementById('disputeResolution').value;
+            const classActionWaiver = document.getElementById('classActionWaiver').checked;
+            const indemnification = document.getElementById('indemnification').checked;
+            const lastUpdated = formatDate(document.getElementById('lastUpdated').value);
+            const includePrivacyRef = document.getElementById('includePrivacyRef').checked;
+            const privacyUrl = document.getElementById('privacyUrl').value.trim() || '/privacy';
+
+            const serviceLabel = serviceType === 'saas' ? 'Service' : serviceType === 'ecommerce' ? 'Platform' : serviceType === 'marketplace' ? 'Marketplace' : serviceType === 'mobile' ? 'App' : 'Website';
+
+            // Account Section
+            let accountSection = '';
+            if (requiresAccount === 'yes' || requiresAccount === 'optional') {
+                accountSection = `
+                    <h2>3. Account Registration</h2>
+                    <p>${requiresAccount === 'yes' ? 'You must create an account to use our ' + serviceLabel + '.' : 'You may create an account to access additional features.'} When registering, you agree to:</p>
+                    <ul>
+                        <li>Provide accurate, current, and complete information</li>
+                        <li>Maintain and update your information to keep it accurate</li>
+                        <li>Keep your password secure and confidential</li>
+                        <li>Notify us immediately of any unauthorized use of your account</li>
+                        <li>Accept responsibility for all activities under your account</li>
+                    </ul>
+                    <p>We reserve the right to suspend or terminate accounts that violate these Terms or are inactive for an extended period.</p>
+                `;
+            }
+
+            // User Content Section
+            let userContentSection = '';
+            if (allowsUserContent || allowsComments) {
+                userContentSection = `
+                    <h2>${requiresAccount !== 'no' ? '4' : '3'}. User Content</h2>
+                    <p>Our ${serviceLabel} ${allowsUserContent ? 'allows you to post, upload, or submit content' : ''}${allowsUserContent && allowsComments ? ' and ' : ''}${allowsComments ? 'post comments' : ''} ("User Content"). You are solely responsible for your User Content.</p>
+                    <p><strong>Content Guidelines:</strong> You agree not to post content that:</p>
+                    <ul>
+                        <li>Is unlawful, harmful, threatening, abusive, harassing, defamatory, or invasive of privacy</li>
+                        <li>Infringes any patent, trademark, trade secret, copyright, or other intellectual property rights</li>
+                        <li>Contains viruses, malware, or other harmful code</li>
+                        <li>Is spam, advertising, or promotional material without authorization</li>
+                        <li>Impersonates any person or entity or misrepresents your affiliation</li>
+                    </ul>
+                    ${userContentLicense ? `<p><strong>License Grant:</strong> By posting User Content, you grant <span class="doc-highlight" contenteditable="true" data-field="companyName">${companyName}</span> a worldwide, non-exclusive, royalty-free, transferable license to use, reproduce, modify, distribute, and display such content in connection with operating and improving our ${serviceLabel}.</p>` : ''}
+                    <p>We reserve the right to remove any User Content that violates these Terms or is otherwise objectionable, at our sole discretion and without notice.</p>
+                `;
+            }
+
+            // Payment Section
+            let paymentSection = '';
+            if (hasPaidFeatures) {
+                let paymentNum = 3;
+                if (requiresAccount !== 'no') paymentNum++;
+                if (allowsUserContent || allowsComments) paymentNum++;
+
+                paymentSection = `
+                    <h2>${paymentNum}. Payments and Billing</h2>
+                    <p>Certain features of our ${serviceLabel} require payment. By purchasing paid features, you agree to the following:</p>
+                    <p><strong>Pricing:</strong> All prices are displayed in U.S. dollars and are subject to change with notice. You are responsible for any applicable taxes.</p>
+                    ${hasSubscriptions ? `<p><strong>Subscriptions:</strong> Subscription fees are billed in advance on a recurring basis. Your subscription will automatically renew unless you cancel before the end of the current billing period. You may cancel at any time through your account settings.</p>` : ''}
+                    ${hasFreeTrial ? `<p><strong>Free Trial:</strong> We may offer free trial periods. At the end of the trial, you will be charged unless you cancel before the trial ends. You may only use one free trial per account.</p>` : ''}
+                    ${hasRefunds ? `<p><strong>Refunds:</strong> You may request a refund within <span class="doc-highlight" contenteditable="true" data-field="refundPeriod">${refundPeriod}</span> days of purchase. Refunds are processed at our discretion and may not be available for all products or services.</p>` : '<p><strong>No Refunds:</strong> All purchases are final. We do not offer refunds except as required by law.</p>'}
+                `;
+            }
+
+            // DMCA Section
+            let dmcaSection = '';
+            if (dmcaCompliance) {
+                let dmcaNum = 3;
+                if (requiresAccount !== 'no') dmcaNum++;
+                if (allowsUserContent || allowsComments) dmcaNum++;
+                if (hasPaidFeatures) dmcaNum++;
+
+                dmcaSection = `
+                    <h2>${dmcaNum}. Copyright and DMCA</h2>
+                    <p>We respect intellectual property rights. If you believe content on our ${serviceLabel} infringes your copyright, please send a DMCA takedown notice to <span class="doc-highlight" contenteditable="true" data-field="contactEmail">${contactEmail}</span> with:</p>
+                    <ul>
+                        <li>A physical or electronic signature of the copyright owner or authorized agent</li>
+                        <li>Identification of the copyrighted work claimed to be infringed</li>
+                        <li>Identification of the material to be removed with sufficient detail to locate it</li>
+                        <li>Your contact information (address, phone, email)</li>
+                        <li>A statement that you have a good faith belief the use is not authorized</li>
+                        <li>A statement under penalty of perjury that the information is accurate and you are authorized to act on behalf of the copyright owner</li>
+                    </ul>
+                    <p>We may terminate accounts of repeat infringers.</p>
+                `;
+            }
+
+            // Dispute Section
+            let disputeText = '';
+            if (disputeResolution === 'arbitration') {
+                disputeText = `<p><strong>Binding Arbitration:</strong> Any dispute arising from these Terms shall be resolved by binding arbitration administered by the American Arbitration Association under its Commercial Arbitration Rules. The arbitration shall be conducted in <span class="doc-highlight" contenteditable="true" data-field="governingLaw">${governingLaw}</span>. The arbitrator's decision shall be final and binding.</p>`;
+            } else if (disputeResolution === 'smallClaims') {
+                disputeText = `<p><strong>Small Claims Exception:</strong> Either party may bring a claim in small claims court if it qualifies. All other disputes shall be resolved by binding arbitration in <span class="doc-highlight" contenteditable="true" data-field="governingLaw">${governingLaw}</span>.</p>`;
+            } else {
+                disputeText = `<p><strong>Jurisdiction:</strong> Any legal action shall be brought exclusively in the state or federal courts located in <span class="doc-highlight" contenteditable="true" data-field="governingLaw">${governingLaw}</span>. You consent to the jurisdiction of such courts.</p>`;
+            }
+
+            let classWaiverText = classActionWaiver ? `<p><strong>Class Action Waiver:</strong> YOU AGREE THAT ANY DISPUTE RESOLUTION WILL BE CONDUCTED ONLY ON AN INDIVIDUAL BASIS AND NOT IN A CLASS, CONSOLIDATED, OR REPRESENTATIVE ACTION.</p>` : '';
+
+            // Indemnification
+            let indemnificationSection = '';
+            if (indemnification) {
+                indemnificationSection = `<p><strong>Indemnification:</strong> You agree to indemnify, defend, and hold harmless <span class="doc-highlight" contenteditable="true" data-field="companyName">${companyName}</span>, its officers, directors, employees, and agents from any claims, damages, losses, or expenses arising from your use of the ${serviceLabel}, your User Content, or your violation of these Terms.</p>`;
+            }
+
+            const documentHTML = `
+                <h1>Terms of Service</h1>
+                <p style="text-align: center; color: var(--text-light);">Last Updated: <span class="doc-highlight" contenteditable="true" data-field="lastUpdated">${lastUpdated}</span></p>
+
+                <h2>1. Acceptance of Terms</h2>
+                <p>Welcome to <span class="doc-highlight" contenteditable="true" data-field="companyName">${companyName}</span> (<span class="doc-highlight" contenteditable="true" data-field="websiteUrl">${websiteUrl}</span>). By accessing or using our ${serviceLabel}, you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, please do not use our ${serviceLabel}.</p>
+                <p>We may update these Terms from time to time. Your continued use after changes constitutes acceptance of the modified Terms. We encourage you to review these Terms periodically.</p>
+                ${includePrivacyRef ? `<p>Please also review our <a href="${privacyUrl}">Privacy Policy</a>, which governs how we collect and use your information.</p>` : ''}
+
+                <h2>2. Eligibility</h2>
+                <p>You must be at least <span class="doc-highlight" contenteditable="true" data-field="minAge">${minAge}</span> years old to use our ${serviceLabel}. By using our ${serviceLabel}, you represent that you meet this age requirement and have the legal capacity to enter into these Terms.</p>
+                ${parseInt(minAge) < 18 ? '<p>If you are under 18, you represent that your parent or legal guardian has reviewed and agreed to these Terms on your behalf.</p>' : ''}
+
+                ${accountSection}
+                ${userContentSection}
+                ${paymentSection}
+                ${dmcaSection}
+
+                <h2>Intellectual Property</h2>
+                <p>All content, features, and functionality of our ${serviceLabel}, including but not limited to text, graphics, logos, icons, images, audio, video, software, and code, are owned by <span class="doc-highlight" contenteditable="true" data-field="companyName">${companyName}</span> or its licensors and are protected by copyright, trademark, and other intellectual property laws.</p>
+                <p>You may not reproduce, distribute, modify, create derivative works of, publicly display, or exploit any content from our ${serviceLabel} without our prior written permission.</p>
+
+                <h2>Prohibited Conduct</h2>
+                <p>You agree not to:</p>
+                <ul>
+                    <li>Use our ${serviceLabel} for any unlawful purpose or in violation of these Terms</li>
+                    <li>Interfere with or disrupt the ${serviceLabel} or servers or networks connected to it</li>
+                    <li>Attempt to gain unauthorized access to any portion of the ${serviceLabel}</li>
+                    <li>Use any robot, spider, scraper, or other automated means to access the ${serviceLabel}</li>
+                    <li>Circumvent, disable, or interfere with security features</li>
+                    <li>Transmit any viruses, worms, or other malicious code</li>
+                    <li>Harass, threaten, or intimidate other users</li>
+                </ul>
+
+                <h2>Disclaimer of Warranties</h2>
+                <p>OUR ${serviceLabel.toUpperCase()} IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.</p>
+                <p>We do not warrant that our ${serviceLabel} will be uninterrupted, error-free, secure, or free of viruses or other harmful components. Your use of our ${serviceLabel} is at your own risk.</p>
+
+                <h2>Limitation of Liability</h2>
+                <p>TO THE MAXIMUM EXTENT PERMITTED BY LAW, <span class="doc-highlight" contenteditable="true" data-field="companyName">${companyName.toUpperCase()}</span> SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING BUT NOT LIMITED TO LOSS OF PROFITS, DATA, USE, OR GOODWILL, ARISING OUT OF YOUR USE OF OR INABILITY TO USE OUR ${serviceLabel.toUpperCase()}.</p>
+                <p>IN NO EVENT SHALL OUR TOTAL LIABILITY EXCEED THE AMOUNT YOU PAID US, IF ANY, IN THE PAST TWELVE (12) MONTHS.</p>
+
+                ${indemnificationSection}
+
+                <h2>Termination</h2>
+                <p>We may suspend or terminate your access to our ${serviceLabel} at any time, with or without cause, and with or without notice. Upon termination, your right to use our ${serviceLabel} will immediately cease.</p>
+                <p>All provisions of these Terms that by their nature should survive termination shall survive, including ownership provisions, warranty disclaimers, and limitations of liability.</p>
+
+                <h2>Governing Law and Disputes</h2>
+                <p>These Terms shall be governed by and construed in accordance with the laws of the State of <span class="doc-highlight" contenteditable="true" data-field="governingLaw">${governingLaw}</span>, without regard to conflict of law principles.</p>
+                ${disputeText}
+                ${classWaiverText}
+
+                <h2>Severability</h2>
+                <p>If any provision of these Terms is found to be unenforceable, the remaining provisions will continue in full force and effect.</p>
+
+                <h2>Entire Agreement</h2>
+                <p>These Terms, together with our Privacy Policy and any other legal notices published on our ${serviceLabel}, constitute the entire agreement between you and <span class="doc-highlight" contenteditable="true" data-field="companyName">${companyName}</span> regarding your use of our ${serviceLabel}.</p>
+
+                <h2>Contact Us</h2>
+                <p>If you have any questions about these Terms, please contact us at:</p>
+                <p><span class="doc-highlight" contenteditable="true" data-field="companyName">${companyName}</span><br>
+                <span class="doc-highlight" contenteditable="true" data-field="companyAddress">${companyAddress}</span><br>
+                Email: <span class="doc-highlight" contenteditable="true" data-field="contactEmail">${contactEmail}</span></p>
+            `;
+
+            document.getElementById('documentPreview').innerHTML = documentHTML;
+            setupInlineEditing();
+
+            if (lastEditedField) {
+                setTimeout(() => {
+                    const el = document.querySelector(`[data-field="${lastEditedField}"]`);
+                    if (el) {
+                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        el.classList.add('field-highlight-animation');
+                        setTimeout(() => el.classList.remove('field-highlight-animation'), 1500);
+                    }
+                    lastEditedField = null;
+                }, 50);
+            }
+        }
+
+        function setupInlineEditing() {
+            document.querySelectorAll('.doc-highlight[data-field]').forEach(field => {
+                field.addEventListener('blur', function() {
+                    const input = document.getElementById(this.dataset.field);
+                    if (input) input.value = this.textContent.trim();
+                    hasCustomEdits = true;
+                });
+            });
+        }
+
+        function printDocument() { window.print(); }
+
+        function downloadWord() {
+            const content = document.getElementById('documentPreview').innerHTML;
+            const name = document.getElementById('companyName').value.trim() || 'Company';
+            const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Terms of Service - ${name}</title>
+                <style>body{font-family:'Times New Roman',serif;font-size:12pt;line-height:1.6;margin:1in;}
+                h1{text-align:center;font-size:18pt;}h2{font-size:14pt;margin-top:18pt;}
+                p{margin-bottom:6pt;text-align:justify;}ul{margin-left:24pt;}
+                .doc-highlight{background:none;border:none;padding:0;}</style></head>
+                <body>${content}</body></html>`;
+            const blob = new Blob([html], { type: 'application/msword' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `Terms_of_Service_${name.replace(/[^a-z0-9]/gi, '_')}.doc`;
+            a.click();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('lastUpdated').value = new Date().toISOString().split('T')[0];
+        });
+    </script>
+</body>
+</html>
