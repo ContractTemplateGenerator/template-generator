@@ -251,6 +251,90 @@
             color: #1e40af;
             margin-bottom: 16px;
         }
+        .gen-warning-box {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 12px;
+            color: #92400e;
+            margin-bottom: 16px;
+        }
+        .gen-tip-box {
+            background: #f0fdf4;
+            border: 1px solid #22c55e;
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 12px;
+            color: #166534;
+            margin-bottom: 16px;
+        }
+        /* Tooltips */
+        .tooltip-trigger {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            cursor: help;
+        }
+        .tooltip-icon {
+            width: 14px;
+            height: 14px;
+            background: #9ca3af;
+            color: white;
+            border-radius: 50%;
+            font-size: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        .tooltip-trigger:hover .tooltip-icon {
+            background: #6366f1;
+        }
+        .field-help {
+            font-size: 11px;
+            color: #6b7280;
+            margin-top: 4px;
+            line-height: 1.4;
+        }
+        .field-help a {
+            color: #6366f1;
+        }
+        /* Expandable sections */
+        .gen-expandable {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+        .gen-expandable-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            background: #f9fafb;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            color: #374151;
+        }
+        .gen-expandable-header:hover {
+            background: #f3f4f6;
+        }
+        .gen-expandable-content {
+            padding: 12px;
+            display: none;
+            border-top: 1px solid #e5e7eb;
+        }
+        .gen-expandable.open .gen-expandable-content {
+            display: block;
+        }
+        .gen-expandable-arrow {
+            transition: transform 0.2s;
+        }
+        .gen-expandable.open .gen-expandable-arrow {
+            transform: rotate(180deg);
+        }
         .blank-doc-message {
             text-align: center;
             padding: 40px 20px;
@@ -783,31 +867,36 @@
             return `
                 <div class="gen-form-header">
                     <h2>Non-Solicitation Agreement</h2>
-                    <p>Protect your customers and employees</p>
+                    <p>Protect your business relationships and workforce</p>
                 </div>
 
                 <div class="gen-info-box">
-                    <strong>More Enforceable Than Non-Competes</strong><br>
-                    Non-solicitation agreements are narrower in scope and generally more enforceable.
+                    <strong>Why Non-Solicitation Agreements Matter</strong><br>
+                    Unlike non-competes (banned in CA, restricted elsewhere), non-solicitation agreements are enforceable in most states because they don't prevent employment—they protect specific business relationships.
                 </div>
 
                 <div class="gen-form-section">
                     <div class="gen-section-title">Company Information</div>
                     <div class="gen-form-group">
-                        <label>Company Name</label>
-                        <input type="text" id="gen_companyName" placeholder="Acme Corporation" oninput="updateGeneratorPreview('companyName')">
+                        <label class="tooltip-trigger">Company Legal Name <span class="tooltip-icon">?</span></label>
+                        <input type="text" id="gen_companyName" placeholder="Acme Corporation, Inc." oninput="updateGeneratorPreview('companyName')">
+                        <div class="field-help">Use your exact legal entity name as registered with the state (e.g., "Inc.", "LLC", "Corp.")</div>
                     </div>
                     <div class="gen-form-row">
                         <div class="gen-form-group">
-                            <label>State</label>
+                            <label class="tooltip-trigger">Governing State <span class="tooltip-icon">?</span></label>
                             <select id="gen_companyState" onchange="updateGeneratorPreview('companyState')">
                                 <option value="">Select...</option>
                                 <option value="California">California</option>
                                 <option value="Delaware">Delaware</option>
                                 <option value="Florida">Florida</option>
+                                <option value="Illinois">Illinois</option>
+                                <option value="Massachusetts">Massachusetts</option>
                                 <option value="New York">New York</option>
                                 <option value="Texas">Texas</option>
+                                <option value="Washington">Washington</option>
                             </select>
+                            <div class="field-help">State law governs enforceability. CA has strict limits; most others allow reasonable restrictions.</div>
                         </div>
                         <div class="gen-form-group">
                             <label>Effective Date</label>
@@ -816,50 +905,154 @@
                     </div>
                     <div class="gen-form-group">
                         <label>Company Address</label>
-                        <input type="text" id="gen_companyAddress" placeholder="123 Business Ave, City, State ZIP" oninput="updateGeneratorPreview('companyAddress')">
+                        <input type="text" id="gen_companyAddress" placeholder="123 Business Ave, Suite 100, City, State ZIP" oninput="updateGeneratorPreview('companyAddress')">
                     </div>
                 </div>
 
                 <div class="gen-form-section">
                     <div class="gen-section-title">Individual Information</div>
                     <div class="gen-form-group">
-                        <label>Individual Name</label>
-                        <input type="text" id="gen_individualName" placeholder="John Smith" oninput="updateGeneratorPreview('individualName')">
+                        <label>Individual's Full Legal Name</label>
+                        <input type="text" id="gen_individualName" placeholder="John Michael Smith" oninput="updateGeneratorPreview('individualName')">
                     </div>
                     <div class="gen-form-group">
-                        <label>Relationship Type</label>
+                        <label class="tooltip-trigger">Relationship Type <span class="tooltip-icon">?</span></label>
                         <select id="gen_individualType" onchange="updateGeneratorPreview('individualType')">
                             <option value="employee">Employee</option>
                             <option value="contractor">Independent Contractor</option>
                             <option value="consultant">Consultant</option>
+                            <option value="officer">Officer/Director</option>
+                            <option value="partner">Business Partner</option>
                         </select>
+                        <div class="field-help">The agreement terms adjust based on relationship type. Officers/partners typically have broader restrictions.</div>
                     </div>
                     <div class="gen-form-group">
                         <label>Position/Title</label>
-                        <input type="text" id="gen_jobTitle" placeholder="Sales Manager" oninput="updateGeneratorPreview('jobTitle')">
+                        <input type="text" id="gen_jobTitle" placeholder="Regional Sales Director" oninput="updateGeneratorPreview('jobTitle')">
+                    </div>
+                    <div class="gen-form-group">
+                        <label>Individual's Address</label>
+                        <input type="text" id="gen_individualAddress" placeholder="456 Home Street, City, State ZIP" oninput="updateGeneratorPreview('individualAddress')">
+                    </div>
+                </div>
+
+                <div class="gen-warning-box">
+                    <strong>California Notice:</strong> Non-solicitation of <em>employees</em> is generally unenforceable in CA per Business & Professions Code § 16600. Customer non-solicits may be enforceable if tied to trade secrets.
+                </div>
+
+                <div class="gen-form-section">
+                    <div class="gen-section-title">Customer Non-Solicitation</div>
+                    <div class="gen-form-group">
+                        <label class="tooltip-trigger">Restriction Period <span class="tooltip-icon">?</span></label>
+                        <select id="gen_customerPeriod" onchange="updateGeneratorPreview('customerPeriod')">
+                            <option value="6 months">6 Months</option>
+                            <option value="12 months" selected>12 Months</option>
+                            <option value="18 months">18 Months</option>
+                            <option value="24 months">24 Months</option>
+                        </select>
+                        <div class="field-help">Courts favor 12-18 months. Longer periods require strong justification (trade secrets, key accounts).</div>
+                    </div>
+                    <div class="gen-form-group">
+                        <label class="tooltip-trigger">Protected Customers <span class="tooltip-icon">?</span></label>
+                        <select id="gen_customerScope" onchange="updateGeneratorPreview('customerScope')">
+                            <option value="worked-with">Customers individual worked with directly</option>
+                            <option value="had-contact">Customers individual had material contact with</option>
+                            <option value="confidential-info">Customers about whom individual received confidential information</option>
+                            <option value="all-customers">All company customers (broader - may be harder to enforce)</option>
+                        </select>
+                        <div class="field-help">Narrower scope = more enforceable. "Worked with directly" is strongest in court.</div>
+                    </div>
+                    <div class="gen-form-group">
+                        <label class="tooltip-trigger">Lookback Period <span class="tooltip-icon">?</span></label>
+                        <select id="gen_lookbackPeriod" onchange="updateGeneratorPreview('lookbackPeriod')">
+                            <option value="12 months">Last 12 months of employment</option>
+                            <option value="18 months">Last 18 months of employment</option>
+                            <option value="24 months" selected>Last 24 months of employment</option>
+                        </select>
+                        <div class="field-help">Defines which customers are "protected" based on when the relationship existed.</div>
                     </div>
                 </div>
 
                 <div class="gen-form-section">
-                    <div class="gen-section-title">Restriction Terms</div>
-                    <div class="gen-form-row">
-                        <div class="gen-form-group">
-                            <label>Customer Restriction</label>
-                            <select id="gen_customerPeriod" onchange="updateGeneratorPreview('customerPeriod')">
-                                <option value="6 months">6 Months</option>
-                                <option value="1 year" selected>1 Year</option>
-                                <option value="2 years">2 Years</option>
-                            </select>
-                        </div>
-                        <div class="gen-form-group">
-                            <label>Employee Restriction</label>
-                            <select id="gen_employeePeriod" onchange="updateGeneratorPreview('employeePeriod')">
-                                <option value="6 months">6 Months</option>
-                                <option value="1 year" selected>1 Year</option>
-                                <option value="2 years">2 Years</option>
-                            </select>
+                    <div class="gen-section-title">Employee Non-Solicitation</div>
+                    <div class="gen-form-group">
+                        <label>Restriction Period</label>
+                        <select id="gen_employeePeriod" onchange="updateGeneratorPreview('employeePeriod')">
+                            <option value="6 months">6 Months</option>
+                            <option value="12 months" selected>12 Months</option>
+                            <option value="18 months">18 Months</option>
+                            <option value="24 months">24 Months</option>
+                        </select>
+                    </div>
+                    <div class="gen-form-group">
+                        <label class="tooltip-trigger">Protected Personnel <span class="tooltip-icon">?</span></label>
+                        <select id="gen_employeeScope" onchange="updateGeneratorPreview('employeeScope')">
+                            <option value="worked-with">Employees individual worked with directly</option>
+                            <option value="supervised">Employees individual supervised or managed</option>
+                            <option value="department">Employees in individual's department</option>
+                            <option value="all-employees">All company employees (broadest)</option>
+                        </select>
+                    </div>
+                    <div class="gen-form-group">
+                        <div class="gen-checkbox-group">
+                            <label class="gen-checkbox-label">
+                                <input type="checkbox" id="gen_includeContractors" onchange="updateGeneratorPreview('includeContractors')" checked>
+                                <span>Include contractors</span>
+                            </label>
+                            <label class="gen-checkbox-label">
+                                <input type="checkbox" id="gen_includeConsultants" onchange="updateGeneratorPreview('includeConsultants')" checked>
+                                <span>Include consultants</span>
+                            </label>
                         </div>
                     </div>
+                </div>
+
+                <div class="gen-form-section">
+                    <div class="gen-section-title">Additional Provisions</div>
+                    <div class="gen-form-group">
+                        <div class="gen-checkbox-group">
+                            <label class="gen-checkbox-label">
+                                <input type="checkbox" id="gen_includeConfidentiality" onchange="updateGeneratorPreview('includeConfidentiality')" checked>
+                                <span>Confidentiality clause</span>
+                            </label>
+                            <label class="gen-checkbox-label">
+                                <input type="checkbox" id="gen_includeNonDisparagement" onchange="updateGeneratorPreview('includeNonDisparagement')" checked>
+                                <span>Non-disparagement</span>
+                            </label>
+                            <label class="gen-checkbox-label">
+                                <input type="checkbox" id="gen_includeInjunctiveRelief" onchange="updateGeneratorPreview('includeInjunctiveRelief')" checked>
+                                <span>Injunctive relief</span>
+                            </label>
+                        </div>
+                        <div class="field-help" style="margin-top: 8px;">Injunctive relief allows seeking court orders to stop violations without proving monetary damages first.</div>
+                    </div>
+                </div>
+
+                <div class="gen-form-section">
+                    <div class="gen-section-title">Consideration (What Employee Receives)</div>
+                    <div class="gen-form-group">
+                        <label class="tooltip-trigger">Consideration Type <span class="tooltip-icon">?</span></label>
+                        <select id="gen_considerationType" onchange="updateGeneratorPreview('considerationType')">
+                            <option value="employment">Initial employment (new hire)</option>
+                            <option value="continued-employment">Continued employment (existing employee)</option>
+                            <option value="promotion">Promotion or new position</option>
+                            <option value="bonus">Signing bonus or special compensation</option>
+                            <option value="equity">Stock options or equity grant</option>
+                        </select>
+                        <div class="field-help"><strong>Critical for enforceability:</strong> Some states (IL, NC, WA) require consideration beyond just continued employment. A bonus or raise strengthens the agreement.</div>
+                    </div>
+                    <div class="gen-form-group" id="considerationAmountGroup" style="display:none;">
+                        <label>Consideration Amount ($)</label>
+                        <input type="text" id="gen_considerationAmount" placeholder="5,000" oninput="updateGeneratorPreview('considerationAmount')">
+                    </div>
+                </div>
+
+                <div class="gen-tip-box">
+                    <strong>Enforceability Tips:</strong><br>
+                    • Have employee sign at hire (not after starting)<br>
+                    • Keep restrictions reasonable in time and scope<br>
+                    • Provide real consideration (bonus, raise, promotion)<br>
+                    • Review state-specific requirements annually
                 </div>
             `;
         }
