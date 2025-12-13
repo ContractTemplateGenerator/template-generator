@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>U.S. Design Patent Search Preview: Garlic Press | Terms.Law</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      line-height: 1.6;
+    }
+    .header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: white;
+      padding: 2rem;
+      text-align: center;
+    }
+    .header h1 {
+      font-size: 1.75rem;
+      margin-bottom: 0.5rem;
+    }
+    .header p {
+      color: #94a3b8;
+      font-size: 0.95rem;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    .preview-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: white;
+      padding: 0.35rem 1rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 1.5rem;
+    }
+    .summary-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      margin-bottom: 1.5rem;
+      border-left: 4px solid #2563eb;
+    }
+    .summary-card h2 {
+      font-size: 1.1rem;
+      color: #0f172a;
+      margin-bottom: 1rem;
+    }
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .stat-box {
+      background: #f1f5f9;
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+    }
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #2563eb;
+    }
+    .stat-label {
+      font-size: 0.8rem;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .findings-list {
+      list-style: none;
+    }
+    .findings-list li {
+      padding: 0.75rem 0;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+    .findings-list li:last-child {
+      border-bottom: none;
+    }
+    .finding-icon {
+      width: 24px;
+      height: 24px;
+      background: #dbeafe;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 0.75rem;
+    }
+    .finding-icon.warning {
+      background: #fef3c7;
+    }
+    .finding-icon.danger {
+      background: #fee2e2;
+    }
+    .redacted {
+      background: linear-gradient(90deg, #1e293b 0%, #334155 50%, #1e293b 100%);
+      color: #1e293b;
+      padding: 0.1rem 0.5rem;
+      border-radius: 3px;
+      font-family: monospace;
+      user-select: none;
+      position: relative;
+    }
+    .redacted::after {
+      content: "REDACTED";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      color: #64748b;
+      font-size: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+    .patent-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      font-size: 0.9rem;
+    }
+    .patent-table th {
+      background: #f1f5f9;
+      padding: 0.75rem;
+      text-align: left;
+      font-weight: 600;
+      color: #475569;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .patent-table td {
+      padding: 0.75rem;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .status-active {
+      display: inline-block;
+      background: #dcfce7;
+      color: #166534;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .blur-row td {
+      filter: blur(4px);
+      user-select: none;
+    }
+    .blur-row:hover td {
+      filter: blur(4px);
+    }
+    .cta-section {
+      background: linear-gradient(135deg, #1e40af 0%, #7c3aed 100%);
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      color: white;
+      margin: 2rem 0;
+    }
+    .cta-section h3 {
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+    .cta-section p {
+      color: rgba(255,255,255,0.85);
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+    }
+    .cta-button {
+      display: inline-block;
+      background: white;
+      color: #1e40af;
+      padding: 0.75rem 2rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .cta-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    .deliverables {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .deliverables h3 {
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      color: #0f172a;
+    }
+    .deliverable-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .deliverable-item:last-child {
+      border-bottom: none;
+    }
+    .check-icon {
+      color: #10b981;
+      font-weight: bold;
+    }
+    .pricing-note {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 1.5rem;
+      font-size: 0.9rem;
+    }
+    .pricing-note strong {
+      color: #92400e;
+    }
+    .footer {
+      text-align: center;
+      padding: 2rem;
+      color: #64748b;
+      font-size: 0.85rem;
+    }
+    .footer a {
+      color: #2563eb;
+      text-decoration: none;
+    }
+    .warning-box {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 1rem 0;
+      font-size: 0.9rem;
+      color: #991b1b;
+    }
+    .china-note {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+    .china-note h4 {
+      color: #166534;
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+    .china-note p {
+      font-size: 0.85rem;
+      color: #166534;
+    }
+    @media (max-width: 600px) {
+      .stat-grid { grid-template-columns: 1fr; }
+      .container { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>U.S. Design Patent Search: Garlic Press</h1>
+    <p>Preliminary Search Results | Prepared by Sergei Tokmakov, Esq.</p>
+  </div>
+
+  <div class="container">
+    <span class="preview-badge">Preview Only</span>
+
+    <div class="summary-card">
+      <h2>Search Summary</h2>
+      <div class="stat-grid">
+        <div class="stat-box">
+          <div class="stat-number">4</div>
+          <div class="stat-label">Active US Design Patents</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-number">2</div>
+          <div class="stat-label">Recently Expired</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-number">1</div>
+          <div class="stat-label">Pending Application</div>
+        </div>
+      </div>
+      <p style="color: #64748b; font-size: 0.9rem;">Search conducted December 13, 2025 covering USPTO design patent records for garlic press and related kitchen implement classifications.</p>
+    </div>
+
+    <div class="summary-card">
+      <h2>Key Findings</h2>
+      <ul class="findings-list">
+        <li>
+          <span class="finding-icon warning">!</span>
+          <div>
+            <strong>Multiple active design patents found</strong> from major kitchenware companies including <span class="redacted">XXXXXXXX</span>, <span class="redacted">XXXXXXXX</span>, and individual inventors
+          </div>
+        </li>
+        <li>
+          <span class="finding-icon danger">!</span>
+          <div>
+            <strong>One patent specifically references Amazon marketplace</strong> sales, indicating active enforcement monitoring
+          </div>
+        </li>
+        <li>
+          <span class="finding-icon">i</span>
+          <div>
+            <strong>Chinese design patent does NOT provide U.S. protection</strong> &mdash; your product must still clear U.S. design patents regardless of China registration
+          </div>
+        </li>
+        <li>
+          <span class="finding-icon">i</span>
+          <div>
+            <strong>Expiration dates range from 2026 to 2040</strong> &mdash; some patents expiring soon, others newly issued with long protection periods
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="summary-card">
+      <h2>Active U.S. Design Patents Identified</h2>
+      <table class="patent-table">
+        <thead>
+          <tr>
+            <th>Patent #</th>
+            <th>Assignee</th>
+            <th>Expires</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="redacted">USDXXXXXXX</span></td>
+            <td><span class="redacted">XXXXXXXX Home Inc</span></td>
+            <td>2040</td>
+            <td><span class="status-active">ACTIVE</span></td>
+          </tr>
+          <tr>
+            <td><span class="redacted">USDXXXXXXX</span></td>
+            <td><span class="redacted">Shenzhen XXXXXX</span></td>
+            <td>2037</td>
+            <td><span class="status-active">ACTIVE</span></td>
+          </tr>
+          <tr>
+            <td><span class="redacted">USDXXXXXXX</span></td>
+            <td>Individual Inventor</td>
+            <td>2036</td>
+            <td><span class="status-active">ACTIVE</span></td>
+          </tr>
+          <tr>
+            <td><span class="redacted">USDXXXXXXX</span></td>
+            <td><span class="redacted">Progressive XXXXXX</span></td>
+            <td>2026</td>
+            <td><span class="status-active">ACTIVE</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="color: #64748b; font-size: 0.85rem; margin-top: 0.75rem;">Full patent numbers, assignee details, design descriptions, and figure analysis available in complete report.</p>
+    </div>
+
+    <div class="china-note">
+      <h4>Regarding Your China Design Patent</h4>
+      <p>A Chinese design patent registration provides <strong>zero protection in the United States</strong>. U.S. Customs and Amazon's IP enforcement only recognize U.S. patents. Your clearance analysis must focus on whether your product's appearance is substantially similar to any of the active U.S. design patents identified above.</p>
+    </div>
+
+    <div class="warning-box">
+      <strong>Infringement Risk:</strong> Design patent infringement occurs when an "ordinary observer" would find your product's appearance substantially similar to a patented design. This requires side-by-side visual comparison of your specific product against each active patent's claimed design figures.
+    </div>
+
+    <div class="cta-section">
+      <h3>Ready for the Full Clearance Analysis?</h3>
+      <p>Get complete patent details, visual comparisons, risk assessment, and a written opinion letter for Amazon compliance.</p>
+      <a href="mailto:owner@terms.law" class="cta-button">Request Full Report</a>
+    </div>
+
+    <div class="deliverables">
+      <h3>Full Engagement Deliverables</h3>
+      <div class="deliverable-item">
+        <span class="check-icon">&#10003;</span>
+        <div><strong>Complete Patent List</strong> &mdash; All patent numbers, filing dates, expiration dates, and assignee information</div>
+      </div>
+      <div class="deliverable-item">
+        <span class="check-icon">&#10003;</span>
+        <div><strong>Design Figure Analysis</strong> &mdash; Key design elements claimed in each patent with annotated drawings</div>
+      </div>
+      <div class="deliverable-item">
+        <span class="check-icon">&#10003;</span>
+        <div><strong>Side-by-Side Comparison</strong> &mdash; Your product vs. each active patent's claimed design</div>
+      </div>
+      <div class="deliverable-item">
+        <span class="check-icon">&#10003;</span>
+        <div><strong>Risk Assessment Matrix</strong> &mdash; Low/Medium/High risk rating for each patent with reasoning</div>
+      </div>
+      <div class="deliverable-item">
+        <span class="check-icon">&#10003;</span>
+        <div><strong>Written Opinion Letter</strong> &mdash; Formal clearance opinion suitable for business records and investor due diligence</div>
+      </div>
+      <div class="deliverable-item">
+        <span class="check-icon">&#10003;</span>
+        <div><strong>Design-Around Recommendations</strong> &mdash; If needed, specific modifications to reduce infringement risk</div>
+      </div>
+
+      <div class="pricing-note">
+        <strong>Typical Fee Range:</strong> Patent search + clearance assessment: $400-600 | Written opinion letter: $300-500 additional | Turnaround: 3-5 business days after receiving product images
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <p><strong>Sergei Tokmakov, Esq.</strong> | California Bar #279869</p>
+    <p><a href="https://terms.law">Terms.Law</a> | Business &amp; IP Law</p>
+    <p style="margin-top: 1rem; font-size: 0.8rem; color: #94a3b8;">This preview is for informational purposes only and does not constitute legal advice. A formal clearance opinion requires engagement and review of your specific product.</p>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Articles of Incorporation Generator | Certificate of Incorporation | Terms.Law</title>
+  <meta name="description" content="Free Articles of Incorporation generator for Delaware, California, Texas, and other states. Create your certificate of incorporation with customizable stock structure.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-primary: #1e40af;
+      --color-primary-dark: #1e3a8a;
+      --color-primary-light: #3b82f6;
+      --color-accent: #7c3aed;
+      --color-accent-light: #8b5cf6;
+      --color-success: #059669;
+      --color-warning: #d97706;
+      --color-danger: #dc2626;
+      --color-bg: #f8fafc;
+      --color-surface: #ffffff;
+      --color-border: #e2e8f0;
+      --color-border-light: #f1f5f9;
+      --color-text: #0f172a;
+      --color-text-secondary: #334155;
+      --color-text-muted: #64748b;
+      --color-text-light: #94a3b8;
+      --color-dark: #0f172a;
+      --color-dark-surface: #1e293b;
+      --doc-bg: #fefefe;
+      --doc-text: #1f2937;
+      --doc-clause-title: #1e40af;
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --radius-full: 9999px;
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-serif: Georgia, 'Times New Roman', serif;
+      --transition-fast: 150ms ease;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body { font-family: var(--font-sans); font-size: 16px; line-height: 1.6; color: var(--color-text); background: var(--color-bg); }
+    .site-header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 0; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); }
+    .header-content { display: flex; align-items: center; justify-content: center; height: 52px; }
+    .header-nav { display: flex; align-items: center; gap: 0; height: 100%; }
+    .nav-link { color: #94a3b8; font-size: 0.85rem; font-weight: 600; padding: 16px 24px; transition: all 150ms ease; text-decoration: none; height: 100%; display: flex; align-items: center; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid transparent; }
+    .nav-link:hover { color: #ffffff; background: rgba(255, 255, 255, 0.05); }
+    .nav-link.active { color: #ffffff; background: rgba(255, 255, 255, 0.08); border-bottom-color: #3b82f6; }
+    .nav-link.home-logo { padding: 12px 20px; font-size: 1.1rem; font-weight: 800; letter-spacing: -0.02em; text-transform: none; }
+    .nav-link.home-logo .logo-text { background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hero { background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #312e81 100%); padding: 2rem 2rem; position: relative; }
+    .hero-content { max-width: 800px; }
+    .hero-badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; background: rgba(124, 58, 237, 0.15); border: 1px solid rgba(124, 58, 237, 0.3); border-radius: var(--radius-full); font-size: 0.8rem; color: #c4b5fd; margin-bottom: 1rem; }
+    .hero h1 { font-size: 2rem; font-weight: 800; color: #fff; line-height: 1.2; margin-bottom: 0.75rem; }
+    .hero h1 .highlight { background: linear-gradient(135deg, #a78bfa, #60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hero-subtitle { font-size: 1rem; color: #94a3b8; line-height: 1.6; }
+    .builder-layout { display: grid; grid-template-columns: 380px 1fr; gap: 0; min-height: calc(100vh - 200px); }
+    @media (max-width: 1024px) { .builder-layout { grid-template-columns: 1fr; } }
+    .builder-sidebar { background: var(--color-surface); border-right: 1px solid var(--color-border); padding: 1.5rem; overflow-y: auto; max-height: calc(100vh - 150px); position: sticky; top: 52px; }
+    .builder-section { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--color-border-light); }
+    .builder-section:last-child { border-bottom: none; margin-bottom: 0; }
+    .builder-section-title { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; }
+    .form-group { margin-bottom: 1rem; }
+    .form-label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--color-text); margin-bottom: 0.35rem; }
+    .form-input, .form-textarea, .form-select { width: 100%; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-md); font-size: 0.9rem; font-family: inherit; transition: all var(--transition-fast); background: var(--color-surface); }
+    .form-input:focus, .form-textarea:focus, .form-select:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1); }
+    .form-textarea { min-height: 80px; resize: vertical; }
+    .form-hint { font-size: 0.75rem; color: var(--color-text-muted); margin-top: 4px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .preview-panel { background: var(--color-bg); padding: 1.5rem; overflow-y: auto; }
+    .preview-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem; }
+    .preview-title { font-size: 0.8rem; font-weight: 700; color: var(--color-text-muted); }
+    .preview-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: var(--radius-md); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all var(--transition-fast); border: none; }
+    .btn-primary { background: var(--color-primary); color: #fff; }
+    .btn-primary:hover { background: var(--color-primary-dark); }
+    .btn-secondary { background: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-border); }
+    .btn-secondary:hover { border-color: var(--color-primary); color: var(--color-primary); }
+    .document-container { background: var(--color-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); overflow: hidden; }
+    .document-header { background: linear-gradient(135deg, var(--color-dark) 0%, var(--color-dark-surface) 100%); padding: 0.75rem 1.5rem; display: flex; align-items: center; justify-content: space-between; }
+    .document-title { color: #fff; font-size: 0.85rem; font-weight: 600; }
+    .document-status { font-size: 0.7rem; color: var(--color-accent-light); }
+    .document-body { padding: 40px 50px; background: var(--doc-bg); font-family: var(--font-serif); font-size: 13px; line-height: 1.8; color: var(--doc-text); }
+    .document-body.full-edit-mode { outline: 3px solid var(--color-primary); background: #fffef8; }
+    .doc-title { text-align: center; font-size: 18px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px; }
+    .doc-subtitle { text-align: center; font-size: 14px; font-weight: bold; margin-bottom: 6px; }
+    .doc-state-header { text-align: center; font-size: 12px; color: var(--color-text-muted); margin-bottom: 25px; font-family: var(--font-sans); }
+    .doc-article-title { font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-top: 20px; margin-bottom: 10px; color: var(--doc-clause-title); text-align: center; }
+    .doc-paragraph { margin-bottom: 12px; text-align: justify; }
+    .doc-list { margin: 12px 0 12px 20px; padding-left: 15px; }
+    .doc-list li { margin-bottom: 8px; text-align: justify; }
+    .doc-highlight { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 1px 5px; border-radius: 3px; border-bottom: 2px solid #f59e0b; font-weight: 600; cursor: text; }
+    .doc-highlight:hover { background: linear-gradient(135deg, #fde68a 0%, #fcd34d 100%); }
+    .doc-highlight:focus { outline: none; box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.3); }
+    .doc-highlight.empty { background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); border-bottom-color: #ef4444; color: #dc2626; }
+    @keyframes highlightPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); } 50% { box-shadow: 0 0 0 6px rgba(245, 158, 11, 0.3); } }
+    .field-highlight-animation { animation: highlightPulse 0.6s ease-out; }
+    .doc-signature-block { margin-top: 40px; }
+    .doc-signature-line { display: flex; align-items: flex-end; margin-bottom: 8px; min-height: 35px; max-width: 350px; }
+    .doc-signature-line .sig-label { width: 100px; font-size: 10px; color: var(--color-text-muted); }
+    .doc-signature-line .sig-value { flex: 1; border-bottom: 1px solid #333; min-height: 30px; display: flex; align-items: flex-end; padding-bottom: 3px; }
+    .stock-class-card { background: var(--color-bg); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 0.75rem; }
+    .stock-class-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+    .stock-class-title { font-weight: 600; font-size: 0.85rem; }
+    .btn-remove { background: none; border: none; color: var(--color-danger); cursor: pointer; font-size: 0.8rem; padding: 4px 8px; }
+    .btn-remove:hover { text-decoration: underline; }
+    .btn-add-stock { width: 100%; padding: 10px; background: var(--color-bg); border: 2px dashed var(--color-border); border-radius: var(--radius-md); color: var(--color-text-muted); cursor: pointer; font-size: 0.85rem; transition: all var(--transition-fast); }
+    .btn-add-stock:hover { border-color: var(--color-primary); color: var(--color-primary); }
+    .director-card { background: var(--color-bg); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 0.75rem; margin-bottom: 0.5rem; }
+    .director-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+    .toast { position: fixed; bottom: 20px; right: 20px; background: var(--color-dark); color: #fff; padding: 12px 18px; border-radius: var(--radius-md); font-size: 0.85rem; box-shadow: var(--shadow-xl); transform: translateY(100px); opacity: 0; transition: all 0.3s ease; z-index: 1000; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { background: var(--color-success); }
+    .site-footer { background: var(--color-dark); color: #94a3b8; padding: 2rem; text-align: center; }
+    .footer-brand { font-size: 1.1rem; font-weight: 800; margin-bottom: 0.5rem; }
+    .footer-brand .logo-text { background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .checkbox-group { display: flex; flex-direction: column; gap: 0.5rem; }
+    .checkbox-item { display: flex; align-items: center; gap: 0.5rem; }
+    .checkbox-item input { width: 16px; height: 16px; }
+    .checkbox-item label { font-size: 0.85rem; cursor: pointer; }
+    @media (max-width: 768px) { .document-body { padding: 25px 20px; } .form-row { grid-template-columns: 1fr; } }
+    @media print { .site-header, .hero, .builder-sidebar, .preview-toolbar, .document-header, .site-footer, .toast { display: none !important; } .builder-layout { display: block; } .preview-panel { padding: 0; } .document-container { box-shadow: none; } .document-body { padding: 0.5in; } .doc-highlight { background: none !important; border: none !important; padding: 0 !important; } }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-content">
+      <nav class="header-nav">
+        <a href="/" class="nav-link home-logo"><span class="logo-text">Terms.Law</span></a>
+        <a href="/Demand-Letters/demand-letters-landing.html" class="nav-link">Demands</a>
+        <a href="contract-library-landing.html" class="nav-link active">Contracts</a>
+        <a href="/INC/formation-landing.html" class="nav-link">Incorporation</a>
+        <a href="/Blog/blog-landing.html" class="nav-link">Blog</a>
+      </nav>
+    </div>
+  </header>
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">Corporation Formation</div>
+      <h1><span class="highlight">Articles of Incorporation</span> Generator</h1>
+      <p class="hero-subtitle">Generate your Certificate of Incorporation with customizable stock structure, registered agent info, and state-specific provisions. Ready to file.</p>
+    </div>
+  </section>
+  <main class="builder-layout">
+    <aside class="builder-sidebar">
+      <div class="builder-section">
+        <h3 class="builder-section-title">Corporation Information</h3>
+        <div class="form-group">
+          <label class="form-label">Corporation Name</label>
+          <input type="text" id="corpName" class="form-input" placeholder="Acme Corporation" oninput="trackFieldEdit('corpName')">
+          <p class="form-hint">Must include "Inc.", "Corp.", "Incorporated", or "Corporation"</p>
+        </div>
+        <div class="form-group">
+          <label class="form-label">State of Incorporation</label>
+          <select id="incState" class="form-select" onchange="updateStateSpecific(); trackFieldEdit('incState')">
+            <option value="Delaware">Delaware</option>
+            <option value="California">California</option>
+            <option value="Texas">Texas</option>
+            <option value="New York">New York</option>
+            <option value="Florida">Florida</option>
+            <option value="Nevada">Nevada</option>
+            <option value="Wyoming">Wyoming</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Corporate Purpose</label>
+          <select id="purpose" class="form-select" onchange="trackFieldEdit('purpose')">
+            <option value="general">General (Any Lawful Business)</option>
+            <option value="specific">Specific Purpose</option>
+          </select>
+        </div>
+        <div class="form-group" id="specificPurposeGroup" style="display: none;">
+          <label class="form-label">Specific Purpose Description</label>
+          <textarea id="specificPurpose" class="form-textarea" placeholder="To engage in the business of software development..." oninput="trackFieldEdit('specificPurpose')"></textarea>
+        </div>
+      </div>
+      <div class="builder-section">
+        <h3 class="builder-section-title">Registered Agent</h3>
+        <div class="form-group">
+          <label class="form-label">Registered Agent Name</label>
+          <input type="text" id="agentName" class="form-input" placeholder="Registered Agent Services Inc." oninput="trackFieldEdit('agentName')">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Agent Street Address</label>
+          <input type="text" id="agentAddress" class="form-input" placeholder="1209 Orange Street" oninput="trackFieldEdit('agentAddress')">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">City</label>
+            <input type="text" id="agentCity" class="form-input" placeholder="Wilmington" oninput="trackFieldEdit('agentCity')">
+          </div>
+          <div class="form-group">
+            <label class="form-label">ZIP Code</label>
+            <input type="text" id="agentZip" class="form-input" placeholder="19801" oninput="trackFieldEdit('agentZip')">
+          </div>
+        </div>
+      </div>
+      <div class="builder-section">
+        <h3 class="builder-section-title">Stock Structure</h3>
+        <div id="stockClasses">
+          <div class="stock-class-card" data-class-id="common">
+            <div class="stock-class-header">
+              <span class="stock-class-title">Common Stock</span>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Authorized Shares</label>
+                <input type="number" class="form-input stock-shares" value="10000000" oninput="updatePreview()">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Par Value ($)</label>
+                <input type="number" step="0.0001" class="form-input stock-par" value="0.0001" oninput="updatePreview()">
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="btn-add-stock" onclick="addStockClass()">+ Add Preferred Stock Class</button>
+      </div>
+      <div class="builder-section">
+        <h3 class="builder-section-title">Initial Directors</h3>
+        <div id="directors">
+          <div class="director-card" data-director-id="1">
+            <div class="director-header">
+              <span class="stock-class-title">Director 1</span>
+              <button class="btn-remove" onclick="removeDirector(this)" style="display: none;">Remove</button>
+            </div>
+            <div class="form-group">
+              <input type="text" class="form-input director-name" placeholder="Full Name" oninput="updatePreview()">
+            </div>
+            <div class="form-group">
+              <input type="text" class="form-input director-address" placeholder="Address" oninput="updatePreview()">
+            </div>
+          </div>
+        </div>
+        <button class="btn-add-stock" onclick="addDirector()">+ Add Director</button>
+      </div>
+      <div class="builder-section">
+        <h3 class="builder-section-title">Incorporator</h3>
+        <div class="form-group">
+          <label class="form-label">Incorporator Name</label>
+          <input type="text" id="incorporatorName" class="form-input" placeholder="John Smith" oninput="trackFieldEdit('incorporatorName')">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Incorporator Address</label>
+          <input type="text" id="incorporatorAddress" class="form-input" placeholder="123 Main St, Wilmington, DE 19801" oninput="trackFieldEdit('incorporatorAddress')">
+        </div>
+      </div>
+      <div class="builder-section">
+        <h3 class="builder-section-title">Optional Provisions</h3>
+        <div class="checkbox-group">
+          <div class="checkbox-item">
+            <input type="checkbox" id="optLiability" checked onchange="updatePreview()">
+            <label for="optLiability">Director Liability Limitation</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="optIndemnification" checked onchange="updatePreview()">
+            <label for="optIndemnification">Indemnification Provision</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="optPreemptive" onchange="updatePreview()">
+            <label for="optPreemptive">Preemptive Rights</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="optCumulative" onchange="updatePreview()">
+            <label for="optCumulative">Cumulative Voting</label>
+          </div>
+          <div class="checkbox-item">
+            <input type="checkbox" id="optPerpetual" checked onchange="updatePreview()">
+            <label for="optPerpetual">Perpetual Existence</label>
+          </div>
+        </div>
+      </div>
+    </aside>
+    <section class="preview-panel">
+      <div class="preview-toolbar">
+        <span class="preview-title">LIVE PREVIEW</span>
+        <div class="preview-actions">
+          <button class="btn btn-secondary" onclick="toggleFullEdit()">Full Edit Mode</button>
+          <button class="btn btn-secondary" onclick="copyToClipboard()">Copy</button>
+          <button class="btn btn-secondary" onclick="window.print()">Print</button>
+          <button class="btn btn-primary" onclick="downloadDocument()">Download</button>
+        </div>
+      </div>
+      <div class="document-container">
+        <div class="document-header">
+          <span class="document-title">Articles of Incorporation</span>
+          <span class="document-status">Auto-saved</span>
+        </div>
+        <div class="document-body" id="documentBody">
+          <!-- Document content generated by JavaScript -->
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <div class="footer-brand"><span class="logo-text">Terms.Law</span></div>
+    <p>Free legal document tools for startups and businesses</p>
+  </footer>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    let stockClassCounter = 0;
+    let directorCounter = 1;
+    let fullEditMode = false;
+
+    const fieldMap = {
+      corpName: 'field-corpName',
+      incState: 'field-incState',
+      purpose: 'field-purpose',
+      specificPurpose: 'field-specificPurpose',
+      agentName: 'field-agentName',
+      agentAddress: 'field-agentAddress',
+      agentCity: 'field-agentCity',
+      agentZip: 'field-agentZip',
+      incorporatorName: 'field-incorporatorName',
+      incorporatorAddress: 'field-incorporatorAddress'
+    };
+
+    function trackFieldEdit(fieldId) {
+      updatePreview();
+      const targetId = fieldMap[fieldId];
+      if (targetId) {
+        setTimeout(() => {
+          const el = document.getElementById(targetId);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            el.classList.remove('field-highlight-animation');
+            void el.offsetWidth;
+            el.classList.add('field-highlight-animation');
+          }
+        }, 100);
+      }
+    }
+
+    function updateStateSpecific() {
+      updatePreview();
+    }
+
+    function getVal(id, def = '') {
+      const el = document.getElementById(id);
+      return el ? (el.value || def) : def;
+    }
+
+    function getChecked(id) {
+      const el = document.getElementById(id);
+      return el ? el.checked : false;
+    }
+
+    function formatNumber(num) {
+      return parseInt(num).toLocaleString();
+    }
+
+    function getStockClasses() {
+      const classes = [];
+      document.querySelectorAll('.stock-class-card').forEach(card => {
+        const classId = card.dataset.classId;
+        const shares = card.querySelector('.stock-shares').value || '0';
+        const par = card.querySelector('.stock-par').value || '0.0001';
+        classes.push({
+          id: classId,
+          name: classId === 'common' ? 'Common Stock' : `Series ${classId} Preferred Stock`,
+          shares: shares,
+          par: par
+        });
+      });
+      return classes;
+    }
+
+    function getDirectors() {
+      const directors = [];
+      document.querySelectorAll('.director-card').forEach(card => {
+        const name = card.querySelector('.director-name').value || '';
+        const address = card.querySelector('.director-address').value || '';
+        if (name || address) {
+          directors.push({ name, address });
+        }
+      });
+      return directors;
+    }
+
+    function addStockClass() {
+      stockClassCounter++;
+      const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      const classLetter = letters[stockClassCounter - 1] || stockClassCounter;
+      const container = document.getElementById('stockClasses');
+      const card = document.createElement('div');
+      card.className = 'stock-class-card';
+      card.dataset.classId = classLetter;
+      card.innerHTML = `
+        <div class="stock-class-header">
+          <span class="stock-class-title">Series ${classLetter} Preferred Stock</span>
+          <button class="btn-remove" onclick="removeStockClass(this)">Remove</button>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Authorized Shares</label>
+            <input type="number" class="form-input stock-shares" value="1000000" oninput="updatePreview()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Par Value ($)</label>
+            <input type="number" step="0.0001" class="form-input stock-par" value="0.0001" oninput="updatePreview()">
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+      updatePreview();
+    }
+
+    function removeStockClass(btn) {
+      btn.closest('.stock-class-card').remove();
+      updatePreview();
+    }
+
+    function addDirector() {
+      directorCounter++;
+      const container = document.getElementById('directors');
+      const card = document.createElement('div');
+      card.className = 'director-card';
+      card.dataset.directorId = directorCounter;
+      card.innerHTML = `
+        <div class="director-header">
+          <span class="stock-class-title">Director ${directorCounter}</span>
+          <button class="btn-remove" onclick="removeDirector(this)">Remove</button>
+        </div>
+        <div class="form-group">
+          <input type="text" class="form-input director-name" placeholder="Full Name" oninput="updatePreview()">
+        </div>
+        <div class="form-group">
+          <input type="text" class="form-input director-address" placeholder="Address" oninput="updatePreview()">
+        </div>
+      `;
+      container.appendChild(card);
+      updateDirectorRemoveButtons();
+      updatePreview();
+    }
+
+    function removeDirector(btn) {
+      btn.closest('.director-card').remove();
+      updateDirectorRemoveButtons();
+      updatePreview();
+    }
+
+    function updateDirectorRemoveButtons() {
+      const cards = document.querySelectorAll('.director-card');
+      cards.forEach((card, i) => {
+        const removeBtn = card.querySelector('.btn-remove');
+        removeBtn.style.display = cards.length > 1 ? 'block' : 'none';
+      });
+    }
+
+    function span(id, val) {
+      const isEmpty = !val || val === '[Not Specified]';
+      return `<span class="doc-highlight${isEmpty ? ' empty' : ''}" id="${id}" contenteditable="true" oninput="syncToForm('${id}')">${val || '[Not Specified]'}</span>`;
+    }
+
+    function syncToForm(fieldId) {
+      const el = document.getElementById(fieldId);
+      if (!el) return;
+      const value = el.innerText;
+      for (const [inputId, spanId] of Object.entries(fieldMap)) {
+        if (spanId === fieldId) {
+          const input = document.getElementById(inputId);
+          if (input) input.value = value;
+          break;
+        }
+      }
+    }
+
+    function updatePreview() {
+      // Show/hide specific purpose field
+      const purposeType = getVal('purpose', 'general');
+      document.getElementById('specificPurposeGroup').style.display = purposeType === 'specific' ? 'block' : 'none';
+
+      const corpName = getVal('corpName', '[Corporation Name]');
+      const state = getVal('incState', 'Delaware');
+      const agentName = getVal('agentName', '[Registered Agent Name]');
+      const agentAddress = getVal('agentAddress', '[Street Address]');
+      const agentCity = getVal('agentCity', '[City]');
+      const agentZip = getVal('agentZip', '[ZIP]');
+      const incorporatorName = getVal('incorporatorName', '[Incorporator Name]');
+      const incorporatorAddress = getVal('incorporatorAddress', '[Incorporator Address]');
+      const specificPurpose = getVal('specificPurpose', '');
+
+      const stockClasses = getStockClasses();
+      const directors = getDirectors();
+
+      // Calculate totals
+      let totalShares = 0;
+      stockClasses.forEach(sc => { totalShares += parseInt(sc.shares) || 0; });
+
+      // State-specific document name
+      const docName = state === 'Delaware' ? 'CERTIFICATE OF INCORPORATION' : 'ARTICLES OF INCORPORATION';
+      const stateLaw = state === 'Delaware' ? 'General Corporation Law of the State of Delaware' :
+                       state === 'California' ? 'California Corporations Code' :
+                       state === 'Texas' ? 'Texas Business Organizations Code' :
+                       state === 'Nevada' ? 'Nevada Revised Statutes Chapter 78' :
+                       `${state} Business Corporation Act`;
+
+      // Purpose clause
+      const purposeClause = purposeType === 'specific' && specificPurpose ?
+        `The purpose of the Corporation is to ${specificPurpose}.` :
+        `The purpose of the Corporation is to engage in any lawful act or activity for which corporations may be organized under the ${stateLaw}.`;
+
+      // Stock authorization section
+      let stockSection = '';
+      if (stockClasses.length === 1 && stockClasses[0].id === 'common') {
+        stockSection = `
+          <p class="doc-paragraph">The total number of shares of stock which the Corporation shall have authority to issue is ${formatNumber(stockClasses[0].shares)} shares of Common Stock, par value $${stockClasses[0].par} per share.</p>
+        `;
+      } else {
+        stockSection = `
+          <p class="doc-paragraph">The total number of shares of all classes of stock which the Corporation shall have authority to issue is ${formatNumber(totalShares)} shares, consisting of:</p>
+          <ul class="doc-list">
+            ${stockClasses.map(sc => `<li>${formatNumber(sc.shares)} shares of ${sc.name}, par value $${sc.par} per share</li>`).join('')}
+          </ul>
+        `;
+        if (stockClasses.some(sc => sc.id !== 'common')) {
+          stockSection += `
+            <p class="doc-paragraph">The designations, powers, preferences, and relative, participating, optional, or other special rights, and the qualifications, limitations, or restrictions thereof, of each class or series of stock shall be set forth in a Certificate of Designation filed with the Secretary of State.</p>
+          `;
+        }
+      }
+
+      // Directors section
+      let directorsSection = '';
+      if (directors.length > 0 && directors.some(d => d.name)) {
+        directorsSection = `
+          <div class="doc-article-title">ARTICLE VI - INITIAL DIRECTORS</div>
+          <p class="doc-paragraph">The name and mailing address of each person who is to serve as a director until the first annual meeting of stockholders or until a successor is elected and qualified:</p>
+          <ul class="doc-list">
+            ${directors.filter(d => d.name).map(d => `<li>${d.name}${d.address ? `, ${d.address}` : ''}</li>`).join('')}
+          </ul>
+        `;
+      }
+
+      // Optional provisions
+      let optionalProvisions = '';
+      let articleNum = directors.length > 0 && directors.some(d => d.name) ? 7 : 6;
+
+      if (getChecked('optLiability')) {
+        const liabilityRef = state === 'Delaware' ? 'Section 102(b)(7) of the General Corporation Law of Delaware' :
+                            'the applicable provisions of the ' + stateLaw;
+        optionalProvisions += `
+          <div class="doc-article-title">ARTICLE ${toRoman(articleNum)} - LIMITATION OF LIABILITY</div>
+          <p class="doc-paragraph">To the fullest extent permitted by ${liabilityRef}, as the same exists or may hereafter be amended, a director of the Corporation shall not be personally liable to the Corporation or its stockholders for monetary damages for breach of fiduciary duty as a director, except for liability (i) for any breach of the director's duty of loyalty to the Corporation or its stockholders, (ii) for acts or omissions not in good faith or which involve intentional misconduct or a knowing violation of law, (iii) under Section 174 of the Delaware General Corporation Law, or (iv) for any transaction from which the director derived an improper personal benefit.</p>
+        `;
+        articleNum++;
+      }
+
+      if (getChecked('optIndemnification')) {
+        optionalProvisions += `
+          <div class="doc-article-title">ARTICLE ${toRoman(articleNum)} - INDEMNIFICATION</div>
+          <p class="doc-paragraph">The Corporation shall indemnify its directors and officers to the fullest extent authorized or permitted by applicable law, as now or hereafter in effect, and such right to indemnification shall continue as to a person who has ceased to be a director or officer of the Corporation and shall inure to the benefit of his or her heirs, executors, and administrators. The Corporation may purchase and maintain insurance on behalf of any person who is or was a director, officer, employee, or agent of the Corporation against any liability asserted against such person and incurred by such person in any such capacity.</p>
+        `;
+        articleNum++;
+      }
+
+      if (getChecked('optPreemptive')) {
+        optionalProvisions += `
+          <div class="doc-article-title">ARTICLE ${toRoman(articleNum)} - PREEMPTIVE RIGHTS</div>
+          <p class="doc-paragraph">Shareholders shall have preemptive rights to acquire proportional amounts of the Corporation's unissued shares upon such terms and conditions as the Board of Directors may determine, subject to applicable law.</p>
+        `;
+        articleNum++;
+      }
+
+      if (getChecked('optCumulative')) {
+        optionalProvisions += `
+          <div class="doc-article-title">ARTICLE ${toRoman(articleNum)} - CUMULATIVE VOTING</div>
+          <p class="doc-paragraph">At each election for directors, every stockholder entitled to vote at such election shall have the right to vote, in person or by proxy, the number of shares owned by such stockholder for as many persons as there are directors to be elected and for whose election such stockholder has a right to vote, or to cumulate such votes by giving one candidate as many votes as the number of such directors multiplied by the number of such stockholder's shares shall equal, or by distributing such votes on the same principle among any number of candidates.</p>
+        `;
+        articleNum++;
+      }
+
+      if (getChecked('optPerpetual')) {
+        optionalProvisions += `
+          <div class="doc-article-title">ARTICLE ${toRoman(articleNum)} - DURATION</div>
+          <p class="doc-paragraph">The Corporation shall have perpetual existence.</p>
+        `;
+        articleNum++;
+      }
+
+      // Incorporator article
+      const incorporatorArticle = `
+        <div class="doc-article-title">ARTICLE ${toRoman(articleNum)} - INCORPORATOR</div>
+        <p class="doc-paragraph">The name and mailing address of the incorporator is:</p>
+        <p class="doc-paragraph" style="text-align: center;">
+          ${span('field-incorporatorName', incorporatorName)}<br>
+          ${span('field-incorporatorAddress', incorporatorAddress)}
+        </p>
+      `;
+
+      const html = `
+        <div class="doc-title">${docName}</div>
+        <div class="doc-subtitle">OF</div>
+        <div class="doc-subtitle">${span('field-corpName', corpName)}</div>
+        <div class="doc-state-header">A ${span('field-incState', state)} Corporation</div>
+
+        <div class="doc-article-title">ARTICLE I - NAME</div>
+        <p class="doc-paragraph">The name of the Corporation is ${span('field-corpName', corpName)}.</p>
+
+        <div class="doc-article-title">ARTICLE II - REGISTERED AGENT</div>
+        <p class="doc-paragraph">The address of the Corporation's registered office in the State of ${span('field-incState', state)} is ${span('field-agentAddress', agentAddress)}, ${span('field-agentCity', agentCity)}, ${span('field-incState', state)} ${span('field-agentZip', agentZip)}. The name of its registered agent at such address is ${span('field-agentName', agentName)}.</p>
+
+        <div class="doc-article-title">ARTICLE III - PURPOSE</div>
+        <p class="doc-paragraph">${purposeClause}</p>
+
+        <div class="doc-article-title">ARTICLE IV - CAPITAL STOCK</div>
+        ${stockSection}
+
+        <div class="doc-article-title">ARTICLE V - BOARD OF DIRECTORS</div>
+        <p class="doc-paragraph">The business and affairs of the Corporation shall be managed by or under the direction of the Board of Directors. The number of directors of the Corporation shall be fixed from time to time by resolution of the Board of Directors. The directors need not be elected by written ballot unless the Bylaws so provide.</p>
+
+        ${directorsSection}
+
+        ${optionalProvisions}
+
+        ${incorporatorArticle}
+
+        <div class="doc-signature-block">
+          <p class="doc-paragraph"><strong>IN WITNESS WHEREOF</strong>, the undersigned incorporator has executed these ${docName.toLowerCase()} on this _____ day of _____________, 20____.</p>
+
+          <div style="margin-top: 40px;">
+            <div class="doc-signature-line">
+              <span class="sig-label">Signature:</span>
+              <span class="sig-value"></span>
+            </div>
+            <div class="doc-signature-line">
+              <span class="sig-label">Printed Name:</span>
+              <span class="sig-value">${span('field-incorporatorName', incorporatorName)}</span>
+            </div>
+            <div class="doc-signature-line">
+              <span class="sig-label">Title:</span>
+              <span class="sig-value">Incorporator</span>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('documentBody').innerHTML = html;
+    }
+
+    function toRoman(num) {
+      const roman = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV'];
+      return roman[num - 1] || num;
+    }
+
+    function toggleFullEdit() {
+      fullEditMode = !fullEditMode;
+      document.getElementById('documentBody').classList.toggle('full-edit-mode', fullEditMode);
+      showToast(fullEditMode ? 'Full edit mode enabled - edit any text directly' : 'Full edit mode disabled');
+    }
+
+    function copyToClipboard() {
+      const content = document.getElementById('documentBody').innerText;
+      navigator.clipboard.writeText(content).then(() => {
+        showToast('Copied to clipboard!', 'success');
+      });
+    }
+
+    function downloadDocument() {
+      const content = document.getElementById('documentBody').innerHTML;
+      const corpName = getVal('corpName', 'Corporation');
+      const state = getVal('incState', 'Delaware');
+      const docTitle = state === 'Delaware' ? 'Certificate of Incorporation' : 'Articles of Incorporation';
+
+      const html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>${docTitle} - ${corpName}</title>
+  <style>
+    body { font-family: Georgia, 'Times New Roman', serif; font-size: 13px; line-height: 1.8; max-width: 8.5in; margin: 0 auto; padding: 1in; }
+    .doc-title { text-align: center; font-size: 18px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px; }
+    .doc-subtitle { text-align: center; font-size: 14px; font-weight: bold; margin-bottom: 6px; }
+    .doc-state-header { text-align: center; font-size: 12px; color: #666; margin-bottom: 25px; }
+    .doc-article-title { font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-top: 20px; margin-bottom: 10px; text-align: center; }
+    .doc-paragraph { margin-bottom: 12px; text-align: justify; }
+    .doc-list { margin: 12px 0 12px 20px; padding-left: 15px; }
+    .doc-list li { margin-bottom: 8px; text-align: justify; }
+    .doc-highlight { background: none; border: none; padding: 0; font-weight: normal; }
+    .doc-signature-block { margin-top: 40px; }
+    .doc-signature-line { margin-bottom: 8px; min-height: 30px; }
+    .sig-label { display: inline-block; width: 100px; font-size: 10px; color: #666; }
+    .sig-value { display: inline-block; border-bottom: 1px solid #333; min-width: 200px; }
+  </style>
+</head>
+<body>${content}</body>
+</html>`;
+
+      const blob = new Blob([html], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${docTitle.replace(/\s+/g, '-')}-${corpName.replace(/[^a-zA-Z0-9]/g, '-')}.html`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Document downloaded!', 'success');
+    }
+
+    function showToast(message, type = '') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast' + (type ? ' ' + type : '');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      updatePreview();
+    });
+  </script>
+</body>
+</html>

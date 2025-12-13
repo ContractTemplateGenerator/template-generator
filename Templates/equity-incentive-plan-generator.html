@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Equity Incentive Plan Generator | Stock Option Plan | Terms.Law</title>
+  <meta name="description" content="Free Equity Incentive Plan generator for startups. Create ISO/NSO option pools, RSUs, and stock awards. Customize vesting, exercise terms, and administration.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Dancing+Script:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-primary: #1e40af;
+      --color-primary-dark: #1e3a8a;
+      --color-primary-light: #3b82f6;
+      --color-accent: #7c3aed;
+      --color-accent-light: #8b5cf6;
+      --color-success: #059669;
+      --color-warning: #d97706;
+      --color-danger: #dc2626;
+      --color-bg: #f8fafc;
+      --color-surface: #ffffff;
+      --color-border: #e2e8f0;
+      --color-border-light: #f1f5f9;
+      --color-text: #0f172a;
+      --color-text-secondary: #334155;
+      --color-text-muted: #64748b;
+      --color-dark: #0f172a;
+      --color-dark-surface: #1e293b;
+      --doc-bg: #fefefe;
+      --doc-text: #1f2937;
+      --doc-clause-title: #1e40af;
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --radius-full: 9999px;
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-serif: Georgia, 'Times New Roman', serif;
+      --transition-fast: 150ms ease;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body { font-family: var(--font-sans); font-size: 16px; line-height: 1.6; color: var(--color-text); background: var(--color-bg); }
+    .site-header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 0; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); }
+    .header-content { display: flex; align-items: center; justify-content: center; height: 52px; }
+    .header-nav { display: flex; align-items: center; gap: 0; height: 100%; }
+    .nav-link { color: #94a3b8; font-size: 0.85rem; font-weight: 600; padding: 16px 24px; transition: all 150ms ease; text-decoration: none; height: 100%; display: flex; align-items: center; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid transparent; }
+    .nav-link:hover { color: #ffffff; background: rgba(255, 255, 255, 0.05); }
+    .nav-link.active { color: #ffffff; background: rgba(255, 255, 255, 0.08); border-bottom-color: #3b82f6; }
+    .nav-link.home-logo { padding: 12px 20px; font-size: 1.1rem; font-weight: 800; letter-spacing: -0.02em; text-transform: none; }
+    .nav-link.home-logo .logo-text { background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hero { background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #312e81 100%); padding: 2rem 2rem; }
+    .hero-content { max-width: 800px; }
+    .hero-badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; background: rgba(124, 58, 237, 0.15); border: 1px solid rgba(124, 58, 237, 0.3); border-radius: var(--radius-full); font-size: 0.8rem; color: #c4b5fd; margin-bottom: 1rem; }
+    .hero h1 { font-size: 2rem; font-weight: 800; color: #fff; line-height: 1.2; margin-bottom: 0.75rem; }
+    .hero h1 .highlight { background: linear-gradient(135deg, #a78bfa, #60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hero-subtitle { font-size: 1rem; color: #94a3b8; line-height: 1.6; }
+    .builder-layout { display: grid; grid-template-columns: 380px 1fr; gap: 0; min-height: calc(100vh - 200px); }
+    @media (max-width: 1024px) { .builder-layout { grid-template-columns: 1fr; } }
+    .builder-sidebar { background: var(--color-surface); border-right: 1px solid var(--color-border); padding: 1.5rem; overflow-y: auto; max-height: calc(100vh - 150px); position: sticky; top: 52px; }
+    .builder-section { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--color-border-light); }
+    .builder-section:last-child { border-bottom: none; margin-bottom: 0; }
+    .builder-section-title { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted); margin-bottom: 0.75rem; }
+    .form-group { margin-bottom: 1rem; }
+    .form-label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--color-text); margin-bottom: 0.35rem; }
+    .form-input, .form-textarea, .form-select { width: 100%; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-md); font-size: 0.9rem; font-family: inherit; transition: all var(--transition-fast); background: var(--color-surface); }
+    .form-input:focus, .form-textarea:focus, .form-select:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1); }
+    .form-hint { font-size: 0.75rem; color: var(--color-text-muted); margin-top: 4px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .preview-panel { background: var(--color-bg); padding: 1.5rem; overflow-y: auto; }
+    .preview-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem; }
+    .preview-title { font-size: 0.8rem; font-weight: 700; color: var(--color-text-muted); }
+    .preview-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: var(--radius-md); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all var(--transition-fast); border: none; }
+    .btn-primary { background: var(--color-primary); color: #fff; }
+    .btn-primary:hover { background: var(--color-primary-dark); }
+    .btn-secondary { background: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-border); }
+    .btn-secondary:hover { border-color: var(--color-primary); color: var(--color-primary); }
+    .document-container { background: var(--color-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); overflow: hidden; }
+    .document-header { background: linear-gradient(135deg, var(--color-dark) 0%, var(--color-dark-surface) 100%); padding: 0.75rem 1.5rem; display: flex; align-items: center; justify-content: space-between; }
+    .document-title { color: #fff; font-size: 0.85rem; font-weight: 600; }
+    .document-status { font-size: 0.7rem; color: var(--color-accent-light); }
+    .document-body { padding: 40px 50px; background: var(--doc-bg); font-family: var(--font-serif); font-size: 13px; line-height: 1.8; color: var(--doc-text); }
+    .doc-title { text-align: center; font-size: 16px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px; }
+    .doc-subtitle { text-align: center; font-size: 11px; color: var(--color-text-muted); margin-bottom: 25px; font-family: var(--font-sans); }
+    .doc-article { font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-top: 25px; margin-bottom: 5px; color: var(--doc-clause-title); text-align: center; }
+    .doc-article-title { text-align: center; font-size: 12px; font-weight: bold; margin-bottom: 15px; color: var(--doc-clause-title); }
+    .doc-section-header { font-size: 12px; font-weight: bold; margin-top: 15px; margin-bottom: 8px; }
+    .doc-paragraph { margin-bottom: 12px; text-align: justify; }
+    .doc-list { margin: 12px 0 12px 20px; padding-left: 15px; }
+    .doc-list li { margin-bottom: 8px; }
+    .doc-highlight { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 1px 5px; border-radius: 3px; border-bottom: 2px solid #f59e0b; font-weight: 600; cursor: text; }
+    .doc-highlight:hover { background: linear-gradient(135deg, #fde68a 0%, #fcd34d 100%); }
+    .doc-highlight.empty { background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); border-bottom-color: #ef4444; color: #dc2626; }
+    @keyframes highlightPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); } 50% { box-shadow: 0 0 0 6px rgba(245, 158, 11, 0.3); } }
+    .field-highlight-animation { animation: highlightPulse 0.6s ease-out; }
+    .toast { position: fixed; bottom: 20px; right: 20px; background: var(--color-dark); color: #fff; padding: 12px 18px; border-radius: var(--radius-md); font-size: 0.85rem; transform: translateY(100px); opacity: 0; transition: all 0.3s ease; z-index: 1000; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { background: var(--color-success); }
+    .site-footer { background: var(--color-dark); color: #94a3b8; padding: 2rem; text-align: center; }
+    .footer-brand { font-size: 1.1rem; font-weight: 800; margin-bottom: 0.5rem; }
+    .footer-brand .logo-text { background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    @media (max-width: 768px) { .document-body { padding: 25px 20px; } .form-row { grid-template-columns: 1fr; } }
+    @media print { .site-header, .hero, .builder-sidebar, .preview-toolbar, .document-header, .site-footer, .toast { display: none !important; } .builder-layout { display: block; } .preview-panel { padding: 0; } .document-container { box-shadow: none; } .document-body { padding: 0.5in; } .doc-highlight { background: none !important; border: none !important; padding: 0 !important; } }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-content">
+      <nav class="header-nav">
+        <a href="/" class="nav-link home-logo"><span class="logo-text">Terms.Law</span></a>
+        <a href="/Demand-Letters/demand-letters-landing.html" class="nav-link">Demands</a>
+        <a href="contract-library-landing.html" class="nav-link active">Contracts</a>
+        <a href="/INC/formation-landing.html" class="nav-link">Incorporation</a>
+        <a href="/Blog/blog-landing.html" class="nav-link">Blog</a>
+      </nav>
+    </div>
+  </header>
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">Employee Equity</div>
+      <h1><span class="highlight">Equity Incentive Plan</span> Generator</h1>
+      <p class="hero-subtitle">Generate a comprehensive equity incentive plan for your startup. Authorize ISOs, NSOs, RSUs, and stock awards. Customize pool size and administration.</p>
+    </div>
+  </section>
+  <main class="builder-layout">
+    <aside class="builder-sidebar">
+      <div class="builder-section">
+        <h3 class="builder-section-title">Company Information</h3>
+        <div class="form-group">
+          <label class="form-label">Company Name</label>
+          <input type="text" id="companyName" class="form-input" placeholder="Acme Inc." oninput="trackFieldEdit('companyName')">
+        </div>
+        <div class="form-group">
+          <label class="form-label">State of Incorporation</label>
+          <select id="incState" class="form-select" onchange="trackFieldEdit('incState')">
+            <option value="Delaware">Delaware</option>
+            <option value="California">California</option>
+            <option value="New York">New York</option>
+            <option value="Texas">Texas</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Plan Year</label>
+          <input type="number" id="planYear" class="form-input" placeholder="2024" oninput="trackFieldEdit('planYear')">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Effective Date</label>
+          <input type="date" id="effectiveDate" class="form-input" oninput="trackFieldEdit('effectiveDate')">
+        </div>
+      </div>
+      <div class="builder-section">
+        <h3 class="builder-section-title">Share Pool</h3>
+        <div class="form-group">
+          <label class="form-label">Shares Reserved for Plan</label>
+          <input type="number" id="sharePool" class="form-input" placeholder="1000000" oninput="trackFieldEdit('sharePool')">
+          <div class="form-hint">Typically 10-20% of fully diluted shares</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">ISO Limit</label>
+          <input type="number" id="isoLimit" class="form-input" placeholder="1000000" oninput="trackFieldEdit('isoLimit')">
+          <div class="form-hint">Max shares for ISOs (can equal pool size)</div>
+        </div>
+        <div class="form-group">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" id="evergreen" onchange="trackFieldEdit('evergreen')">
+            <span class="form-label" style="margin:0;">Evergreen provision</span>
+          </label>
+          <div class="form-hint">Auto-increase pool annually</div>
+        </div>
+        <div class="form-group" id="evergreenDetails" style="display:none;">
+          <label class="form-label">Annual Increase (%)</label>
+          <input type="number" id="evergreenPercent" class="form-input" placeholder="4" oninput="trackFieldEdit('evergreenPercent')">
+          <div class="form-hint">% of outstanding shares added each year</div>
+        </div>
+      </div>
+      <div class="builder-section">
+        <h3 class="builder-section-title">Award Types</h3>
+        <div class="form-group">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" id="allowISO" checked onchange="trackFieldEdit('awardTypes')">
+            <span class="form-label" style="margin:0;">Incentive Stock Options (ISO)</span>
+          </label>
+        </div>
+        <div class="form-group">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" id="allowNSO" checked onchange="trackFieldEdit('awardTypes')">
+            <span class="form-label" style="margin:0;">Non-Qualified Stock Options (NSO)</span>
+          </label>
+        </div>
+        <div class="form-group">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" id="allowRSU" onchange="trackFieldEdit('awardTypes')">
+            <span class="form-label" style="margin:0;">Restricted Stock Units (RSU)</span>
+          </label>
+        </div>
+        <div class="form-group">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" id="allowRSA" onchange="trackFieldEdit('awardTypes')">
+            <span class="form-label" style="margin:0;">Restricted Stock Awards (RSA)</span>
+          </label>
+        </div>
+      </div>
+      <div class="builder-section">
+        <h3 class="builder-section-title">Default Vesting</h3>
+        <div class="form-group">
+          <label class="form-label">Vesting Period</label>
+          <select id="vestingPeriod" class="form-select" onchange="trackFieldEdit('vestingPeriod')">
+            <option value="4">4 years (standard)</option>
+            <option value="3">3 years</option>
+            <option value="2">2 years</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cliff Period</label>
+          <select id="cliffPeriod" class="form-select" onchange="trackFieldEdit('cliffPeriod')">
+            <option value="12">12 months (standard)</option>
+            <option value="6">6 months</option>
+            <option value="0">No cliff</option>
+          </select>
+        </div>
+      </div>
+      <div class="builder-section">
+        <h3 class="builder-section-title">Option Terms</h3>
+        <div class="form-group">
+          <label class="form-label">Option Expiration</label>
+          <select id="optionExpiration" class="form-select" onchange="trackFieldEdit('optionExpiration')">
+            <option value="10">10 years (standard)</option>
+            <option value="7">7 years</option>
+            <option value="5">5 years</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Post-Termination Exercise Period</label>
+          <select id="postTermExercise" class="form-select" onchange="trackFieldEdit('postTermExercise')">
+            <option value="90">90 days (standard)</option>
+            <option value="30">30 days</option>
+            <option value="180">6 months</option>
+            <option value="365">1 year</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" id="earlyExercise" onchange="trackFieldEdit('earlyExercise')">
+            <span class="form-label" style="margin:0;">Allow early exercise</span>
+          </label>
+          <div class="form-hint">Exercise unvested options (83(b) eligible)</div>
+        </div>
+      </div>
+      <div class="builder-section">
+        <h3 class="builder-section-title">Change of Control</h3>
+        <div class="form-group">
+          <label class="form-label">Acceleration</label>
+          <select id="acceleration" class="form-select" onchange="trackFieldEdit('acceleration')">
+            <option value="double">Double trigger (standard)</option>
+            <option value="single">Single trigger</option>
+            <option value="none">No automatic acceleration</option>
+          </select>
+        </div>
+      </div>
+    </aside>
+    <div class="preview-panel">
+      <div class="preview-toolbar">
+        <div class="preview-title">Live Preview - Click highlighted text to edit</div>
+        <div class="preview-actions">
+          <button class="btn btn-secondary" onclick="copyToClipboard()">Copy</button>
+          <button class="btn btn-secondary" onclick="window.print()">Print</button>
+          <button class="btn btn-primary" onclick="downloadDocument()">Download</button>
+        </div>
+      </div>
+      <div class="document-container">
+        <div class="document-header">
+          <span class="document-title">Equity Incentive Plan</span>
+          <span class="document-status">Live</span>
+        </div>
+        <div class="document-body" id="documentPreview"></div>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer">
+    <div class="footer-brand"><span class="logo-text">Terms.Law</span></div>
+    <p>2024 Terms.Law - Sergei Tokmakov, Esq.</p>
+  </footer>
+  <div class="toast" id="toast"></div>
+  <script>
+    let lastEditedField = null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const year = new Date().getFullYear();
+      document.getElementById('planYear').value = year;
+      document.getElementById('effectiveDate').value = new Date().toISOString().split('T')[0];
+      document.getElementById('evergreen').addEventListener('change', function() {
+        document.getElementById('evergreenDetails').style.display = this.checked ? 'block' : 'none';
+      });
+      updatePreview();
+    });
+
+    function trackFieldEdit(fieldId) { lastEditedField = fieldId; updatePreview(); }
+
+    function formatNumber(num) {
+      if (!num) return '';
+      return new Intl.NumberFormat('en-US').format(num);
+    }
+
+    function updatePreview() {
+      const h = (v, p, f) => `<span class="doc-highlight${!v?' empty':''}" data-field="${f}" contenteditable="true">${v||'['+p+']'}</span>`;
+
+      const companyName = document.getElementById('companyName').value;
+      const incState = document.getElementById('incState').value;
+      const planYear = document.getElementById('planYear').value;
+      const effectiveDate = document.getElementById('effectiveDate').value;
+      const sharePool = document.getElementById('sharePool').value;
+      const isoLimit = document.getElementById('isoLimit').value;
+      const evergreen = document.getElementById('evergreen').checked;
+      const evergreenPercent = document.getElementById('evergreenPercent').value || '4';
+      const allowISO = document.getElementById('allowISO').checked;
+      const allowNSO = document.getElementById('allowNSO').checked;
+      const allowRSU = document.getElementById('allowRSU').checked;
+      const allowRSA = document.getElementById('allowRSA').checked;
+      const vestingPeriod = document.getElementById('vestingPeriod').value;
+      const cliffPeriod = document.getElementById('cliffPeriod').value;
+      const optionExpiration = document.getElementById('optionExpiration').value;
+      const postTermExercise = document.getElementById('postTermExercise').value;
+      const earlyExercise = document.getElementById('earlyExercise').checked;
+      const acceleration = document.getElementById('acceleration').value;
+
+      const formattedDate = effectiveDate ? new Date(effectiveDate+'T00:00:00').toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}) : '';
+      const formattedPool = formatNumber(sharePool);
+      const formattedISOLimit = formatNumber(isoLimit);
+
+      let awardTypes = [];
+      if (allowISO) awardTypes.push('Incentive Stock Options');
+      if (allowNSO) awardTypes.push('Non-Qualified Stock Options');
+      if (allowRSU) awardTypes.push('Restricted Stock Units');
+      if (allowRSA) awardTypes.push('Restricted Stock Awards');
+
+      const cliffText = cliffPeriod === '0' ? 'no cliff' : `a ${cliffPeriod}-month cliff`;
+
+      let accelerationText = '';
+      if (acceleration === 'double') {
+        accelerationText = `Upon a Change of Control, if a Participant's service is terminated without Cause or the Participant resigns for Good Reason within twelve (12) months following such Change of Control, 100% of such Participant's unvested Awards shall immediately vest.`;
+      } else if (acceleration === 'single') {
+        accelerationText = `Upon a Change of Control, 100% of all outstanding unvested Awards shall immediately vest.`;
+      } else {
+        accelerationText = `The Board shall have discretion to determine the treatment of outstanding Awards upon a Change of Control.`;
+      }
+
+      document.getElementById('documentPreview').innerHTML = `
+        <div class="doc-title">${h(planYear,'2024','planYear')} EQUITY INCENTIVE PLAN</div>
+        <div class="doc-subtitle">of ${h(companyName,'Company Name','companyName')}<br>Effective ${h(formattedDate,'Date','effectiveDate')}</div>
+
+        <div class="doc-article">ARTICLE I</div>
+        <div class="doc-article-title">PURPOSE AND ADOPTION</div>
+
+        <p class="doc-paragraph"><strong>Section 1.1 Purpose.</strong> The purpose of this ${h(planYear,'2024','planYear')} Equity Incentive Plan (this "<strong>Plan</strong>") of ${h(companyName,'Company Name','companyName')}, a ${h(incState,'Delaware','incState')} corporation (the "<strong>Company</strong>"), is to advance the interests of the Company and its stockholders by providing an incentive to attract, retain, and reward persons performing services for the Company and to motivate such persons to contribute to the growth and profitability of the Company.</p>
+
+        <p class="doc-paragraph"><strong>Section 1.2 Adoption and Term.</strong> This Plan was adopted by the Board of Directors on ${h(formattedDate,'[Date]','effectiveDate')} and shall remain in effect until terminated by the Board, provided that no Incentive Stock Options may be granted after the tenth anniversary of the Plan's adoption.</p>
+
+        <div class="doc-article">ARTICLE II</div>
+        <div class="doc-article-title">DEFINITIONS</div>
+
+        <p class="doc-paragraph">"<strong>Award</strong>" means any Option, Restricted Stock Unit, Restricted Stock Award, or other equity award granted under this Plan.</p>
+        <p class="doc-paragraph">"<strong>Board</strong>" means the Board of Directors of the Company.</p>
+        <p class="doc-paragraph">"<strong>Cause</strong>" means (i) conviction of a felony; (ii) willful misconduct or gross negligence; (iii) material breach of any agreement with the Company; or (iv) continued failure to perform duties after written notice.</p>
+        <p class="doc-paragraph">"<strong>Change of Control</strong>" means (i) acquisition of more than 50% of voting securities; (ii) sale of substantially all assets; (iii) merger where existing stockholders hold less than 50% of the surviving entity; or (iv) complete liquidation.</p>
+        <p class="doc-paragraph">"<strong>Committee</strong>" means the Compensation Committee of the Board, or the full Board if no such committee exists.</p>
+        <p class="doc-paragraph">"<strong>Fair Market Value</strong>" means, as of any date, (i) if publicly traded, the closing price on such date; or (ii) if not publicly traded, the value determined in good faith by the Board in accordance with Section 409A.</p>
+        ${allowISO ? `<p class="doc-paragraph">"<strong>Incentive Stock Option</strong>" or "<strong>ISO</strong>" means an Option intended to qualify as an incentive stock option under Section 422 of the Code.</p>` : ''}
+        ${allowNSO ? `<p class="doc-paragraph">"<strong>Non-Qualified Stock Option</strong>" or "<strong>NSO</strong>" means an Option that is not intended to qualify as an ISO.</p>` : ''}
+        <p class="doc-paragraph">"<strong>Participant</strong>" means any eligible person who has been granted an Award.</p>
+
+        <div class="doc-article">ARTICLE III</div>
+        <div class="doc-article-title">SHARES SUBJECT TO PLAN</div>
+
+        <p class="doc-paragraph"><strong>Section 3.1 Share Reserve.</strong> Subject to adjustment as provided herein, the aggregate number of shares of Common Stock that may be issued pursuant to Awards under this Plan shall not exceed ${h(formattedPool,'1,000,000','sharePool')} shares.</p>
+
+        ${allowISO ? `<p class="doc-paragraph"><strong>Section 3.2 ISO Limit.</strong> The maximum number of shares that may be issued pursuant to Incentive Stock Options shall be ${h(formattedISOLimit,'1,000,000','isoLimit')} shares.</p>` : ''}
+
+        ${evergreen ? `<p class="doc-paragraph"><strong>Section 3.${allowISO ? '3' : '2'} Evergreen Provision.</strong> On the first day of each fiscal year during the term of this Plan, commencing with the fiscal year following the year of adoption, the number of shares reserved under this Plan shall automatically increase by ${evergreenPercent}% of the total number of shares of Common Stock outstanding on the last day of the preceding fiscal year, or such lesser amount as determined by the Board.</p>` : ''}
+
+        <p class="doc-paragraph"><strong>Section 3.${allowISO && evergreen ? '4' : allowISO || evergreen ? '3' : '2'} Share Counting.</strong> Shares subject to Awards that are forfeited, canceled, expire unexercised, or are settled in cash shall again become available for issuance under this Plan.</p>
+
+        <div class="doc-article">ARTICLE IV</div>
+        <div class="doc-article-title">ELIGIBILITY</div>
+
+        <p class="doc-paragraph"><strong>Section 4.1 Eligible Persons.</strong> Awards may be granted to employees, directors, and consultants of the Company or any subsidiary. ${allowISO ? 'Incentive Stock Options may only be granted to employees of the Company or a subsidiary.' : ''}</p>
+
+        <div class="doc-article">ARTICLE V</div>
+        <div class="doc-article-title">AWARDS</div>
+
+        <p class="doc-paragraph"><strong>Section 5.1 Types of Awards.</strong> The following types of Awards may be granted under this Plan: ${awardTypes.join(', ') || '[Award Types]'}.</p>
+
+        ${(allowISO || allowNSO) ? `
+        <p class="doc-paragraph"><strong>Section 5.2 Stock Options.</strong></p>
+        <ul class="doc-list">
+          <li><strong>Exercise Price.</strong> The exercise price per share shall not be less than 100% of the Fair Market Value on the date of grant. ${allowISO ? 'For ISOs granted to 10% stockholders, the exercise price shall not be less than 110% of Fair Market Value.' : ''}</li>
+          <li><strong>Term.</strong> Options shall expire no later than ${optionExpiration} years from the date of grant. ${allowISO ? 'ISOs granted to 10% stockholders shall expire no later than 5 years from the date of grant.' : ''}</li>
+          <li><strong>Vesting.</strong> Unless otherwise specified, Options shall vest over ${vestingPeriod} years with ${cliffText}, vesting monthly thereafter.</li>
+          ${earlyExercise ? `<li><strong>Early Exercise.</strong> The Committee may permit early exercise of unvested Options, subject to the Company's repurchase right.</li>` : ''}
+          <li><strong>Post-Termination Exercise.</strong> Unless otherwise specified, vested Options may be exercised for ${postTermExercise} days following termination of service (or 12 months in the case of death or disability).</li>
+        </ul>
+        ` : ''}
+
+        ${allowRSU ? `
+        <p class="doc-paragraph"><strong>Section 5.${(allowISO || allowNSO) ? '3' : '2'} Restricted Stock Units.</strong> RSUs represent a right to receive shares of Common Stock upon satisfaction of vesting conditions. Unless otherwise specified, RSUs shall vest over ${vestingPeriod} years with ${cliffText}.</p>
+        ` : ''}
+
+        ${allowRSA ? `
+        <p class="doc-paragraph"><strong>Section 5.${(allowISO || allowNSO) && allowRSU ? '4' : (allowISO || allowNSO) || allowRSU ? '3' : '2'} Restricted Stock Awards.</strong> Restricted Stock Awards are grants of shares subject to forfeiture until vesting conditions are satisfied. The Participant shall have voting and dividend rights, but unvested shares shall be subject to the Company's repurchase right.</p>
+        ` : ''}
+
+        <div class="doc-article">ARTICLE VI</div>
+        <div class="doc-article-title">CHANGE OF CONTROL</div>
+
+        <p class="doc-paragraph"><strong>Section 6.1 Treatment of Awards.</strong> ${accelerationText}</p>
+
+        <p class="doc-paragraph"><strong>Section 6.2 Assumption or Substitution.</strong> In the event of a Change of Control, outstanding Awards may be assumed or substituted by the successor corporation. If Awards are not assumed or substituted, they shall become fully vested immediately prior to the Change of Control.</p>
+
+        <div class="doc-article">ARTICLE VII</div>
+        <div class="doc-article-title">ADMINISTRATION</div>
+
+        <p class="doc-paragraph"><strong>Section 7.1 Authority.</strong> This Plan shall be administered by the Committee, which shall have full authority to: (a) select Participants; (b) determine the type and terms of Awards; (c) interpret the Plan; and (d) make all other determinations necessary for Plan administration.</p>
+
+        <p class="doc-paragraph"><strong>Section 7.2 Delegation.</strong> The Committee may delegate its authority to grant Awards to non-executive employees to one or more officers, subject to limitations imposed by applicable law.</p>
+
+        <div class="doc-article">ARTICLE VIII</div>
+        <div class="doc-article-title">ADJUSTMENTS</div>
+
+        <p class="doc-paragraph"><strong>Section 8.1 Capital Adjustments.</strong> In the event of any stock split, reverse stock split, stock dividend, recapitalization, or similar change in the Company's capital structure, the Committee shall make appropriate adjustments to: (a) the number of shares reserved under the Plan; (b) the number of shares subject to outstanding Awards; and (c) the exercise price of outstanding Options.</p>
+
+        <div class="doc-article">ARTICLE IX</div>
+        <div class="doc-article-title">GENERAL PROVISIONS</div>
+
+        <p class="doc-paragraph"><strong>Section 9.1 Non-Transferability.</strong> Awards may not be transferred except by will or the laws of descent and distribution, and during a Participant's lifetime may only be exercised by the Participant.</p>
+
+        <p class="doc-paragraph"><strong>Section 9.2 Tax Withholding.</strong> The Company may withhold from any payment or shares an amount sufficient to satisfy applicable tax withholding obligations.</p>
+
+        <p class="doc-paragraph"><strong>Section 9.3 No Right to Continued Service.</strong> Nothing in this Plan shall confer any right to continued employment or service.</p>
+
+        <p class="doc-paragraph"><strong>Section 9.4 Governing Law.</strong> This Plan shall be governed by the laws of the State of ${h(incState,'Delaware','incState')}.</p>
+
+        <p class="doc-paragraph"><strong>Section 9.5 Amendment and Termination.</strong> The Board may amend or terminate this Plan at any time, provided that no amendment shall impair the rights of any Participant without consent, and stockholder approval shall be required for any amendment that increases the share reserve or expands eligibility for ISOs.</p>
+
+        <p class="doc-paragraph" style="text-align:center;margin-top:30px;">* * *</p>
+
+        <p class="doc-paragraph"><strong>CERTIFICATION:</strong> The undersigned Secretary of the Company hereby certifies that this ${planYear || '[Year]'} Equity Incentive Plan was duly adopted by the Board of Directors on __________________ and approved by the stockholders on __________________.</p>
+
+        <p class="doc-paragraph" style="margin-top:40px;">
+          _______________________________<br>
+          Secretary
+        </p>
+      `;
+
+      if(lastEditedField){
+        setTimeout(()=>{
+          const el = document.querySelector(`[data-field="${lastEditedField}"]`);
+          if(el){
+            el.scrollIntoView({behavior:'smooth',block:'center'});
+            el.classList.add('field-highlight-animation');
+            setTimeout(()=>el.classList.remove('field-highlight-animation'),600);
+          }
+        },50);
+      }
+    }
+
+    function showToast(msg,type=''){
+      const t=document.getElementById('toast');
+      t.textContent=msg;
+      t.className='toast show'+(type?' '+type:'');
+      setTimeout(()=>t.classList.remove('show'),3000);
+    }
+
+    function copyToClipboard(){
+      const r=document.createRange();
+      r.selectNode(document.getElementById('documentPreview'));
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(r);
+      document.execCommand('copy');
+      window.getSelection().removeAllRanges();
+      showToast('Copied!','success');
+    }
+
+    function downloadDocument(){
+      const c=document.getElementById('documentPreview').innerHTML;
+      const companyName = document.getElementById('companyName').value || 'Company';
+      const planYear = document.getElementById('planYear').value || new Date().getFullYear();
+      const h=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${planYear} Equity Incentive Plan - ${companyName}</title><style>body{font-family:Georgia,serif;max-width:8.5in;margin:1in auto;line-height:1.8;font-size:12pt}.doc-title{text-align:center;font-size:16pt;font-weight:bold;text-transform:uppercase;letter-spacing:2px}.doc-subtitle{text-align:center;font-size:10pt;color:#666;margin-bottom:30px}.doc-article{text-align:center;font-size:13pt;font-weight:bold;text-transform:uppercase;margin-top:30px}.doc-article-title{text-align:center;font-size:11pt;font-weight:bold;margin-bottom:15px}.doc-paragraph{margin:12px 0;text-align:justify}.doc-list{margin:12px 0 12px 20px}.doc-list li{margin-bottom:8px}.doc-highlight{background:#fef3c7}</style></head><body>${c}</body></html>`;
+      const b=new Blob([h],{type:'text/html'});
+      const u=URL.createObjectURL(b);
+      const a=document.createElement('a');
+      a.href=u;
+      a.download=`${planYear}-Equity-Incentive-Plan.html`;
+      a.click();
+      URL.revokeObjectURL(u);
+      showToast('Downloaded!','success');
+    }
+  </script>
+</body>
+</html>
