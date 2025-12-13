@@ -1,0 +1,1595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor/Supply Agreement Generator | Terms.Law</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e40af;
+            --primary-dark: #1e3a8a;
+            --secondary: #475569;
+            --accent: #f59e0b;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+        }
+
+        .nav-divider {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .nav-title {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: white;
+        }
+
+        /* Main Layout */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        /* Form Panel */
+        .form-panel {
+            background: var(--surface);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 80px;
+            max-height: calc(100vh - 100px);
+            overflow-y: auto;
+        }
+
+        .form-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-radius: 12px 12px 0 0;
+        }
+
+        .form-header h2 {
+            font-size: 1.25rem;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .form-header p {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .form-content {
+            padding: 1.5rem;
+        }
+
+        .form-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text);
+            margin-bottom: 0.375rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.625rem 0.875rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+        }
+
+        .checkbox-group label {
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+
+        /* Product Cards */
+        .product-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .product-card {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            position: relative;
+        }
+
+        .product-card .remove-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: none;
+            border: none;
+            color: var(--error);
+            cursor: pointer;
+            font-size: 1.25rem;
+            padding: 0.25rem;
+            line-height: 1;
+        }
+
+        .product-card .form-row {
+            margin-top: 0.5rem;
+        }
+
+        .add-product-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: #f0f9ff;
+            border: 2px dashed var(--primary);
+            border-radius: 8px;
+            color: var(--primary);
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .add-product-btn:hover {
+            background: #e0f2fe;
+        }
+
+        /* Action Buttons */
+        .form-actions {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .btn {
+            padding: 0.875rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--background);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Document Preview */
+        .preview-panel {
+            background: var(--surface);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .preview-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .preview-header h3 {
+            font-size: 1rem;
+            color: var(--text);
+        }
+
+        .preview-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .preview-actions .btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+
+        .edit-mode-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: #fef3c7;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: #92400e;
+        }
+
+        .edit-mode-toggle input {
+            accent-color: var(--warning);
+        }
+
+        .document-container {
+            padding: 2rem;
+            max-width: 850px;
+            margin: 0 auto;
+        }
+
+        .document {
+            background: white;
+            padding: 3rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            line-height: 1.8;
+            font-size: 14px;
+        }
+
+        .document h1 {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        .document h2 {
+            font-size: 1.1rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text);
+        }
+
+        .document p {
+            margin-bottom: 1rem;
+            text-align: justify;
+        }
+
+        .document .parties {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .document .section {
+            margin-bottom: 1.5rem;
+        }
+
+        .document .section-number {
+            font-weight: 600;
+        }
+
+        .document .subsection {
+            margin-left: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Product Table */
+        .product-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 13px;
+        }
+
+        .product-table th,
+        .product-table td {
+            border: 1px solid var(--border);
+            padding: 0.5rem;
+            text-align: left;
+        }
+
+        .product-table th {
+            background: #f8fafc;
+            font-weight: 600;
+        }
+
+        .product-table td.currency {
+            text-align: right;
+        }
+
+        /* Signature Block */
+        .signature-block {
+            margin-top: 3rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+        }
+
+        .signature-party h4 {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .signature-line {
+            border-top: 1px solid var(--text);
+            margin-top: 3rem;
+            padding-top: 0.5rem;
+        }
+
+        .signature-field {
+            margin-top: 1rem;
+        }
+
+        .signature-field span {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        /* Highlight Styles */
+        .doc-highlight {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            padding: 1px 4px;
+            border-radius: 3px;
+            border-bottom: 2px solid var(--accent);
+            transition: all 0.2s;
+        }
+
+        .doc-highlight:hover {
+            background: linear-gradient(135deg, #fde68a 0%, #fcd34d 100%);
+        }
+
+        .doc-highlight:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.3);
+        }
+
+        /* Scroll-to-view highlight animation */
+        @keyframes highlightPulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+            50% { transform: scale(1.02); box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+        }
+
+        @keyframes flashContainer {
+            0% { background-color: transparent; }
+            30% { background-color: rgba(245, 158, 11, 0.2); }
+            100% { background-color: transparent; }
+        }
+
+        .field-highlight-animation {
+            animation: highlightPulse 0.6s ease-out;
+            background: linear-gradient(135deg, #fde047 0%, #facc15 100%) !important;
+        }
+
+        .section-highlight-animation {
+            animation: flashContainer 1s ease-out;
+        }
+
+        /* Full Edit Mode Styles */
+        .full-edit-mode .document {
+            border: 2px dashed var(--warning);
+        }
+
+        .full-edit-warning {
+            display: none;
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+            color: #92400e;
+        }
+
+        .full-edit-mode .full-edit-warning {
+            display: block;
+        }
+
+        /* Print Styles */
+        @media print {
+            .navbar, .form-panel, .preview-header, .full-edit-warning {
+                display: none !important;
+            }
+
+            .main-container {
+                display: block;
+                padding: 0;
+            }
+
+            .preview-panel {
+                box-shadow: none;
+            }
+
+            .document-container {
+                padding: 0;
+            }
+
+            .document {
+                border: none;
+                box-shadow: none;
+                padding: 0;
+            }
+
+            .doc-highlight {
+                background: none !important;
+                border: none !important;
+                padding: 0 !important;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+
+            .form-panel {
+                position: relative;
+                top: 0;
+                max-height: none;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .navbar {
+                padding: 1rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .main-container {
+                padding: 1rem;
+            }
+
+            .document {
+                padding: 1.5rem;
+            }
+
+            .signature-block {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a href="https://terms.law" class="nav-logo">Terms.Law</a>
+                <span class="nav-divider">|</span>
+                <span class="nav-title">Vendor/Supply Agreement Generator</span>
+            </div>
+            <div class="nav-links">
+                <a href="/Templates/contract-library-landing.html">Contract Library</a>
+                <a href="/Blog/">Blog</a>
+                <a href="https://terms.law">Home</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Form Panel -->
+        <div class="form-panel">
+            <div class="form-header">
+                <h2>📦 Agreement Details</h2>
+                <p>Fill in the details to generate your vendor/supply agreement</p>
+            </div>
+
+            <div class="form-content">
+                <!-- Buyer Information -->
+                <div class="form-section">
+                    <div class="section-title">Buyer Information</div>
+                    <div class="form-group">
+                        <label for="buyerName">Buyer Company Name</label>
+                        <input type="text" id="buyerName" placeholder="ABC Corporation" oninput="trackFieldEdit('buyerName')">
+                    </div>
+                    <div class="form-group">
+                        <label for="buyerAddress">Business Address</label>
+                        <input type="text" id="buyerAddress" placeholder="123 Main St, City, State ZIP" oninput="trackFieldEdit('buyerAddress')">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="buyerState">State</label>
+                            <select id="buyerState" onchange="trackFieldEdit('buyerState')">
+                                <option value="">Select State</option>
+                                <option value="Alabama">Alabama</option>
+                                <option value="Alaska">Alaska</option>
+                                <option value="Arizona">Arizona</option>
+                                <option value="Arkansas">Arkansas</option>
+                                <option value="California">California</option>
+                                <option value="Colorado">Colorado</option>
+                                <option value="Connecticut">Connecticut</option>
+                                <option value="Delaware">Delaware</option>
+                                <option value="Florida">Florida</option>
+                                <option value="Georgia">Georgia</option>
+                                <option value="Hawaii">Hawaii</option>
+                                <option value="Idaho">Idaho</option>
+                                <option value="Illinois">Illinois</option>
+                                <option value="Indiana">Indiana</option>
+                                <option value="Iowa">Iowa</option>
+                                <option value="Kansas">Kansas</option>
+                                <option value="Kentucky">Kentucky</option>
+                                <option value="Louisiana">Louisiana</option>
+                                <option value="Maine">Maine</option>
+                                <option value="Maryland">Maryland</option>
+                                <option value="Massachusetts">Massachusetts</option>
+                                <option value="Michigan">Michigan</option>
+                                <option value="Minnesota">Minnesota</option>
+                                <option value="Mississippi">Mississippi</option>
+                                <option value="Missouri">Missouri</option>
+                                <option value="Montana">Montana</option>
+                                <option value="Nebraska">Nebraska</option>
+                                <option value="Nevada">Nevada</option>
+                                <option value="New Hampshire">New Hampshire</option>
+                                <option value="New Jersey">New Jersey</option>
+                                <option value="New York">New York</option>
+                                <option value="North Carolina">North Carolina</option>
+                                <option value="North Dakota">North Dakota</option>
+                                <option value="Ohio">Ohio</option>
+                                <option value="Oklahoma">Oklahoma</option>
+                                <option value="Oregon">Oregon</option>
+                                <option value="Pennsylvania">Pennsylvania</option>
+                                <option value="Rhode Island">Rhode Island</option>
+                                <option value="South Carolina">South Carolina</option>
+                                <option value="South Dakota">South Dakota</option>
+                                <option value="Tennessee">Tennessee</option>
+                                <option value="Texas">Texas</option>
+                                <option value="Utah">Utah</option>
+                                <option value="Vermont">Vermont</option>
+                                <option value="Virginia">Virginia</option>
+                                <option value="Washington">Washington</option>
+                                <option value="West Virginia">West Virginia</option>
+                                <option value="Wisconsin">Wisconsin</option>
+                                <option value="Wyoming">Wyoming</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="buyerEntity">Entity Type</label>
+                            <select id="buyerEntity" onchange="trackFieldEdit('buyerEntity')">
+                                <option value="Corporation">Corporation</option>
+                                <option value="LLC">LLC</option>
+                                <option value="Partnership">Partnership</option>
+                                <option value="Sole Proprietorship">Sole Proprietorship</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="buyerContact">Contact Person</label>
+                        <input type="text" id="buyerContact" placeholder="John Smith" oninput="trackFieldEdit('buyerContact')">
+                    </div>
+                    <div class="form-group">
+                        <label for="buyerEmail">Contact Email</label>
+                        <input type="email" id="buyerEmail" placeholder="john@example.com" oninput="trackFieldEdit('buyerEmail')">
+                    </div>
+                </div>
+
+                <!-- Vendor Information -->
+                <div class="form-section">
+                    <div class="section-title">Vendor/Supplier Information</div>
+                    <div class="form-group">
+                        <label for="vendorName">Vendor Company Name</label>
+                        <input type="text" id="vendorName" placeholder="XYZ Supplies Inc." oninput="trackFieldEdit('vendorName')">
+                    </div>
+                    <div class="form-group">
+                        <label for="vendorAddress">Business Address</label>
+                        <input type="text" id="vendorAddress" placeholder="456 Commerce Blvd, City, State ZIP" oninput="trackFieldEdit('vendorAddress')">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="vendorState">State</label>
+                            <select id="vendorState" onchange="trackFieldEdit('vendorState')">
+                                <option value="">Select State</option>
+                                <option value="Alabama">Alabama</option>
+                                <option value="Alaska">Alaska</option>
+                                <option value="Arizona">Arizona</option>
+                                <option value="Arkansas">Arkansas</option>
+                                <option value="California">California</option>
+                                <option value="Colorado">Colorado</option>
+                                <option value="Connecticut">Connecticut</option>
+                                <option value="Delaware">Delaware</option>
+                                <option value="Florida">Florida</option>
+                                <option value="Georgia">Georgia</option>
+                                <option value="Hawaii">Hawaii</option>
+                                <option value="Idaho">Idaho</option>
+                                <option value="Illinois">Illinois</option>
+                                <option value="Indiana">Indiana</option>
+                                <option value="Iowa">Iowa</option>
+                                <option value="Kansas">Kansas</option>
+                                <option value="Kentucky">Kentucky</option>
+                                <option value="Louisiana">Louisiana</option>
+                                <option value="Maine">Maine</option>
+                                <option value="Maryland">Maryland</option>
+                                <option value="Massachusetts">Massachusetts</option>
+                                <option value="Michigan">Michigan</option>
+                                <option value="Minnesota">Minnesota</option>
+                                <option value="Mississippi">Mississippi</option>
+                                <option value="Missouri">Missouri</option>
+                                <option value="Montana">Montana</option>
+                                <option value="Nebraska">Nebraska</option>
+                                <option value="Nevada">Nevada</option>
+                                <option value="New Hampshire">New Hampshire</option>
+                                <option value="New Jersey">New Jersey</option>
+                                <option value="New York">New York</option>
+                                <option value="North Carolina">North Carolina</option>
+                                <option value="North Dakota">North Dakota</option>
+                                <option value="Ohio">Ohio</option>
+                                <option value="Oklahoma">Oklahoma</option>
+                                <option value="Oregon">Oregon</option>
+                                <option value="Pennsylvania">Pennsylvania</option>
+                                <option value="Rhode Island">Rhode Island</option>
+                                <option value="South Carolina">South Carolina</option>
+                                <option value="South Dakota">South Dakota</option>
+                                <option value="Tennessee">Tennessee</option>
+                                <option value="Texas">Texas</option>
+                                <option value="Utah">Utah</option>
+                                <option value="Vermont">Vermont</option>
+                                <option value="Virginia">Virginia</option>
+                                <option value="Washington">Washington</option>
+                                <option value="West Virginia">West Virginia</option>
+                                <option value="Wisconsin">Wisconsin</option>
+                                <option value="Wyoming">Wyoming</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="vendorEntity">Entity Type</label>
+                            <select id="vendorEntity" onchange="trackFieldEdit('vendorEntity')">
+                                <option value="Corporation">Corporation</option>
+                                <option value="LLC">LLC</option>
+                                <option value="Partnership">Partnership</option>
+                                <option value="Sole Proprietorship">Sole Proprietorship</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="vendorContact">Contact Person</label>
+                        <input type="text" id="vendorContact" placeholder="Jane Doe" oninput="trackFieldEdit('vendorContact')">
+                    </div>
+                    <div class="form-group">
+                        <label for="vendorEmail">Contact Email</label>
+                        <input type="email" id="vendorEmail" placeholder="jane@supplier.com" oninput="trackFieldEdit('vendorEmail')">
+                    </div>
+                </div>
+
+                <!-- Products/Goods -->
+                <div class="form-section">
+                    <div class="section-title">Products/Goods</div>
+                    <div id="productCards" class="product-cards">
+                        <div class="product-card" data-index="0">
+                            <button type="button" class="remove-btn" onclick="removeProduct(0)" title="Remove product">&times;</button>
+                            <div class="form-group">
+                                <label>Product Name/Description</label>
+                                <input type="text" class="product-name" placeholder="Widget Model A" oninput="trackFieldEdit('products')">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>SKU/Part Number</label>
+                                    <input type="text" class="product-sku" placeholder="WGT-001" oninput="trackFieldEdit('products')">
+                                </div>
+                                <div class="form-group">
+                                    <label>Unit Price ($)</label>
+                                    <input type="number" class="product-price" placeholder="100.00" step="0.01" oninput="trackFieldEdit('products')">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Minimum Quantity</label>
+                                    <input type="number" class="product-min-qty" placeholder="100" oninput="trackFieldEdit('products')">
+                                </div>
+                                <div class="form-group">
+                                    <label>Unit of Measure</label>
+                                    <select class="product-unit" onchange="trackFieldEdit('products')">
+                                        <option value="units">Units</option>
+                                        <option value="cases">Cases</option>
+                                        <option value="pallets">Pallets</option>
+                                        <option value="pounds">Pounds</option>
+                                        <option value="kilograms">Kilograms</option>
+                                        <option value="gallons">Gallons</option>
+                                        <option value="liters">Liters</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="add-product-btn" onclick="addProduct()">+ Add Another Product</button>
+                </div>
+
+                <!-- Terms & Conditions -->
+                <div class="form-section">
+                    <div class="section-title">Agreement Terms</div>
+                    <div class="form-group">
+                        <label for="effectiveDate">Effective Date</label>
+                        <input type="date" id="effectiveDate" oninput="trackFieldEdit('effectiveDate')">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="termLength">Initial Term</label>
+                            <input type="number" id="termLength" placeholder="12" value="12" oninput="trackFieldEdit('termLength')">
+                        </div>
+                        <div class="form-group">
+                            <label for="termUnit">Term Unit</label>
+                            <select id="termUnit" onchange="trackFieldEdit('termUnit')">
+                                <option value="months">Months</option>
+                                <option value="years">Years</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="autoRenew" checked onchange="trackFieldEdit('autoRenew')">
+                        <label for="autoRenew">Auto-renewal with same term</label>
+                    </div>
+                    <div class="form-group">
+                        <label for="renewalNotice">Renewal Notice Period (days)</label>
+                        <input type="number" id="renewalNotice" placeholder="30" value="30" oninput="trackFieldEdit('renewalNotice')">
+                    </div>
+                </div>
+
+                <!-- Payment Terms -->
+                <div class="form-section">
+                    <div class="section-title">Payment Terms</div>
+                    <div class="form-group">
+                        <label for="paymentTerms">Payment Due</label>
+                        <select id="paymentTerms" onchange="trackFieldEdit('paymentTerms')">
+                            <option value="Net 30">Net 30</option>
+                            <option value="Net 15">Net 15</option>
+                            <option value="Net 45">Net 45</option>
+                            <option value="Net 60">Net 60</option>
+                            <option value="Due on Receipt">Due on Receipt</option>
+                            <option value="2/10 Net 30">2/10 Net 30 (2% discount if paid in 10 days)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="lateFee">Late Payment Fee (%)</label>
+                        <input type="number" id="lateFee" placeholder="1.5" value="1.5" step="0.1" oninput="trackFieldEdit('lateFee')">
+                    </div>
+                    <div class="form-group">
+                        <label for="paymentMethod">Accepted Payment Methods</label>
+                        <select id="paymentMethod" onchange="trackFieldEdit('paymentMethod')">
+                            <option value="check, wire transfer, or ACH">Check, Wire Transfer, or ACH</option>
+                            <option value="wire transfer or ACH only">Wire Transfer or ACH Only</option>
+                            <option value="credit card, check, wire transfer, or ACH">Credit Card, Check, Wire Transfer, or ACH</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Delivery Terms -->
+                <div class="form-section">
+                    <div class="section-title">Delivery Terms</div>
+                    <div class="form-group">
+                        <label for="deliveryTerms">Incoterms / Delivery Terms</label>
+                        <select id="deliveryTerms" onchange="trackFieldEdit('deliveryTerms')">
+                            <option value="FOB Destination">FOB Destination (Vendor pays shipping; risk transfers at delivery)</option>
+                            <option value="FOB Origin">FOB Origin (Buyer pays shipping; risk transfers at shipment)</option>
+                            <option value="EXW">EXW - Ex Works (Buyer arranges all shipping)</option>
+                            <option value="CIF">CIF - Cost, Insurance, Freight (Vendor pays to destination port)</option>
+                            <option value="DDP">DDP - Delivered Duty Paid (Vendor pays all costs including customs)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="deliveryAddress">Delivery Address</label>
+                        <input type="text" id="deliveryAddress" placeholder="Same as Buyer address or specify different" oninput="trackFieldEdit('deliveryAddress')">
+                    </div>
+                    <div class="form-group">
+                        <label for="leadTime">Standard Lead Time (business days)</label>
+                        <input type="number" id="leadTime" placeholder="14" value="14" oninput="trackFieldEdit('leadTime')">
+                    </div>
+                </div>
+
+                <!-- Quality & Warranty -->
+                <div class="form-section">
+                    <div class="section-title">Quality & Warranty</div>
+                    <div class="form-group">
+                        <label for="warrantyPeriod">Warranty Period</label>
+                        <select id="warrantyPeriod" onchange="trackFieldEdit('warrantyPeriod')">
+                            <option value="12 months">12 Months</option>
+                            <option value="6 months">6 Months</option>
+                            <option value="18 months">18 Months</option>
+                            <option value="24 months">24 Months</option>
+                            <option value="36 months">36 Months</option>
+                        </select>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="includeSpecs" onchange="trackFieldEdit('includeSpecs')">
+                        <label for="includeSpecs">Include product specifications exhibit</label>
+                    </div>
+                    <div class="form-group">
+                        <label for="defectThreshold">Acceptable Defect Rate (%)</label>
+                        <input type="number" id="defectThreshold" placeholder="2" value="2" step="0.1" oninput="trackFieldEdit('defectThreshold')">
+                    </div>
+                    <div class="form-group">
+                        <label for="inspectionPeriod">Inspection Period (days after delivery)</label>
+                        <input type="number" id="inspectionPeriod" placeholder="10" value="10" oninput="trackFieldEdit('inspectionPeriod')">
+                    </div>
+                </div>
+
+                <!-- Additional Provisions -->
+                <div class="form-section">
+                    <div class="section-title">Additional Provisions</div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="includeExclusivity" onchange="trackFieldEdit('includeExclusivity')">
+                        <label for="includeExclusivity">Include exclusivity provisions</label>
+                    </div>
+                    <div class="form-group" id="exclusivityTerritoryGroup" style="display: none;">
+                        <label for="exclusivityTerritory">Exclusivity Territory</label>
+                        <input type="text" id="exclusivityTerritory" placeholder="United States" oninput="trackFieldEdit('exclusivityTerritory')">
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="includeInsurance" checked onchange="trackFieldEdit('includeInsurance')">
+                        <label for="includeInsurance">Require vendor insurance</label>
+                    </div>
+                    <div class="form-group" id="insuranceAmountGroup">
+                        <label for="insuranceAmount">Minimum Insurance Coverage ($)</label>
+                        <input type="number" id="insuranceAmount" placeholder="1000000" value="1000000" oninput="trackFieldEdit('insuranceAmount')">
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="includeConfidentiality" checked onchange="trackFieldEdit('includeConfidentiality')">
+                        <label for="includeConfidentiality">Include confidentiality provisions</label>
+                    </div>
+                    <div class="form-group">
+                        <label for="governingLaw">Governing Law State</label>
+                        <select id="governingLaw" onchange="trackFieldEdit('governingLaw')">
+                            <option value="">Same as Buyer State</option>
+                            <option value="Alabama">Alabama</option>
+                            <option value="Alaska">Alaska</option>
+                            <option value="Arizona">Arizona</option>
+                            <option value="Arkansas">Arkansas</option>
+                            <option value="California">California</option>
+                            <option value="Colorado">Colorado</option>
+                            <option value="Connecticut">Connecticut</option>
+                            <option value="Delaware">Delaware</option>
+                            <option value="Florida">Florida</option>
+                            <option value="Georgia">Georgia</option>
+                            <option value="Hawaii">Hawaii</option>
+                            <option value="Idaho">Idaho</option>
+                            <option value="Illinois">Illinois</option>
+                            <option value="Indiana">Indiana</option>
+                            <option value="Iowa">Iowa</option>
+                            <option value="Kansas">Kansas</option>
+                            <option value="Kentucky">Kentucky</option>
+                            <option value="Louisiana">Louisiana</option>
+                            <option value="Maine">Maine</option>
+                            <option value="Maryland">Maryland</option>
+                            <option value="Massachusetts">Massachusetts</option>
+                            <option value="Michigan">Michigan</option>
+                            <option value="Minnesota">Minnesota</option>
+                            <option value="Mississippi">Mississippi</option>
+                            <option value="Missouri">Missouri</option>
+                            <option value="Montana">Montana</option>
+                            <option value="Nebraska">Nebraska</option>
+                            <option value="Nevada">Nevada</option>
+                            <option value="New Hampshire">New Hampshire</option>
+                            <option value="New Jersey">New Jersey</option>
+                            <option value="New York">New York</option>
+                            <option value="North Carolina">North Carolina</option>
+                            <option value="North Dakota">North Dakota</option>
+                            <option value="Ohio">Ohio</option>
+                            <option value="Oklahoma">Oklahoma</option>
+                            <option value="Oregon">Oregon</option>
+                            <option value="Pennsylvania">Pennsylvania</option>
+                            <option value="Rhode Island">Rhode Island</option>
+                            <option value="South Carolina">South Carolina</option>
+                            <option value="South Dakota">South Dakota</option>
+                            <option value="Tennessee">Tennessee</option>
+                            <option value="Texas">Texas</option>
+                            <option value="Utah">Utah</option>
+                            <option value="Vermont">Vermont</option>
+                            <option value="Virginia">Virginia</option>
+                            <option value="Washington">Washington</option>
+                            <option value="West Virginia">West Virginia</option>
+                            <option value="Wisconsin">Wisconsin</option>
+                            <option value="Wyoming">Wyoming</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn btn-primary" onclick="updatePreview()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    Generate Agreement
+                </button>
+            </div>
+        </div>
+
+        <!-- Preview Panel -->
+        <div class="preview-panel" id="previewPanel">
+            <div class="preview-header">
+                <h3>Document Preview</h3>
+                <div class="preview-actions">
+                    <div class="edit-mode-toggle">
+                        <input type="checkbox" id="fullEditMode" onchange="toggleFullEditMode()">
+                        <label for="fullEditMode">Full Edit Mode</label>
+                    </div>
+                    <button class="btn btn-secondary" onclick="printDocument()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                            <rect x="6" y="14" width="12" height="8"></rect>
+                        </svg>
+                        Print
+                    </button>
+                    <button class="btn btn-success" onclick="downloadWord()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Download Word
+                    </button>
+                </div>
+            </div>
+
+            <div class="document-container">
+                <div class="full-edit-warning">
+                    ⚠️ <strong>Full Edit Mode Active:</strong> You can now directly edit any text in the document below.
+                    Changes made in this mode will NOT sync back to the form fields. Generating a new preview will overwrite your edits.
+                </div>
+                <div class="document" id="documentPreview">
+                    <p style="text-align: center; color: var(--text-light); padding: 3rem;">
+                        Fill in the form fields and click "Generate Agreement" to preview your document.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State management
+        let lastEditedField = null;
+        let hasCustomEdits = false;
+        let productCount = 1;
+
+        // Toggle exclusivity territory field
+        document.getElementById('includeExclusivity').addEventListener('change', function() {
+            document.getElementById('exclusivityTerritoryGroup').style.display = this.checked ? 'block' : 'none';
+        });
+
+        // Toggle insurance amount field
+        document.getElementById('includeInsurance').addEventListener('change', function() {
+            document.getElementById('insuranceAmountGroup').style.display = this.checked ? 'block' : 'none';
+        });
+
+        // Product management
+        function addProduct() {
+            const container = document.getElementById('productCards');
+            const index = productCount++;
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.dataset.index = index;
+            card.innerHTML = `
+                <button type="button" class="remove-btn" onclick="removeProduct(${index})" title="Remove product">&times;</button>
+                <div class="form-group">
+                    <label>Product Name/Description</label>
+                    <input type="text" class="product-name" placeholder="Widget Model B" oninput="trackFieldEdit('products')">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>SKU/Part Number</label>
+                        <input type="text" class="product-sku" placeholder="WGT-002" oninput="trackFieldEdit('products')">
+                    </div>
+                    <div class="form-group">
+                        <label>Unit Price ($)</label>
+                        <input type="number" class="product-price" placeholder="100.00" step="0.01" oninput="trackFieldEdit('products')">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Minimum Quantity</label>
+                        <input type="number" class="product-min-qty" placeholder="100" oninput="trackFieldEdit('products')">
+                    </div>
+                    <div class="form-group">
+                        <label>Unit of Measure</label>
+                        <select class="product-unit" onchange="trackFieldEdit('products')">
+                            <option value="units">Units</option>
+                            <option value="cases">Cases</option>
+                            <option value="pallets">Pallets</option>
+                            <option value="pounds">Pounds</option>
+                            <option value="kilograms">Kilograms</option>
+                            <option value="gallons">Gallons</option>
+                            <option value="liters">Liters</option>
+                        </select>
+                    </div>
+                </div>
+            `;
+            container.appendChild(card);
+            trackFieldEdit('products');
+        }
+
+        function removeProduct(index) {
+            const card = document.querySelector(`.product-card[data-index="${index}"]`);
+            if (card && document.querySelectorAll('.product-card').length > 1) {
+                card.remove();
+                trackFieldEdit('products');
+            }
+        }
+
+        function getProducts() {
+            const products = [];
+            document.querySelectorAll('.product-card').forEach(card => {
+                const name = card.querySelector('.product-name').value.trim();
+                const sku = card.querySelector('.product-sku').value.trim();
+                const price = parseFloat(card.querySelector('.product-price').value) || 0;
+                const minQty = parseInt(card.querySelector('.product-min-qty').value) || 0;
+                const unit = card.querySelector('.product-unit').value;
+                if (name) {
+                    products.push({ name, sku, price, minQty, unit });
+                }
+            });
+            return products;
+        }
+
+        // Track field edits for scroll-to-view
+        function trackFieldEdit(fieldId) {
+            if (hasCustomEdits) {
+                const proceed = confirm('You have made custom edits to the document. Generating a new preview will overwrite those changes. Continue?');
+                if (!proceed) return;
+                hasCustomEdits = false;
+            }
+            lastEditedField = fieldId;
+            updatePreview();
+        }
+
+        // Full edit mode
+        function toggleFullEditMode() {
+            const isEnabled = document.getElementById('fullEditMode').checked;
+            const previewPanel = document.getElementById('previewPanel');
+            const documentEl = document.getElementById('documentPreview');
+
+            if (isEnabled) {
+                previewPanel.classList.add('full-edit-mode');
+                documentEl.contentEditable = true;
+                documentEl.addEventListener('input', markCustomEdits);
+            } else {
+                previewPanel.classList.remove('full-edit-mode');
+                documentEl.contentEditable = false;
+                documentEl.removeEventListener('input', markCustomEdits);
+            }
+        }
+
+        function markCustomEdits() {
+            hasCustomEdits = true;
+        }
+
+        // Format currency
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 2
+            }).format(amount);
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            if (!dateString) return '[DATE]';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        }
+
+        // Generate document preview
+        function updatePreview() {
+            const buyerName = document.getElementById('buyerName').value.trim() || '[BUYER NAME]';
+            const buyerAddress = document.getElementById('buyerAddress').value.trim() || '[BUYER ADDRESS]';
+            const buyerState = document.getElementById('buyerState').value || '[STATE]';
+            const buyerEntity = document.getElementById('buyerEntity').value;
+            const buyerContact = document.getElementById('buyerContact').value.trim() || '[CONTACT NAME]';
+            const buyerEmail = document.getElementById('buyerEmail').value.trim() || '[EMAIL]';
+
+            const vendorName = document.getElementById('vendorName').value.trim() || '[VENDOR NAME]';
+            const vendorAddress = document.getElementById('vendorAddress').value.trim() || '[VENDOR ADDRESS]';
+            const vendorState = document.getElementById('vendorState').value || '[STATE]';
+            const vendorEntity = document.getElementById('vendorEntity').value;
+            const vendorContact = document.getElementById('vendorContact').value.trim() || '[CONTACT NAME]';
+            const vendorEmail = document.getElementById('vendorEmail').value.trim() || '[EMAIL]';
+
+            const effectiveDate = formatDate(document.getElementById('effectiveDate').value);
+            const termLength = document.getElementById('termLength').value || '12';
+            const termUnit = document.getElementById('termUnit').value;
+            const autoRenew = document.getElementById('autoRenew').checked;
+            const renewalNotice = document.getElementById('renewalNotice').value || '30';
+
+            const paymentTerms = document.getElementById('paymentTerms').value;
+            const lateFee = document.getElementById('lateFee').value || '1.5';
+            const paymentMethod = document.getElementById('paymentMethod').value;
+
+            const deliveryTerms = document.getElementById('deliveryTerms').value;
+            const deliveryAddress = document.getElementById('deliveryAddress').value.trim() || buyerAddress;
+            const leadTime = document.getElementById('leadTime').value || '14';
+
+            const warrantyPeriod = document.getElementById('warrantyPeriod').value;
+            const includeSpecs = document.getElementById('includeSpecs').checked;
+            const defectThreshold = document.getElementById('defectThreshold').value || '2';
+            const inspectionPeriod = document.getElementById('inspectionPeriod').value || '10';
+
+            const includeExclusivity = document.getElementById('includeExclusivity').checked;
+            const exclusivityTerritory = document.getElementById('exclusivityTerritory').value.trim() || 'United States';
+            const includeInsurance = document.getElementById('includeInsurance').checked;
+            const insuranceAmount = parseInt(document.getElementById('insuranceAmount').value) || 1000000;
+            const includeConfidentiality = document.getElementById('includeConfidentiality').checked;
+            const governingLaw = document.getElementById('governingLaw').value || buyerState;
+
+            const products = getProducts();
+
+            // Build products table
+            let productsTable = '';
+            if (products.length > 0) {
+                productsTable = `
+                    <table class="product-table">
+                        <thead>
+                            <tr>
+                                <th>Product Description</th>
+                                <th>SKU/Part #</th>
+                                <th>Unit Price</th>
+                                <th>Min. Qty</th>
+                                <th>Unit</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${products.map(p => `
+                                <tr>
+                                    <td>${p.name}</td>
+                                    <td>${p.sku || 'N/A'}</td>
+                                    <td class="currency">${formatCurrency(p.price)}</td>
+                                    <td>${p.minQty}</td>
+                                    <td>${p.unit}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } else {
+                productsTable = '<p><em>[Products to be specified in Exhibit A]</em></p>';
+            }
+
+            // Build exclusivity section
+            let exclusivitySection = '';
+            if (includeExclusivity) {
+                exclusivitySection = `
+                    <div class="section">
+                        <h2><span class="section-number">9.</span> EXCLUSIVITY</h2>
+                        <p>9.1 <strong>Exclusive Supply.</strong> During the Term of this Agreement, Vendor agrees to be the exclusive supplier of the Products to Buyer within <span class="doc-highlight" contenteditable="true" data-field="exclusivityTerritory">${exclusivityTerritory}</span> (the "Territory").</p>
+                        <p>9.2 <strong>Non-Competition.</strong> During the Term and for a period of twelve (12) months following termination, Vendor shall not directly supply Products to any competitor of Buyer within the Territory without Buyer's prior written consent.</p>
+                        <p>9.3 <strong>Right of First Refusal.</strong> If Vendor develops new products similar to or competitive with the Products, Vendor shall offer Buyer the right of first refusal to add such products to this Agreement on terms to be mutually agreed.</p>
+                    </div>
+                `;
+            }
+
+            // Build insurance section
+            let insuranceSection = '';
+            if (includeInsurance) {
+                insuranceSection = `
+                    <div class="section">
+                        <h2><span class="section-number">${includeExclusivity ? '10' : '9'}.</span> INSURANCE</h2>
+                        <p>${includeExclusivity ? '10' : '9'}.1 <strong>Required Coverage.</strong> Vendor shall maintain, at its own expense, the following insurance coverage:</p>
+                        <p class="subsection">(a) Commercial General Liability insurance with limits of not less than <span class="doc-highlight" contenteditable="true" data-field="insuranceAmount">${formatCurrency(insuranceAmount)}</span> per occurrence;</p>
+                        <p class="subsection">(b) Product Liability insurance with limits of not less than ${formatCurrency(insuranceAmount)} per occurrence;</p>
+                        <p class="subsection">(c) Workers' Compensation insurance as required by applicable law.</p>
+                        <p>${includeExclusivity ? '10' : '9'}.2 <strong>Certificates of Insurance.</strong> Upon request, Vendor shall provide Buyer with certificates of insurance evidencing the required coverage, naming Buyer as an additional insured on the Commercial General Liability and Product Liability policies.</p>
+                    </div>
+                `;
+            }
+
+            // Build confidentiality section
+            let confidentialitySection = '';
+            if (includeConfidentiality) {
+                const confSectionNum = (includeExclusivity ? 10 : 9) + (includeInsurance ? 1 : 0);
+                confidentialitySection = `
+                    <div class="section">
+                        <h2><span class="section-number">${confSectionNum}.</span> CONFIDENTIALITY</h2>
+                        <p>${confSectionNum}.1 <strong>Confidential Information.</strong> Each party acknowledges that it may receive confidential and proprietary information of the other party, including but not limited to pricing, business plans, customer lists, technical data, and trade secrets ("Confidential Information").</p>
+                        <p>${confSectionNum}.2 <strong>Non-Disclosure.</strong> Each party agrees to: (a) maintain the confidentiality of the other party's Confidential Information using at least the same degree of care it uses to protect its own confidential information; (b) not disclose such Confidential Information to any third party without prior written consent; and (c) use such Confidential Information solely for the purposes of this Agreement.</p>
+                        <p>${confSectionNum}.3 <strong>Survival.</strong> The obligations of confidentiality shall survive termination of this Agreement for a period of three (3) years.</p>
+                    </div>
+                `;
+            }
+
+            // Calculate general provisions section number
+            let generalSectionNum = 9;
+            if (includeExclusivity) generalSectionNum++;
+            if (includeInsurance) generalSectionNum++;
+            if (includeConfidentiality) generalSectionNum++;
+
+            const documentHTML = `
+                <h1>VENDOR/SUPPLY AGREEMENT</h1>
+
+                <div class="parties">
+                    <p>This Vendor/Supply Agreement (the "Agreement") is entered into as of <span class="doc-highlight" contenteditable="true" data-field="effectiveDate">${effectiveDate}</span> (the "Effective Date")</p>
+                    <p><strong>by and between</strong></p>
+                    <p><span class="doc-highlight" contenteditable="true" data-field="buyerName">${buyerName}</span>, a ${buyerState} ${buyerEntity} ("Buyer")<br>
+                    <span class="doc-highlight" contenteditable="true" data-field="buyerAddress">${buyerAddress}</span></p>
+                    <p><strong>and</strong></p>
+                    <p><span class="doc-highlight" contenteditable="true" data-field="vendorName">${vendorName}</span>, a ${vendorState} ${vendorEntity} ("Vendor")<br>
+                    <span class="doc-highlight" contenteditable="true" data-field="vendorAddress">${vendorAddress}</span></p>
+                </div>
+
+                <p><strong>RECITALS</strong></p>
+                <p>WHEREAS, Vendor is engaged in the business of manufacturing and/or distributing certain products; and</p>
+                <p>WHEREAS, Buyer desires to purchase such products from Vendor, and Vendor desires to sell such products to Buyer, subject to the terms and conditions set forth herein;</p>
+                <p>NOW, THEREFORE, in consideration of the mutual covenants and agreements hereinafter set forth and for other good and valuable consideration, the receipt and sufficiency of which are hereby acknowledged, the parties agree as follows:</p>
+
+                <div class="section" data-field="products">
+                    <h2><span class="section-number">1.</span> PRODUCTS</h2>
+                    <p>1.1 <strong>Products.</strong> Vendor agrees to sell and deliver to Buyer, and Buyer agrees to purchase from Vendor, the products described below (the "Products"):</p>
+                    ${productsTable}
+                    ${includeSpecs ? '<p>1.2 <strong>Specifications.</strong> Products shall conform to the specifications set forth in Exhibit A attached hereto and incorporated herein by reference.</p>' : ''}
+                    <p>1.${includeSpecs ? '3' : '2'} <strong>Price Adjustments.</strong> Vendor may adjust prices upon thirty (30) days' prior written notice, provided that any price increase shall not exceed five percent (5%) in any twelve-month period without Buyer's written consent.</p>
+                </div>
+
+                <div class="section">
+                    <h2><span class="section-number">2.</span> ORDERS AND DELIVERY</h2>
+                    <p>2.1 <strong>Purchase Orders.</strong> Buyer shall submit purchase orders to Vendor specifying the Products, quantities, requested delivery dates, and delivery location. Vendor shall confirm acceptance of each order within three (3) business days of receipt.</p>
+                    <p>2.2 <strong>Delivery Terms.</strong> All deliveries shall be made <span class="doc-highlight" contenteditable="true" data-field="deliveryTerms">${deliveryTerms}</span> to <span class="doc-highlight" contenteditable="true" data-field="deliveryAddress">${deliveryAddress}</span>.</p>
+                    <p>2.3 <strong>Lead Time.</strong> Standard lead time for Products is <span class="doc-highlight" contenteditable="true" data-field="leadTime">${leadTime}</span> business days from order acceptance. Vendor shall use commercially reasonable efforts to meet requested delivery dates.</p>
+                    <p>2.4 <strong>Risk of Loss.</strong> Risk of loss and title to Products shall pass to Buyer in accordance with the delivery terms specified above.</p>
+                    <p>2.5 <strong>Shortages and Damage.</strong> Buyer shall inspect all shipments upon receipt and notify Vendor of any shortages, damage, or non-conformities within <span class="doc-highlight" contenteditable="true" data-field="inspectionPeriod">${inspectionPeriod}</span> business days of delivery.</p>
+                </div>
+
+                <div class="section">
+                    <h2><span class="section-number">3.</span> PAYMENT</h2>
+                    <p>3.1 <strong>Payment Terms.</strong> Payment for Products shall be due <span class="doc-highlight" contenteditable="true" data-field="paymentTerms">${paymentTerms}</span> from the date of Vendor's invoice.</p>
+                    <p>3.2 <strong>Payment Method.</strong> All payments shall be made by <span class="doc-highlight" contenteditable="true" data-field="paymentMethod">${paymentMethod}</span>.</p>
+                    <p>3.3 <strong>Late Payments.</strong> Any amounts not paid when due shall bear interest at the rate of <span class="doc-highlight" contenteditable="true" data-field="lateFee">${lateFee}</span>% per month (or the maximum rate permitted by law, if less) from the due date until paid in full.</p>
+                    <p>3.4 <strong>Taxes.</strong> Prices are exclusive of all sales, use, excise, and similar taxes. Buyer shall be responsible for all such taxes, excluding taxes based on Vendor's income.</p>
+                </div>
+
+                <div class="section">
+                    <h2><span class="section-number">4.</span> QUALITY AND WARRANTY</h2>
+                    <p>4.1 <strong>Quality Standards.</strong> All Products shall be of good quality, free from defects in materials and workmanship, and shall conform to applicable specifications and industry standards.</p>
+                    <p>4.2 <strong>Warranty.</strong> Vendor warrants that all Products delivered under this Agreement shall be free from defects in materials and workmanship for a period of <span class="doc-highlight" contenteditable="true" data-field="warrantyPeriod">${warrantyPeriod}</span> from the date of delivery (the "Warranty Period").</p>
+                    <p>4.3 <strong>Defect Rate.</strong> If the defect rate for any shipment exceeds <span class="doc-highlight" contenteditable="true" data-field="defectThreshold">${defectThreshold}</span>%, Buyer may, at its option: (a) return the entire shipment for full refund or replacement; (b) request Vendor to replace defective units at Vendor's expense; or (c) accept the shipment at a reduced price mutually agreed upon by the parties.</p>
+                    <p>4.4 <strong>Warranty Remedies.</strong> If any Product fails to conform to the warranty during the Warranty Period, Vendor shall, at Buyer's option, repair or replace the non-conforming Product at no additional charge to Buyer, including shipping costs.</p>
+                    <p>4.5 <strong>DISCLAIMER.</strong> EXCEPT AS EXPRESSLY SET FORTH IN THIS AGREEMENT, VENDOR MAKES NO OTHER WARRANTIES, EXPRESS OR IMPLIED, INCLUDING ANY IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.</p>
+                </div>
+
+                <div class="section">
+                    <h2><span class="section-number">5.</span> TERM AND TERMINATION</h2>
+                    <p>5.1 <strong>Term.</strong> This Agreement shall commence on the Effective Date and continue for an initial term of <span class="doc-highlight" contenteditable="true" data-field="termLength">${termLength}</span> <span class="doc-highlight" contenteditable="true" data-field="termUnit">${termUnit}</span> (the "Initial Term").</p>
+                    ${autoRenew ? `<p>5.2 <strong>Renewal.</strong> Unless either party provides written notice of non-renewal at least <span class="doc-highlight" contenteditable="true" data-field="renewalNotice">${renewalNotice}</span> days prior to the expiration of the then-current term, this Agreement shall automatically renew for successive periods equal to the Initial Term.</p>` : '<p>5.2 <strong>Expiration.</strong> This Agreement shall expire at the end of the Initial Term unless extended by mutual written agreement of the parties.</p>'}
+                    <p>5.3 <strong>Termination for Cause.</strong> Either party may terminate this Agreement immediately upon written notice if the other party: (a) materially breaches this Agreement and fails to cure such breach within thirty (30) days of written notice; (b) becomes insolvent, files for bankruptcy, or makes an assignment for the benefit of creditors.</p>
+                    <p>5.4 <strong>Termination for Convenience.</strong> Either party may terminate this Agreement without cause upon ninety (90) days' prior written notice to the other party.</p>
+                    <p>5.5 <strong>Effect of Termination.</strong> Upon termination or expiration: (a) Buyer shall pay for all Products delivered prior to termination; (b) Vendor shall fulfill any accepted orders outstanding at the time of termination; and (c) each party shall return or destroy the other party's Confidential Information.</p>
+                </div>
+
+                <div class="section">
+                    <h2><span class="section-number">6.</span> INDEMNIFICATION</h2>
+                    <p>6.1 <strong>Vendor Indemnification.</strong> Vendor shall indemnify, defend, and hold harmless Buyer from and against any and all claims, damages, losses, costs, and expenses (including reasonable attorneys' fees) arising from: (a) any defect in the Products; (b) Vendor's negligence or willful misconduct; (c) any claim that the Products infringe any third-party intellectual property rights; or (d) Vendor's breach of this Agreement.</p>
+                    <p>6.2 <strong>Buyer Indemnification.</strong> Buyer shall indemnify, defend, and hold harmless Vendor from and against any and all claims, damages, losses, costs, and expenses (including reasonable attorneys' fees) arising from: (a) Buyer's negligence or willful misconduct; (b) Buyer's misuse of the Products; or (c) Buyer's breach of this Agreement.</p>
+                </div>
+
+                <div class="section">
+                    <h2><span class="section-number">7.</span> LIMITATION OF LIABILITY</h2>
+                    <p>7.1 <strong>Consequential Damages.</strong> IN NO EVENT SHALL EITHER PARTY BE LIABLE TO THE OTHER FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING LOST PROFITS, ARISING OUT OF OR RELATING TO THIS AGREEMENT, REGARDLESS OF WHETHER SUCH DAMAGES WERE FORESEEABLE OR WHETHER EITHER PARTY WAS ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.</p>
+                    <p>7.2 <strong>Liability Cap.</strong> EXCEPT FOR CLAIMS ARISING FROM A PARTY'S INDEMNIFICATION OBLIGATIONS, GROSS NEGLIGENCE, OR WILLFUL MISCONDUCT, NEITHER PARTY'S TOTAL LIABILITY UNDER THIS AGREEMENT SHALL EXCEED THE TOTAL AMOUNTS PAID OR PAYABLE BY BUYER TO VENDOR DURING THE TWELVE (12) MONTH PERIOD PRECEDING THE CLAIM.</p>
+                </div>
+
+                <div class="section">
+                    <h2><span class="section-number">8.</span> COMPLIANCE</h2>
+                    <p>8.1 <strong>Laws and Regulations.</strong> Each party shall comply with all applicable federal, state, and local laws, regulations, and ordinances in the performance of this Agreement.</p>
+                    <p>8.2 <strong>Product Compliance.</strong> Vendor warrants that all Products comply with applicable safety standards, labeling requirements, and other regulatory requirements, including but not limited to FDA, CPSC, and EPA regulations where applicable.</p>
+                    <p>8.3 <strong>Import/Export.</strong> Each party shall be responsible for obtaining any necessary import or export licenses and shall comply with all applicable import and export laws and regulations.</p>
+                </div>
+
+                ${exclusivitySection}
+                ${insuranceSection}
+                ${confidentialitySection}
+
+                <div class="section">
+                    <h2><span class="section-number">${generalSectionNum}.</span> GENERAL PROVISIONS</h2>
+                    <p>${generalSectionNum}.1 <strong>Governing Law.</strong> This Agreement shall be governed by and construed in accordance with the laws of the State of <span class="doc-highlight" contenteditable="true" data-field="governingLaw">${governingLaw}</span>, without regard to its conflict of laws principles.</p>
+                    <p>${generalSectionNum}.2 <strong>Dispute Resolution.</strong> Any dispute arising out of or relating to this Agreement shall be resolved through good faith negotiations. If the dispute cannot be resolved within thirty (30) days, either party may pursue mediation or litigation in the courts of ${governingLaw}.</p>
+                    <p>${generalSectionNum}.3 <strong>Force Majeure.</strong> Neither party shall be liable for any failure or delay in performance due to causes beyond its reasonable control, including acts of God, war, terrorism, labor disputes, government actions, or natural disasters.</p>
+                    <p>${generalSectionNum}.4 <strong>Assignment.</strong> Neither party may assign this Agreement without the prior written consent of the other party, except that either party may assign this Agreement to an affiliate or in connection with a merger, acquisition, or sale of all or substantially all of its assets.</p>
+                    <p>${generalSectionNum}.5 <strong>Notices.</strong> All notices under this Agreement shall be in writing and shall be deemed delivered when: (a) delivered personally; (b) sent by confirmed email; (c) three (3) business days after being sent by certified mail, return receipt requested; or (d) one (1) business day after being sent by overnight courier.</p>
+                    <p>${generalSectionNum}.6 <strong>Entire Agreement.</strong> This Agreement, together with any exhibits and schedules attached hereto, constitutes the entire agreement between the parties concerning its subject matter and supersedes all prior agreements, understandings, and representations.</p>
+                    <p>${generalSectionNum}.7 <strong>Amendment.</strong> This Agreement may not be amended or modified except by a written instrument signed by both parties.</p>
+                    <p>${generalSectionNum}.8 <strong>Waiver.</strong> No waiver of any provision of this Agreement shall be effective unless in writing and signed by the waiving party. No failure or delay in exercising any right shall constitute a waiver of that right.</p>
+                    <p>${generalSectionNum}.9 <strong>Severability.</strong> If any provision of this Agreement is held invalid or unenforceable, the remaining provisions shall continue in full force and effect.</p>
+                    <p>${generalSectionNum}.10 <strong>Counterparts.</strong> This Agreement may be executed in counterparts, each of which shall be deemed an original and all of which together shall constitute one and the same instrument. Electronic signatures shall be deemed valid and binding.</p>
+                </div>
+
+                <p><strong>IN WITNESS WHEREOF</strong>, the parties have executed this Vendor/Supply Agreement as of the Effective Date.</p>
+
+                <div class="signature-block">
+                    <div class="signature-party">
+                        <h4>BUYER:</h4>
+                        <p><strong><span class="doc-highlight" contenteditable="true" data-field="buyerName">${buyerName}</span></strong></p>
+                        <div class="signature-line">
+                            <span>Signature</span>
+                        </div>
+                        <div class="signature-field">
+                            <span>Name: <span class="doc-highlight" contenteditable="true" data-field="buyerContact">${buyerContact}</span></span>
+                        </div>
+                        <div class="signature-field">
+                            <span>Title: ____________________</span>
+                        </div>
+                        <div class="signature-field">
+                            <span>Date: ____________________</span>
+                        </div>
+                    </div>
+                    <div class="signature-party">
+                        <h4>VENDOR:</h4>
+                        <p><strong><span class="doc-highlight" contenteditable="true" data-field="vendorName">${vendorName}</span></strong></p>
+                        <div class="signature-line">
+                            <span>Signature</span>
+                        </div>
+                        <div class="signature-field">
+                            <span>Name: <span class="doc-highlight" contenteditable="true" data-field="vendorContact">${vendorContact}</span></span>
+                        </div>
+                        <div class="signature-field">
+                            <span>Title: ____________________</span>
+                        </div>
+                        <div class="signature-field">
+                            <span>Date: ____________________</span>
+                        </div>
+                    </div>
+                </div>
+
+                ${includeSpecs ? `
+                <div style="page-break-before: always; margin-top: 3rem; padding-top: 2rem; border-top: 2px solid var(--border);">
+                    <h2 style="text-align: center;">EXHIBIT A</h2>
+                    <h3 style="text-align: center;">Product Specifications</h3>
+                    <p style="text-align: center; color: var(--text-light);"><em>[Product specifications to be attached]</em></p>
+                </div>
+                ` : ''}
+            `;
+
+            document.getElementById('documentPreview').innerHTML = documentHTML;
+
+            // Set up inline editing sync
+            setupInlineEditing();
+
+            // Scroll to edited field
+            if (lastEditedField) {
+                setTimeout(() => {
+                    const highlight = document.querySelector(`[data-field="${lastEditedField}"]`);
+                    if (highlight) {
+                        highlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        highlight.classList.add('field-highlight-animation');
+                        setTimeout(() => highlight.classList.remove('field-highlight-animation'), 1500);
+                    }
+                    lastEditedField = null;
+                }, 50);
+            }
+        }
+
+        // Setup inline editing sync
+        function setupInlineEditing() {
+            const editableFields = document.querySelectorAll('.doc-highlight[data-field]');
+            editableFields.forEach(field => {
+                field.addEventListener('blur', function() {
+                    const fieldId = this.dataset.field;
+                    const value = this.textContent.trim();
+                    const input = document.getElementById(fieldId);
+                    if (input && fieldId !== 'products') {
+                        if (input.type === 'date') {
+                            // Try to parse the date
+                            const parsed = new Date(value);
+                            if (!isNaN(parsed)) {
+                                input.value = parsed.toISOString().split('T')[0];
+                            }
+                        } else {
+                            input.value = value;
+                        }
+                    }
+                    hasCustomEdits = true;
+                });
+            });
+        }
+
+        // Print document
+        function printDocument() {
+            window.print();
+        }
+
+        // Download as Word
+        function downloadWord() {
+            const content = document.getElementById('documentPreview').innerHTML;
+            const buyerName = document.getElementById('buyerName').value.trim() || 'Company';
+            const vendorName = document.getElementById('vendorName').value.trim() || 'Vendor';
+
+            const styles = `
+                <style>
+                    body { font-family: 'Times New Roman', Times, serif; font-size: 12pt; line-height: 1.6; margin: 1in; }
+                    h1 { text-align: center; font-size: 16pt; margin-bottom: 12pt; }
+                    h2 { font-size: 12pt; margin-top: 18pt; margin-bottom: 6pt; }
+                    p { margin-bottom: 6pt; text-align: justify; }
+                    .parties { text-align: center; margin-bottom: 24pt; }
+                    .signature-block { margin-top: 36pt; }
+                    .signature-party { display: inline-block; width: 45%; vertical-align: top; }
+                    .signature-line { border-top: 1px solid black; margin-top: 48pt; padding-top: 6pt; }
+                    table { width: 100%; border-collapse: collapse; margin: 12pt 0; }
+                    th, td { border: 1px solid black; padding: 6pt; text-align: left; }
+                    th { background-color: #f0f0f0; }
+                    .doc-highlight { background: none; border: none; padding: 0; }
+                </style>
+            `;
+
+            const html = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="utf-8">
+                    <title>Vendor Supply Agreement - ${buyerName} and ${vendorName}</title>
+                    ${styles}
+                </head>
+                <body>
+                    ${content}
+                </body>
+                </html>
+            `;
+
+            const blob = new Blob([html], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Vendor_Supply_Agreement_${buyerName.replace(/[^a-z0-9]/gi, '_')}_${vendorName.replace(/[^a-z0-9]/gi, '_')}.doc`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set default date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('effectiveDate').value = today;
+        });
+    </script>
+</body>
+</html>

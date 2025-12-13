@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Statement of Work (SOW) Generator | Terms.Law</title>
+  <meta name="description" content="Free Statement of Work generator. Create detailed SOWs for projects, consulting engagements, and development work. Attorney-drafted with real-time preview.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Dancing+Script:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --color-primary: #1e40af;
+      --color-primary-dark: #1e3a8a;
+      --color-primary-light: #3b82f6;
+      --color-accent: #7c3aed;
+      --color-accent-light: #8b5cf6;
+      --color-success: #059669;
+      --color-warning: #d97706;
+      --color-danger: #dc2626;
+      --color-bg: #f8fafc;
+      --color-surface: #ffffff;
+      --color-border: #e2e8f0;
+      --color-border-light: #f1f5f9;
+      --color-text: #0f172a;
+      --color-text-secondary: #334155;
+      --color-text-muted: #64748b;
+      --color-text-light: #94a3b8;
+      --color-dark: #0f172a;
+      --color-dark-surface: #1e293b;
+      --doc-bg: #fefefe;
+      --doc-text: #1f2937;
+      --doc-clause-title: #1e40af;
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --radius-full: 9999px;
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-serif: Georgia, 'Times New Roman', serif;
+      --transition-fast: 150ms ease;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body { font-family: var(--font-sans); font-size: 16px; line-height: 1.6; color: var(--color-text); background: var(--color-bg); }
+
+    /* Header */
+    .site-header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 0; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); }
+    .header-content { display: flex; align-items: center; justify-content: center; height: 52px; }
+    .header-nav { display: flex; align-items: center; gap: 0; height: 100%; }
+    .nav-link { color: #94a3b8; font-size: 0.85rem; font-weight: 600; padding: 16px 24px; transition: all 150ms ease; text-decoration: none; height: 100%; display: flex; align-items: center; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid transparent; }
+    .nav-link:hover { color: #ffffff; background: rgba(255, 255, 255, 0.05); }
+    .nav-link.active { color: #ffffff; background: rgba(255, 255, 255, 0.08); border-bottom-color: #3b82f6; }
+    .nav-link.home-logo { padding: 12px 20px; font-size: 1.1rem; font-weight: 800; letter-spacing: -0.02em; text-transform: none; }
+    .nav-link.home-logo .logo-text { background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+    /* Hero */
+    .hero { background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #4c1d95 100%); padding: 2rem 2rem; position: relative; }
+    .hero-content { max-width: 800px; }
+    .hero-badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; background: rgba(124, 58, 237, 0.15); border: 1px solid rgba(124, 58, 237, 0.3); border-radius: var(--radius-full); font-size: 0.8rem; color: #c4b5fd; margin-bottom: 1rem; }
+    .hero h1 { font-size: 2rem; font-weight: 800; color: #fff; line-height: 1.2; margin-bottom: 0.75rem; }
+    .hero h1 .highlight { background: linear-gradient(135deg, #c4b5fd, #60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hero-subtitle { font-size: 1rem; color: #94a3b8; line-height: 1.6; }
+
+    /* Builder Layout */
+    .builder-layout { display: grid; grid-template-columns: 420px 1fr; gap: 0; min-height: calc(100vh - 200px); }
+    @media (max-width: 1024px) { .builder-layout { grid-template-columns: 1fr; } }
+
+    .builder-sidebar { background: var(--color-surface); border-right: 1px solid var(--color-border); padding: 1.5rem; overflow-y: auto; max-height: calc(100vh - 150px); position: sticky; top: 52px; }
+    .builder-section { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--color-border-light); }
+    .builder-section:last-child { border-bottom: none; margin-bottom: 0; }
+    .builder-section-title { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; }
+
+    /* Form Elements */
+    .form-group { margin-bottom: 1rem; }
+    .form-label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--color-text); margin-bottom: 0.35rem; }
+    .form-input, .form-textarea, .form-select { width: 100%; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-md); font-size: 0.9rem; font-family: inherit; transition: all var(--transition-fast); background: var(--color-surface); }
+    .form-input:focus, .form-textarea:focus, .form-select:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1); }
+    .form-textarea { min-height: 100px; resize: vertical; }
+    .form-hint { font-size: 0.75rem; color: var(--color-text-muted); margin-top: 4px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    /* Deliverable Cards */
+    .deliverable-card { background: var(--color-bg); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 0.75rem; }
+    .deliverable-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+    .deliverable-card-title { font-weight: 600; font-size: 0.85rem; }
+    .deliverable-remove { background: none; border: none; color: var(--color-danger); cursor: pointer; font-size: 1.1rem; padding: 0; }
+    .add-deliverable-btn { width: 100%; padding: 10px; background: var(--color-bg); border: 2px dashed var(--color-border); border-radius: var(--radius-md); color: var(--color-text-muted); font-weight: 600; cursor: pointer; font-size: 0.85rem; }
+    .add-deliverable-btn:hover { border-color: var(--color-primary); color: var(--color-primary); }
+
+    /* Preview Panel */
+    .preview-panel { background: var(--color-bg); padding: 1.5rem; overflow-y: auto; }
+    .preview-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem; }
+    .preview-title { font-size: 0.8rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .preview-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+    /* Buttons */
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: var(--radius-md); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all var(--transition-fast); border: none; }
+    .btn-primary { background: var(--color-primary); color: #fff; }
+    .btn-primary:hover { background: var(--color-primary-dark); }
+    .btn-secondary { background: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-border); }
+    .btn-secondary:hover { border-color: var(--color-primary); color: var(--color-primary); }
+
+    /* Document */
+    .document-container { background: var(--color-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); overflow: hidden; }
+    .document-header { background: linear-gradient(135deg, var(--color-dark) 0%, var(--color-dark-surface) 100%); padding: 0.75rem 1.5rem; display: flex; align-items: center; justify-content: space-between; }
+    .document-title { color: #fff; font-size: 0.85rem; font-weight: 600; }
+    .document-status { font-size: 0.7rem; color: var(--color-accent-light); }
+    .document-body { padding: 50px 60px; background: var(--doc-bg); font-family: var(--font-serif); font-size: 13px; line-height: 1.8; color: var(--doc-text); }
+    .document-body.full-edit-mode { outline: 3px solid var(--color-primary); background: #fffef8; }
+
+    /* Document Formatting */
+    .doc-title { text-align: center; font-size: 18px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px; }
+    .doc-subtitle { text-align: center; font-size: 12px; color: var(--color-text-muted); margin-bottom: 30px; font-family: var(--font-sans); }
+    .doc-section-header { font-size: 13px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-top: 25px; margin-bottom: 12px; color: var(--doc-clause-title); border-bottom: 1px solid var(--color-border); padding-bottom: 5px; }
+    .doc-paragraph { margin-bottom: 14px; text-align: justify; }
+    .doc-list { margin: 12px 0 12px 25px; padding-left: 15px; }
+    .doc-list li { margin-bottom: 8px; text-align: justify; }
+
+    /* Highlighted Fields - CRITICAL */
+    .doc-highlight { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 1px 5px; border-radius: 3px; border-bottom: 2px solid #f59e0b; font-weight: 600; cursor: text; }
+    .doc-highlight:hover { background: linear-gradient(135deg, #fde68a 0%, #fcd34d 100%); }
+    .doc-highlight:focus { outline: none; box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.3); }
+    .doc-highlight.empty { background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); border-bottom-color: #ef4444; color: #dc2626; }
+
+    /* CRITICAL: Field highlight animation */
+    @keyframes highlightPulse {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+      50% { transform: scale(1.02); box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+    }
+    .field-highlight-animation { animation: highlightPulse 0.6s ease-out; background: linear-gradient(135deg, #fde047 0%, #facc15 100%) !important; }
+
+    @keyframes flashContainer {
+      0%, 100% { background: transparent; }
+      25% { background: rgba(251, 191, 36, 0.2); box-shadow: 0 0 12px rgba(251, 191, 36, 0.3); }
+      50% { background: rgba(253, 230, 138, 0.3); }
+      75% { background: rgba(251, 191, 36, 0.15); }
+    }
+    ul.field-highlight-animation, ol.field-highlight-animation, div.field-highlight-animation, table.field-highlight-animation { animation: flashContainer 1.5s ease; border-radius: 8px; }
+
+    /* Tables */
+    .doc-table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 12px; }
+    .doc-table th, .doc-table td { border: 1px solid var(--color-border); padding: 10px 12px; text-align: left; }
+    .doc-table th { background: var(--color-bg); font-weight: 600; font-size: 11px; text-transform: uppercase; }
+
+    /* Signatures */
+    .doc-signature-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px; margin-top: 50px; }
+    .doc-signature-party-title { font-weight: bold; font-size: 11px; text-transform: uppercase; margin-bottom: 20px; color: var(--color-text-muted); }
+    .doc-signature-line { display: flex; align-items: flex-end; margin-bottom: 10px; min-height: 35px; }
+    .signature-label { width: 70px; font-size: 10px; color: var(--color-text-muted); }
+    .signature-value { flex: 1; border-bottom: 1px solid #333; min-height: 30px; display: flex; align-items: flex-end; padding-bottom: 3px; }
+
+    /* Toast */
+    .toast { position: fixed; bottom: 20px; right: 20px; background: var(--color-dark); color: #fff; padding: 12px 18px; border-radius: var(--radius-md); font-size: 0.85rem; box-shadow: var(--shadow-xl); transform: translateY(100px); opacity: 0; transition: all 0.3s ease; z-index: 1000; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { background: var(--color-success); }
+
+    /* Footer */
+    .site-footer { background: var(--color-dark); color: #94a3b8; padding: 2rem; text-align: center; }
+    .footer-brand { font-size: 1.1rem; font-weight: 800; margin-bottom: 0.5rem; }
+    .footer-brand .logo-text { background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+    @media print {
+      .site-header, .hero, .builder-sidebar, .preview-toolbar, .document-header, .site-footer, .toast { display: none !important; }
+      .builder-layout { display: block; }
+      .preview-panel { padding: 0; }
+      .document-container { box-shadow: none; }
+      .document-body { padding: 0.5in; }
+      .doc-highlight { background: none !important; border: none !important; padding: 0 !important; }
+    }
+
+    @media (max-width: 768px) {
+      .document-body { padding: 25px 20px; }
+      .doc-signature-row { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-content">
+      <nav class="header-nav">
+        <a href="/" class="nav-link home-logo"><span class="logo-text">Terms.Law</span></a>
+        <a href="/Demand-Letters/demand-letters-landing.html" class="nav-link">Demands</a>
+        <a href="contract-library-landing.html" class="nav-link active">Contracts</a>
+        <a href="/INC/formation-landing.html" class="nav-link">Incorporation</a>
+        <a href="/Blog/" class="nav-link">Blog</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">📋 Project Essential</div>
+      <h1>Statement of <span class="highlight">Work</span> Generator</h1>
+      <p class="hero-subtitle">Create detailed SOWs for projects, consulting engagements, and development work. Define deliverables, milestones, timelines, and payment schedules.</p>
+    </div>
+  </section>
+
+  <main class="builder-layout">
+    <aside class="builder-sidebar">
+
+      <!-- PROJECT INFO -->
+      <div class="builder-section">
+        <h3 class="builder-section-title">📁 Project Information</h3>
+        <div class="form-group">
+          <label class="form-label">SOW Number</label>
+          <input type="text" id="sowNumber" class="form-input" placeholder="SOW-001" oninput="trackFieldEdit('sowNumber')">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Project Name</label>
+          <input type="text" id="projectName" class="form-input" placeholder="Website Redesign Project" oninput="trackFieldEdit('projectName')">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Project Description</label>
+          <textarea id="projectDescription" class="form-textarea" placeholder="Brief description of the project scope and objectives..." oninput="trackFieldEdit('projectDescription')"></textarea>
+        </div>
+      </div>
+
+      <!-- PARTIES -->
+      <div class="builder-section">
+        <h3 class="builder-section-title">🤝 Parties</h3>
+        <div class="form-group">
+          <label class="form-label">Provider/Contractor Name</label>
+          <input type="text" id="providerName" class="form-input" placeholder="Acme Dev Agency" oninput="trackFieldEdit('providerName')">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Client Name</label>
+          <input type="text" id="clientName" class="form-input" placeholder="Client Corp." oninput="trackFieldEdit('clientName')">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Reference MSA Date (if applicable)</label>
+          <input type="date" id="msaDate" class="form-input" oninput="trackFieldEdit('msaDate')">
+          <span class="form-hint">Leave blank if this is a standalone SOW</span>
+        </div>
+      </div>
+
+      <!-- TIMELINE -->
+      <div class="builder-section">
+        <h3 class="builder-section-title">📅 Timeline</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Start Date</label>
+            <input type="date" id="startDate" class="form-input" oninput="trackFieldEdit('startDate')">
+          </div>
+          <div class="form-group">
+            <label class="form-label">End Date</label>
+            <input type="date" id="endDate" class="form-input" oninput="trackFieldEdit('endDate')">
+          </div>
+        </div>
+      </div>
+
+      <!-- DELIVERABLES -->
+      <div class="builder-section">
+        <h3 class="builder-section-title">📦 Deliverables</h3>
+        <div id="deliverablesContainer">
+          <div class="deliverable-card" data-index="0">
+            <div class="deliverable-card-header">
+              <span class="deliverable-card-title">Deliverable 1</span>
+              <button class="deliverable-remove" onclick="removeDeliverable(0)" title="Remove">×</button>
+            </div>
+            <div class="form-group">
+              <input type="text" class="form-input deliverable-name" placeholder="Deliverable name" oninput="trackFieldEdit('deliverables')">
+            </div>
+            <div class="form-group">
+              <textarea class="form-textarea deliverable-desc" placeholder="Description of deliverable..." style="min-height: 60px;" oninput="trackFieldEdit('deliverables')"></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" style="font-size: 0.75rem;">Due Date</label>
+                <input type="date" class="form-input deliverable-due" oninput="trackFieldEdit('deliverables')">
+              </div>
+              <div class="form-group">
+                <label class="form-label" style="font-size: 0.75rem;">Amount ($)</label>
+                <input type="number" class="form-input deliverable-amount" placeholder="0" oninput="trackFieldEdit('deliverables')">
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="add-deliverable-btn" onclick="addDeliverable()">+ Add Deliverable</button>
+      </div>
+
+      <!-- PRICING -->
+      <div class="builder-section">
+        <h3 class="builder-section-title">💰 Pricing</h3>
+        <div class="form-group">
+          <label class="form-label">Pricing Model</label>
+          <select id="pricingModel" class="form-select" onchange="trackFieldEdit('pricingModel')">
+            <option value="fixed">Fixed Price</option>
+            <option value="hourly">Hourly (Time & Materials)</option>
+            <option value="milestone">Milestone-Based</option>
+          </select>
+        </div>
+        <div class="form-group" id="fixedPriceGroup">
+          <label class="form-label">Total Fixed Price ($)</label>
+          <input type="number" id="totalPrice" class="form-input" placeholder="10000" oninput="trackFieldEdit('totalPrice')">
+        </div>
+        <div class="form-group" id="hourlyRateGroup" style="display: none;">
+          <label class="form-label">Hourly Rate ($)</label>
+          <input type="number" id="hourlyRate" class="form-input" placeholder="150" oninput="trackFieldEdit('hourlyRate')">
+        </div>
+        <div class="form-group" id="maxHoursGroup" style="display: none;">
+          <label class="form-label">Estimated Hours / Not-to-Exceed</label>
+          <input type="number" id="maxHours" class="form-input" placeholder="100" oninput="trackFieldEdit('maxHours')">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Payment Terms</label>
+          <select id="paymentTerms" class="form-select" onchange="trackFieldEdit('paymentTerms')">
+            <option value="net30">Net 30</option>
+            <option value="net15">Net 15</option>
+            <option value="due_on_delivery">Due on Delivery</option>
+            <option value="50_50">50% Upfront, 50% on Completion</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ASSUMPTIONS -->
+      <div class="builder-section">
+        <h3 class="builder-section-title">📝 Assumptions & Dependencies</h3>
+        <div class="form-group">
+          <label class="form-label">Key Assumptions</label>
+          <textarea id="assumptions" class="form-textarea" placeholder="List key assumptions for this project..." oninput="trackFieldEdit('assumptions')"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Client Responsibilities</label>
+          <textarea id="clientResponsibilities" class="form-textarea" placeholder="What the client needs to provide..." oninput="trackFieldEdit('clientResponsibilities')"></textarea>
+        </div>
+      </div>
+
+      <!-- SIGNATURES -->
+      <div class="builder-section">
+        <h3 class="builder-section-title">✍️ Signatories</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Provider Signatory</label>
+            <input type="text" id="providerSignatory" class="form-input" placeholder="John Smith" oninput="trackFieldEdit('providerSignatory')">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Title</label>
+            <input type="text" id="providerTitle" class="form-input" placeholder="Project Manager" oninput="trackFieldEdit('providerTitle')">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Client Signatory</label>
+            <input type="text" id="clientSignatory" class="form-input" placeholder="Jane Doe" oninput="trackFieldEdit('clientSignatory')">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Title</label>
+            <input type="text" id="clientTitle" class="form-input" placeholder="CEO" oninput="trackFieldEdit('clientTitle')">
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+    <section class="preview-panel">
+      <div class="preview-toolbar">
+        <span class="preview-title">📄 Live Document Preview</span>
+        <div class="preview-actions">
+          <button class="btn btn-secondary" onclick="toggleFullEditMode()" id="editModeBtn">✏️ Edit Mode</button>
+          <button class="btn btn-secondary" onclick="window.print()">🖨️ Print</button>
+          <button class="btn btn-primary" onclick="downloadWord()">📥 Download Word</button>
+        </div>
+      </div>
+
+      <div class="document-container">
+        <div class="document-header">
+          <span class="document-title">Statement of Work</span>
+          <span class="document-status">● Live Preview</span>
+        </div>
+        <div class="document-body" id="documentPreview">
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-brand"><span class="logo-text">Terms.Law</span></div>
+    <p>Attorney-drafted legal documents for businesses</p>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ============================================
+    // STATE VARIABLES
+    // ============================================
+    let lastEditedField = null;
+    let isFullEditMode = false;
+    let savedDocumentHTML = '';
+    let hasCustomEdits = false;
+    let deliverableCount = 1;
+
+    const fieldInputMap = {
+      'sowNumber': 'sowNumber',
+      'projectName': 'projectName',
+      'projectDescription': 'projectDescription',
+      'providerName': 'providerName',
+      'clientName': 'clientName',
+      'startDate': 'startDate',
+      'endDate': 'endDate',
+      'totalPrice': 'totalPrice',
+      'hourlyRate': 'hourlyRate'
+    };
+
+    // ============================================
+    // DELIVERABLE MANAGEMENT
+    // ============================================
+    function addDeliverable() {
+      const container = document.getElementById('deliverablesContainer');
+      const index = deliverableCount++;
+      const card = document.createElement('div');
+      card.className = 'deliverable-card';
+      card.dataset.index = index;
+      card.innerHTML = `
+        <div class="deliverable-card-header">
+          <span class="deliverable-card-title">Deliverable ${index + 1}</span>
+          <button class="deliverable-remove" onclick="removeDeliverable(${index})" title="Remove">×</button>
+        </div>
+        <div class="form-group">
+          <input type="text" class="form-input deliverable-name" placeholder="Deliverable name" oninput="trackFieldEdit('deliverables')">
+        </div>
+        <div class="form-group">
+          <textarea class="form-textarea deliverable-desc" placeholder="Description of deliverable..." style="min-height: 60px;" oninput="trackFieldEdit('deliverables')"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" style="font-size: 0.75rem;">Due Date</label>
+            <input type="date" class="form-input deliverable-due" oninput="trackFieldEdit('deliverables')">
+          </div>
+          <div class="form-group">
+            <label class="form-label" style="font-size: 0.75rem;">Amount ($)</label>
+            <input type="number" class="form-input deliverable-amount" placeholder="0" oninput="trackFieldEdit('deliverables')">
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+      trackFieldEdit('deliverables');
+    }
+
+    function removeDeliverable(index) {
+      const card = document.querySelector(`.deliverable-card[data-index="${index}"]`);
+      if (card && document.querySelectorAll('.deliverable-card').length > 1) {
+        card.remove();
+        trackFieldEdit('deliverables');
+      }
+    }
+
+    function getDeliverables() {
+      const deliverables = [];
+      document.querySelectorAll('.deliverable-card').forEach((card, i) => {
+        const name = card.querySelector('.deliverable-name')?.value || '';
+        const desc = card.querySelector('.deliverable-desc')?.value || '';
+        const due = card.querySelector('.deliverable-due')?.value || '';
+        const amount = card.querySelector('.deliverable-amount')?.value || '';
+        if (name || desc) {
+          deliverables.push({ name, desc, due, amount, index: i + 1 });
+        }
+      });
+      return deliverables;
+    }
+
+    // ============================================
+    // PRICING MODEL TOGGLE
+    // ============================================
+    document.getElementById('pricingModel').addEventListener('change', function() {
+      const model = this.value;
+      document.getElementById('fixedPriceGroup').style.display = model === 'fixed' || model === 'milestone' ? 'block' : 'none';
+      document.getElementById('hourlyRateGroup').style.display = model === 'hourly' ? 'block' : 'none';
+      document.getElementById('maxHoursGroup').style.display = model === 'hourly' ? 'block' : 'none';
+    });
+
+    // ============================================
+    // TRACK FIELD EDIT - CRITICAL FOR SCROLL + HIGHLIGHT
+    // ============================================
+    function trackFieldEdit(fieldId) {
+      if (hasCustomEdits) {
+        const proceed = confirm('You have custom edits. Changing inputs will regenerate the document. Continue?');
+        if (!proceed) return;
+        hasCustomEdits = false;
+      }
+      lastEditedField = fieldId;
+      updatePreview();
+    }
+
+    // ============================================
+    // UPDATE PREVIEW
+    // ============================================
+    function updatePreview() {
+      if (isFullEditMode) return;
+
+      const h = (value, placeholder, fieldId) => {
+        const isEmpty = !value || value.startsWith('[');
+        const displayValue = isEmpty ? `[${placeholder}]` : value;
+        const emptyClass = isEmpty ? ' empty' : '';
+        return `<span class="doc-highlight${emptyClass}" data-field="${fieldId}" contenteditable="true">${displayValue}</span>`;
+      };
+
+      // Get values
+      const sowNumber = document.getElementById('sowNumber').value || '';
+      const projectName = document.getElementById('projectName').value || '';
+      const projectDescription = document.getElementById('projectDescription').value || '';
+      const providerName = document.getElementById('providerName').value || '';
+      const clientName = document.getElementById('clientName').value || '';
+      const msaDate = document.getElementById('msaDate').value || '';
+      const startDate = document.getElementById('startDate').value || '';
+      const endDate = document.getElementById('endDate').value || '';
+      const pricingModel = document.getElementById('pricingModel').value || 'fixed';
+      const totalPrice = document.getElementById('totalPrice').value || '';
+      const hourlyRate = document.getElementById('hourlyRate').value || '';
+      const maxHours = document.getElementById('maxHours').value || '';
+      const paymentTerms = document.getElementById('paymentTerms').value || 'net30';
+      const assumptions = document.getElementById('assumptions').value || '';
+      const clientResponsibilities = document.getElementById('clientResponsibilities').value || '';
+      const providerSignatory = document.getElementById('providerSignatory').value || '';
+      const providerTitle = document.getElementById('providerTitle').value || '';
+      const clientSignatory = document.getElementById('clientSignatory').value || '';
+      const clientTitle = document.getElementById('clientTitle').value || '';
+
+      const deliverables = getDeliverables();
+
+      // Format dates
+      const formatDate = (d) => d ? new Date(d + 'T00:00:00').toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
+      const formattedStart = formatDate(startDate);
+      const formattedEnd = formatDate(endDate);
+      const formattedMsa = formatDate(msaDate);
+
+      // Pricing text
+      let pricingText = '';
+      if (pricingModel === 'fixed') {
+        pricingText = `This SOW is priced on a fixed-fee basis. The total fee for the Services described herein is ${h('$' + (totalPrice || '0'), 'Total Price', 'totalPrice')} USD.`;
+      } else if (pricingModel === 'hourly') {
+        pricingText = `This SOW is priced on a time-and-materials basis at a rate of ${h('$' + (hourlyRate || '0'), 'Hourly Rate', 'hourlyRate')} USD per hour. The estimated total hours are ${h(maxHours || 'TBD', 'Max Hours', 'maxHours')}, with a not-to-exceed amount of ${h('$' + (hourlyRate * maxHours || '0'), 'NTE Amount', 'nteAmount')} USD without prior written approval.`;
+      } else {
+        pricingText = `This SOW is priced on a milestone basis. Payment is due upon completion and acceptance of each deliverable as specified in the table below.`;
+      }
+
+      // Payment terms
+      const paymentTermsText = {
+        'net30': 'Payment is due within thirty (30) days of invoice date.',
+        'net15': 'Payment is due within fifteen (15) days of invoice date.',
+        'due_on_delivery': 'Payment is due upon delivery and acceptance of each deliverable.',
+        '50_50': 'Fifty percent (50%) of the total fee is due upon execution of this SOW. The remaining fifty percent (50%) is due upon final delivery and acceptance.'
+      }[paymentTerms] || 'Payment is due within thirty (30) days of invoice date.';
+
+      // MSA reference
+      const msaRef = msaDate
+        ? `This Statement of Work ("<strong>SOW</strong>") is entered into pursuant to the Master Services Agreement dated ${formattedMsa} between the parties (the "<strong>MSA</strong>"). This SOW is subject to all terms and conditions of the MSA. In the event of any conflict between this SOW and the MSA, the terms of the MSA shall prevail unless expressly stated otherwise herein.`
+        : `This Statement of Work ("<strong>SOW</strong>") is a standalone agreement between the parties and constitutes the entire agreement with respect to the Services described herein.`;
+
+      // Build deliverables table
+      let deliverablesTable = '';
+      if (deliverables.length > 0) {
+        deliverablesTable = `
+          <table class="doc-table" data-field="deliverables">
+            <thead>
+              <tr>
+                <th style="width: 5%;">#</th>
+                <th style="width: 25%;">Deliverable</th>
+                <th style="width: 40%;">Description</th>
+                <th style="width: 15%;">Due Date</th>
+                <th style="width: 15%;">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${deliverables.map(d => `
+                <tr>
+                  <td>${d.index}</td>
+                  <td>${d.name || '[Name]'}</td>
+                  <td>${d.desc || '[Description]'}</td>
+                  <td>${d.due ? formatDate(d.due) : '[TBD]'}</td>
+                  <td>${d.amount ? '$' + Number(d.amount).toLocaleString() : '[TBD]'}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      }
+
+      // Assumptions list
+      const assumptionsList = assumptions ? assumptions.split('\n').filter(a => a.trim()).map(a => `<li>${a.trim()}</li>`).join('') : '<li>[No assumptions specified]</li>';
+      const responsibilitiesList = clientResponsibilities ? clientResponsibilities.split('\n').filter(r => r.trim()).map(r => `<li>${r.trim()}</li>`).join('') : '<li>[No client responsibilities specified]</li>';
+
+      let html = `
+        <div class="doc-title">STATEMENT OF WORK</div>
+        <p class="doc-subtitle">${h(sowNumber || 'SOW-001', 'SOW Number', 'sowNumber')}</p>
+
+        <p class="doc-paragraph">
+          <strong>Project:</strong> ${h(projectName, 'Project Name', 'projectName')}<br>
+          <strong>Provider:</strong> ${h(providerName, 'Provider Name', 'providerName')}<br>
+          <strong>Client:</strong> ${h(clientName, 'Client Name', 'clientName')}<br>
+          <strong>Effective Date:</strong> ${h(formattedStart, 'Start Date', 'startDate')}
+        </p>
+
+        <div class="doc-section-header">1. Introduction</div>
+        <p class="doc-paragraph">${msaRef}</p>
+
+        <div class="doc-section-header">2. Project Description</div>
+        <p class="doc-paragraph" data-field="projectDescription">${projectDescription || '[Project description to be provided]'}</p>
+
+        <div class="doc-section-header">3. Scope of Services</div>
+        <p class="doc-paragraph">Provider agrees to perform the following services and deliver the following deliverables:</p>
+        ${deliverablesTable || '<p class="doc-paragraph"><em>[No deliverables defined]</em></p>'}
+
+        <div class="doc-section-header">4. Timeline</div>
+        <p class="doc-paragraph">
+          <strong>Project Start Date:</strong> ${h(formattedStart, 'Start Date', 'startDate')}<br>
+          <strong>Project End Date:</strong> ${h(formattedEnd, 'End Date', 'endDate')}
+        </p>
+        <p class="doc-paragraph">
+          All deliverables shall be completed by their respective due dates as specified in Section 3. Provider shall notify Client promptly if any delays are anticipated.
+        </p>
+
+        <div class="doc-section-header">5. Pricing and Payment</div>
+        <p class="doc-paragraph" data-field="totalPrice">${pricingText}</p>
+        <p class="doc-paragraph">${paymentTermsText}</p>
+
+        <div class="doc-section-header">6. Assumptions</div>
+        <p class="doc-paragraph">This SOW is based on the following assumptions:</p>
+        <ul class="doc-list" data-field="assumptions">${assumptionsList}</ul>
+
+        <div class="doc-section-header">7. Client Responsibilities</div>
+        <p class="doc-paragraph">Client agrees to provide the following:</p>
+        <ul class="doc-list" data-field="clientResponsibilities">${responsibilitiesList}</ul>
+
+        <div class="doc-section-header">8. Acceptance Criteria</div>
+        <p class="doc-paragraph">
+          Each deliverable shall be deemed accepted upon written approval by Client or upon expiration of five (5) business days following delivery without written rejection specifying deficiencies. Client may reject a deliverable only if it materially fails to conform to the specifications set forth in this SOW.
+        </p>
+
+        <div class="doc-section-header">9. Change Orders</div>
+        <p class="doc-paragraph">
+          Any changes to the scope, timeline, or pricing of this SOW must be documented in a written change order signed by both parties. Provider is not obligated to perform any changed or additional work until a change order is executed.
+        </p>
+
+        <p class="doc-paragraph" style="margin-top: 40px;">
+          <strong>IN WITNESS WHEREOF</strong>, the parties have executed this Statement of Work as of the Effective Date.
+        </p>
+
+        <!-- Signatures -->
+        <div class="doc-signature-row">
+          <div class="doc-signature-party">
+            <div class="doc-signature-party-title">PROVIDER</div>
+            <div style="font-weight: bold; margin-bottom: 15px;">${providerName || '[Provider Name]'}</div>
+            <div class="doc-signature-line">
+              <span class="signature-label">Signature:</span>
+              <span class="signature-value"></span>
+            </div>
+            <div class="doc-signature-line">
+              <span class="signature-label">Name:</span>
+              <span class="signature-value">${providerSignatory || '______________________'}</span>
+            </div>
+            <div class="doc-signature-line">
+              <span class="signature-label">Title:</span>
+              <span class="signature-value">${providerTitle || '______________________'}</span>
+            </div>
+            <div class="doc-signature-line">
+              <span class="signature-label">Date:</span>
+              <span class="signature-value">______________________</span>
+            </div>
+          </div>
+
+          <div class="doc-signature-party">
+            <div class="doc-signature-party-title">CLIENT</div>
+            <div style="font-weight: bold; margin-bottom: 15px;">${clientName || '[Client Name]'}</div>
+            <div class="doc-signature-line">
+              <span class="signature-label">Signature:</span>
+              <span class="signature-value"></span>
+            </div>
+            <div class="doc-signature-line">
+              <span class="signature-label">Name:</span>
+              <span class="signature-value">${clientSignatory || '______________________'}</span>
+            </div>
+            <div class="doc-signature-line">
+              <span class="signature-label">Title:</span>
+              <span class="signature-value">${clientTitle || '______________________'}</span>
+            </div>
+            <div class="doc-signature-line">
+              <span class="signature-label">Date:</span>
+              <span class="signature-value">______________________</span>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('documentPreview').innerHTML = html;
+      setupInlineEditing();
+
+      // CRITICAL: Scroll to and highlight
+      if (lastEditedField) {
+        setTimeout(() => {
+          const highlight = document.querySelector(`[data-field="${lastEditedField}"]`);
+          if (highlight) {
+            highlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            highlight.classList.add('field-highlight-animation');
+            setTimeout(() => highlight.classList.remove('field-highlight-animation'), 1500);
+          }
+          lastEditedField = null;
+        }, 50);
+      }
+    }
+
+    // ============================================
+    // INLINE EDITING
+    // ============================================
+    function setupInlineEditing() {
+      document.querySelectorAll('.doc-highlight[contenteditable="true"]').forEach(el => {
+        el.addEventListener('blur', function() { handleInlineEdit(this); });
+        el.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); this.blur(); } });
+        el.addEventListener('focus', function() {
+          const selection = window.getSelection();
+          const range = document.createRange();
+          range.selectNodeContents(this);
+          selection.removeAllRanges();
+          selection.addRange(range);
+        });
+      });
+    }
+
+    function handleInlineEdit(element) {
+      const fieldId = element.dataset.field;
+      const newValue = element.textContent.trim();
+      const inputId = fieldInputMap[fieldId];
+      if (inputId) {
+        const input = document.getElementById(inputId);
+        if (input && !newValue.startsWith('[') && !newValue.endsWith(']')) {
+          input.value = newValue;
+        }
+      }
+    }
+
+    // ============================================
+    // FULL EDIT MODE
+    // ============================================
+    function toggleFullEditMode() {
+      const docBody = document.getElementById('documentPreview');
+      const toggleBtn = document.getElementById('editModeBtn');
+
+      if (!isFullEditMode) {
+        isFullEditMode = true;
+        savedDocumentHTML = docBody.innerHTML;
+        docBody.contentEditable = 'true';
+        docBody.classList.add('full-edit-mode');
+        toggleBtn.innerHTML = '💾 Save Edits';
+        toggleBtn.classList.add('active');
+        showToast('Edit mode enabled. Make any changes you need.');
+      } else {
+        isFullEditMode = false;
+        hasCustomEdits = true;
+        docBody.contentEditable = 'false';
+        docBody.classList.remove('full-edit-mode');
+        toggleBtn.innerHTML = '✏️ Edit Mode';
+        toggleBtn.classList.remove('active');
+        showToast('Edits saved!');
+      }
+    }
+
+    // ============================================
+    // DOWNLOAD
+    // ============================================
+    function downloadWord() {
+      const content = document.getElementById('documentPreview').innerHTML;
+      const projectName = document.getElementById('projectName').value || 'SOW';
+
+      const html = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
+        <head><meta charset='utf-8'><title>Statement of Work</title></head>
+        <body style="font-family: Georgia, serif; font-size: 12pt; line-height: 1.6;">
+        ${content}
+        </body></html>
+      `;
+
+      const blob = new Blob([html], { type: 'application/msword' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `SOW - ${projectName}.doc`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('Document downloaded!', 'success');
+    }
+
+    function showToast(message, type = '') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast show ' + type;
+      setTimeout(() => { toast.className = 'toast'; }, 3000);
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('startDate').value = today;
+      updatePreview();
+    });
+  </script>
+</body>
+</html>
