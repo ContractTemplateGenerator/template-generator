@@ -62,6 +62,8 @@
         .btn-outline { background: transparent; border: 1px solid #e5e7eb; color: #374151; }
         .btn-outline:hover { background: #f3f4f6; }
         .btn-sm { padding: 6px 12px; font-size: 13px; }
+        .btn-success { background: #22c55e; color: white; }
+        .btn-success:hover { background: #16a34a; }
 
         .main-container {
             display: flex;
@@ -74,9 +76,34 @@
             flex: 1;
             min-width: 0;
         }
-        .comments-section {
-            width: 320px;
-            flex-shrink: 0;
+
+        /* Mode Toggle */
+        .mode-toggle {
+            display: flex;
+            background: #e5e7eb;
+            border-radius: 8px;
+            padding: 4px;
+            gap: 4px;
+        }
+        .mode-btn {
+            padding: 8px 16px;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+        .mode-btn:hover { color: #374151; }
+        .mode-btn.active {
+            background: white;
+            color: #6366f1;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
         .toolbar {
@@ -173,111 +200,267 @@
             resize: vertical;
         }
 
-        /* Comments Panel */
-        .comments-panel {
+
+        /* Generator Mode Styles */
+        .generator-container {
+            display: none;
+        }
+        .generator-container.active {
+            display: flex;
+            gap: 24px;
+        }
+        .edit-container.hidden {
+            display: none;
+        }
+
+        .generator-form-panel {
+            width: 400px;
+            flex-shrink: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            padding: 20px;
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+            position: sticky;
+            top: 100px;
+        }
+        .generator-preview-panel {
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* Document Selector */
+        .doc-selector {
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        .doc-selector label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .doc-selector select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            background: white;
+            cursor: pointer;
+        }
+        .doc-selector select:focus {
+            outline: none;
+            border-color: #6366f1;
+        }
+
+        /* Generator Form Styles */
+        .gen-form-header {
+            margin-bottom: 20px;
+        }
+        .gen-form-header h2 {
+            font-size: 18px;
+            color: #1a1a2e;
+            margin-bottom: 4px;
+        }
+        .gen-form-header p {
+            font-size: 13px;
+            color: #6b7280;
+        }
+        .gen-form-section {
+            margin-bottom: 20px;
+        }
+        .gen-section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .gen-section-title::before {
+            content: '';
+            width: 3px;
+            height: 14px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            border-radius: 2px;
+        }
+        .gen-form-group {
+            margin-bottom: 12px;
+        }
+        .gen-form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: #475569;
+            margin-bottom: 4px;
+        }
+        .gen-form-group input,
+        .gen-form-group select,
+        .gen-form-group textarea {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 13px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        .gen-form-group input:focus,
+        .gen-form-group select:focus,
+        .gen-form-group textarea:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+        }
+        .gen-form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .gen-checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .gen-checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #475569;
+            padding: 6px 10px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .gen-checkbox-label:hover {
+            background: #f8f9fa;
+        }
+        .gen-checkbox-label input {
+            width: 14px;
+            height: 14px;
+        }
+        .gen-checkbox-label input:checked + span {
+            color: #6366f1;
+            font-weight: 500;
+        }
+        .gen-info-box {
+            background: #eff6ff;
+            border: 1px solid #3b82f6;
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 12px;
+            color: #1e40af;
+            margin-bottom: 16px;
+        }
+        .gen-insert-btn {
+            width: 100%;
+            padding: 14px;
+            margin-top: 16px;
+            font-size: 15px;
+        }
+
+        /* Preview Panel */
+        .preview-container {
             background: white;
             border-radius: 12px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             overflow: hidden;
         }
-        .comments-header {
-            padding: 16px;
-            border-bottom: 1px solid #e5e7eb;
+        .preview-toolbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 12px 16px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e5e7eb;
         }
-        .comments-header h3 {
-            font-size: 16px;
+        .preview-toolbar-title {
             font-weight: 600;
-            color: #1a1a2e;
+            color: #374151;
+            font-size: 14px;
         }
-        .comment-count {
-            background: #6366f1;
-            color: white;
-            font-size: 12px;
-            padding: 2px 8px;
-            border-radius: 10px;
+        .preview-toolbar-actions {
+            display: flex;
+            gap: 8px;
         }
-        .comments-list {
-            max-height: 400px;
+        .preview-content {
+            padding: 24px;
+            max-height: calc(100vh - 280px);
             overflow-y: auto;
         }
-        .comment-item {
-            padding: 16px;
-            border-bottom: 1px solid #f3f4f6;
+
+        /* Document Preview Styles */
+        .doc-preview {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 48px;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 12pt;
+            line-height: 1.6;
+            color: #000;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 1px solid #e5e7eb;
         }
-        .comment-item:last-child { border-bottom: none; }
-        .comment-author {
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .doc-preview h1 {
+            text-align: center;
+            font-size: 16pt;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        .doc-preview h2 {
+            font-size: 12pt;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        .doc-preview p {
+            margin-bottom: 12px;
+            text-align: justify;
+        }
+        .doc-preview .center {
+            text-align: center;
+        }
+        .doc-preview .parties {
+            margin: 20px 0;
+        }
+        .doc-preview .clause {
+            margin-bottom: 14px;
+        }
+        .doc-preview .sub-clause {
+            margin-left: 24px;
             margin-bottom: 8px;
         }
-        .comment-author .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
+        .doc-preview .signature-block {
+            margin-top: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
         }
-        .comment-author-name {
-            font-weight: 500;
-            font-size: 14px;
-            color: #374151;
+        .doc-preview .signature-party h3 {
+            font-size: 11pt;
+            margin-bottom: 24px;
+            text-transform: uppercase;
         }
-        .comment-time {
-            font-size: 12px;
-            color: #9ca3af;
-            margin-left: auto;
+        .doc-preview .signature-line {
+            border-top: 1px solid #000;
+            margin-top: 30px;
+            padding-top: 4px;
+            font-size: 10pt;
         }
-        .comment-text {
-            font-size: 14px;
-            color: #4b5563;
-            line-height: 1.5;
-        }
-        .comment-actions {
-            margin-top: 8px;
-            display: flex;
-            gap: 8px;
-        }
-        .comment-action-btn {
-            background: none;
-            border: none;
-            font-size: 12px;
-            color: #6b7280;
-            cursor: pointer;
-            padding: 4px 8px;
-            border-radius: 4px;
-        }
-        .comment-action-btn:hover {
-            background: #f3f4f6;
-            color: #374151;
-        }
-        .comment-action-btn.resolve { color: #22c55e; }
-        .comment-action-btn.delete { color: #ef4444; }
-        .add-comment {
-            padding: 16px;
-            border-top: 1px solid #e5e7eb;
-        }
-        .add-comment textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            font-size: 14px;
-            resize: none;
-            outline: none;
-            font-family: inherit;
-        }
-        .add-comment textarea:focus { border-color: #6366f1; }
-        .add-comment-btn {
-            margin-top: 8px;
-            width: 100%;
-        }
-        .no-comments {
-            padding: 32px 16px;
-            text-align: center;
-            color: #9ca3af;
-            font-size: 14px;
+        .doc-highlight {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            padding: 0 3px;
+            border-radius: 2px;
         }
 
         /* Template Modal */
@@ -363,12 +546,37 @@
         .toast.show { transform: translateY(0); opacity: 1; }
         .hidden { display: none !important; }
 
+        @media (max-width: 1100px) {
+            .generator-container.active {
+                flex-direction: column;
+            }
+            .generator-form-panel {
+                width: 100%;
+                max-height: none;
+                position: relative;
+                top: 0;
+            }
+        }
+
         @media (max-width: 900px) {
             .main-container {
                 flex-direction: column;
             }
             .comments-section {
                 width: 100%;
+            }
+        }
+
+        @media print {
+            body * { visibility: hidden; }
+            .doc-preview, .doc-preview * { visibility: visible; }
+            .doc-preview {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                box-shadow: none;
+                border: none;
             }
         }
     </style>
@@ -390,9 +598,27 @@
         <div class="editor-section">
             <div class="toolbar">
                 <div class="toolbar-group">
-                    <button class="btn btn-outline btn-sm" id="templateBtn">+ Template</button>
+                    <div class="mode-toggle">
+                        <button class="mode-btn active" id="editModeBtn" onclick="switchMode('edit')">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                            Edit
+                        </button>
+                        <button class="mode-btn" id="generateModeBtn" onclick="switchMode('generate')">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+                            </svg>
+                            Generate
+                        </button>
+                    </div>
                 </div>
                 <div class="toolbar-divider"></div>
+                <div class="toolbar-group" id="editToolbarItems">
+                    <button class="btn btn-outline btn-sm" id="templateBtn">+ Template</button>
+                </div>
+                <div class="toolbar-divider" id="editToolbarDivider"></div>
                 <div class="session-name">
                     <input type="text" id="sessionName" placeholder="Untitled Session">
                 </div>
@@ -402,33 +628,65 @@
                 </div>
             </div>
 
-            <div class="users-panel">
-                <h3>Connected Users</h3>
-                <div class="user-list" id="userList">
-                    <span style="color: #9ca3af;">Waiting...</span>
+            <!-- Edit Mode Container -->
+            <div class="edit-container" id="editContainer">
+                <div class="users-panel">
+                    <h3>Connected Users</h3>
+                    <div class="user-list" id="userList">
+                        <span style="color: #9ca3af;">Waiting...</span>
+                    </div>
+                </div>
+
+                <div class="editor-container">
+                    <textarea id="editor" placeholder="Start typing... Changes sync in real-time."></textarea>
                 </div>
             </div>
 
-            <div class="editor-container">
-                <textarea id="editor" placeholder="Start typing... Changes sync in real-time."></textarea>
+            <!-- Generator Mode Container -->
+            <div class="generator-container" id="generatorContainer">
+                <div class="generator-form-panel">
+                    <!-- Document Selector -->
+                    <div class="doc-selector">
+                        <label>Select Document Type</label>
+                        <select id="docTypeSelector" onchange="loadDocumentGenerator()">
+                            <option value="">Choose a document...</option>
+                            <option value="non-solicitation">Non-Solicitation Agreement</option>
+                            <option value="commission">Commission Agreement</option>
+                            <option value="nda">Non-Disclosure Agreement (NDA)</option>
+                            <option value="piia">PIIA (Inventions Assignment)</option>
+                            <option value="sublease">Sublease Agreement</option>
+                        </select>
+                    </div>
+
+                    <!-- Dynamic Form Container -->
+                    <div id="generatorFormContainer">
+                        <div class="gen-info-box">
+                            Select a document type above to start generating.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="generator-preview-panel">
+                    <div class="preview-container">
+                        <div class="preview-toolbar">
+                            <span class="preview-toolbar-title">Live Preview</span>
+                            <div class="preview-toolbar-actions">
+                                <button class="btn btn-outline btn-sm" onclick="printPreview()">Print</button>
+                                <button class="btn btn-outline btn-sm" onclick="downloadPreview()">Download</button>
+                            </div>
+                        </div>
+                        <div class="preview-content">
+                            <div class="doc-preview" id="docPreview">
+                                <p style="color: #9ca3af; text-align: center; padding: 60px 20px;">
+                                    Select a document type and fill in the form to see a live preview.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="comments-section">
-            <div class="comments-panel">
-                <div class="comments-header">
-                    <h3>Comments</h3>
-                    <span class="comment-count" id="commentCount">0</span>
-                </div>
-                <div class="comments-list" id="commentsList">
-                    <div class="no-comments">No comments yet. Add a comment to start a discussion.</div>
-                </div>
-                <div class="add-comment">
-                    <textarea id="newComment" rows="3" placeholder="Add a comment..."></textarea>
-                    <button class="btn btn-primary btn-sm add-comment-btn" id="addCommentBtn">Add Comment</button>
-                </div>
-            </div>
-        </div>
     </div>
 
     <div class="modal-overlay" id="joinModal">
@@ -471,7 +729,1238 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        // Firebase config
+        // ========== MODE SWITCHING ==========
+        let currentMode = 'edit';
+
+        function switchMode(mode) {
+            currentMode = mode;
+
+            // Update toggle buttons
+            document.getElementById('editModeBtn').classList.toggle('active', mode === 'edit');
+            document.getElementById('generateModeBtn').classList.toggle('active', mode === 'generate');
+
+            // Show/hide containers
+            document.getElementById('editContainer').classList.toggle('hidden', mode !== 'edit');
+            document.getElementById('generatorContainer').classList.toggle('active', mode === 'generate');
+
+            // Show/hide edit-specific toolbar items
+            document.getElementById('editToolbarItems').classList.toggle('hidden', mode !== 'edit');
+            document.getElementById('editToolbarDivider').classList.toggle('hidden', mode !== 'edit');
+        }
+
+        // ========== DOCUMENT GENERATORS ==========
+        const documentGenerators = {
+            'non-solicitation': {
+                title: 'Non-Solicitation Agreement',
+                description: 'Protect your customers and employees from poaching',
+                form: generateNonSolicitationForm,
+                preview: generateNonSolicitationPreview
+            },
+            'commission': {
+                title: 'Commission Agreement',
+                description: 'Sales commission structure and payment terms',
+                form: generateCommissionForm,
+                preview: generateCommissionPreview
+            },
+            'nda': {
+                title: 'Non-Disclosure Agreement',
+                description: 'Protect confidential information in business relationships',
+                form: generateNDAForm,
+                preview: generateNDAPreview
+            },
+            'piia': {
+                title: 'PIIA (Inventions Assignment)',
+                description: 'Assign intellectual property and inventions to employer',
+                form: generatePIIAForm,
+                preview: generatePIIAPreview
+            },
+            'sublease': {
+                title: 'Sublease Agreement',
+                description: 'Sublease residential or commercial property',
+                form: generateSubleaseForm,
+                preview: generateSubleasePreview
+            }
+        };
+
+        function loadDocumentGenerator() {
+            const docType = document.getElementById('docTypeSelector').value;
+            const formContainer = document.getElementById('generatorFormContainer');
+            const previewContainer = document.getElementById('docPreview');
+
+            if (!docType || !documentGenerators[docType]) {
+                formContainer.innerHTML = `
+                    <div class="gen-info-box">
+                        Select a document type above to start generating.
+                    </div>
+                `;
+                previewContainer.innerHTML = `
+                    <p style="color: #9ca3af; text-align: center; padding: 60px 20px;">
+                        Select a document type and fill in the form to see a live preview.
+                    </p>
+                `;
+                return;
+            }
+
+            const generator = documentGenerators[docType];
+            formContainer.innerHTML = generator.form();
+            updateGeneratorPreview();
+        }
+
+        function updateGeneratorPreview() {
+            const docType = document.getElementById('docTypeSelector').value;
+            if (!docType || !documentGenerators[docType]) return;
+
+            const generator = documentGenerators[docType];
+            document.getElementById('docPreview').innerHTML = generator.preview();
+        }
+
+        function getGenValue(id, defaultVal = '') {
+            const el = document.getElementById(id);
+            if (!el) return defaultVal;
+            if (el.type === 'checkbox') return el.checked;
+            return el.value || defaultVal;
+        }
+
+        function formatGenDate(dateStr) {
+            if (!dateStr) return '[DATE]';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        }
+
+        function insertToEditor() {
+            const previewContent = document.getElementById('docPreview').innerText;
+            const editor = document.getElementById('editor');
+
+            // Switch to edit mode
+            switchMode('edit');
+
+            // Insert content
+            editor.value = previewContent;
+            updateContent();
+
+            showToast('Document inserted into editor!');
+        }
+
+        function printPreview() {
+            window.print();
+        }
+
+        function downloadPreview() {
+            const content = document.getElementById('docPreview').innerHTML;
+            const docType = document.getElementById('docTypeSelector').value || 'document';
+            const html = `
+                <html>
+                <head><meta charset="utf-8"><title>${docType}</title>
+                <style>
+                    body { font-family: 'Times New Roman', serif; font-size: 12pt; line-height: 1.6; padding: 1in; }
+                    h1 { text-align: center; font-size: 16pt; text-transform: uppercase; }
+                    h2 { font-size: 12pt; text-transform: uppercase; margin-top: 18pt; }
+                    p { margin-bottom: 12pt; text-align: justify; }
+                    .sub-clause { margin-left: 36pt; }
+                    .signature-block { margin-top: 36pt; }
+                    .signature-line { border-top: 1px solid black; margin-top: 30pt; padding-top: 4pt; }
+                </style></head>
+                <body>${content}</body></html>
+            `;
+            const blob = new Blob([html], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${docType}-agreement.doc`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // ========== NON-SOLICITATION GENERATOR ==========
+        function generateNonSolicitationForm() {
+            const today = new Date().toISOString().split('T')[0];
+            return `
+                <div class="gen-form-header">
+                    <h2>Non-Solicitation Agreement</h2>
+                    <p>Protect your customers and employees from poaching</p>
+                </div>
+
+                <div class="gen-info-box">
+                    <strong>More Enforceable Than Non-Competes</strong><br>
+                    Non-solicitation agreements are narrower in scope and generally more enforceable.
+                </div>
+
+                <div class="gen-form-section">
+                    <div class="gen-section-title">Company Information</div>
+                    <div class="gen-form-group">
+                        <label>Company Name</label>
+                        <input type="text" id="gen_companyName" placeholder="Acme Corporation" oninput="updateGeneratorPreview()">
+                    </div>
+                    <div class="gen-form-row">
+                        <div class="gen-form-group">
+                            <label>State</label>
+                            <select id="gen_companyState" onchange="updateGeneratorPreview()">
+                                <option value="">Select...</option>
+                                <option value="California">California</option>
+                                <option value="Delaware">Delaware</option>
+                                <option value="Florida">Florida</option>
+                                <option value="New York">New York</option>
+                                <option value="Texas">Texas</option>
+                            </select>
+                        </div>
+                        <div class="gen-form-group">
+                            <label>Effective Date</label>
+                            <input type="date" id="gen_effectiveDate" value="${today}" onchange="updateGeneratorPreview()">
+                        </div>
+                    </div>
+                    <div class="gen-form-group">
+                        <label>Company Address</label>
+                        <input type="text" id="gen_companyAddress" placeholder="123 Business Ave, City, State ZIP" oninput="updateGeneratorPreview()">
+                    </div>
+                </div>
+
+                <div class="gen-form-section">
+                    <div class="gen-section-title">Individual Information</div>
+                    <div class="gen-form-group">
+                        <label>Individual Name</label>
+                        <input type="text" id="gen_individualName" placeholder="John Smith" oninput="updateGeneratorPreview()">
+                    </div>
+                    <div class="gen-form-group">
+                        <label>Relationship Type</label>
+                        <select id="gen_individualType" onchange="updateGeneratorPreview()">
+                            <option value="employee">Employee</option>
+                            <option value="contractor">Independent Contractor</option>
+                            <option value="consultant">Consultant</option>
+                        </select>
+                    </div>
+                    <div class="gen-form-group">
+                        <label>Position/Title</label>
+                        <input type="text" id="gen_jobTitle" placeholder="Sales Manager" oninput="updateGeneratorPreview()">
+                    </div>
+                </div>
+
+                <div class="gen-form-section">
+                    <div class="gen-section-title">Customer Non-Solicitation</div>
+                    <div class="gen-form-row">
+                        <div class="gen-form-group">
+                            <label>Restriction Period</label>
+                            <select id="gen_customerPeriod" onchange="updateGeneratorPreview()">
+                                <option value="6 months">6 Months</option>
+                                <option value="1 year" selected>1 Year</option>
+                                <option value="2 years">2 Years</option>
+                            </select>
+                        </div>
+                        <div class="gen-form-group">
+                            <label>Lookback Period</label>
+                            <select id="gen_customerLookback" onchange="updateGeneratorPreview()">
+                                <option value="1 year">Last 1 Year</option>
+                                <option value="2 years" selected>Last 2 Years</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="gen-form-section">
+                    <div class="gen-section-title">Employee Non-Solicitation</div>
+                    <div class="gen-form-group">
+                        <label class="gen-checkbox-label" style="border: none; padding: 0; margin-bottom: 8px;">
+                            <input type="checkbox" id="gen_includeEmployeeNonSol" onchange="updateGeneratorPreview()" checked>
+                            <span>Include Employee Non-Solicitation</span>
+                        </label>
+                    </div>
+                    <div class="gen-form-group">
+                        <label>Employee Restriction Period</label>
+                        <select id="gen_employeePeriod" onchange="updateGeneratorPreview()">
+                            <option value="6 months">6 Months</option>
+                            <option value="1 year" selected>1 Year</option>
+                            <option value="2 years">2 Years</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="gen-form-section">
+                    <div class="gen-section-title">Additional Provisions</div>
+                    <div class="gen-form-group">
+                        <label>Include These Clauses</label>
+                        <div class="gen-checkbox-group">
+                            <label class="gen-checkbox-label">
+                                <input type="checkbox" id="gen_confidentiality" onchange="updateGeneratorPreview()" checked>
+                                <span>Confidentiality</span>
+                            </label>
+                            <label class="gen-checkbox-label">
+                                <input type="checkbox" id="gen_returnProperty" onchange="updateGeneratorPreview()" checked>
+                                <span>Return of Property</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-success gen-insert-btn" onclick="insertToEditor()">
+                    Insert into Editor →
+                </button>
+            `;
+        }
+
+        function generateNonSolicitationPreview() {
+            const companyName = getGenValue('gen_companyName', '[COMPANY NAME]');
+            const companyState = getGenValue('gen_companyState', '[STATE]');
+            const companyAddress = getGenValue('gen_companyAddress', '[ADDRESS]');
+            const effectiveDate = formatGenDate(getGenValue('gen_effectiveDate'));
+            const individualName = getGenValue('gen_individualName', '[INDIVIDUAL NAME]');
+            const individualType = getGenValue('gen_individualType', 'employee');
+            const jobTitle = getGenValue('gen_jobTitle', '[TITLE]');
+            const customerPeriod = getGenValue('gen_customerPeriod', '1 year');
+            const customerLookback = getGenValue('gen_customerLookback', '2 years');
+            const employeePeriod = getGenValue('gen_employeePeriod', '1 year');
+            const includeEmployeeNonSol = getGenValue('gen_includeEmployeeNonSol');
+            const includeConfidentiality = getGenValue('gen_confidentiality');
+            const includeReturnProperty = getGenValue('gen_returnProperty');
+
+            const typeLabel = { 'employee': 'Employee', 'contractor': 'Contractor', 'consultant': 'Consultant' }[individualType] || 'Employee';
+            const relationshipText = individualType === 'employee' ? 'employment' : 'business relationship';
+
+            let sections = '';
+            let sectionNum = 1;
+
+            // Customer Non-Solicitation
+            sections += `
+                <h2>${sectionNum}. NON-SOLICITATION OF CUSTOMERS</h2>
+                <p class="clause">${sectionNum}.1 <strong>Restriction.</strong> During the ${relationshipText} and for a period of <span class="doc-highlight">${customerPeriod}</span> following termination, ${typeLabel} agrees not to directly or indirectly:</p>
+                <p class="sub-clause">(a) Solicit any Customer for the purpose of providing competitive products or services;</p>
+                <p class="sub-clause">(b) Induce any Customer to reduce or terminate its relationship with Company;</p>
+                <p class="sub-clause">(c) Accept business from any Customer.</p>
+                <p class="clause">${sectionNum}.2 <strong>Customer Definition.</strong> "Customer" means any person or entity that was a customer during the <span class="doc-highlight">${customerLookback}</span> prior to termination.</p>
+            `;
+            sectionNum++;
+
+            // Employee Non-Solicitation
+            if (includeEmployeeNonSol) {
+                sections += `
+                    <h2>${sectionNum}. NON-SOLICITATION OF EMPLOYEES</h2>
+                    <p class="clause">${sectionNum}.1 For a period of <span class="doc-highlight">${employeePeriod}</span> following termination, ${typeLabel} agrees not to solicit, recruit, or hire any employee or contractor of Company.</p>
+                `;
+                sectionNum++;
+            }
+
+            // Confidentiality
+            if (includeConfidentiality) {
+                sections += `
+                    <h2>${sectionNum}. CONFIDENTIALITY</h2>
+                    <p class="clause">${sectionNum}.1 ${typeLabel} agrees to hold all Confidential Information in strict confidence and not disclose it to any third party.</p>
+                    <p class="clause">${sectionNum}.2 This obligation survives termination indefinitely for trade secrets and five (5) years for other confidential information.</p>
+                `;
+                sectionNum++;
+            }
+
+            // Return of Property
+            if (includeReturnProperty) {
+                sections += `
+                    <h2>${sectionNum}. RETURN OF PROPERTY</h2>
+                    <p class="clause">${sectionNum}.1 Upon termination, ${typeLabel} shall immediately return all Company property and delete all Company information from personal devices.</p>
+                `;
+                sectionNum++;
+            }
+
+            // General Provisions
+            sections += `
+                <h2>${sectionNum}. GENERAL PROVISIONS</h2>
+                <p class="clause">${sectionNum}.1 <strong>Governing Law.</strong> This Agreement shall be governed by the laws of <span class="doc-highlight">${companyState}</span>.</p>
+                <p class="clause">${sectionNum}.2 <strong>Severability.</strong> If any provision is unenforceable, it shall be modified to the minimum extent necessary.</p>
+                <p class="clause">${sectionNum}.3 <strong>Entire Agreement.</strong> This Agreement constitutes the entire agreement between the parties.</p>
+            `;
+
+            return `
+                <h1>Non-Solicitation Agreement</h1>
+                <p class="center" style="font-style: italic;">Effective Date: <span class="doc-highlight">${effectiveDate}</span></p>
+
+                <div class="parties">
+                    <p>This Agreement is entered into by:</p>
+                    <p><strong>Company:</strong> <span class="doc-highlight">${companyName}</span>, located at <span class="doc-highlight">${companyAddress}</span></p>
+                    <p><strong>${typeLabel}:</strong> <span class="doc-highlight">${individualName}</span>, serving as <span class="doc-highlight">${jobTitle}</span></p>
+                </div>
+
+                <p><strong>WHEREAS,</strong> Company has valuable customer relationships and employee resources;</p>
+                <p><strong>WHEREAS,</strong> ${typeLabel} will have access to confidential information and relationships;</p>
+                <p><strong>NOW, THEREFORE,</strong> the parties agree as follows:</p>
+
+                ${sections}
+
+                <div class="signature-block">
+                    <div class="signature-party">
+                        <h3>Company</h3>
+                        <div class="signature-line">Signature</div>
+                        <div class="signature-line">Name & Title</div>
+                        <div class="signature-line">Date</div>
+                    </div>
+                    <div class="signature-party">
+                        <h3>${typeLabel}</h3>
+                        <div class="signature-line">Signature</div>
+                        <div class="signature-line"><span class="doc-highlight">${individualName}</span></div>
+                        <div class="signature-line">Date</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ========== COMMISSION AGREEMENT GENERATOR ==========
+        function generateCommissionForm() {
+            const today = new Date().toISOString().split('T')[0];
+            return `
+                <div class="gen-form-header">
+                    <h2>Commission Agreement</h2>
+                    <p>Define sales commission structure and payment terms</p>
+                </div>
+
+                <div class="gen-form-section">
+                    <div class="gen-section-title">Company Information</div>
+                    <div class="gen-form-group">
+                        <label>Company Name</label>
+                        <input type="text" id="gen_companyName" placeholder="Sales Corp, Inc." oninput="updateGeneratorPreview()">
+                    </div>
+                    <div class="gen-form-row">
+                        <div class="gen-form-group">
+                            <label>State</label>
+                            <select id="gen_companyState" onchange="updateGeneratorPreview()">
+                                <option value="">Select...</option>
+                                <option value="California">California</option>
+                                <option value="Delaware">Delaware</option>
+                                <option value="Florida">Florida</option>
+                                <option value="New York">New York</option>
+                                <option value="Texas">Texas</option>
+                            </select>
+                        </div>
+                        <div class="gen-form-group">
+                            <label>Effective Date</label>
+                            <input type="date" id="gen_effectiveDate" value="${today}" onchange="updateGeneratorPreview()">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="gen-form-section">
+                    <div class="gen-section-title">Salesperson Information</div>
+                    <div class="gen-form-group">
+                        <label>Salesperson Name</label>
+                        <input type="text" id="gen_salespersonName" placeholder="Jane Sales" oninput="updateGeneratorPreview()">
+                    </div>
+                    <div class="gen-form-group">
+                        <label>Title/Role</label>
+                        <input type="text" id="gen_jobTitle" placeholder="Regional Sales Manager" oninput="updateGeneratorPreview()">
+                    </div>
+                </div>
+
+                <div class="gen-form-section">
+                    <div class="gen-section-title">Commission Structure</div>
+                    <div class="gen-form-row">
+                        <div class="gen-form-group">
+                            <label>Commission Rate (%)</label>
+                            <input type="number" id="gen_commissionRate" placeholder="10" min="0" max="100" step="0.5" oninput="updateGeneratorPreview()">
+                        </div>
+                        <div class="gen-form-group">
+                            <label>Based On</label>
+                            <select id="gen_commissionBasis" onchange="updateGeneratorPreview()">
+                                <option value="gross sales">Gross Sales</option>
+                                <option value="net sales">Net Sales</option>
+                                <option value="collected revenue">Collected Revenue</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="gen-form-row">
+                        <div class="gen-form-group">
+                            <label>Payment Frequency</label>
+                            <select id="gen_paymentFrequency" onchange="updateGeneratorPreview()">
+                                <option value="monthly">Monthly</option>
+                                <option value="bi-weekly">Bi-Weekly</option>
+                                <option value="quarterly">Quarterly</option>
+                            </select>
+                        </div>
+                        <div class="gen-form-group">
+                            <label>Commission Earned When</label>
+                            <select id="gen_earnedWhen" onchange="updateGeneratorPreview()">
+                                <option value="sale is closed">Sale Closed</option>
+                                <option value="payment is received">Payment Received</option>
+                                <option value="product is delivered">Product Delivered</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="gen-form-section">
+                    <div class="gen-section-title">Additional Terms</div>
+                    <div class="gen-form-group">
+                        <label>Include These Provisions</label>
+                        <div class="gen-checkbox-group">
+                            <label class="gen-checkbox-label">
+                                <input type="checkbox" id="gen_includeClawback" onchange="updateGeneratorPreview()" checked>
+                                <span>Clawback Clause</span>
+                            </label>
+                            <label class="gen-checkbox-label">
+                                <input type="checkbox" id="gen_includeTerritory" onchange="updateGeneratorPreview()">
+                                <span>Territory</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-success gen-insert-btn" onclick="insertToEditor()">
+                    Insert into Editor →
+                </button>
+            `;
+        }
+
+        function generateCommissionPreview() {
+            const companyName = getGenValue('gen_companyName', '[COMPANY NAME]');
+            const companyState = getGenValue('gen_companyState', '[STATE]');
+            const effectiveDate = formatGenDate(getGenValue('gen_effectiveDate'));
+            const salespersonName = getGenValue('gen_salespersonName', '[SALESPERSON NAME]');
+            const jobTitle = getGenValue('gen_jobTitle', '[TITLE]');
+            const commissionRate = getGenValue('gen_commissionRate', '[RATE]');
+            const commissionBasis = getGenValue('gen_commissionBasis', 'gross sales');
+            const paymentFrequency = getGenValue('gen_paymentFrequency', 'monthly');
+            const earnedWhen = getGenValue('gen_earnedWhen', 'sale is closed');
+            const includeClawback = getGenValue('gen_includeClawback');
+            const includeTerritory = getGenValue('gen_includeTerritory');
+
+            let sections = '';
+            let sectionNum = 1;
+
+            // Commission Structure
+            sections += `
+                <h2>${sectionNum}. COMMISSION STRUCTURE</h2>
+                <p class="clause">${sectionNum}.1 <strong>Commission Rate.</strong> Salesperson shall earn a commission of <span class="doc-highlight">${commissionRate}%</span> of <span class="doc-highlight">${commissionBasis}</span> for all qualifying sales.</p>
+                <p class="clause">${sectionNum}.2 <strong>When Earned.</strong> Commission is earned when the <span class="doc-highlight">${earnedWhen}</span>.</p>
+                <p class="clause">${sectionNum}.3 <strong>Payment.</strong> Commissions shall be paid <span class="doc-highlight">${paymentFrequency}</span>, within 15 days after the end of each period.</p>
+            `;
+            sectionNum++;
+
+            // Territory
+            if (includeTerritory) {
+                sections += `
+                    <h2>${sectionNum}. TERRITORY</h2>
+                    <p class="clause">${sectionNum}.1 Salesperson's territory shall be defined by Company and may be modified with reasonable notice.</p>
+                `;
+                sectionNum++;
+            }
+
+            // Clawback
+            if (includeClawback) {
+                sections += `
+                    <h2>${sectionNum}. CLAWBACK</h2>
+                    <p class="clause">${sectionNum}.1 If a customer returns products, cancels, or receives a refund within 90 days, the commission shall be deducted from future payments.</p>
+                    <p class="clause">${sectionNum}.2 If a customer fails to pay within 180 days (bad debt), any commission paid shall be recovered.</p>
+                `;
+                sectionNum++;
+            }
+
+            // General Provisions
+            sections += `
+                <h2>${sectionNum}. TERM AND TERMINATION</h2>
+                <p class="clause">${sectionNum}.1 This Agreement continues until terminated by either party with 14 days written notice.</p>
+                <p class="clause">${sectionNum}.2 Upon termination, Salesperson is entitled to commissions earned before the termination date.</p>
+            `;
+            sectionNum++;
+
+            sections += `
+                <h2>${sectionNum}. GENERAL PROVISIONS</h2>
+                <p class="clause">${sectionNum}.1 <strong>Governing Law.</strong> This Agreement is governed by the laws of <span class="doc-highlight">${companyState}</span>.</p>
+                <p class="clause">${sectionNum}.2 <strong>Entire Agreement.</strong> This constitutes the entire agreement regarding commission compensation.</p>
+            `;
+
+            return `
+                <h1>Sales Commission Agreement</h1>
+                <p class="center" style="font-style: italic;">Effective Date: <span class="doc-highlight">${effectiveDate}</span></p>
+
+                <div class="parties">
+                    <p>This Agreement is entered into by:</p>
+                    <p><strong>Company:</strong> <span class="doc-highlight">${companyName}</span></p>
+                    <p><strong>Salesperson:</strong> <span class="doc-highlight">${salespersonName}</span>, serving as <span class="doc-highlight">${jobTitle}</span></p>
+                </div>
+
+                <p><strong>WHEREAS,</strong> Company desires to engage Salesperson to sell its products/services;</p>
+                <p><strong>NOW, THEREFORE,</strong> the parties agree as follows:</p>
+
+                ${sections}
+
+                <div class="signature-block">
+                    <div class="signature-party">
+                        <h3>Company</h3>
+                        <div class="signature-line">Signature</div>
+                        <div class="signature-line">Name & Title</div>
+                        <div class="signature-line">Date</div>
+                    </div>
+                    <div class="signature-party">
+                        <h3>Salesperson</h3>
+                        <div class="signature-line">Signature</div>
+                        <div class="signature-line"><span class="doc-highlight">${salespersonName}</span></div>
+                        <div class="signature-line">Date</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ========== NDA GENERATOR ==========
+        function generateNDAForm() {
+            const today = new Date().toISOString().split('T')[0];
+            return `
+                <div class="gen-form-header">
+                    <h2>Non-Disclosure Agreement</h2>
+                    <p>Protect confidential information in business relationships</p>
+                </div>
+
+                <div class="gen-form-section">
+                    <div class="gen-section-title">Agreement Type</div>
+                    <div class="gen-form-group">
+                        <label>NDA Type</label>
+                        <select id="gen_ndaType" onchange="updateGeneratorPreview()">
+                            <option value="mutual">Mutual (Two-Way)</option>
+                            <option value="unilateral">Unilateral (One-Way)</option>
+                        </select>
+                    </div>
+                    <div class="gen-form-row">
+                        <div class="gen-form-group">
+                            <label>Governing State</label>
+                            <select id="gen_governingState" onchange="updateGeneratorPreview()">
+                                <option value="">Select...</option>
+                                <option value="California">California</option>
+                                <option value="Delaware">Delaware</option>
+                                <option value="Florida">Florida</option>
+                                <option value="New York">New York</option>
+                                <option value="Texas">Texas</option>
+                            </select>
+                        </div>
+                        <div class="gen-form-group">
+                            <label>Effective Date</label>
+                            <input type="date" id="gen_effectiveDate" value="${today}" onchange="updateGeneratorPreview()">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="gen-form-section">
+                    <div class="gen-section-title">Disclosing Party</div>
+                    <div class="gen-form-group">
+                        <label>Party Name</label>
+                        <input type="text" id="gen_disclosingParty" placeholder="ABC Corporation" oninput="updateGeneratorPreview()">
+                    </div>
+                    <div class="gen-form-group">
+                        <label>Address</label>
+                        <input type="text" id="gen_disclosingAddress" placeholder="123 Main St, City, State ZIP" oninput="updateGeneratorPreview()">
+                    </div>
+                </div>
+
+                <div class="gen-form-section">
+                    <div class="gen-section-title">Receiving Party</div>
+                    <div class="gen-form-group">
+                        <label>Party Name</label>
+                        <input type="text" id="gen_receivingParty" placeholder="XYZ Company" oninput="updateGeneratorPreview()">
+                    </div>
+                    <div class="gen-form-group">
+                        <label>Address</label>
+                        <input type="text" id="gen_receivingAddress" placeholder="456 Oak Ave, City, State ZIP" oninput="updateGeneratorPreview()">
+                    </div>
+                </div>
+
+                <div class="gen-form-section">
+                    <div class="gen-section-title">Agreement Terms</div>
+                    <div class="gen-form-row">
+                        <div class="gen-form-group">
+                            <label>Purpose of Disclosure</label>
+                            <select id="gen_purpose" onchange="updateGeneratorPreview()">
+                                <option value="evaluating a potential business relationship">Evaluating Business Relationship</option>
+                                <option value="discussing a potential partnership">Potential Partnership</option>
+                                <option value="evaluating potential investment">Investment Discussions</option>
+                                <option value="evaluating potential acquisition">M&A Discussions</option>
+                            </select>
+                        </div>
+                        <div class="gen-form-group">
+                            <label>Term (Years)</label>
+                            <select id="gen_termYears" onchange="updateGeneratorPreview()">
+                                <option value="1">1 Year</option>
+                                <option value="2" selected>2 Years</option>
+                                <option value="3">3 Years</option>
+                                <option value="5">5 Years</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="gen-form-group">
+                        <label>Survival Period After Termination</label>
+                        <select id="gen_survivalYears" onchange="updateGeneratorPreview()">
+                            <option value="2">2 Years</option>
+                            <option value="3" selected>3 Years</option>
+                            <option value="5">5 Years</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="gen-form-section">
+                    <div class="gen-section-title">Additional Provisions</div>
+                    <div class="gen-form-group">
+                        <div class="gen-checkbox-group">
+                            <label class="gen-checkbox-label">
+                                <input type="checkbox" id="gen_includeNonSolicitation" onchange="updateGeneratorPreview()">
+                                <span>Non-Solicitation</span>
+                            </label>
+                            <label class="gen-checkbox-label">
+                                <input type="checkbox" id="gen_includeNonCircumvent" onchange="updateGeneratorPreview()" checked>
+                                <span>Non-Circumvention</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-success gen-insert-btn" onclick="insertToEditor()">
+                    Insert into Editor →
+                </button>
+            `;
+        }
+
+        function generateNDAPreview() {
+            const ndaType = getGenValue('gen_ndaType', 'mutual');
+            const governingState = getGenValue('gen_governingState', '[STATE]');
+            const effectiveDate = formatGenDate(getGenValue('gen_effectiveDate'));
+            const disclosingParty = getGenValue('gen_disclosingParty', '[DISCLOSING PARTY]');
+            const disclosingAddress = getGenValue('gen_disclosingAddress', '[ADDRESS]');
+            const receivingParty = getGenValue('gen_receivingParty', '[RECEIVING PARTY]');
+            const receivingAddress = getGenValue('gen_receivingAddress', '[ADDRESS]');
+            const purpose = getGenValue('gen_purpose', 'evaluating a potential business relationship');
+            const termYears = getGenValue('gen_termYears', '2');
+            const survivalYears = getGenValue('gen_survivalYears', '3');
+            const includeNonSolicitation = getGenValue('gen_includeNonSolicitation');
+            const includeNonCircumvent = getGenValue('gen_includeNonCircumvent');
+
+            const isMutual = ndaType === 'mutual';
+            const partyRef = isMutual ? 'Each party' : 'Receiving Party';
+            const obligationText = isMutual ? 'The parties agree' : 'Receiving Party agrees';
+
+            let sections = '';
+            let sectionNum = 1;
+
+            // Definition
+            sections += `
+                <h2>${sectionNum}. DEFINITION OF CONFIDENTIAL INFORMATION</h2>
+                <p class="clause">${sectionNum}.1 "Confidential Information" means any non-public information disclosed by ${isMutual ? 'either party' : 'Disclosing Party'}, whether orally, in writing, or electronically, that is designated as confidential or should reasonably be understood to be confidential.</p>
+                <p class="clause">${sectionNum}.2 Confidential Information includes, but is not limited to: trade secrets, business plans, customer lists, financial data, technical specifications, and proprietary methodologies.</p>
+            `;
+            sectionNum++;
+
+            // Obligations
+            sections += `
+                <h2>${sectionNum}. OBLIGATIONS</h2>
+                <p class="clause">${sectionNum}.1 ${obligationText} to hold all Confidential Information in strict confidence and not disclose it to any third party without prior written consent.</p>
+                <p class="clause">${sectionNum}.2 ${partyRef} shall use Confidential Information solely for the purpose of <span class="doc-highlight">${purpose}</span>.</p>
+                <p class="clause">${sectionNum}.3 ${partyRef} shall protect Confidential Information using the same degree of care used to protect its own confidential information, but no less than reasonable care.</p>
+            `;
+            sectionNum++;
+
+            // Exclusions
+            sections += `
+                <h2>${sectionNum}. EXCLUSIONS</h2>
+                <p class="clause">Confidential Information does not include information that:</p>
+                <p class="sub-clause">(a) Is or becomes publicly available through no fault of the receiving party;</p>
+                <p class="sub-clause">(b) Was known to the receiving party prior to disclosure;</p>
+                <p class="sub-clause">(c) Is independently developed without use of Confidential Information;</p>
+                <p class="sub-clause">(d) Is rightfully obtained from a third party without restriction.</p>
+            `;
+            sectionNum++;
+
+            // Non-Circumvention
+            if (includeNonCircumvent) {
+                sections += `
+                    <h2>${sectionNum}. NON-CIRCUMVENTION</h2>
+                    <p class="clause">${sectionNum}.1 ${partyRef} agrees not to circumvent, avoid, or bypass the other party to deal directly with any contacts, sources, or opportunities disclosed under this Agreement.</p>
+                `;
+                sectionNum++;
+            }
+
+            // Non-Solicitation
+            if (includeNonSolicitation) {
+                sections += `
+                    <h2>${sectionNum}. NON-SOLICITATION</h2>
+                    <p class="clause">${sectionNum}.1 During the term and for one (1) year thereafter, ${partyRef.toLowerCase()} agrees not to solicit or hire any employees of the other party with whom they had contact during discussions.</p>
+                `;
+                sectionNum++;
+            }
+
+            // Term
+            sections += `
+                <h2>${sectionNum}. TERM</h2>
+                <p class="clause">${sectionNum}.1 This Agreement shall remain in effect for <span class="doc-highlight">${termYears} year${termYears > 1 ? 's' : ''}</span> from the Effective Date.</p>
+                <p class="clause">${sectionNum}.2 Confidentiality obligations shall survive termination for <span class="doc-highlight">${survivalYears} years</span>, except for trade secrets which shall be protected indefinitely.</p>
+            `;
+            sectionNum++;
+
+            // Return of Materials
+            sections += `
+                <h2>${sectionNum}. RETURN OF MATERIALS</h2>
+                <p class="clause">${sectionNum}.1 Upon termination or request, ${partyRef.toLowerCase()} shall promptly return or destroy all Confidential Information and provide written certification of destruction.</p>
+            `;
+            sectionNum++;
+
+            // General
+            sections += `
+                <h2>${sectionNum}. GENERAL PROVISIONS</h2>
+                <p class="clause">${sectionNum}.1 <strong>Governing Law.</strong> This Agreement shall be governed by the laws of <span class="doc-highlight">${governingState}</span>.</p>
+                <p class="clause">${sectionNum}.2 <strong>Injunctive Relief.</strong> The parties acknowledge that breach may cause irreparable harm and agree that injunctive relief shall be available without the need to post bond.</p>
+                <p class="clause">${sectionNum}.3 <strong>Entire Agreement.</strong> This Agreement constitutes the entire agreement regarding confidentiality and supersedes all prior discussions.</p>
+            `;
+
+            return `
+                <h1>${isMutual ? 'Mutual ' : ''}Non-Disclosure Agreement</h1>
+                <p class="center" style="font-style: italic;">Effective Date: <span class="doc-highlight">${effectiveDate}</span></p>
+
+                <div class="parties">
+                    <p>This Agreement is entered into by:</p>
+                    <p><strong>${isMutual ? 'Party A' : 'Disclosing Party'}:</strong> <span class="doc-highlight">${disclosingParty}</span>, located at <span class="doc-highlight">${disclosingAddress}</span></p>
+                    <p><strong>${isMutual ? 'Party B' : 'Receiving Party'}:</strong> <span class="doc-highlight">${receivingParty}</span>, located at <span class="doc-highlight">${receivingAddress}</span></p>
+                </div>
+
+                <p><strong>WHEREAS,</strong> the parties wish to explore <span class="doc-highlight">${purpose}</span>;</p>
+                <p><strong>WHEREAS,</strong> such discussions may require the disclosure of confidential information;</p>
+                <p><strong>NOW, THEREFORE,</strong> the parties agree as follows:</p>
+
+                ${sections}
+
+                <div class="signature-block">
+                    <div class="signature-party">
+                        <h3>${isMutual ? 'Party A' : 'Disclosing Party'}</h3>
+                        <div class="signature-line">Signature</div>
+                        <div class="signature-line"><span class="doc-highlight">${disclosingParty}</span></div>
+                        <div class="signature-line">Date</div>
+                    </div>
+                    <div class="signature-party">
+                        <h3>${isMutual ? 'Party B' : 'Receiving Party'}</h3>
+                        <div class="signature-line">Signature</div>
+                        <div class="signature-line"><span class="doc-highlight">${receivingParty}</span></div>
+                        <div class="signature-line">Date</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ========== PIIA GENERATOR ==========
+        function generatePIIAForm() {
+            const today = new Date().toISOString().split('T')[0];
+            return `
+                <div class="gen-form-header">
+                    <h2>PIIA (Inventions Assignment)</h2>
+                    <p>Proprietary Information and Inventions Assignment Agreement</p>
+                </div>
+
+                <div class="gen-info-box">
+                    <strong>Standard for Tech Companies</strong><br>
+                    This agreement assigns employee inventions and protects company IP.
+                </div>
+
+                <div class="gen-form-section">
+                    <div class="gen-section-title">Company Information</div>
+                    <div class="gen-form-group">
+                        <label>Company Name</label>
+                        <input type="text" id="gen_companyName" placeholder="Tech Corp, Inc." oninput="updateGeneratorPreview()">
+                    </div>
+                    <div class="gen-form-row">
+                        <div class="gen-form-group">
+                            <label>State</label>
+                            <select id="gen_companyState" onchange="updateGeneratorPreview()">
+                                <option value="">Select...</option>
+                                <option value="California">California</option>
+                                <option value="Delaware">Delaware</option>
+                                <option value="Florida">Florida</option>
+                                <option value="New York">New York</option>
+                                <option value="Texas">Texas</option>
+                            </select>
+                        </div>
+                        <div class="gen-form-group">
+                            <label>Effective Date</label>
+                            <input type="date" id="gen_effectiveDate" value="${today}" onchange="updateGeneratorPreview()">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="gen-form-section">
+                    <div class="gen-section-title">Employee Information</div>
+                    <div class="gen-form-group">
+                        <label>Employee Name</label>
+                        <input type="text" id="gen_employeeName" placeholder="John Developer" oninput="updateGeneratorPreview()">
+                    </div>
+                    <div class="gen-form-group">
+                        <label>Position/Title</label>
+                        <input type="text" id="gen_jobTitle" placeholder="Software Engineer" oninput="updateGeneratorPreview()">
+                    </div>
+                </div>
+
+                <div class="gen-form-section">
+                    <div class="gen-section-title">Assignment Scope</div>
+                    <div class="gen-form-group">
+                        <label>Include These Provisions</label>
+                        <div class="gen-checkbox-group">
+                            <label class="gen-checkbox-label">
+                                <input type="checkbox" id="gen_includeConfidentiality" onchange="updateGeneratorPreview()" checked>
+                                <span>Confidentiality</span>
+                            </label>
+                            <label class="gen-checkbox-label">
+                                <input type="checkbox" id="gen_includeWorkProduct" onchange="updateGeneratorPreview()" checked>
+                                <span>Work Product</span>
+                            </label>
+                            <label class="gen-checkbox-label">
+                                <input type="checkbox" id="gen_includeNonSolicitation" onchange="updateGeneratorPreview()">
+                                <span>Non-Solicitation</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="gen-form-group">
+                        <label>Prior Inventions (if any)</label>
+                        <textarea id="gen_priorInventions" rows="2" placeholder="List any prior inventions to exclude..." oninput="updateGeneratorPreview()"></textarea>
+                    </div>
+                </div>
+
+                <button class="btn btn-success gen-insert-btn" onclick="insertToEditor()">
+                    Insert into Editor →
+                </button>
+            `;
+        }
+
+        function generatePIIAPreview() {
+            const companyName = getGenValue('gen_companyName', '[COMPANY NAME]');
+            const companyState = getGenValue('gen_companyState', '[STATE]');
+            const effectiveDate = formatGenDate(getGenValue('gen_effectiveDate'));
+            const employeeName = getGenValue('gen_employeeName', '[EMPLOYEE NAME]');
+            const jobTitle = getGenValue('gen_jobTitle', '[TITLE]');
+            const includeConfidentiality = getGenValue('gen_includeConfidentiality');
+            const includeWorkProduct = getGenValue('gen_includeWorkProduct');
+            const includeNonSolicitation = getGenValue('gen_includeNonSolicitation');
+            const priorInventions = getGenValue('gen_priorInventions', '');
+
+            let sections = '';
+            let sectionNum = 1;
+
+            // Confidentiality
+            if (includeConfidentiality) {
+                sections += `
+                    <h2>${sectionNum}. CONFIDENTIAL INFORMATION</h2>
+                    <p class="clause">${sectionNum}.1 <strong>Definition.</strong> "Confidential Information" means all non-public information relating to Company's business, including trade secrets, technical data, customer information, business strategies, and financial information.</p>
+                    <p class="clause">${sectionNum}.2 <strong>Non-Disclosure.</strong> Employee agrees to hold Confidential Information in strict confidence and not disclose it to any third party during or after employment.</p>
+                    <p class="clause">${sectionNum}.3 <strong>Non-Use.</strong> Employee shall use Confidential Information solely for Company's benefit and not for personal gain or for any other entity.</p>
+                `;
+                sectionNum++;
+            }
+
+            // Inventions Assignment
+            sections += `
+                <h2>${sectionNum}. ASSIGNMENT OF INVENTIONS</h2>
+                <p class="clause">${sectionNum}.1 <strong>Work Product Assignment.</strong> Employee hereby assigns to Company all right, title, and interest in any Invention that:</p>
+                <p class="sub-clause">(a) Is developed using Company equipment, supplies, or facilities;</p>
+                <p class="sub-clause">(b) Results from work performed for Company;</p>
+                <p class="sub-clause">(c) Relates to Company's business or actual/anticipated research.</p>
+                <p class="clause">${sectionNum}.2 <strong>Definition.</strong> "Invention" includes all inventions, discoveries, improvements, ideas, works of authorship, designs, and trade secrets.</p>
+                <p class="clause">${sectionNum}.3 <strong>Disclosure.</strong> Employee shall promptly disclose all Inventions to Company in writing.</p>
+                <p class="clause">${sectionNum}.4 <strong>Further Assistance.</strong> Employee agrees to execute any documents and take any actions necessary to perfect Company's ownership of Inventions.</p>
+            `;
+            sectionNum++;
+
+            // Work Product
+            if (includeWorkProduct) {
+                sections += `
+                    <h2>${sectionNum}. WORK MADE FOR HIRE</h2>
+                    <p class="clause">${sectionNum}.1 All copyrightable works created within the scope of employment shall be considered "work made for hire" under the Copyright Act.</p>
+                    <p class="clause">${sectionNum}.2 To the extent any work does not qualify as work made for hire, Employee hereby assigns all copyright rights to Company.</p>
+                `;
+                sectionNum++;
+            }
+
+            // Prior Inventions
+            sections += `
+                <h2>${sectionNum}. PRIOR INVENTIONS</h2>
+                <p class="clause">${sectionNum}.1 The following prior inventions are excluded from this Agreement: ${priorInventions ? `<span class="doc-highlight">${priorInventions}</span>` : '<span class="doc-highlight">[None]</span>'}</p>
+                <p class="clause">${sectionNum}.2 If no prior inventions are listed, Employee represents that no such prior inventions exist.</p>
+            `;
+            sectionNum++;
+
+            // Non-Solicitation
+            if (includeNonSolicitation) {
+                sections += `
+                    <h2>${sectionNum}. NON-SOLICITATION</h2>
+                    <p class="clause">${sectionNum}.1 For one (1) year following termination, Employee agrees not to solicit or recruit any Company employees or contractors.</p>
+                `;
+                sectionNum++;
+            }
+
+            // Return of Property
+            sections += `
+                <h2>${sectionNum}. RETURN OF PROPERTY</h2>
+                <p class="clause">${sectionNum}.1 Upon termination, Employee shall immediately return all Company property, including documents, files, equipment, and all copies of Confidential Information.</p>
+                <p class="clause">${sectionNum}.2 Employee shall delete all Company information from personal devices and accounts.</p>
+            `;
+            sectionNum++;
+
+            // General
+            sections += `
+                <h2>${sectionNum}. GENERAL PROVISIONS</h2>
+                <p class="clause">${sectionNum}.1 <strong>Governing Law.</strong> This Agreement is governed by the laws of <span class="doc-highlight">${companyState}</span>.</p>
+                <p class="clause">${sectionNum}.2 <strong>Injunctive Relief.</strong> Employee acknowledges that breach may cause irreparable harm and agrees that injunctive relief is appropriate.</p>
+                <p class="clause">${sectionNum}.3 <strong>Survival.</strong> Confidentiality and assignment obligations survive termination of employment.</p>
+            `;
+
+            return `
+                <h1>Proprietary Information and Inventions Assignment Agreement</h1>
+                <p class="center" style="font-style: italic;">Effective Date: <span class="doc-highlight">${effectiveDate}</span></p>
+
+                <div class="parties">
+                    <p>This Agreement is entered into by:</p>
+                    <p><strong>Company:</strong> <span class="doc-highlight">${companyName}</span></p>
+                    <p><strong>Employee:</strong> <span class="doc-highlight">${employeeName}</span>, serving as <span class="doc-highlight">${jobTitle}</span></p>
+                </div>
+
+                <p><strong>WHEREAS,</strong> Company possesses valuable proprietary information and trade secrets;</p>
+                <p><strong>WHEREAS,</strong> Employee will have access to and may develop confidential information during employment;</p>
+                <p><strong>NOW, THEREFORE,</strong> in consideration of employment and other good and valuable consideration, the parties agree:</p>
+
+                ${sections}
+
+                <div class="signature-block">
+                    <div class="signature-party">
+                        <h3>Company</h3>
+                        <div class="signature-line">Signature</div>
+                        <div class="signature-line">Name & Title</div>
+                        <div class="signature-line">Date</div>
+                    </div>
+                    <div class="signature-party">
+                        <h3>Employee</h3>
+                        <div class="signature-line">Signature</div>
+                        <div class="signature-line"><span class="doc-highlight">${employeeName}</span></div>
+                        <div class="signature-line">Date</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ========== SUBLEASE GENERATOR ==========
+        function generateSubleaseForm() {
+            const today = new Date().toISOString().split('T')[0];
+            return `
+                <div class="gen-form-header">
+                    <h2>Sublease Agreement</h2>
+                    <p>Sublease residential or commercial property to a subtenant</p>
+                </div>
+
+                <div class="gen-form-section">
+                    <div class="gen-section-title">Property Information</div>
+                    <div class="gen-form-group">
+                        <label>Property Address</label>
+                        <input type="text" id="gen_propertyAddress" placeholder="123 Main St, Apt 4B, City, State ZIP" oninput="updateGeneratorPreview()">
+                    </div>
+                    <div class="gen-form-row">
+                        <div class="gen-form-group">
+                            <label>Property Type</label>
+                            <select id="gen_propertyType" onchange="updateGeneratorPreview()">
+                                <option value="residential">Residential</option>
+                                <option value="commercial">Commercial</option>
+                            </select>
+                        </div>
+                        <div class="gen-form-group">
+                            <label>Governing State</label>
+                            <select id="gen_governingState" onchange="updateGeneratorPreview()">
+                                <option value="">Select...</option>
+                                <option value="California">California</option>
+                                <option value="Florida">Florida</option>
+                                <option value="New York">New York</option>
+                                <option value="Texas">Texas</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="gen-form-section">
+                    <div class="gen-section-title">Original Tenant (Sublessor)</div>
+                    <div class="gen-form-group">
+                        <label>Sublessor Name</label>
+                        <input type="text" id="gen_sublessorName" placeholder="Current Tenant Name" oninput="updateGeneratorPreview()">
+                    </div>
+                </div>
+
+                <div class="gen-form-section">
+                    <div class="gen-section-title">New Tenant (Sublessee)</div>
+                    <div class="gen-form-group">
+                        <label>Sublessee Name</label>
+                        <input type="text" id="gen_sublesseeName" placeholder="New Subtenant Name" oninput="updateGeneratorPreview()">
+                    </div>
+                </div>
+
+                <div class="gen-form-section">
+                    <div class="gen-section-title">Lease Terms</div>
+                    <div class="gen-form-row">
+                        <div class="gen-form-group">
+                            <label>Start Date</label>
+                            <input type="date" id="gen_startDate" value="${today}" onchange="updateGeneratorPreview()">
+                        </div>
+                        <div class="gen-form-group">
+                            <label>End Date</label>
+                            <input type="date" id="gen_endDate" onchange="updateGeneratorPreview()">
+                        </div>
+                    </div>
+                    <div class="gen-form-row">
+                        <div class="gen-form-group">
+                            <label>Monthly Rent ($)</label>
+                            <input type="number" id="gen_monthlyRent" placeholder="1500" oninput="updateGeneratorPreview()">
+                        </div>
+                        <div class="gen-form-group">
+                            <label>Security Deposit ($)</label>
+                            <input type="number" id="gen_securityDeposit" placeholder="1500" oninput="updateGeneratorPreview()">
+                        </div>
+                    </div>
+                    <div class="gen-form-group">
+                        <label>Rent Due Day</label>
+                        <select id="gen_rentDueDay" onchange="updateGeneratorPreview()">
+                            <option value="1st">1st of each month</option>
+                            <option value="15th">15th of each month</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="gen-form-section">
+                    <div class="gen-section-title">Additional Terms</div>
+                    <div class="gen-form-group">
+                        <div class="gen-checkbox-group">
+                            <label class="gen-checkbox-label">
+                                <input type="checkbox" id="gen_utilitiesIncluded" onchange="updateGeneratorPreview()">
+                                <span>Utilities Included</span>
+                            </label>
+                            <label class="gen-checkbox-label">
+                                <input type="checkbox" id="gen_petsAllowed" onchange="updateGeneratorPreview()">
+                                <span>Pets Allowed</span>
+                            </label>
+                            <label class="gen-checkbox-label">
+                                <input type="checkbox" id="gen_furnished" onchange="updateGeneratorPreview()">
+                                <span>Furnished</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-success gen-insert-btn" onclick="insertToEditor()">
+                    Insert into Editor →
+                </button>
+            `;
+        }
+
+        function generateSubleasePreview() {
+            const propertyAddress = getGenValue('gen_propertyAddress', '[PROPERTY ADDRESS]');
+            const propertyType = getGenValue('gen_propertyType', 'residential');
+            const governingState = getGenValue('gen_governingState', '[STATE]');
+            const sublessorName = getGenValue('gen_sublessorName', '[SUBLESSOR NAME]');
+            const sublesseeName = getGenValue('gen_sublesseeName', '[SUBLESSEE NAME]');
+            const startDate = formatGenDate(getGenValue('gen_startDate'));
+            const endDate = formatGenDate(getGenValue('gen_endDate'));
+            const monthlyRent = getGenValue('gen_monthlyRent', '[AMOUNT]');
+            const securityDeposit = getGenValue('gen_securityDeposit', '[AMOUNT]');
+            const rentDueDay = getGenValue('gen_rentDueDay', '1st');
+            const utilitiesIncluded = getGenValue('gen_utilitiesIncluded');
+            const petsAllowed = getGenValue('gen_petsAllowed');
+            const furnished = getGenValue('gen_furnished');
+
+            const isResidential = propertyType === 'residential';
+            let sectionNum = 1;
+            let sections = '';
+
+            // Premises
+            sections += `
+                <h2>${sectionNum}. PREMISES</h2>
+                <p class="clause">${sectionNum}.1 Sublessor agrees to sublease to Sublessee the ${isResidential ? 'residential' : 'commercial'} property located at:</p>
+                <p class="sub-clause"><span class="doc-highlight">${propertyAddress}</span></p>
+                <p class="clause">${sectionNum}.2 The premises are subleased ${furnished ? '<span class="doc-highlight">furnished</span>' : 'unfurnished'}.</p>
+            `;
+            sectionNum++;
+
+            // Term
+            sections += `
+                <h2>${sectionNum}. TERM</h2>
+                <p class="clause">${sectionNum}.1 The sublease term begins on <span class="doc-highlight">${startDate}</span> and ends on <span class="doc-highlight">${endDate}</span>.</p>
+                <p class="clause">${sectionNum}.2 This sublease is subject to the terms of the original lease between Sublessor and Landlord.</p>
+            `;
+            sectionNum++;
+
+            // Rent
+            sections += `
+                <h2>${sectionNum}. RENT</h2>
+                <p class="clause">${sectionNum}.1 Sublessee agrees to pay monthly rent of <span class="doc-highlight">$${monthlyRent}</span>.</p>
+                <p class="clause">${sectionNum}.2 Rent is due on the <span class="doc-highlight">${rentDueDay}</span> of each month.</p>
+                <p class="clause">${sectionNum}.3 Rent shall be paid to Sublessor by check, electronic transfer, or other agreed method.</p>
+                <p class="clause">${sectionNum}.4 Late payments after the 5th day shall incur a late fee of 5% of monthly rent.</p>
+            `;
+            sectionNum++;
+
+            // Security Deposit
+            sections += `
+                <h2>${sectionNum}. SECURITY DEPOSIT</h2>
+                <p class="clause">${sectionNum}.1 Sublessee shall pay a security deposit of <span class="doc-highlight">$${securityDeposit}</span> upon execution of this Agreement.</p>
+                <p class="clause">${sectionNum}.2 The deposit shall be returned within 30 days after the sublease ends, less any deductions for damages or unpaid rent.</p>
+            `;
+            sectionNum++;
+
+            // Utilities
+            sections += `
+                <h2>${sectionNum}. UTILITIES</h2>
+                <p class="clause">${sectionNum}.1 ${utilitiesIncluded ? '<span class="doc-highlight">Utilities are included</span> in the monthly rent (water, electricity, gas, internet).' : 'Sublessee is responsible for <span class="doc-highlight">all utilities</span> including water, electricity, gas, and internet.'}</p>
+            `;
+            sectionNum++;
+
+            // Use and Restrictions
+            sections += `
+                <h2>${sectionNum}. USE OF PREMISES</h2>
+                <p class="clause">${sectionNum}.1 The premises shall be used solely for ${isResidential ? 'residential purposes' : 'lawful commercial purposes as described in the original lease'}.</p>
+                <p class="clause">${sectionNum}.2 Sublessee shall not engage in any illegal activities on the premises.</p>
+                <p class="clause">${sectionNum}.3 ${petsAllowed ? '<span class="doc-highlight">Pets are allowed</span> with prior written consent and may require an additional pet deposit.' : '<span class="doc-highlight">No pets</span> are allowed without prior written consent.'}</p>
+            `;
+            sectionNum++;
+
+            // Maintenance
+            sections += `
+                <h2>${sectionNum}. MAINTENANCE</h2>
+                <p class="clause">${sectionNum}.1 Sublessee shall maintain the premises in good condition and promptly report any needed repairs.</p>
+                <p class="clause">${sectionNum}.2 Sublessee is responsible for minor repairs under $100.</p>
+            `;
+            sectionNum++;
+
+            // Landlord Consent
+            sections += `
+                <h2>${sectionNum}. LANDLORD CONSENT</h2>
+                <p class="clause">${sectionNum}.1 Sublessor represents that they have obtained written consent from the Landlord for this sublease, or that such consent is not required under the original lease.</p>
+            `;
+            sectionNum++;
+
+            // General
+            sections += `
+                <h2>${sectionNum}. GENERAL PROVISIONS</h2>
+                <p class="clause">${sectionNum}.1 <strong>Governing Law.</strong> This Agreement is governed by the laws of <span class="doc-highlight">${governingState}</span>.</p>
+                <p class="clause">${sectionNum}.2 <strong>Original Lease.</strong> Sublessee agrees to comply with all terms of the original lease.</p>
+                <p class="clause">${sectionNum}.3 <strong>Entire Agreement.</strong> This constitutes the entire sublease agreement between the parties.</p>
+            `;
+
+            return `
+                <h1>Sublease Agreement</h1>
+
+                <div class="parties">
+                    <p>This Sublease Agreement is entered into by:</p>
+                    <p><strong>Sublessor (Original Tenant):</strong> <span class="doc-highlight">${sublessorName}</span></p>
+                    <p><strong>Sublessee (New Tenant):</strong> <span class="doc-highlight">${sublesseeName}</span></p>
+                </div>
+
+                <p><strong>WHEREAS,</strong> Sublessor is the tenant under a lease agreement for the property described below;</p>
+                <p><strong>WHEREAS,</strong> Sublessor wishes to sublease the property to Sublessee;</p>
+                <p><strong>NOW, THEREFORE,</strong> the parties agree as follows:</p>
+
+                ${sections}
+
+                <div class="signature-block">
+                    <div class="signature-party">
+                        <h3>Sublessor</h3>
+                        <div class="signature-line">Signature</div>
+                        <div class="signature-line"><span class="doc-highlight">${sublessorName}</span></div>
+                        <div class="signature-line">Date</div>
+                    </div>
+                    <div class="signature-party">
+                        <h3>Sublessee</h3>
+                        <div class="signature-line">Signature</div>
+                        <div class="signature-line"><span class="doc-highlight">${sublesseeName}</span></div>
+                        <div class="signature-line">Date</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ========== FIREBASE & COLLABORATION ==========
         const firebaseConfig = {
             apiKey: "AIzaSyCeACvK3MVTOOaWY4SWG1yNnrcA9ILkkaM",
             authDomain: "termsdocs.firebaseapp.com",
@@ -483,7 +1972,6 @@
             measurementId: "G-PBGF06LDTM"
         };
 
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
@@ -491,12 +1979,12 @@
         let userColor = '';
         let roomId = '';
         let myUserId = '';
-        let contentRef, usersRef, myUserRef, commentsRef, metaRef;
+        let contentRef, usersRef, myUserRef, metaRef;
         let isLocalUpdate = false;
         let saveTimeout = null;
         const userColors = ['#ef4444', '#3b82f6', '#22c55e', '#f59e0b', '#8b5cf6', '#ec4899'];
 
-        // Templates
+        // Templates (for Edit mode)
         const templates = {
             blank: '',
             stripe: `[YOUR COMPANY NAME]
@@ -523,174 +2011,41 @@ To Whom It May Concern:
 
 This letter serves as formal notice pursuant to Section 13.3(a) of the Stripe Services Agreement ("SSA") of my intent to commence arbitration proceedings against Stripe, Inc. and Stripe Payments Company unless this matter is resolved within 30 days.
 
-I am writing regarding Stripe's continued withholding of $[AMOUNT] in customer payments belonging to [YOUR COMPANY NAME]. Despite [your promise to release funds by DATE / the passage of significant time], your company continues to hold these funds without providing any reasonable timeline for release.
-
-FACTUAL BACKGROUND
-
-[YOUR COMPANY NAME] operated as a [BUSINESS TYPE] business for [DURATION] with Stripe, maintaining [DISPUTE RATE]% dispute rate throughout our relationship. On [DATE], Stripe terminated/froze my merchant account, citing only vague "risk" concerns without identifying any specific violations of your Services Agreement.
-
-Since that date, Stripe has failed to:
-- Provide specific justification for the continued withholding beyond general references to "risk"
-- Establish any concrete timeline for releasing the held funds
-- Identify any specific Service Agreement violations that would justify indefinite withholding
-
-LEGAL CLAIMS
-
-Stripe's actions constitute multiple breaches of the SSA, including but not limited to:
-
-1. BREACH OF CONTRACT: Stripe has materially breached the SSA by withholding funds for an unreasonable period without contractual authority.
-
-2. CONVERSION: Stripe has wrongfully exercised dominion over $[AMOUNT] belonging to [YOUR COMPANY NAME], depriving us of our rightful property beyond any reasonable period necessary for risk management.
-
-3. BREACH OF IMPLIED COVENANT OF GOOD FAITH AND FAIR DEALING: Stripe's arbitrary withholding of funds without substantial justification violates this fundamental contractual obligation.
-
-4. VIOLATION OF CALIFORNIA BUSINESS & PROFESSIONS CODE § 17200: Stripe's systematic withholding of merchant funds without clear contractual authority constitutes an unfair business practice under California law.
-
-DEMAND FOR RESOLUTION
-
-To resolve this matter without proceeding to arbitration, I demand:
-
-1. Immediate release of the $[AMOUNT] in withheld funds
-2. Accounting of any interest earned on these funds while held by Stripe
-3. Written confirmation of the release timeline
-
-If I do not receive a satisfactory response within 14 days, I intend to file an arbitration demand upon the expiration of the 30-day notice period required by Section 13.3(a) of the SSA.
-
-Sincerely,
-
-[YOUR NAME]
-[YOUR COMPANY NAME]`,
+[Continue with your specific details...]`,
             nda: `MUTUAL NON-DISCLOSURE AGREEMENT
 
 This Mutual Non-Disclosure Agreement ("Agreement") is entered into as of [DATE] by and between:
 
 Party A: [PARTY A NAME]
-Address: [PARTY A ADDRESS]
-
 Party B: [PARTY B NAME]
-Address: [PARTY B ADDRESS]
-
-WHEREAS, the parties wish to explore a potential business relationship and in connection therewith, may disclose to each other certain confidential and proprietary information.
-
-NOW, THEREFORE, in consideration of the mutual covenants and agreements contained herein, the parties agree as follows:
 
 1. DEFINITION OF CONFIDENTIAL INFORMATION
+"Confidential Information" means any information disclosed by one party to the other that is designated as confidential or should reasonably be understood to be confidential.
 
-"Confidential Information" means any information disclosed by one party ("Disclosing Party") to the other party ("Receiving Party"), either directly or indirectly, in writing, orally, or by inspection of tangible objects, that is designated as "Confidential," "Proprietary," or some similar designation, or that reasonably should be understood to be confidential given the nature of the information and circumstances of disclosure.
+2. OBLIGATIONS
+Each party agrees to hold confidential information in strict confidence and not disclose it to third parties.
 
-2. OBLIGATIONS OF RECEIVING PARTY
+3. TERM
+This Agreement shall remain in effect for [DURATION] years.
 
-The Receiving Party agrees to:
-(a) Hold the Confidential Information in strict confidence;
-(b) Not disclose the Confidential Information to any third parties without prior written consent;
-(c) Use the Confidential Information only for the Purpose;
-(d) Protect the Confidential Information using the same degree of care it uses to protect its own confidential information, but in no event less than reasonable care.
+[Signatures]`,
+            llc: `OPERATING AGREEMENT OF [LLC NAME], LLC
 
-3. EXCLUSIONS
-
-Confidential Information does not include information that:
-(a) Was publicly known at the time of disclosure;
-(b) Becomes publicly known through no fault of the Receiving Party;
-(c) Was rightfully in the Receiving Party's possession prior to disclosure;
-(d) Is rightfully obtained by the Receiving Party from a third party without breach of any confidentiality obligation;
-(e) Is independently developed by the Receiving Party without use of the Confidential Information.
-
-4. TERM
-
-This Agreement shall remain in effect for a period of [DURATION] years from the Effective Date.
-
-5. RETURN OF INFORMATION
-
-Upon termination of this Agreement or upon request, each party shall return or destroy all Confidential Information received from the other party.
-
-6. GOVERNING LAW
-
-This Agreement shall be governed by the laws of [STATE/JURISDICTION].
-
-IN WITNESS WHEREOF, the parties have executed this Agreement as of the date first written above.
-
-PARTY A:                          PARTY B:
-
-_____________________            _____________________
-Signature                         Signature
-
-_____________________            _____________________
-Name:                            Name:
-Title:                           Title:
-Date:                            Date:`,
-            llc: `OPERATING AGREEMENT
-OF
-[LLC NAME], LLC
-
-A [STATE] LIMITED LIABILITY COMPANY
-
-This Operating Agreement ("Agreement") of [LLC NAME], LLC (the "Company"), is entered into effective as of [DATE], by the Member(s) listed below.
+This Operating Agreement is entered into as of [DATE].
 
 ARTICLE I - ORGANIZATION
+1.1 Name: [LLC NAME], LLC
+1.2 Principal Office: [ADDRESS]
 
-1.1 Formation. The Company was formed on [FORMATION DATE] by filing Articles of Organization with the [STATE] Secretary of State.
-
-1.2 Name. The name of the Company is [LLC NAME], LLC.
-
-1.3 Principal Office. The principal office of the Company shall be located at:
-[ADDRESS]
-[CITY], [STATE] [ZIP]
-
-1.4 Registered Agent. The registered agent of the Company is:
-[REGISTERED AGENT NAME]
-[REGISTERED AGENT ADDRESS]
-
-1.5 Term. The Company shall continue until dissolved in accordance with this Agreement or by law.
-
-ARTICLE II - PURPOSE
-
-The Company is organized for the purpose of [BUSINESS PURPOSE] and any other lawful business activity.
-
-ARTICLE III - MEMBERS AND CAPITAL CONTRIBUTIONS
-
-3.1 Initial Member(s):
-
+ARTICLE II - MEMBERS
 Name: [MEMBER NAME]
-Address: [MEMBER ADDRESS]
-Initial Contribution: $[AMOUNT]
-Membership Interest: [PERCENTAGE]%
+Contribution: $[AMOUNT]
+Ownership: [PERCENTAGE]%
 
-3.2 Additional Contributions. No Member shall be required to make any additional capital contributions.
+ARTICLE III - MANAGEMENT
+The Company shall be member-managed.
 
-ARTICLE IV - ALLOCATIONS AND DISTRIBUTIONS
-
-4.1 Allocations. Profits and losses shall be allocated to the Members in proportion to their Membership Interests.
-
-4.2 Distributions. Distributions shall be made to the Members at such times and in such amounts as determined by the Members, in proportion to their Membership Interests.
-
-ARTICLE V - MANAGEMENT
-
-5.1 Management. The Company shall be managed by its Member(s).
-
-5.2 Authority. The Member(s) shall have full authority to manage and control the business and affairs of the Company.
-
-ARTICLE VI - DISSOLUTION
-
-The Company shall be dissolved upon:
-(a) The written consent of all Members;
-(b) The occurrence of any event that makes it unlawful to continue the Company's business;
-(c) Any other event specified by law.
-
-ARTICLE VII - MISCELLANEOUS
-
-7.1 Governing Law. This Agreement shall be governed by the laws of [STATE].
-
-7.2 Amendments. This Agreement may be amended only by written consent of all Members.
-
-7.3 Entire Agreement. This Agreement constitutes the entire agreement among the Members.
-
-IN WITNESS WHEREOF, the undersigned have executed this Operating Agreement as of the date first written above.
-
-MEMBER(S):
-
-_____________________
-[MEMBER NAME]
-Date:`
+[Continue with additional provisions...]`
         };
 
         // Get or create room ID
@@ -701,10 +2056,8 @@ Date:`
             window.history.replaceState({}, '', `?room=${roomId}`);
         }
 
-        // Generate unique user ID
         myUserId = Math.random().toString(36).substring(2, 10);
 
-        // Load saved name
         const savedName = localStorage.getItem('terms-law-name');
         if (savedName) document.getElementById('userName').value = savedName;
 
@@ -723,15 +2076,7 @@ Date:`
         document.getElementById('cancelTemplateBtn').addEventListener('click', () => {
             document.getElementById('templateModal').classList.add('hidden');
         });
-        document.getElementById('addCommentBtn').addEventListener('click', addComment);
-        document.getElementById('newComment').addEventListener('keypress', e => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                addComment();
-            }
-        });
 
-        // Template selection
         document.querySelectorAll('.template-card').forEach(card => {
             card.addEventListener('click', () => {
                 const templateKey = card.dataset.template;
@@ -759,35 +2104,28 @@ Date:`
         function initFirebase() {
             contentRef = db.ref(`rooms/${roomId}/content`);
             usersRef = db.ref(`rooms/${roomId}/users`);
-            commentsRef = db.ref(`rooms/${roomId}/comments`);
             metaRef = db.ref(`rooms/${roomId}/meta`);
             myUserRef = usersRef.child(myUserId);
 
             const editor = document.getElementById('editor');
             const sessionNameInput = document.getElementById('sessionName');
 
-            // Add this user to presence
             myUserRef.set({
                 name: userName,
                 color: userColor,
                 timestamp: firebase.database.ServerValue.TIMESTAMP
             });
 
-            // Remove user on disconnect
             myUserRef.onDisconnect().remove();
 
-            // Listen for content changes
             contentRef.on('value', (snapshot) => {
                 if (isLocalUpdate) return;
-
                 const content = snapshot.val() || '';
                 const cursorPos = editor.selectionStart;
-
                 editor.value = content;
                 editor.setSelectionRange(Math.min(cursorPos, content.length), Math.min(cursorPos, content.length));
             });
 
-            // Listen for session name changes
             metaRef.child('name').on('value', (snapshot) => {
                 const name = snapshot.val();
                 if (name && document.activeElement !== sessionNameInput) {
@@ -795,31 +2133,18 @@ Date:`
                 }
             });
 
-            // Listen for user changes
             usersRef.on('value', (snapshot) => {
                 updateUsers(snapshot.val() || {});
             });
 
-            // Listen for comments
-            commentsRef.on('value', (snapshot) => {
-                updateComments(snapshot.val() || {});
-            });
-
-            // Connection state
             db.ref('.info/connected').on('value', (snapshot) => {
                 const connected = snapshot.val();
                 document.getElementById('statusDot').classList.toggle('connected', connected);
                 document.getElementById('statusText').textContent = connected ? 'Connected' : 'Connecting...';
-
-                if (connected) {
-                    showToast(`Joined as ${userName}`);
-                }
+                if (connected) showToast(`Joined as ${userName}`);
             });
 
-            // Editor input -> Firebase
             editor.addEventListener('input', updateContent);
-
-            // Session name change
             sessionNameInput.addEventListener('input', () => {
                 metaRef.child('name').set(sessionNameInput.value);
             });
@@ -846,7 +2171,6 @@ Date:`
         function updateUsers(users) {
             const userList = document.getElementById('userList');
             userList.innerHTML = '';
-
             const userEntries = Object.entries(users);
 
             if (userEntries.length === 0) {
@@ -864,78 +2188,6 @@ Date:`
             });
         }
 
-        function updateComments(comments) {
-            const commentsList = document.getElementById('commentsList');
-            const commentCount = document.getElementById('commentCount');
-            const commentEntries = Object.entries(comments).sort((a, b) => b[1].timestamp - a[1].timestamp);
-
-            commentCount.textContent = commentEntries.length;
-
-            if (commentEntries.length === 0) {
-                commentsList.innerHTML = '<div class="no-comments">No comments yet. Add a comment to start a discussion.</div>';
-                return;
-            }
-
-            commentsList.innerHTML = '';
-            commentEntries.forEach(([id, comment]) => {
-                const isOwner = comment.userId === myUserId;
-                const timeAgo = getTimeAgo(comment.timestamp);
-
-                const item = document.createElement('div');
-                item.className = 'comment-item';
-                item.innerHTML = `
-                    <div class="comment-author">
-                        <span class="dot" style="background:${comment.color}"></span>
-                        <span class="comment-author-name">${comment.author}</span>
-                        <span class="comment-time">${timeAgo}</span>
-                    </div>
-                    <div class="comment-text">${escapeHtml(comment.text)}</div>
-                    ${isOwner ? `
-                    <div class="comment-actions">
-                        <button class="comment-action-btn delete" onclick="deleteComment('${id}')">Delete</button>
-                    </div>
-                    ` : ''}
-                `;
-                commentsList.appendChild(item);
-            });
-        }
-
-        function addComment() {
-            const input = document.getElementById('newComment');
-            const text = input.value.trim();
-            if (!text) return;
-
-            commentsRef.push({
-                text: text,
-                author: userName,
-                userId: myUserId,
-                color: userColor,
-                timestamp: firebase.database.ServerValue.TIMESTAMP
-            });
-
-            input.value = '';
-            showToast('Comment added');
-        }
-
-        function deleteComment(commentId) {
-            commentsRef.child(commentId).remove();
-            showToast('Comment deleted');
-        }
-
-        function getTimeAgo(timestamp) {
-            const seconds = Math.floor((Date.now() - timestamp) / 1000);
-            if (seconds < 60) return 'just now';
-            if (seconds < 3600) return Math.floor(seconds / 60) + 'm ago';
-            if (seconds < 86400) return Math.floor(seconds / 3600) + 'h ago';
-            return Math.floor(seconds / 86400) + 'd ago';
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
         function copyLink() {
             navigator.clipboard.writeText(window.location.href)
                 .then(() => showToast('Link copied!'))
@@ -949,7 +2201,6 @@ Date:`
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
-        // Cleanup on page unload
         window.addEventListener('beforeunload', () => {
             if (myUserRef) myUserRef.remove();
         });
