@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAFE Agreement Generator | Y Combinator Post-Money SAFE | Terms.Law</title>
+  <meta name="description" content="Free SAFE Agreement generator based on Y Combinator's post-money SAFE. Choose valuation cap, discount, or MFN terms. Attorney-drafted with real-time preview.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Dancing+Script:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-primary: #1e40af;
+      --color-primary-dark: #1e3a8a;
+      --color-primary-light: #3b82f6;
+      --color-accent: #7c3aed;
+      --color-accent-light: #8b5cf6;
+      --color-success: #059669;
+      --color-warning: #d97706;
+      --color-danger: #dc2626;
+      --color-bg: #f8fafc;
+      --color-surface: #ffffff;
+      --color-border: #e2e8f0;
+      --color-border-light: #f1f5f9;
+      --color-text: #0f172a;
+      --color-text-secondary: #334155;
+      --color-text-muted: #64748b;
+      --color-text-light: #94a3b8;
+      --color-dark: #0f172a;
+      --color-dark-surface: #1e293b;
+      --doc-bg: #fefefe;
+      --doc-text: #1f2937;
+      --doc-clause-title: #1e40af;
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --radius-full: 9999px;
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-serif: Georgia, 'Times New Roman', serif;
+      --transition-fast: 150ms ease;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body { font-family: var(--font-sans); font-size: 16px; line-height: 1.6; color: var(--color-text); background: var(--color-bg); }
+    .site-header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 0; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); }
+    .header-content { display: flex; align-items: center; justify-content: center; height: 52px; }
+    .header-nav { display: flex; align-items: center; gap: 0; height: 100%; }
+    .nav-link { color: #94a3b8; font-size: 0.85rem; font-weight: 600; padding: 16px 24px; transition: all 150ms ease; text-decoration: none; height: 100%; display: flex; align-items: center; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid transparent; }
+    .nav-link:hover { color: #ffffff; background: rgba(255, 255, 255, 0.05); }
+    .nav-link.active { color: #ffffff; background: rgba(255, 255, 255, 0.08); border-bottom-color: #3b82f6; }
+    .nav-link.home-logo { padding: 12px 20px; font-size: 1.1rem; font-weight: 800; letter-spacing: -0.02em; text-transform: none; }
+    .nav-link.home-logo .logo-text { background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hero { background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #312e81 100%); padding: 2rem 2rem; position: relative; }
+    .hero-content { max-width: 800px; }
+    .hero-badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; background: rgba(124, 58, 237, 0.15); border: 1px solid rgba(124, 58, 237, 0.3); border-radius: var(--radius-full); font-size: 0.8rem; color: #c4b5fd; margin-bottom: 1rem; }
+    .hero h1 { font-size: 2rem; font-weight: 800; color: #fff; line-height: 1.2; margin-bottom: 0.75rem; }
+    .hero h1 .highlight { background: linear-gradient(135deg, #a78bfa, #60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hero-subtitle { font-size: 1rem; color: #94a3b8; line-height: 1.6; }
+    .builder-layout { display: grid; grid-template-columns: 380px 1fr; gap: 0; min-height: calc(100vh - 200px); }
+    @media (max-width: 1024px) { .builder-layout { grid-template-columns: 1fr; } }
+    .builder-sidebar { background: var(--color-surface); border-right: 1px solid var(--color-border); padding: 1.5rem; overflow-y: auto; max-height: calc(100vh - 150px); position: sticky; top: 52px; }
+    .builder-section { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--color-border-light); }
+    .builder-section:last-child { border-bottom: none; margin-bottom: 0; }
+    .builder-section-title { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; }
+    .form-group { margin-bottom: 1rem; }
+    .form-label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--color-text); margin-bottom: 0.35rem; }
+    .form-input, .form-textarea, .form-select { width: 100%; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-md); font-size: 0.9rem; font-family: inherit; transition: all var(--transition-fast); background: var(--color-surface); }
+    .form-input:focus, .form-textarea:focus, .form-select:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1); }
+    .form-textarea { min-height: 80px; resize: vertical; }
+    .form-hint { font-size: 0.75rem; color: var(--color-text-muted); margin-top: 4px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .preview-panel { background: var(--color-bg); padding: 1.5rem; overflow-y: auto; }
+    .preview-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem; }
+    .preview-title { font-size: 0.8rem; font-weight: 700; color: var(--color-text-muted); }
+    .preview-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: var(--radius-md); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all var(--transition-fast); border: none; }
+    .btn-primary { background: var(--color-primary); color: #fff; }
+    .btn-primary:hover { background: var(--color-primary-dark); }
+    .btn-secondary { background: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-border); }
+    .btn-secondary:hover { border-color: var(--color-primary); color: var(--color-primary); }
+    .document-container { background: var(--color-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); overflow: hidden; }
+    .document-header { background: linear-gradient(135deg, var(--color-dark) 0%, var(--color-dark-surface) 100%); padding: 0.75rem 1.5rem; display: flex; align-items: center; justify-content: space-between; }
+    .document-title { color: #fff; font-size: 0.85rem; font-weight: 600; }
+    .document-status { font-size: 0.7rem; color: var(--color-accent-light); }
+    .document-body { padding: 40px 50px; background: var(--doc-bg); font-family: var(--font-serif); font-size: 13px; line-height: 1.8; color: var(--doc-text); }
+    .document-body.full-edit-mode { outline: 3px solid var(--color-primary); background: #fffef8; }
+    .doc-title { text-align: center; font-size: 16px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px; }
+    .doc-subtitle { text-align: center; font-size: 11px; color: var(--color-text-muted); margin-bottom: 25px; font-family: var(--font-sans); }
+    .doc-section-header { font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-top: 20px; margin-bottom: 10px; color: var(--doc-clause-title); border-bottom: 1px solid var(--color-border); padding-bottom: 4px; }
+    .doc-paragraph { margin-bottom: 12px; text-align: justify; }
+    .doc-list { margin: 12px 0 12px 20px; padding-left: 15px; }
+    .doc-list li { margin-bottom: 8px; text-align: justify; }
+    .doc-highlight { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 1px 5px; border-radius: 3px; border-bottom: 2px solid #f59e0b; font-weight: 600; cursor: text; }
+    .doc-highlight:hover { background: linear-gradient(135deg, #fde68a 0%, #fcd34d 100%); }
+    .doc-highlight:focus { outline: none; box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.3); }
+    .doc-highlight.empty { background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); border-bottom-color: #ef4444; color: #dc2626; }
+    @keyframes highlightPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); } 50% { box-shadow: 0 0 0 6px rgba(245, 158, 11, 0.3); } }
+    .field-highlight-animation { animation: highlightPulse 0.6s ease-out; }
+    .doc-signature-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; margin-top: 40px; }
+    .doc-signature-party-title { font-weight: bold; font-size: 11px; text-transform: uppercase; margin-bottom: 15px; color: var(--color-text-muted); }
+    .doc-signature-line { display: flex; align-items: flex-end; margin-bottom: 8px; min-height: 35px; }
+    .doc-signature-line .sig-label { width: 60px; font-size: 10px; color: var(--color-text-muted); }
+    .doc-signature-line .sig-value { flex: 1; border-bottom: 1px solid #333; min-height: 30px; display: flex; align-items: flex-end; padding-bottom: 3px; }
+    .safe-type-card { background: var(--color-bg); border: 2px solid var(--color-border); border-radius: var(--radius-md); padding: 0.75rem; margin-bottom: 0.5rem; cursor: pointer; transition: all var(--transition-fast); }
+    .safe-type-card:hover { border-color: var(--color-primary-light); }
+    .safe-type-card.selected { border-color: var(--color-primary); background: rgba(30, 64, 175, 0.05); }
+    .safe-type-card input { display: none; }
+    .safe-type-name { font-weight: 600; font-size: 0.85rem; margin-bottom: 2px; }
+    .safe-type-desc { font-size: 0.75rem; color: var(--color-text-muted); }
+    .toast { position: fixed; bottom: 20px; right: 20px; background: var(--color-dark); color: #fff; padding: 12px 18px; border-radius: var(--radius-md); font-size: 0.85rem; box-shadow: var(--shadow-xl); transform: translateY(100px); opacity: 0; transition: all 0.3s ease; z-index: 1000; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { background: var(--color-success); }
+    .site-footer { background: var(--color-dark); color: #94a3b8; padding: 2rem; text-align: center; }
+    .footer-brand { font-size: 1.1rem; font-weight: 800; margin-bottom: 0.5rem; }
+    .footer-brand .logo-text { background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    @media (max-width: 768px) { .document-body { padding: 25px 20px; } .doc-signature-row { grid-template-columns: 1fr; } .form-row { grid-template-columns: 1fr; } }
+    @media print { .site-header, .hero, .builder-sidebar, .preview-toolbar, .document-header, .site-footer, .toast { display: none !important; } .builder-layout { display: block; } .preview-panel { padding: 0; } .document-container { box-shadow: none; } .document-body { padding: 0.5in; } .doc-highlight { background: none !important; border: none !important; padding: 0 !important; } }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-content">
+      <nav class="header-nav">
+        <a href="/" class="nav-link home-logo"><span class="logo-text">Terms.Law</span></a>
+        <a href="/Demand-Letters/demand-letters-landing.html" class="nav-link">Demands</a>
+        <a href="contract-library-landing.html" class="nav-link active">Contracts</a>
+        <a href="/INC/formation-landing.html" class="nav-link">Incorporation</a>
+        <a href="/Blog/blog-landing.html" class="nav-link">Blog</a>
+      </nav>
+    </div>
+  </header>
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">Y Combinator Standard</div>
+      <h1><span class="highlight">SAFE</span> Agreement Generator</h1>
+      <p class="hero-subtitle">Generate a Simple Agreement for Future Equity based on Y Combinator's post-money SAFE. Choose valuation cap, discount, or MFN terms.</p>
+    </div>
+  </section>
+  <main class="builder-layout">
+    <aside class="builder-sidebar">
+      <div class="builder-section">
+        <h3 class="builder-section-title">Company Information</h3>
+        <div class="form-group">
+          <label class="form-label">Company Name</label>
+          <input type="text" id="companyName" class="form-input" placeholder="Acme Inc." oninput="trackFieldEdit('companyName')">
+        </div>
+        <div class="form-group">
+          <label class="form-label">State of Incorporation</label>
+          <select id="incState" class="form-select" onchange="trackFieldEdit('incState')">
+            <option value="Delaware">Delaware</option>
+            <option value="California">California</option>
+            <option value="New York">New York</option>
+            <option value="Texas">Texas</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Company Address</label>
+          <input type="text" id="companyAddress" class="form-input" placeholder="123 Startup Way, San Francisco, CA 94102" oninput="trackFieldEdit('companyAddress')">
+        </div>
+      </div>
+      <div class="builder-section">
+        <h3 class="builder-section-title">Investor Information</h3>
+        <div class="form-group">
+          <label class="form-label">Investor Name</label>
+          <input type="text" id="investorName" class="form-input" placeholder="Angel Investor LLC" oninput="trackFieldEdit('investorName')">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Investor Address</label>
+          <input type="text" id="investorAddress" class="form-input" placeholder="456 Capital Ave, Palo Alto, CA 94301" oninput="trackFieldEdit('investorAddress')">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Investment Amount ($)</label>
+          <input type="number" id="investmentAmount" class="form-input" placeholder="50000" oninput="trackFieldEdit('investmentAmount')">
+        </div>
+      </div>
+      <div class="builder-section">
+        <h3 class="builder-section-title">SAFE Type</h3>
+        <label class="safe-type-card" id="typeCapCard">
+          <input type="radio" name="safeType" value="cap" checked onchange="updateSafeType()">
+          <div class="safe-type-name">Valuation Cap</div>
+          <div class="safe-type-desc">Most common. Investor gets equity at lower of cap or next round price.</div>
+        </label>
+        <label class="safe-type-card" id="typeDiscountCard">
+          <input type="radio" name="safeType" value="discount" onchange="updateSafeType()">
+          <div class="safe-type-name">Discount Only</div>
+          <div class="safe-type-desc">Investor gets discount to next round price. No cap protection.</div>
+        </label>
+        <label class="safe-type-card" id="typeBothCard">
+          <input type="radio" name="safeType" value="both" onchange="updateSafeType()">
+          <div class="safe-type-name">Cap + Discount</div>
+          <div class="safe-type-desc">Investor gets the better of cap or discount. Most investor-friendly.</div>
+        </label>
+        <label class="safe-type-card" id="typeMfnCard">
+          <input type="radio" name="safeType" value="mfn" onchange="updateSafeType()">
+          <div class="safe-type-name">MFN (No Cap/Discount)</div>
+          <div class="safe-type-desc">Gets terms of any better SAFEs issued later. Founder-friendly.</div>
+        </label>
+      </div>
+      <div class="builder-section" id="termsSection">
+        <h3 class="builder-section-title">SAFE Terms</h3>
+        <div class="form-group" id="capGroup">
+          <label class="form-label">Valuation Cap ($)</label>
+          <input type="number" id="valuationCap" class="form-input" placeholder="5000000" oninput="trackFieldEdit('valuationCap')">
+          <div class="form-hint">Post-money valuation cap</div>
+        </div>
+        <div class="form-group" id="discountGroup" style="display:none;">
+          <label class="form-label">Discount Rate (%)</label>
+          <input type="number" id="discountRate" class="form-input" placeholder="20" oninput="trackFieldEdit('discountRate')">
+          <div class="form-hint">Typically 15-25%</div>
+        </div>
+      </div>
+      <div class="builder-section">
+        <h3 class="builder-section-title">Additional Terms</h3>
+        <div class="form-group">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" id="proRata" onchange="trackFieldEdit('proRata')">
+            <span class="form-label" style="margin:0;">Pro-rata rights</span>
+          </label>
+          <div class="form-hint">Investor can maintain % in future rounds</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Effective Date</label>
+          <input type="date" id="effectiveDate" class="form-input" oninput="trackFieldEdit('effectiveDate')">
+        </div>
+      </div>
+    </aside>
+    <div class="preview-panel">
+      <div class="preview-toolbar">
+        <div class="preview-title">Live Preview - Click highlighted text to edit</div>
+        <div class="preview-actions">
+          <button class="btn btn-secondary" onclick="copyToClipboard()">Copy</button>
+          <button class="btn btn-secondary" onclick="window.print()">Print</button>
+          <button class="btn btn-primary" onclick="downloadDocument()">Download</button>
+        </div>
+      </div>
+      <div class="document-container">
+        <div class="document-header">
+          <span class="document-title">SAFE Agreement</span>
+          <span class="document-status">Live</span>
+        </div>
+        <div class="document-body" id="documentPreview"></div>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer">
+    <div class="footer-brand"><span class="logo-text">Terms.Law</span></div>
+    <p>2024 Terms.Law - Sergei Tokmakov, Esq.</p>
+  </footer>
+  <div class="toast" id="toast"></div>
+  <script>
+    let lastEditedField = null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('effectiveDate').value = new Date().toISOString().split('T')[0];
+      updateSafeType();
+      updatePreview();
+    });
+
+    function updateSafeType() {
+      const type = document.querySelector('input[name="safeType"]:checked').value;
+      document.querySelectorAll('.safe-type-card').forEach(c => c.classList.remove('selected'));
+      document.getElementById('type' + type.charAt(0).toUpperCase() + type.slice(1) + 'Card').classList.add('selected');
+
+      const capGroup = document.getElementById('capGroup');
+      const discountGroup = document.getElementById('discountGroup');
+
+      if (type === 'cap') {
+        capGroup.style.display = 'block';
+        discountGroup.style.display = 'none';
+      } else if (type === 'discount') {
+        capGroup.style.display = 'none';
+        discountGroup.style.display = 'block';
+      } else if (type === 'both') {
+        capGroup.style.display = 'block';
+        discountGroup.style.display = 'block';
+      } else {
+        capGroup.style.display = 'none';
+        discountGroup.style.display = 'none';
+      }
+      updatePreview();
+    }
+
+    function trackFieldEdit(fieldId) { lastEditedField = fieldId; updatePreview(); }
+
+    function formatCurrency(num) {
+      if (!num) return '';
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(num);
+    }
+
+    function updatePreview() {
+      const h = (v, p, f) => `<span class="doc-highlight${!v?' empty':''}" data-field="${f}" contenteditable="true">${v||'['+p+']'}</span>`;
+
+      const companyName = document.getElementById('companyName').value;
+      const incState = document.getElementById('incState').value;
+      const companyAddress = document.getElementById('companyAddress').value;
+      const investorName = document.getElementById('investorName').value;
+      const investorAddress = document.getElementById('investorAddress').value;
+      const investmentAmount = document.getElementById('investmentAmount').value;
+      const valuationCap = document.getElementById('valuationCap').value;
+      const discountRate = document.getElementById('discountRate').value;
+      const proRata = document.getElementById('proRata').checked;
+      const effectiveDate = document.getElementById('effectiveDate').value;
+      const safeType = document.querySelector('input[name="safeType"]:checked').value;
+
+      const formattedDate = effectiveDate ? new Date(effectiveDate+'T00:00:00').toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}) : '';
+      const formattedAmount = formatCurrency(investmentAmount);
+      const formattedCap = formatCurrency(valuationCap);
+      const discountMultiplier = discountRate ? (100 - parseFloat(discountRate)) / 100 : 0.8;
+
+      let safeTypeTitle = '';
+      let conversionTerms = '';
+
+      if (safeType === 'cap') {
+        safeTypeTitle = 'POST-MONEY SAFE - VALUATION CAP';
+        conversionTerms = `
+          <p class="doc-paragraph"><strong>(a) Equity Financing.</strong> If there is an Equity Financing before the termination of this Safe, on the initial closing of such Equity Financing, this Safe will automatically convert into the number of shares of Safe Preferred Stock equal to the Purchase Amount divided by the Conversion Price.</p>
+          <p class="doc-paragraph">The "<strong>Conversion Price</strong>" means the price per share equal to the Post-Money Valuation Cap divided by the Company Capitalization.</p>
+          <p class="doc-paragraph">The "<strong>Post-Money Valuation Cap</strong>" is ${h(formattedCap,'$5,000,000','valuationCap')}.</p>
+        `;
+      } else if (safeType === 'discount') {
+        safeTypeTitle = 'POST-MONEY SAFE - DISCOUNT';
+        conversionTerms = `
+          <p class="doc-paragraph"><strong>(a) Equity Financing.</strong> If there is an Equity Financing before the termination of this Safe, on the initial closing of such Equity Financing, this Safe will automatically convert into the number of shares of Safe Preferred Stock equal to the Purchase Amount divided by the Discount Price.</p>
+          <p class="doc-paragraph">The "<strong>Discount Price</strong>" means the price per share of the Standard Preferred Stock sold in the Equity Financing multiplied by the Discount Rate.</p>
+          <p class="doc-paragraph">The "<strong>Discount Rate</strong>" is ${h(discountRate ? (100-parseFloat(discountRate))+'%' : '80%','80%','discountRate')} (representing a ${h(discountRate||'20','20','discountRate')}% discount).</p>
+        `;
+      } else if (safeType === 'both') {
+        safeTypeTitle = 'POST-MONEY SAFE - VALUATION CAP AND DISCOUNT';
+        conversionTerms = `
+          <p class="doc-paragraph"><strong>(a) Equity Financing.</strong> If there is an Equity Financing before the termination of this Safe, on the initial closing of such Equity Financing, this Safe will automatically convert into the number of shares of Safe Preferred Stock equal to the Purchase Amount divided by the Conversion Price.</p>
+          <p class="doc-paragraph">The "<strong>Conversion Price</strong>" means the lower of: (i) the Post-Money Valuation Cap divided by the Company Capitalization, or (ii) the Discount Price.</p>
+          <p class="doc-paragraph">The "<strong>Post-Money Valuation Cap</strong>" is ${h(formattedCap,'$5,000,000','valuationCap')}.</p>
+          <p class="doc-paragraph">The "<strong>Discount Rate</strong>" is ${h(discountRate ? (100-parseFloat(discountRate))+'%' : '80%','80%','discountRate')} (representing a ${h(discountRate||'20','20','discountRate')}% discount).</p>
+        `;
+      } else {
+        safeTypeTitle = 'POST-MONEY SAFE - MFN';
+        conversionTerms = `
+          <p class="doc-paragraph"><strong>(a) Equity Financing.</strong> If there is an Equity Financing before the termination of this Safe, on the initial closing of such Equity Financing, this Safe will automatically convert into the number of shares of Safe Preferred Stock equal to the Purchase Amount divided by the price per share of the Standard Preferred Stock.</p>
+          <p class="doc-paragraph"><strong>MFN Provision:</strong> If the Company issues any subsequent Simple Agreements for Future Equity (or similar convertible instruments) with terms more favorable to investors than this Safe, the Investor may elect to amend this Safe to include such more favorable terms.</p>
+        `;
+      }
+
+      const proRataSection = proRata ? `
+        <div class="doc-section-header">Pro-Rata Rights</div>
+        <p class="doc-paragraph">The Investor shall have the right to participate in future Equity Financings on a pro-rata basis. The Investor's pro-rata rights shall be calculated based on the ratio of (a) the number of shares of Common Stock underlying the Safe Preferred Stock held by the Investor, to (b) the Company Capitalization as of immediately prior to such Equity Financing.</p>
+      ` : '';
+
+      document.getElementById('documentPreview').innerHTML = `
+        <div class="doc-title">${safeTypeTitle}</div>
+        <p class="doc-subtitle">Effective ${h(formattedDate,'Date','effectiveDate')}</p>
+
+        <p class="doc-paragraph">THIS CERTIFIES THAT in exchange for the payment by ${h(investorName,'Investor Name','investorName')} (the "<strong>Investor</strong>") of ${h(formattedAmount,'$50,000','investmentAmount')} (the "<strong>Purchase Amount</strong>") on or about the date hereof, ${h(companyName,'Company Name','companyName')}, a ${h(incState,'Delaware','incState')} corporation (the "<strong>Company</strong>"), issues to the Investor the right to certain shares of the Company's Capital Stock, subject to the terms described below.</p>
+
+        <div class="doc-section-header">1. Events</div>
+        ${conversionTerms}
+
+        <p class="doc-paragraph"><strong>(b) Liquidity Event.</strong> If there is a Liquidity Event before the termination of this Safe, this Safe will automatically be entitled (subject to the liquidation preferences of any series of Preferred Stock) to receive a portion of Proceeds, due and payable immediately prior to or concurrent with the consummation of such Liquidity Event, equal to the greater of (i) the Purchase Amount or (ii) the amount payable on the number of shares of Common Stock equal to the Purchase Amount divided by the Liquidity Price.</p>
+
+        <p class="doc-paragraph"><strong>(c) Dissolution Event.</strong> If there is a Dissolution Event before the termination of this Safe, the Investor will automatically be entitled to receive a portion of Proceeds equal to the Purchase Amount, due and payable immediately prior to the consummation of the Dissolution Event.</p>
+
+        <div class="doc-section-header">2. Definitions</div>
+        <p class="doc-paragraph">"<strong>Capital Stock</strong>" means the capital stock of the Company, including, without limitation, the Common Stock and Preferred Stock.</p>
+        <p class="doc-paragraph">"<strong>Company Capitalization</strong>" means the sum, as of immediately prior to the Equity Financing, of: (1) all shares of Capital Stock (on an as-converted basis) issued and outstanding, assuming exercise or conversion of all outstanding vested and unvested options, warrants and other convertible securities, but excluding (A) this Safe, (B) all other Safes, and (C) convertible promissory notes; and (2) all shares of Common Stock reserved and available for future grant under any equity incentive or similar plan of the Company.</p>
+        <p class="doc-paragraph">"<strong>Equity Financing</strong>" means a bona fide transaction or series of transactions with the principal purpose of raising capital, pursuant to which the Company issues and sells Preferred Stock at a fixed valuation.</p>
+        <p class="doc-paragraph">"<strong>Liquidity Event</strong>" means a Change of Control or an IPO.</p>
+        <p class="doc-paragraph">"<strong>Liquidity Price</strong>" means the price per share equal to: the Post-Money Valuation Cap divided by the Company Capitalization, calculated as of immediately prior to the Liquidity Event.</p>
+        <p class="doc-paragraph">"<strong>Safe Preferred Stock</strong>" means the shares of the series of Preferred Stock issued to the Investor in an Equity Financing.</p>
+
+        ${proRataSection}
+
+        <div class="doc-section-header">3. Company Representations</div>
+        <p class="doc-paragraph">The Company represents and warrants that: (a) it is a corporation duly organized, validly existing and in good standing under the laws of ${h(incState,'State','incState')}; (b) the execution and delivery of this Safe is within the Company's powers and has been duly authorized; and (c) this Safe constitutes a valid and binding obligation of the Company.</p>
+
+        <div class="doc-section-header">4. Investor Representations</div>
+        <p class="doc-paragraph">The Investor represents that: (a) the Investor has full legal capacity, power and authority to execute and deliver this Safe; (b) the Investor is an accredited investor as defined in Rule 501(a) of Regulation D promulgated under the Securities Act; and (c) the Investor is acquiring this Safe for investment for the Investor's own account.</p>
+
+        <div class="doc-section-header">5. Miscellaneous</div>
+        <p class="doc-paragraph"><strong>(a) Governing Law.</strong> This Safe shall be governed by the laws of the State of ${h(incState,'State','incState')}, without regard to conflict of law principles.</p>
+        <p class="doc-paragraph"><strong>(b) Amendment.</strong> This Safe may only be amended with the written consent of the Company and the Investor.</p>
+        <p class="doc-paragraph"><strong>(c) Notices.</strong> All notices under this Safe shall be in writing and sent to the addresses set forth below or as subsequently modified by written notice.</p>
+
+        <p class="doc-paragraph" style="margin-top:30px;"><strong>IN WITNESS WHEREOF</strong>, the undersigned have executed this Safe as of the date first written above.</p>
+
+        <div class="doc-signature-row">
+          <div>
+            <div class="doc-signature-party-title">Company: ${companyName || '[Company Name]'}</div>
+            <div class="doc-signature-line"><span class="sig-label">Sign:</span><span class="sig-value"></span></div>
+            <div class="doc-signature-line"><span class="sig-label">Name:</span><span class="sig-value"></span></div>
+            <div class="doc-signature-line"><span class="sig-label">Title:</span><span class="sig-value"></span></div>
+            <div class="doc-signature-line"><span class="sig-label">Address:</span><span class="sig-value">${companyAddress || ''}</span></div>
+          </div>
+          <div>
+            <div class="doc-signature-party-title">Investor: ${investorName || '[Investor Name]'}</div>
+            <div class="doc-signature-line"><span class="sig-label">Sign:</span><span class="sig-value"></span></div>
+            <div class="doc-signature-line"><span class="sig-label">Name:</span><span class="sig-value"></span></div>
+            <div class="doc-signature-line"><span class="sig-label">Title:</span><span class="sig-value"></span></div>
+            <div class="doc-signature-line"><span class="sig-label">Address:</span><span class="sig-value">${investorAddress || ''}</span></div>
+          </div>
+        </div>
+      `;
+
+      if(lastEditedField){
+        setTimeout(()=>{
+          const el = document.querySelector(`[data-field="${lastEditedField}"]`);
+          if(el){
+            el.scrollIntoView({behavior:'smooth',block:'center'});
+            el.classList.add('field-highlight-animation');
+            setTimeout(()=>el.classList.remove('field-highlight-animation'),600);
+          }
+        },50);
+      }
+    }
+
+    function showToast(msg,type=''){
+      const t=document.getElementById('toast');
+      t.textContent=msg;
+      t.className='toast show'+(type?' '+type:'');
+      setTimeout(()=>t.classList.remove('show'),3000);
+    }
+
+    function copyToClipboard(){
+      const r=document.createRange();
+      r.selectNode(document.getElementById('documentPreview'));
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(r);
+      document.execCommand('copy');
+      window.getSelection().removeAllRanges();
+      showToast('Copied!','success');
+    }
+
+    function downloadDocument(){
+      const c=document.getElementById('documentPreview').innerHTML;
+      const safeType = document.querySelector('input[name="safeType"]:checked').value;
+      const typeLabel = {cap:'Valuation-Cap',discount:'Discount',both:'Cap-and-Discount',mfn:'MFN'}[safeType];
+      const h=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>SAFE Agreement</title><style>body{font-family:Georgia,serif;max-width:8.5in;margin:1in auto;line-height:1.8;font-size:12pt}.doc-title{text-align:center;font-size:14pt;font-weight:bold;text-transform:uppercase;letter-spacing:2px}.doc-subtitle{text-align:center;font-size:10pt;color:#666;margin-bottom:20px}.doc-section-header{font-weight:bold;text-transform:uppercase;margin-top:20px;border-bottom:1px solid #ccc;font-size:11pt}.doc-paragraph{margin:12px 0;text-align:justify}.doc-highlight{background:#fef3c7}.doc-signature-row{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:40px}.doc-signature-party-title{font-weight:bold;text-transform:uppercase;margin-bottom:15px;font-size:10pt}.doc-signature-line{display:flex;margin-bottom:8px;min-height:30px}.doc-signature-line .sig-label{width:60px;font-size:9pt;color:#666}.doc-signature-line .sig-value{flex:1;border-bottom:1px solid #333}</style></head><body>${c}</body></html>`;
+      const b=new Blob([h],{type:'text/html'});
+      const u=URL.createObjectURL(b);
+      const a=document.createElement('a');
+      a.href=u;
+      a.download=`SAFE-Agreement-${typeLabel}.html`;
+      a.click();
+      URL.revokeObjectURL(u);
+      showToast('Downloaded!','success');
+    }
+  </script>
+</body>
+</html>
