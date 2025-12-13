@@ -1,28 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-901N2Y3CDZ"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-901N2Y3CDZ');
-    </script>
+    <!-- NOINDEX - Confidential client portal -->
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="googlebot" content="noindex, nofollow">
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Terms.Law - Collaborative Document Editor</title>
 
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: #f8f9fa;
             min-height: 100vh;
         }
-
         .header {
             background: #1a1a2e;
             color: white;
@@ -31,12 +28,9 @@
             justify-content: space-between;
             align-items: center;
         }
-
         .logo { font-size: 20px; font-weight: 600; }
         .logo span { color: #6366f1; }
-
         .header-actions { display: flex; gap: 12px; align-items: center; }
-
         .connection-status {
             display: flex;
             align-items: center;
@@ -46,16 +40,13 @@
             background: rgba(255,255,255,0.1);
             border-radius: 20px;
         }
-
         .status-dot {
             width: 8px;
             height: 8px;
             border-radius: 50%;
             background: #fbbf24;
         }
-
         .status-dot.connected { background: #22c55e; }
-
         .btn {
             padding: 10px 20px;
             border-radius: 8px;
@@ -64,16 +55,13 @@
             font-weight: 500;
             cursor: pointer;
         }
-
         .btn-primary { background: #6366f1; color: white; }
         .btn-secondary { background: rgba(255,255,255,0.15); color: white; }
-
         .main-content {
             max-width: 900px;
             margin: 0 auto;
             padding: 24px;
         }
-
         .users-panel {
             background: white;
             border-radius: 12px;
@@ -81,16 +69,13 @@
             margin-bottom: 16px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
-
         .users-panel h3 {
             font-size: 14px;
             color: #6b7280;
             margin-bottom: 12px;
             text-transform: uppercase;
         }
-
         .user-list { display: flex; flex-wrap: wrap; gap: 8px; }
-
         .user-badge {
             display: flex;
             align-items: center;
@@ -100,25 +85,21 @@
             border-radius: 20px;
             font-size: 14px;
         }
-
         .user-badge .dot {
             width: 10px;
             height: 10px;
             border-radius: 50%;
         }
-
         .user-badge.you {
             background: #ecfdf5;
             border: 1px solid #22c55e;
         }
-
         .editor-container {
             background: white;
             border-radius: 12px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             overflow: hidden;
         }
-
         #editor {
             width: 100%;
             min-height: 500px;
@@ -130,7 +111,6 @@
             font-family: inherit;
             resize: vertical;
         }
-
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -140,7 +120,6 @@
             justify-content: center;
             z-index: 1000;
         }
-
         .modal {
             background: white;
             padding: 32px;
@@ -149,10 +128,8 @@
             width: 90%;
             text-align: center;
         }
-
         .modal h2 { margin-bottom: 8px; color: #1a1a2e; }
         .modal p { color: #6b7280; margin-bottom: 24px; }
-
         .modal input {
             width: 100%;
             padding: 14px 16px;
@@ -162,10 +139,8 @@
             margin-bottom: 16px;
             outline: none;
         }
-
         .modal input:focus { border-color: #6366f1; }
         .modal .btn { width: 100%; padding: 14px; }
-
         .toast {
             position: fixed;
             bottom: 24px;
@@ -179,10 +154,8 @@
             transition: all 0.3s;
             z-index: 1001;
         }
-
         .toast.show { transform: translateY(0); opacity: 1; }
         .hidden { display: none !important; }
-
         .debug-info {
             background: #fef3c7;
             border: 1px solid #f59e0b;
@@ -222,7 +195,7 @@
         </div>
 
         <div class="editor-container">
-            <textarea id="editor" placeholder="Start typing..."></textarea>
+            <textarea id="editor" placeholder="Start typing... Changes sync in real-time."></textarea>
         </div>
     </main>
 
@@ -237,24 +210,41 @@
 
     <div class="toast" id="toast"></div>
 
-    <script type="module">
-        // Use proven working CDN URLs
-        const Y = await import('https://cdn.jsdelivr.net/npm/yjs@13.6.10/+esm');
-        const { WebsocketProvider } = await import('https://cdn.jsdelivr.net/npm/y-websocket@2.0.3/+esm');
+    <script>
+        // Firebase config (public demo database)
+        const firebaseConfig = {
+            apiKey: "AIzaSyD1nmPKICxYvBRFzVCg_O6Avo3XQTSI6S4",
+            authDomain: "terms-law-collab.firebaseapp.com",
+            databaseURL: "https://terms-law-collab-default-rtdb.firebaseio.com",
+            projectId: "terms-law-collab",
+            storageBucket: "terms-law-collab.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abc123"
+        };
 
-        let ydoc, provider, ytext;
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
         let userName = '';
         let userColor = '';
+        let roomId = '';
+        let myUserId = '';
+        let contentRef, usersRef, myUserRef;
+        let isLocalUpdate = false;
         const userColors = ['#ef4444', '#3b82f6', '#22c55e', '#f59e0b', '#8b5cf6', '#ec4899'];
 
         // Get or create room ID
         const urlParams = new URLSearchParams(window.location.search);
-        let roomId = urlParams.get('room');
+        roomId = urlParams.get('room');
         if (!roomId) {
             roomId = Math.random().toString(36).substring(2, 14);
             window.history.replaceState({}, '', `?room=${roomId}`);
         }
         document.getElementById('debugRoom').textContent = roomId;
+
+        // Generate unique user ID
+        myUserId = Math.random().toString(36).substring(2, 10);
 
         // Load saved name
         const savedName = localStorage.getItem('terms-law-name');
@@ -278,120 +268,90 @@
             userColor = userColors[Math.floor(Math.random() * userColors.length)];
             document.getElementById('joinModal').classList.add('hidden');
 
-            initCollab();
+            initFirebase();
         }
 
-        function initCollab() {
-            document.getElementById('debugStatus').textContent = 'Initializing...';
+        function initFirebase() {
+            document.getElementById('debugStatus').textContent = 'Connecting...';
 
-            ydoc = new Y.Doc();
-            ytext = ydoc.getText('content');
-
-            provider = new WebsocketProvider(
-                'wss://demos.yjs.dev/ws',
-                `terms-law-${roomId}`,
-                ydoc
-            );
-
-            provider.awareness.setLocalStateField('user', {
-                name: userName,
-                color: userColor
-            });
+            contentRef = db.ref(`rooms/${roomId}/content`);
+            usersRef = db.ref(`rooms/${roomId}/users`);
+            myUserRef = usersRef.child(myUserId);
 
             const editor = document.getElementById('editor');
 
-            // Connection events
-            provider.on('status', e => {
-                const connected = e.status === 'connected';
-                document.getElementById('statusDot').classList.toggle('connected', connected);
-                document.getElementById('statusText').textContent = connected ? 'Connected' : 'Connecting...';
-                document.getElementById('debugStatus').textContent = e.status;
+            // Add this user to presence
+            myUserRef.set({
+                name: userName,
+                color: userColor,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
             });
 
-            provider.on('sync', synced => {
-                document.getElementById('debugStatus').textContent = synced ? 'Synced' : 'Syncing...';
-                if (synced) {
-                    // Load content from Yjs and set lastValue
-                    const content = ytext.toString();
-                    editor.value = content;
-                    lastValue = content;
+            // Remove user on disconnect
+            myUserRef.onDisconnect().remove();
+
+            // Listen for content changes
+            contentRef.on('value', (snapshot) => {
+                if (isLocalUpdate) return;
+
+                const content = snapshot.val() || '';
+                const cursorPos = editor.selectionStart;
+
+                editor.value = content;
+                editor.setSelectionRange(Math.min(cursorPos, content.length), Math.min(cursorPos, content.length));
+
+                document.getElementById('debugStatus').textContent = 'Synced';
+            });
+
+            // Listen for user changes
+            usersRef.on('value', (snapshot) => {
+                updateUsers(snapshot.val() || {});
+            });
+
+            // Connection state
+            db.ref('.info/connected').on('value', (snapshot) => {
+                const connected = snapshot.val();
+                document.getElementById('statusDot').classList.toggle('connected', connected);
+                document.getElementById('statusText').textContent = connected ? 'Connected' : 'Connecting...';
+
+                if (connected) {
                     showToast(`Joined as ${userName}`);
                 }
             });
 
-            provider.awareness.on('change', updateUsers);
-
-            // Track last known value for diffing
-            let lastValue = '';
-            let isRemoteUpdate = false;
-
-            // Simple approach: just sync the full text
-            let syncing = false;
-
-            // Editor -> Yjs
+            // Editor input -> Firebase
+            let debounceTimer;
             editor.addEventListener('input', () => {
-                if (syncing) return;
-                syncing = true;
-
-                const content = editor.value;
-                console.log('LOCAL INPUT:', content.substring(0, 30) + '...');
-
-                ydoc.transact(() => {
-                    ytext.delete(0, ytext.length);
-                    ytext.insert(0, content);
-                }, 'local');
-
-                syncing = false;
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    isLocalUpdate = true;
+                    contentRef.set(editor.value).then(() => {
+                        isLocalUpdate = false;
+                    });
+                }, 50);
             });
-
-            // Yjs -> Editor (only for remote changes)
-            ytext.observe(event => {
-                console.log('YTEXT OBSERVE - local:', event.transaction.local, 'origin:', event.transaction.origin);
-
-                // Skip if this was our own change
-                if (event.transaction.origin === 'local') {
-                    console.log('Skipping local change');
-                    return;
-                }
-
-                syncing = true;
-                const cursorPos = editor.selectionStart;
-                const newContent = ytext.toString();
-                console.log('REMOTE UPDATE:', newContent.substring(0, 30) + '...');
-
-                editor.value = newContent;
-                editor.setSelectionRange(Math.min(cursorPos, newContent.length), Math.min(cursorPos, newContent.length));
-                syncing = false;
-            });
-
-            // Initialize lastValue
-            lastValue = ytext.toString() || '';
-
-            setTimeout(updateUsers, 500);
         }
 
-        function updateUsers() {
-            if (!provider) return;
+        function updateUsers(users) {
             const userList = document.getElementById('userList');
             userList.innerHTML = '';
 
-            const states = provider.awareness.getStates();
-            let count = 0;
+            const userEntries = Object.entries(users);
+            document.getElementById('debugUsers').textContent = userEntries.length;
 
-            states.forEach((state, clientId) => {
-                if (state.user) {
-                    const isYou = clientId === provider.awareness.clientID;
-                    const badge = document.createElement('div');
-                    badge.className = `user-badge${isYou ? ' you' : ''}`;
-                    badge.innerHTML = `<span class="dot" style="background:${state.user.color}"></span>
-                        <span>${state.user.name}${isYou ? ' (you)' : ''}</span>`;
-                    userList.appendChild(badge);
-                    count++;
-                }
+            if (userEntries.length === 0) {
+                userList.innerHTML = '<span style="color:#9ca3af;">Waiting...</span>';
+                return;
+            }
+
+            userEntries.forEach(([id, user]) => {
+                const isYou = id === myUserId;
+                const badge = document.createElement('div');
+                badge.className = `user-badge${isYou ? ' you' : ''}`;
+                badge.innerHTML = `<span class="dot" style="background:${user.color}"></span>
+                    <span>${user.name}${isYou ? ' (you)' : ''}</span>`;
+                userList.appendChild(badge);
             });
-
-            document.getElementById('debugUsers').textContent = count;
-            if (!count) userList.innerHTML = '<span style="color:#9ca3af;">Waiting...</span>';
         }
 
         function copyLink() {
@@ -406,6 +366,11 @@
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (myUserRef) myUserRef.remove();
+        });
     </script>
 </body>
 </html>
