@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-901N2Y3CDZ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-901N2Y3CDZ');
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Terms.Law - Collaborative Document Editor</title>
@@ -119,6 +128,7 @@
             border: none;
             outline: none;
             font-family: inherit;
+            resize: vertical;
         }
 
         .modal-overlay {
@@ -212,7 +222,7 @@
         </div>
 
         <div class="editor-container">
-            <div id="editor" contenteditable="true">Start typing here...</div>
+            <textarea id="editor" placeholder="Start typing..."></textarea>
         </div>
     </main>
 
@@ -301,54 +311,79 @@
             provider.on('sync', synced => {
                 document.getElementById('debugStatus').textContent = synced ? 'Synced' : 'Syncing...';
                 if (synced) {
-                    // Load content from Yjs
+                    // Load content from Yjs and set lastValue
                     const content = ytext.toString();
-                    if (content) editor.innerText = content;
+                    editor.value = content;
+                    lastValue = content;
                     showToast(`Joined as ${userName}`);
                 }
             });
 
             provider.awareness.on('change', updateUsers);
 
-            // Sync editor -> Yjs (debounced)
-            let timeout;
+            // Track last known value for diffing
+            let lastValue = '';
+            let isRemoteUpdate = false;
+
+            // Sync editor -> Yjs with proper character-level diff
             editor.addEventListener('input', () => {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => {
-                    const content = editor.innerText;
+                if (isRemoteUpdate) return;
+
+                const newValue = editor.value;
+                const oldValue = lastValue;
+
+                // Find common prefix
+                let start = 0;
+                while (start < oldValue.length && start < newValue.length && oldValue[start] === newValue[start]) {
+                    start++;
+                }
+
+                // Find common suffix
+                let oldEnd = oldValue.length;
+                let newEnd = newValue.length;
+                while (oldEnd > start && newEnd > start && oldValue[oldEnd - 1] === newValue[newEnd - 1]) {
+                    oldEnd--;
+                    newEnd--;
+                }
+
+                // Apply diff to Yjs
+                const deleteCount = oldEnd - start;
+                const insertText = newValue.slice(start, newEnd);
+
+                if (deleteCount > 0 || insertText.length > 0) {
                     ydoc.transact(() => {
-                        ytext.delete(0, ytext.length);
-                        ytext.insert(0, content);
+                        if (deleteCount > 0) {
+                            ytext.delete(start, deleteCount);
+                        }
+                        if (insertText.length > 0) {
+                            ytext.insert(start, insertText);
+                        }
                     });
-                }, 100);
+                }
+
+                lastValue = newValue;
             });
 
             // Sync Yjs -> editor
             ytext.observe(event => {
-                if (!event.transaction.local) {
-                    const sel = window.getSelection();
-                    const hadFocus = document.activeElement === editor;
-                    let cursorOffset = 0;
-                    if (hadFocus && sel.rangeCount > 0) {
-                        cursorOffset = sel.getRangeAt(0).startOffset;
-                    }
+                if (event.transaction.local) return;
 
-                    editor.innerText = ytext.toString();
+                isRemoteUpdate = true;
 
-                    // Restore cursor
-                    if (hadFocus) {
-                        try {
-                            const range = document.createRange();
-                            const textNode = editor.firstChild || editor;
-                            const offset = Math.min(cursorOffset, textNode.length || 0);
-                            range.setStart(textNode, offset);
-                            range.collapse(true);
-                            sel.removeAllRanges();
-                            sel.addRange(range);
-                        } catch (e) {}
-                    }
-                }
+                const cursorPos = editor.selectionStart;
+                const newContent = ytext.toString();
+                editor.value = newContent;
+                lastValue = newContent;
+
+                // Restore cursor position
+                const newPos = Math.min(cursorPos, newContent.length);
+                editor.setSelectionRange(newPos, newPos);
+
+                isRemoteUpdate = false;
             });
+
+            // Initialize lastValue
+            lastValue = ytext.toString() || '';
 
             setTimeout(updateUsers, 500);
         }
