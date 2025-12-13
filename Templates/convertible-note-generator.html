@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Convertible Note Generator | Convertible Promissory Note | Terms.Law</title>
+  <meta name="description" content="Free Convertible Note generator for startup financing. Customize interest rate, maturity, valuation cap, and discount. Attorney-drafted with real-time preview.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Dancing+Script:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-primary: #1e40af;
+      --color-primary-dark: #1e3a8a;
+      --color-primary-light: #3b82f6;
+      --color-accent: #7c3aed;
+      --color-accent-light: #8b5cf6;
+      --color-success: #059669;
+      --color-warning: #d97706;
+      --color-danger: #dc2626;
+      --color-bg: #f8fafc;
+      --color-surface: #ffffff;
+      --color-border: #e2e8f0;
+      --color-border-light: #f1f5f9;
+      --color-text: #0f172a;
+      --color-text-secondary: #334155;
+      --color-text-muted: #64748b;
+      --color-text-light: #94a3b8;
+      --color-dark: #0f172a;
+      --color-dark-surface: #1e293b;
+      --doc-bg: #fefefe;
+      --doc-text: #1f2937;
+      --doc-clause-title: #1e40af;
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --radius-full: 9999px;
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-serif: Georgia, 'Times New Roman', serif;
+      --transition-fast: 150ms ease;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body { font-family: var(--font-sans); font-size: 16px; line-height: 1.6; color: var(--color-text); background: var(--color-bg); }
+    .site-header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 0; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); }
+    .header-content { display: flex; align-items: center; justify-content: center; height: 52px; }
+    .header-nav { display: flex; align-items: center; gap: 0; height: 100%; }
+    .nav-link { color: #94a3b8; font-size: 0.85rem; font-weight: 600; padding: 16px 24px; transition: all 150ms ease; text-decoration: none; height: 100%; display: flex; align-items: center; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid transparent; }
+    .nav-link:hover { color: #ffffff; background: rgba(255, 255, 255, 0.05); }
+    .nav-link.active { color: #ffffff; background: rgba(255, 255, 255, 0.08); border-bottom-color: #3b82f6; }
+    .nav-link.home-logo { padding: 12px 20px; font-size: 1.1rem; font-weight: 800; letter-spacing: -0.02em; text-transform: none; }
+    .nav-link.home-logo .logo-text { background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hero { background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #312e81 100%); padding: 2rem 2rem; position: relative; }
+    .hero-content { max-width: 800px; }
+    .hero-badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; background: rgba(124, 58, 237, 0.15); border: 1px solid rgba(124, 58, 237, 0.3); border-radius: var(--radius-full); font-size: 0.8rem; color: #c4b5fd; margin-bottom: 1rem; }
+    .hero h1 { font-size: 2rem; font-weight: 800; color: #fff; line-height: 1.2; margin-bottom: 0.75rem; }
+    .hero h1 .highlight { background: linear-gradient(135deg, #a78bfa, #60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .hero-subtitle { font-size: 1rem; color: #94a3b8; line-height: 1.6; }
+    .builder-layout { display: grid; grid-template-columns: 380px 1fr; gap: 0; min-height: calc(100vh - 200px); }
+    @media (max-width: 1024px) { .builder-layout { grid-template-columns: 1fr; } }
+    .builder-sidebar { background: var(--color-surface); border-right: 1px solid var(--color-border); padding: 1.5rem; overflow-y: auto; max-height: calc(100vh - 150px); position: sticky; top: 52px; }
+    .builder-section { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--color-border-light); }
+    .builder-section:last-child { border-bottom: none; margin-bottom: 0; }
+    .builder-section-title { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; }
+    .form-group { margin-bottom: 1rem; }
+    .form-label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--color-text); margin-bottom: 0.35rem; }
+    .form-input, .form-textarea, .form-select { width: 100%; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-md); font-size: 0.9rem; font-family: inherit; transition: all var(--transition-fast); background: var(--color-surface); }
+    .form-input:focus, .form-textarea:focus, .form-select:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1); }
+    .form-textarea { min-height: 80px; resize: vertical; }
+    .form-hint { font-size: 0.75rem; color: var(--color-text-muted); margin-top: 4px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .preview-panel { background: var(--color-bg); padding: 1.5rem; overflow-y: auto; }
+    .preview-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem; }
+    .preview-title { font-size: 0.8rem; font-weight: 700; color: var(--color-text-muted); }
+    .preview-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: var(--radius-md); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all var(--transition-fast); border: none; }
+    .btn-primary { background: var(--color-primary); color: #fff; }
+    .btn-primary:hover { background: var(--color-primary-dark); }
+    .btn-secondary { background: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-border); }
+    .btn-secondary:hover { border-color: var(--color-primary); color: var(--color-primary); }
+    .document-container { background: var(--color-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); overflow: hidden; }
+    .document-header { background: linear-gradient(135deg, var(--color-dark) 0%, var(--color-dark-surface) 100%); padding: 0.75rem 1.5rem; display: flex; align-items: center; justify-content: space-between; }
+    .document-title { color: #fff; font-size: 0.85rem; font-weight: 600; }
+    .document-status { font-size: 0.7rem; color: var(--color-accent-light); }
+    .document-body { padding: 40px 50px; background: var(--doc-bg); font-family: var(--font-serif); font-size: 13px; line-height: 1.8; color: var(--doc-text); }
+    .doc-title { text-align: center; font-size: 16px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px; }
+    .doc-subtitle { text-align: center; font-size: 11px; color: var(--color-text-muted); margin-bottom: 25px; font-family: var(--font-sans); }
+    .doc-section-header { font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-top: 20px; margin-bottom: 10px; color: var(--doc-clause-title); border-bottom: 1px solid var(--color-border); padding-bottom: 4px; }
+    .doc-paragraph { margin-bottom: 12px; text-align: justify; }
+    .doc-list { margin: 12px 0 12px 20px; padding-left: 15px; }
+    .doc-list li { margin-bottom: 8px; text-align: justify; }
+    .doc-highlight { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 1px 5px; border-radius: 3px; border-bottom: 2px solid #f59e0b; font-weight: 600; cursor: text; }
+    .doc-highlight:hover { background: linear-gradient(135deg, #fde68a 0%, #fcd34d 100%); }
+    .doc-highlight:focus { outline: none; box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.3); }
+    .doc-highlight.empty { background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); border-bottom-color: #ef4444; color: #dc2626; }
+    @keyframes highlightPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); } 50% { box-shadow: 0 0 0 6px rgba(245, 158, 11, 0.3); } }
+    .field-highlight-animation { animation: highlightPulse 0.6s ease-out; }
+    .doc-signature-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; margin-top: 40px; }
+    .doc-signature-party-title { font-weight: bold; font-size: 11px; text-transform: uppercase; margin-bottom: 15px; color: var(--color-text-muted); }
+    .doc-signature-line { display: flex; align-items: flex-end; margin-bottom: 8px; min-height: 35px; }
+    .doc-signature-line .sig-label { width: 60px; font-size: 10px; color: var(--color-text-muted); }
+    .doc-signature-line .sig-value { flex: 1; border-bottom: 1px solid #333; min-height: 30px; display: flex; align-items: flex-end; padding-bottom: 3px; }
+    .toast { position: fixed; bottom: 20px; right: 20px; background: var(--color-dark); color: #fff; padding: 12px 18px; border-radius: var(--radius-md); font-size: 0.85rem; box-shadow: var(--shadow-xl); transform: translateY(100px); opacity: 0; transition: all 0.3s ease; z-index: 1000; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { background: var(--color-success); }
+    .site-footer { background: var(--color-dark); color: #94a3b8; padding: 2rem; text-align: center; }
+    .footer-brand { font-size: 1.1rem; font-weight: 800; margin-bottom: 0.5rem; }
+    .footer-brand .logo-text { background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    @media (max-width: 768px) { .document-body { padding: 25px 20px; } .doc-signature-row { grid-template-columns: 1fr; } .form-row { grid-template-columns: 1fr; } }
+    @media print { .site-header, .hero, .builder-sidebar, .preview-toolbar, .document-header, .site-footer, .toast { display: none !important; } .builder-layout { display: block; } .preview-panel { padding: 0; } .document-container { box-shadow: none; } .document-body { padding: 0.5in; } .doc-highlight { background: none !important; border: none !important; padding: 0 !important; } }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-content">
+      <nav class="header-nav">
+        <a href="/" class="nav-link home-logo"><span class="logo-text">Terms.Law</span></a>
+        <a href="/Demand-Letters/demand-letters-landing.html" class="nav-link">Demands</a>
+        <a href="contract-library-landing.html" class="nav-link active">Contracts</a>
+        <a href="/INC/formation-landing.html" class="nav-link">Incorporation</a>
+        <a href="/Blog/blog-landing.html" class="nav-link">Blog</a>
+      </nav>
+    </div>
+  </header>
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">Debt Financing</div>
+      <h1><span class="highlight">Convertible Note</span> Generator</h1>
+      <p class="hero-subtitle">Generate a convertible promissory note for seed-stage financing. Customize interest rate, maturity date, valuation cap, and conversion discount.</p>
+    </div>
+  </section>
+  <main class="builder-layout">
+    <aside class="builder-sidebar">
+      <div class="builder-section">
+        <h3 class="builder-section-title">Company Information</h3>
+        <div class="form-group">
+          <label class="form-label">Company Name</label>
+          <input type="text" id="companyName" class="form-input" placeholder="Acme Inc." oninput="trackFieldEdit('companyName')">
+        </div>
+        <div class="form-group">
+          <label class="form-label">State of Incorporation</label>
+          <select id="incState" class="form-select" onchange="trackFieldEdit('incState')">
+            <option value="Delaware">Delaware</option>
+            <option value="California">California</option>
+            <option value="New York">New York</option>
+            <option value="Texas">Texas</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Company Address</label>
+          <input type="text" id="companyAddress" class="form-input" placeholder="123 Startup Way, San Francisco, CA 94102" oninput="trackFieldEdit('companyAddress')">
+        </div>
+      </div>
+      <div class="builder-section">
+        <h3 class="builder-section-title">Investor Information</h3>
+        <div class="form-group">
+          <label class="form-label">Investor/Lender Name</label>
+          <input type="text" id="investorName" class="form-input" placeholder="John Smith" oninput="trackFieldEdit('investorName')">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Investor Address</label>
+          <input type="text" id="investorAddress" class="form-input" placeholder="456 Capital Ave, Palo Alto, CA 94301" oninput="trackFieldEdit('investorAddress')">
+        </div>
+      </div>
+      <div class="builder-section">
+        <h3 class="builder-section-title">Note Terms</h3>
+        <div class="form-group">
+          <label class="form-label">Principal Amount ($)</label>
+          <input type="number" id="principalAmount" class="form-input" placeholder="100000" oninput="trackFieldEdit('principalAmount')">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Interest Rate (%)</label>
+            <input type="number" id="interestRate" class="form-input" placeholder="6" step="0.1" oninput="trackFieldEdit('interestRate')">
+            <div class="form-hint">Typically 5-8%</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Maturity (months)</label>
+            <input type="number" id="maturityMonths" class="form-input" placeholder="24" oninput="trackFieldEdit('maturityMonths')">
+            <div class="form-hint">Typically 18-24</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Issue Date</label>
+          <input type="date" id="issueDate" class="form-input" oninput="trackFieldEdit('issueDate')">
+        </div>
+      </div>
+      <div class="builder-section">
+        <h3 class="builder-section-title">Conversion Terms</h3>
+        <div class="form-group">
+          <label class="form-label">Valuation Cap ($)</label>
+          <input type="number" id="valuationCap" class="form-input" placeholder="5000000" oninput="trackFieldEdit('valuationCap')">
+          <div class="form-hint">Pre-money valuation cap (leave blank for no cap)</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Discount Rate (%)</label>
+          <input type="number" id="discountRate" class="form-input" placeholder="20" oninput="trackFieldEdit('discountRate')">
+          <div class="form-hint">Typically 15-25% (leave blank for no discount)</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Qualified Financing Threshold ($)</label>
+          <input type="number" id="qualifiedThreshold" class="form-input" placeholder="1000000" oninput="trackFieldEdit('qualifiedThreshold')">
+          <div class="form-hint">Min raise to trigger auto-conversion</div>
+        </div>
+      </div>
+      <div class="builder-section">
+        <h3 class="builder-section-title">Additional Terms</h3>
+        <div class="form-group">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" id="proRata" onchange="trackFieldEdit('proRata')">
+            <span class="form-label" style="margin:0;">Pro-rata participation rights</span>
+          </label>
+        </div>
+        <div class="form-group">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" id="infoRights" checked onchange="trackFieldEdit('infoRights')">
+            <span class="form-label" style="margin:0;">Information rights</span>
+          </label>
+        </div>
+      </div>
+    </aside>
+    <div class="preview-panel">
+      <div class="preview-toolbar">
+        <div class="preview-title">Live Preview - Click highlighted text to edit</div>
+        <div class="preview-actions">
+          <button class="btn btn-secondary" onclick="copyToClipboard()">Copy</button>
+          <button class="btn btn-secondary" onclick="window.print()">Print</button>
+          <button class="btn btn-primary" onclick="downloadDocument()">Download</button>
+        </div>
+      </div>
+      <div class="document-container">
+        <div class="document-header">
+          <span class="document-title">Convertible Promissory Note</span>
+          <span class="document-status">Live</span>
+        </div>
+        <div class="document-body" id="documentPreview"></div>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer">
+    <div class="footer-brand"><span class="logo-text">Terms.Law</span></div>
+    <p>2024 Terms.Law - Sergei Tokmakov, Esq.</p>
+  </footer>
+  <div class="toast" id="toast"></div>
+  <script>
+    let lastEditedField = null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('issueDate').value = new Date().toISOString().split('T')[0];
+      updatePreview();
+    });
+
+    function trackFieldEdit(fieldId) { lastEditedField = fieldId; updatePreview(); }
+
+    function formatCurrency(num) {
+      if (!num) return '';
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(num);
+    }
+
+    function getMaturityDate() {
+      const issueDate = document.getElementById('issueDate').value;
+      const months = parseInt(document.getElementById('maturityMonths').value) || 24;
+      if (!issueDate) return '';
+      const date = new Date(issueDate + 'T00:00:00');
+      date.setMonth(date.getMonth() + months);
+      return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    }
+
+    function updatePreview() {
+      const h = (v, p, f) => `<span class="doc-highlight${!v?' empty':''}" data-field="${f}" contenteditable="true">${v||'['+p+']'}</span>`;
+
+      const companyName = document.getElementById('companyName').value;
+      const incState = document.getElementById('incState').value;
+      const companyAddress = document.getElementById('companyAddress').value;
+      const investorName = document.getElementById('investorName').value;
+      const investorAddress = document.getElementById('investorAddress').value;
+      const principalAmount = document.getElementById('principalAmount').value;
+      const interestRate = document.getElementById('interestRate').value || '6';
+      const maturityMonths = document.getElementById('maturityMonths').value || '24';
+      const issueDate = document.getElementById('issueDate').value;
+      const valuationCap = document.getElementById('valuationCap').value;
+      const discountRate = document.getElementById('discountRate').value;
+      const qualifiedThreshold = document.getElementById('qualifiedThreshold').value || '1000000';
+      const proRata = document.getElementById('proRata').checked;
+      const infoRights = document.getElementById('infoRights').checked;
+
+      const formattedDate = issueDate ? new Date(issueDate+'T00:00:00').toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}) : '';
+      const maturityDate = getMaturityDate();
+      const formattedPrincipal = formatCurrency(principalAmount);
+      const formattedCap = formatCurrency(valuationCap);
+      const formattedThreshold = formatCurrency(qualifiedThreshold);
+
+      let conversionPrice = '';
+      if (valuationCap && discountRate) {
+        conversionPrice = `the lower of (i) the price per share equal to the Valuation Cap divided by the Company Capitalization, or (ii) ${100 - parseFloat(discountRate)}% of the price per share paid by cash investors in such Qualified Financing`;
+      } else if (valuationCap) {
+        conversionPrice = `the price per share equal to the Valuation Cap divided by the Company Capitalization`;
+      } else if (discountRate) {
+        conversionPrice = `${100 - parseFloat(discountRate)}% of the price per share paid by cash investors in such Qualified Financing`;
+      } else {
+        conversionPrice = `the price per share paid by cash investors in such Qualified Financing`;
+      }
+
+      const proRataSection = proRata ? `
+        <div class="doc-section-header">8. Pro-Rata Rights</div>
+        <p class="doc-paragraph">Subject to any restrictions under applicable law or the Company's governing documents, the Holder shall have the right to participate in any subsequent equity financing of the Company on a pro-rata basis, calculated based on the Holder's percentage ownership of the Company following conversion of this Note.</p>
+      ` : '';
+
+      const infoRightsSection = infoRights ? `
+        <div class="doc-section-header">${proRata ? '9' : '8'}. Information Rights</div>
+        <p class="doc-paragraph">Until conversion or repayment of this Note, the Company shall provide the Holder with: (a) annual unaudited financial statements within 120 days after the end of each fiscal year; and (b) quarterly updates on material business developments upon reasonable request.</p>
+      ` : '';
+
+      document.getElementById('documentPreview').innerHTML = `
+        <div class="doc-title">CONVERTIBLE PROMISSORY NOTE</div>
+        <p class="doc-subtitle">${h(formattedDate,'Issue Date','issueDate')}</p>
+
+        <p class="doc-paragraph"><strong>Principal Amount:</strong> ${h(formattedPrincipal,'$100,000','principalAmount')}</p>
+
+        <p class="doc-paragraph">FOR VALUE RECEIVED, ${h(companyName,'Company Name','companyName')}, a ${h(incState,'Delaware','incState')} corporation (the "<strong>Company</strong>"), promises to pay to ${h(investorName,'Investor Name','investorName')} or registered assigns (the "<strong>Holder</strong>"), the principal sum of ${h(formattedPrincipal,'$100,000','principalAmount')}, together with accrued and unpaid interest thereon, on or before the Maturity Date, subject to earlier conversion as set forth below.</p>
+
+        <div class="doc-section-header">1. Interest</div>
+        <p class="doc-paragraph">This Note shall bear simple interest at the rate of ${h(interestRate+'%','6%','interestRate')} per annum, calculated on a 365-day year basis. Interest shall accrue from the date hereof and shall be payable upon maturity, conversion, or prepayment of this Note.</p>
+
+        <div class="doc-section-header">2. Maturity Date</div>
+        <p class="doc-paragraph">Unless earlier converted pursuant to Section 4 or prepaid pursuant to Section 5, the entire outstanding principal balance of this Note, together with all accrued and unpaid interest, shall be due and payable on ${h(maturityDate,'[Maturity Date]','maturityMonths')} (the "<strong>Maturity Date</strong>"), which is ${h(maturityMonths+' months','24 months','maturityMonths')} from the date of this Note.</p>
+
+        <div class="doc-section-header">3. Qualified Financing</div>
+        <p class="doc-paragraph">A "<strong>Qualified Financing</strong>" means the next sale and issuance by the Company of Preferred Stock in a transaction or series of related transactions resulting in aggregate gross proceeds to the Company of at least ${h(formattedThreshold,'$1,000,000','qualifiedThreshold')}, excluding any amounts raised under convertible notes or SAFEs.</p>
+
+        <div class="doc-section-header">4. Automatic Conversion</div>
+        <p class="doc-paragraph"><strong>4.1 Qualified Financing Conversion.</strong> Upon the closing of a Qualified Financing, the outstanding principal amount of this Note, together with all accrued and unpaid interest, shall automatically convert into shares of the same series of Preferred Stock sold in such Qualified Financing at a conversion price equal to ${conversionPrice}.</p>
+
+        ${valuationCap ? `<p class="doc-paragraph">The "<strong>Valuation Cap</strong>" is ${h(formattedCap,'$5,000,000','valuationCap')}. The "<strong>Company Capitalization</strong>" means all shares of Capital Stock (on an as-converted basis) issued and outstanding immediately prior to the Qualified Financing, including all shares issuable upon exercise of outstanding options and warrants, but excluding shares reserved for future issuance under equity incentive plans and shares issuable upon conversion of convertible securities.</p>` : ''}
+
+        <p class="doc-paragraph"><strong>4.2 Change of Control.</strong> If a Change of Control occurs prior to conversion or repayment of this Note, the Holder may elect either: (a) to receive a cash payment equal to two times (2x) the outstanding principal plus accrued interest; or (b) to convert this Note into Common Stock at a conversion price equal to ${valuationCap ? 'the Valuation Cap divided by the Company Capitalization' : 'the fair market value per share as determined by the Board in good faith'}.</p>
+
+        <div class="doc-section-header">5. Prepayment</div>
+        <p class="doc-paragraph">This Note may not be prepaid by the Company without the prior written consent of the Holder, except that the Company may prepay this Note in connection with a Change of Control as described above.</p>
+
+        <div class="doc-section-header">6. Events of Default</div>
+        <p class="doc-paragraph">The occurrence of any of the following shall constitute an "<strong>Event of Default</strong>": (a) failure to pay any amount due hereunder when due; (b) breach of any material covenant or representation; (c) voluntary or involuntary bankruptcy or insolvency proceedings; or (d) dissolution or liquidation of the Company. Upon an Event of Default, the Holder may declare all amounts immediately due and payable.</p>
+
+        <div class="doc-section-header">7. General Provisions</div>
+        <p class="doc-paragraph"><strong>7.1 Governing Law.</strong> This Note shall be governed by the laws of the State of ${h(incState,'Delaware','incState')}, without regard to conflicts of law principles.</p>
+        <p class="doc-paragraph"><strong>7.2 Amendments.</strong> This Note may only be amended with the written consent of the Company and the Holder.</p>
+        <p class="doc-paragraph"><strong>7.3 Successors.</strong> This Note shall be binding upon the Company and its successors and shall inure to the benefit of the Holder and its successors and assigns.</p>
+        <p class="doc-paragraph"><strong>7.4 No Security.</strong> This Note is unsecured and ranks equally with all other unsecured indebtedness of the Company.</p>
+
+        ${proRataSection}
+        ${infoRightsSection}
+
+        <p class="doc-paragraph" style="margin-top:30px;"><strong>IN WITNESS WHEREOF</strong>, the Company has executed this Convertible Promissory Note as of the date first written above.</p>
+
+        <div class="doc-signature-row">
+          <div>
+            <div class="doc-signature-party-title">Company: ${companyName || '[Company Name]'}</div>
+            <div class="doc-signature-line"><span class="sig-label">Sign:</span><span class="sig-value"></span></div>
+            <div class="doc-signature-line"><span class="sig-label">Name:</span><span class="sig-value"></span></div>
+            <div class="doc-signature-line"><span class="sig-label">Title:</span><span class="sig-value"></span></div>
+            <div class="doc-signature-line"><span class="sig-label">Address:</span><span class="sig-value">${companyAddress || ''}</span></div>
+          </div>
+          <div>
+            <div class="doc-signature-party-title">Accepted by Holder</div>
+            <div class="doc-signature-line"><span class="sig-label">Sign:</span><span class="sig-value"></span></div>
+            <div class="doc-signature-line"><span class="sig-label">Name:</span><span class="sig-value">${investorName || ''}</span></div>
+            <div class="doc-signature-line"><span class="sig-label">Address:</span><span class="sig-value">${investorAddress || ''}</span></div>
+          </div>
+        </div>
+      `;
+
+      if(lastEditedField){
+        setTimeout(()=>{
+          const el = document.querySelector(`[data-field="${lastEditedField}"]`);
+          if(el){
+            el.scrollIntoView({behavior:'smooth',block:'center'});
+            el.classList.add('field-highlight-animation');
+            setTimeout(()=>el.classList.remove('field-highlight-animation'),600);
+          }
+        },50);
+      }
+    }
+
+    function showToast(msg,type=''){
+      const t=document.getElementById('toast');
+      t.textContent=msg;
+      t.className='toast show'+(type?' '+type:'');
+      setTimeout(()=>t.classList.remove('show'),3000);
+    }
+
+    function copyToClipboard(){
+      const r=document.createRange();
+      r.selectNode(document.getElementById('documentPreview'));
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(r);
+      document.execCommand('copy');
+      window.getSelection().removeAllRanges();
+      showToast('Copied!','success');
+    }
+
+    function downloadDocument(){
+      const c=document.getElementById('documentPreview').innerHTML;
+      const h=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Convertible Promissory Note</title><style>body{font-family:Georgia,serif;max-width:8.5in;margin:1in auto;line-height:1.8;font-size:12pt}.doc-title{text-align:center;font-size:14pt;font-weight:bold;text-transform:uppercase;letter-spacing:2px}.doc-subtitle{text-align:center;font-size:10pt;color:#666;margin-bottom:20px}.doc-section-header{font-weight:bold;text-transform:uppercase;margin-top:20px;border-bottom:1px solid #ccc;font-size:11pt}.doc-paragraph{margin:12px 0;text-align:justify}.doc-highlight{background:#fef3c7}.doc-signature-row{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:40px}.doc-signature-party-title{font-weight:bold;text-transform:uppercase;margin-bottom:15px;font-size:10pt}.doc-signature-line{display:flex;margin-bottom:8px;min-height:30px}.doc-signature-line .sig-label{width:60px;font-size:9pt;color:#666}.doc-signature-line .sig-value{flex:1;border-bottom:1px solid #333}</style></head><body>${c}</body></html>`;
+      const b=new Blob([h],{type:'text/html'});
+      const u=URL.createObjectURL(b);
+      const a=document.createElement('a');
+      a.href=u;
+      a.download='Convertible-Promissory-Note.html';
+      a.click();
+      URL.revokeObjectURL(u);
+      showToast('Downloaded!','success');
+    }
+  </script>
+</body>
+</html>
