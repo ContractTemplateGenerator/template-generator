@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employment Offer Letter Generator | Terms.Law</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #1e40af; --primary-dark: #1e3a8a; --accent: #f59e0b; --background: #f8fafc; --surface: #ffffff; --text: #1e293b; --text-light: #64748b; --border: #e2e8f0; --success: #10b981; --warning: #f59e0b; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--background); color: var(--text); line-height: 1.6; }
+        .navbar { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); padding: 1rem 2rem; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .nav-container { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .nav-brand { display: flex; align-items: center; gap: 1rem; }
+        .nav-logo { font-size: 1.5rem; font-weight: 700; color: white; text-decoration: none; }
+        .nav-divider { color: rgba(255,255,255,0.5); }
+        .nav-title { color: rgba(255,255,255,0.9); font-size: 1rem; }
+        .nav-links { display: flex; gap: 1.5rem; }
+        .nav-links a { color: rgba(255,255,255,0.85); text-decoration: none; font-size: 0.9rem; font-weight: 500; }
+        .nav-links a:hover { color: white; }
+        .main-container { max-width: 1400px; margin: 0 auto; padding: 2rem; display: grid; grid-template-columns: 420px 1fr; gap: 2rem; align-items: start; }
+        .form-panel { background: var(--surface); border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); position: sticky; top: 80px; max-height: calc(100vh - 100px); overflow-y: auto; }
+        .form-header { padding: 1.5rem; border-bottom: 1px solid var(--border); background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 12px 12px 0 0; }
+        .form-header h2 { font-size: 1.25rem; color: var(--text); margin-bottom: 0.25rem; }
+        .form-header p { font-size: 0.85rem; color: var(--text-light); }
+        .form-content { padding: 1.5rem; }
+        .form-section { margin-bottom: 1.5rem; }
+        .section-title { font-size: 0.9rem; font-weight: 600; color: var(--primary); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--border); }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 0.375rem; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.625rem 0.875rem; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; font-family: inherit; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(30,64,175,0.1); }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+        .checkbox-group { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0; }
+        .checkbox-group input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary); }
+        .checkbox-group label { margin-bottom: 0; cursor: pointer; }
+        .form-actions { padding: 1.5rem; border-top: 1px solid var(--border); }
+        .btn { padding: 0.875rem 1.5rem; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 0.5rem; border: none; width: 100%; }
+        .btn-primary { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(30,64,175,0.3); }
+        .btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+        .btn-success { background: linear-gradient(135deg, var(--success) 0%, #059669 100%); color: white; }
+        .preview-panel { background: var(--surface); border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .preview-header { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        .preview-header h3 { font-size: 1rem; }
+        .preview-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .preview-actions .btn { padding: 0.5rem 1rem; font-size: 0.85rem; width: auto; }
+        .edit-mode-toggle { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: #fef3c7; border-radius: 8px; font-size: 0.85rem; color: #92400e; }
+        .document-container { padding: 2rem; max-width: 850px; margin: 0 auto; }
+        .document { background: white; padding: 3rem; border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.05); line-height: 1.8; font-size: 14px; }
+        .document h1 { font-size: 1.25rem; margin-bottom: 1.5rem; }
+        .document p { margin-bottom: 1rem; text-align: justify; }
+        .document ul { margin-left: 1.5rem; margin-bottom: 1rem; }
+        .document li { margin-bottom: 0.5rem; }
+        .document .letterhead { text-align: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 2px solid var(--primary); }
+        .document .letterhead h1 { margin-bottom: 0.25rem; }
+        .document .date-line { margin-bottom: 1.5rem; }
+        .document .recipient { margin-bottom: 1.5rem; }
+        .document .signature-area { margin-top: 2rem; }
+        .document .signature-line { border-top: 1px solid var(--text); width: 250px; margin-top: 3rem; padding-top: 0.5rem; }
+        .doc-highlight { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 1px 4px; border-radius: 3px; border-bottom: 2px solid var(--accent); }
+        .doc-highlight:hover { background: linear-gradient(135deg, #fde68a 0%, #fcd34d 100%); }
+        .doc-highlight:focus { outline: none; box-shadow: 0 0 0 3px rgba(245,158,11,0.3); }
+        @keyframes highlightPulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245,158,11,0.7); } 50% { transform: scale(1.02); box-shadow: 0 0 0 8px rgba(245,158,11,0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245,158,11,0); } }
+        .field-highlight-animation { animation: highlightPulse 0.6s ease-out; background: linear-gradient(135deg, #fde047 0%, #facc15 100%) !important; }
+        .full-edit-mode .document { border: 2px dashed var(--warning); }
+        .full-edit-warning { display: none; background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; font-size: 0.85rem; color: #92400e; }
+        .full-edit-mode .full-edit-warning { display: block; }
+        @media print { .navbar, .form-panel, .preview-header, .full-edit-warning { display: none !important; } .main-container { display: block; padding: 0; } .document { border: none; box-shadow: none; padding: 0; } .doc-highlight { background: none !important; border: none !important; padding: 0 !important; } }
+        @media (max-width: 1024px) { .main-container { grid-template-columns: 1fr; } .form-panel { position: relative; top: 0; max-height: none; } }
+        @media (max-width: 640px) { .navbar { padding: 1rem; } .nav-links { display: none; } .main-container { padding: 1rem; } .document { padding: 1.5rem; } }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a href="https://terms.law" class="nav-logo">Terms.Law</a>
+                <span class="nav-divider">|</span>
+                <span class="nav-title">Employment Offer Letter Generator</span>
+            </div>
+            <div class="nav-links">
+                <a href="/Templates/contract-library-landing.html">Contract Library</a>
+                <a href="/Blog/">Blog</a>
+                <a href="https://terms.law">Home</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="form-panel">
+            <div class="form-header">
+                <h2>📧 Employment Offer Letter</h2>
+                <p>Generate a professional job offer letter for new hires</p>
+            </div>
+
+            <div class="form-content">
+                <div class="form-section">
+                    <div class="section-title">Company Information</div>
+                    <div class="form-group">
+                        <label for="companyName">Company Name</label>
+                        <input type="text" id="companyName" placeholder="Acme Corporation" oninput="trackFieldEdit('companyName')">
+                    </div>
+                    <div class="form-group">
+                        <label for="companyAddress">Company Address</label>
+                        <input type="text" id="companyAddress" placeholder="123 Business Ave, Suite 100, City, ST 12345" oninput="trackFieldEdit('companyAddress')">
+                    </div>
+                    <div class="form-group">
+                        <label for="signerName">Hiring Manager/Signer Name</label>
+                        <input type="text" id="signerName" placeholder="Jane Smith" oninput="trackFieldEdit('signerName')">
+                    </div>
+                    <div class="form-group">
+                        <label for="signerTitle">Signer Title</label>
+                        <input type="text" id="signerTitle" placeholder="VP of Human Resources" oninput="trackFieldEdit('signerTitle')">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">Candidate Information</div>
+                    <div class="form-group">
+                        <label for="candidateName">Candidate Full Name</label>
+                        <input type="text" id="candidateName" placeholder="John Doe" oninput="trackFieldEdit('candidateName')">
+                    </div>
+                    <div class="form-group">
+                        <label for="candidateAddress">Candidate Address</label>
+                        <input type="text" id="candidateAddress" placeholder="456 Residential St, City, ST 12345" oninput="trackFieldEdit('candidateAddress')">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">Position Details</div>
+                    <div class="form-group">
+                        <label for="jobTitle">Job Title</label>
+                        <input type="text" id="jobTitle" placeholder="Senior Software Engineer" oninput="trackFieldEdit('jobTitle')">
+                    </div>
+                    <div class="form-group">
+                        <label for="department">Department</label>
+                        <input type="text" id="department" placeholder="Engineering" oninput="trackFieldEdit('department')">
+                    </div>
+                    <div class="form-group">
+                        <label for="reportsTo">Reports To</label>
+                        <input type="text" id="reportsTo" placeholder="Director of Engineering" oninput="trackFieldEdit('reportsTo')">
+                    </div>
+                    <div class="form-group">
+                        <label for="workLocation">Work Location</label>
+                        <input type="text" id="workLocation" placeholder="San Francisco, CA (Hybrid)" oninput="trackFieldEdit('workLocation')">
+                    </div>
+                    <div class="form-group">
+                        <label for="employmentType">Employment Type</label>
+                        <select id="employmentType" onchange="trackFieldEdit('employmentType')">
+                            <option value="full-time">Full-Time</option>
+                            <option value="part-time">Part-Time</option>
+                            <option value="temporary">Temporary</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="exemptStatus">FLSA Status</label>
+                        <select id="exemptStatus" onchange="trackFieldEdit('exemptStatus')">
+                            <option value="exempt">Exempt (Salaried)</option>
+                            <option value="non-exempt">Non-Exempt (Hourly)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">Compensation</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="salary">Base Salary/Rate ($)</label>
+                            <input type="number" id="salary" placeholder="120000" step="0.01" oninput="trackFieldEdit('salary')">
+                        </div>
+                        <div class="form-group">
+                            <label for="payFrequency">Pay Frequency</label>
+                            <select id="payFrequency" onchange="trackFieldEdit('payFrequency')">
+                                <option value="annually">Per Year</option>
+                                <option value="hourly">Per Hour</option>
+                                <option value="biweekly">Bi-Weekly</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="hasBonus" onchange="trackFieldEdit('hasBonus'); toggleBonusFields()">
+                        <label for="hasBonus">Include signing/annual bonus</label>
+                    </div>
+                    <div id="bonusFields" style="display: none;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="signingBonus">Signing Bonus ($)</label>
+                                <input type="number" id="signingBonus" placeholder="10000" oninput="trackFieldEdit('signingBonus')">
+                            </div>
+                            <div class="form-group">
+                                <label for="targetBonus">Target Annual Bonus (%)</label>
+                                <input type="number" id="targetBonus" placeholder="15" oninput="trackFieldEdit('targetBonus')">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="hasEquity" onchange="trackFieldEdit('hasEquity'); toggleEquityFields()">
+                        <label for="hasEquity">Include equity compensation</label>
+                    </div>
+                    <div id="equityFields" style="display: none;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="equityShares">Number of Options/Shares</label>
+                                <input type="number" id="equityShares" placeholder="10000" oninput="trackFieldEdit('equityShares')">
+                            </div>
+                            <div class="form-group">
+                                <label for="vestingSchedule">Vesting Schedule</label>
+                                <select id="vestingSchedule" onchange="trackFieldEdit('vestingSchedule')">
+                                    <option value="4year-1cliff">4 years, 1-year cliff</option>
+                                    <option value="4year-monthly">4 years, monthly vesting</option>
+                                    <option value="3year-1cliff">3 years, 1-year cliff</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">Start Date & Benefits</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="startDate">Proposed Start Date</label>
+                            <input type="date" id="startDate" oninput="trackFieldEdit('startDate')">
+                        </div>
+                        <div class="form-group">
+                            <label for="offerExpiration">Offer Expiration Date</label>
+                            <input type="date" id="offerExpiration" oninput="trackFieldEdit('offerExpiration')">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="ptoPolicy">PTO Policy</label>
+                        <select id="ptoPolicy" onchange="trackFieldEdit('ptoPolicy')">
+                            <option value="unlimited">Unlimited PTO</option>
+                            <option value="15days">15 days per year</option>
+                            <option value="20days">20 days per year</option>
+                            <option value="25days">25 days per year</option>
+                        </select>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="healthBenefits" checked onchange="trackFieldEdit('healthBenefits')">
+                        <label for="healthBenefits">Health/dental/vision insurance</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="retirement401k" checked onchange="trackFieldEdit('retirement401k')">
+                        <label for="retirement401k">401(k) with company match</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="relocationAssist" onchange="trackFieldEdit('relocationAssist')">
+                        <label for="relocationAssist">Relocation assistance</label>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">Contingencies</div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="bgCheck" checked onchange="trackFieldEdit('bgCheck')">
+                        <label for="bgCheck">Background check required</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="drugTest" onchange="trackFieldEdit('drugTest')">
+                        <label for="drugTest">Drug screening required</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="i9Verification" checked onchange="trackFieldEdit('i9Verification')">
+                        <label for="i9Verification">I-9 employment verification</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="signAgreements" checked onchange="trackFieldEdit('signAgreements')">
+                        <label for="signAgreements">Sign confidentiality/IP agreements</label>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">Employment Terms</div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="atWill" checked onchange="trackFieldEdit('atWill')">
+                        <label for="atWill">At-will employment</label>
+                    </div>
+                    <div class="form-group">
+                        <label for="governingState">Governing State</label>
+                        <select id="governingState" onchange="trackFieldEdit('governingState')">
+                            <option value="California">California</option>
+                            <option value="New York">New York</option>
+                            <option value="Texas">Texas</option>
+                            <option value="Florida">Florida</option>
+                            <option value="Delaware">Delaware</option>
+                            <option value="Washington">Washington</option>
+                            <option value="Massachusetts">Massachusetts</option>
+                            <option value="Illinois">Illinois</option>
+                            <option value="Colorado">Colorado</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn btn-primary" onclick="updatePreview()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    Generate Offer Letter
+                </button>
+            </div>
+        </div>
+
+        <div class="preview-panel" id="previewPanel">
+            <div class="preview-header">
+                <h3>Document Preview</h3>
+                <div class="preview-actions">
+                    <div class="edit-mode-toggle">
+                        <input type="checkbox" id="fullEditMode" onchange="toggleFullEditMode()">
+                        <label for="fullEditMode">Full Edit Mode</label>
+                    </div>
+                    <button class="btn btn-secondary" onclick="printDocument()">Print</button>
+                    <button class="btn btn-success" onclick="downloadWord()">Download Word</button>
+                </div>
+            </div>
+            <div class="document-container">
+                <div class="full-edit-warning">⚠️ <strong>Full Edit Mode:</strong> Edit directly. Changes won't sync to form.</div>
+                <div class="document" id="documentPreview">
+                    <p style="text-align: center; color: var(--text-light); padding: 3rem;">Fill in the form and click "Generate Offer Letter" to preview.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let lastEditedField = null;
+        let hasCustomEdits = false;
+
+        function toggleBonusFields() {
+            document.getElementById('bonusFields').style.display = document.getElementById('hasBonus').checked ? 'block' : 'none';
+        }
+
+        function toggleEquityFields() {
+            document.getElementById('equityFields').style.display = document.getElementById('hasEquity').checked ? 'block' : 'none';
+        }
+
+        function trackFieldEdit(fieldId) {
+            if (hasCustomEdits && !confirm('Regenerating will overwrite custom edits. Continue?')) return;
+            hasCustomEdits = false;
+            lastEditedField = fieldId;
+            updatePreview();
+        }
+
+        function toggleFullEditMode() {
+            const isEnabled = document.getElementById('fullEditMode').checked;
+            const panel = document.getElementById('previewPanel');
+            const doc = document.getElementById('documentPreview');
+            panel.classList.toggle('full-edit-mode', isEnabled);
+            doc.contentEditable = isEnabled;
+            if (isEnabled) doc.addEventListener('input', () => hasCustomEdits = true);
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '[DATE]';
+            return new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(amount);
+        }
+
+        function formatNumber(num) {
+            return new Intl.NumberFormat('en-US').format(num);
+        }
+
+        function getPayFrequencyText(freq, salary) {
+            switch(freq) {
+                case 'annually': return `${formatCurrency(salary)} per year`;
+                case 'hourly': return `${formatCurrency(salary)} per hour`;
+                case 'biweekly': return `${formatCurrency(salary)} bi-weekly`;
+                default: return `${formatCurrency(salary)} per year`;
+            }
+        }
+
+        function getVestingText(schedule) {
+            switch(schedule) {
+                case '4year-1cliff': return 'over four (4) years, with a one-year cliff (25% vesting after one year, then monthly vesting thereafter)';
+                case '4year-monthly': return 'over four (4) years, with monthly vesting from the start date';
+                case '3year-1cliff': return 'over three (3) years, with a one-year cliff (33.33% vesting after one year, then monthly vesting thereafter)';
+                default: return 'per the company\'s standard vesting schedule';
+            }
+        }
+
+        function getPTOText(policy) {
+            switch(policy) {
+                case 'unlimited': return 'unlimited paid time off (PTO), subject to manager approval and business needs';
+                case '15days': return 'fifteen (15) days of paid time off (PTO) per year, accruing from your start date';
+                case '20days': return 'twenty (20) days of paid time off (PTO) per year, accruing from your start date';
+                case '25days': return 'twenty-five (25) days of paid time off (PTO) per year, accruing from your start date';
+                default: return 'paid time off per company policy';
+            }
+        }
+
+        function updatePreview() {
+            const companyName = document.getElementById('companyName').value.trim() || '[COMPANY NAME]';
+            const companyAddress = document.getElementById('companyAddress').value.trim() || '[COMPANY ADDRESS]';
+            const signerName = document.getElementById('signerName').value.trim() || '[SIGNER NAME]';
+            const signerTitle = document.getElementById('signerTitle').value.trim() || '[SIGNER TITLE]';
+
+            const candidateName = document.getElementById('candidateName').value.trim() || '[CANDIDATE NAME]';
+            const candidateAddress = document.getElementById('candidateAddress').value.trim() || '[CANDIDATE ADDRESS]';
+
+            const jobTitle = document.getElementById('jobTitle').value.trim() || '[JOB TITLE]';
+            const department = document.getElementById('department').value.trim() || '[DEPARTMENT]';
+            const reportsTo = document.getElementById('reportsTo').value.trim() || '[MANAGER]';
+            const workLocation = document.getElementById('workLocation').value.trim() || '[LOCATION]';
+            const employmentType = document.getElementById('employmentType').value;
+            const exemptStatus = document.getElementById('exemptStatus').value;
+
+            const salary = parseFloat(document.getElementById('salary').value) || 0;
+            const payFrequency = document.getElementById('payFrequency').value;
+            const hasBonus = document.getElementById('hasBonus').checked;
+            const signingBonus = parseFloat(document.getElementById('signingBonus').value) || 0;
+            const targetBonus = document.getElementById('targetBonus').value || '0';
+            const hasEquity = document.getElementById('hasEquity').checked;
+            const equityShares = document.getElementById('equityShares').value || '0';
+            const vestingSchedule = document.getElementById('vestingSchedule').value;
+
+            const startDate = formatDate(document.getElementById('startDate').value);
+            const offerExpiration = formatDate(document.getElementById('offerExpiration').value);
+            const ptoPolicy = document.getElementById('ptoPolicy').value;
+            const healthBenefits = document.getElementById('healthBenefits').checked;
+            const retirement401k = document.getElementById('retirement401k').checked;
+            const relocationAssist = document.getElementById('relocationAssist').checked;
+
+            const bgCheck = document.getElementById('bgCheck').checked;
+            const drugTest = document.getElementById('drugTest').checked;
+            const i9Verification = document.getElementById('i9Verification').checked;
+            const signAgreements = document.getElementById('signAgreements').checked;
+
+            const atWill = document.getElementById('atWill').checked;
+            const governingState = document.getElementById('governingState').value;
+
+            const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+            // Build bonus section
+            let bonusSection = '';
+            if (hasBonus) {
+                let bonusParts = [];
+                if (signingBonus > 0) {
+                    bonusParts.push(`a one-time signing bonus of <span class="doc-highlight" contenteditable="true" data-field="signingBonus">${formatCurrency(signingBonus)}</span>, payable with your first paycheck (subject to repayment if you voluntarily leave within one year)`);
+                }
+                if (targetBonus > 0) {
+                    bonusParts.push(`eligibility for an annual performance bonus with a target of <span class="doc-highlight" contenteditable="true" data-field="targetBonus">${targetBonus}%</span> of your base salary, based on individual and company performance`);
+                }
+                if (bonusParts.length > 0) {
+                    bonusSection = `<p><strong>Bonus:</strong> In addition to your base salary, you will receive ${bonusParts.join('; and ')}.</p>`;
+                }
+            }
+
+            // Build equity section
+            let equitySection = '';
+            if (hasEquity) {
+                equitySection = `<p><strong>Equity:</strong> Subject to approval by our Board of Directors, you will be granted an option to purchase <span class="doc-highlight" contenteditable="true" data-field="equityShares">${formatNumber(equityShares)}</span> shares of the Company's common stock at the fair market value on the date of grant. These options will vest ${getVestingText(vestingSchedule)}, subject to your continued employment with the Company.</p>`;
+            }
+
+            // Build benefits section
+            let benefitsList = [];
+            if (healthBenefits) benefitsList.push('Comprehensive health, dental, and vision insurance for you and your eligible dependents');
+            if (retirement401k) benefitsList.push('401(k) retirement plan with company matching contributions');
+            benefitsList.push(getPTOText(ptoPolicy).charAt(0).toUpperCase() + getPTOText(ptoPolicy).slice(1));
+            benefitsList.push('Paid holidays per the company holiday schedule');
+            if (relocationAssist) benefitsList.push('Relocation assistance per company policy');
+
+            // Build contingencies
+            let contingencies = [];
+            if (bgCheck) contingencies.push('Successful completion of a background check');
+            if (drugTest) contingencies.push('Successful completion of a pre-employment drug screening');
+            if (i9Verification) contingencies.push('Completion of Form I-9 and verification of your eligibility to work in the United States');
+            if (signAgreements) contingencies.push('Execution of our standard Confidentiality, Invention Assignment, and Non-Solicitation Agreement');
+
+            const documentHTML = `
+                <div class="letterhead">
+                    <h1><span class="doc-highlight" contenteditable="true" data-field="companyName">${companyName}</span></h1>
+                    <p><span class="doc-highlight" contenteditable="true" data-field="companyAddress">${companyAddress}</span></p>
+                </div>
+
+                <div class="date-line">
+                    <p>${today}</p>
+                </div>
+
+                <div class="recipient">
+                    <p><span class="doc-highlight" contenteditable="true" data-field="candidateName">${candidateName}</span><br>
+                    <span class="doc-highlight" contenteditable="true" data-field="candidateAddress">${candidateAddress}</span></p>
+                </div>
+
+                <p>Dear <span class="doc-highlight" contenteditable="true" data-field="candidateName">${candidateName}</span>,</p>
+
+                <p>On behalf of <span class="doc-highlight" contenteditable="true" data-field="companyName">${companyName}</span> (the "Company"), I am pleased to extend this offer of employment for the position of <span class="doc-highlight" contenteditable="true" data-field="jobTitle">${jobTitle}</span>. We were impressed with your background and experience and believe you will be a valuable addition to our team.</p>
+
+                <p><strong>Position:</strong> You will serve as <span class="doc-highlight" contenteditable="true" data-field="jobTitle">${jobTitle}</span> in our <span class="doc-highlight" contenteditable="true" data-field="department">${department}</span> department, reporting to the <span class="doc-highlight" contenteditable="true" data-field="reportsTo">${reportsTo}</span>. This is a ${employmentType === 'full-time' ? 'full-time' : employmentType === 'part-time' ? 'part-time' : 'temporary'}, ${exemptStatus === 'exempt' ? 'exempt (salaried)' : 'non-exempt (hourly)'} position based in <span class="doc-highlight" contenteditable="true" data-field="workLocation">${workLocation}</span>.</p>
+
+                <p><strong>Start Date:</strong> Your anticipated start date is <span class="doc-highlight" contenteditable="true" data-field="startDate">${startDate}</span>, subject to the satisfaction of certain conditions described below.</p>
+
+                <p><strong>Compensation:</strong> Your starting base ${payFrequency === 'hourly' ? 'rate' : 'salary'} will be <span class="doc-highlight" contenteditable="true" data-field="salary">${getPayFrequencyText(payFrequency, salary)}</span>, paid in accordance with the Company's standard payroll schedule, less applicable withholdings and deductions.</p>
+
+                ${bonusSection}
+                ${equitySection}
+
+                <p><strong>Benefits:</strong> As a ${employmentType === 'full-time' ? 'full-time' : ''} employee, you will be eligible to participate in our benefits programs, which currently include:</p>
+                <ul>
+                    ${benefitsList.map(b => `<li>${b}</li>`).join('')}
+                </ul>
+                <p>Benefits are subject to the terms and conditions of the applicable plan documents and may be modified from time to time.</p>
+
+                ${contingencies.length > 0 ? `
+                <p><strong>Contingencies:</strong> This offer is contingent upon:</p>
+                <ul>
+                    ${contingencies.map(c => `<li>${c}</li>`).join('')}
+                </ul>
+                ` : ''}
+
+                ${atWill ? `<p><strong>At-Will Employment:</strong> Your employment with the Company will be "at-will," meaning that either you or the Company may terminate the employment relationship at any time, with or without cause, and with or without notice. This at-will status cannot be changed except by a written agreement signed by you and an authorized officer of the Company.</p>` : ''}
+
+                <p><strong>Confidentiality:</strong> You agree that during your employment you will not improperly use or disclose any proprietary information or trade secrets of any former employer or other person or entity, and you will not bring onto the Company's premises any unpublished documents or proprietary information belonging to any such employer, person, or entity.</p>
+
+                <p><strong>Acceptance:</strong> This offer is valid until <span class="doc-highlight" contenteditable="true" data-field="offerExpiration">${offerExpiration}</span>. To accept this offer, please sign and date this letter below and return it to me. A duplicate copy is enclosed for your records.</p>
+
+                <p>We are excited about the possibility of you joining our team and look forward to working with you. If you have any questions about this offer, please do not hesitate to contact me.</p>
+
+                <p>Sincerely,</p>
+
+                <div class="signature-area">
+                    <div class="signature-line">
+                        <span><span class="doc-highlight" contenteditable="true" data-field="signerName">${signerName}</span></span><br>
+                        <span><span class="doc-highlight" contenteditable="true" data-field="signerTitle">${signerTitle}</span></span><br>
+                        <span><span class="doc-highlight" contenteditable="true" data-field="companyName">${companyName}</span></span>
+                    </div>
+                </div>
+
+                <hr style="margin: 3rem 0; border: none; border-top: 1px dashed var(--border);">
+
+                <p><strong>ACCEPTANCE OF OFFER</strong></p>
+
+                <p>I, <span class="doc-highlight" contenteditable="true" data-field="candidateName">${candidateName}</span>, accept the offer of employment as <span class="doc-highlight" contenteditable="true" data-field="jobTitle">${jobTitle}</span> with <span class="doc-highlight" contenteditable="true" data-field="companyName">${companyName}</span> under the terms and conditions set forth in this letter.</p>
+
+                <div class="signature-area" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem;">
+                    <div>
+                        <div class="signature-line">
+                            <span>Employee Signature</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="signature-line">
+                            <span>Date</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('documentPreview').innerHTML = documentHTML;
+            setupInlineEditing();
+
+            if (lastEditedField) {
+                setTimeout(() => {
+                    const el = document.querySelector(`[data-field="${lastEditedField}"]`);
+                    if (el) {
+                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        el.classList.add('field-highlight-animation');
+                        setTimeout(() => el.classList.remove('field-highlight-animation'), 1500);
+                    }
+                    lastEditedField = null;
+                }, 50);
+            }
+        }
+
+        function setupInlineEditing() {
+            document.querySelectorAll('.doc-highlight[data-field]').forEach(field => {
+                field.addEventListener('blur', function() {
+                    const input = document.getElementById(this.dataset.field);
+                    if (input) input.value = this.textContent.trim();
+                    hasCustomEdits = true;
+                });
+            });
+        }
+
+        function printDocument() { window.print(); }
+
+        function downloadWord() {
+            const content = document.getElementById('documentPreview').innerHTML;
+            const company = document.getElementById('companyName').value.trim() || 'Company';
+            const candidate = document.getElementById('candidateName').value.trim() || 'Candidate';
+            const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Offer Letter - ${candidate}</title>
+                <style>body{font-family:'Times New Roman',serif;font-size:12pt;line-height:1.6;margin:1in;}
+                h1{font-size:16pt;margin-bottom:6pt;}.letterhead{text-align:center;margin-bottom:24pt;border-bottom:2px solid #333;padding-bottom:12pt;}
+                p{margin-bottom:12pt;text-align:justify;}ul{margin-left:24pt;margin-bottom:12pt;}
+                .signature-line{border-top:1px solid black;width:250px;margin-top:48pt;padding-top:6pt;}
+                .doc-highlight{background:none;border:none;padding:0;}</style></head>
+                <body>${content}</body></html>`;
+            const blob = new Blob([html], { type: 'application/msword' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `Offer_Letter_${candidate.replace(/[^a-z0-9]/gi, '_')}.doc`;
+            a.click();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set default dates
+            const today = new Date();
+            const startDefault = new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000);
+            const expireDefault = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+            document.getElementById('startDate').value = startDefault.toISOString().split('T')[0];
+            document.getElementById('offerExpiration').value = expireDefault.toISOString().split('T')[0];
+        });
+    </script>
+</body>
+</html>
