@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Training AI On Open Source Code: Legal Landmines, Safe Patterns, And “Visual” Cheat Sheets | Terms.Law</title>
+  <meta name="description" content="Everyone trains on GitHub now: The problem: “public” ≠ “free for any use”, and open-source licenses are not all the same. Some are very comfortable with AI trai">
+  <link rel="canonical" href="https://terms.law/2025/11/11/training-ai-on-open-source-code-legal-landmines-safe-patterns-and-visual-cheat-sheets/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/shared/styles.css">
+</head>
+<body>
+  <div id="site-header"></div>
+  <script src="/shared/header-loader.js"></script>
+
+  <main>
+    <article>
+      <h1>Training AI On Open Source Code: Legal Landmines, Safe Patterns, And “Visual” Cheat Sheets</h1>
+      <div class="meta">Published: November 11, 2025 • AI</div>
+      <div class="content">
+<p>Everyone trains on GitHub now:</p>
+
+
+
+<ul class="wp-block-list">
+<li>Foundation models slurp millions of public repos.</li>
+
+
+
+<li>Internal teams fine-tune on in-house forks and vendor SDKs.</li>
+
+
+
+<li>Startups dream of “AI that knows the entire open-source ecosystem.”</li>
+</ul>
+
+
+
+<p>The problem: <strong>“public” ≠ “free for any use”</strong>, and open-source licenses are <em>not</em> all the same. Some are very comfortable with AI training; some can turn into a copyleft time bomb if you get it wrong.</p>
+
+
+
+<p>This guide walks through:</p>
+
+
+
+<ul class="wp-block-list">
+<li>How different OSS licenses treat training and outputs</li>
+
+
+
+<li>Where the real risks are (training vs regurgitation vs distribution)</li>
+
+
+
+<li>Practical patterns for training safely on open-source code</li>
+</ul>
+
+
+
+<p>With tables and matrices you can reuse in your own docs.</p>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<div id="ez-toc-container" class="ez-toc-v2_0_79_2 counter-hierarchy ez-toc-counter ez-toc-grey ez-toc-container-direction">
+<div class="ez-toc-title-container">
+<p class="ez-toc-title" style="cursor:inherit">Contents</p>
+<span class="ez-toc-title-toggle"><a href="#" class="ez-toc-pull-right ez-toc-btn ez-toc-btn-xs ez-toc-btn-default ez-toc-toggle" aria-label="Toggle Table of Content"><span class="ez-toc-js-icon-con"><span class=""><span class="eztoc-hide" style="display:none;">Toggle</span><span class="ez-toc-icon-toggle-span"><svg style="fill: #999;color:#999" xmlns="http://www.w3.org/2000/svg" class="list-377408" width="20px" height="20px" viewBox="0 0 24 24" fill="none"><path d="M6 6H4v2h2V6zm14 0H8v2h12V6zM4 11h2v2H4v-2zm16 0H8v2h12v-2zM4 16h2v2H4v-2zm16 0H8v2h12v-2z" fill="currentColor"></path></svg><svg style="fill: #999;color:#999" class="arrow-unsorted-368013" xmlns="http://www.w3.org/2000/svg" width="10px" height="10px" viewBox="0 0 24 24" version="1.2" baseProfile="tiny"><path d="M18.2 9.3l-6.2-6.3-6.2 6.3c-.2.2-.3.4-.3.7s.1.5.3.7c.2.2.4.3.7.3h11c.3 0 .5-.1.7-.3.2-.2.3-.5.3-.7s-.1-.5-.3-.7zM5.8 14.7l6.2 6.3 6.2-6.3c.2-.2.3-.5.3-.7s-.1-.5-.3-.7c-.2-.2-.4-.3-.7-.3h-11c-.3 0-.5.1-.7.3-.2.2-.3.5-.3.7s.1.5.3.7z"/></svg></span></span></span></a></span></div>
+<nav><ul class='ez-toc-list ez-toc-list-level-1 ' ><li class='ez-toc-page-1 ez-toc-heading-level-2'><a class="ez-toc-link ez-toc-heading-1" href="https://terms.law/2025/11/11/training-ai-on-open-source-code-legal-landmines-safe-patterns-and-visual-cheat-sheets/#%F0%9F%A7%A9_What_%E2%80%9CTraining_On_Open_Source%E2%80%9D_Actually_Involves" >🧩 What “Training On Open Source” Actually Involves</a></li><li class='ez-toc-page-1 ez-toc-heading-level-2'><a class="ez-toc-link ez-toc-heading-2" href="https://terms.law/2025/11/11/training-ai-on-open-source-code-legal-landmines-safe-patterns-and-visual-cheat-sheets/#%F0%9F%A7%BE_Open_Source_Licenses_%E2%80%9CVisual%E2%80%9D_Risk_Matrix_For_AI_Training" >🧾 Open Source Licenses: “Visual” Risk Matrix For AI Training</a><ul class='ez-toc-list-level-3' ><li class='ez-toc-heading-level-3'><a class="ez-toc-link ez-toc-heading-3" href="https://terms.law/2025/11/11/training-ai-on-open-source-code-legal-landmines-safe-patterns-and-visual-cheat-sheets/#Quick_Heat_Map" >Quick Heat Map</a></li></ul></li><li class='ez-toc-page-1 ez-toc-heading-level-2'><a class="ez-toc-link ez-toc-heading-4" href="https://terms.law/2025/11/11/training-ai-on-open-source-code-legal-landmines-safe-patterns-and-visual-cheat-sheets/#%F0%9F%93%9A_Key_License_Concepts_That_Matter_For_AI" >📚 Key License Concepts That Matter For AI</a></li><li class='ez-toc-page-1 ez-toc-heading-level-2'><a class="ez-toc-link ez-toc-heading-5" href="https://terms.law/2025/11/11/training-ai-on-open-source-code-legal-landmines-safe-patterns-and-visual-cheat-sheets/#%E2%9A%96%EF%B8%8F_Where_The_Real_Legal_Risk_Comes_From" >⚖️ Where The Real Legal Risk Comes From</a><ul class='ez-toc-list-level-3' ><li class='ez-toc-heading-level-3'><a class="ez-toc-link ez-toc-heading-6" href="https://terms.law/2025/11/11/training-ai-on-open-source-code-legal-landmines-safe-patterns-and-visual-cheat-sheets/#Visual_Scenario_Matrix" >Visual Scenario Matrix</a></li></ul></li><li class='ez-toc-page-1 ez-toc-heading-level-2'><a class="ez-toc-link ez-toc-heading-7" href="https://terms.law/2025/11/11/training-ai-on-open-source-code-legal-landmines-safe-patterns-and-visual-cheat-sheets/#%F0%9F%A7%AA_Case_Signals_Community_Norms_Even_Without_Perfect_Case_Law" >🧪 Case Signals &amp; Community Norms (Even Without Perfect Case Law)</a></li><li class='ez-toc-page-1 ez-toc-heading-level-2'><a class="ez-toc-link ez-toc-heading-8" href="https://terms.law/2025/11/11/training-ai-on-open-source-code-legal-landmines-safe-patterns-and-visual-cheat-sheets/#%F0%9F%A7%B1_Safer_Design_Patterns_For_Training_On_OSS" >🧱 Safer Design Patterns For Training On OSS</a><ul class='ez-toc-list-level-3' ><li class='ez-toc-heading-level-3'><a class="ez-toc-link ez-toc-heading-9" href="https://terms.law/2025/11/11/training-ai-on-open-source-code-legal-landmines-safe-patterns-and-visual-cheat-sheets/#1_Data_Selection_Filtering" >1. Data Selection &amp; Filtering</a></li><li class='ez-toc-page-1 ez-toc-heading-level-3'><a class="ez-toc-link ez-toc-heading-10" href="https://terms.law/2025/11/11/training-ai-on-open-source-code-legal-landmines-safe-patterns-and-visual-cheat-sheets/#2_Regurgitation_Controls" >2. Regurgitation Controls</a></li><li class='ez-toc-page-1 ez-toc-heading-level-3'><a class="ez-toc-link ez-toc-heading-11" href="https://terms.law/2025/11/11/training-ai-on-open-source-code-legal-landmines-safe-patterns-and-visual-cheat-sheets/#3_Attribution_License_Surfacing" >3. Attribution &amp; License Surfacing</a></li></ul></li><li class='ez-toc-page-1 ez-toc-heading-level-2'><a class="ez-toc-link ez-toc-heading-12" href="https://terms.law/2025/11/11/training-ai-on-open-source-code-legal-landmines-safe-patterns-and-visual-cheat-sheets/#%F0%9F%A7%BE_Internal_Policy_Matrix_%E2%80%9CWhat_Can_We_Feed_The_Model%E2%80%9D" >🧾 Internal Policy Matrix: “What Can We Feed The Model?”</a></li><li class='ez-toc-page-1 ez-toc-heading-level-2'><a class="ez-toc-link ez-toc-heading-13" href="https://terms.law/2025/11/11/training-ai-on-open-source-code-legal-landmines-safe-patterns-and-visual-cheat-sheets/#%F0%9F%A7%AD_Practical_Playbook_If_Youre%E2%80%A6" >🧭 Practical Playbook: If You’re…</a><ul class='ez-toc-list-level-3' ><li class='ez-toc-heading-level-3'><a class="ez-toc-link ez-toc-heading-14" href="https://terms.law/2025/11/11/training-ai-on-open-source-code-legal-landmines-safe-patterns-and-visual-cheat-sheets/#1_A_Company_Training_Its_Own_Models_Internally" >1. A Company Training Its Own Models Internally</a></li><li class='ez-toc-page-1 ez-toc-heading-level-3'><a class="ez-toc-link ez-toc-heading-15" href="https://terms.law/2025/11/11/training-ai-on-open-source-code-legal-landmines-safe-patterns-and-visual-cheat-sheets/#2_A_Vendor_Shipping_Code-Suggesting_AI" >2. A Vendor Shipping Code-Suggesting AI</a></li><li class='ez-toc-page-1 ez-toc-heading-level-3'><a class="ez-toc-link ez-toc-heading-16" href="https://terms.law/2025/11/11/training-ai-on-open-source-code-legal-landmines-safe-patterns-and-visual-cheat-sheets/#3_A_Team_Consuming_AI_Code_Suggestions" >3. A Team Consuming AI Code Suggestions</a></li></ul></li><li class='ez-toc-page-1 ez-toc-heading-level-2'><a class="ez-toc-link ez-toc-heading-17" href="https://terms.law/2025/11/11/training-ai-on-open-source-code-legal-landmines-safe-patterns-and-visual-cheat-sheets/#TLDR_Mental_Model" >TL;DR Mental Model</a></li></ul></nav></div>
+<h2 class="wp-block-heading"><span class="ez-toc-section" id="%F0%9F%A7%A9_What_%E2%80%9CTraining_On_Open_Source%E2%80%9D_Actually_Involves"></span>🧩 What “Training On Open Source” Actually Involves<span class="ez-toc-section-end"></span></h2>
+
+
+
+<p>When you “train on open source code,” you’re typically doing some combination of:</p>
+
+
+
+<figure class="wp-block-table"><table class="has-fixed-layout"><thead><tr><th>⚙️ Step</th><th>What You Actually Do</th><th>Legal Hooks</th></tr></thead><tbody><tr><td><strong>1. Ingest / copy repos</strong></td><td>Clone/download OSS repos (or use big datasets like The Stack) into your training pipeline.</td><td>Direct copying of copyrighted code under the repo’s license.</td></tr><tr><td><strong>2. Preprocess &amp; tokenize</strong></td><td>Normalize, strip comments, break into tokens/ASTs, store in intermediate formats.</td><td>Still copying and making derivative forms, but usually internal.</td></tr><tr><td><strong>3. Train models</strong></td><td>Use that code to adjust weights of a model (language model, code LLM, embeddings, etc.).</td><td>Lots of debate: are weights “derivative works”? Most licenses never thought about this.</td></tr><tr><td><strong>4. Serve outputs</strong></td><td>Model suggests or generates code for users, sometimes very close to training snippets.</td><td>This is where <strong>infringement and license obligations</strong> practically show up.</td></tr><tr><td><strong>5. Distribute / commercialize</strong></td><td>You ship a product that emits or relies on those outputs.</td><td>If outputs embed or are constrained by copyleft terms, your distribution may trigger license duties.</td></tr></tbody></table></figure>
+
+
+
+<p>Most OSS fights are really about <strong>step 4/5</strong> (outputs and what you ship), not just step 3 (training in a black box).</p>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<h2 class="wp-block-heading"><span class="ez-toc-section" id="%F0%9F%A7%BE_Open_Source_Licenses_%E2%80%9CVisual%E2%80%9D_Risk_Matrix_For_AI_Training"></span>🧾 Open Source Licenses: “Visual” Risk Matrix For AI Training<span class="ez-toc-section-end"></span></h2>
+
+
+
+<p>Different licenses = different risk profiles.</p>
+
+
+
+<h3 class="wp-block-heading"><span class="ez-toc-section" id="Quick_Heat_Map"></span>Quick Heat Map<span class="ez-toc-section-end"></span></h3>
+
+
+
+<figure class="wp-block-table"><table class="has-fixed-layout"><thead><tr><th>License Family</th><th>Examples</th><th>Training On Code</th><th>Risk Of Output Obligations</th></tr></thead><tbody><tr><td><strong>Permissive</strong></td><td>MIT, BSD, Apache-2.0</td><td>Generally low controversy for training itself.</td><td>Outputs that closely copy code still infringe if unlicensed; otherwise minimal copyleft baggage.</td></tr><tr><td><strong>Weak Copyleft</strong></td><td>MPL-2.0, LGPL-2.1/3.0</td><td>Training debated but less explosive; obligations usually tied to linking/combining.</td><td>If output embeds actual MPL/LGPL code, you may need to disclose modifications / allow relinking.</td></tr><tr><td><strong>Strong Copyleft</strong></td><td>GPL-2.0/3.0, AGPL-3.0</td><td>Highest theoretical risk: some argue training creates derivative works; AGPL adds network-use triggers.</td><td>If outputs replicate GPL code and are distributed, you can be forced into GPL terms or be in violation.</td></tr><tr><td><strong>Source-available / special</strong></td><td>SSPL, BSL, Elastic, custom “no ML” add-ons</td><td>Often explicitly restrict certain uses (e.g. cloud, training, competition).</td><td>Violating license can be straight breach; not “open source” under OSI at all.</td></tr></tbody></table></figure>
+
+
+
+<p>Even for permissive licenses: <strong>if your model regurgitates large chunks of code</strong>, you’re still doing classic copyright infringement unless you respect that license (including attribution, notices, etc.).</p>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<h2 class="wp-block-heading"><span class="ez-toc-section" id="%F0%9F%93%9A_Key_License_Concepts_That_Matter_For_AI"></span>📚 Key License Concepts That Matter For AI<span class="ez-toc-section-end"></span></h2>
+
+
+
+<p>Consider this your “visual glossary” for the licenses you’re likely to trip over.</p>
+
+
+
+<figure class="wp-block-table"><table class="has-fixed-layout"><thead><tr><th>🧠 Concept</th><th>What It Means For Human Devs</th><th>What It Means For AI Training</th></tr></thead><tbody><tr><td><strong>Derivative work</strong></td><td>Adaptations, translations, modifications of the original code.</td><td>Are model weights “derivative”? Unclear. Outputs that mirror training code <em>definitely</em> look derivative.</td></tr><tr><td><strong>Distribution</strong></td><td>Shipping binaries/source to users.</td><td>Serving code suggestions <em>to a user</em> can feel like distribution of the underlying code.</td></tr><tr><td><strong>Copyleft “infection”</strong></td><td>If you combine GPL code into your program and distribute it, your program must be GPL too.</td><td>If your model spits out GPL code into a proprietary product, that product may be expected to comply with GPL.</td></tr><tr><td><strong>Network copyleft</strong></td><td>AGPL triggers when software is used over a network (SaaS).</td><td>If your product effectively “provides” AGPL code over an API, you may be pulled into AGPL obligations.</td></tr><tr><td><strong>Attribution / NOTICE files</strong></td><td>You must preserve license text and copyright notices.</td><td>If outputs contain recognizable chunks from Apache-2.0 or MIT libs, you may owe attribution even if you don’t ship the entire repo.</td></tr></tbody></table></figure>
+
+
+
+<p>No court has definitively answered “are model weights a derivative work of the training set” for code licenses. But you don’t need that question answered to get into trouble: <strong>output copying alone can be enough.</strong></p>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<h2 class="wp-block-heading"><span class="ez-toc-section" id="%E2%9A%96%EF%B8%8F_Where_The_Real_Legal_Risk_Comes_From"></span>⚖️ Where The Real Legal Risk Comes From<span class="ez-toc-section-end"></span></h2>
+
+
+
+<p>There are three main pressure points:</p>
+
+
+
+<ol class="wp-block-list">
+<li><strong>Model regurgitation</strong> – model outputs large chunks of training code verbatim or near-verbatim.</li>
+
+
+
+<li><strong>Copyleft in outputs</strong> – those chunks happen to come from GPL/AGPL or similar code and you use them in proprietary products.</li>
+
+
+
+<li><strong>License-restricted sources</strong> – you accidentally trained on code that explicitly bans training/ML or requires a commercial license.</li>
+</ol>
+
+
+
+<h3 class="wp-block-heading"><span class="ez-toc-section" id="Visual_Scenario_Matrix"></span>Visual Scenario Matrix<span class="ez-toc-section-end"></span></h3>
+
+
+
+<figure class="wp-block-table"><table class="has-fixed-layout"><thead><tr><th>Scenario</th><th>Infringement Risk</th><th>License Risk</th><th>Notes</th></tr></thead><tbody><tr><td>Model trained on <strong>large GitHub corpus</strong>, user occasionally sees small generic snippets (for loops, trivial functions).</td><td>Low, though never zero.</td><td>Low</td><td>Short, generic code often not protectable. Still, track if patterns look too specific.</td></tr><tr><td>Model spits out a <strong>30-line function identical</strong> to a popular MIT-licensed snippet</td><td>High: likely copyright infringement if used without MIT terms.</td><td>Medium: you should include MIT license/notice if you ship it.</td><td>Permissive but not free of obligations.</td></tr><tr><td>Model emits ** GPL-licensed function** that user copies into proprietary product</td><td>High</td><td>High: you either comply with GPL (share source, etc.) or you’re in breach.</td><td></td></tr><tr><td>Model trained on <strong>code that had “no AI use” in license</strong></td><td>High (breach, maybe infringement)</td><td>High</td><td>Even if outputs are not verbatim, training can violate license conditions (contract claims).</td></tr><tr><td>Internal fine-tuning on your own repos, used only within your company</td><td>Low</td><td>Low, assuming you own the code or comply with inbound licenses.</td><td>Still watch for third-party libs mixed in.</td></tr></tbody></table></figure>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<h2 class="wp-block-heading"><span class="ez-toc-section" id="%F0%9F%A7%AA_Case_Signals_Community_Norms_Even_Without_Perfect_Case_Law"></span>🧪 Case Signals &amp; Community Norms (Even Without Perfect Case Law)<span class="ez-toc-section-end"></span></h2>
+
+
+
+<p>There isn’t a Supreme Court case yet squarely about “AI trained on OSS,” but we do have <strong>signals</strong> from adjacent fights and community reactions:</p>
+
+
+
+<ul class="wp-block-list">
+<li><strong>Developers suing over code models</strong> (e.g., GitHub Copilot lawsuits) argue that training on public repos and emitting similar code is infringing; vendors argue fair use &amp; transformative training. These cases are still in early stages and haven’t produced a definitive rule, but they highlight <strong>two flashpoints</strong>:
+<ul class="wp-block-list">
+<li>Lack of attribution &amp; license compliance for emitted code.</li>
+
+
+
+<li>Regurgitation of nontrivial snippets from training repos.</li>
+</ul>
+</li>
+
+
+
+<li><strong>Courts in other AI cases</strong> are distinguishing between:
+<ul class="wp-block-list">
+<li>Internal copying for training models (possibly fair use in some contexts), and</li>
+
+
+
+<li>Outputs that <strong>replace the original product</strong> (e.g., legal headnotes, paywalled content), which have been treated much more skeptically.</li>
+</ul>
+</li>
+
+
+
+<li>OSS communities are already reacting:
+<ul class="wp-block-list">
+<li>Some projects add “no AI training” or “no ML use” clauses on top of standard licenses (these are not OSI-approved “open source” anymore, but they’re binding terms if you use the code).</li>
+
+
+
+<li>Others are experimenting with <strong>“AI-friendly” licenses</strong> that explicitly <em>allow</em> training use, often in exchange for attribution or open models.</li>
+</ul>
+</li>
+</ul>
+
+
+
+<p>Pragmatically: <strong>you do not want to be the test case</strong> that answers all this for the first time.</p>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<h2 class="wp-block-heading"><span class="ez-toc-section" id="%F0%9F%A7%B1_Safer_Design_Patterns_For_Training_On_OSS"></span>🧱 Safer Design Patterns For Training On OSS<span class="ez-toc-section-end"></span></h2>
+
+
+
+<p>Let’s organize a “safe-ish vs risky” pattern table.</p>
+
+
+
+<h3 class="wp-block-heading"><span class="ez-toc-section" id="1_Data_Selection_Filtering"></span>1. Data Selection &amp; Filtering<span class="ez-toc-section-end"></span></h3>
+
+
+
+<figure class="wp-block-table"><table class="has-fixed-layout"><thead><tr><th>Approach</th><th>Description</th><th>Risk Level</th></tr></thead><tbody><tr><td><strong>Curated permissive-only set</strong></td><td>Only train on repos under MIT/BSD/Apache-2.0 with no extra restrictions; exclude GPL/AGPL, custom, source-available.</td><td>🟢 Lower</td></tr><tr><td><strong>Mixed licenses with license labels</strong></td><td>Train on broad OSS, but track license of every file and use metadata at inference time to avoid suggesting copyleft code.</td><td>🟡 Medium</td></tr><tr><td><strong>“All public GitHub” with no filtering</strong></td><td>Crawl everything public, ignoring licenses.</td><td>🔴 High</td></tr></tbody></table></figure>
+
+
+
+<h3 class="wp-block-heading"><span class="ez-toc-section" id="2_Regurgitation_Controls"></span>2. Regurgitation Controls<span class="ez-toc-section-end"></span></h3>
+
+
+
+<figure class="wp-block-table"><table class="has-fixed-layout"><thead><tr><th>Technique</th><th>What It Does</th><th>Why It Matters</th></tr></thead><tbody><tr><td><strong>Similarity filters</strong></td><td>Check outputs against training set; block or warn when similarity &gt; threshold.</td><td>Reduces chance of verbatim copy of licensed code.</td></tr><tr><td><strong>Snippet length caps</strong></td><td>Limit how long a single suggestion can be (e.g., &lt; N lines).</td><td>Shorter snippets are less likely to be protectable or license-triggering.</td></tr><tr><td><strong>No “copy file” behavior</strong></td><td>Prevent prompts like “give me the full source of X project” from returning training code.</td><td>Avoids obvious training-set leakage.</td></tr></tbody></table></figure>
+
+
+
+<h3 class="wp-block-heading"><span class="ez-toc-section" id="3_Attribution_License_Surfacing"></span>3. Attribution &amp; License Surfacing<span class="ez-toc-section-end"></span></h3>
+
+
+
+<figure class="wp-block-table"><table class="has-fixed-layout"><thead><tr><th>Pattern</th><th>Description</th></tr></thead><tbody><tr><td><strong>Attribution suggestions</strong></td><td>If a suggestion strongly matches a known OSS component, surface a notice: “This resembles code from PROJECT (LICENSE). Consider complying with its terms.”</td></tr><tr><td><strong>License-aware mode</strong></td><td>User can choose “only suggest code that is permissively licensed and surface required notices automatically.”</td></tr><tr><td><strong>Org-local tuning</strong></td><td>Let companies fine-tune primarily on <em>their own</em> code, so outbound license risk is mostly their inbound risk.</td></tr></tbody></table></figure>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<h2 class="wp-block-heading"><span class="ez-toc-section" id="%F0%9F%A7%BE_Internal_Policy_Matrix_%E2%80%9CWhat_Can_We_Feed_The_Model%E2%80%9D"></span>🧾 Internal Policy Matrix: “What Can We Feed The Model?”<span class="ez-toc-section-end"></span></h2>
+
+
+
+<p>If you’re an engineering org, you can make a simple policy like this.</p>
+
+
+
+<figure class="wp-block-table"><table class="has-fixed-layout"><thead><tr><th>Input Type</th><th>OK For Internal Fine-Tuning?</th><th>OK For External Vendor Training?</th></tr></thead><tbody><tr><td>Code you fully own (in-house, no third-party dependencies)</td><td>✅ Yes</td><td>✅ Maybe, if contractually protected and anonymized.</td></tr><tr><td>MIT/BSD/Apache snippets already used in your product</td><td>✅ Yes, but track attribution duties.</td><td>⚠️ Only with vendor who respects license metadata and doesn’t regurgitate.</td></tr><tr><td>GPL/AGPL-licensed code in your codebase</td><td>⚠️ Only if you already comply with GPL/AGPL; review carefully.</td><td>❌ High risk; don’t send to vendor training without specialized advice.</td></tr><tr><td>Proprietary SDKs, partner code under strict license</td><td>⚠️ Only with written permission from the licensor.</td><td>❌ No, unless explicitly negotiated.</td></tr><tr><td>Random public GitHub repos you don’t use</td><td>✅ Internally for experimentation (still be cautious)</td><td>❌ Don’t donate your training set to a third-party vendor irresponsibly.</td></tr></tbody></table></figure>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<h2 class="wp-block-heading"><span class="ez-toc-section" id="%F0%9F%A7%AD_Practical_Playbook_If_Youre%E2%80%A6"></span>🧭 Practical Playbook: If You’re…<span class="ez-toc-section-end"></span></h2>
+
+
+
+<h3 class="wp-block-heading"><span class="ez-toc-section" id="1_A_Company_Training_Its_Own_Models_Internally"></span>1. A Company Training Its Own Models Internally<span class="ez-toc-section-end"></span></h3>
+
+
+
+<ul class="wp-block-list">
+<li><strong>Curate training data</strong>:
+<ul class="wp-block-list">
+<li>Separate <strong>permissive OSS</strong> from <strong>copyleft / source-available / closed</strong>.</li>
+
+
+
+<li>Label license types and keep that metadata throughout your pipeline.</li>
+</ul>
+</li>
+
+
+
+<li><strong>Configure regurgitation guards</strong>:
+<ul class="wp-block-list">
+<li>Similarity filters vs your training set.</li>
+
+
+
+<li>Max snippet length.</li>
+
+
+
+<li>Block high-risk prompts (“give me the source code of [project]”).</li>
+</ul>
+</li>
+
+
+
+<li><strong>Set a review process</strong>:
+<ul class="wp-block-list">
+<li>Require devs to treat AI output like code from Stack Overflow or GitHub:
+<ul class="wp-block-list">
+<li>check license,</li>
+
+
+
+<li>attribute when needed,</li>
+
+
+
+<li>avoid dropping in big chunks blindly.</li>
+</ul>
+</li>
+</ul>
+</li>
+
+
+
+<li><strong>Document your posture</strong>:
+<ul class="wp-block-list">
+<li>If you’re ever challenged, being able to show <strong>design efforts to avoid copying</strong> and respect licenses will matter.</li>
+</ul>
+</li>
+</ul>
+
+
+
+<h3 class="wp-block-heading"><span class="ez-toc-section" id="2_A_Vendor_Shipping_Code-Suggesting_AI"></span>2. A Vendor Shipping Code-Suggesting AI<span class="ez-toc-section-end"></span></h3>
+
+
+
+<ul class="wp-block-list">
+<li><strong>Have a license strategy</strong>, not just a scraper:
+<ul class="wp-block-list">
+<li>Decide which licenses you’re comfortable training on.</li>
+
+
+
+<li>Be explicit (publicly) about how you deal with GPL/AGPL and custom licenses.</li>
+</ul>
+</li>
+
+
+
+<li><strong>Offer IP and license-aware features</strong>:
+<ul class="wp-block-list">
+<li>Users will increasingly expect you to help them stay compliant (warnings, attribution hints, license filters).</li>
+</ul>
+</li>
+
+
+
+<li><strong>Contract carefully</strong>:
+<ul class="wp-block-list">
+<li>Make clear what you indemnify for (e.g., your architecture, your training choices), and what you don’t (e.g., users instructing your system to recreate forbidden code).</li>
+</ul>
+</li>
+</ul>
+
+
+
+<h3 class="wp-block-heading"><span class="ez-toc-section" id="3_A_Team_Consuming_AI_Code_Suggestions"></span>3. A Team Consuming AI Code Suggestions<span class="ez-toc-section-end"></span></h3>
+
+
+
+<ul class="wp-block-list">
+<li>Treat suggestions as if they came from <strong>a random GitHub gist</strong>:
+<ul class="wp-block-list">
+<li>Don’t paste them blindly into commercial code.</li>
+
+
+
+<li>Run your usual license-checking tools across resulting repos.</li>
+
+
+
+<li>Be extra cautious about long, sophisticated snippets that look “too good.”</li>
+</ul>
+</li>
+
+
+
+<li>Consider policies like:
+<ul class="wp-block-list">
+<li>“No direct use of AI-generated code in core IP without human rewrite &amp; review.”</li>
+
+
+
+<li>“Any suggestion over X lines must be vetted for license origin.”</li>
+</ul>
+</li>
+</ul>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<h2 class="wp-block-heading"><span class="ez-toc-section" id="TLDR_Mental_Model"></span>TL;DR Mental Model<span class="ez-toc-section-end"></span></h2>
+
+
+
+<ul class="wp-block-list">
+<li><strong>Training on open source</strong> isn’t automatically forbidden, but it’s not a license-free buffet either.</li>
+
+
+
+<li>The <strong>real danger</strong> is not the math in the weights; it’s <strong>what comes out of the model</strong> and how you use it.</li>
+
+
+
+<li>Licenses like MIT and Apache are relatively friendly if you also handle <strong>attribution and notices</strong>; copyleft and custom “no AI” licenses can be landmines.</li>
+
+
+
+<li>Good practice looks like: <strong>curate → label → guard → review</strong>, not “scrape everything and hope for fair use.”</li>
+</ul>
+
+
+
+<!-- Calendly inline widget begin -->
+<div class="calendly-inline-widget" data-url="https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1" style="min-width:320px;height:700px;"></div>
+<script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
+<!-- Calendly inline widget end -->
+</div>
+    </article>
+  </main>
+
+  <footer><p>© 2025 Terms.Law. All rights reserved.</p></footer>
+</body>
+</html>

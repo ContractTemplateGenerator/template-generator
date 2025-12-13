@@ -1,0 +1,1816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Promissory Note Generator | Terms.Law</title>
+  <link rel="canonical" href="https://terms.law/2022/11/19/promissory-note-generator/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/shared/styles.css">
+</head>
+<body>
+  <div id="site-header"></div>
+  <script src="/shared/header-loader.js"></script>
+  <main>
+    <article>
+      <h1>Promissory Note Generator</h1>
+      <div class="meta">Published: November 19, 2022 • Document Generators, Free Templates</div>
+      <div class="content">
+<div id="promissory-note-generator" class="terms-law-tool">
+  <div class="tool-container">
+    <div class="tool-header">
+      <h2>Promissory Note Generator</h2>
+      <p class="tool-intro">Create a legally binding promissory note with customized terms. This document establishes the terms for loan repayment between a borrower and lender.</p>
+    </div>
+    
+    <!-- Progress Bar -->
+    <div class="tool-progress-container">
+      <div class="tool-progress-bar">
+        <div id="progress-bar"></div>
+      </div>
+      <div class="tool-progress-text"><span id="current-step">1</span>/<span id="total-steps">3</span></div>
+    </div>
+    
+    <!-- Split View Container -->
+    <div class="split-view-container">
+      <!-- Left Side: Question Container -->
+      <div id="question-container" class="question-panel">
+        <!-- Questions will be inserted here by JavaScript -->
+      </div>
+      
+      <!-- Right Side: Preview Container -->
+      <div id="preview-container" class="preview-panel">
+        <div class="preview-header">
+          <h3>Promissory Note Preview</h3>
+          <p class="preview-note">This preview updates as you make selections.</p>
+        </div>
+        <div class="preview-content">
+          <div id="preview-text"></div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Results Container -->
+    <div id="results-container" style="display: none;">
+      <div class="results-header">
+        <h3>Your Promissory Note</h3>
+        <p>Below is your completed promissory note based on the information provided.</p>
+      </div>
+      
+      <div class="note-text-container">
+        <div id="note-text"></div>
+      </div>
+      
+      <div class="copy-action">
+        <button id="copy-btn" class="tool-btn copy-btn">Copy Promissory Note</button>
+        <span id="copy-message" class="copy-message"></span>
+      </div>
+      
+      <div class="note-notes">
+        <h4>Important Notes</h4>
+        <p>This promissory note template is provided as a starting point and may need further customization for your specific use case. It&#8217;s important to:</p>
+        <ul>
+          <li>Review the terms thoroughly to ensure they align with your intentions</li>
+          <li>Consider having the document reviewed by a qualified attorney</li>
+          <li>Ensure all parties understand the terms before signing</li>
+          <li>Keep signed copies in a safe place</li>
+        </ul>
+      </div>
+      
+      <!-- CTA Buttons -->
+      <div class="results-cta">
+        <button id="recalculate-btn" class="tool-btn tool-btn-secondary">Start Over</button>
+        <a href="#" class="tool-btn tool-btn-cta" onclick="Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting'});return false;">Schedule Legal Consultation</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Tool Styles */
+.terms-law-tool {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  max-width: 1000px;
+  margin: 0 auto;
+  color: #333;
+}
+
+.tool-container {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 30px;
+}
+
+.tool-header {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.tool-header h2 {
+  color: #2c3e50;
+  font-size: 22px;
+  margin-bottom: 8px;
+}
+
+.tool-intro {
+  color: #555;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* Split View Layout */
+.split-view-container {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.question-panel {
+  flex: 1;
+  max-width: 50%;
+}
+
+.preview-panel {
+  flex: 1;
+  border-left: 1px solid #eee;
+  padding-left: 15px;
+}
+
+.preview-header {
+  margin-bottom: 10px;
+}
+
+.preview-header h3 {
+  font-size: 16px;
+  color: #2c3e50;
+  margin: 0 0 5px 0;
+}
+
+.preview-note {
+  font-size: 12px;
+  color: #777;
+  font-style: italic;
+  margin: 0;
+}
+
+.preview-content {
+  background-color: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 15px;
+  max-height: 400px;
+  overflow-y: auto;
+  transition: background-color 0.5s ease;
+}
+
+#preview-text {
+  font-size: 12px;
+  line-height: 1.5;
+  color: #333;
+  white-space: pre-wrap;
+}
+
+/* Progress Bar */
+.tool-progress-container {
+  margin: 15px 0;
+  position: relative;
+}
+
+.tool-progress-bar {
+  height: 6px;
+  background-color: #e0e0e0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+#progress-bar {
+  height: 100%;
+  background-color: #3498db;
+  width: 33.33%;
+  transition: width 0.3s ease;
+}
+
+.tool-progress-text {
+  text-align: right;
+  font-size: 12px;
+  color: #777;
+  margin-top: 3px;
+}
+
+/* Question Styles */
+.question-step {
+  margin-bottom: 15px;
+}
+
+.question-step h3 {
+  font-size: 16px;
+  margin-bottom: 10px;
+  color: #2c3e50;
+}
+
+.question-description {
+  color: #555;
+  font-size: 13px;
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+/* Input Styles */
+.input-group {
+  margin-bottom: 12px;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.text-input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.number-input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.date-input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.select-input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: white;
+}
+
+.input-helper {
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+}
+
+.input-prefix {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.input-prefix span {
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  border-right: none;
+  border-radius: 4px 0 0 4px;
+  padding: 8px 10px;
+  color: #555;
+  font-size: 14px;
+}
+
+.input-prefix input {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 0 4px 4px 0;
+  font-size: 14px;
+}
+
+.checkbox-group {
+  margin-bottom: 12px;
+}
+
+.checkbox-option {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.checkbox-option input[type="checkbox"] {
+  margin-right: 8px;
+  margin-top: 3px;
+}
+
+.checkbox-label {
+  font-size: 14px;
+}
+
+/* Navigation Buttons */
+.tool-navigation {
+  margin-top: 15px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.tool-btn {
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.tool-btn-primary {
+  background-color: #3498db;
+  color: white;
+}
+
+.tool-btn-primary:hover {
+  background-color: #2980b9;
+}
+
+.tool-btn-secondary {
+  background-color: #ecf0f1;
+  color: #34495e;
+}
+
+.tool-btn-secondary:hover {
+  background-color: #dde4e6;
+}
+
+.tool-btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tool-btn-cta {
+  background-color: #2c3e50;
+  color: white !important;
+  display: inline-block;
+  text-align: center;
+}
+
+.tool-btn-cta:hover {
+  background-color: #1a252f;
+}
+
+/* Results Styles */
+#results-container {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+#results-container.visible {
+  opacity: 1;
+}
+
+.results-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.results-header h3 {
+  color: #2c3e50;
+  font-size: 22px;
+  margin-bottom: 8px;
+}
+
+.note-text-container {
+  background-color: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+#note-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333;
+  white-space: pre-wrap;
+}
+
+.copy-action {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.copy-btn {
+  background-color: #3498db;
+  color: white;
+}
+
+.copy-btn:hover {
+  background-color: #2980b9;
+}
+
+.copy-message {
+  display: inline-block;
+  margin-left: 10px;
+  font-size: 14px;
+  color: #27ae60;
+}
+
+.note-notes {
+  background-color: #fff8e1;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 25px;
+}
+
+.note-notes h4 {
+  color: #856404;
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 18px;
+}
+
+.note-notes ul {
+  padding-left: 20px;
+  margin-bottom: 0;
+}
+
+.note-notes li {
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+/* Call to Action */
+.results-cta {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .tool-container {
+    padding: 15px;
+  }
+  
+  .split-view-container {
+    flex-direction: column;
+  }
+  
+  .question-panel, 
+  .preview-panel {
+    max-width: 100%;
+  }
+  
+  .preview-panel {
+    border-left: none;
+    border-top: 1px solid #eee;
+    padding-left: 0;
+    padding-top: 15px;
+    margin-top: 15px;
+  }
+  
+  .results-cta {
+    flex-direction: column;
+  }
+  
+  .tool-btn {
+    width: 100%;
+  }
+}
+</style>
+
+<!-- Load Calendly Widget -->
+<link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+<script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Set current date for default values
+  const today = new Date();
+  const nextYear = new Date(today);
+  nextYear.setFullYear(today.getFullYear() + 1);
+  
+  // Format dates for input fields
+  const formatDateForInput = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+  
+  // Format dates for display
+  const formatDateForDisplay = (dateString) => {
+    const date = new Date(dateString);
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return date.toLocaleDateString('en-US', options);
+  };
+  
+  // Questions Data
+  const questions = [
+    {
+      id: 'loan-details',
+      title: 'Loan Amount and Terms',
+      description: 'Enter the basic details about the loan.',
+      fields: [
+        {
+          id: 'loan-amount',
+          label: 'Loan Amount',
+          type: 'currency',
+          value: '10000',
+          helper: 'The principal amount being borrowed'
+        },
+        {
+          id: 'interest-rate',
+          label: 'Annual Interest Rate (%)',
+          type: 'number',
+          value: '5',
+          helper: 'The annual interest rate as a percentage'
+        },
+        {
+          id: 'late-fee',
+          label: 'Late Payment Fee ($)',
+          type: 'currency',
+          value: '25',
+          helper: 'Fee charged for late payments'
+        },
+        {
+          id: 'date-of-note',
+          label: 'Date of Note',
+          type: 'date',
+          value: formatDateForInput(today),
+          helper: 'The date when the promissory note is executed'
+        }
+      ]
+    },
+    {
+      id: 'payment-terms',
+      title: 'Payment Terms',
+      description: 'Specify how and when the loan will be repaid.',
+      fields: [
+        {
+          id: 'due-date',
+          label: 'Due Date',
+          type: 'date',
+          value: formatDateForInput(nextYear),
+          helper: 'The date when the loan must be fully repaid'
+        },
+        {
+          id: 'payment-schedule',
+          label: 'Payment Schedule',
+          type: 'select',
+          options: [
+            { value: 'lump-sum', label: 'Lump Sum (on due date)', selected: true },
+            { value: 'monthly', label: 'Monthly Payments' },
+            { value: 'quarterly', label: 'Quarterly Payments' },
+            { value: 'custom', label: 'Custom Schedule' }
+          ],
+          helper: 'How frequently payments will be made'
+        },
+        {
+          id: 'secured-loan',
+          label: 'Secured Loan',
+          type: 'checkbox',
+          options: [
+            { 
+              id: 'is-secured', 
+              label: 'This loan is secured by collateral',
+              checked: false
+            }
+          ],
+          helper: 'Check if this loan is secured by collateral'
+        },
+        {
+          id: 'collateral-description',
+          label: 'Collateral Description',
+          type: 'textarea',
+          value: '',
+          helper: 'Describe the collateral securing this loan, if applicable',
+          depends: 'is-secured'
+        },
+        
+
+
+{
+  id: 'governing-law',
+  label: 'Governing Law (State)',
+  type: 'select',
+  options: [
+    { value: 'Alabama', label: 'Alabama' },
+    { value: 'Alaska', label: 'Alaska' },
+    { value: 'Arizona', label: 'Arizona' },
+    { value: 'Arkansas', label: 'Arkansas' },
+    { value: 'California', label: 'California', selected: true },
+    { value: 'Colorado', label: 'Colorado' },
+    { value: 'Connecticut', label: 'Connecticut' },
+    { value: 'Delaware', label: 'Delaware' },
+    { value: 'Florida', label: 'Florida' },
+    { value: 'Georgia', label: 'Georgia' },
+    { value: 'Hawaii', label: 'Hawaii' },
+    { value: 'Idaho', label: 'Idaho' },
+    { value: 'Illinois', label: 'Illinois' },
+    { value: 'Indiana', label: 'Indiana' },
+    { value: 'Iowa', label: 'Iowa' },
+    { value: 'Kansas', label: 'Kansas' },
+    { value: 'Kentucky', label: 'Kentucky' },
+    { value: 'Louisiana', label: 'Louisiana' },
+    { value: 'Maine', label: 'Maine' },
+    { value: 'Maryland', label: 'Maryland' },
+    { value: 'Massachusetts', label: 'Massachusetts' },
+    { value: 'Michigan', label: 'Michigan' },
+    { value: 'Minnesota', label: 'Minnesota' },
+    { value: 'Mississippi', label: 'Mississippi' },
+    { value: 'Missouri', label: 'Missouri' },
+    { value: 'Montana', label: 'Montana' },
+    { value: 'Nebraska', label: 'Nebraska' },
+    { value: 'Nevada', label: 'Nevada' },
+    { value: 'New Hampshire', label: 'New Hampshire' },
+    { value: 'New Jersey', label: 'New Jersey' },
+    { value: 'New Mexico', label: 'New Mexico' },
+    { value: 'New York', label: 'New York' },
+    { value: 'North Carolina', label: 'North Carolina' },
+    { value: 'North Dakota', label: 'North Dakota' },
+    { value: 'Ohio', label: 'Ohio' },
+    { value: 'Oklahoma', label: 'Oklahoma' },
+    { value: 'Oregon', label: 'Oregon' },
+    { value: 'Pennsylvania', label: 'Pennsylvania' },
+    { value: 'Rhode Island', label: 'Rhode Island' },
+    { value: 'South Carolina', label: 'South Carolina' },
+    { value: 'South Dakota', label: 'South Dakota' },
+    { value: 'Tennessee', label: 'Tennessee' },
+    { value: 'Texas', label: 'Texas' },
+    { value: 'Utah', label: 'Utah' },
+    { value: 'Vermont', label: 'Vermont' },
+    { value: 'Virginia', label: 'Virginia' },
+    { value: 'Washington', label: 'Washington' },
+    { value: 'West Virginia', label: 'West Virginia' },
+    { value: 'Wisconsin', label: 'Wisconsin' },
+    { value: 'Wyoming', label: 'Wyoming' }
+  ],
+  helper: 'The state whose laws will govern this agreement'
+}
+
+
+      ]
+    },
+    {
+      id: 'parties',
+      title: 'Borrower and Lender Information',
+      description: 'Enter the names of the parties involved in this promissory note.',
+      fields: [
+        {
+          id: 'borrower-name',
+          label: 'Borrower Full Name',
+          type: 'text',
+          value: 'John Doe',
+          helper: 'The full legal name of the person or entity borrowing the money'
+        },
+        {
+          id: 'lender-name',
+          label: 'Lender Full Name',
+          type: 'text',
+          value: 'Jane Smith',
+          helper: 'The full legal name of the person or entity lending the money'
+        },
+        {
+          id: 'co-signer',
+          label: 'Co-Signer',
+          type: 'checkbox',
+          options: [
+            { 
+              id: 'has-cosigner', 
+              label: 'This loan has a co-signer',
+              checked: false
+            }
+          ],
+          helper: 'Check if this loan has a co-signer'
+        },
+        {
+          id: 'co-signer-name',
+          label: 'Co-Signer Full Name',
+          type: 'text',
+          value: '',
+          helper: 'The full legal name of the co-signer',
+          depends: 'has-cosigner'
+        }
+      ]
+    }
+  ];
+  
+  // DOM Elements
+  const questionContainer = document.getElementById('question-container');
+  const previewContainer = document.getElementById('preview-container');
+  const previewText = document.getElementById('preview-text');
+  const resultsContainer = document.getElementById('results-container');
+  const progressBar = document.getElementById('progress-bar');
+  const currentStepEl = document.getElementById('current-step');
+  const totalStepsEl = document.getElementById('total-steps');
+  const recalculateBtn = document.getElementById('recalculate-btn');
+  const copyBtn = document.getElementById('copy-btn');
+  const copyMessage = document.getElementById('copy-message');
+  
+  // Set up variables
+  let currentStep = 0;
+  const userAnswers = {};
+  const totalSteps = questions.length;
+  
+  // Initialize the tool
+  function initTool() {
+    // Set total steps
+    totalStepsEl.textContent = totalSteps;
+    
+    // Initialize with default values
+    questions.forEach(question => {
+      question.fields.forEach(field => {
+        if (field.type === 'select') {
+          const selectedOption = field.options.find(option => option.selected);
+          if (selectedOption) {
+            userAnswers[field.id] = selectedOption.value;
+          } else if (field.options.length > 0) {
+            userAnswers[field.id] = field.options[0].value;
+          }
+        } else if (field.type === 'checkbox') {
+          field.options.forEach(option => {
+            userAnswers[option.id] = option.checked || false;
+          });
+        } else {
+          userAnswers[field.id] = field.value || '';
+        }
+      });
+    });
+    
+    // Generate initial preview
+    updatePreview();
+    
+    // Show first question
+    showQuestion(0);
+    
+    // Add event listener to recalculate button
+    recalculateBtn.addEventListener('click', function() {
+      resultsContainer.style.display = 'none';
+      resultsContainer.classList.remove('visible');
+      previewContainer.style.display = 'block';
+      questionContainer.style.display = 'block';
+      showQuestion(0);
+      
+      // Scroll to the top of the tool
+      document.getElementById('promissory-note-generator').scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start'
+      });
+    });
+    
+    // Add event listener to copy button
+    copyBtn.addEventListener('click', function() {
+      const noteText = document.getElementById('note-text').innerText;
+      
+      navigator.clipboard.writeText(noteText).then(function() {
+        copyMessage.textContent = 'Promissory note copied!';
+        setTimeout(function() {
+          copyMessage.textContent = '';
+        }, 3000);
+      }, function() {
+        copyMessage.textContent = 'Unable to copy. Please select and copy manually.';
+        setTimeout(function() {
+          copyMessage.textContent = '';
+        }, 3000);
+      });
+    });
+  }
+  
+  // Show a specific question
+  function showQuestion(index) {
+    currentStep = index;
+    currentStepEl.textContent = index + 1;
+    
+    // Update progress bar
+    progressBar.style.width = `${((index + 1) / totalSteps) * 100}%`;
+    
+    // Get the current question
+    const question = questions[index];
+    
+    // Create the question HTML
+    let html = `
+      <div class="question-step" id="step-${question.id}">
+        <h3>${question.title}</h3>
+        <p class="question-description">${question.description}</p>
+    `;
+    
+    // Add fields
+    question.fields.forEach(field => {
+      // Check if the field should be shown based on dependencies
+      if (field.depends && !userAnswers[field.depends]) {
+        return; // Skip this field if its dependency isn't met
+      }
+      
+      if (field.type === 'currency') {
+        html += `
+          <div class="input-group">
+            <label for="${field.id}">${field.label}</label>
+            <div class="input-prefix">
+              <span>$</span>
+              <input type="number" id="${field.id}" class="number-input" value="${userAnswers[field.id]}" min="0" step="1">
+            </div>
+            ${field.helper ? `<div class="input-helper">${field.helper}</div>` : ''}
+          </div>
+        `;
+      } else if (field.type === 'number') {
+        html += `
+          <div class="input-group">
+            <label for="${field.id}">${field.label}</label>
+            <input type="number" id="${field.id}" class="number-input" value="${userAnswers[field.id]}" min="0" step="0.1">
+            ${field.helper ? `<div class="input-helper">${field.helper}</div>` : ''}
+          </div>
+        `;
+      } else if (field.type === 'date') {
+        html += `
+          <div class="input-group">
+            <label for="${field.id}">${field.label}</label>
+            <input type="date" id="${field.id}" class="date-input" value="${userAnswers[field.id]}">
+            ${field.helper ? `<div class="input-helper">${field.helper}</div>` : ''}
+          </div>
+        `;
+      } else if (field.type === 'select') {
+        html += `
+          <div class="input-group">
+            <label for="${field.id}">${field.label}</label>
+            <select id="${field.id}" class="select-input">
+        `;
+        field.options.forEach(option => {
+          const isSelected = userAnswers[field.id] === option.value;
+          html += `<option value="${option.value}" ${isSelected ? 'selected' : ''}>${option.label}</option>`;
+        });
+        html += `
+            </select>
+            ${field.helper ? `<div class="input-helper">${field.helper}</div>` : ''}
+          </div>
+        `;
+      } else if (field.type === 'text') {
+        html += `
+          <div class="input-group">
+            <label for="${field.id}">${field.label}</label>
+            <input type="text" id="${field.id}" class="text-input" value="${userAnswers[field.id]}">
+            ${field.helper ? `<div class="input-helper">${field.helper}</div>` : ''}
+          </div>
+        `;
+      } else if (field.type === 'textarea') {
+        html += `
+          <div class="input-group">
+            <label for="${field.id}">${field.label}</label>
+            <textarea id="${field.id}" class="text-input" rows="3">${userAnswers[field.id] || ''}</textarea>
+            ${field.helper ? `<div class="input-helper">${field.helper}</div>` : ''}
+          </div>
+        `;
+      } else if (field.type === 'checkbox') {
+        html += `
+          <div class="checkbox-group">
+            <label>${field.label}</label>
+            ${field.helper ? `<div class="input-helper">${field.helper}</div>` : ''}
+        `;
+        
+        field.options.forEach(option => {
+          const isChecked = userAnswers[option.id];
+          html += `
+            <div class="checkbox-option">
+              <input type="checkbox" id="${option.id}" ${isChecked ? 'checked' : ''}>
+              <label for="${option.id}" class="checkbox-label">${option.label}</label>
+            </div>
+          `;
+        });
+        
+        html += `</div>`;
+      }
+    });
+    
+    html += `</div>`;
+    
+    // Add navigation buttons
+    html += `
+      <div class="tool-navigation">
+        <button id="back-btn" class="tool-btn tool-btn-secondary" ${index === 0 ? 'disabled' : ''}>Back</button>
+        <button id="continue-btn" class="tool-btn tool-btn-primary">${index === totalSteps - 1 ? 'Generate Note' : 'Continue'}</button>
+      </div>
+    `;
+    
+    // Set the HTML
+    questionContainer.innerHTML = html;
+    
+    // Add event listeners to input fields for real-time preview updates
+    const inputs = document.querySelectorAll('.text-input, .number-input, .date-input, .select-input');
+    inputs.forEach(input => {
+      input.addEventListener('input', function() {
+        // Store the answer
+        userAnswers[this.id] = this.value;
+        
+        // Update the preview with the section that changed
+        updatePreview(this.id);
+      });
+      
+      // For select inputs, we need to use 'change' event instead of 'input'
+      if (input.tagName.toLowerCase() === 'select') {
+        input.addEventListener('change', function() {
+          // Store the answer
+          userAnswers[this.id] = this.value;
+          
+          // Update the preview with the section that changed
+          updatePreview(this.id);
+        });
+      }
+    });
+    
+    // Add event listeners to checkbox inputs
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', function() {
+        // Store the answer
+        userAnswers[this.id] = this.checked;
+        
+        // Update dependent fields visibility
+        updateDependentFields(this.id, this.checked);
+        
+        // Update the preview with the section that changed
+        updatePreview(this.id);
+      });
+    });
+    
+    // Add event listeners to the Back and Continue buttons
+    document.getElementById('back-btn').addEventListener('click', function() {
+      if (currentStep > 0) {
+        // Save current answers
+        saveCurrentAnswers();
+        // Go to previous question
+        showQuestion(currentStep - 1);
+      }
+    });
+    
+    document.getElementById('continue-btn').addEventListener('click', function() {
+      // Save current answers
+      saveCurrentAnswers();
+      
+      if (currentStep < totalSteps - 1) {
+        // Go to next question
+        showQuestion(currentStep + 1);
+      } else {
+        // Generate promissory note
+        generatePromissoryNote();
+      }
+    });
+    
+    // Update dependent fields visibility on initial load
+    updateDependentFieldsVisibility();
+  }
+  
+  // Update dependent fields visibility
+  function updateDependentFields(changedId, isChecked) {
+    // Get the current question
+    const question = questions[currentStep];
+    
+    // Find fields that depend on the changed checkbox
+    const dependentFields = question.fields.filter(field => field.depends === changedId);
+    
+    if (dependentFields.length > 0) {
+      // Re-render the step to update visibility
+      showQuestion(currentStep);
+    }
+  }
+  
+  // Check if all dependent fields should be visible
+  function updateDependentFieldsVisibility() {
+    // Get all checkboxes on the current page
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    
+    // Check if any need to trigger dependent fields
+    checkboxes.forEach(checkbox => {
+      if (checkbox.checked) {
+        updateDependentFields(checkbox.id, true);
+      }
+    });
+  }
+  
+  // Save the current answers from the form
+  function saveCurrentAnswers() {
+    const question = questions[currentStep];
+    
+    question.fields.forEach(field => {
+      if (field.type === 'text' || field.type === 'number' || field.type === 'date' || field.type === 'select' || field.type === 'currency' || field.type === 'textarea') {
+        const inputEl = document.getElementById(field.id);
+        if (inputEl) {
+          userAnswers[field.id] = inputEl.value;
+        }
+      } else if (field.type === 'checkbox') {
+        field.options.forEach(option => {
+          const checkboxEl = document.getElementById(option.id);
+          if (checkboxEl) {
+            userAnswers[option.id] = checkboxEl.checked;
+          }
+        });
+      }
+    });
+  }
+  
+  // Update the promissory note preview based on current selections
+  function updatePreview(changedSection = null) {
+    // Get values from user answers
+    const loanAmount = userAnswers['loan-amount'] || '10000';
+    const interestRate = userAnswers['interest-rate'] || '5';
+    const lateFee = userAnswers['late-fee'] || '25';
+    const dateOfNote = userAnswers['date-of-note'] || formatDateForInput(today);
+    const dueDate = userAnswers['due-date'] || formatDateForInput(nextYear);
+    const paymentSchedule = userAnswers['payment-schedule'] || 'lump-sum';
+    const borrowerName = userAnswers['borrower-name'] || 'John Doe';
+    const lenderName = userAnswers['lender-name'] || 'Jane Smith';
+    const isSecured = userAnswers['is-secured'] || false;
+    const collateralDescription = userAnswers['collateral-description'] || '';
+    const hasCosigner = userAnswers['has-cosigner'] || false;
+    const cosignerName = userAnswers['co-signer-name'] || '';
+    const governingLaw = userAnswers['governing-law'] || 'California';
+    
+    // Format dates for display
+    const formattedDateOfNote = formatDateForDisplay(dateOfNote);
+    const formattedDueDate = formatDateForDisplay(dueDate);
+    
+    // Get payment schedule text
+    let paymentScheduleText = '';
+    switch(paymentSchedule) {
+      case 'lump-sum':
+        paymentScheduleText = `The full amount of principal and accrued interest shall be paid in a single lump sum on the due date (${formattedDueDate}).`;
+        break;
+      case 'monthly':
+        paymentScheduleText = `The Borrower shall make monthly payments of principal and interest beginning one month from the date of this Note and continuing until the due date (${formattedDueDate}).`;
+        break;
+      case 'quarterly':
+        paymentScheduleText = `The Borrower shall make quarterly payments of principal and interest beginning three months from the date of this Note and continuing until the due date (${formattedDueDate}).`;
+        break;
+      case 'custom':
+        paymentScheduleText = `The Borrower shall make payments according to the schedule attached to this Note, with the final payment due on ${formattedDueDate}.`;
+        break;
+    }
+    
+    // Define the sections and their content with unique IDs
+    const sections = {
+      header: `<div id="preview-header">PROMISSORY NOTE</div>\n\n`,
+      
+      loansummary: `<div id="preview-loan-summary">Principal Amount: $${Number(loanAmount).toLocaleString()}\nDate: ${formattedDateOfNote}</div>\n\n`,
+      
+      promise: `<div id="preview-promise">FOR VALUE RECEIVED, ${borrowerName} ("Borrower") promises to pay to ${lenderName} ("Lender") the principal sum of $${Number(loanAmount).toLocaleString()} with interest at the annual rate of ${interestRate}% on the unpaid balance.</div>\n\n`,
+      
+      payment: `<div id="preview-payment">1. PAYMENT\n${paymentScheduleText}</div>\n\n`,
+      
+      lateFee: `<div id="preview-latefee">2. LATE FEE\nIf any payment is not made within five (5) days of its due date, Borrower shall pay a late fee of $${lateFee}.</div>\n\n`,
+      
+      prepayment: `<div id="preview-prepayment">3. PREPAYMENT\nBorrower may prepay all or any part of the principal without penalty.</div>\n\n`,
+      
+      default: `<div id="preview-default">4. DEFAULT\nIf Borrower fails to make any payment when due, the entire balance shall become immediately due and payable at the option of Lender.</div>\n\n`,
+      
+      collateral: isSecured ? `<div id="preview-collateral">5. SECURITY\nThis Note is secured by the following collateral: ${collateralDescription || '[Description of collateral]'}</div>\n\n` : '',
+      
+      governingLaw: `<div id="preview-governing-law">5${isSecured ? '6' : ''}. GOVERNING LAW\nThis Note shall be governed by the laws of the state of ${governingLaw}.</div>\n\n`,
+      
+      cosigner: hasCosigner ? `<div id="preview-cosigner">6${isSecured ? '7' : ''}. CO-SIGNER\n${cosignerName} agrees to be jointly and severally liable for the repayment of this Note.</div>\n\n` : '',
+      
+      signatures: `<div id="preview-signatures">IN WITNESS WHEREOF, Borrower${hasCosigner ? ' and Co-Signer' : ''} has executed this Promissory Note as of the date first written above.\n\n__________________________\n${borrowerName}, Borrower\n\n${hasCosigner ? `__________________________\n${cosignerName}, Co-Signer\n\n` : ''}__________________________\n${lenderName}, Lender</div>`
+    };
+    
+    // Combine all sections
+    const previewHTML = 
+        sections.header + 
+        sections.loansummary + 
+        sections.promise + 
+        sections.payment + 
+        sections.lateFee +
+        sections.prepayment + 
+        sections.default + 
+        sections.collateral +
+        sections.governingLaw +
+        sections.cosigner +
+        sections.signatures;
+    
+    // Set the preview HTML
+    previewText.innerHTML = previewHTML;
+    
+    // If a section has changed, highlight it
+    if (changedSection) {
+      highlightPreviewSection(changedSection);
+    }
+  }
+  
+  // Track which section is currently highlighted
+  let currentlyHighlightedSection = null;
+  
+  // Highlight a section of the preview
+  function highlightPreviewSection(section) {
+    // Remove previous highlighting if any
+    if (currentlyHighlightedSection) {
+      const prevHighlighted = document.getElementById(currentlyHighlightedSection);
+      if (prevHighlighted) {
+        prevHighlighted.style.backgroundColor = '';
+      }
+    }
+    
+    // Map the changed field to the appropriate section ID
+    let sectionToHighlight = null;
+    if (section === 'loan-amount' || section === 'interest-rate') {
+      sectionToHighlight = 'preview-promise';
+    } else if (section === 'date-of-note') {
+      sectionToHighlight = 'preview-loan-summary';
+    } else if (section === 'due-date' || section === 'payment-schedule') {
+      sectionToHighlight = 'preview-payment';
+    } else if (section === 'late-fee') {
+      sectionToHighlight = 'preview-latefee';
+    } else if (section === 'is-secured' || section === 'collateral-description') {
+      sectionToHighlight = 'preview-collateral';
+    } else if (section === 'governing-law') {
+      sectionToHighlight = 'preview-governing-law';
+    } else if (section === 'has-cosigner' || section === 'co-signer-name') {
+      sectionToHighlight = 'preview-cosigner';
+    } else if (section === 'borrower-name' || section === 'lender-name') {
+      if (section === 'borrower-name') {
+        // Check if we're on the first screen where we're setting the promise
+        if (currentStep < 2) {
+          sectionToHighlight = 'preview-promise';
+        } else {
+          sectionToHighlight = 'preview-signatures';
+        }
+      } else {
+        sectionToHighlight = 'preview-promise';
+      }
+    }
+    
+    // Highlight the new section
+    if (sectionToHighlight) {
+      const elementToHighlight = document.getElementById(sectionToHighlight);
+      if (elementToHighlight) {
+        // Check if the element is visible in the viewport
+        const previewContainer = document.querySelector('.preview-content');
+        const containerRect = previewContainer.getBoundingClientRect();
+        const elementRect = elementToHighlight.getBoundingClientRect();
+        
+        // Only scroll if the element is not fully visible
+        const isFullyVisible = 
+            elementRect.top >= containerRect.top && 
+            elementRect.bottom <= containerRect.bottom;
+        
+        if (!isFullyVisible) {
+          // Element is not fully visible, scroll to it
+          elementToHighlight.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        
+        // Highlight the element
+        elementToHighlight.style.backgroundColor = '#ffffd0';
+        
+        // Update the currently highlighted section
+        currentlyHighlightedSection = sectionToHighlight;
+      }
+    }
+  }
+  
+  // Generate the promissory note based on user selections
+  function generatePromissoryNote() {
+    // Get values from user answers
+    const loanAmount = userAnswers['loan-amount'] || '10000';
+    const interestRate = userAnswers['interest-rate'] || '5';
+    const lateFee = userAnswers['late-fee'] || '25';
+    const dateOfNote = userAnswers['date-of-note'] || formatDateForInput(today);
+    const dueDate = userAnswers['due-date'] || formatDateForInput(nextYear);
+    const paymentSchedule = userAnswers['payment-schedule'] || 'lump-sum';
+    const borrowerName = userAnswers['borrower-name'] || 'John Doe';
+    const lenderName = userAnswers['lender-name'] || 'Jane Smith';
+    const isSecured = userAnswers['is-secured'] || false;
+    const collateralDescription = userAnswers['collateral-description'] || '';
+    const hasCosigner = userAnswers['has-cosigner'] || false;
+    const cosignerName = userAnswers['co-signer-name'] || '';
+    const governingLaw = userAnswers['governing-law'] || 'California';
+    
+    // Format dates for display
+    const formattedDateOfNote = formatDateForDisplay(dateOfNote);
+    const formattedDueDate = formatDateForDisplay(dueDate);
+    
+    // Get payment schedule text
+    let paymentScheduleText = '';
+    switch(paymentSchedule) {
+      case 'lump-sum':
+        paymentScheduleText = `The full amount of principal and accrued interest shall be paid in a single lump sum on the due date (${formattedDueDate}).`;
+        break;
+      case 'monthly':
+        paymentScheduleText = `The Borrower shall make monthly payments of principal and interest beginning one month from the date of this Note and continuing until the due date (${formattedDueDate}).`;
+        break;
+      case 'quarterly':
+        paymentScheduleText = `The Borrower shall make quarterly payments of principal and interest beginning three months from the date of this Note and continuing until the due date (${formattedDueDate}).`;
+        break;
+      case 'custom':
+        paymentScheduleText = `The Borrower shall make payments according to the schedule attached to this Note, with the final payment due on ${formattedDueDate}.`;
+        break;
+    }
+    
+    // Determine section numbers based on optional sections
+    let securitySection = isSecured ? '5' : '';
+    let governingLawSection = isSecured ? '6' : '5';
+    let cosignerSection = isSecured ? '7' : '6';
+    
+    // Generate the full promissory note text
+    let noteText = `PROMISSORY NOTE
+
+Principal Amount: $${Number(loanAmount).toLocaleString()}
+Date: ${formattedDateOfNote}
+
+FOR VALUE RECEIVED, ${borrowerName} ("Borrower") promises to pay to ${lenderName} ("Lender") the principal sum of $${Number(loanAmount).toLocaleString()} with interest at the annual rate of ${interestRate}% on the unpaid balance.
+
+1. PAYMENT
+${paymentScheduleText}
+
+2. LATE FEE
+If any payment is not made within five (5) days of its due date, Borrower shall pay a late fee of $${lateFee}.
+
+3. PREPAYMENT
+Borrower may prepay all or any part of the principal without penalty.
+
+4. DEFAULT
+If Borrower fails to make any payment when due, the entire balance shall become immediately due and payable at the option of Lender.`;
+
+    if (isSecured) {
+      noteText += `
+
+5. SECURITY
+This Note is secured by the following collateral: ${collateralDescription || '[Description of collateral]'}`;
+    }
+
+    noteText += `
+
+${governingLawSection}. GOVERNING LAW
+This Note shall be governed by the laws of the state of ${governingLaw}.`;
+
+    if (hasCosigner) {
+      noteText += `
+
+${cosignerSection}. CO-SIGNER
+${cosignerName} agrees to be jointly and severally liable for the repayment of this Note.`;
+    }
+
+    noteText += `
+
+IN WITNESS WHEREOF, Borrower${hasCosigner ? ' and Co-Signer' : ''} has executed this Promissory Note as of the date first written above.
+
+__________________________
+${borrowerName}, Borrower
+`;
+
+    if (hasCosigner) {
+      noteText += `
+__________________________
+${cosignerName}, Co-Signer
+`;
+    }
+
+    noteText += `
+__________________________
+${lenderName}, Lender`;
+    
+    // Display the note text
+    const noteTextElement = document.getElementById('note-text');
+    noteTextElement.textContent = noteText;
+    
+    // Hide question container, preview container, and show results
+    questionContainer.style.display = 'none';
+    previewContainer.style.display = 'none';
+    resultsContainer.style.display = 'block';
+    
+    // Add visible class after a slight delay for animation
+    setTimeout(() => {
+      resultsContainer.classList.add('visible');
+    }, 50);
+    
+    // Scroll to the top of the results
+    document.querySelector('.results-header').scrollIntoView({ behavior: 'smooth' });
+  }
+  
+  // Initialize the tool
+  initTool();
+});
+</script>
+
+
+
+<h1 class="wp-block-heading has-text-align-center">Understanding Promissory Notes</h1>
+
+
+
+<p>A promissory note is one of the most fundamental legal instruments in business and personal lending. Whether you&#8217;re lending money to a business partner, documenting a family loan, or structuring payment terms for a business transaction, a properly drafted promissory note provides the legal protection both parties need.</p>
+
+
+
+<p>On this page, I&#8217;ve created a user-friendly promissory note generator to help you draft a legally sound document in minutes. Before using the tool, let&#8217;s explore what promissory notes are, when you need them, and how to ensure your note is both legally enforceable and practical.</p>
+
+
+
+<h2 class="wp-block-heading">What Is a Promissory Note?</h2>
+
+
+
+<p>A promissory note is a written promise to pay a specified sum of money to another party under defined terms. It&#8217;s essentially an IOU with legal teeth—documenting not just the debt itself but also the specific repayment terms, interest rates, and consequences of non-payment.</p>
+
+
+
+<p>Unlike a casual IOU or verbal agreement, a promissory note creates a legally binding obligation that courts will generally enforce. It sits somewhere between an informal IOU and a complex loan agreement in terms of formality and detail.</p>
+
+
+
+<h2 class="wp-block-heading">When to Use a Promissory Note</h2>
+
+
+
+<p>Promissory notes are versatile financial instruments used in many contexts:</p>
+
+
+
+<ul class="wp-block-list">
+<li><strong>Business loans between partners or investors</strong></li>
+
+
+
+<li><strong>Family loans</strong> (making informal arrangements legally binding)</li>
+
+
+
+<li><strong>Real estate transactions</strong> (seller financing arrangements)</li>
+
+
+
+<li><strong>Asset purchases</strong> with payment plans</li>
+
+
+
+<li><strong>Debt consolidation</strong> or restructuring</li>
+
+
+
+<li><strong>Short-term bridge financing</strong></li>
+</ul>
+
+
+
+<p>For startups and small businesses, promissory notes can be particularly valuable for documenting seed capital, founder loans, or convertible debt arrangements.</p>
+
+
+
+<h2 class="wp-block-heading">Legal Elements of a Valid Promissory Note</h2>
+
+
+
+<p>For a promissory note to be legally enforceable, it must contain certain essential elements:</p>
+
+
+
+<h3 class="wp-block-heading">1. Identification of Parties</h3>
+
+
+
+<p>The note must clearly identify both the &#8220;maker&#8221; (borrower) and the &#8220;payee&#8221; (lender) with legal names. In some cases, you may also have a co-signer who becomes jointly responsible for repayment.</p>
+
+
+
+<h3 class="wp-block-heading">2. Unconditional Promise to Pay</h3>
+
+
+
+<p>The language must unambiguously state that the borrower promises to pay the specified amount. This is not just a formality—courts look for clear language establishing the obligation.</p>
+
+
+
+<h3 class="wp-block-heading">3. Definite Amount</h3>
+
+
+
+<p>The principal amount must be clearly stated. While interest calculations may create a variable total repayment amount, the principal must be specified.</p>
+
+
+
+<h3 class="wp-block-heading">4. Repayment Terms</h3>
+
+
+
+<p>The note must specify when and how the debt will be repaid. This includes:</p>
+
+
+
+<ul class="wp-block-list">
+<li>Payment schedule (lump sum, installments, etc.)</li>
+
+
+
+<li>Due date(s)</li>
+
+
+
+<li>Payment methods</li>
+
+
+
+<li>Calculation of interest</li>
+</ul>
+
+
+
+<h3 class="wp-block-heading">5. Signature and Date</h3>
+
+
+
+<p>The borrower (and any co-signers) must sign and date the document. While some states may require a witness or notarization for certain types of notes, a basic promissory note generally requires only the borrower&#8217;s signature.</p>
+
+
+
+<h2 class="wp-block-heading">How to Use the Promissory Note Generator</h2>
+
+
+
+<p>My promissory note generator walks you through three simple steps to create a customized document. Here&#8217;s how to use it effectively:</p>
+
+
+
+<h3 class="wp-block-heading">Step 1: Enter Loan Amount and Terms</h3>
+
+
+
+<p>Begin by specifying the fundamental details of the loan:</p>
+
+
+
+<ul class="wp-block-list">
+<li><strong>Loan Amount</strong>: The principal sum being borrowed</li>
+
+
+
+<li><strong>Interest Rate</strong>: Annual percentage (must comply with state usury laws)</li>
+
+
+
+<li><strong>Late Fee</strong>: Amount charged for late payments</li>
+
+
+
+<li><strong>Date of Note</strong>: When the agreement takes effect</li>
+</ul>
+
+
+
+<h3 class="wp-block-heading">Step 2: Define Payment Terms</h3>
+
+
+
+<p>Next, establish how and when the debt will be repaid:</p>
+
+
+
+<ul class="wp-block-list">
+<li><strong>Due Date</strong>: When the loan must be fully repaid</li>
+
+
+
+<li><strong>Payment Schedule</strong>: Options include lump sum, monthly payments, quarterly payments, or custom schedule</li>
+
+
+
+<li><strong>Secured Loan Option</strong>: Indicate whether collateral secures the loan</li>
+
+
+
+<li><strong>Collateral Description</strong>: If secured, describe the property backing the loan</li>
+
+
+
+<li><strong>Governing Law</strong>: Select which state&#8217;s laws will govern the agreement</li>
+</ul>
+
+
+
+<h3 class="wp-block-heading">Step 3: Specify Borrower and Lender Information</h3>
+
+
+
+<p>Finally, provide the legal names of all parties involved:</p>
+
+
+
+<ul class="wp-block-list">
+<li><strong>Borrower&#8217;s Name</strong>: The person or entity receiving the loan</li>
+
+
+
+<li><strong>Lender&#8217;s Name</strong>: The person or entity providing the loan</li>
+
+
+
+<li><strong>Co-Signer (Optional)</strong>: Additional person guaranteeing the loan</li>
+</ul>
+
+
+
+<p>After completing these steps, the generator creates a comprehensive promissory note that you can copy, download, or print for signing.</p>
+
+
+
+<h2 class="wp-block-heading">Legal Considerations When Creating Promissory Notes</h2>
+
+
+
+<h3 class="wp-block-heading">Interest Rate Limitations</h3>
+
+
+
+<p>Perhaps the most critical legal consideration when drafting a promissory note is complying with state usury laws, which cap maximum interest rates. These vary significantly by state:</p>
+
+
+
+<ul class="wp-block-list">
+<li>California limits non-exempt lenders to 10% for personal loans</li>
+
+
+
+<li>Florida caps rates at 18% for loans under $500,000</li>
+
+
+
+<li>New York generally limits rates to 16%</li>
+
+
+
+<li>Texas allows up to 18% for most loans under $250,000</li>
+</ul>
+
+
+
+<p>Exceeding these limits can have serious consequences—from rendering the interest provisions unenforceable to potentially invalidating the entire note or even triggering penalties.</p>
+
+
+
+<h3 class="wp-block-heading">Secured vs. Unsecured Notes</h3>
+
+
+
+<p>When deciding whether to require collateral, consider:</p>
+
+
+
+<ol class="wp-block-list">
+<li><strong>Enforcement options</strong>: Secured notes give you the right to claim specific property if the borrower defaults</li>
+
+
+
+<li><strong>Interest rate implications</strong>: Secured notes typically justify lower interest rates due to reduced risk</li>
+
+
+
+<li><strong>Documentation requirements</strong>: Secured notes may require additional documentation like UCC filings or mortgage recordings to perfect your security interest</li>
+</ol>
+
+
+
+<p>The generator allows you to create either type but remember that for valuable collateral, you may need additional documentation beyond the promissory note itself.</p>
+
+
+
+<h3 class="wp-block-heading">Tax Implications</h3>
+
+
+
+<p>Promissory notes have significant tax implications for both parties:</p>
+
+
+
+<p>For lenders:</p>
+
+
+
+<ul class="wp-block-list">
+<li>Interest received is generally taxable income</li>
+
+
+
+<li>The IRS expects loans between related parties to charge at least the &#8220;Applicable Federal Rate&#8221; (AFR)</li>
+
+
+
+<li>Below-market loans may trigger imputed interest rules</li>
+</ul>
+
+
+
+<p>For borrowers:</p>
+
+
+
+<ul class="wp-block-list">
+<li>Interest paid for business purposes may be tax-deductible</li>
+
+
+
+<li>Personal loan interest is generally not deductible</li>
+
+
+
+<li>Forgiven debt may be treated as taxable income</li>
+</ul>
+
+
+
+<p>I recommend consulting with a tax professional about the specific implications of your loan arrangement.</p>
+
+
+
+<h2 class="wp-block-heading">Practical Tips for Creating Effective Promissory Notes</h2>
+
+
+
+<h3 class="wp-block-heading">1. Be Clear About Acceleration Clauses</h3>
+
+
+
+<p>My generator includes a standard default provision allowing the lender to demand full payment if the borrower misses a payment. Consider whether you want additional &#8220;acceleration triggers&#8221; such as:</p>
+
+
+
+<ul class="wp-block-list">
+<li>Bankruptcy filing</li>
+
+
+
+<li>Transfer of business ownership</li>
+
+
+
+<li>Sale of essential assets</li>
+
+
+
+<li>Change in financial condition</li>
+</ul>
+
+
+
+<h3 class="wp-block-heading">2. Consider Prepayment Terms</h3>
+
+
+
+<p>The generator creates a note that allows prepayment without penalty, which is generally borrower-friendly. If you have reasons to discourage early repayment (such as relying on the interest income), you might want to modify this section to include a prepayment penalty.</p>
+
+
+
+<h3 class="wp-block-heading">3. Document All Payments</h3>
+
+
+
+<p>Once the note is in effect, maintain meticulous records of all payments, including:</p>
+
+
+
+<ul class="wp-block-list">
+<li>Date received</li>
+
+
+
+<li>Amount received</li>
+
+
+
+<li>How applied (to principal, interest, late fees)</li>
+
+
+
+<li>Running balance</li>
+</ul>
+
+
+
+<p>This documentation proves invaluable if any disputes arise about payment history.</p>
+
+
+
+<h3 class="wp-block-heading">4. Store Properly</h3>
+
+
+
+<p>After signing, both parties should retain:</p>
+
+
+
+<ul class="wp-block-list">
+<li>The original signed note (typically held by the lender)</li>
+
+
+
+<li>Copies of the note (for borrower and any co-signers)</li>
+
+
+
+<li>Any amendments or modifications made later</li>
+</ul>
+
+
+
+<p>Store these documents in a secure location along with any payment records.</p>
+
+
+
+<h2 class="wp-block-heading">Frequently Asked Questions</h2>
+
+
+
+<h3 class="wp-block-heading">Do promissory notes need to be notarized?</h3>
+
+
+
+<p>Generally, promissory notes do not require notarization to be legally valid. However, notarization provides an additional layer of authentication that can be valuable if the note is ever contested. It confirms the identity of the signer and their intent to execute the document. For loans involving substantial amounts or in cases where you anticipate potential disputes, notarization is a prudent extra step even though it&#8217;s not legally required in most states.</p>
+
+
+
+<h3 class="wp-block-heading">What happens if I need to change the terms of a promissory note after it&#8217;s been signed?</h3>
+
+
+
+<p>After a promissory note has been signed, any changes require mutual agreement documented in writing. The proper way to modify terms is to create an amendment to the original note, clearly referencing the original document and specifying exactly what terms are being changed. Both parties should sign this amendment. Alternatively, you can create an entirely new promissory note that supersedes the original, though this approach should explicitly state that it replaces the previous note. Unilateral changes by either party are not legally enforceable and could potentially invalidate the entire agreement.</p>
+
+
+
+<h3 class="wp-block-heading">Can I sell or transfer a promissory note to someone else?</h3>
+
+
+
+<p>Yes, promissory notes are generally assignable unless they specifically include a non-assignment clause. This means the lender can sell or transfer the note to a third party, who then becomes entitled to receive payments. However, there are important considerations: the borrower must be notified of the assignment, proper documentation of the transfer must be maintained, and in some cases, consumer protection laws may restrict certain transfers. For business purposes, the transferability of notes can be valuable for cash flow management or restructuring, but should be handled with proper legal guidance to ensure the note remains enforceable after transfer.</p>
+
+
+
+<h3 class="wp-block-heading">What&#8217;s the difference between a promissory note and a loan agreement?</h3>
+
+
+
+<p>A promissory note is essentially a streamlined version of a loan agreement, focusing primarily on the repayment promise and basic terms. The key differences are:</p>
+
+
+
+<p>Promissory notes are typically shorter (1-3 pages) and more straightforward, covering the essential repayment terms, interest rate, and consequences of default. They&#8217;re ideal for relatively simple lending arrangements where the primary concern is documenting the debt and ensuring repayment.</p>
+
+
+
+<p>Loan agreements are more comprehensive contracts (often 10+ pages) that include extensive provisions covering representations and warranties, affirmative and negative covenants, detailed events of default, and remedies. They&#8217;re more appropriate for complex commercial loans, situations with multiple lenders, or when the borrower must meet ongoing obligations beyond just repayment.</p>
+
+
+
+<p>For most small business and personal lending situations, a well-drafted promissory note provides sufficient protection without the complexity of a full loan agreement.</p>
+
+
+
+<h3 class="wp-block-heading">What should I do if the borrower stops making payments?</h3>
+
+
+
+<p>If a borrower defaults on a promissory note, take a strategic approach rather than an immediately adversarial one. First, document the default thoroughly and send a formal written notice referencing the specific terms violated. Many defaults result from temporary cash flow issues rather than unwillingness to pay, so consider whether a restructuring might actually serve both parties better than immediate legal action.</p>
+
+
+
+<p>If restructuring isn&#8217;t viable, your options include invoking any acceleration clause to demand full payment, attempting to claim collateral if it&#8217;s a secured note, or filing a legal action to enforce the note. The statute of limitations for enforcing written contracts varies by state (typically 3-6 years), so don&#8217;t delay too long in taking action. Remember that the promissory note itself is often sufficient evidence in court to establish the debt, making these relatively straightforward legal claims compared to other commercial disputes.</p>
+
+
+
+<h3 class="wp-block-heading">How does bankruptcy affect a promissory note?</h3>
+
+
+
+<p>Bankruptcy significantly impacts promissory notes, with different outcomes depending on whether the note is secured or unsecured. When a borrower files for bankruptcy, an automatic stay immediately prevents lenders from taking collection actions outside the bankruptcy process.</p>
+
+
+
+<p>For unsecured promissory notes, the debt typically becomes part of the general unsecured claims pool, meaning you may recover only a fraction of the amount owed (if anything) after priority creditors are paid. Secured notes provide better protection, as your security interest in the collateral generally survives bankruptcy, though you may still face delays and potential modifications to the repayment terms.</p>
+
+
+
+<p>If you&#8217;re concerned about bankruptcy risk, consider requiring a co-signer with strong financial standing, as this provides an alternative source of repayment if the primary borrower enters bankruptcy proceedings. For substantial loans, conducting proper due diligence on the borrower&#8217;s financial condition before lending remains the best protection.</p>
+
+
+
+<h3 class="wp-block-heading">Can I use the generator for convertible notes for my startup?</h3>
+
+
+
+<p>My standard promissory note generator is not designed for convertible notes, which are specialized instruments used primarily in startup financing that can convert to equity under specified conditions. Convertible notes require additional provisions addressing conversion triggers (like qualified financing rounds), conversion discounts, valuation caps, and other startup-specific terms.</p>
+
+
+
+<p>If you need a convertible note for seed financing, I recommend scheduling a consultation for a custom document tailored to your specific startup needs, investor requirements, and future financing plans. Properly structured convertible notes balance immediate capital needs with long-term equity considerations in ways that standard promissory notes are not designed to address.</p>
+
+
+
+<p>By using this promissory note generator, you can create a legally sound document that protects both lender and borrower. Remember that while this tool creates a solid foundation for most common lending scenarios, complex transactions or special circumstances may require additional customization. If you have questions about your specific situation, I&#8217;m available for consultations to provide personalized guidance.</p>
+</div>
+    </article>
+  </main>
+  <footer><p>© 2025 Terms.Law. All rights reserved.</p></footer>
+</body>
+</html>

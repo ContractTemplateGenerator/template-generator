@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>⚙️ API Terms Abuse: When AI Bots Ignore Your robots.txt and Rate Limits | Terms.Law</title>
+  <meta name="description" content="SaaS platforms now face challenges from AI crawlers and scrapers ignoring established rules. This guide outlines technical and legal strategies to protect APIs ">
+  <link rel="canonical" href="https://terms.law/2025/12/05/%e2%9a%99%ef%b8%8f-api-terms-abuse-when-ai-bots-ignore-your-robots-txt-and-rate-limits/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/shared/styles.css">
+</head>
+<body>
+  <div id="site-header"></div>
+  <script src="/shared/header-loader.js"></script>
+
+  <main>
+    <article>
+      <h1>⚙️ API Terms Abuse: When AI Bots Ignore Your robots.txt and Rate Limits</h1>
+      <div class="meta">Published: December 5, 2025 • AI</div>
+      <div class="content">
+<p>LLM crawlers do not care that you spent months on your API docs and “please be nice” language in your ToS.</p>
+
+
+
+<p>If you run a SaaS platform with public documentation, dev portals, and APIs, you’re now in the business of policing:</p>
+
+
+
+<ul class="wp-block-list">
+<li>unannounced AI crawlers,</li>
+
+
+
+<li>“headless browser” scrapers masquerading as normal users, and</li>
+
+
+
+<li>data brokers quietly reselling your traffic to model builders.</li>
+</ul>
+
+
+
+<p>This is a <strong>dev-facing guide</strong> to the legal + technical playbook:</p>
+
+
+
+<ul class="wp-block-list">
+<li>what robots.txt and rate limits actually <em>do</em> (and don’t do);</li>
+
+
+
+<li>how courts are treating scraping and API terms;</li>
+
+
+
+<li>how to structure <strong>C&amp;Ds and enforcement</strong> when an LLM crawler blows through your rules.</li>
+</ul>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<div id="ez-toc-container" class="ez-toc-v2_0_79_2 counter-hierarchy ez-toc-counter ez-toc-grey ez-toc-container-direction">
+<div class="ez-toc-title-container">
+<p class="ez-toc-title" style="cursor:inherit">Contents</p>
+<span class="ez-toc-title-toggle"><a href="#" class="ez-toc-pull-right ez-toc-btn ez-toc-btn-xs ez-toc-btn-default ez-toc-toggle" aria-label="Toggle Table of Content"><span class="ez-toc-js-icon-con"><span class=""><span class="eztoc-hide" style="display:none;">Toggle</span><span class="ez-toc-icon-toggle-span"><svg style="fill: #999;color:#999" xmlns="http://www.w3.org/2000/svg" class="list-377408" width="20px" height="20px" viewBox="0 0 24 24" fill="none"><path d="M6 6H4v2h2V6zm14 0H8v2h12V6zM4 11h2v2H4v-2zm16 0H8v2h12v-2zM4 16h2v2H4v-2zm16 0H8v2h12v-2z" fill="currentColor"></path></svg><svg style="fill: #999;color:#999" class="arrow-unsorted-368013" xmlns="http://www.w3.org/2000/svg" width="10px" height="10px" viewBox="0 0 24 24" version="1.2" baseProfile="tiny"><path d="M18.2 9.3l-6.2-6.3-6.2 6.3c-.2.2-.3.4-.3.7s.1.5.3.7c.2.2.4.3.7.3h11c.3 0 .5-.1.7-.3.2-.2.3-.5.3-.7s-.1-.5-.3-.7zM5.8 14.7l6.2 6.3 6.2-6.3c.2-.2.3-.5.3-.7s-.1-.5-.3-.7c-.2-.2-.4-.3-.7-.3h-11c-.3 0-.5.1-.7.3-.2.2-.3.5-.3.7s.1.5.3.7z"/></svg></span></span></span></a></span></div>
+<nav><ul class='ez-toc-list ez-toc-list-level-1 ' ><li class='ez-toc-page-1 ez-toc-heading-level-2'><a class="ez-toc-link ez-toc-heading-1" href="https://terms.law/2025/12/05/%e2%9a%99%ef%b8%8f-api-terms-abuse-when-ai-bots-ignore-your-robots-txt-and-rate-limits/#%F0%9F%A4%96_What_robotstxt_and_rate_limits_really_buy_you" >🤖 What robots.txt and rate limits really buy you</a><ul class='ez-toc-list-level-3' ><li class='ez-toc-heading-level-3'><a class="ez-toc-link ez-toc-heading-2" href="https://terms.law/2025/12/05/%e2%9a%99%ef%b8%8f-api-terms-abuse-when-ai-bots-ignore-your-robots-txt-and-rate-limits/#%F0%9F%A7%B1_Table_%E2%80%93_Technical_controls_vs_legal_significance" >🧱 Table – Technical controls vs legal significance</a></li></ul></li><li class='ez-toc-page-1 ez-toc-heading-level-2'><a class="ez-toc-link ez-toc-heading-3" href="https://terms.law/2025/12/05/%e2%9a%99%ef%b8%8f-api-terms-abuse-when-ai-bots-ignore-your-robots-txt-and-rate-limits/#%E2%9A%96%EF%B8%8F_How_courts_are_treating_scraping_of_public_APIs_and_docs" >⚖️ How courts are treating scraping of public APIs and docs</a><ul class='ez-toc-list-level-3' ><li class='ez-toc-heading-level-3'><a class="ez-toc-link ez-toc-heading-4" href="https://terms.law/2025/12/05/%e2%9a%99%ef%b8%8f-api-terms-abuse-when-ai-bots-ignore-your-robots-txt-and-rate-limits/#CFAA_and_%E2%80%9Cpublic%E2%80%9D_data_%E2%80%93_hiQ_v_LinkedIn" >CFAA and “public” data – hiQ v LinkedIn</a></li><li class='ez-toc-page-1 ez-toc-heading-level-3'><a class="ez-toc-link ez-toc-heading-5" href="https://terms.law/2025/12/05/%e2%9a%99%ef%b8%8f-api-terms-abuse-when-ai-bots-ignore-your-robots-txt-and-rate-limits/#ToS_alone_wont_save_you_%E2%80%93_X_Corp_v_Bright_Data" >ToS alone won’t save you – X Corp v Bright Data</a></li><li class='ez-toc-page-1 ez-toc-heading-level-3'><a class="ez-toc-link ez-toc-heading-6" href="https://terms.law/2025/12/05/%e2%9a%99%ef%b8%8f-api-terms-abuse-when-ai-bots-ignore-your-robots-txt-and-rate-limits/#Logged-in_vs_logged-out_%E2%80%93_Meta_v_Bright_Data" >Logged-in vs logged-out – Meta v Bright Data</a></li><li class='ez-toc-page-1 ez-toc-heading-level-3'><a class="ez-toc-link ez-toc-heading-7" href="https://terms.law/2025/12/05/%e2%9a%99%ef%b8%8f-api-terms-abuse-when-ai-bots-ignore-your-robots-txt-and-rate-limits/#The_AI_era_Reddit_v_Anthropic_Reddit_v_Perplexity" >The AI era: Reddit v Anthropic, Reddit v Perplexity</a></li></ul></li><li class='ez-toc-page-1 ez-toc-heading-level-2'><a class="ez-toc-link ez-toc-heading-8" href="https://terms.law/2025/12/05/%e2%9a%99%ef%b8%8f-api-terms-abuse-when-ai-bots-ignore-your-robots-txt-and-rate-limits/#%F0%9F%A7%AD_For_SaaS_platforms_designing_your_stack_with_AI_scrapers_in_mind" >🧭 For SaaS platforms: designing your stack with AI scrapers in mind</a><ul class='ez-toc-list-level-3' ><li class='ez-toc-heading-level-3'><a class="ez-toc-link ez-toc-heading-9" href="https://terms.law/2025/12/05/%e2%9a%99%ef%b8%8f-api-terms-abuse-when-ai-bots-ignore-your-robots-txt-and-rate-limits/#%F0%9F%A7%B1_Contract_layer_API_ToS_language" >🧱 Contract layer: API &amp; ToS language</a></li><li class='ez-toc-page-1 ez-toc-heading-level-3'><a class="ez-toc-link ez-toc-heading-10" href="https://terms.law/2025/12/05/%e2%9a%99%ef%b8%8f-api-terms-abuse-when-ai-bots-ignore-your-robots-txt-and-rate-limits/#%F0%9F%A7%AA_Technical_layer_make_abuse_measurable" >🧪 Technical layer: make abuse measurable</a></li><li class='ez-toc-page-1 ez-toc-heading-level-3'><a class="ez-toc-link ez-toc-heading-11" href="https://terms.law/2025/12/05/%e2%9a%99%ef%b8%8f-api-terms-abuse-when-ai-bots-ignore-your-robots-txt-and-rate-limits/#%F0%9F%A7%AC_Governance_layer_content_ownership" >🧬 Governance layer: content &amp; ownership</a></li></ul></li><li class='ez-toc-page-1 ez-toc-heading-level-2'><a class="ez-toc-link ez-toc-heading-12" href="https://terms.law/2025/12/05/%e2%9a%99%ef%b8%8f-api-terms-abuse-when-ai-bots-ignore-your-robots-txt-and-rate-limits/#%F0%9F%95%B5%EF%B8%8F_Detecting_and_documenting_API_terms_abuse_by_LLM_crawlers" >🕵️ Detecting and documenting API terms abuse by LLM crawlers</a><ul class='ez-toc-list-level-3' ><li class='ez-toc-heading-level-3'><a class="ez-toc-link ez-toc-heading-13" href="https://terms.law/2025/12/05/%e2%9a%99%ef%b8%8f-api-terms-abuse-when-ai-bots-ignore-your-robots-txt-and-rate-limits/#What_%E2%80%9CLLM_crawler_abuse%E2%80%9D_usually_looks_like" >What “LLM crawler abuse” usually looks like</a></li></ul></li><li class='ez-toc-page-1 ez-toc-heading-level-2'><a class="ez-toc-link ez-toc-heading-14" href="https://terms.law/2025/12/05/%e2%9a%99%ef%b8%8f-api-terms-abuse-when-ai-bots-ignore-your-robots-txt-and-rate-limits/#%E2%9C%89%EF%B8%8F_Structuring_a_C_D_to_an_AI_crawler_that_ignores_your_rules" >✉️ Structuring a C&amp;D to an AI crawler that ignores your rules</a><ul class='ez-toc-list-level-3' ><li class='ez-toc-heading-level-3'><a class="ez-toc-link ez-toc-heading-15" href="https://terms.law/2025/12/05/%e2%9a%99%ef%b8%8f-api-terms-abuse-when-ai-bots-ignore-your-robots-txt-and-rate-limits/#%F0%9F%A7%A9_Table_%E2%80%93_Key_building_blocks_of_an_AI-scraper_C_D" >🧩 Table – Key building blocks of an AI-scraper C&amp;D</a></li></ul></li><li class='ez-toc-page-1 ez-toc-heading-level-2'><a class="ez-toc-link ez-toc-heading-16" href="https://terms.law/2025/12/05/%e2%9a%99%ef%b8%8f-api-terms-abuse-when-ai-bots-ignore-your-robots-txt-and-rate-limits/#%F0%9F%9A%A8_Enforcement_what_you_actually_do_after_the_C_D" >🚨 Enforcement: what you actually do after the C&amp;D</a><ul class='ez-toc-list-level-3' ><li class='ez-toc-heading-level-3'><a class="ez-toc-link ez-toc-heading-17" href="https://terms.law/2025/12/05/%e2%9a%99%ef%b8%8f-api-terms-abuse-when-ai-bots-ignore-your-robots-txt-and-rate-limits/#Immediate_platform_actions" >Immediate platform actions</a></li><li class='ez-toc-page-1 ez-toc-heading-level-3'><a class="ez-toc-link ez-toc-heading-18" href="https://terms.law/2025/12/05/%e2%9a%99%ef%b8%8f-api-terms-abuse-when-ai-bots-ignore-your-robots-txt-and-rate-limits/#Considering_litigation" >Considering litigation</a></li></ul></li><li class='ez-toc-page-1 ez-toc-heading-level-2'><a class="ez-toc-link ez-toc-heading-19" href="https://terms.law/2025/12/05/%e2%9a%99%ef%b8%8f-api-terms-abuse-when-ai-bots-ignore-your-robots-txt-and-rate-limits/#%E2%9D%93_FAQ_for_SaaS_platforms_and_dev_teams" >❓ FAQ for SaaS platforms and dev teams</a><ul class='ez-toc-list-level-3' ><li class='ez-toc-heading-level-3'><a class="ez-toc-link ez-toc-heading-20" href="https://terms.law/2025/12/05/%e2%9a%99%ef%b8%8f-api-terms-abuse-when-ai-bots-ignore-your-robots-txt-and-rate-limits/#Are_we_legally_required_to_honor_all_crawlers_that_follow_robotstxt" >Are we legally required to honor all crawlers that follow robots.txt?</a></li><li class='ez-toc-page-1 ez-toc-heading-level-3'><a class="ez-toc-link ez-toc-heading-21" href="https://terms.law/2025/12/05/%e2%9a%99%ef%b8%8f-api-terms-abuse-when-ai-bots-ignore-your-robots-txt-and-rate-limits/#Can_we_ever_rely_on_ToS_alone_to_stop_scraping" >Can we ever rely on ToS alone to stop scraping?</a></li><li class='ez-toc-page-1 ez-toc-heading-level-3'><a class="ez-toc-link ez-toc-heading-22" href="https://terms.law/2025/12/05/%e2%9a%99%ef%b8%8f-api-terms-abuse-when-ai-bots-ignore-your-robots-txt-and-rate-limits/#Does_ignoring_robotstxt_itself_violate_any_law" >Does ignoring robots.txt itself violate any law?</a></li><li class='ez-toc-page-1 ez-toc-heading-level-3'><a class="ez-toc-link ez-toc-heading-23" href="https://terms.law/2025/12/05/%e2%9a%99%ef%b8%8f-api-terms-abuse-when-ai-bots-ignore-your-robots-txt-and-rate-limits/#Should_we_try_to_cut_off_all_AI_crawlers" >Should we try to cut off all AI crawlers?</a></li></ul></li></ul></nav></div>
+<h2 class="wp-block-heading"><span class="ez-toc-section" id="%F0%9F%A4%96_What_robotstxt_and_rate_limits_really_buy_you"></span>🤖 What robots.txt and rate limits really buy you<span class="ez-toc-section-end"></span></h2>
+
+
+
+<p><strong>robots.txt</strong> is part of the Robots Exclusion Protocol: a standard way to tell crawlers what they <em>should</em> and <em>shouldn’t</em> fetch. It’s widely used, recently formalized in RFC 9309, and still entirely <strong>voluntary</strong>. (<a href="https://en.wikipedia.org/wiki/Robots.txt?utm_source=chatgpt.com">Wikipedia</a>)</p>
+
+
+
+<p>Recent measurement work confirms what devs already suspect: many AI-focused crawlers <strong>don’t even check</strong> robots.txt, and compliance falls <em>as directives get stricter</em>. (<a href="https://arxiv.org/abs/2505.21733?utm_source=chatgpt.com">arXiv</a>)</p>
+
+
+
+<p>Rate limits and IP blocks are similar: technically powerful, legally ambiguous.</p>
+
+
+
+<h3 class="wp-block-heading"><span class="ez-toc-section" id="%F0%9F%A7%B1_Table_%E2%80%93_Technical_controls_vs_legal_significance"></span>🧱 Table – Technical controls vs legal significance<span class="ez-toc-section-end"></span></h3>
+
+
+
+<figure class="wp-block-table"><table class="has-fixed-layout"><thead><tr><th>Control</th><th>What it does technically</th><th>How it plays in disputes</th></tr></thead><tbody><tr><td><strong>robots.txt</strong></td><td>Tells well-behaved bots where they may crawl and at what rate.</td><td>Not a contract by itself. Shows you attempted <strong>reasonable technical controls</strong>. Ignoring it can help your story on <strong>DMCA anti-circumvention</strong>, trespass, and “willful” behavior, but it’s not a silver bullet. (<a href="https://en.wikipedia.org/wiki/Robots.txt?utm_source=chatgpt.com">Wikipedia</a>)</td></tr><tr><td><strong>Rate limits</strong></td><td>Throttle requests per key/IP to a defined quota.</td><td>Violations are strong evidence of <strong>technical abuse</strong>. If tied to API Terms, exceeding limits can be part of a <strong>contract breach</strong> or anti-circumvention narrative. (<a href="https://stytch.com/blog/how-to-block-ai-web-crawlers/?utm_source=chatgpt.com">Stytch</a>)</td></tr><tr><td><strong>API keys / auth</strong></td><td>Gated access; lets you bind users to explicit terms.</td><td>Courts are more willing to enforce <strong>anti-scraping clauses</strong> when the defendant actually used authenticated access or developer terms. (<a href="https://www.privacyworld.blog/2022/11/federal-court-rules-in-favor-of-linkedins-breach-of-contract-claim-after-six-years-of-cfaa-data-scraping-litigation/?utm_source=chatgpt.com">Privacy World</a>)</td></tr><tr><td><strong>IP blocking / CAPTCHAs</strong></td><td>Cut off abusive IP ranges; distinguish bots from humans.</td><td>Repeated attempts to <strong>evade</strong> these controls after notice look like DMCA circumvention and support <strong>trespass / unfair competition</strong> theories. This is precisely what Reddit alleges Perplexity and data brokers did. (<a href="https://natlawreview.com/article/anti-circumvention-reddits-case-against-perplexity?utm_source=chatgpt.com">National Law Review</a>)</td></tr></tbody></table></figure>
+
+
+
+<p>So: robots.txt + rate limits are <strong>necessary</strong>, but only part of an enforcement stack that has to be contractual, technical, and litigation-aware.</p>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<h2 class="wp-block-heading"><span class="ez-toc-section" id="%E2%9A%96%EF%B8%8F_How_courts_are_treating_scraping_of_public_APIs_and_docs"></span>⚖️ How courts are treating scraping of public APIs and docs<span class="ez-toc-section-end"></span></h2>
+
+
+
+<h3 class="wp-block-heading"><span class="ez-toc-section" id="CFAA_and_%E2%80%9Cpublic%E2%80%9D_data_%E2%80%93_hiQ_v_LinkedIn"></span>CFAA and “public” data – hiQ v LinkedIn<span class="ez-toc-section-end"></span></h3>
+
+
+
+<p>The <strong>hiQ v LinkedIn</strong> saga is the original public-scraping case. The Ninth Circuit held that scraping <strong>public LinkedIn profiles</strong> was unlikely to be “without authorization” under the Computer Fraud and Abuse Act (CFAA), even after LinkedIn sent a cease-and-desist and deployed technical measures. (<a href="https://en.wikipedia.org/wiki/HiQ_Labs_v._LinkedIn?utm_source=chatgpt.com">Wikipedia</a>)</p>
+
+
+
+<p>Takeaway for devs:</p>
+
+
+
+<ul class="wp-block-list">
+<li>CFAA is a <strong>weak tool</strong> for purely public docs and endpoints, especially in the Ninth Circuit. Don’t count on “CFAA threat” as your main club.</li>
+</ul>
+
+
+
+<h3 class="wp-block-heading"><span class="ez-toc-section" id="ToS_alone_wont_save_you_%E2%80%93_X_Corp_v_Bright_Data"></span>ToS alone won’t save you – X Corp v Bright Data<span class="ez-toc-section-end"></span></h3>
+
+
+
+<p>X sued Bright Data over scraping public tweets to sell as datasets, alleging breach of its ToS and related state-law claims. A federal judge in N.D. Cal. <strong>dismissed the case</strong>:</p>
+
+
+
+<ul class="wp-block-list">
+<li>X’s ToS claims were <strong>preempted</strong> by the Copyright Act, because X doesn’t own user content and can’t use state contract law to create a private copyright regime. (<a href="https://blog.ericgoldman.org/archives/2024/05/x-corp-v-bright-data-is-the-decision-weve-been-waiting-for-guest-blog-post.htm?utm_source=chatgpt.com">Technology &amp; Marketing Law Blog</a>)</li>
+
+
+
+<li>X also hadn’t plausibly shown Bright Data actually breached the agreement or caused the kind of system harm needed for tort claims. (<a href="https://www.courtlistener.com/docket/67637345/x-corp-v-bright-data-ltd/?utm_source=chatgpt.com">courtlistener.com</a>)</li>
+</ul>
+
+
+
+<p>Takeaway:</p>
+
+
+
+<blockquote class="wp-block-quote is-layout-flow wp-block-quote-is-layout-flow">
+<p>“No scraping” in your ToS, standing alone, is not a guaranteed basis for a lawsuit—especially for <strong>public</strong> content you don’t own.</p>
+</blockquote>
+
+
+
+<h3 class="wp-block-heading"><span class="ez-toc-section" id="Logged-in_vs_logged-out_%E2%80%93_Meta_v_Bright_Data"></span>Logged-in vs logged-out – Meta v Bright Data<span class="ez-toc-section-end"></span></h3>
+
+
+
+<p>In <strong>Meta v Bright Data</strong>, Meta argued Bright Data violated its terms by scraping Facebook and Instagram. Judge Chen granted <strong>summary judgment for Bright Data</strong> on the breach-of-contract claim:</p>
+
+
+
+<ul class="wp-block-list">
+<li>Meta’s terms provisions at issue were aimed at <strong>account-holders abusing logged-in access</strong>.</li>
+
+
+
+<li>Bright Data scraped <strong>logged-out, public</strong> data using generic web access.</li>
+
+
+
+<li>The court held Meta’s ToS didn’t bind Bright Data in that context; Bright Data stood in the same shoes as any non-logged-in visitor. (<a href="https://www.quinnemanuel.com/media/bq0josrj/bright-data-questions-answered-and-unanswered-45.pdf?utm_source=chatgpt.com">quinnemanuel.com</a>)</li>
+</ul>
+
+
+
+<p>Takeaway:</p>
+
+
+
+<ul class="wp-block-list">
+<li>If your abuse is coming from <strong>non-authenticated scraping</strong>, ToS enforcement is weaker. You want <strong>tokens and contracts</strong>, not just browsewrap.</li>
+</ul>
+
+
+
+<h3 class="wp-block-heading"><span class="ez-toc-section" id="The_AI_era_Reddit_v_Anthropic_Reddit_v_Perplexity"></span>The AI era: Reddit v Anthropic, Reddit v Perplexity<span class="ez-toc-section-end"></span></h3>
+
+
+
+<p>Reddit is running the <strong>modern AI playbook</strong>:</p>
+
+
+
+<ul class="wp-block-list">
+<li><strong>Reddit v Anthropic (SF Superior Court)</strong> – focuses on breach of the <strong>Reddit User Agreement</strong>, unjust enrichment, interference with user contracts, and scraping to train Claude without a license, allegedly after Reddit blocked Anthropic’s bots and asked it to stop. (<a href="https://www.reuters.com/business/reddit-sues-ai-startup-anthropic-allegedly-using-data-without-permission-2025-06-04/?utm_source=chatgpt.com">Reuters</a>)</li>
+
+
+
+<li><strong>Reddit v Perplexity &amp; data brokers (SDNY)</strong> – alleges “industrial-scale” scraping of Reddit content via Google SERPs, bypassing robots.txt and anti-scraping measures; layers <strong>copyright, DMCA anti-circumvention, unfair competition, unjust enrichment</strong> on top of the ToS story. (<a href="https://natlawreview.com/article/anti-circumvention-reddits-case-against-perplexity?utm_source=chatgpt.com">National Law Review</a>)</li>
+</ul>
+
+
+
+<p>Reddit also publicly announced updates to its <strong>robots.txt and rate limiting</strong> as part of a broader strategy to block unauthorized AI crawlers and push them into paid licensing deals. (<a href="https://www.reuters.com/technology/reddit-update-web-standard-block-automated-website-scraping-2024-06-25/?utm_source=chatgpt.com">Reuters</a>)</p>
+
+
+
+<p>Takeaway:</p>
+
+
+
+<blockquote class="wp-block-quote is-layout-flow wp-block-quote-is-layout-flow">
+<p>The pattern is shifting from “you broke our ToS” to “you built a commercial AI product by <strong>circumventing technical controls, ignoring our terms, and exploiting our content</strong>.”</p>
+</blockquote>
+
+
+
+<p>That’s exactly the framing you want if your target is a modern LLM crawler.</p>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<h2 class="wp-block-heading"><span class="ez-toc-section" id="%F0%9F%A7%AD_For_SaaS_platforms_designing_your_stack_with_AI_scrapers_in_mind"></span>🧭 For SaaS platforms: designing your stack with AI scrapers in mind<span class="ez-toc-section-end"></span></h2>
+
+
+
+<p>Think of this as <strong>defensive architecture</strong> across three layers.</p>
+
+
+
+<h3 class="wp-block-heading"><span class="ez-toc-section" id="%F0%9F%A7%B1_Contract_layer_API_ToS_language"></span>🧱 Contract layer: API &amp; ToS language<span class="ez-toc-section-end"></span></h3>
+
+
+
+<p>For dev portals and APIs, you want <strong>developer-facing terms</strong> that:</p>
+
+
+
+<ul class="wp-block-list">
+<li>Tie access to a <strong>key, account, or seat</strong>, not just “anyone who visits our docs.”</li>
+
+
+
+<li>Explicitly restrict:
+<ul class="wp-block-list">
+<li>high-volume scraping or bulk export;</li>
+
+
+
+<li>use of output or documentation for <strong>training or improving general-purpose models</strong>;</li>
+
+
+
+<li>reselling or redistributing your data via data brokers/export tools.</li>
+</ul>
+</li>
+
+
+
+<li>Reserve rights to:
+<ul class="wp-block-list">
+<li>throttle, suspend, or <strong>revoke keys</strong> for abuse;</li>
+
+
+
+<li>demand <strong>logs</strong> and cooperation in investigating suspected automated scraping;</li>
+
+
+
+<li>pursue <strong>DMCA 1201 / anti-circumvention</strong> and other remedies if bots bypass your technical measures.</li>
+</ul>
+</li>
+</ul>
+
+
+
+<p>Courts have enforced anti-scraping terms against <strong>known account-holders</strong> who used fake profiles or abused private APIs, while being skeptical when sites try to bind random visitors. (<a href="https://www.privacyworld.blog/2022/11/federal-court-rules-in-favor-of-linkedins-breach-of-contract-claim-after-six-years-of-cfaa-data-scraping-litigation/?utm_source=chatgpt.com">Privacy World</a>)</p>
+
+
+
+<h3 class="wp-block-heading"><span class="ez-toc-section" id="%F0%9F%A7%AA_Technical_layer_make_abuse_measurable"></span>🧪 Technical layer: make abuse measurable<span class="ez-toc-section-end"></span></h3>
+
+
+
+<p>You want to be able to point to something more concrete than “our servers felt slow.”</p>
+
+
+
+<p>For each API key and IP range, log:</p>
+
+
+
+<ul class="wp-block-list">
+<li>request timestamps and paths;</li>
+
+
+
+<li>user agent and any declared bot identity;</li>
+
+
+
+<li><strong>burst patterns</strong> (e.g., 10K requests in 5 minutes to <code>/docs/</code> or <code>/v1/resource</code>);</li>
+
+
+
+<li>correlation with your robots.txt rules (e.g., access to <code>/disallow/</code> paths).</li>
+</ul>
+
+
+
+<p>These fields become exhibits in C&amp;Ds and, if needed, complaints.</p>
+
+
+
+<h3 class="wp-block-heading"><span class="ez-toc-section" id="%F0%9F%A7%AC_Governance_layer_content_ownership"></span>🧬 Governance layer: content &amp; ownership<span class="ez-toc-section-end"></span></h3>
+
+
+
+<p>AI cases keep reminding platforms of a basic but uncomfortable fact:</p>
+
+
+
+<ul class="wp-block-list">
+<li>If <strong>users own the content</strong> and you only hold a non-exclusive license (like X, Reddit, many forums), there are limits on what you can do with ToS to police third-party use. (<a href="https://www.wtk-law.com/blog/how-to-stop-ai-from-scraping-your-website-data-district-court-points-to-copyright-law-for-answers/?utm_source=chatgpt.com">wtk-law.com</a>)</li>
+</ul>
+
+
+
+<p>That doesn’t mean do nothing, but it affects:</p>
+
+
+
+<ul class="wp-block-list">
+<li>your <strong>copyright theories</strong>;</li>
+
+
+
+<li>whether you lean more on <strong>contract, privacy, and data protection</strong>;</li>
+
+
+
+<li>and what you promise users about how their contributions will (or won’t) be used in AI training.</li>
+</ul>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<h2 class="wp-block-heading"><span class="ez-toc-section" id="%F0%9F%95%B5%EF%B8%8F_Detecting_and_documenting_API_terms_abuse_by_LLM_crawlers"></span>🕵️ Detecting and documenting API terms abuse by LLM crawlers<span class="ez-toc-section-end"></span></h2>
+
+
+
+<p>As a dev or platform architect, your job is to make the <strong>abuse story legible</strong> in log form.</p>
+
+
+
+<h3 class="wp-block-heading"><span class="ez-toc-section" id="What_%E2%80%9CLLM_crawler_abuse%E2%80%9D_usually_looks_like"></span>What “LLM crawler abuse” usually looks like<span class="ez-toc-section-end"></span></h3>
+
+
+
+<p>Patterns you’ll recognize:</p>
+
+
+
+<ul class="wp-block-list">
+<li>A small number of IPs or ASNs hitting <strong>every endpoint and every doc page</strong>, often ignoring <code>Retry-After</code> headers.</li>
+
+
+
+<li>User agents that either openly declare <code>*Bot</code> … or fake standard browsers while behaving like classic scrapers.</li>
+
+
+
+<li>Aggressive crawling of exactly the directories marked <code>Disallow</code> in robots.txt. (<a href="https://arxiv.org/abs/2505.21733?utm_source=chatgpt.com">arXiv</a>)</li>
+
+
+
+<li>Usage coming from accounts or keys that <strong>never progress</strong> beyond read-only calls and explore the entire schema.</li>
+</ul>
+
+
+
+<p>When you see that, start assembling a <strong>technical dossier</strong>:</p>
+
+
+
+<figure class="wp-block-table"><table class="has-fixed-layout"><thead><tr><th>Evidence item</th><th>Why it matters</th></tr></thead><tbody><tr><td>IP ranges and ASN ownership</td><td>Lets you tie traffic to data centers, cloud providers, or known scraping companies.</td></tr><tr><td>Key or account IDs</td><td>Supports contract theories; shows they agreed to your dev terms.</td></tr><tr><td>robots.txt vs access patterns</td><td>Helps tell the story: “They saw the instructions and decided to ignore them.”</td></tr><tr><td>Rate-limit headers vs traffic</td><td>Documents deliberate evasion of throttling and support for “technical abuse” framing.</td></tr><tr><td>Any identification of the bot</td><td>Some AI crawlers self-identify (GPTBot, Claude-Web, PerplexityBot); screenshots of this matter, especially if they continue after you disallow them. (<a href="https://www.wired.com/story/how-to-stop-your-data-from-being-used-to-train-ai?utm_source=chatgpt.com">WIRED</a>)</td></tr></tbody></table></figure>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<h2 class="wp-block-heading"><span class="ez-toc-section" id="%E2%9C%89%EF%B8%8F_Structuring_a_C_D_to_an_AI_crawler_that_ignores_your_rules"></span>✉️ Structuring a C&amp;D to an AI crawler that ignores your rules<span class="ez-toc-section-end"></span></h2>
+
+
+
+<p>Here’s the <strong>bones of a dev-savvy C&amp;D</strong> aimed at LLM scrapers. You’d adapt this for your jurisdiction, but the structure is stable.</p>
+
+
+
+<h3 class="wp-block-heading"><span class="ez-toc-section" id="%F0%9F%A7%A9_Table_%E2%80%93_Key_building_blocks_of_an_AI-scraper_C_D"></span>🧩 Table – Key building blocks of an AI-scraper C&amp;D<span class="ez-toc-section-end"></span></h3>
+
+
+
+<figure class="wp-block-table"><table class="has-fixed-layout"><thead><tr><th>Section</th><th>What you do</th><th>Dev-facing details to include</th></tr></thead><tbody><tr><td><strong>1. Identify the bot and traffic</strong></td><td>Tie the letter to concrete behavior.</td><td>IP ranges, user agents, API keys, time windows, and approximate request volume. Include sample log lines or charts as appendices.</td></tr><tr><td><strong>2. Point to your contractual terms</strong></td><td>Show that this isn’t just vibes; there was an agreement.</td><td>Quote the relevant <strong>API Terms / ToS</strong> sections: anti-scraping, rate limits, “no AI training”, export / resale restrictions. Clarify how the bot (or its operator) agreed—e.g., developer signup, key issuance. (<a href="https://www.privacyworld.blog/2022/11/federal-court-rules-in-favor-of-linkedins-breach-of-contract-claim-after-six-years-of-cfaa-data-scraping-litigation/?utm_source=chatgpt.com">Privacy World</a>)</td></tr><tr><td><strong>3. Describe technical abuse</strong></td><td>Elevate it above “they made a lot of requests.”</td><td>Explain how their behavior exceeded <strong>documented rate limits</strong>, ignored robots.txt, hit blocked paths, or bypassed auth and CAPTCHAs. Connect directly to your docs: “Our published limit is X requests / minute; your bot has repeatedly hit &gt;Y/minute.” (<a href="https://stytch.com/blog/how-to-block-ai-web-crawlers/?utm_source=chatgpt.com">Stytch</a>)</td></tr><tr><td><strong>4. Legal theories (short and targeted)</strong></td><td>Layer contract + IP + computer misuse.</td><td>&#8211; Breach of API Terms (for key-based use) &#8211; Trespass to chattels / unfair competition for evasive scraping &#8211; Potential <strong>DMCA §1201 anti-circumvention</strong> if they bypass technical access controls, especially robots + IP blocking + CAPTCHAs. (<a href="https://natlawreview.com/article/anti-circumvention-reddits-case-against-perplexity?utm_source=chatgpt.com">National Law Review</a>)</td></tr><tr><td><strong>5. Demands: keys, logging, and model use</strong></td><td>This is where you get concrete.</td><td>Common demands: &#8211; Immediately cease scraping and training on your endpoints/content. &#8211; <strong>Revoke and delete API keys</strong>, and confirm no derived keys/proxies. &#8211; Provide <strong>network-level logs</strong> (IPs, timestamps, endpoints, volumes) for a defined lookback period. &#8211; Provide a sworn statement describing <strong>how harvested data was used</strong> (training, fine-tuning, RAG indices) and commit to <strong>ceasing use / deleting derived corpora</strong> where appropriate.</td></tr><tr><td><strong>6. Cure window and escalation</strong></td><td>Give them a path out, but on your terms.</td><td>Short but reasonable timeline (e.g., 7–14 days) to comply and schedule a discussion about <strong>licensing</strong> if they want continued access. Make clear that failure will lead to key revocation, broader IP blocking, and potential <strong>litigation</strong> in your chosen forum.</td></tr></tbody></table></figure>
+
+
+
+<p>Your tone can stay professional and technical: the goal is to make it feel inevitable that, if they don’t cooperate, the next step is a complaint that looks a lot like Reddit’s filings.</p>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<h2 class="wp-block-heading"><span class="ez-toc-section" id="%F0%9F%9A%A8_Enforcement_what_you_actually_do_after_the_C_D"></span>🚨 Enforcement: what you actually do after the C&amp;D<span class="ez-toc-section-end"></span></h2>
+
+
+
+<p>If the LLM crawler keeps misbehaving after your letter, you have options.</p>
+
+
+
+<h3 class="wp-block-heading"><span class="ez-toc-section" id="Immediate_platform_actions"></span>Immediate platform actions<span class="ez-toc-section-end"></span></h3>
+
+
+
+<ul class="wp-block-list">
+<li><strong>Revoke keys and sessions</strong> bound to the offending entity.</li>
+
+
+
+<li>Extend <strong>IP and ASN blocking</strong>, including known data centers and proxies used.</li>
+
+
+
+<li>Tighten <strong>rate limits</strong> globally or for suspect ranges; require CAPTCHAs or OAuth for previously anonymous endpoints.</li>
+</ul>
+
+
+
+<p>Log these changes—they become evidence if you later argue <strong>circumvention</strong> (because the bot had to adapt to evade them). (<a href="https://redditinc.com/hubfs/Reddit%20Inc/Content/Reddit%20v.%20SerpApi.pdf?utm_source=chatgpt.com">redditinc.com</a>)</p>
+
+
+
+<h3 class="wp-block-heading"><span class="ez-toc-section" id="Considering_litigation"></span>Considering litigation<span class="ez-toc-section-end"></span></h3>
+
+
+
+<p>If the crawler:</p>
+
+
+
+<ul class="wp-block-list">
+<li>is high-volume;</li>
+
+
+
+<li>clearly training or powering a commercial model on your data; and</li>
+
+
+
+<li>ignores multiple notices and technical blocks,</li>
+</ul>
+
+
+
+<p>you’re in the same fact pattern as <strong>Reddit v Anthropic / Perplexity</strong>.</p>
+
+
+
+<p>Claims counsel are reaching for in these fact patterns include:</p>
+
+
+
+<ul class="wp-block-list">
+<li><strong>Breach of contract</strong> (for authenticated access / API users). (<a href="https://www.courthousenews.com/wp-content/uploads/2025/06/reddit-vs-anthropic-pbc-complaint.pdf?utm_source=chatgpt.com">Courthouse News</a>)</li>
+
+
+
+<li><strong>Copyright</strong> (for expressive docs / examples / knowledge base content). (<a href="https://www.ddg.fr/actualite/reddit-inc-v-anthropic-pbc---legal-action-over-the-unauthorized-use-of-user-generated-content-in-ai-training?utm_source=chatgpt.com">ddg.fr</a>)</li>
+
+
+
+<li><strong>DMCA §1201</strong>: bypassing robots + IP blocks + CAPTCHAs and using Google SERPs or proxies to sneak in anyway. (<a href="https://natlawreview.com/article/anti-circumvention-reddits-case-against-perplexity?utm_source=chatgpt.com">National Law Review</a>)</li>
+
+
+
+<li><strong>Trespass to chattels / unfair competition / unjust enrichment</strong> under state law, especially in state court where judges are more comfortable treating scraping as interference with your business rather than a pure copyright issue. (<a href="https://www.courthousenews.com/wp-content/uploads/2025/06/reddit-vs-anthropic-pbc-complaint.pdf?utm_source=chatgpt.com">Courthouse News</a>)</li>
+</ul>
+
+
+
+<p>The key is that your <strong>API Terms, robots.txt, and rate-limit policies have been turned into a narrative</strong>:</p>
+
+
+
+<blockquote class="wp-block-quote is-layout-flow wp-block-quote-is-layout-flow">
+<p>“We set clear rules, both contractual and technical. You built an LLM product by intentionally ignoring them and evading our controls.”</p>
+</blockquote>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<h2 class="wp-block-heading"><span class="ez-toc-section" id="%E2%9D%93_FAQ_for_SaaS_platforms_and_dev_teams"></span>❓ FAQ for SaaS platforms and dev teams<span class="ez-toc-section-end"></span></h2>
+
+
+
+<h3 class="wp-block-heading"><span class="ez-toc-section" id="Are_we_legally_required_to_honor_all_crawlers_that_follow_robotstxt"></span>Are we legally required to honor all crawlers that follow robots.txt?<span class="ez-toc-section-end"></span></h3>
+
+
+
+<p>No. robots.txt is a <strong>voluntary protocol</strong>, not a legal obligation. You can block or throttle even “polite” bots if they don’t fit your business model. (<a href="https://en.wikipedia.org/wiki/Robots.txt?utm_source=chatgpt.com">Wikipedia</a>)</p>
+
+
+
+<p>robots.txt is mainly useful to:</p>
+
+
+
+<ul class="wp-block-list">
+<li>signal your preferences;</li>
+
+
+
+<li>distinguish respectful actors from bad ones;</li>
+
+
+
+<li>and support your story that you had <strong>reasonable technical measures</strong> before you went to court.</li>
+</ul>
+
+
+
+<h3 class="wp-block-heading"><span class="ez-toc-section" id="Can_we_ever_rely_on_ToS_alone_to_stop_scraping"></span>Can we ever rely on ToS alone to stop scraping?<span class="ez-toc-section-end"></span></h3>
+
+
+
+<p>Sometimes, but it’s risky:</p>
+
+
+
+<ul class="wp-block-list">
+<li>For <strong>authenticated users</strong> with keys or logins, courts have enforced anti-scraping clauses and account-abuse provisions. (<a href="https://www.privacyworld.blog/2022/11/federal-court-rules-in-favor-of-linkedins-breach-of-contract-claim-after-six-years-of-cfaa-data-scraping-litigation/?utm_source=chatgpt.com">Privacy World</a>)</li>
+
+
+
+<li>For <strong>purely public content</strong>, cases like <strong>X v Bright Data</strong> and <strong>Meta v Bright Data</strong> show judges are reluctant to let platforms use state contract law to expand their rights beyond copyright and user licenses. (<a href="https://blog.ericgoldman.org/archives/2024/05/x-corp-v-bright-data-is-the-decision-weve-been-waiting-for-guest-blog-post.htm?utm_source=chatgpt.com">Technology &amp; Marketing Law Blog</a>)</li>
+</ul>
+
+
+
+<p>So use ToS, but <strong>don’t stop there</strong>. Combine them with auth, logging, and targeted legal hooks.</p>
+
+
+
+<h3 class="wp-block-heading"><span class="ez-toc-section" id="Does_ignoring_robotstxt_itself_violate_any_law"></span>Does ignoring robots.txt itself violate any law?<span class="ez-toc-section-end"></span></h3>
+
+
+
+<p>Not by itself. robots.txt is voluntary. But:</p>
+
+
+
+<ul class="wp-block-list">
+<li>If a bot both <strong>ignores robots.txt</strong> <em>and</em> actively evades CAPTCHAs, IP blocks, or other controls <em>after notice</em>, that combination starts to look like <strong>circumvention of technical measures</strong> and can support DMCA §1201, trespass, and similar claims. (<a href="https://natlawreview.com/article/anti-circumvention-reddits-case-against-perplexity?utm_source=chatgpt.com">National Law Review</a>)</li>
+</ul>
+
+
+
+<p>The law isn’t there yet in a clean, bright-line way, but Reddit’s Perplexity suit is basically trying to make that argument stick.</p>
+
+
+
+<h3 class="wp-block-heading"><span class="ez-toc-section" id="Should_we_try_to_cut_off_all_AI_crawlers"></span>Should we try to cut off <em>all</em> AI crawlers?<span class="ez-toc-section-end"></span></h3>
+
+
+
+<p>Probably not. A more sustainable approach:</p>
+
+
+
+<ul class="wp-block-list">
+<li>Allow or license <strong>specific AI vendors</strong> whose use you’re comfortable with;</li>
+
+
+
+<li>Block and pursue those who <strong>won’t sign a license</strong> and aggressively ignore your controls;</li>
+
+
+
+<li>Make your <strong>robots.txt + docs</strong> reflect this distinction (e.g., whitelisting named crawlers and disallowing others). (<a href="https://www.reuters.com/technology/reddit-update-web-standard-block-automated-website-scraping-2024-06-25/?utm_source=chatgpt.com">Reuters</a>)</li>
+</ul>
+
+
+
+<p>This positions you as <strong>selective, not Luddite</strong>, which helps legally and reputationally.</p>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<p>If your SaaS platform is already seeing unexplained bursts of traffic on docs and APIs, the time to assemble your <strong>technical dossier and C&amp;D templates</strong> is <em>before</em> you end up in Reddit’s position. The intersection of <strong>dev telemetry + clean contracts + targeted demand letters</strong> is where you can still steer AI crawlers toward a license instead of a lawsuit.</p>
+
+
+
+<p>And once you have this system in place, it becomes a reusable pattern for every future model vendor that decides <em>your</em> docs are free training data.</p>
+
+
+
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+
+
+
+<ul class="wp-block-list">
+<li><a href="https://www.reuters.com/legal/musks-x-corp-loses-lawsuit-against-israeli-data-scraping-company-2024-05-10/?utm_source=chatgpt.com">Reuters</a></li>
+
+
+
+<li><a href="https://apnews.com/article/3ad8968550dd7e11bcd285a74fb6e2ff?utm_source=chatgpt.com">AP News</a></li>
+
+
+
+<li><a href="https://www.reuters.com/technology/reddit-update-web-standard-block-automated-website-scraping-2024-06-25/?utm_source=chatgpt.com">Reuters</a></li>
+
+
+
+<li><a href="https://www.reuters.com/legal/litigation/authors-lawyers-15-billion-anthropic-settlement-seek-300-million-2025-12-04/?utm_source=chatgpt.com">Reuters</a></li>
+</ul>
+</div>
+    </article>
+  </main>
+
+  <footer><p>© 2025 Terms.Law. All rights reserved.</p></footer>
+</body>
+</html>
