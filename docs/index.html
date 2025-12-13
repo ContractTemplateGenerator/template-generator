@@ -13,6 +13,9 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
+    <!-- Google Font for Signatures -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Great+Vibes&family=Satisfy&display=swap" rel="stylesheet">
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -606,6 +609,345 @@
         .toast.show { transform: translateY(0); opacity: 1; }
         .hidden { display: none !important; }
 
+        /* Signature Section */
+        .signature-section {
+            margin-top: 24px;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+        }
+        .signature-section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .sig-party-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .sig-party-tab {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #e5e7eb;
+            background: white;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .sig-party-tab.active {
+            border-color: #6366f1;
+            background: #ede9fe;
+            color: #6366f1;
+        }
+        .sig-party-tab .sig-status {
+            font-size: 10px;
+            display: block;
+            margin-top: 4px;
+            color: #9ca3af;
+        }
+        .sig-party-tab.signed .sig-status {
+            color: #22c55e;
+        }
+        /* Signature Type Toggle (Draw/Type) */
+        .sig-type-toggle {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 12px;
+            background: #e5e7eb;
+            padding: 4px;
+            border-radius: 8px;
+        }
+        .sig-toggle-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #6b7280;
+        }
+        .sig-toggle-btn.active {
+            background: white;
+            color: #374151;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .sig-input-group {
+            margin-bottom: 16px;
+        }
+        .sig-input-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: #475569;
+            margin-bottom: 6px;
+        }
+        .sig-type-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        .sig-type-input:focus {
+            outline: none;
+            border-color: #6366f1;
+        }
+        /* Draw Signature Canvas */
+        .sig-draw-container {
+            background: white;
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 8px;
+            margin-bottom: 12px;
+        }
+        .sig-canvas {
+            width: 100%;
+            height: 100px;
+            border-radius: 4px;
+            cursor: crosshair;
+            touch-action: none;
+        }
+        .sig-canvas-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 8px;
+        }
+        .sig-clear-btn {
+            padding: 6px 12px;
+            border: 1px solid #e5e7eb;
+            background: white;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #6b7280;
+            cursor: pointer;
+        }
+        .sig-clear-btn:hover {
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+        /* Type Signature Preview */
+        .sig-preview {
+            background: white;
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .sig-preview-text {
+            font-size: 32px;
+            color: #1e3a5f;
+            min-height: 45px;
+        }
+        .sig-font-dancing { font-family: 'Dancing Script', cursive; }
+        .sig-font-vibes { font-family: 'Great Vibes', cursive; }
+        .sig-font-satisfy { font-family: 'Satisfy', cursive; }
+        .sig-preview-placeholder {
+            color: #9ca3af;
+            font-size: 14px;
+            font-style: italic;
+        }
+        .sig-font-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .sig-font-btn {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #e5e7eb;
+            background: white;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .sig-font-btn:hover {
+            border-color: #6366f1;
+        }
+        .sig-font-btn.active {
+            border-color: #6366f1;
+            background: #ede9fe;
+        }
+        .sig-apply-btn {
+            width: 100%;
+            padding: 12px;
+            background: #22c55e;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .sig-apply-btn:hover {
+            background: #16a34a;
+        }
+        .sig-apply-btn:disabled {
+            background: #d1d5db;
+            cursor: not-allowed;
+        }
+
+        /* Email to Sign */
+        .email-sign-section {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e5e7eb;
+        }
+        .email-sign-row {
+            display: flex;
+            gap: 8px;
+        }
+        .email-sign-input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .email-sign-input:focus {
+            outline: none;
+            border-color: #6366f1;
+        }
+        .email-sign-btn {
+            padding: 10px 16px;
+            background: #6366f1;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .email-sign-btn:hover {
+            background: #4f46e5;
+        }
+
+        /* Signature in Document Preview */
+        .doc-signature-typed {
+            font-size: 28px;
+            color: #1e3a5f;
+            min-height: 40px;
+        }
+        .doc-signature-image {
+            max-height: 60px;
+            max-width: 200px;
+        }
+        .doc-signature-timestamp {
+            font-size: 9pt;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+        .unsigned-placeholder {
+            color: #9ca3af;
+            font-style: italic;
+            font-size: 12px;
+        }
+
+        /* Verification Stamp */
+        .verification-stamp {
+            margin-top: 40px;
+            padding: 20px;
+            border: 2px solid #6366f1;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+            text-align: center;
+        }
+        .verification-stamp-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .verification-stamp-logo {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+        .verification-stamp-logo span {
+            color: #6366f1;
+        }
+        .verification-stamp-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #6366f1;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .verification-stamp-id {
+            font-family: monospace;
+            font-size: 10px;
+            color: #6b7280;
+            margin-top: 8px;
+        }
+        .verification-stamp-parties {
+            margin-top: 16px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            text-align: left;
+            font-size: 10px;
+        }
+        .verification-party {
+            padding: 12px;
+            background: white;
+            border-radius: 6px;
+        }
+        .verification-party-label {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 4px;
+        }
+        .verification-party-name {
+            color: #1a1a2e;
+        }
+        .verification-party-time {
+            color: #6b7280;
+            font-size: 9px;
+            margin-top: 2px;
+        }
+        .verification-party-ip {
+            color: #9ca3af;
+            font-size: 8px;
+        }
+        .verification-not-signed {
+            color: #9ca3af;
+            font-style: italic;
+        }
+
+        /* Email Sent Badge */
+        .email-sent-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: #dbeafe;
+            color: #1d4ed8;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+
         @media (max-width: 1100px) {
             .main-container {
                 flex-direction: column;
@@ -676,6 +1018,129 @@
                 <div class="blank-doc-message">
                     <h3>Blank Document</h3>
                     <p>Start typing in the editor, or select a document template above to auto-generate.</p>
+                </div>
+            </div>
+
+            <!-- Signature Section -->
+            <div class="signature-section" id="signatureSection">
+                <div class="signature-section-title">
+                    ✍️ Electronic Signatures
+                </div>
+
+                <div class="sig-party-tabs">
+                    <button class="sig-party-tab active" id="sigTabPartyA" onclick="selectSignatureParty('partyA')">
+                        Party A
+                        <span class="sig-status" id="sigStatusA">Not signed</span>
+                    </button>
+                    <button class="sig-party-tab" id="sigTabPartyB" onclick="selectSignatureParty('partyB')">
+                        Party B
+                        <span class="sig-status" id="sigStatusB">Not signed</span>
+                    </button>
+                </div>
+
+                <!-- Party A Signature -->
+                <div id="sigPartyAPanel">
+                    <div class="sig-input-group">
+                        <label>Signer's Full Legal Name</label>
+                        <input type="text" class="sig-type-input" id="sigNameA" placeholder="Your full legal name" oninput="updateSignaturePreview('A')">
+                    </div>
+
+                    <div class="sig-type-toggle">
+                        <button class="sig-toggle-btn active" onclick="setSignatureMode('A', 'type')">Type</button>
+                        <button class="sig-toggle-btn" onclick="setSignatureMode('A', 'draw')">Draw</button>
+                    </div>
+
+                    <!-- Type Signature -->
+                    <div id="sigTypeContainerA">
+                        <div class="sig-preview" id="sigPreviewA">
+                            <span class="sig-preview-placeholder">Your signature will appear here</span>
+                        </div>
+
+                        <div class="sig-font-selector">
+                            <button class="sig-font-btn sig-font-dancing active" onclick="selectSignatureFont('A', 'dancing')" data-font="dancing">
+                                <span style="font-family: 'Dancing Script', cursive;">Abc</span>
+                            </button>
+                            <button class="sig-font-btn sig-font-vibes" onclick="selectSignatureFont('A', 'vibes')" data-font="vibes">
+                                <span style="font-family: 'Great Vibes', cursive;">Abc</span>
+                            </button>
+                            <button class="sig-font-btn sig-font-satisfy" onclick="selectSignatureFont('A', 'satisfy')" data-font="satisfy">
+                                <span style="font-family: 'Satisfy', cursive;">Abc</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Draw Signature -->
+                    <div id="sigDrawContainerA" class="hidden">
+                        <div class="sig-draw-container">
+                            <canvas id="sigCanvasA" class="sig-canvas"></canvas>
+                            <div class="sig-canvas-actions">
+                                <button class="sig-clear-btn" onclick="clearCanvas('A')">Clear</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="sig-apply-btn" id="sigApplyA" onclick="applySignature('A')" disabled>
+                        Apply My Signature
+                    </button>
+                </div>
+
+                <!-- Party B Signature -->
+                <div id="sigPartyBPanel" class="hidden">
+                    <div class="sig-input-group">
+                        <label>Signer's Full Legal Name</label>
+                        <input type="text" class="sig-type-input" id="sigNameB" placeholder="Counterparty's full legal name" oninput="updateSignaturePreview('B')">
+                    </div>
+
+                    <div class="sig-type-toggle">
+                        <button class="sig-toggle-btn active" onclick="setSignatureMode('B', 'type')">Type</button>
+                        <button class="sig-toggle-btn" onclick="setSignatureMode('B', 'draw')">Draw</button>
+                    </div>
+
+                    <!-- Type Signature -->
+                    <div id="sigTypeContainerB">
+                        <div class="sig-preview" id="sigPreviewB">
+                            <span class="sig-preview-placeholder">Their signature will appear here</span>
+                        </div>
+
+                        <div class="sig-font-selector">
+                            <button class="sig-font-btn sig-font-dancing active" onclick="selectSignatureFont('B', 'dancing')" data-font="dancing">
+                                <span style="font-family: 'Dancing Script', cursive;">Abc</span>
+                            </button>
+                            <button class="sig-font-btn sig-font-vibes" onclick="selectSignatureFont('B', 'vibes')" data-font="vibes">
+                                <span style="font-family: 'Great Vibes', cursive;">Abc</span>
+                            </button>
+                            <button class="sig-font-btn sig-font-satisfy" onclick="selectSignatureFont('B', 'satisfy')" data-font="satisfy">
+                                <span style="font-family: 'Satisfy', cursive;">Abc</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Draw Signature -->
+                    <div id="sigDrawContainerB" class="hidden">
+                        <div class="sig-draw-container">
+                            <canvas id="sigCanvasB" class="sig-canvas"></canvas>
+                            <div class="sig-canvas-actions">
+                                <button class="sig-clear-btn" onclick="clearCanvas('B')">Clear</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="sig-apply-btn" id="sigApplyB" onclick="applySignature('B')" disabled>
+                        Apply Signature
+                    </button>
+
+                    <div class="email-sign-section">
+                        <div class="sig-input-group" style="margin-bottom: 8px;">
+                            <label>Or send for signature via email</label>
+                        </div>
+                        <div class="email-sign-row">
+                            <input type="email" class="email-sign-input" id="emailSignInput" placeholder="counterparty@email.com">
+                            <button class="email-sign-btn" onclick="sendForSignature()">Send to Sign</button>
+                        </div>
+                        <div id="emailSentBadge" class="hidden">
+                            <span class="email-sent-badge">📧 Signature request sent</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1060,48 +1525,183 @@
         function generateNonSolicitationPreview() {
             const companyName = getGenValue('gen_companyName', '[COMPANY NAME]');
             const companyState = getGenValue('gen_companyState', '[STATE]');
-            const companyAddress = getGenValue('gen_companyAddress', '[ADDRESS]');
+            const companyAddress = getGenValue('gen_companyAddress', '[COMPANY ADDRESS]');
             const effectiveDate = formatGenDate(getGenValue('gen_effectiveDate'));
             const individualName = getGenValue('gen_individualName', '[INDIVIDUAL NAME]');
+            const individualAddress = getGenValue('gen_individualAddress', '[INDIVIDUAL ADDRESS]');
             const individualType = getGenValue('gen_individualType', 'employee');
             const jobTitle = getGenValue('gen_jobTitle', '[TITLE]');
-            const customerPeriod = getGenValue('gen_customerPeriod', '1 year');
-            const employeePeriod = getGenValue('gen_employeePeriod', '1 year');
+            const customerPeriod = getGenValue('gen_customerPeriod', '12 months');
+            const customerScope = getGenValue('gen_customerScope', 'worked-with');
+            const lookbackPeriod = getGenValue('gen_lookbackPeriod', '24 months');
+            const employeePeriod = getGenValue('gen_employeePeriod', '12 months');
+            const employeeScope = getGenValue('gen_employeeScope', 'worked-with');
+            const includeContractors = getGenValue('gen_includeContractors');
+            const includeConsultants = getGenValue('gen_includeConsultants');
+            const includeConfidentiality = getGenValue('gen_includeConfidentiality');
+            const includeNonDisparagement = getGenValue('gen_includeNonDisparagement');
+            const includeInjunctiveRelief = getGenValue('gen_includeInjunctiveRelief');
+            const considerationType = getGenValue('gen_considerationType', 'employment');
 
-            const typeLabel = { 'employee': 'Employee', 'contractor': 'Contractor', 'consultant': 'Consultant' }[individualType] || 'Employee';
+            const typeLabels = {
+                'employee': 'Employee',
+                'contractor': 'Contractor',
+                'consultant': 'Consultant',
+                'officer': 'Officer',
+                'partner': 'Partner'
+            };
+            const typeLabel = typeLabels[individualType] || 'Employee';
+
+            const customerScopeText = {
+                'worked-with': 'with whom ' + typeLabel + ' had direct business dealings or for whom ' + typeLabel + ' performed services',
+                'had-contact': 'with whom ' + typeLabel + ' had material contact or about whom ' + typeLabel + ' obtained information',
+                'confidential-info': 'about whom ' + typeLabel + ' received Confidential Information during the course of engagement',
+                'all-customers': 'who were customers of Company'
+            }[customerScope];
+
+            const employeeScopeText = {
+                'worked-with': 'with whom ' + typeLabel + ' worked directly',
+                'supervised': 'whom ' + typeLabel + ' supervised, managed, or had authority over',
+                'department': 'who worked in ' + typeLabel + "'s department or business unit",
+                'all-employees': 'employed by Company'
+            }[employeeScope];
+
+            let personnelTypes = ['employees'];
+            if (includeContractors) personnelTypes.push('independent contractors');
+            if (includeConsultants) personnelTypes.push('consultants');
+            const personnelText = personnelTypes.join(', ').replace(/, ([^,]*)$/, ', and $1');
+
+            const considerationText = {
+                'employment': 'the offer of employment and access to Confidential Information',
+                'continued-employment': 'continued employment, access to Confidential Information, and other good and valuable consideration',
+                'promotion': 'promotion to the position of ' + jobTitle + ', increased compensation, and access to Confidential Information',
+                'bonus': 'special compensation, and access to Confidential Information',
+                'equity': 'equity compensation, stock options, and access to Confidential Information'
+            }[considerationType];
+
+            let sectionNum = 1;
+            let sections = '';
+
+            // RECITALS
+            sections += `
+                <p><strong>RECITALS</strong></p>
+                <p class="clause">A. Company is engaged in the business of providing products and/or services to customers and has developed valuable customer relationships, trade secrets, and goodwill.</p>
+                <p class="clause">B. ${typeLabel} is or will be engaged by Company as ${hl(jobTitle, '[TITLE]', 'jobTitle')} and will have access to and become acquainted with Company's Confidential Information, customer relationships, and business operations.</p>
+                <p class="clause">C. Company has a legitimate business interest in protecting its customer relationships, workforce stability, and Confidential Information from unfair competition.</p>
+                <p class="clause">D. ${typeLabel} acknowledges that the restrictions in this Agreement are reasonable and necessary to protect Company's legitimate business interests.</p>
+                <p style="margin-top: 16px;"><strong>NOW, THEREFORE,</strong> in consideration of ${considerationText}, the receipt and sufficiency of which are hereby acknowledged, the parties agree as follows:</p>
+            `;
+
+            // DEFINITIONS
+            sections += `
+                <h2>${sectionNum}. DEFINITIONS</h2>
+                <p class="clause">${sectionNum}.1 <strong>"Confidential Information"</strong> means all non-public information relating to Company's business, including but not limited to: customer lists and contact information; customer preferences, requirements, and purchasing history; pricing strategies and discount structures; business plans and marketing strategies; financial information and projections; proprietary processes and methodologies; software, algorithms, and technical data; vendor and supplier relationships; and any information designated as confidential.</p>
+                <p class="clause">${sectionNum}.2 <strong>"Customer"</strong> means any person or entity that: (a) purchased products or services from Company; (b) was solicited by Company; or (c) was in active negotiations with Company, in each case during the ${hl(lookbackPeriod, '24 months', 'lookbackPeriod')} preceding the termination of ${typeLabel}'s engagement.</p>
+                <p class="clause">${sectionNum}.3 <strong>"Protected Customer"</strong> means any Customer ${customerScopeText} during ${typeLabel}'s engagement with Company.</p>
+                <p class="clause">${sectionNum}.4 <strong>"Protected Personnel"</strong> means any ${personnelText} ${employeeScopeText} during ${typeLabel}'s engagement with Company.</p>
+                <p class="clause">${sectionNum}.5 <strong>"Restricted Period"</strong> means the period during ${typeLabel}'s engagement with Company and for the applicable time period following termination as specified herein, regardless of the reason for termination.</p>
+                <p class="clause">${sectionNum}.6 <strong>"Solicit"</strong> means to initiate contact, encourage, entice, or induce, directly or indirectly, whether for ${typeLabel}'s own benefit or for the benefit of any other person or entity.</p>
+            `;
+            sectionNum++;
+
+            // NON-SOLICITATION OF CUSTOMERS
+            sections += `
+                <h2>${sectionNum}. NON-SOLICITATION OF CUSTOMERS</h2>
+                <p class="clause">${sectionNum}.1 <strong>Restriction.</strong> During the Restricted Period, which shall continue for ${hl(customerPeriod, '12 months', 'customerPeriod')} following termination of ${typeLabel}'s engagement, ${typeLabel} shall not, directly or indirectly:</p>
+                <p class="sub-clause">(a) Solicit any Protected Customer for the purpose of providing products or services that are competitive with those offered by Company;</p>
+                <p class="sub-clause">(b) Attempt to induce any Protected Customer to reduce or terminate its business relationship with Company;</p>
+                <p class="sub-clause">(c) Interfere with or disrupt any existing or prospective business relationship between Company and any Protected Customer;</p>
+                <p class="sub-clause">(d) Accept business from any Protected Customer for products or services competitive with Company's offerings, regardless of who initiated the contact.</p>
+                <p class="clause">${sectionNum}.2 <strong>Scope Clarification.</strong> This restriction applies to Protected Customers whether ${typeLabel} contacts them directly, through an intermediary, through a new employer, or through any entity in which ${typeLabel} has an ownership interest or serves in any capacity.</p>
+                <p class="clause">${sectionNum}.3 <strong>Permitted Activities.</strong> Nothing herein shall prohibit ${typeLabel} from: (a) responding to general advertising not targeted at Protected Customers; or (b) working for a competitor in a capacity that does not involve Protected Customers.</p>
+            `;
+            sectionNum++;
+
+            // NON-SOLICITATION OF EMPLOYEES
+            sections += `
+                <h2>${sectionNum}. NON-SOLICITATION OF PERSONNEL</h2>
+                <p class="clause">${sectionNum}.1 <strong>Restriction.</strong> During the Restricted Period, which shall continue for ${hl(employeePeriod, '12 months', 'employeePeriod')} following termination, ${typeLabel} shall not, directly or indirectly:</p>
+                <p class="sub-clause">(a) Solicit, recruit, hire, or engage any Protected Personnel to leave Company's employment or engagement;</p>
+                <p class="sub-clause">(b) Encourage, induce, or assist any Protected Personnel in terminating their relationship with Company;</p>
+                <p class="sub-clause">(c) Hire or engage any Protected Personnel on behalf of any other person or entity;</p>
+                <p class="sub-clause">(d) Provide information about Protected Personnel to recruiters, competitors, or other potential employers.</p>
+                <p class="clause">${sectionNum}.2 <strong>Independence of Restrictions.</strong> This restriction shall apply regardless of whether ${typeLabel} initiated the contact or whether the Protected Personnel expressed interest in leaving Company independently.</p>
+            `;
+            sectionNum++;
+
+            // CONFIDENTIALITY
+            if (includeConfidentiality) {
+                sections += `
+                    <h2>${sectionNum}. CONFIDENTIALITY</h2>
+                    <p class="clause">${sectionNum}.1 <strong>Non-Disclosure.</strong> ${typeLabel} shall hold all Confidential Information in strict confidence and shall not, without prior written consent of Company, disclose any Confidential Information to any third party or use any Confidential Information for any purpose other than performing duties for Company.</p>
+                    <p class="clause">${sectionNum}.2 <strong>Protection Standards.</strong> ${typeLabel} shall protect Confidential Information using at least the same degree of care used to protect ${typeLabel}'s own confidential information, but in no event less than reasonable care.</p>
+                    <p class="clause">${sectionNum}.3 <strong>Return of Materials.</strong> Upon termination of engagement or upon Company's request, ${typeLabel} shall immediately return all documents, files, records, and materials containing Confidential Information, including all copies, and shall permanently delete all electronic copies from personal devices and accounts.</p>
+                    <p class="clause">${sectionNum}.4 <strong>Survival.</strong> The obligations under this Section shall survive termination of this Agreement and ${typeLabel}'s engagement indefinitely with respect to trade secrets, and for a period of three (3) years with respect to other Confidential Information.</p>
+                `;
+                sectionNum++;
+            }
+
+            // NON-DISPARAGEMENT
+            if (includeNonDisparagement) {
+                sections += `
+                    <h2>${sectionNum}. NON-DISPARAGEMENT</h2>
+                    <p class="clause">${sectionNum}.1 ${typeLabel} agrees not to make any false, misleading, or disparaging statements about Company, its officers, directors, employees, products, services, or business practices to any third party, including but not limited to customers, suppliers, employees, competitors, or the media.</p>
+                    <p class="clause">${sectionNum}.2 Nothing in this Section shall prohibit ${typeLabel} from: (a) responding truthfully to legal process or government inquiry; (b) reporting suspected violations of law to appropriate authorities; or (c) making truthful statements in the context of legal proceedings.</p>
+                `;
+                sectionNum++;
+            }
+
+            // INJUNCTIVE RELIEF
+            if (includeInjunctiveRelief) {
+                sections += `
+                    <h2>${sectionNum}. REMEDIES AND ENFORCEMENT</h2>
+                    <p class="clause">${sectionNum}.1 <strong>Irreparable Harm.</strong> ${typeLabel} acknowledges that a breach of this Agreement would cause irreparable harm to Company for which monetary damages would be inadequate, and that the harm would be difficult or impossible to measure.</p>
+                    <p class="clause">${sectionNum}.2 <strong>Injunctive Relief.</strong> In the event of any actual or threatened breach, Company shall be entitled to seek immediate injunctive relief, including temporary restraining orders and preliminary and permanent injunctions, without the necessity of proving actual damages or posting any bond or other security.</p>
+                    <p class="clause">${sectionNum}.3 <strong>Cumulative Remedies.</strong> The right to injunctive relief shall be in addition to, and not in lieu of, any other remedies available to Company at law or in equity, including monetary damages and recovery of attorneys' fees.</p>
+                    <p class="clause">${sectionNum}.4 <strong>Extension of Restricted Period.</strong> If ${typeLabel} violates any provision of this Agreement, the Restricted Period shall be extended by a period equal to the duration of such violation.</p>
+                `;
+                sectionNum++;
+            }
+
+            // GENERAL PROVISIONS
+            sections += `
+                <h2>${sectionNum}. GENERAL PROVISIONS</h2>
+                <p class="clause">${sectionNum}.1 <strong>Governing Law and Jurisdiction.</strong> This Agreement shall be governed by and construed in accordance with the laws of the State of ${hl(companyState, '[STATE]', 'companyState')}, without regard to its conflicts of law principles. The parties consent to the exclusive jurisdiction of the state and federal courts located in ${hl(companyState, '[STATE]', 'companyState')} for any disputes arising under this Agreement.</p>
+                <p class="clause">${sectionNum}.2 <strong>Severability and Modification.</strong> If any provision of this Agreement is held to be invalid, illegal, or unenforceable, such provision shall be modified to the minimum extent necessary to make it valid and enforceable, or if modification is not possible, shall be severed from this Agreement. The invalidity of any provision shall not affect the validity of the remaining provisions.</p>
+                <p class="clause">${sectionNum}.3 <strong>Entire Agreement.</strong> This Agreement constitutes the entire agreement between the parties concerning its subject matter and supersedes all prior agreements, understandings, negotiations, and discussions, whether oral or written.</p>
+                <p class="clause">${sectionNum}.4 <strong>Amendment.</strong> This Agreement may not be amended or modified except by a written instrument signed by both parties.</p>
+                <p class="clause">${sectionNum}.5 <strong>Waiver.</strong> No waiver of any provision of this Agreement shall be effective unless in writing. The failure of either party to enforce any provision shall not constitute a waiver of such provision or affect the right to enforce it at a later time.</p>
+                <p class="clause">${sectionNum}.6 <strong>Assignment.</strong> ${typeLabel} may not assign this Agreement or any rights or obligations hereunder. Company may assign this Agreement to any successor or affiliate without consent.</p>
+                <p class="clause">${sectionNum}.7 <strong>Attorneys' Fees.</strong> In any action to enforce this Agreement, the prevailing party shall be entitled to recover reasonable attorneys' fees and costs from the non-prevailing party.</p>
+                <p class="clause">${sectionNum}.8 <strong>Acknowledgment.</strong> ${typeLabel} acknowledges having read this Agreement, having had the opportunity to consult with independent legal counsel, and voluntarily agreeing to all terms and conditions set forth herein.</p>
+            `;
 
             return `
-                <h1>Non-Solicitation Agreement</h1>
+                <h1>NON-SOLICITATION AGREEMENT</h1>
                 <p class="center" style="font-style: italic;">Effective Date: ${hl(effectiveDate, '[DATE]', 'effectiveDate')}</p>
 
-                <div class="parties">
-                    <p>This Agreement is entered into by:</p>
-                    <p><strong>Company:</strong> ${hl(companyName, '[COMPANY NAME]', 'companyName')}, located at ${hl(companyAddress, '[ADDRESS]', 'companyAddress')}</p>
-                    <p><strong>${typeLabel}:</strong> ${hl(individualName, '[INDIVIDUAL NAME]', 'individualName')}, serving as ${hl(jobTitle, '[TITLE]', 'jobTitle')}</p>
+                <p>This Non-Solicitation Agreement (this <strong>"Agreement"</strong>) is entered into as of the Effective Date by and between:</p>
+
+                <div class="parties" style="margin: 24px 0; padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px;">
+                    <p><strong>${hl(companyName, '[COMPANY NAME]', 'companyName')}</strong>, a ${hl(companyState, '[STATE]', 'companyState')} corporation with its principal place of business at ${hl(companyAddress, '[COMPANY ADDRESS]', 'companyAddress')} (<strong>"Company"</strong>)</p>
+                    <p style="margin-top: 12px;"><strong>${hl(individualName, '[INDIVIDUAL NAME]', 'individualName')}</strong>, an individual residing at ${hl(individualAddress, '[INDIVIDUAL ADDRESS]', 'individualAddress')} (<strong>"${typeLabel}"</strong>)</p>
                 </div>
 
-                <p><strong>WHEREAS,</strong> Company has valuable customer relationships and employee resources;</p>
-                <p><strong>NOW, THEREFORE,</strong> the parties agree as follows:</p>
+                ${sections}
 
-                <h2>1. NON-SOLICITATION OF CUSTOMERS</h2>
-                <p class="clause">1.1 For a period of ${hl(customerPeriod, '1 year', 'customerPeriod')} following termination, ${typeLabel} agrees not to directly or indirectly solicit any Customer for competitive purposes.</p>
-
-                <h2>2. NON-SOLICITATION OF EMPLOYEES</h2>
-                <p class="clause">2.1 For a period of ${hl(employeePeriod, '1 year', 'employeePeriod')} following termination, ${typeLabel} agrees not to solicit, recruit, or hire any employee or contractor of Company.</p>
-
-                <h2>3. GENERAL PROVISIONS</h2>
-                <p class="clause">3.1 <strong>Governing Law.</strong> This Agreement shall be governed by the laws of ${hl(companyState, '[STATE]', 'companyState')}.</p>
-                <p class="clause">3.2 <strong>Severability.</strong> If any provision is unenforceable, it shall be modified to the minimum extent necessary.</p>
+                <p style="margin-top: 24px;"><strong>IN WITNESS WHEREOF,</strong> the parties have executed this Agreement as of the Effective Date.</p>
 
                 <div class="signature-block">
                     <div class="signature-party">
-                        <h3>Company</h3>
+                        <h3>COMPANY</h3>
+                        <p>${hl(companyName, '[COMPANY NAME]', 'companyName')}</p>
                         <div class="signature-line">Signature</div>
-                        <div class="signature-line">Name & Title</div>
+                        <div class="signature-line">Printed Name</div>
+                        <div class="signature-line">Title</div>
                         <div class="signature-line">Date</div>
                     </div>
                     <div class="signature-party">
-                        <h3>${typeLabel}</h3>
+                        <h3>${typeLabel.toUpperCase()}</h3>
                         <div class="signature-line">Signature</div>
                         <div class="signature-line">${hl(individualName, '[NAME]', 'individualName')}</div>
                         <div class="signature-line">Date</div>
@@ -1234,17 +1834,37 @@
             return `
                 <div class="gen-form-header">
                     <h2>Non-Disclosure Agreement</h2>
-                    <p>Protect confidential information</p>
+                    <p>Protect confidential information in business relationships</p>
+                </div>
+
+                <div class="gen-info-box">
+                    <strong>Choosing the Right NDA Type</strong><br>
+                    <strong>Mutual:</strong> Both parties share confidential information (partnerships, joint ventures, M&A discussions).<br>
+                    <strong>Unilateral:</strong> One party discloses to the other (hiring contractors, pitching to investors).
                 </div>
 
                 <div class="gen-form-section">
                     <div class="gen-section-title">Agreement Type</div>
                     <div class="gen-form-group">
-                        <label>NDA Type</label>
+                        <label class="tooltip-trigger">NDA Type <span class="tooltip-icon">?</span></label>
                         <select id="gen_ndaType" onchange="updateGeneratorPreview('ndaType')">
                             <option value="mutual">Mutual (Two-Way)</option>
                             <option value="unilateral">Unilateral (One-Way)</option>
                         </select>
+                        <div class="field-help">Mutual NDAs protect both parties equally. Use unilateral when only one party discloses sensitive information.</div>
+                    </div>
+                    <div class="gen-form-group">
+                        <label class="tooltip-trigger">Purpose of Disclosure <span class="tooltip-icon">?</span></label>
+                        <select id="gen_purpose" onchange="updateGeneratorPreview('purpose')">
+                            <option value="business-relationship">Evaluating potential business relationship</option>
+                            <option value="partnership">Exploring strategic partnership</option>
+                            <option value="investment">Investment discussions</option>
+                            <option value="acquisition">M&A or acquisition discussions</option>
+                            <option value="employment">Employment or contractor engagement</option>
+                            <option value="vendor">Vendor or supplier evaluation</option>
+                            <option value="licensing">Technology licensing discussions</option>
+                        </select>
+                        <div class="field-help">Defining the purpose limits how disclosed information can be used.</div>
                     </div>
                     <div class="gen-form-row">
                         <div class="gen-form-group">
@@ -1254,6 +1874,7 @@
                                 <option value="California">California</option>
                                 <option value="Delaware">Delaware</option>
                                 <option value="Florida">Florida</option>
+                                <option value="Illinois">Illinois</option>
                                 <option value="New York">New York</option>
                                 <option value="Texas">Texas</option>
                             </select>
@@ -1266,42 +1887,155 @@
                 </div>
 
                 <div class="gen-form-section">
-                    <div class="gen-section-title">Disclosing Party</div>
+                    <div class="gen-section-title">Disclosing Party (Party A)</div>
                     <div class="gen-form-group">
-                        <label>Party Name</label>
-                        <input type="text" id="gen_disclosingParty" placeholder="ABC Corporation" oninput="updateGeneratorPreview('disclosingParty')">
+                        <label>Legal Entity Name</label>
+                        <input type="text" id="gen_disclosingParty" placeholder="ABC Corporation, Inc." oninput="updateGeneratorPreview('disclosingParty')">
+                    </div>
+                    <div class="gen-form-group">
+                        <label>Entity Type</label>
+                        <select id="gen_disclosingType" onchange="updateGeneratorPreview('disclosingType')">
+                            <option value="corporation">Corporation</option>
+                            <option value="llc">LLC</option>
+                            <option value="partnership">Partnership</option>
+                            <option value="individual">Individual</option>
+                        </select>
+                    </div>
+                    <div class="gen-form-group">
+                        <label>State of Formation/Residence</label>
+                        <input type="text" id="gen_disclosingState" placeholder="Delaware" oninput="updateGeneratorPreview('disclosingState')">
+                    </div>
+                    <div class="gen-form-group">
+                        <label>Address</label>
+                        <input type="text" id="gen_disclosingAddress" placeholder="123 Main Street, Suite 100, City, State ZIP" oninput="updateGeneratorPreview('disclosingAddress')">
                     </div>
                 </div>
 
                 <div class="gen-form-section">
-                    <div class="gen-section-title">Receiving Party</div>
+                    <div class="gen-section-title">Receiving Party (Party B)</div>
                     <div class="gen-form-group">
-                        <label>Party Name</label>
-                        <input type="text" id="gen_receivingParty" placeholder="XYZ Company" oninput="updateGeneratorPreview('receivingParty')">
+                        <label>Legal Entity Name</label>
+                        <input type="text" id="gen_receivingParty" placeholder="XYZ Company LLC" oninput="updateGeneratorPreview('receivingParty')">
+                    </div>
+                    <div class="gen-form-group">
+                        <label>Entity Type</label>
+                        <select id="gen_receivingType" onchange="updateGeneratorPreview('receivingType')">
+                            <option value="corporation">Corporation</option>
+                            <option value="llc">LLC</option>
+                            <option value="partnership">Partnership</option>
+                            <option value="individual">Individual</option>
+                        </select>
+                    </div>
+                    <div class="gen-form-group">
+                        <label>State of Formation/Residence</label>
+                        <input type="text" id="gen_receivingState" placeholder="California" oninput="updateGeneratorPreview('receivingState')">
+                    </div>
+                    <div class="gen-form-group">
+                        <label>Address</label>
+                        <input type="text" id="gen_receivingAddress" placeholder="456 Oak Avenue, City, State ZIP" oninput="updateGeneratorPreview('receivingAddress')">
                     </div>
                 </div>
 
                 <div class="gen-form-section">
-                    <div class="gen-section-title">Terms</div>
+                    <div class="gen-section-title">Term & Duration</div>
                     <div class="gen-form-row">
                         <div class="gen-form-group">
-                            <label>Term (Years)</label>
+                            <label class="tooltip-trigger">Agreement Term <span class="tooltip-icon">?</span></label>
                             <select id="gen_termYears" onchange="updateGeneratorPreview('termYears')">
                                 <option value="1">1 Year</option>
                                 <option value="2" selected>2 Years</option>
                                 <option value="3">3 Years</option>
                                 <option value="5">5 Years</option>
+                                <option value="indefinite">Indefinite (until terminated)</option>
                             </select>
+                            <div class="field-help">How long parties can share information under this NDA.</div>
                         </div>
                         <div class="gen-form-group">
-                            <label>Survival Period</label>
+                            <label class="tooltip-trigger">Confidentiality Survival <span class="tooltip-icon">?</span></label>
                             <select id="gen_survivalYears" onchange="updateGeneratorPreview('survivalYears')">
                                 <option value="2">2 Years</option>
                                 <option value="3" selected>3 Years</option>
                                 <option value="5">5 Years</option>
+                                <option value="indefinite">Indefinite (trade secrets)</option>
                             </select>
+                            <div class="field-help">How long confidentiality obligations last after the agreement ends. Trade secrets should be protected indefinitely.</div>
                         </div>
                     </div>
+                </div>
+
+                <div class="gen-form-section">
+                    <div class="gen-section-title">Additional Protections</div>
+                    <div class="gen-form-group">
+                        <div class="gen-checkbox-group">
+                            <label class="gen-checkbox-label">
+                                <input type="checkbox" id="gen_includeNonCircumvent" onchange="updateGeneratorPreview('includeNonCircumvent')" checked>
+                                <span>Non-Circumvention</span>
+                            </label>
+                            <label class="gen-checkbox-label">
+                                <input type="checkbox" id="gen_includeNonSolicitation" onchange="updateGeneratorPreview('includeNonSolicitation')">
+                                <span>Non-Solicitation</span>
+                            </label>
+                            <label class="gen-checkbox-label">
+                                <input type="checkbox" id="gen_includeNonCompete" onchange="updateGeneratorPreview('includeNonCompete')">
+                                <span>Non-Compete (limited)</span>
+                            </label>
+                        </div>
+                        <div class="field-help" style="margin-top: 8px;">
+                            <strong>Non-Circumvention:</strong> Prevents parties from bypassing each other to deal directly with disclosed contacts.<br>
+                            <strong>Non-Solicitation:</strong> Prevents hiring each other's employees.<br>
+                            <strong>Non-Compete:</strong> Limits using information to compete (use cautiously, often unenforceable).
+                        </div>
+                    </div>
+                    <div class="gen-form-group">
+                        <div class="gen-checkbox-group">
+                            <label class="gen-checkbox-label">
+                                <input type="checkbox" id="gen_includeInjunctive" onchange="updateGeneratorPreview('includeInjunctive')" checked>
+                                <span>Injunctive Relief</span>
+                            </label>
+                            <label class="gen-checkbox-label">
+                                <input type="checkbox" id="gen_includeIndemnification" onchange="updateGeneratorPreview('includeIndemnification')" checked>
+                                <span>Indemnification</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="gen-form-section">
+                    <div class="gen-section-title">Permitted Disclosures</div>
+                    <div class="gen-form-group">
+                        <label class="tooltip-trigger">Who can receive confidential information? <span class="tooltip-icon">?</span></label>
+                        <div class="gen-checkbox-group">
+                            <label class="gen-checkbox-label">
+                                <input type="checkbox" id="gen_permitEmployees" onchange="updateGeneratorPreview('permitEmployees')" checked>
+                                <span>Employees (need-to-know)</span>
+                            </label>
+                            <label class="gen-checkbox-label">
+                                <input type="checkbox" id="gen_permitContractors" onchange="updateGeneratorPreview('permitContractors')" checked>
+                                <span>Contractors</span>
+                            </label>
+                            <label class="gen-checkbox-label">
+                                <input type="checkbox" id="gen_permitAdvisors" onchange="updateGeneratorPreview('permitAdvisors')" checked>
+                                <span>Legal/Financial Advisors</span>
+                            </label>
+                            <label class="gen-checkbox-label">
+                                <input type="checkbox" id="gen_permitAffiliates" onchange="updateGeneratorPreview('permitAffiliates')">
+                                <span>Affiliates/Subsidiaries</span>
+                            </label>
+                        </div>
+                        <div class="field-help" style="margin-top: 8px;">All permitted recipients must be bound by confidentiality obligations at least as protective as this NDA.</div>
+                    </div>
+                </div>
+
+                <div class="gen-warning-box">
+                    <strong>Legal Compliance Note:</strong> This NDA includes standard exceptions for legally required disclosures (subpoenas, court orders). The receiving party must provide advance notice when possible.
+                </div>
+
+                <div class="gen-tip-box">
+                    <strong>Best Practices:</strong><br>
+                    • Mark confidential documents clearly ("CONFIDENTIAL")<br>
+                    • Confirm oral disclosures in writing within 10 days<br>
+                    • Keep records of what information was shared<br>
+                    • Review annually and update as needed
                 </div>
             `;
         }
@@ -1310,47 +2044,244 @@
             const ndaType = getGenValue('gen_ndaType', 'mutual');
             const governingState = getGenValue('gen_governingState', '[STATE]');
             const effectiveDate = formatGenDate(getGenValue('gen_effectiveDate'));
-            const disclosingParty = getGenValue('gen_disclosingParty', '[DISCLOSING PARTY]');
-            const receivingParty = getGenValue('gen_receivingParty', '[RECEIVING PARTY]');
+            const purpose = getGenValue('gen_purpose', 'business-relationship');
+            const disclosingParty = getGenValue('gen_disclosingParty', '[PARTY A NAME]');
+            const disclosingType = getGenValue('gen_disclosingType', 'corporation');
+            const disclosingState = getGenValue('gen_disclosingState', '[STATE]');
+            const disclosingAddress = getGenValue('gen_disclosingAddress', '[ADDRESS]');
+            const receivingParty = getGenValue('gen_receivingParty', '[PARTY B NAME]');
+            const receivingType = getGenValue('gen_receivingType', 'corporation');
+            const receivingState = getGenValue('gen_receivingState', '[STATE]');
+            const receivingAddress = getGenValue('gen_receivingAddress', '[ADDRESS]');
             const termYears = getGenValue('gen_termYears', '2');
             const survivalYears = getGenValue('gen_survivalYears', '3');
+            const includeNonCircumvent = getGenValue('gen_includeNonCircumvent');
+            const includeNonSolicitation = getGenValue('gen_includeNonSolicitation');
+            const includeNonCompete = getGenValue('gen_includeNonCompete');
+            const includeInjunctive = getGenValue('gen_includeInjunctive');
+            const includeIndemnification = getGenValue('gen_includeIndemnification');
+            const permitEmployees = getGenValue('gen_permitEmployees');
+            const permitContractors = getGenValue('gen_permitContractors');
+            const permitAdvisors = getGenValue('gen_permitAdvisors');
+            const permitAffiliates = getGenValue('gen_permitAffiliates');
 
             const isMutual = ndaType === 'mutual';
+            const partyA = isMutual ? 'Party A' : 'Disclosing Party';
+            const partyB = isMutual ? 'Party B' : 'Receiving Party';
+            const parties = isMutual ? 'each party' : 'Receiving Party';
+            const Parties = isMutual ? 'Each party' : 'Receiving Party';
+            const otherParty = isMutual ? 'the other party' : 'Disclosing Party';
+
+            const entityTypes = {
+                'corporation': 'corporation',
+                'llc': 'limited liability company',
+                'partnership': 'partnership',
+                'individual': 'individual'
+            };
+
+            const purposeText = {
+                'business-relationship': 'evaluating a potential business relationship between the parties',
+                'partnership': 'exploring a potential strategic partnership or joint venture',
+                'investment': 'evaluating a potential investment opportunity',
+                'acquisition': 'evaluating a potential merger, acquisition, or similar transaction',
+                'employment': 'evaluating a potential employment or contractor engagement',
+                'vendor': 'evaluating a potential vendor or supplier relationship',
+                'licensing': 'evaluating a potential technology licensing arrangement'
+            }[purpose];
+
+            // Build permitted recipients
+            let permittedRecipients = [];
+            if (permitEmployees) permittedRecipients.push('employees who have a need to know');
+            if (permitContractors) permittedRecipients.push('contractors and consultants');
+            if (permitAdvisors) permittedRecipients.push('legal counsel, accountants, and financial advisors');
+            if (permitAffiliates) permittedRecipients.push('affiliates and subsidiaries');
+            const recipientsText = permittedRecipients.length > 0 ? permittedRecipients.join('; ') : 'employees with a need to know';
+
+            const termText = termYears === 'indefinite' ? 'until terminated by either party upon thirty (30) days written notice' : `for a period of ${termYears} year${termYears > 1 ? 's' : ''} from the Effective Date`;
+            const survivalText = survivalYears === 'indefinite' ? 'shall survive indefinitely' : `shall survive for a period of ${survivalYears} year${survivalYears > 1 ? 's' : ''} following termination or expiration of this Agreement`;
+
+            let sectionNum = 1;
+            let sections = '';
+
+            // DEFINITIONS
+            sections += `
+                <h2>${sectionNum}. DEFINITIONS</h2>
+                <p class="clause">${sectionNum}.1 <strong>"Confidential Information"</strong> means any and all non-public, proprietary, or confidential information disclosed by ${isMutual ? 'either party' : 'Disclosing Party'} to ${isMutual ? 'the other party' : 'Receiving Party'}, whether disclosed orally, in writing, electronically, or by any other means, and whether or not marked as confidential, including but not limited to:</p>
+                <p class="sub-clause">(a) Trade secrets, inventions, ideas, processes, formulas, algorithms, software, source code, data, know-how, improvements, discoveries, and developments;</p>
+                <p class="sub-clause">(b) Information regarding plans for research, development, new products, marketing, and selling;</p>
+                <p class="sub-clause">(c) Business plans, budgets, financial statements, projections, prices, costs, and pricing strategies;</p>
+                <p class="sub-clause">(d) Customer lists, customer data, supplier information, and vendor relationships;</p>
+                <p class="sub-clause">(e) Information regarding employees, contractors, and organizational structure;</p>
+                <p class="sub-clause">(f) Information disclosed during the course of ${purposeText}.</p>
+                <p class="clause">${sectionNum}.2 <strong>"Representatives"</strong> means ${recipientsText}, in each case who are bound by confidentiality obligations at least as protective as those contained herein.</p>
+            `;
+            sectionNum++;
+
+            // EXCLUSIONS
+            sections += `
+                <h2>${sectionNum}. EXCLUSIONS FROM CONFIDENTIAL INFORMATION</h2>
+                <p class="clause">${sectionNum}.1 Confidential Information shall not include information that:</p>
+                <p class="sub-clause">(a) Is or becomes publicly available through no fault or breach by ${parties};</p>
+                <p class="sub-clause">(b) Was rightfully in ${parties}'s possession prior to disclosure, as evidenced by written records;</p>
+                <p class="sub-clause">(c) Is independently developed by ${parties} without use of or reference to the Confidential Information;</p>
+                <p class="sub-clause">(d) Is rightfully obtained from a third party without restriction on disclosure;</p>
+                <p class="sub-clause">(e) Is disclosed with the prior written approval of ${otherParty}.</p>
+                <p class="clause">${sectionNum}.2 The burden of proving any exclusion shall rest with the party claiming such exclusion.</p>
+            `;
+            sectionNum++;
+
+            // OBLIGATIONS
+            sections += `
+                <h2>${sectionNum}. CONFIDENTIALITY OBLIGATIONS</h2>
+                <p class="clause">${sectionNum}.1 <strong>Non-Disclosure.</strong> ${Parties} agrees to hold all Confidential Information in strict confidence and not to disclose any Confidential Information to any third party except as expressly permitted herein.</p>
+                <p class="clause">${sectionNum}.2 <strong>Limited Use.</strong> ${Parties} shall use Confidential Information solely for the purpose of ${purposeText} (the <strong>"Permitted Purpose"</strong>) and for no other purpose whatsoever.</p>
+                <p class="clause">${sectionNum}.3 <strong>Standard of Care.</strong> ${Parties} shall protect Confidential Information using the same degree of care it uses to protect its own confidential information of a similar nature, but in no event less than reasonable care.</p>
+                <p class="clause">${sectionNum}.4 <strong>Permitted Disclosures.</strong> ${Parties} may disclose Confidential Information to its Representatives who: (a) have a need to know for the Permitted Purpose; and (b) are bound by confidentiality obligations at least as restrictive as those herein. ${Parties} shall be responsible for any breach of this Agreement by its Representatives.</p>
+                <p class="clause">${sectionNum}.5 <strong>No Copies.</strong> ${Parties} shall not copy, reproduce, or duplicate any Confidential Information except as reasonably necessary for the Permitted Purpose.</p>
+            `;
+            sectionNum++;
+
+            // REQUIRED DISCLOSURES
+            sections += `
+                <h2>${sectionNum}. LEGALLY REQUIRED DISCLOSURES</h2>
+                <p class="clause">${sectionNum}.1 If ${parties} is required by law, regulation, or valid legal process (including subpoena, civil investigative demand, or similar process) to disclose any Confidential Information, ${parties} shall:</p>
+                <p class="sub-clause">(a) Provide ${otherParty} with prompt written notice of such requirement (to the extent legally permitted) so that ${otherParty} may seek a protective order or other appropriate remedy;</p>
+                <p class="sub-clause">(b) Cooperate with ${otherParty}'s efforts to obtain such protective order or remedy;</p>
+                <p class="sub-clause">(c) Disclose only that portion of Confidential Information that is legally required; and</p>
+                <p class="sub-clause">(d) Use reasonable efforts to obtain assurances that confidential treatment will be accorded to the disclosed information.</p>
+            `;
+            sectionNum++;
+
+            // RETURN OF INFORMATION
+            sections += `
+                <h2>${sectionNum}. RETURN OR DESTRUCTION OF INFORMATION</h2>
+                <p class="clause">${sectionNum}.1 Upon the earlier of: (a) termination or expiration of this Agreement; (b) ${otherParty}'s written request; or (c) completion of the Permitted Purpose, ${parties} shall promptly:</p>
+                <p class="sub-clause">(a) Return to ${otherParty} all documents, materials, and other tangible items containing Confidential Information;</p>
+                <p class="sub-clause">(b) Permanently destroy all copies, extracts, and summaries of Confidential Information in any form;</p>
+                <p class="sub-clause">(c) Delete all electronic copies from computer systems, servers, and backup media; and</p>
+                <p class="sub-clause">(d) Upon request, provide written certification of compliance with this Section.</p>
+                <p class="clause">${sectionNum}.2 Notwithstanding the foregoing, ${parties} may retain one copy of Confidential Information solely for legal archival purposes, subject to continued confidentiality obligations.</p>
+            `;
+            sectionNum++;
+
+            // NON-CIRCUMVENTION
+            if (includeNonCircumvent) {
+                sections += `
+                    <h2>${sectionNum}. NON-CIRCUMVENTION</h2>
+                    <p class="clause">${sectionNum}.1 ${Parties} agrees not to circumvent, avoid, bypass, or obviate ${otherParty}, directly or indirectly, to avoid payment of fees or commissions, or to gain any benefit from the use of Confidential Information, including but not limited to contacts, sources, or business opportunities disclosed hereunder.</p>
+                    <p class="clause">${sectionNum}.2 ${Parties} shall not make direct contact with any contacts, sources, associates, or affiliates of ${otherParty} that are disclosed as Confidential Information without the prior written consent of ${otherParty}.</p>
+                `;
+                sectionNum++;
+            }
+
+            // NON-SOLICITATION
+            if (includeNonSolicitation) {
+                sections += `
+                    <h2>${sectionNum}. NON-SOLICITATION</h2>
+                    <p class="clause">${sectionNum}.1 During the term of this Agreement and for a period of one (1) year thereafter, ${parties} shall not, directly or indirectly, solicit, recruit, or hire any employee or contractor of ${otherParty} with whom ${parties} had contact or about whom ${parties} received Confidential Information.</p>
+                `;
+                sectionNum++;
+            }
+
+            // NON-COMPETE
+            if (includeNonCompete) {
+                sections += `
+                    <h2>${sectionNum}. LIMITED NON-COMPETITION</h2>
+                    <p class="clause">${sectionNum}.1 During the term of this Agreement and for a period of six (6) months thereafter, ${parties} agrees not to use Confidential Information to develop, market, or sell products or services that directly compete with ${otherParty}'s products or services as disclosed in the Confidential Information.</p>
+                    <p class="clause">${sectionNum}.2 This restriction shall not prevent ${parties} from engaging in its general business activities that do not utilize Confidential Information.</p>
+                `;
+                sectionNum++;
+            }
+
+            // NO LICENSE / NO WARRANTIES
+            sections += `
+                <h2>${sectionNum}. NO LICENSE; NO WARRANTIES</h2>
+                <p class="clause">${sectionNum}.1 <strong>No License.</strong> Nothing in this Agreement grants ${parties} any right, title, interest, or license in or to any Confidential Information, intellectual property, or proprietary rights of ${otherParty}.</p>
+                <p class="clause">${sectionNum}.2 <strong>No Warranties.</strong> ALL CONFIDENTIAL INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT.</p>
+                <p class="clause">${sectionNum}.3 <strong>No Obligation.</strong> Neither party is obligated by this Agreement to disclose any particular information, enter into any additional agreement, or proceed with any transaction.</p>
+            `;
+            sectionNum++;
+
+            // TERM
+            sections += `
+                <h2>${sectionNum}. TERM AND TERMINATION</h2>
+                <p class="clause">${sectionNum}.1 <strong>Term.</strong> This Agreement shall remain in effect ${hl(termText, 'for 2 years from the Effective Date', 'termYears')}.</p>
+                <p class="clause">${sectionNum}.2 <strong>Survival.</strong> The confidentiality obligations set forth herein ${hl(survivalText, 'shall survive for 3 years', 'survivalYears')}. Obligations with respect to trade secrets shall continue for as long as such information remains a trade secret under applicable law.</p>
+                <p class="clause">${sectionNum}.3 <strong>Effect of Termination.</strong> Termination of this Agreement shall not affect any rights or obligations that accrued prior to termination.</p>
+            `;
+            sectionNum++;
+
+            // REMEDIES
+            if (includeInjunctive) {
+                sections += `
+                    <h2>${sectionNum}. REMEDIES</h2>
+                    <p class="clause">${sectionNum}.1 <strong>Irreparable Harm.</strong> ${Parties} acknowledges that any unauthorized disclosure or use of Confidential Information may cause irreparable harm to ${otherParty} for which monetary damages would be an inadequate remedy.</p>
+                    <p class="clause">${sectionNum}.2 <strong>Injunctive Relief.</strong> In addition to any other remedies available at law or in equity, ${otherParty} shall be entitled to seek injunctive relief, including temporary restraining orders, preliminary injunctions, and permanent injunctions, without the necessity of proving actual damages or posting any bond.</p>
+                    <p class="clause">${sectionNum}.3 <strong>Cumulative Remedies.</strong> All remedies are cumulative and not exclusive of any other remedies provided by law or equity.</p>
+                `;
+                sectionNum++;
+            }
+
+            // INDEMNIFICATION
+            if (includeIndemnification) {
+                sections += `
+                    <h2>${sectionNum}. INDEMNIFICATION</h2>
+                    <p class="clause">${sectionNum}.1 ${Parties} shall indemnify, defend, and hold harmless ${otherParty} and its officers, directors, employees, agents, and successors from and against any and all claims, damages, losses, costs, and expenses (including reasonable attorneys' fees) arising out of or relating to any breach of this Agreement by ${parties} or its Representatives.</p>
+                `;
+                sectionNum++;
+            }
+
+            // GENERAL PROVISIONS
+            sections += `
+                <h2>${sectionNum}. GENERAL PROVISIONS</h2>
+                <p class="clause">${sectionNum}.1 <strong>Governing Law.</strong> This Agreement shall be governed by and construed in accordance with the laws of the State of ${hl(governingState, '[STATE]', 'governingState')}, without regard to its conflicts of law principles.</p>
+                <p class="clause">${sectionNum}.2 <strong>Jurisdiction.</strong> The parties consent to the exclusive jurisdiction of the state and federal courts located in ${hl(governingState, '[STATE]', 'governingState')} for any action arising out of this Agreement.</p>
+                <p class="clause">${sectionNum}.3 <strong>Entire Agreement.</strong> This Agreement constitutes the entire agreement between the parties concerning its subject matter and supersedes all prior discussions, negotiations, and agreements.</p>
+                <p class="clause">${sectionNum}.4 <strong>Amendment.</strong> This Agreement may not be amended except by a written instrument signed by both parties.</p>
+                <p class="clause">${sectionNum}.5 <strong>Waiver.</strong> No waiver of any provision shall be effective unless in writing. A waiver in one instance shall not constitute a waiver of any other provision or subsequent breach.</p>
+                <p class="clause">${sectionNum}.6 <strong>Severability.</strong> If any provision is found invalid or unenforceable, the remaining provisions shall continue in full force and effect.</p>
+                <p class="clause">${sectionNum}.7 <strong>Assignment.</strong> Neither party may assign this Agreement without the prior written consent of the other party, except that either party may assign to a successor in connection with a merger, acquisition, or sale of all or substantially all of its assets.</p>
+                <p class="clause">${sectionNum}.8 <strong>Notices.</strong> All notices shall be in writing and delivered by hand, overnight courier, or certified mail to the addresses set forth above.</p>
+                <p class="clause">${sectionNum}.9 <strong>Counterparts.</strong> This Agreement may be executed in counterparts, each of which shall be deemed an original and all of which together shall constitute one instrument. Electronic signatures shall be deemed valid and binding.</p>
+            `;
 
             return `
-                <h1>${isMutual ? 'Mutual ' : ''}Non-Disclosure Agreement</h1>
+                <h1>${isMutual ? 'MUTUAL ' : ''}NON-DISCLOSURE AGREEMENT</h1>
                 <p class="center" style="font-style: italic;">Effective Date: ${hl(effectiveDate, '[DATE]', 'effectiveDate')}</p>
 
-                <div class="parties">
-                    <p>This Agreement is entered into by:</p>
-                    <p><strong>${isMutual ? 'Party A' : 'Disclosing Party'}:</strong> ${hl(disclosingParty, '[PARTY A]', 'disclosingParty')}</p>
-                    <p><strong>${isMutual ? 'Party B' : 'Receiving Party'}:</strong> ${hl(receivingParty, '[PARTY B]', 'receivingParty')}</p>
+                <p>This ${isMutual ? 'Mutual ' : ''}Non-Disclosure Agreement (this <strong>"Agreement"</strong>) is entered into as of the Effective Date by and between:</p>
+
+                <div class="parties" style="margin: 24px 0; padding: 16px; border: 1px solid #e5e7eb; border-radius: 8px;">
+                    <p><strong>${hl(disclosingParty, '[PARTY A NAME]', 'disclosingParty')}</strong>, a ${hl(disclosingState, '[STATE]', 'disclosingState')} ${entityTypes[disclosingType]}, with its principal place of business at ${hl(disclosingAddress, '[ADDRESS]', 'disclosingAddress')} (<strong>"${partyA}"</strong>)</p>
+                    <p style="text-align: center; margin: 8px 0;">and</p>
+                    <p><strong>${hl(receivingParty, '[PARTY B NAME]', 'receivingParty')}</strong>, a ${hl(receivingState, '[STATE]', 'receivingState')} ${entityTypes[receivingType]}, with its principal place of business at ${hl(receivingAddress, '[ADDRESS]', 'receivingAddress')} (<strong>"${partyB}"</strong>)</p>
                 </div>
 
-                <h2>1. CONFIDENTIAL INFORMATION</h2>
-                <p class="clause">1.1 "Confidential Information" means any non-public information disclosed by ${isMutual ? 'either party' : 'Disclosing Party'}.</p>
+                <p><strong>RECITALS</strong></p>
+                <p class="clause">WHEREAS, the parties wish to explore ${purposeText} (the <strong>"Purpose"</strong>); and</p>
+                <p class="clause">WHEREAS, in connection with the Purpose, ${isMutual ? 'each party' : partyA} may disclose certain confidential and proprietary information to ${isMutual ? 'the other party' : partyB}; and</p>
+                <p class="clause">WHEREAS, the parties desire to protect such confidential information from unauthorized use and disclosure;</p>
+                <p style="margin-top: 16px;"><strong>NOW, THEREFORE,</strong> in consideration of the mutual covenants and agreements herein, and for other good and valuable consideration, the receipt and sufficiency of which are hereby acknowledged, the parties agree as follows:</p>
 
-                <h2>2. OBLIGATIONS</h2>
-                <p class="clause">2.1 ${isMutual ? 'Each party' : 'Receiving Party'} agrees to hold all Confidential Information in strict confidence.</p>
+                ${sections}
 
-                <h2>3. TERM</h2>
-                <p class="clause">3.1 This Agreement remains in effect for ${hl(termYears + ' year' + (termYears > 1 ? 's' : ''), '2 years', 'termYears')}.</p>
-                <p class="clause">3.2 Confidentiality obligations survive for ${hl(survivalYears + ' years', '3 years', 'survivalYears')} after termination.</p>
-
-                <h2>4. GOVERNING LAW</h2>
-                <p class="clause">4.1 This Agreement is governed by the laws of ${hl(governingState, '[STATE]', 'governingState')}.</p>
+                <p style="margin-top: 24px;"><strong>IN WITNESS WHEREOF,</strong> the parties have executed this Agreement as of the Effective Date.</p>
 
                 <div class="signature-block">
                     <div class="signature-party">
-                        <h3>${isMutual ? 'Party A' : 'Disclosing Party'}</h3>
+                        <h3>${partyA.toUpperCase()}</h3>
+                        <p>${hl(disclosingParty, '[PARTY A NAME]', 'disclosingParty')}</p>
                         <div class="signature-line">Signature</div>
-                        <div class="signature-line">${hl(disclosingParty, '[NAME]', 'disclosingParty')}</div>
+                        <div class="signature-line">Printed Name</div>
+                        <div class="signature-line">Title</div>
                         <div class="signature-line">Date</div>
                     </div>
                     <div class="signature-party">
-                        <h3>${isMutual ? 'Party B' : 'Receiving Party'}</h3>
+                        <h3>${partyB.toUpperCase()}</h3>
+                        <p>${hl(receivingParty, '[PARTY B NAME]', 'receivingParty')}</p>
                         <div class="signature-line">Signature</div>
-                        <div class="signature-line">${hl(receivingParty, '[NAME]', 'receivingParty')}</div>
+                        <div class="signature-line">Printed Name</div>
+                        <div class="signature-line">Title</div>
                         <div class="signature-line">Date</div>
                     </div>
                 </div>
@@ -1808,6 +2739,439 @@
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
+
+        // ========== SIGNATURE FUNCTIONALITY ==========
+        const signatures = {
+            A: { name: '', font: 'dancing', mode: 'type', applied: false, timestamp: null, dataUrl: null, ip: null },
+            B: { name: '', font: 'dancing', mode: 'type', applied: false, timestamp: null, dataUrl: null, ip: null }
+        };
+        let signaturesRef = null;
+        let canvasContexts = {};
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+        let documentId = null;
+
+        // Get internet time from WorldTimeAPI
+        async function getInternetTime() {
+            try {
+                const response = await fetch('https://worldtimeapi.org/api/ip');
+                const data = await response.json();
+                return data.datetime;
+            } catch (e) {
+                // Fallback to local time if API fails, but mark it
+                console.warn('Could not fetch internet time, using local time');
+                return new Date().toISOString();
+            }
+        }
+
+        // Get user's IP address
+        async function getUserIP() {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                return data.ip;
+            } catch (e) {
+                return 'Unknown';
+            }
+        }
+
+        // Generate unique document ID
+        function generateDocumentId() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let id = 'TL-';
+            for (let i = 0; i < 8; i++) {
+                id += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return id + '-' + Date.now().toString(36).toUpperCase();
+        }
+
+        function initSignatures() {
+            if (!roomId) return;
+            signaturesRef = db.ref(`rooms/${roomId}/signatures`);
+
+            // Generate or retrieve document ID
+            signaturesRef.child('documentId').once('value', (snapshot) => {
+                if (snapshot.val()) {
+                    documentId = snapshot.val();
+                } else {
+                    documentId = generateDocumentId();
+                    signaturesRef.child('documentId').set(documentId);
+                }
+            });
+
+            signaturesRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    if (data.A) {
+                        signatures.A = { ...signatures.A, ...data.A };
+                        updateSignatureUI('A');
+                    }
+                    if (data.B) {
+                        signatures.B = { ...signatures.B, ...data.B };
+                        updateSignatureUI('B');
+                    }
+                    if (data.documentId) {
+                        documentId = data.documentId;
+                    }
+                    // Update verification stamp if any signatures exist
+                    if (signatures.A.applied || signatures.B.applied) {
+                        updateVerificationStamp();
+                    }
+                }
+            });
+
+            // Initialize canvases
+            initSignatureCanvases();
+        }
+
+        function initSignatureCanvases() {
+            ['A', 'B'].forEach(party => {
+                const canvas = document.getElementById(`sigCanvas${party}`);
+                if (!canvas) return;
+
+                const ctx = canvas.getContext('2d');
+                canvasContexts[party] = ctx;
+
+                // Set canvas resolution
+                const rect = canvas.getBoundingClientRect();
+                canvas.width = rect.width * 2;
+                canvas.height = rect.height * 2;
+                ctx.scale(2, 2);
+
+                // Style settings
+                ctx.strokeStyle = '#1a365d';
+                ctx.lineWidth = 2;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+
+                // Mouse events
+                canvas.addEventListener('mousedown', (e) => startDrawing(e, party));
+                canvas.addEventListener('mousemove', (e) => draw(e, party));
+                canvas.addEventListener('mouseup', () => stopDrawing(party));
+                canvas.addEventListener('mouseout', () => stopDrawing(party));
+
+                // Touch events for mobile
+                canvas.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    const touch = e.touches[0];
+                    startDrawing(touch, party);
+                });
+                canvas.addEventListener('touchmove', (e) => {
+                    e.preventDefault();
+                    const touch = e.touches[0];
+                    draw(touch, party);
+                });
+                canvas.addEventListener('touchend', () => stopDrawing(party));
+            });
+        }
+
+        function startDrawing(e, party) {
+            isDrawing = true;
+            const canvas = document.getElementById(`sigCanvas${party}`);
+            const rect = canvas.getBoundingClientRect();
+            lastX = e.clientX - rect.left;
+            lastY = e.clientY - rect.top;
+        }
+
+        function draw(e, party) {
+            if (!isDrawing) return;
+
+            const canvas = document.getElementById(`sigCanvas${party}`);
+            const ctx = canvasContexts[party];
+            const rect = canvas.getBoundingClientRect();
+
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(x, y);
+            ctx.stroke();
+
+            lastX = x;
+            lastY = y;
+
+            // Enable apply button when drawing
+            document.getElementById('sigApply' + party).disabled = !document.getElementById('sigName' + party).value.trim();
+        }
+
+        function stopDrawing(party) {
+            if (isDrawing) {
+                isDrawing = false;
+                // Save canvas data
+                const canvas = document.getElementById(`sigCanvas${party}`);
+                signatures[party].dataUrl = canvas.toDataURL('image/png');
+            }
+        }
+
+        function clearCanvas(party) {
+            const canvas = document.getElementById(`sigCanvas${party}`);
+            const ctx = canvasContexts[party];
+            const rect = canvas.getBoundingClientRect();
+            ctx.clearRect(0, 0, rect.width * 2, rect.height * 2);
+            signatures[party].dataUrl = null;
+        }
+
+        function setSignatureMode(party, mode) {
+            signatures[party].mode = mode;
+
+            // Update toggle buttons
+            const panel = document.getElementById('sigParty' + party + 'Panel');
+            panel.querySelectorAll('.sig-toggle-btn').forEach((btn, idx) => {
+                btn.classList.toggle('active', (idx === 0 && mode === 'type') || (idx === 1 && mode === 'draw'));
+            });
+
+            // Show/hide containers
+            document.getElementById('sigTypeContainer' + party).classList.toggle('hidden', mode !== 'type');
+            document.getElementById('sigDrawContainer' + party).classList.toggle('hidden', mode !== 'draw');
+
+            // Re-init canvas if switching to draw mode
+            if (mode === 'draw') {
+                setTimeout(() => initSignatureCanvases(), 100);
+            }
+        }
+
+        function selectSignatureParty(party) {
+            const isA = party === 'partyA';
+            document.getElementById('sigTabPartyA').classList.toggle('active', isA);
+            document.getElementById('sigTabPartyB').classList.toggle('active', !isA);
+            document.getElementById('sigPartyAPanel').classList.toggle('hidden', !isA);
+            document.getElementById('sigPartyBPanel').classList.toggle('hidden', isA);
+
+            // Re-init canvases when switching
+            setTimeout(() => initSignatureCanvases(), 100);
+        }
+
+        function updateSignaturePreview(party) {
+            const nameInput = document.getElementById('sigName' + party);
+            const preview = document.getElementById('sigPreview' + party);
+            const applyBtn = document.getElementById('sigApply' + party);
+            const name = nameInput.value.trim();
+
+            if (name) {
+                const fontClass = 'sig-font-' + signatures[party].font;
+                preview.innerHTML = `<span class="sig-preview-text ${fontClass}">${name}</span>`;
+                applyBtn.disabled = false;
+            } else {
+                preview.innerHTML = '<span class="sig-preview-placeholder">Your signature will appear here</span>';
+                applyBtn.disabled = true;
+            }
+        }
+
+        function selectSignatureFont(party, font) {
+            signatures[party].font = font;
+
+            // Update button states
+            const container = document.getElementById('sigParty' + party + 'Panel');
+            container.querySelectorAll('.sig-font-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.font === font);
+            });
+
+            // Update preview
+            updateSignaturePreview(party);
+        }
+
+        async function applySignature(party) {
+            const nameInput = document.getElementById('sigName' + party);
+            const name = nameInput.value.trim();
+
+            if (!name) return;
+
+            showToast('Applying signature...');
+
+            // Get internet time and IP
+            const [internetTime, userIP] = await Promise.all([
+                getInternetTime(),
+                getUserIP()
+            ]);
+
+            signatures[party].name = name;
+            signatures[party].applied = true;
+            signatures[party].timestamp = internetTime;
+            signatures[party].ip = userIP;
+
+            // If draw mode, ensure dataUrl is captured
+            if (signatures[party].mode === 'draw') {
+                const canvas = document.getElementById(`sigCanvas${party}`);
+                signatures[party].dataUrl = canvas.toDataURL('image/png');
+            }
+
+            // Save to Firebase
+            if (signaturesRef) {
+                signaturesRef.child(party).set(signatures[party]);
+            }
+
+            updateSignatureUI(party);
+            updateDocumentSignatures();
+            updateVerificationStamp();
+            showToast('Signature applied with verification stamp!');
+        }
+
+        function updateSignatureUI(party) {
+            const tab = document.getElementById('sigTabParty' + party);
+            const status = document.getElementById('sigStatus' + party);
+
+            if (signatures[party].applied) {
+                tab.classList.add('signed');
+                status.textContent = '✓ Signed';
+                status.style.color = '#22c55e';
+            } else {
+                tab.classList.remove('signed');
+                status.textContent = 'Not signed';
+                status.style.color = '#9ca3af';
+            }
+        }
+
+        function formatTimestamp(isoString) {
+            if (!isoString) return '';
+            const date = new Date(isoString);
+            return date.toLocaleString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                timeZoneName: 'short'
+            });
+        }
+
+        function updateDocumentSignatures() {
+            const preview = document.getElementById('docPreview');
+            const sigBlocks = preview.querySelectorAll('.signature-party');
+
+            ['A', 'B'].forEach((party, idx) => {
+                if (sigBlocks.length > idx && signatures[party].applied) {
+                    const sigLine = sigBlocks[idx].querySelector('.signature-line');
+                    if (sigLine) {
+                        let sigHtml = '';
+
+                        if (signatures[party].mode === 'draw' && signatures[party].dataUrl) {
+                            sigHtml = `<img src="${signatures[party].dataUrl}" class="doc-signature-image" alt="Signature">`;
+                        } else {
+                            const fontClass = 'sig-font-' + signatures[party].font;
+                            sigHtml = `<div class="doc-signature-typed ${fontClass}">${signatures[party].name}</div>`;
+                        }
+
+                        sigHtml += `<div class="doc-signature-timestamp">${formatTimestamp(signatures[party].timestamp)}</div>`;
+                        sigLine.innerHTML = sigHtml;
+                    }
+                }
+            });
+
+            syncToFirebase();
+        }
+
+        function updateVerificationStamp() {
+            // Remove existing stamp if any
+            let existingStamp = document.querySelector('.verification-stamp');
+            if (existingStamp) existingStamp.remove();
+
+            // Only add if at least one signature
+            if (!signatures.A.applied && !signatures.B.applied) return;
+
+            const preview = document.getElementById('docPreview');
+
+            const stampHtml = `
+                <div class="verification-stamp">
+                    <div class="verification-stamp-header">
+                        <div class="verification-stamp-logo">Terms.<span>Law</span></div>
+                    </div>
+                    <div class="verification-stamp-title">Electronic Signature Verification</div>
+                    <div class="verification-stamp-id">Document ID: ${documentId || 'Generating...'}</div>
+
+                    <div class="verification-stamp-parties">
+                        <div class="verification-party">
+                            <div class="verification-party-label">Party A</div>
+                            ${signatures.A.applied ? `
+                                <div class="verification-party-name">${signatures.A.name}</div>
+                                <div class="verification-party-time">${formatTimestamp(signatures.A.timestamp)}</div>
+                                <div class="verification-party-ip">IP: ${signatures.A.ip || 'N/A'}</div>
+                            ` : '<div class="verification-not-signed">Not yet signed</div>'}
+                        </div>
+                        <div class="verification-party">
+                            <div class="verification-party-label">Party B</div>
+                            ${signatures.B.applied ? `
+                                <div class="verification-party-name">${signatures.B.name}</div>
+                                <div class="verification-party-time">${formatTimestamp(signatures.B.timestamp)}</div>
+                                <div class="verification-party-ip">IP: ${signatures.B.ip || 'N/A'}</div>
+                            ` : '<div class="verification-not-signed">Not yet signed</div>'}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            preview.insertAdjacentHTML('beforeend', stampHtml);
+        }
+
+        function sendForSignature() {
+            const emailInput = document.getElementById('emailSignInput');
+            const email = emailInput.value.trim();
+
+            if (!email || !email.includes('@')) {
+                showToast('Please enter a valid email address');
+                return;
+            }
+
+            const signUrl = window.location.href;
+            const sessionName = document.getElementById('sessionName').value || 'Document';
+
+            const subject = encodeURIComponent(`Action Required: Sign "${sessionName}" - Terms.Law`);
+            const body = encodeURIComponent(`Hello,
+
+You have been requested to review and electronically sign a legal document.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 Document: ${sessionName}
+🔗 Document ID: ${documentId || 'Will be assigned'}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Please click the secure link below to access the document:
+${signUrl}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+HOW TO SIGN:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Click the link above to open the document
+2. Review the document carefully
+3. Scroll down to the "Electronic Signatures" section
+4. Click on "Party B" tab
+5. Enter your full legal name
+6. Choose to TYPE or DRAW your signature
+7. Click "Apply Signature"
+
+Your signature will be timestamped and verified by Terms.Law.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+This is an official electronic signature request.
+By signing, you agree to the terms contained in the document.
+
+Questions? Contact the sender of this email.
+
+Powered by Terms.Law Docs
+`);
+
+            window.open(`mailto:${email}?subject=${subject}&body=${body}`);
+
+            document.getElementById('emailSentBadge').classList.remove('hidden');
+
+            if (signaturesRef) {
+                signaturesRef.child('emailSent').set({
+                    email: email,
+                    sentAt: new Date().toISOString(),
+                    sentBy: userName,
+                    documentId: documentId
+                });
+            }
+
+            showToast('Signature request email opened!');
+        }
+
+        // Initialize signatures after Firebase is ready
+        setTimeout(initSignatures, 1500);
 
         window.addEventListener('beforeunload', () => {
             if (myUserRef) myUserRef.remove();
