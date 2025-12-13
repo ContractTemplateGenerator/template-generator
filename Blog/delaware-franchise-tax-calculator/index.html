@@ -1,0 +1,2152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Delaware Franchise Tax Calculator & Fix Guide | Terms.Law</title>
+  <meta name="description" content="Interactive Delaware franchise tax calculator. See why startups get $75K+ tax bills and how to fix it. Step-by-step guide with live eCorp dashboard mockup.">
+  <meta name="keywords" content="Delaware franchise tax, startup tax, authorized shares method, assumed par value, Delaware annual report, eCorp, franchise tax calculator">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Delaware Franchise Tax Calculator - Why Your CPA Got It Wrong">
+  <meta property="og:description" content="Interactive calculator showing how to reduce your Delaware franchise tax from $75K+ to $400.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://terms.law/Blog/delaware-franchise-tax-calculator/">
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-901N2Y3CDZ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-901N2Y3CDZ');
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --color-primary: #2563eb;
+      --color-primary-dark: #1d4ed8;
+      --color-success: #10b981;
+      --color-success-dark: #059669;
+      --color-warning: #f59e0b;
+      --color-danger: #ef4444;
+      --color-bg: #f8fafc;
+      --color-surface: #ffffff;
+      --color-border: #e2e8f0;
+      --color-text: #0f172a;
+      --color-text-secondary: #334155;
+      --color-text-muted: #64748b;
+      --de-red: #8B0000;
+      --de-header-bg: #6B0F1A;
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-mono: 'SF Mono', 'Monaco', 'Consolas', monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-sans);
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--color-text);
+      background: var(--color-bg);
+      min-height: 100vh;
+    }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+
+    /* Site Header */
+    .site-header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      padding: 1rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    .site-header .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: white;
+      text-decoration: none;
+    }
+    .logo span { color: #60a5fa; }
+    .header-cta {
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      color: white;
+      padding: 0.5rem 1.25rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .header-cta:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+    }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #312e81 100%);
+      color: white;
+      padding: 3rem 0;
+      text-align: center;
+    }
+    .hero h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      line-height: 1.2;
+    }
+    .hero h1 .highlight {
+      background: linear-gradient(135deg, #ef4444, #f59e0b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p {
+      font-size: 1.25rem;
+      color: rgba(255,255,255,0.8);
+      max-width: 700px;
+      margin: 0 auto 1.5rem;
+    }
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      margin-top: 2rem;
+    }
+    .hero-stat {
+      text-align: center;
+    }
+    .hero-stat .number {
+      font-size: 2rem;
+      font-weight: 800;
+    }
+    .hero-stat .number.bad { color: #ef4444; }
+    .hero-stat .number.good { color: #10b981; }
+    .hero-stat .number.neutral { color: #60a5fa; }
+    .hero-stat .label {
+      font-size: 0.875rem;
+      color: rgba(255,255,255,0.6);
+    }
+
+    /* Tab Navigation */
+    .tab-nav {
+      background: white;
+      border-bottom: 1px solid var(--color-border);
+      position: sticky;
+      top: 60px;
+      z-index: 100;
+    }
+    .tab-nav .container {
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+    }
+    .tab-btn {
+      padding: 1rem 1.5rem;
+      background: none;
+      border: none;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .tab-btn:hover {
+      color: var(--color-text);
+      background: var(--color-bg);
+    }
+    .tab-btn.active {
+      color: var(--color-primary);
+      border-bottom-color: var(--color-primary);
+    }
+    .tab-btn .badge {
+      background: var(--color-primary);
+      color: white;
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 10px;
+    }
+
+    /* Tab Content */
+    .tab-content {
+      display: none;
+      padding: 2rem 0;
+    }
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Cards */
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+    .card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: var(--color-text);
+    }
+    .card h3 {
+      font-size: 1.1rem;
+      margin-bottom: 0.75rem;
+      color: var(--color-text);
+    }
+    .card p {
+      color: var(--color-text-secondary);
+      margin-bottom: 1rem;
+    }
+
+    /* Alert Boxes */
+    .alert {
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin: 1.5rem 0;
+      display: flex;
+      gap: 1rem;
+    }
+    .alert-icon {
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+    .alert-content h4 {
+      font-size: 1rem;
+      margin-bottom: 0.25rem;
+    }
+    .alert-content p {
+      margin: 0;
+      font-size: 0.9rem;
+    }
+    .alert-danger {
+      background: #fef2f2;
+      border: 2px solid #fecaca;
+    }
+    .alert-danger .alert-content h4 { color: #991b1b; }
+    .alert-danger .alert-content p { color: #7f1d1d; }
+    .alert-success {
+      background: #f0fdf4;
+      border: 2px solid #bbf7d0;
+    }
+    .alert-success .alert-content h4 { color: #166534; }
+    .alert-success .alert-content p { color: #14532d; }
+    .alert-warning {
+      background: #fffbeb;
+      border: 2px solid #fde68a;
+    }
+    .alert-warning .alert-content h4 { color: #92400e; }
+    .alert-warning .alert-content p { color: #78350f; }
+    .alert-info {
+      background: #eff6ff;
+      border: 2px solid #bfdbfe;
+    }
+    .alert-info .alert-content h4 { color: #1e40af; }
+    .alert-info .alert-content p { color: #1e3a8a; }
+
+    /* Steps */
+    .steps {
+      counter-reset: step;
+    }
+    .step {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+    .step::before {
+      content: '';
+      position: absolute;
+      left: 20px;
+      top: 50px;
+      bottom: -20px;
+      width: 2px;
+      background: var(--color-border);
+    }
+    .step:last-child::before {
+      display: none;
+    }
+    .step-number {
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, var(--color-primary), #7c3aed);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+    }
+    .step-content {
+      flex: 1;
+      background: var(--color-bg);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+    .step-content h4 {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+    .step-content p {
+      color: var(--color-text-secondary);
+      margin-bottom: 0.75rem;
+    }
+    .step-content code {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      overflow-x: auto;
+    }
+
+    /* Checklist */
+    .checklist {
+      list-style: none;
+    }
+    .checklist li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .checklist li:last-child {
+      border-bottom: none;
+    }
+    .checklist-icon {
+      width: 24px;
+      height: 24px;
+      background: var(--color-bg);
+      border: 2px solid var(--color-border);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: transparent;
+      transition: all 0.2s;
+    }
+    .checklist li.checked .checklist-icon {
+      background: var(--color-success);
+      border-color: var(--color-success);
+      color: white;
+    }
+    .checklist-text {
+      flex: 1;
+    }
+    .checklist-text strong {
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+    .checklist-text span {
+      font-size: 0.875rem;
+      color: var(--color-text-muted);
+    }
+
+    /* Delaware eCorp Mockup - Authentic Government Style */
+    .ecorp-mockup {
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      margin: 2rem 0;
+      border: 1px solid #999;
+    }
+    .ecorp-browser-bar {
+      background: linear-gradient(180deg, #e8e8e8 0%, #d4d4d4 100%);
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid #b0b0b0;
+    }
+    .browser-dots {
+      display: flex;
+      gap: 6px;
+    }
+    .browser-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    .browser-dot.red { background: #ff5f57; }
+    .browser-dot.yellow { background: #ffbd2e; }
+    .browser-dot.green { background: #28ca41; }
+    .browser-url {
+      flex: 1;
+      background: white;
+      border: 1px solid #aaa;
+      border-radius: 3px;
+      padding: 4px 8px;
+      font-size: 12px;
+      color: #333;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .browser-url .lock-icon {
+      color: #22863a;
+      font-size: 11px;
+    }
+    .browser-tabs {
+      display: flex;
+      gap: 2px;
+      margin-left: 8px;
+    }
+    .browser-tab {
+      background: #f5f5f5;
+      border: 1px solid #ccc;
+      border-bottom: none;
+      padding: 4px 12px;
+      font-size: 11px;
+      border-radius: 4px 4px 0 0;
+      color: #666;
+    }
+    .browser-tab.active {
+      background: white;
+      color: #333;
+    }
+
+    /* Delaware State Banner */
+    .de-state-banner {
+      background: #003366;
+      padding: 4px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+    }
+    .de-state-banner a {
+      color: #99ccff;
+      text-decoration: none;
+    }
+    .de-state-banner a:hover {
+      text-decoration: underline;
+    }
+    .de-official-label {
+      color: white;
+      font-weight: 600;
+    }
+
+    .ecorp-header {
+      background: linear-gradient(180deg, #5a0a13 0%, #800000 50%, #5a0a13 100%);
+      padding: 0;
+      border-bottom: 3px solid #ffd700;
+    }
+    .ecorp-header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 16px;
+    }
+    .ecorp-logo-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .de-seal {
+      width: 60px;
+      height: 60px;
+      background: radial-gradient(circle, #ffd700 0%, #b8860b 50%, #ffd700 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: #5a0a13;
+      font-weight: 700;
+      text-align: center;
+      border: 2px solid #ffd700;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    .ecorp-title-block {
+      color: white;
+    }
+    .ecorp-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      font-family: Georgia, 'Times New Roman', serif;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    }
+    .ecorp-dept {
+      font-size: 0.75rem;
+      color: #ffcc99;
+      margin-top: 2px;
+    }
+    .ecorp-live-support {
+      background: linear-gradient(180deg, #336633 0%, #224422 100%);
+      color: white;
+      padding: 8px 12px;
+      font-size: 11px;
+      text-align: center;
+      border-radius: 4px;
+      border: 1px solid #448844;
+    }
+    .ecorp-live-support .status-label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 2px;
+    }
+    .ecorp-live-support .offline {
+      background: #666;
+      padding: 1px 6px;
+      border-radius: 2px;
+      font-size: 10px;
+      margin-right: 4px;
+    }
+
+    /* Main Navigation Bar */
+    .ecorp-main-nav {
+      background: linear-gradient(180deg, #f5f5f5 0%, #e0e0e0 100%);
+      border-bottom: 1px solid #ccc;
+      padding: 0;
+    }
+    .ecorp-main-nav ul {
+      list-style: none;
+      display: flex;
+      margin: 0;
+      padding: 0 12px;
+    }
+    .ecorp-main-nav li {
+      border-right: 1px solid #ccc;
+    }
+    .ecorp-main-nav li:first-child {
+      border-left: 1px solid #ccc;
+    }
+    .ecorp-main-nav a {
+      display: block;
+      padding: 8px 14px;
+      color: #003366;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .ecorp-main-nav a:hover {
+      background: #dde5ed;
+    }
+    .ecorp-main-nav a.active {
+      background: #003366;
+      color: white;
+    }
+
+    .ecorp-breadcrumb {
+      background: #f8f8f8;
+      padding: 6px 16px;
+      font-size: 11px;
+      color: #666;
+      border-bottom: 1px solid #ddd;
+    }
+    .ecorp-breadcrumb a {
+      color: #0066cc;
+      text-decoration: none;
+    }
+    .ecorp-breadcrumb a:hover {
+      text-decoration: underline;
+    }
+    .ecorp-breadcrumb .separator {
+      margin: 0 4px;
+      color: #999;
+    }
+
+    .ecorp-body {
+      padding: 16px;
+      background: #ffffff;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .ecorp-page-title {
+      text-align: center;
+      font-size: 16px;
+      font-weight: 700;
+      color: #800000;
+      margin-bottom: 4px;
+      font-family: Georgia, 'Times New Roman', serif;
+      border-bottom: 2px solid #800000;
+      padding-bottom: 8px;
+    }
+    .ecorp-page-subtitle {
+      text-align: center;
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 16px;
+    }
+
+    .ecorp-notice {
+      background: #fffde7;
+      border: 1px solid #ffcc00;
+      border-left: 4px solid #ffcc00;
+      padding: 10px 12px;
+      margin-bottom: 16px;
+      font-size: 12px;
+      color: #5d4e00;
+    }
+    .ecorp-notice.red {
+      background: #fff0f0;
+      border-color: #cc0000;
+      border-left-color: #cc0000;
+      color: #990000;
+    }
+    .ecorp-notice strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    /* Company Info - Delaware Style Table */
+    .ecorp-section-header {
+      background: linear-gradient(180deg, #800000 0%, #5a0a13 100%);
+      color: white;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 0;
+      border: 1px solid #5a0a13;
+      border-bottom: none;
+    }
+    .company-info {
+      display: table;
+      width: 100%;
+      margin-bottom: 16px;
+      border-collapse: collapse;
+      background: white;
+      border: 1px solid #ccc;
+    }
+    .company-info-row {
+      display: table-row;
+    }
+    .info-group {
+      display: table-cell;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      vertical-align: top;
+    }
+    .info-group label {
+      font-size: 11px;
+      color: #666;
+      font-weight: 700;
+      display: block;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+    .info-group .value {
+      font-size: 13px;
+      color: #000;
+      font-weight: 600;
+    }
+    .info-group .value.highlight-red {
+      color: #cc0000;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .info-group .value.highlight-green {
+      color: #008800;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    /* Stock Table - Delaware Authentic */
+    .stock-section {
+      margin-top: 16px;
+    }
+    .stock-section-header {
+      background: linear-gradient(180deg, #800000 0%, #5a0a13 100%);
+      color: white;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid #5a0a13;
+      border-bottom: none;
+    }
+    .stock-section-header .required-note {
+      font-weight: normal;
+      font-size: 11px;
+      color: #ffcccc;
+    }
+
+    .stock-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin-bottom: 0;
+      background: white;
+      border: 1px solid #999;
+    }
+    .stock-table th {
+      background: linear-gradient(180deg, #e0e0e0 0%, #c0c0c0 100%);
+      color: #333;
+      padding: 8px 6px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 11px;
+      border: 1px solid #999;
+      text-transform: uppercase;
+    }
+    .stock-table td {
+      padding: 6px 8px;
+      border: 1px solid #ccc;
+      vertical-align: middle;
+      text-align: center;
+      background: #fafafa;
+    }
+    .stock-table tr:nth-child(even) td {
+      background: #f0f0f0;
+    }
+    .stock-table input[type="text"] {
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid #999;
+      font-size: 12px;
+      font-family: Arial, sans-serif;
+      text-align: right;
+      background: white;
+    }
+    .stock-table input[type="text"]:focus {
+      outline: none;
+      border-color: #0066cc;
+      box-shadow: 0 0 3px rgba(0, 102, 204, 0.3);
+      background: #fffff0;
+    }
+    .stock-table input.readonly {
+      background: #f0f0f0;
+      color: #333;
+      border-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    /* Highlight Problem Fields - Delaware Style */
+    .problem-cell {
+      position: relative;
+      background: #fff8f8 !important;
+    }
+    .problem-cell input {
+      border: 2px solid #cc0000 !important;
+      background: #fff8f8 !important;
+    }
+    .problem-label {
+      position: absolute;
+      top: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #cc0000;
+      color: white;
+      font-size: 9px;
+      padding: 2px 8px;
+      font-weight: 700;
+      white-space: nowrap;
+      z-index: 10;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    @keyframes pulse-border {
+      0%, 100% { border-color: #cc0000; }
+      50% { border-color: #ff6666; }
+    }
+    .problem-cell input {
+      animation: pulse-border 1.5s infinite;
+    }
+
+    /* Delaware Style Buttons */
+    .ecorp-buttons {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin: 16px 0;
+      flex-wrap: wrap;
+      padding: 16px;
+      background: #f5f5f5;
+      border: 1px solid #ddd;
+    }
+    .ecorp-btn {
+      padding: 8px 20px;
+      border: 1px solid #666;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: Arial, sans-serif;
+      text-transform: uppercase;
+    }
+    .ecorp-btn-primary {
+      background: linear-gradient(180deg, #336699 0%, #224466 100%);
+      color: white;
+      border-color: #224466;
+    }
+    .ecorp-btn-primary:hover {
+      background: linear-gradient(180deg, #4477aa 0%, #336699 100%);
+    }
+    .ecorp-btn-secondary {
+      background: linear-gradient(180deg, #f5f5f5 0%, #e0e0e0 100%);
+      color: #333;
+      border-color: #999;
+    }
+    .ecorp-btn-secondary:hover {
+      background: linear-gradient(180deg, #ffffff 0%, #f0f0f0 100%);
+    }
+    .ecorp-btn-recalc {
+      background: linear-gradient(180deg, #008800 0%, #006600 100%);
+      color: white;
+      border-color: #006600;
+      font-size: 13px;
+      padding: 10px 24px;
+    }
+    .ecorp-btn-recalc:hover {
+      background: linear-gradient(180deg, #00aa00 0%, #008800 100%);
+    }
+
+    /* Tax Results */
+    .tax-results {
+      background: white;
+      border: 2px solid #ddd;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .tax-results h3 {
+      font-size: 1.1rem;
+      margin-bottom: 1.25rem;
+      color: #333;
+      text-align: center;
+    }
+    .tax-comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+    .tax-column {
+      padding: 1.25rem;
+      border-radius: 12px;
+    }
+    .tax-column.wrong {
+      background: linear-gradient(135deg, #fef2f2, #fee2e2);
+      border: 2px solid #fecaca;
+    }
+    .tax-column.correct {
+      background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+      border: 2px solid #bbf7d0;
+    }
+    .tax-column h4 {
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .tax-column.wrong h4 { color: #991b1b; }
+    .tax-column.correct h4 { color: #166534; }
+    .tax-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+      font-size: 0.85rem;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+    }
+    .tax-row:last-child {
+      border-bottom: none;
+      font-weight: 700;
+      font-size: 1.1rem;
+      padding-top: 1rem;
+      margin-top: 0.5rem;
+      border-top: 2px dashed currentColor;
+    }
+    .tax-column.wrong .tax-row:last-child { color: #dc2626; }
+    .tax-column.correct .tax-row:last-child { color: #16a34a; }
+
+    .savings-banner {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      text-align: center;
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin: 1.5rem 0;
+    }
+    .savings-banner .amount {
+      font-size: 3rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+    .savings-banner .label {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      margin-top: 0.5rem;
+    }
+
+    /* Calculation Breakdown */
+    .calc-breakdown {
+      background: #1e293b;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      color: #e2e8f0;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      overflow-x: auto;
+    }
+    .calc-breakdown .comment {
+      color: #64748b;
+    }
+    .calc-breakdown .highlight {
+      color: #fbbf24;
+    }
+    .calc-breakdown .result {
+      color: #4ade80;
+      font-weight: 600;
+    }
+
+    /* Presets */
+    .presets-section {
+      margin: 2rem 0;
+    }
+    .presets-section h3 {
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      color: var(--color-text);
+    }
+    .preset-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+    }
+    .preset-card {
+      background: white;
+      border: 2px solid var(--color-border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .preset-card:hover {
+      border-color: var(--color-primary);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .preset-card h4 {
+      font-size: 0.95rem;
+      margin-bottom: 0.5rem;
+      color: var(--color-text);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .preset-card p {
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+      margin-bottom: 0.75rem;
+    }
+    .preset-card .preset-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      font-size: 0.7rem;
+    }
+    .preset-card .preset-stats span {
+      background: #e0e7ff;
+      color: #3730a3;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    /* Methods Comparison */
+    .methods-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+    .method-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+    .method-card.bad {
+      border-top: 4px solid #ef4444;
+    }
+    .method-card.good {
+      border-top: 4px solid #10b981;
+    }
+    .method-card .method-tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-bottom: 0.75rem;
+    }
+    .method-card.bad .method-tag {
+      background: #fef2f2;
+      color: #991b1b;
+    }
+    .method-card.good .method-tag {
+      background: #f0fdf4;
+      color: #166534;
+    }
+    .method-card h3 {
+      font-size: 1rem;
+      margin-bottom: 0.75rem;
+    }
+    .method-card.bad h3 { color: #991b1b; }
+    .method-card.good h3 { color: #166534; }
+    .method-card .formula {
+      background: #f8fafc;
+      border: 1px solid var(--color-border);
+      padding: 1rem;
+      border-radius: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      margin: 1rem 0;
+      line-height: 1.8;
+    }
+    .method-card p {
+      font-size: 0.875rem;
+      color: var(--color-text-secondary);
+    }
+
+    /* FAQ */
+    .faq-item {
+      border-bottom: 1px solid var(--color-border);
+      padding: 1.25rem 0;
+    }
+    .faq-item:last-child {
+      border-bottom: none;
+    }
+    .faq-question {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+      color: var(--color-text);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .faq-question::after {
+      content: '+';
+      font-size: 1.5rem;
+      color: var(--color-text-muted);
+    }
+    .faq-item.open .faq-question::after {
+      content: '-';
+    }
+    .faq-answer {
+      color: var(--color-text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.7;
+      display: none;
+    }
+    .faq-item.open .faq-answer {
+      display: block;
+    }
+
+    /* Export Button */
+    .export-section {
+      text-align: center;
+      margin: 2rem 0;
+      padding: 1.5rem;
+      background: #f8fafc;
+      border-radius: 12px;
+    }
+    .export-section p {
+      font-size: 0.9rem;
+      color: var(--color-text-muted);
+      margin-bottom: 1rem;
+    }
+    .export-btn {
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .export-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    /* CTA */
+    .cta-section {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: white;
+      padding: 3rem;
+      border-radius: 16px;
+      text-align: center;
+      margin: 3rem 0;
+    }
+    .cta-section h2 {
+      font-size: 1.75rem;
+      margin-bottom: 1rem;
+    }
+    .cta-section p {
+      color: rgba(255,255,255,0.8);
+      margin-bottom: 1.5rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .cta-btn {
+      display: inline-block;
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1.1rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .cta-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(37, 99, 235, 0.4);
+    }
+
+    /* Footer */
+    .site-footer {
+      background: #0f172a;
+      color: rgba(255,255,255,0.6);
+      padding: 2rem 0;
+      text-align: center;
+      font-size: 0.875rem;
+    }
+    .site-footer a {
+      color: #60a5fa;
+      text-decoration: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 1.75rem; }
+      .hero-stats { flex-direction: column; gap: 1.5rem; }
+      .tax-comparison { grid-template-columns: 1fr; }
+      .methods-grid { grid-template-columns: 1fr; }
+      .tab-btn { padding: 0.75rem 1rem; font-size: 0.85rem; }
+      .cta-section { padding: 2rem 1.5rem; }
+
+      /* Delaware mockup responsive */
+      .ecorp-header-top { flex-direction: column; gap: 12px; text-align: center; }
+      .ecorp-logo-section { justify-content: center; }
+      .ecorp-main-nav ul { flex-wrap: wrap; justify-content: center; }
+      .ecorp-main-nav li { border-left: none !important; }
+      .de-state-banner { flex-direction: column; gap: 4px; text-align: center; }
+      .company-info { display: block; }
+      .company-info-row { display: block; }
+      .info-group { display: block; border-bottom: 1px solid #ddd; }
+      .stock-table { font-size: 10px; }
+      .stock-table th, .stock-table td { padding: 4px; }
+      .stock-table input[type="text"] { font-size: 11px; padding: 4px; }
+      .ecorp-buttons { flex-direction: column; }
+      .ecorp-btn { width: 100%; justify-content: center; }
+      .problem-label { font-size: 8px; padding: 1px 4px; }
+    }
+
+    /* Print Styles */
+    @media print {
+      .site-header, .tab-nav, .ecorp-buttons, .presets-section, .export-section, .cta-section, .site-footer { display: none; }
+      .tab-content { display: block !important; }
+      .ecorp-mockup { box-shadow: none; border: 1px solid #ddd; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Site Header -->
+  <header class="site-header">
+    <div class="container">
+      <a href="https://terms.law" class="logo">Terms<span>.Law</span></a>
+      <a href="https://terms.law/#contact" class="header-cta">Get Help With Your DE Tax</a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <h1>Delaware Franchise Tax <span class="highlight">Calculator & Fix Guide</span></h1>
+      <p>See exactly why your startup got a $75K+ tax bill and how to reduce it to the $400 minimum. Interactive calculator with step-by-step fix instructions.</p>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="number bad">$75,215</div>
+          <div class="label">What They Bill You</div>
+        </div>
+        <div class="hero-stat">
+          <div class="number good">$400</div>
+          <div class="label">What You Should Pay</div>
+        </div>
+        <div class="hero-stat">
+          <div class="number neutral">2 Fields</div>
+          <div class="label">That Fix Everything</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tab Navigation -->
+  <nav class="tab-nav">
+    <div class="container">
+      <button class="tab-btn active" data-tab="calculator">
+        <span>Interactive Calculator</span>
+        <span class="badge">Try It</span>
+      </button>
+      <button class="tab-btn" data-tab="guide">Step-by-Step Fix Guide</button>
+      <button class="tab-btn" data-tab="understand">Understanding the Problem</button>
+      <button class="tab-btn" data-tab="faq">FAQ</button>
+    </div>
+  </nav>
+
+  <main class="container">
+
+    <!-- Tab 1: Interactive Calculator -->
+    <section class="tab-content active" id="calculator">
+
+      <div class="alert alert-info">
+        <div class="alert-icon">💡</div>
+        <div class="alert-content">
+          <h4>How This Works</h4>
+          <p>This is an interactive mockup of Delaware's eCorp dashboard. Enter your company's data in the highlighted fields and click "Recalculate Tax" to see how much you could save.</p>
+        </div>
+      </div>
+
+      <!-- Presets -->
+      <div class="presets-section">
+        <h3>Quick Start: Choose Your Company Type</h3>
+        <div class="preset-grid">
+          <div class="preset-card" onclick="loadPreset('seed')">
+            <h4>🌱 Seed-Stage Startup</h4>
+            <p>Raised $500K, issued shares to founders and small angel round.</p>
+            <div class="preset-stats">
+              <span>2M issued</span>
+              <span>$500K assets</span>
+              <span>Tax: ~$400</span>
+            </div>
+          </div>
+          <div class="preset-card" onclick="loadPreset('seriesA')">
+            <h4>🚀 Series A Company</h4>
+            <p>Raised $5M Series A, growing team with option pool.</p>
+            <div class="preset-stats">
+              <span>4M issued</span>
+              <span>$3M assets</span>
+              <span>Tax: ~$720</span>
+            </div>
+          </div>
+          <div class="preset-card" onclick="loadPreset('bootstrap')">
+            <h4>🔧 Bootstrapped Company</h4>
+            <p>Converted from LLC, minimal outside investment.</p>
+            <div class="preset-stats">
+              <span>1M issued</span>
+              <span>$200K assets</span>
+              <span>Tax: ~$400</span>
+            </div>
+          </div>
+          <div class="preset-card" onclick="loadPreset('seriesB')">
+            <h4>📈 Series B+ Company</h4>
+            <p>Multiple funding rounds, significant assets.</p>
+            <div class="preset-stats">
+              <span>8M issued</span>
+              <span>$15M assets</span>
+              <span>Tax: ~$1,125</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Delaware eCorp Mockup - Authentic Design -->
+      <div class="ecorp-mockup">
+        <!-- Browser Chrome -->
+        <div class="ecorp-browser-bar">
+          <div class="browser-dots">
+            <span class="browser-dot red"></span>
+            <span class="browser-dot yellow"></span>
+            <span class="browser-dot green"></span>
+          </div>
+          <div class="browser-url">
+            <span class="lock-icon">🔒</span>
+            icis.corp.delaware.gov/ecorp/AnnualReport/FranchiseTax.aspx
+          </div>
+        </div>
+
+        <!-- Delaware State Banner -->
+        <div class="de-state-banner">
+          <div>
+            <a href="#">Delaware.gov</a>
+            <span style="color:#ccc;margin:0 8px;">|</span>
+            <a href="#">Text Only</a>
+            <span style="color:#ccc;margin:0 8px;">|</span>
+            <a href="#">Governor</a>
+            <span style="color:#ccc;margin:0 8px;">|</span>
+            <a href="#">General Assembly</a>
+          </div>
+          <span class="de-official-label">An Official State of Delaware Website</span>
+        </div>
+
+        <!-- Main Header with Delaware Seal -->
+        <div class="ecorp-header">
+          <div class="ecorp-header-top">
+            <div class="ecorp-logo-section">
+              <div class="de-seal">
+                <div style="line-height:1.1;">STATE<br>OF<br>DE</div>
+              </div>
+              <div class="ecorp-title-block">
+                <div class="ecorp-title">Division of Corporations</div>
+                <div class="ecorp-dept">Delaware Department of State</div>
+              </div>
+            </div>
+            <div class="ecorp-live-support">
+              <span class="status-label">LIVE SUPPORT</span>
+              <span class="offline">OFFLINE</span> Corporate Tax
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation Bar -->
+        <nav class="ecorp-main-nav">
+          <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Entity Search</a></li>
+            <li><a href="#" class="active">Pay Taxes / File Annual Report</a></li>
+            <li><a href="#">UCC</a></li>
+            <li><a href="#">Name Reservation</a></li>
+            <li><a href="#">Help</a></li>
+          </ul>
+        </nav>
+
+        <!-- Breadcrumb -->
+        <div class="ecorp-breadcrumb">
+          <a href="#">Department of State</a>
+          <span class="separator">›</span>
+          <a href="#">Division of Corporations</a>
+          <span class="separator">›</span>
+          <a href="#">eCorp</a>
+          <span class="separator">›</span>
+          <strong>Annual Franchise Tax Report</strong>
+        </div>
+
+        <div class="ecorp-body">
+          <div class="ecorp-page-title">2024 Annual Franchise Tax Report</div>
+          <div class="ecorp-page-subtitle">Amended Filing</div>
+
+          <div class="ecorp-notice red">
+            <strong>IMPORTANT:</strong> Your Annual Report has already been filed for this tax year. All information on the current report will be replaced by this amended filing. Amendment filing fee: $50.00
+          </div>
+
+          <!-- Corporation Information Section -->
+          <div class="ecorp-section-header">Corporation Information</div>
+          <div class="company-info">
+            <div class="company-info-row">
+              <div class="info-group">
+                <label>File Number</label>
+                <div class="value">5982918</div>
+              </div>
+              <div class="info-group">
+                <label>Corporation Name</label>
+                <div class="value">ACME STARTUP, INC.</div>
+              </div>
+              <div class="info-group">
+                <label>Incorporation Date</label>
+                <div class="value">01/15/2021</div>
+              </div>
+            </div>
+            <div class="company-info-row">
+              <div class="info-group">
+                <label>Franchise Tax</label>
+                <div class="value highlight-red" id="displayTax">$75,215.00</div>
+              </div>
+              <div class="info-group">
+                <label>Interest (1.5% per month)</label>
+                <div class="value highlight-red" id="displayInterest">$11,282.25</div>
+              </div>
+              <div class="info-group">
+                <label>Total Amount Due</label>
+                <div class="value highlight-red" id="displayTotal">$86,497.25</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stock Information Section -->
+          <div class="stock-section">
+            <div class="stock-section-header">
+              Stock Information
+              <span class="required-note">(* indicates required fields)</span>
+            </div>
+
+            <table class="stock-table">
+              <thead>
+                <tr>
+                  <th>Begin Date</th>
+                  <th>End Date</th>
+                  <th>Stock Class</th>
+                  <th>Authorized Shares</th>
+                  <th>Par Value</th>
+                  <th>Issued Shares *</th>
+                  <th>Gross Assets *</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>01/15/2021</td>
+                  <td>12/31/2024</td>
+                  <td>COMMON</td>
+                  <td><input type="text" id="authorizedCommon" value="10,000,000" class="readonly" readonly></td>
+                  <td>$0.00001</td>
+                  <td class="problem-cell">
+                    <span class="problem-label">Often Left Blank!</span>
+                    <input type="text" id="issuedCommon" value="" placeholder="Enter issued shares">
+                  </td>
+                  <td class="problem-cell" rowspan="2" style="vertical-align:middle;">
+                    <span class="problem-label">Often Left Blank!</span>
+                    <input type="text" id="grossAssets" value="" placeholder="Total assets (Schedule L)">
+                  </td>
+                </tr>
+                <tr>
+                  <td>01/15/2021</td>
+                  <td>12/31/2024</td>
+                  <td>PREFERRED</td>
+                  <td><input type="text" id="authorizedPreferred" value="5,000,000" class="readonly" readonly></td>
+                  <td>$0.00001</td>
+                  <td class="problem-cell">
+                    <input type="text" id="issuedPreferred" value="" placeholder="Enter issued shares">
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="ecorp-buttons">
+              <button class="ecorp-btn ecorp-btn-recalc" onclick="recalculateTax()">
+                RECALCULATE TAX
+              </button>
+              <button class="ecorp-btn ecorp-btn-secondary" onclick="resetFields()">
+                RESET FORM
+              </button>
+              <button class="ecorp-btn ecorp-btn-primary">
+                CONTINUE TO PAYMENT
+              </button>
+            </div>
+          </div>
+
+          <!-- Tax Results -->
+          <div class="tax-results" id="taxResults" style="display:none;">
+            <h3>📊 Tax Calculation Comparison</h3>
+            <div class="tax-comparison">
+              <div class="tax-column wrong">
+                <h4>❌ Authorized Shares Method</h4>
+                <div class="tax-row">
+                  <span>Total Authorized:</span>
+                  <span id="wrongAuthorized">15,000,000</span>
+                </div>
+                <div class="tax-row">
+                  <span>Calculation:</span>
+                  <span>$175 + ($85 × 1,499)</span>
+                </div>
+                <div class="tax-row">
+                  <span>Franchise Tax:</span>
+                  <span id="wrongTax">$75,215.82</span>
+                </div>
+              </div>
+              <div class="tax-column correct">
+                <h4>✅ Assumed Par Value Method</h4>
+                <div class="tax-row">
+                  <span>Gross Assets:</span>
+                  <span id="correctAssets">$500,000</span>
+                </div>
+                <div class="tax-row">
+                  <span>Total Issued:</span>
+                  <span id="correctIssued">3,500,000</span>
+                </div>
+                <div class="tax-row">
+                  <span>Assumed Par:</span>
+                  <span id="correctPar">$0.1429</span>
+                </div>
+                <div class="tax-row">
+                  <span>Par Value Capital:</span>
+                  <span id="correctCapital">$2,143,500</span>
+                </div>
+                <div class="tax-row">
+                  <span>Franchise Tax:</span>
+                  <span id="correctTax">$857.40</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="savings-banner" id="savingsBanner">
+              <div class="label">💰 You Would Save</div>
+              <div class="amount" id="savingsAmount">$74,358.42</div>
+              <div class="label" style="margin-top:0.5rem;font-size:0.9rem;">by filling in Issued Shares and Gross Assets</div>
+            </div>
+
+            <!-- Calculation Breakdown -->
+            <div class="calc-breakdown" id="calcBreakdown">
+              <div class="comment">// Assumed Par Value Capital Method Calculation</div>
+              <div>Assumed Par Value = Gross Assets / Issued Shares</div>
+              <div>                  = <span class="highlight" id="breakdownAssets">$500,000</span> / <span class="highlight" id="breakdownIssued">3,500,000</span></div>
+              <div>                  = <span class="highlight" id="breakdownPar">$0.1429</span> per share</div>
+              <br>
+              <div>Par Value Capital = Authorized Shares × Assumed Par</div>
+              <div>                  = <span class="highlight" id="breakdownAuth">15,000,000</span> × <span class="highlight" id="breakdownPar2">$0.1429</span></div>
+              <div>                  = <span class="highlight" id="breakdownCapital">$2,143,500</span></div>
+              <br>
+              <div>Franchise Tax = (Par Value Capital / $1,000,000) × $400</div>
+              <div>              = (<span class="highlight" id="breakdownCapital2">$2,143,500</span> / $1,000,000) × $400</div>
+              <div>              = <span class="result" id="breakdownTax">$857.40</span> (minimum $400)</div>
+            </div>
+          </div>
+
+          <!-- Export Section -->
+          <div class="export-section" id="exportSection" style="display:none;">
+            <p>Save this calculation to share with your CPA or use when filing your amended return.</p>
+            <button class="export-btn" onclick="exportCalculation()">
+              📋 Copy Calculation Summary
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Tab 2: Step-by-Step Guide -->
+    <section class="tab-content" id="guide">
+      <div class="card">
+        <h2>How to Fix Your Delaware Franchise Tax Bill</h2>
+        <p>Follow these steps to amend your Delaware Annual Report and reduce your franchise tax from $75K+ to the minimum (~$400).</p>
+
+        <div class="alert alert-warning">
+          <div class="alert-icon">⏰</div>
+          <div class="alert-content">
+            <h4>Time Required</h4>
+            <p>This process takes about 15-20 minutes. You'll need your company's cap table and most recent balance sheet (Form 1120, Schedule L).</p>
+          </div>
+        </div>
+
+        <div class="steps">
+          <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <h4>Gather Your Information</h4>
+              <p>Before logging into Delaware's system, collect these items:</p>
+              <ul class="checklist">
+                <li>
+                  <span class="checklist-icon">✓</span>
+                  <div class="checklist-text">
+                    <strong>Delaware Entity File Number</strong>
+                    <span>Found on your Certificate of Incorporation (usually 7 digits)</span>
+                  </div>
+                </li>
+                <li>
+                  <span class="checklist-icon">✓</span>
+                  <div class="checklist-text">
+                    <strong>Cap Table as of December 31</strong>
+                    <span>Shows total ISSUED shares (Common + Preferred) — NOT authorized shares</span>
+                  </div>
+                </li>
+                <li>
+                  <span class="checklist-icon">✓</span>
+                  <div class="checklist-text">
+                    <strong>Total Gross Assets</strong>
+                    <span>From Form 1120, Schedule L, Line 15 (Total Assets) as of fiscal year end</span>
+                  </div>
+                </li>
+                <li>
+                  <span class="checklist-icon">✓</span>
+                  <div class="checklist-text">
+                    <strong>Officer & Director Information</strong>
+                    <span>Names and addresses for at least one officer and all directors</span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <h4>Log Into Delaware eCorp</h4>
+              <p>Go to Delaware's online filing system:</p>
+              <code>https://icis.corp.delaware.gov/ecorp/</code>
+              <p style="margin-top:1rem;">Click "Pay Taxes / File Annual Report" and enter your Entity File Number.</p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <h4>Fill In the Critical Fields</h4>
+              <p>In the Stock Information section, you MUST fill in:</p>
+              <div class="alert alert-danger" style="margin:1rem 0;">
+                <div class="alert-icon">🎯</div>
+                <div class="alert-content">
+                  <h4>The Two Fields That Matter Most</h4>
+                  <p><strong>Issued Shares:</strong> Enter the actual number of shares issued to shareholders (from your cap table). Do NOT include option pool or authorized-but-unissued shares.</p>
+                  <p style="margin-top:0.5rem;"><strong>Gross Assets:</strong> Enter your Total Assets from Form 1120, Schedule L. This is typically the last line of your balance sheet.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-number">4</div>
+            <div class="step-content">
+              <h4>Click "Recalculate Tax"</h4>
+              <p>After entering Issued Shares and Gross Assets, click the "Recalculate Tax" button. The system will switch to the Assumed Par Value Capital Method and your tax should drop dramatically.</p>
+              <div class="alert alert-success" style="margin:1rem 0;">
+                <div class="alert-icon">✨</div>
+                <div class="alert-content">
+                  <h4>Expected Result</h4>
+                  <p>Your franchise tax should drop from $75,000+ to somewhere between $400 and $2,000 depending on your company's size.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-number">5</div>
+            <div class="step-content">
+              <h4>Complete Remaining Fields & Submit</h4>
+              <p>Fill in the rest of the required information:</p>
+              <ul style="margin-left:1.5rem;margin-bottom:1rem;">
+                <li>Principal Place of Business (your company's address)</li>
+                <li>Nature of Business (select from dropdown)</li>
+                <li>Officer Information (at least one officer)</li>
+                <li>Director Information (all current directors)</li>
+                <li>Check the Terms & Conditions box</li>
+              </ul>
+              <p>Submit and pay the recalculated amount (tax + $50 filing fee for amendments).</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cta-section">
+        <h2>Need Help Filing Your Amendment?</h2>
+        <p>I help startups navigate Delaware corporate filings. If you're unsure about your share counts or need help with the amendment, I can walk you through it.</p>
+        <a href="https://terms.law/#contact" class="cta-btn">Get Help →</a>
+      </div>
+    </section>
+
+    <!-- Tab 3: Understanding the Problem -->
+    <section class="tab-content" id="understand">
+      <div class="card">
+        <h2>Why This Happens: The Two Calculation Methods</h2>
+        <p>Delaware offers two methods for calculating franchise tax. The problem is that if you don't provide certain information, Delaware defaults to the method that's almost always more expensive for startups.</p>
+      </div>
+
+      <div class="methods-grid">
+        <div class="method-card bad">
+          <span class="method-tag">DEFAULT (When Fields Are Blank)</span>
+          <h3>Authorized Shares Method</h3>
+          <div class="formula">
+            First 10,000 shares = $175<br>
+            Each additional 10,000 = $85<br>
+            <br>
+            Minimum: $175<br>
+            Maximum: $200,000
+          </div>
+          <p><strong>Why it's brutal for startups:</strong> You're taxed on all AUTHORIZED shares — including millions reserved for future employees, investors, and growth that haven't been issued yet.</p>
+          <p><strong>Example:</strong> 15M authorized shares = $175 + (1,499 × $85) = <strong style="color:#dc2626;">$75,215</strong></p>
+        </div>
+
+        <div class="method-card good">
+          <span class="method-tag">USED WHEN YOU PROVIDE DATA</span>
+          <h3>Assumed Par Value Capital Method</h3>
+          <div class="formula">
+            Assumed Par = Gross Assets ÷ Issued Shares<br>
+            <br>
+            Par Value Capital = Authorized × Assumed Par<br>
+            <br>
+            Tax = (Capital ÷ $1M) × $400<br>
+            <br>
+            Minimum: $400 | Maximum: $200,000
+          </div>
+          <p><strong>Why it's fair:</strong> Your tax is based on your actual economic footprint (gross assets and issued shares), not theoretical maximum shares.</p>
+          <p><strong>Example:</strong> $500K assets ÷ 3.5M issued = $0.14/share × 15M auth = $2.1M capital = <strong style="color:#16a34a;">$857</strong></p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Common Mistakes (Even by Experienced CPAs)</h2>
+
+        <div class="alert alert-danger">
+          <div class="alert-icon">1️⃣</div>
+          <div class="alert-content">
+            <h4>Leaving Issued Shares Blank</h4>
+            <p>The most common mistake. Many CPAs don't realize this field needs to be filled in, or they don't have access to the company's cap table. Delaware then defaults to the Authorized Shares Method.</p>
+          </div>
+        </div>
+
+        <div class="alert alert-danger">
+          <div class="alert-icon">2️⃣</div>
+          <div class="alert-content">
+            <h4>Leaving Gross Assets Blank</h4>
+            <p>Even if Issued Shares is filled in, leaving Gross Assets blank prevents Delaware from using the Assumed Par Value Method. Both fields are required.</p>
+          </div>
+        </div>
+
+        <div class="alert alert-warning">
+          <div class="alert-icon">3️⃣</div>
+          <div class="alert-content">
+            <h4>Including Option Pool in Issued Shares</h4>
+            <p>Stock options that have been GRANTED but not EXERCISED are NOT issued shares. Only count shares that have actually been issued to shareholders.</p>
+          </div>
+        </div>
+
+        <div class="alert alert-warning">
+          <div class="alert-icon">4️⃣</div>
+          <div class="alert-content">
+            <h4>Using Authorized Shares Instead of Issued</h4>
+            <p>Some filers mistakenly enter their authorized share count (from the COI) instead of their issued share count (from the cap table). These are very different numbers.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Real-World Impact</h2>
+        <p>Here's what different types of companies typically pay when the fields are filled correctly vs. left blank:</p>
+
+        <table style="width:100%;border-collapse:collapse;margin-top:1rem;">
+          <thead>
+            <tr style="background:#f1f5f9;">
+              <th style="padding:0.75rem;text-align:left;border-bottom:2px solid #e2e8f0;">Company Type</th>
+              <th style="padding:0.75rem;text-align:right;border-bottom:2px solid #e2e8f0;">With Blank Fields</th>
+              <th style="padding:0.75rem;text-align:right;border-bottom:2px solid #e2e8f0;">With Correct Data</th>
+              <th style="padding:0.75rem;text-align:right;border-bottom:2px solid #e2e8f0;">Savings</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding:0.75rem;border-bottom:1px solid #e2e8f0;">Pre-Seed (10M auth)</td>
+              <td style="padding:0.75rem;text-align:right;border-bottom:1px solid #e2e8f0;color:#dc2626;font-weight:600;">$85,175</td>
+              <td style="padding:0.75rem;text-align:right;border-bottom:1px solid #e2e8f0;color:#16a34a;font-weight:600;">$400</td>
+              <td style="padding:0.75rem;text-align:right;border-bottom:1px solid #e2e8f0;font-weight:700;">$84,775</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border-bottom:1px solid #e2e8f0;">Seed Stage (15M auth)</td>
+              <td style="padding:0.75rem;text-align:right;border-bottom:1px solid #e2e8f0;color:#dc2626;font-weight:600;">$127,675</td>
+              <td style="padding:0.75rem;text-align:right;border-bottom:1px solid #e2e8f0;color:#16a34a;font-weight:600;">$400-$600</td>
+              <td style="padding:0.75rem;text-align:right;border-bottom:1px solid #e2e8f0;font-weight:700;">~$127,000</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;border-bottom:1px solid #e2e8f0;">Series A (20M auth)</td>
+              <td style="padding:0.75rem;text-align:right;border-bottom:1px solid #e2e8f0;color:#dc2626;font-weight:600;">$170,175</td>
+              <td style="padding:0.75rem;text-align:right;border-bottom:1px solid #e2e8f0;color:#16a34a;font-weight:600;">$600-$1,200</td>
+              <td style="padding:0.75rem;text-align:right;border-bottom:1px solid #e2e8f0;font-weight:700;">~$169,000</td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;">Series B+ (50M+ auth)</td>
+              <td style="padding:0.75rem;text-align:right;color:#dc2626;font-weight:600;">$200,000 (max)</td>
+              <td style="padding:0.75rem;text-align:right;color:#16a34a;font-weight:600;">$1,000-$5,000</td>
+              <td style="padding:0.75rem;text-align:right;font-weight:700;">~$195,000</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Tab 4: FAQ -->
+    <section class="tab-content" id="faq">
+      <div class="card">
+        <h2>Frequently Asked Questions</h2>
+
+        <div class="faq-item open">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            Where do I find my company's Issued Shares count?
+          </div>
+          <div class="faq-answer">
+            <p>Your issued shares count comes from your <strong>cap table</strong> (capitalization table). This is different from your Certificate of Incorporation, which shows authorized shares.</p>
+            <p style="margin-top:0.5rem;">Add up all shares that have actually been issued to:</p>
+            <ul style="margin:0.5rem 0 0.5rem 1.5rem;">
+              <li>Founders</li>
+              <li>Investors (all preferred series)</li>
+              <li>Employees who have exercised options</li>
+              <li>Any other shareholders</li>
+            </ul>
+            <p style="margin-top:0.5rem;"><strong>Do NOT include:</strong> Unexercised stock options, warrants, or reserved-but-unissued shares.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            Where do I find my company's Gross Assets?
+          </div>
+          <div class="faq-answer">
+            <p>Gross Assets = Total Assets from your company's balance sheet as of fiscal year end (usually December 31).</p>
+            <p style="margin-top:0.5rem;">If your company files Form 1120, it's on <strong>Schedule L, Line 15 (Total Assets)</strong>.</p>
+            <p style="margin-top:0.5rem;">If you don't have formal financials yet, estimate based on:</p>
+            <ul style="margin:0.5rem 0 0 1.5rem;">
+              <li>Cash in bank accounts</li>
+              <li>Value of equipment, IP, or other assets</li>
+              <li>Investment amounts received (before spending)</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            I already paid the high tax bill. Can I get a refund?
+          </div>
+          <div class="faq-answer">
+            <p>Yes! You can file an amended Annual Report with correct information. Delaware will recalculate your tax and issue a credit for the overpayment.</p>
+            <p style="margin-top:0.5rem;">The credit can be applied to future years' franchise tax or, in some cases, refunded. Contact Delaware's Franchise Tax Department at 302-739-3073, Option 3 to discuss your specific situation.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            What if I have multiple stock classes or time periods?
+          </div>
+          <div class="faq-answer">
+            <p>If your stock structure changed during the year (e.g., you issued new preferred stock), Delaware's form will show multiple time periods. For each period, enter:</p>
+            <ul style="margin:0.5rem 0 0 1.5rem;">
+              <li>The issued shares as of that period's end date</li>
+              <li>Use the fiscal year-end Gross Assets for all periods (or assets as of 30 days within each period's end date)</li>
+            </ul>
+            <p style="margin-top:0.5rem;">The Asset Date must be within 30 days of the period end date, or it can be your fiscal year end date.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            Do I include ESOP or option pool shares?
+          </div>
+          <div class="faq-answer">
+            <p><strong>No.</strong> Only include shares that have actually been issued to shareholders.</p>
+            <ul style="margin:0.5rem 0 0 1.5rem;">
+              <li><strong>Include:</strong> Shares issued upon option exercise</li>
+              <li><strong>Exclude:</strong> Granted but unexercised options</li>
+              <li><strong>Exclude:</strong> Reserved shares in the option pool</li>
+              <li><strong>Exclude:</strong> Warrants (until exercised)</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            What's the minimum and maximum franchise tax?
+          </div>
+          <div class="faq-answer">
+            <p>Under both methods:</p>
+            <ul style="margin:0.5rem 0 0 1.5rem;">
+              <li><strong>Minimum:</strong> $400 (most startups pay this)</li>
+              <li><strong>Maximum:</strong> $200,000 (caps both methods)</li>
+            </ul>
+            <p style="margin-top:0.5rem;">There's also a $100 Annual Report filing fee on top of the franchise tax.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            When is Delaware franchise tax due?
+          </div>
+          <div class="faq-answer">
+            <p>For most corporations: <strong>March 1</strong> of each year, covering the prior tax year.</p>
+            <p style="margin-top:0.5rem;">If you miss the deadline, penalties and 1.5% monthly interest accrue. The interest compounds, which is why old unpaid balances can grow significantly.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="cta-section">
+        <h2>Still Have Questions?</h2>
+        <p>Every company's situation is a bit different. If you're unsure about your share counts, asset values, or how to file the amendment, I'm happy to help.</p>
+        <a href="https://terms.law/#contact" class="cta-btn">Ask a Question →</a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2024 <a href="https://terms.law">Terms.Law</a> - Sergei Tokmakov, Esq. | <a href="https://apps.calbar.ca.gov/attorney/Licensee/Detail/279869">CA Bar #279869</a></p>
+      <p style="margin-top: 0.5rem; font-size: 0.75rem;">This calculator is for educational purposes. Consult a professional for your specific situation.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Tab Navigation
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Update buttons
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        // Update content
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.getElementById(btn.dataset.tab).classList.add('active');
+
+        // Scroll to top of content
+        window.scrollTo({ top: 200, behavior: 'smooth' });
+      });
+    });
+
+    // FAQ Toggle
+    function toggleFaq(element) {
+      const item = element.parentElement;
+      item.classList.toggle('open');
+    }
+
+    // Parse number from formatted string
+    function parseNumber(str) {
+      if (!str) return 0;
+      return parseFloat(str.replace(/[^0-9.-]/g, '')) || 0;
+    }
+
+    // Format number with commas
+    function formatNumber(num) {
+      return num.toLocaleString('en-US');
+    }
+
+    // Format currency
+    function formatCurrency(num) {
+      return '$' + num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    // Calculate Authorized Shares Method tax
+    function calcAuthorizedMethod(authorizedShares) {
+      if (authorizedShares <= 10000) {
+        return 175;
+      }
+
+      let tax = 175; // First 10,000
+      let remaining = authorizedShares - 10000;
+      tax += Math.ceil(remaining / 10000) * 85;
+
+      // Apply min/max
+      tax = Math.max(400, Math.min(200000, tax));
+
+      return tax;
+    }
+
+    // Calculate Assumed Par Value Capital Method tax
+    function calcAssumedParMethod(authorizedShares, issuedShares, grossAssets) {
+      if (issuedShares <= 0 || grossAssets <= 0) {
+        return null;
+      }
+
+      // Step 1: Calculate Assumed Par Value
+      let assumedPar = grossAssets / issuedShares;
+
+      // Step 2: Assumed Par Value Capital
+      let assumedParCapital = authorizedShares * assumedPar;
+
+      // Step 3: Tax = $400 per $1,000,000 of assumed par value capital
+      let tax = (assumedParCapital / 1000000) * 400;
+
+      // Apply min/max
+      tax = Math.max(400, Math.min(200000, tax));
+
+      return {
+        tax: tax,
+        assumedPar: assumedPar,
+        parCapital: assumedParCapital
+      };
+    }
+
+    // Main recalculation function
+    function recalculateTax() {
+      // Get values
+      const authorizedCommon = parseNumber(document.getElementById('authorizedCommon').value);
+      const authorizedPreferred = parseNumber(document.getElementById('authorizedPreferred').value);
+      const issuedCommon = parseNumber(document.getElementById('issuedCommon').value);
+      const issuedPreferred = parseNumber(document.getElementById('issuedPreferred').value);
+      const grossAssets = parseNumber(document.getElementById('grossAssets').value);
+
+      const totalAuthorized = authorizedCommon + authorizedPreferred;
+      const totalIssued = issuedCommon + issuedPreferred;
+
+      // Validate
+      if (totalIssued <= 0 || grossAssets <= 0) {
+        alert('Please enter both Issued Shares and Gross Assets to calculate.');
+        return;
+      }
+
+      // Calculate both methods
+      const wrongTax = calcAuthorizedMethod(totalAuthorized);
+      const correctResult = calcAssumedParMethod(totalAuthorized, totalIssued, grossAssets);
+
+      // Show results
+      document.getElementById('taxResults').style.display = 'block';
+      document.getElementById('exportSection').style.display = 'block';
+      document.getElementById('wrongAuthorized').textContent = formatNumber(totalAuthorized);
+      document.getElementById('wrongTax').textContent = formatCurrency(wrongTax);
+
+      if (correctResult) {
+        document.getElementById('correctAssets').textContent = formatCurrency(grossAssets);
+        document.getElementById('correctIssued').textContent = formatNumber(totalIssued);
+        document.getElementById('correctPar').textContent = '$' + correctResult.assumedPar.toFixed(4);
+        document.getElementById('correctCapital').textContent = formatCurrency(correctResult.parCapital);
+        document.getElementById('correctTax').textContent = formatCurrency(correctResult.tax);
+
+        // Update header displays
+        document.getElementById('displayTax').textContent = formatCurrency(correctResult.tax);
+        document.getElementById('displayTax').className = 'value highlight-green';
+
+        const interest = correctResult.tax * 0.015 * 12;
+        document.getElementById('displayInterest').textContent = formatCurrency(interest);
+        document.getElementById('displayInterest').className = 'value highlight-green';
+
+        const total = correctResult.tax + interest + 100;
+        document.getElementById('displayTotal').textContent = formatCurrency(total);
+        document.getElementById('displayTotal').className = 'value highlight-green';
+
+        // Show savings
+        const savings = wrongTax - correctResult.tax;
+        document.getElementById('savingsAmount').textContent = formatCurrency(savings);
+        document.getElementById('savingsBanner').style.display = 'block';
+
+        // Update calculation breakdown
+        document.getElementById('breakdownAssets').textContent = formatCurrency(grossAssets);
+        document.getElementById('breakdownIssued').textContent = formatNumber(totalIssued);
+        document.getElementById('breakdownPar').textContent = '$' + correctResult.assumedPar.toFixed(4);
+        document.getElementById('breakdownAuth').textContent = formatNumber(totalAuthorized);
+        document.getElementById('breakdownPar2').textContent = '$' + correctResult.assumedPar.toFixed(4);
+        document.getElementById('breakdownCapital').textContent = formatCurrency(correctResult.parCapital);
+        document.getElementById('breakdownCapital2').textContent = formatCurrency(correctResult.parCapital);
+        document.getElementById('breakdownTax').textContent = formatCurrency(correctResult.tax);
+      }
+
+      // Scroll to results
+      document.getElementById('taxResults').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // Reset fields
+    function resetFields() {
+      document.getElementById('issuedCommon').value = '';
+      document.getElementById('issuedPreferred').value = '';
+      document.getElementById('grossAssets').value = '';
+      document.getElementById('taxResults').style.display = 'none';
+      document.getElementById('exportSection').style.display = 'none';
+
+      // Reset header to wrong values (Authorized Shares Method)
+      document.getElementById('displayTax').textContent = '$75,215.00';
+      document.getElementById('displayTax').className = 'value highlight-red';
+      document.getElementById('displayInterest').textContent = '$11,282.25';
+      document.getElementById('displayInterest').className = 'value highlight-red';
+      document.getElementById('displayTotal').textContent = '$86,497.25';
+      document.getElementById('displayTotal').className = 'value highlight-red';
+    }
+
+    // Load presets
+    function loadPreset(type) {
+      const presets = {
+        seed: {
+          issuedCommon: '1,500,000',
+          issuedPreferred: '500,000',
+          grossAssets: '500,000'
+        },
+        seriesA: {
+          issuedCommon: '2,500,000',
+          issuedPreferred: '1,500,000',
+          grossAssets: '3,000,000'
+        },
+        bootstrap: {
+          issuedCommon: '1,000,000',
+          issuedPreferred: '0',
+          grossAssets: '200,000'
+        },
+        seriesB: {
+          issuedCommon: '4,000,000',
+          issuedPreferred: '4,000,000',
+          grossAssets: '15,000,000'
+        }
+      };
+
+      const preset = presets[type];
+      if (preset) {
+        document.getElementById('issuedCommon').value = preset.issuedCommon;
+        document.getElementById('issuedPreferred').value = preset.issuedPreferred;
+        document.getElementById('grossAssets').value = preset.grossAssets;
+        recalculateTax();
+      }
+    }
+
+    // Export calculation
+    function exportCalculation() {
+      const authorizedCommon = parseNumber(document.getElementById('authorizedCommon').value);
+      const authorizedPreferred = parseNumber(document.getElementById('authorizedPreferred').value);
+      const issuedCommon = parseNumber(document.getElementById('issuedCommon').value);
+      const issuedPreferred = parseNumber(document.getElementById('issuedPreferred').value);
+      const grossAssets = parseNumber(document.getElementById('grossAssets').value);
+
+      const totalAuthorized = authorizedCommon + authorizedPreferred;
+      const totalIssued = issuedCommon + issuedPreferred;
+
+      const wrongTax = calcAuthorizedMethod(totalAuthorized);
+      const correctResult = calcAssumedParMethod(totalAuthorized, totalIssued, grossAssets);
+
+      const text = `DELAWARE FRANCHISE TAX CALCULATION SUMMARY
+==========================================
+Generated: ${new Date().toLocaleDateString()}
+
+COMPANY DATA:
+- Authorized Common: ${formatNumber(authorizedCommon)}
+- Authorized Preferred: ${formatNumber(authorizedPreferred)}
+- Total Authorized: ${formatNumber(totalAuthorized)}
+- Issued Common: ${formatNumber(issuedCommon)}
+- Issued Preferred: ${formatNumber(issuedPreferred)}
+- Total Issued: ${formatNumber(totalIssued)}
+- Gross Assets: ${formatCurrency(grossAssets)}
+
+CALCULATION COMPARISON:
+
+❌ Authorized Shares Method (Wrong - used when fields are blank):
+   Tax: ${formatCurrency(wrongTax)}
+
+✅ Assumed Par Value Capital Method (Correct):
+   Assumed Par Value: ${formatCurrency(grossAssets)} / ${formatNumber(totalIssued)} = $${correctResult.assumedPar.toFixed(4)}
+   Par Value Capital: ${formatNumber(totalAuthorized)} × $${correctResult.assumedPar.toFixed(4)} = ${formatCurrency(correctResult.parCapital)}
+   Tax: (${formatCurrency(correctResult.parCapital)} / $1,000,000) × $400 = ${formatCurrency(correctResult.tax)}
+
+💰 POTENTIAL SAVINGS: ${formatCurrency(wrongTax - correctResult.tax)}
+
+---
+Calculator: https://terms.law/Blog/delaware-franchise-tax-calculator/
+Questions? Contact Sergei Tokmakov at terms.law`;
+
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Calculation summary copied to clipboard!');
+      }).catch(() => {
+        // Fallback
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        alert('Calculation summary copied to clipboard!');
+      });
+    }
+  </script>
+
+</body>
+</html>
