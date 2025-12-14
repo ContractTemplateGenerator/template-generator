@@ -3454,6 +3454,46 @@ Powered by Terms.Law Docs
             '/api/document-chat'
         ];
 
+        // Direct Groq API fallback (for local testing when server APIs are unavailable)
+        // Get a free key at https://console.groq.com/keys
+        const GROQ_API_KEY_FALLBACK = localStorage.getItem('groq_api_key') || '';
+
+        async function callGroqDirectly(message, documentText, documentType, conversationHistory) {
+            if (!GROQ_API_KEY_FALLBACK) {
+                throw new Error('No Groq API key - set via localStorage.setItem("groq_api_key", "your-key")');
+            }
+
+            const systemPrompt = `You are an expert legal document analyst helping users understand contracts and legal agreements.
+
+CURRENT DOCUMENT:
+Type: ${documentType}
+${documentText ? `Content:\n${documentText.substring(0, 6000)}` : 'No document loaded.'}
+
+Be direct, reference specific clauses, use **bold** for key terms. Note this is AI assistance, not legal advice.`;
+
+            const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${GROQ_API_KEY_FALLBACK}`
+                },
+                body: JSON.stringify({
+                    model: 'llama-3.3-70b-versatile',
+                    messages: [
+                        { role: 'system', content: systemPrompt },
+                        ...conversationHistory.slice(-6),
+                        { role: 'user', content: message }
+                    ],
+                    max_tokens: 1500,
+                    temperature: 0.3
+                })
+            });
+
+            if (!response.ok) throw new Error('Groq API failed');
+            const data = await response.json();
+            return { response: data.choices[0].message.content };
+        }
+
         function initAiChat() {
             const panel = document.getElementById('aiChatPanel');
             const fab = document.getElementById('aiChatFab');
@@ -3588,11 +3628,17 @@ Powered by Terms.Law Docs
                     }
                 }
 
+                let data = null;
                 if (!response) {
-                    throw new Error('All API endpoints failed');
+                    // Try direct Groq fallback for local testing
+                    if (GROQ_API_KEY_FALLBACK && aiChat.selectedModel === 'llama') {
+                        data = await callGroqDirectly(message, documentText, documentType, aiChat.conversationHistory);
+                    } else {
+                        throw new Error('All API endpoints failed. For local testing, set your Groq key: localStorage.setItem("groq_api_key", "your-key-here")');
+                    }
+                } else {
+                    data = await response.json();
                 }
-
-                const data = await response.json();
 
                 // Update conversation history
                 aiChat.conversationHistory.push(
@@ -3604,7 +3650,11 @@ Powered by Terms.Law Docs
 
             } catch (error) {
                 console.error('AI Chat error:', error);
-                addAiMessage('assistant', 'Sorry, I encountered an error. Please try again.');
+                if (error.message.includes('Groq key')) {
+                    addAiMessage('assistant', 'API unavailable. To enable locally:\n\n1. Get free key at console.groq.com\n2. Open browser console (F12)\n3. Run: `localStorage.setItem("groq_api_key", "your-key")`\n4. Refresh page');
+                } else {
+                    addAiMessage('assistant', 'Sorry, I encountered an error. Please try again.');
+                }
             } finally {
                 aiChat.isLoading = false;
                 renderAiMessages();
