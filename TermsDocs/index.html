@@ -764,10 +764,10 @@
 
     /* Generator loaded indicator */
     .generator-loaded-bar {
-      padding: 8px 16px;
+      padding: 6px 12px;
       background: #f0fdf4;
       border-bottom: 1px solid #bbf7d0;
-      font-size: 13px;
+      font-size: 12px;
       color: #166534;
       display: none;
       justify-content: space-between;
@@ -776,6 +776,19 @@
 
     .generator-loaded-bar.visible {
       display: flex;
+    }
+
+    .generator-loaded-bar .width-hint {
+      font-size: 11px;
+      color: #15803d;
+      opacity: 0.8;
+      margin-left: auto;
+      margin-right: 12px;
+    }
+
+    /* Hide toolbar when generator is loaded */
+    .doc-editor.has-generator .editor-toolbar {
+      display: none;
     }
 
     .generator-loaded-bar button {
@@ -1140,58 +1153,52 @@
         </div>
 
         <div class="content-body">
-          <div class="dashboard-grid">
-            <div class="stat-card">
-              <div class="stat-card-header">
-                <div class="stat-icon purple">📄</div>
+          <!-- Mini stat cards -->
+          <div style="display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;">
+            <div onclick="showTab('mydocs')" style="flex: 1; min-width: 140px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 8px; padding: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px;">
+              <span style="font-size: 20px;">📄</span>
+              <div>
+                <div style="font-size: 18px; font-weight: 700;">0</div>
+                <div style="font-size: 11px; color: var(--color-text-muted);">Generators Saved</div>
               </div>
-              <div class="stat-value">3</div>
-              <div class="stat-label">Documents in Progress</div>
             </div>
-            <div class="stat-card">
-              <div class="stat-card-header">
-                <div class="stat-icon blue">✍️</div>
+            <div onclick="showTab('esign')" style="flex: 1; min-width: 140px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 8px; padding: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px;">
+              <span style="font-size: 20px;">✍️</span>
+              <div>
+                <div style="font-size: 18px; font-weight: 700;">0</div>
+                <div style="font-size: 11px; color: var(--color-text-muted);">Pending Signatures</div>
               </div>
-              <div class="stat-value">1</div>
-              <div class="stat-label">Pending Signatures</div>
             </div>
-            <div class="stat-card">
-              <div class="stat-card-header">
-                <div class="stat-icon green">✅</div>
+            <div onclick="showTab('compliance')" style="flex: 1; min-width: 140px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 8px; padding: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px;">
+              <span style="font-size: 20px;">🏢</span>
+              <div>
+                <div style="font-size: 18px; font-weight: 700;">0</div>
+                <div style="font-size: 11px; color: var(--color-text-muted);">Entities Tracked</div>
               </div>
-              <div class="stat-value">12</div>
-              <div class="stat-label">Completed Documents</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-card-header">
-                <div class="stat-icon orange">📅</div>
-              </div>
-              <div class="stat-value">2</div>
-              <div class="stat-label">Upcoming Deadlines</div>
             </div>
           </div>
 
-          <h3 class="section-title" style="margin-bottom: 16px;">Quick Actions</h3>
+          <h3 class="section-title" style="margin-bottom: 16px;">What You Can Do</h3>
           <div class="quick-actions">
             <div class="action-card" onclick="showTab('workspace')">
-              <div class="action-icon">📝</div>
-              <div class="action-title">Blank Document</div>
-              <div class="action-desc">Start from scratch or paste existing text</div>
-            </div>
-            <div class="action-card" onclick="showTab('workspace')">
               <div class="action-icon">⚙️</div>
-              <div class="action-title">Use a Generator</div>
-              <div class="action-desc">200+ attorney-drafted templates</div>
+              <div class="action-title">Document Generators</div>
+              <div class="action-desc">NDA, LLC, contracts — fill in blanks, preview live</div>
+            </div>
+            <div class="action-card" onclick="shareCollabLink()">
+              <div class="action-icon">👥</div>
+              <div class="action-title">Live Collaboration</div>
+              <div class="action-desc">Share link, edit together over Zoom</div>
+            </div>
+            <div class="action-card" onclick="showTab('esign')">
+              <div class="action-icon">✍️</div>
+              <div class="action-title">E-Sign & Send</div>
+              <div class="action-desc">Sign yourself or request from others</div>
             </div>
             <div class="action-card" onclick="showTab('compliance')">
-              <div class="action-icon">🏢</div>
-              <div class="action-title">Add Your Entity</div>
-              <div class="action-desc">Track compliance deadlines</div>
-            </div>
-            <div class="action-card" onclick="openEsignModal()">
-              <div class="action-icon">✍️</div>
-              <div class="action-title">Send for Signature</div>
-              <div class="action-desc">E-sign with timestamp</div>
+              <div class="action-icon">📅</div>
+              <div class="action-title">Compliance Calendar</div>
+              <div class="action-desc">Track entity filings, taxes, deadlines</div>
             </div>
           </div>
 
@@ -1323,6 +1330,7 @@
             <div class="doc-editor">
               <div class="generator-loaded-bar" id="generatorLoadedBar">
                 <span><strong id="loadedGeneratorName">LLC Operating Agreement</strong> generator loaded</span>
+                <span class="width-hint">↔ Widen window for side-by-side preview</span>
                 <button onclick="closeGenerator()">Back to blank editor</button>
               </div>
               <div class="editor-toolbar">
@@ -2056,9 +2064,10 @@ You can also paste existing text to edit, or share this workspace link for real-
       iframe.src = embedUrl;
       editorContent.classList.add('with-iframe');
 
-      // Show loaded bar
+      // Show loaded bar, hide toolbar
       document.getElementById('loadedGeneratorName').textContent = name;
       document.getElementById('generatorLoadedBar').classList.add('visible');
+      document.querySelector('.doc-editor').classList.add('has-generator');
     }
 
     function closeGenerator() {
@@ -2071,6 +2080,7 @@ You can also paste existing text to edit, or share this workspace link for real-
 
       editorContent.classList.remove('with-iframe');
       document.getElementById('generatorLoadedBar').classList.remove('visible');
+      document.querySelector('.doc-editor').classList.remove('has-generator');
 
       // Activate blank document option
       document.querySelectorAll('.generator-item').forEach(i => i.classList.remove('active'));
