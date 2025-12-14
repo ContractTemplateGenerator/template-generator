@@ -1,0 +1,1861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>What's Your Case Worth? | Free Legal Case Calculator | Terms.Law</title>
+  <meta name="description" content="Free calculator to find out what your legal case is worth. See expected recovery amounts, settlement ranges, success probability, and whether pursuing your case makes financial sense.">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Case Value Calculator - Is Your Case Worth Pursuing?">
+  <meta property="og:description" content="Interactive calculator showing expected outcomes, costs, and whether pursuing your case makes financial sense.">
+  <meta property="og:type" content="website">
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-901N2Y3CDZ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-901N2Y3CDZ');
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --color-primary: #2563eb;
+      --color-primary-dark: #1d4ed8;
+      --color-success: #10b981;
+      --color-success-light: #d1fae5;
+      --color-warning: #f59e0b;
+      --color-warning-light: #fef3c7;
+      --color-danger: #ef4444;
+      --color-danger-light: #fee2e2;
+      --color-bg: #f8fafc;
+      --color-surface: #ffffff;
+      --color-border: #e2e8f0;
+      --color-text: #0f172a;
+      --color-text-secondary: #475569;
+      --color-text-muted: #94a3b8;
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-sans);
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--color-text);
+      background: var(--color-bg);
+      min-height: 100vh;
+    }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+
+    /* Header */
+    .site-header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      padding: 1rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    .site-header .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: white;
+      text-decoration: none;
+    }
+    .logo span { color: #60a5fa; }
+    .header-cta {
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      color: white;
+      padding: 0.5rem 1.25rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .header-cta:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+    }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #312e81 100%);
+      color: white;
+      padding: 2.5rem 0 3rem;
+      text-align: center;
+    }
+    .hero h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 0.75rem;
+      line-height: 1.2;
+    }
+    .hero p {
+      font-size: 1.1rem;
+      color: rgba(255,255,255,0.8);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .case-type-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 6px 16px;
+      border-radius: 100px;
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+    }
+
+    /* Calculator Card */
+    .calc-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      margin: -2rem auto 2rem;
+      max-width: 1100px;
+      overflow: hidden;
+    }
+
+    /* Progress Steps */
+    .progress-bar {
+      display: flex;
+      background: #f1f5f9;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .progress-step {
+      flex: 1;
+      padding: 1rem;
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      position: relative;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .progress-step.active {
+      color: var(--color-primary);
+      background: white;
+    }
+    .progress-step.completed {
+      color: var(--color-success);
+    }
+    .progress-step::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: transparent;
+    }
+    .progress-step.active::after {
+      background: var(--color-primary);
+    }
+    .progress-step.completed::after {
+      background: var(--color-success);
+    }
+    .step-num {
+      display: inline-flex;
+      width: 24px;
+      height: 24px;
+      align-items: center;
+      justify-content: center;
+      background: #e2e8f0;
+      border-radius: 50%;
+      font-size: 0.75rem;
+      margin-right: 0.5rem;
+    }
+    .progress-step.active .step-num {
+      background: var(--color-primary);
+      color: white;
+    }
+    .progress-step.completed .step-num {
+      background: var(--color-success);
+      color: white;
+    }
+
+    /* Sections */
+    .calc-section {
+      padding: 2rem;
+      display: none;
+    }
+    .calc-section.active {
+      display: block;
+    }
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--color-text);
+    }
+    .section-subtitle {
+      font-size: 0.9rem;
+      color: var(--color-text-secondary);
+      margin-bottom: 1.5rem;
+    }
+
+    /* Legal Insight Box */
+    .legal-insight {
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      border: 1px solid #bfdbfe;
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+      display: none;
+    }
+    .legal-insight.visible {
+      display: block;
+    }
+    .legal-insight-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .legal-insight-icon {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #2563eb;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+    .legal-insight-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #1e40af;
+    }
+    .legal-insight-content {
+      font-size: 0.85rem;
+      color: #1e3a5f;
+      line-height: 1.6;
+    }
+    .legal-insight-content strong {
+      color: #1e40af;
+    }
+
+    /* Form Elements */
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    .form-label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 0.5rem;
+      color: var(--color-text);
+    }
+    .form-label .tooltip-trigger {
+      display: inline-flex;
+      width: 18px;
+      height: 18px;
+      align-items: center;
+      justify-content: center;
+      background: #e2e8f0;
+      border-radius: 50%;
+      font-size: 0.7rem;
+      color: var(--color-text-muted);
+      cursor: help;
+      margin-left: 0.5rem;
+      position: relative;
+    }
+    .form-label .tooltip-trigger:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e293b;
+      color: white;
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 400;
+      white-space: normal;
+      max-width: 280px;
+      z-index: 100;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    /* Amount Input */
+    .amount-input-wrap {
+      position: relative;
+    }
+    .amount-input-wrap::before {
+      content: '$';
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--color-text-muted);
+    }
+    .amount-input {
+      width: 100%;
+      max-width: 400px;
+      padding: 1rem 1rem 1rem 2.5rem;
+      font-size: 1.75rem;
+      font-weight: 700;
+      border: 2px solid var(--color-border);
+      border-radius: 12px;
+      font-family: var(--font-sans);
+      transition: border-color 0.2s;
+    }
+    .amount-input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+    }
+
+    /* Option Buttons */
+    .options-row {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .option-btn {
+      flex: 1;
+      min-width: 100px;
+      padding: 0.875rem 1rem;
+      border: 2px solid var(--color-border);
+      border-radius: 10px;
+      background: white;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--color-text);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .option-btn:hover {
+      border-color: var(--color-primary);
+      background: #f8faff;
+    }
+    .option-btn.selected {
+      border-color: var(--color-primary);
+      background: var(--color-primary);
+      color: white;
+    }
+    .option-btn.positive.selected {
+      background: var(--color-success);
+      border-color: var(--color-success);
+    }
+    .option-btn.negative.selected {
+      background: var(--color-danger);
+      border-color: var(--color-danger);
+    }
+    .option-btn.neutral.selected {
+      background: var(--color-warning);
+      border-color: var(--color-warning);
+    }
+
+    /* Slider */
+    .slider-container {
+      padding: 0.5rem 0;
+    }
+    .slider-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+      margin-bottom: 0.5rem;
+    }
+    input[type="range"] {
+      width: 100%;
+      -webkit-appearance: none;
+      background: transparent;
+      margin: 0;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 24px;
+      height: 24px;
+      background: white;
+      border: 3px solid var(--color-primary);
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      margin-top: -8px;
+    }
+    input[type="range"]::-webkit-slider-runnable-track {
+      height: 8px;
+      background: linear-gradient(90deg, #fee2e2 0%, #fef3c7 50%, #d1fae5 100%);
+      border-radius: 4px;
+    }
+
+    /* Navigation */
+    .calc-nav {
+      display: flex;
+      justify-content: space-between;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--color-border);
+      margin-top: 1.5rem;
+    }
+    .btn {
+      padding: 0.875rem 1.75rem;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .btn-secondary {
+      background: #f1f5f9;
+      color: var(--color-text-secondary);
+    }
+    .btn-secondary:hover {
+      background: #e2e8f0;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--color-primary), #7c3aed);
+      color: white;
+    }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+    .btn-success {
+      background: linear-gradient(135deg, var(--color-success), #059669);
+      color: white;
+    }
+
+    /* ========== RESULTS SECTION ========== */
+    .results-container {
+      padding: 0;
+    }
+
+    /* Verdict Banner */
+    .verdict-banner {
+      padding: 2rem;
+      text-align: center;
+      border-radius: 0;
+    }
+    .verdict-banner.positive {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+    }
+    .verdict-banner.neutral {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: white;
+    }
+    .verdict-banner.negative {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: white;
+    }
+    .verdict-icon {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+    }
+    .verdict-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+    .verdict-subtitle {
+      font-size: 1rem;
+      opacity: 0.9;
+    }
+
+    /* Key Numbers */
+    .key-numbers {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .key-number {
+      padding: 2rem;
+      text-align: center;
+      border-right: 1px solid var(--color-border);
+    }
+    .key-number:last-child {
+      border-right: none;
+    }
+    .key-number .value {
+      font-size: 2.25rem;
+      font-weight: 800;
+      color: var(--color-text);
+    }
+    .key-number .value.positive { color: var(--color-success); }
+    .key-number .value.negative { color: var(--color-danger); }
+    .key-number .value.warning { color: var(--color-warning); }
+    .key-number .label {
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+      margin-top: 0.25rem;
+    }
+
+    /* Gauge Section */
+    .gauge-section {
+      padding: 1.5rem 2rem;
+      text-align: center;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .gauge-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+      margin-bottom: 1rem;
+    }
+    .gauge-container {
+      position: relative;
+      width: 200px;
+      height: 110px;
+      margin: 0 auto;
+    }
+    .gauge-bg {
+      position: absolute;
+      width: 200px;
+      height: 100px;
+      border-radius: 100px 100px 0 0;
+      background: linear-gradient(90deg, #ef4444 0%, #f59e0b 35%, #10b981 100%);
+      overflow: hidden;
+    }
+    .gauge-bg::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 20px;
+      right: 20px;
+      height: 60px;
+      background: white;
+      border-radius: 60px 60px 0 0;
+    }
+    .gauge-needle {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 4px;
+      height: 70px;
+      background: #1e293b;
+      transform-origin: bottom center;
+      transform: translateX(-50%) rotate(-90deg);
+      border-radius: 2px;
+      transition: transform 0.8s ease-out;
+    }
+    .gauge-center {
+      position: absolute;
+      bottom: -5px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 16px;
+      height: 16px;
+      background: #1e293b;
+      border-radius: 50%;
+    }
+    .gauge-labels {
+      display: flex;
+      justify-content: space-between;
+      width: 200px;
+      margin: 0 auto;
+      font-size: 0.7rem;
+      color: var(--color-text-muted);
+    }
+
+    /* Legal Analysis Section */
+    .legal-analysis-section {
+      padding: 1.5rem 2rem;
+      background: #f8fafc;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .legal-analysis-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: var(--color-text);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .legal-analysis-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .legal-card {
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+      padding: 1rem;
+    }
+    .legal-card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .legal-card-icon {
+      font-size: 1.1rem;
+    }
+    .legal-card-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--color-text);
+    }
+    .legal-card-content {
+      font-size: 0.8rem;
+      color: var(--color-text-secondary);
+      line-height: 1.5;
+    }
+
+    /* Outcome Bars */
+    .outcomes-section {
+      padding: 1.5rem 2rem;
+    }
+    .outcomes-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .outcome-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+      gap: 1rem;
+    }
+    .outcome-label {
+      width: 120px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+    }
+    .outcome-bar-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .outcome-bar-bg {
+      flex: 1;
+      height: 36px;
+      background: #f1f5f9;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+    }
+    .outcome-bar {
+      height: 100%;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 12px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: white;
+      transition: width 0.5s ease;
+    }
+    .outcome-bar.zero { background: #94a3b8; }
+    .outcome-bar.lowball { background: #f59e0b; }
+    .outcome-bar.partial { background: #3b82f6; }
+    .outcome-bar.full { background: #10b981; }
+    .outcome-amount {
+      width: 90px;
+      text-align: right;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--color-text);
+    }
+
+    /* Stacked Bar */
+    .stacked-bar-section {
+      padding: 0 2rem 1.5rem;
+    }
+    .stacked-bar-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      margin-bottom: 0.75rem;
+    }
+    .stacked-bar {
+      height: 50px;
+      display: flex;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .stacked-segment {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: white;
+      transition: all 0.3s;
+    }
+    .stacked-segment.zero { background: #94a3b8; }
+    .stacked-segment.lowball { background: #f59e0b; }
+    .stacked-segment.partial { background: #3b82f6; }
+    .stacked-segment.full { background: #10b981; }
+    .stacked-legend {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 0.75rem;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.75rem;
+      color: var(--color-text-secondary);
+    }
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+    }
+    .legend-dot.zero { background: #94a3b8; }
+    .legend-dot.lowball { background: #f59e0b; }
+    .legend-dot.partial { background: #3b82f6; }
+    .legend-dot.full { background: #10b981; }
+
+    /* Settlement Range */
+    .settlement-section {
+      padding: 1.5rem 2rem;
+      background: #f0fdf4;
+      border-top: 1px solid #bbf7d0;
+      border-bottom: 1px solid #bbf7d0;
+    }
+    .settlement-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: #166534;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .settlement-range {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      justify-content: center;
+    }
+    .settlement-value {
+      text-align: center;
+    }
+    .settlement-value .amount {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #166534;
+    }
+    .settlement-value .label {
+      font-size: 0.75rem;
+      color: #166534;
+      opacity: 0.8;
+    }
+    .settlement-arrow {
+      font-size: 1.5rem;
+      color: #22c55e;
+    }
+
+    /* Comparison Cards */
+    .comparison-section {
+      padding: 1.5rem 2rem;
+      background: #f8fafc;
+      border-top: 1px solid var(--color-border);
+    }
+    .comparison-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    .comparison-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+    .comparison-card {
+      background: white;
+      border: 2px solid var(--color-border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .comparison-card.recommended {
+      border-color: var(--color-success);
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+    .comparison-card.recommended::before {
+      content: 'RECOMMENDED';
+      display: block;
+      background: var(--color-success);
+      color: white;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin: -0.5rem auto 0.75rem;
+      width: fit-content;
+    }
+    .card-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+    .card-cost {
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+      margin-bottom: 0.75rem;
+    }
+    .card-expected {
+      font-size: 1.25rem;
+      font-weight: 800;
+      margin-bottom: 0.25rem;
+    }
+    .card-expected.positive { color: var(--color-success); }
+    .card-expected.negative { color: var(--color-danger); }
+    .card-expected.neutral { color: var(--color-warning); }
+    .card-label {
+      font-size: 0.7rem;
+      color: var(--color-text-muted);
+    }
+
+    /* CTA Section */
+    .cta-section {
+      padding: 2rem;
+      text-align: center;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: white;
+    }
+    .cta-section h3 {
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+    .cta-section p {
+      color: rgba(255,255,255,0.8);
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+    }
+    .cta-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .cta-btn {
+      padding: 0.875rem 1.75rem;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .cta-btn-primary {
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      color: white;
+    }
+    .cta-btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+    }
+    .cta-btn-secondary {
+      background: rgba(255,255,255,0.1);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+    .cta-btn-secondary:hover {
+      background: rgba(255,255,255,0.2);
+    }
+
+    /* Disclaimer */
+    .disclaimer {
+      padding: 1rem 2rem;
+      background: #f8fafc;
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      text-align: center;
+      border-top: 1px solid var(--color-border);
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .comparison-cards { grid-template-columns: 1fr; }
+      .legal-analysis-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      .options-row { flex-direction: column; }
+      .option-btn { min-width: auto; }
+      .key-numbers { grid-template-columns: 1fr; }
+      .key-number { border-right: none; border-bottom: 1px solid var(--color-border); }
+      .outcome-row { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+      .outcome-label { width: auto; }
+      .progress-step span:not(.step-num) { display: none; }
+      .settlement-range { flex-direction: column; }
+    }
+
+    /* Animation */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .calc-section.active {
+      animation: fadeIn 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container">
+      <a href="https://terms.law" class="logo">Terms<span>.Law</span></a>
+      <a href="https://terms.law/#contact" class="header-cta">Get a Free Quote</a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="case-type-badge" id="caseTypeBadge">
+        <span id="caseTypeIcon">&#9878;</span>
+        <span id="caseTypeLabel">Case Evaluation</span>
+      </div>
+      <h1>What's Your Case Worth?</h1>
+      <p>Get your expected recovery amount, settlement range, and success probability in 60 seconds.</p>
+    </div>
+  </section>
+
+  <!-- Calculator -->
+  <div class="calc-card">
+    <!-- Progress -->
+    <div class="progress-bar">
+      <div class="progress-step active" data-step="1">
+        <span class="step-num">1</span>
+        <span>Your Claim</span>
+      </div>
+      <div class="progress-step" data-step="2">
+        <span class="step-num">2</span>
+        <span>Evidence</span>
+      </div>
+      <div class="progress-step" data-step="3">
+        <span class="step-num">3</span>
+        <span>Other Side</span>
+      </div>
+      <div class="progress-step" data-step="4">
+        <span class="step-num">4</span>
+        <span>Results</span>
+      </div>
+    </div>
+
+    <!-- Step 1: Claim Details -->
+    <div class="calc-section active" id="step1">
+      <h2 class="section-title">Tell us about your claim</h2>
+      <p class="section-subtitle">We'll calculate your expected value and settlement range.</p>
+
+      <div class="form-group">
+        <label class="form-label">
+          How much money is at stake?
+          <span class="tooltip-trigger" data-tooltip="Enter the full amount in dispute, before any negotiations or partial payments.">?</span>
+        </label>
+        <div class="amount-input-wrap">
+          <input type="text" class="amount-input" id="claimAmount" placeholder="5,000" value="">
+        </div>
+      </div>
+
+      <!-- Legal Insight - case specific -->
+      <div class="legal-insight visible" id="step1Insight">
+        <div class="legal-insight-header">
+          <div class="legal-insight-icon">&#9878;</div>
+          <div class="legal-insight-title" id="step1InsightTitle">Legal Framework</div>
+        </div>
+        <div class="legal-insight-content" id="step1InsightContent">
+          <!-- Populated by case type -->
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          Do you have written documentation?
+          <span class="tooltip-trigger" data-tooltip="Contracts, invoices, emails, text messages, receipts showing what was agreed.">?</span>
+        </label>
+        <div class="options-row">
+          <button class="option-btn positive" data-field="hasContract" data-value="yes">Yes, clear written terms</button>
+          <button class="option-btn neutral" data-field="hasContract" data-value="partial">Some writing, but incomplete</button>
+          <button class="option-btn negative" data-field="hasContract" data-value="no">Mostly verbal</button>
+        </div>
+      </div>
+
+      <div class="calc-nav">
+        <div></div>
+        <button class="btn btn-primary" onclick="nextStep(2)">Continue <span>&#8594;</span></button>
+      </div>
+    </div>
+
+    <!-- Step 2: Evidence -->
+    <div class="calc-section" id="step2">
+      <h2 class="section-title">How strong is your evidence?</h2>
+      <p class="section-subtitle">Good documentation significantly improves outcomes.</p>
+
+      <div class="legal-insight visible">
+        <div class="legal-insight-header">
+          <div class="legal-insight-icon">&#128203;</div>
+          <div class="legal-insight-title">Why Evidence Matters</div>
+        </div>
+        <div class="legal-insight-content">
+          <strong>Evidence is the backbone of any successful claim.</strong> Written documentation proves what was agreed and creates leverage in negotiations. Without it, disputes become "he said/she said" situations that are harder to win and settle for less.
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          Can you clearly prove what was promised?
+          <span class="tooltip-trigger" data-tooltip="Screenshots, emails, texts, or contracts showing what the other side committed to.">?</span>
+        </label>
+        <div class="options-row">
+          <button class="option-btn positive" data-field="proofPromise" data-value="yes">Yes, I have clear proof</button>
+          <button class="option-btn neutral" data-field="proofPromise" data-value="partial">I have some evidence</button>
+          <button class="option-btn negative" data-field="proofPromise" data-value="no">It's mostly my word</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          Has the other side admitted anything helpful?
+          <span class="tooltip-trigger" data-tooltip="Any messages where they acknowledge the problem, apologize, or offer partial resolution.">?</span>
+        </label>
+        <div class="options-row">
+          <button class="option-btn positive" data-field="admissions" data-value="yes">Yes, they admitted fault</button>
+          <button class="option-btn neutral" data-field="admissions" data-value="partial">Kind of / vague acknowledgment</button>
+          <button class="option-btn negative" data-field="admissions" data-value="no">No, they deny everything</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          Is the amount you're owed clearly calculable?
+          <span class="tooltip-trigger" data-tooltip="Can you show the exact dollar amount through invoices, receipts, or a clear calculation?">?</span>
+        </label>
+        <div class="options-row">
+          <button class="option-btn positive" data-field="damagesClear" data-value="yes">Yes, exact amount documented</button>
+          <button class="option-btn neutral" data-field="damagesClear" data-value="partial">Roughly calculable</button>
+          <button class="option-btn negative" data-field="damagesClear" data-value="no">Hard to calculate precisely</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          How long ago did this happen?
+          <span class="tooltip-trigger" data-tooltip="More recent disputes typically have better outcomes and more options.">?</span>
+        </label>
+        <div class="options-row">
+          <button class="option-btn positive" data-field="timeAgo" data-value="recent">Less than 3 months</button>
+          <button class="option-btn neutral" data-field="timeAgo" data-value="moderate">3-12 months</button>
+          <button class="option-btn negative" data-field="timeAgo" data-value="old">Over a year ago</button>
+        </div>
+      </div>
+
+      <div class="calc-nav">
+        <button class="btn btn-secondary" onclick="prevStep(1)"><span>&#8592;</span> Back</button>
+        <button class="btn btn-primary" onclick="nextStep(3)">Continue <span>&#8594;</span></button>
+      </div>
+    </div>
+
+    <!-- Step 3: Other Side -->
+    <div class="calc-section" id="step3">
+      <h2 class="section-title">About the other party</h2>
+      <p class="section-subtitle">This helps us assess how likely they are to respond and what leverage you have.</p>
+
+      <div class="legal-insight visible">
+        <div class="legal-insight-header">
+          <div class="legal-insight-icon">&#128200;</div>
+          <div class="legal-insight-title">Your Negotiating Leverage</div>
+        </div>
+        <div class="legal-insight-content">
+          <strong>Leverage determines negotiating power.</strong> Your leverage depends on: (1) <strong>Alternative remedies</strong> like chargebacks or regulatory complaints; (2) <strong>Credible litigation threat</strong>; (3) <strong>Reputational pressure</strong> - reviews and exposure. The more options you have, the more seriously they take your demand.
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Who are you dealing with?</label>
+        <div class="options-row">
+          <button class="option-btn" data-field="opponentType" data-value="bigCompany">Established Company</button>
+          <button class="option-btn" data-field="opponentType" data-value="smallBusiness">Small Business</button>
+          <button class="option-btn" data-field="opponentType" data-value="individual">Individual / Freelancer</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          How have they responded so far?
+          <span class="tooltip-trigger" data-tooltip="Their communication style predicts how they'll respond to formal demands.">?</span>
+        </label>
+        <div class="options-row">
+          <button class="option-btn positive" data-field="priorResponse" data-value="responsive">Responsive, trying to work it out</button>
+          <button class="option-btn neutral" data-field="priorResponse" data-value="slow">Slow / making excuses</button>
+          <button class="option-btn negative" data-field="priorResponse" data-value="hostile">Ignoring me or hostile</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          Have they already paid or refunded anything?
+          <span class="tooltip-trigger" data-tooltip="Partial payments affect the remaining amount in dispute and can indicate willingness to settle.">?</span>
+        </label>
+        <div class="options-row">
+          <button class="option-btn positive" data-field="partialOffer" data-value="significant">Yes, more than half</button>
+          <button class="option-btn neutral" data-field="partialOffer" data-value="some">Yes, some but less than half</button>
+          <button class="option-btn negative" data-field="partialOffer" data-value="no">No, nothing at all</button>
+        </div>
+      </div>
+
+      <div class="form-group" id="chargebackQuestion">
+        <label class="form-label">
+          Can you dispute the payment with your bank/PayPal/platform?
+          <span class="tooltip-trigger" data-tooltip="If chargeback or platform dispute is available, it changes your leverage significantly.">?</span>
+        </label>
+        <div class="options-row">
+          <button class="option-btn positive" data-field="chargebackAvail" data-value="yes">Yes, still within window</button>
+          <button class="option-btn neutral" data-field="chargebackAvail" data-value="maybe">Not sure</button>
+          <button class="option-btn negative" data-field="chargebackAvail" data-value="no">No / Not applicable</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          Would you file in small claims court if they ignore you?
+          <span class="tooltip-trigger" data-tooltip="Claims work best when the other side believes you'll follow through.">?</span>
+        </label>
+        <div class="options-row">
+          <button class="option-btn positive" data-field="willingToSue" data-value="yes">Yes, I would follow through</button>
+          <button class="option-btn neutral" data-field="willingToSue" data-value="maybe">Maybe, depends on cost</button>
+          <button class="option-btn negative" data-field="willingToSue" data-value="no">Probably not</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">
+          How much hassle are you willing to deal with?
+        </label>
+        <div class="slider-container">
+          <div class="slider-labels">
+            <span>Just want it over ($0)</span>
+            <span>Moderate effort ($250)</span>
+            <span>I'll fight ($500+)</span>
+          </div>
+          <input type="range" id="hassleSlider" min="0" max="500" value="250" step="50">
+        </div>
+      </div>
+
+      <div class="calc-nav">
+        <button class="btn btn-secondary" onclick="prevStep(2)"><span>&#8592;</span> Back</button>
+        <button class="btn btn-success" onclick="calculateResults()">See My Results <span>&#8594;</span></button>
+      </div>
+    </div>
+
+    <!-- Step 4: Results -->
+    <div class="calc-section results-container" id="step4">
+      <!-- Verdict Banner -->
+      <div class="verdict-banner positive" id="verdictBanner">
+        <div class="verdict-icon" id="verdictIcon">&#10003;</div>
+        <div class="verdict-title" id="verdictTitle">Worth Pursuing</div>
+        <div class="verdict-subtitle" id="verdictSubtitle">Your expected net benefit is positive.</div>
+      </div>
+
+      <!-- Key Numbers -->
+      <div class="key-numbers">
+        <div class="key-number">
+          <div class="value positive" id="expectedValue">+$1,250</div>
+          <div class="label">Expected Value</div>
+        </div>
+        <div class="key-number">
+          <div class="value" id="successOdds">65%</div>
+          <div class="label">Success Probability</div>
+        </div>
+        <div class="key-number">
+          <div class="value" id="breakEvenOdds">30%</div>
+          <div class="label">Break-Even Threshold</div>
+        </div>
+      </div>
+
+      <!-- Gauge -->
+      <div class="gauge-section">
+        <div class="gauge-title">Overall Success Probability</div>
+        <div class="gauge-container">
+          <div class="gauge-bg"></div>
+          <div class="gauge-needle" id="gaugeNeedle"></div>
+          <div class="gauge-center"></div>
+        </div>
+        <div class="gauge-labels">
+          <span>0%</span>
+          <span>50%</span>
+          <span>100%</span>
+        </div>
+      </div>
+
+      <!-- Settlement Range -->
+      <div class="settlement-section">
+        <h3 class="settlement-title">&#128176; Typical Settlement Range</h3>
+        <div class="settlement-range">
+          <div class="settlement-value">
+            <div class="amount" id="settlementLow">$1,500</div>
+            <div class="label">Low End</div>
+          </div>
+          <div class="settlement-arrow">&#8594;</div>
+          <div class="settlement-value">
+            <div class="amount" id="settlementMid">$3,000</div>
+            <div class="label">Likely</div>
+          </div>
+          <div class="settlement-arrow">&#8594;</div>
+          <div class="settlement-value">
+            <div class="amount" id="settlementHigh">$4,500</div>
+            <div class="label">High End</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Outcome Bars -->
+      <div class="outcomes-section">
+        <h3 class="outcomes-title">&#128200; Possible Outcomes</h3>
+        <div class="outcome-row">
+          <div class="outcome-label">No Recovery</div>
+          <div class="outcome-bar-wrap">
+            <div class="outcome-bar-bg">
+              <div class="outcome-bar zero" id="barZero" style="width: 35%">35%</div>
+            </div>
+            <div class="outcome-amount">$0</div>
+          </div>
+        </div>
+        <div class="outcome-row">
+          <div class="outcome-label">Lowball Offer</div>
+          <div class="outcome-bar-wrap">
+            <div class="outcome-bar-bg">
+              <div class="outcome-bar lowball" id="barLowball" style="width: 20%">20%</div>
+            </div>
+            <div class="outcome-amount" id="amountLowball">$500</div>
+          </div>
+        </div>
+        <div class="outcome-row">
+          <div class="outcome-label">Partial Settlement</div>
+          <div class="outcome-bar-wrap">
+            <div class="outcome-bar-bg">
+              <div class="outcome-bar partial" id="barPartial" style="width: 30%">30%</div>
+            </div>
+            <div class="outcome-amount" id="amountPartial">$2,500</div>
+          </div>
+        </div>
+        <div class="outcome-row">
+          <div class="outcome-label">Full/Near-Full</div>
+          <div class="outcome-bar-wrap">
+            <div class="outcome-bar-bg">
+              <div class="outcome-bar full" id="barFull" style="width: 15%">15%</div>
+            </div>
+            <div class="outcome-amount" id="amountFull">$4,750</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stacked Bar -->
+      <div class="stacked-bar-section">
+        <div class="stacked-bar-title">Outcome Distribution</div>
+        <div class="stacked-bar" id="stackedBar">
+          <div class="stacked-segment zero" style="width: 35%">35%</div>
+          <div class="stacked-segment lowball" style="width: 20%">20%</div>
+          <div class="stacked-segment partial" style="width: 30%">30%</div>
+          <div class="stacked-segment full" style="width: 15%">15%</div>
+        </div>
+        <div class="stacked-legend">
+          <div class="legend-item"><div class="legend-dot zero"></div> No Recovery</div>
+          <div class="legend-item"><div class="legend-dot lowball"></div> Lowball</div>
+          <div class="legend-item"><div class="legend-dot partial"></div> Partial</div>
+          <div class="legend-item"><div class="legend-dot full"></div> Full</div>
+        </div>
+      </div>
+
+      <!-- Legal Analysis -->
+      <div class="legal-analysis-section">
+        <h3 class="legal-analysis-title">&#9878; Legal Analysis</h3>
+        <div class="legal-analysis-grid" id="legalAnalysisGrid">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Comparison Cards -->
+      <div class="comparison-section">
+        <h3 class="comparison-title">Compare Your Options</h3>
+        <div class="comparison-cards" id="comparisonCards">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <div class="cta-section">
+        <h3 id="ctaTitle">Ready to Move Forward?</h3>
+        <p id="ctaText">Based on your inputs, pursuing this case appears to be a good investment.</p>
+        <div class="cta-buttons">
+          <a href="https://terms.law/#contact" class="cta-btn cta-btn-primary" id="ctaPrimary">
+            Get Started
+          </a>
+          <a href="https://terms.law" class="cta-btn cta-btn-secondary">
+            Learn More
+          </a>
+        </div>
+      </div>
+
+      <!-- Disclaimer -->
+      <div class="disclaimer">
+        This calculator provides estimates for educational purposes only. Results vary based on specific facts.
+        This is not legal advice and does not create an attorney-client relationship.
+      </div>
+
+      <!-- Navigation -->
+      <div class="calc-nav" style="padding: 1.5rem 2rem; border-top: none;">
+        <button class="btn btn-secondary" onclick="prevStep(3)"><span>&#8592;</span> Adjust Inputs</button>
+        <button class="btn btn-primary" onclick="resetCalculator()">Start Over</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer style="background: #0f172a; color: rgba(255,255,255,0.6); padding: 2rem 0; text-align: center; font-size: 0.875rem;">
+    <div class="container">
+      <p>&copy; 2024 <a href="https://terms.law" style="color: #60a5fa; text-decoration: none;">Terms.Law</a> - Sergei Tokmakov, Esq. | <a href="https://apps.calbar.ca.gov/attorney/Licensee/Detail/279869" style="color: #60a5fa; text-decoration: none;">CA Bar #279869</a></p>
+    </div>
+  </footer>
+
+  <script>
+    // Case type configurations
+    const caseTypes = {
+      'unpaid-invoice': {
+        icon: '&#128196;',
+        label: 'Unpaid Invoice',
+        title: 'Unpaid Invoice Recovery',
+        insightTitle: 'Invoice Collection Framework',
+        insight: `<strong>Unpaid invoices are straightforward breach of contract claims.</strong> Most states allow recovery of the unpaid amount plus interest (typically 10-18% annually). If you have a written agreement with attorney's fee provisions, you may recover legal costs too. <strong>Key evidence:</strong> signed contracts, purchase orders, delivery confirmations, and written acknowledgments.`,
+        letterCost: 450,
+        baseProb: 0.45,
+        options: [
+          { icon: '&#128221;', title: 'Demand Letter', cost: '$450', desc: 'Attorney letterhead, payment deadline' },
+          { icon: '&#127963;', title: 'Small Claims', cost: '$75-200 + filing', desc: 'File yourself with ghostwriting help' },
+          { icon: '&#9878;', title: 'Collection Agency', cost: '25-50% of recovery', desc: 'For older debts' }
+        ]
+      },
+      'contractor': {
+        icon: '&#128295;',
+        label: 'Contractor Dispute',
+        title: 'Contractor Didn\'t Deliver',
+        insightTitle: 'Contractor Dispute Framework',
+        insight: `<strong>Contractor disputes often involve licensing leverage.</strong> Unlicensed contractors in many states cannot enforce contracts or collect payment. <strong>Consumer remedies</strong> include refunds for unperformed work, cost to complete, and damages for defective work. Many states have licensing board complaint processes that provide alternative resolution.`,
+        letterCost: 450,
+        baseProb: 0.50,
+        options: [
+          { icon: '&#128221;', title: 'Demand Letter', cost: '$450', desc: 'Threatens licensing complaint' },
+          { icon: '&#127970;', title: 'CSLB Complaint', cost: 'Free', desc: 'Licensing board complaint (CA)' },
+          { icon: '&#127963;', title: 'Small Claims', cost: '$75-200 + filing', desc: 'For amounts up to $12,500' }
+        ]
+      },
+      'deposit': {
+        icon: '&#127968;',
+        label: 'Security Deposit',
+        title: 'Security Deposit Not Returned',
+        insightTitle: 'Security Deposit Law',
+        insight: `<strong>Security deposit laws heavily favor tenants.</strong> Many states require landlords to return deposits within 14-30 days with itemized deductions, or face <strong>penalties of 2-3x the deposit amount</strong>. Normal wear and tear cannot be deducted. Landlords must prove damages with photos and receipts. These statutory penalties make deposit claims particularly strong.`,
+        letterCost: 350,
+        baseProb: 0.55,
+        options: [
+          { icon: '&#128221;', title: 'Demand Letter', cost: '$350', desc: 'Cites security deposit statutes' },
+          { icon: '&#127963;', title: 'Small Claims', cost: '$75-200 + filing', desc: 'Can recover up to 2-3x deposit' },
+          { icon: '&#127970;', title: 'Housing Authority', cost: 'Free', desc: 'File complaint if applicable' }
+        ]
+      },
+      'refund': {
+        icon: '&#128722;',
+        label: 'Refund',
+        title: 'Need a Refund',
+        insightTitle: 'Consumer Purchase Disputes',
+        insight: `<strong>Consumer protection laws may apply.</strong> Under state consumer protection statutes, you may be entitled to not just a refund but also <strong>attorney's fees and statutory damages</strong> if the seller engaged in deceptive practices. <strong>Chargeback rights</strong> under the Fair Credit Billing Act give you 60 days to dispute charges for goods not received or significantly different.`,
+        letterCost: 400,
+        baseProb: 0.40,
+        options: [
+          { icon: '&#128179;', title: 'Chargeback', cost: 'Free', desc: 'If paid by card within 60-120 days' },
+          { icon: '&#128172;', title: 'Platform Dispute', cost: 'Free', desc: 'PayPal, Affirm, etc.' },
+          { icon: '&#128221;', title: 'Demand Letter', cost: '$400', desc: 'When other options exhausted' }
+        ]
+      },
+      'breach': {
+        icon: '&#9878;',
+        label: 'Contract Breach',
+        title: 'Contract Breach',
+        insightTitle: 'Breach of Contract Framework',
+        insight: `<strong>Contract enforcement requires proving: (1) valid agreement, (2) your performance, (3) their breach, and (4) your damages.</strong> Written contracts are strongest, but oral agreements are enforceable for amounts under the Statute of Frauds threshold. Email and text exchanges can prove oral contract terms. Courts award expectation damages.`,
+        letterCost: 450,
+        baseProb: 0.45,
+        options: [
+          { icon: '&#128221;', title: 'Demand Letter', cost: '$450', desc: 'Formal notice of breach' },
+          { icon: '&#127963;', title: 'Small Claims', cost: '$75-200 + filing', desc: 'For amounts up to $12,500' },
+          { icon: '&#9878;', title: 'Consultation', cost: '$240/hr', desc: 'Assess litigation options' }
+        ]
+      },
+      'default': {
+        icon: '&#9878;',
+        label: 'Case Evaluation',
+        title: 'Legal Case Evaluation',
+        insightTitle: 'Case Assessment',
+        insight: `<strong>Every case depends on evidence, applicable law, and the other side's ability to pay.</strong> This calculator helps you understand whether pursuing your case makes financial sense based on typical outcomes for similar disputes.`,
+        letterCost: 450,
+        baseProb: 0.40,
+        options: [
+          { icon: '&#128221;', title: 'Demand Letter', cost: '$450', desc: 'Formal legal demand' },
+          { icon: '&#127963;', title: 'Small Claims', cost: '$75-200 + filing', desc: 'For amounts up to $12,500' },
+          { icon: '&#9878;', title: 'Consultation', cost: '$240/hr', desc: 'Discuss your options' }
+        ]
+      }
+    };
+
+    // State
+    const state = {
+      currentStep: 1,
+      caseType: 'default',
+      claimAmount: 0,
+      hasContract: '',
+      proofPromise: '',
+      admissions: '',
+      damagesClear: '',
+      timeAgo: '',
+      opponentType: '',
+      priorResponse: '',
+      partialOffer: '',
+      chargebackAvail: '',
+      willingToSue: '',
+      hassleValue: 250
+    };
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      // Get case type from URL
+      const params = new URLSearchParams(window.location.search);
+      const caseType = params.get('type') || 'default';
+      state.caseType = caseTypes[caseType] ? caseType : 'default';
+
+      // Update UI for case type
+      updateCaseTypeUI();
+
+      // Amount input formatting
+      const amountInput = document.getElementById('claimAmount');
+      amountInput.addEventListener('input', (e) => {
+        let value = e.target.value.replace(/[^0-9]/g, '');
+        if (value) {
+          state.claimAmount = parseInt(value);
+          e.target.value = parseInt(value).toLocaleString();
+        } else {
+          state.claimAmount = 0;
+          e.target.value = '';
+        }
+      });
+
+      // Option buttons
+      document.querySelectorAll('.option-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const field = btn.dataset.field;
+          const value = btn.dataset.value;
+          btn.parentElement.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+          state[field] = value;
+        });
+      });
+
+      // Hassle slider
+      const hassleSlider = document.getElementById('hassleSlider');
+      hassleSlider.addEventListener('input', (e) => {
+        state.hassleValue = parseInt(e.target.value);
+      });
+
+      // Pre-fill amount from URL if provided
+      const amount = params.get('amount');
+      if (amount) {
+        state.claimAmount = parseInt(amount);
+        amountInput.value = parseInt(amount).toLocaleString();
+      }
+    });
+
+    function updateCaseTypeUI() {
+      const config = caseTypes[state.caseType];
+      document.getElementById('caseTypeIcon').innerHTML = config.icon;
+      document.getElementById('caseTypeLabel').textContent = config.label;
+      document.getElementById('step1InsightTitle').textContent = config.insightTitle;
+      document.getElementById('step1InsightContent').innerHTML = config.insight;
+      document.title = `${config.title} Calculator | Terms.Law`;
+    }
+
+    // Navigation
+    function nextStep(step) {
+      if (step === 2 && state.currentStep === 1) {
+        if (!state.claimAmount || state.claimAmount < 100) {
+          alert('Please enter the amount at stake (minimum $100).');
+          return;
+        }
+      }
+      goToStep(step);
+    }
+
+    function prevStep(step) {
+      goToStep(step);
+    }
+
+    function goToStep(step) {
+      document.querySelectorAll('.progress-step').forEach((el, i) => {
+        el.classList.remove('active', 'completed');
+        if (i + 1 < step) el.classList.add('completed');
+        if (i + 1 === step) el.classList.add('active');
+      });
+      document.querySelectorAll('.calc-section').forEach(s => s.classList.remove('active'));
+      document.getElementById(`step${step}`).classList.add('active');
+      state.currentStep = step;
+      document.querySelector('.calc-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function resetCalculator() {
+      state.currentStep = 1;
+      state.claimAmount = 0;
+      state.hasContract = '';
+      state.proofPromise = '';
+      state.admissions = '';
+      state.damagesClear = '';
+      state.timeAgo = '';
+      state.opponentType = '';
+      state.priorResponse = '';
+      state.partialOffer = '';
+      state.chargebackAvail = '';
+      state.willingToSue = '';
+      state.hassleValue = 250;
+
+      document.getElementById('claimAmount').value = '';
+      document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+      document.getElementById('hassleSlider').value = 250;
+      goToStep(1);
+    }
+
+    // Calculate Results
+    function calculateResults() {
+      const config = caseTypes[state.caseType];
+      const amount = state.claimAmount;
+      const letterCost = config.letterCost;
+
+      // Calculate evidence score (0-1)
+      let evidenceScore = 0;
+      if (state.hasContract === 'yes') evidenceScore += 0.35;
+      else if (state.hasContract === 'partial') evidenceScore += 0.15;
+
+      if (state.proofPromise === 'yes') evidenceScore += 0.30;
+      else if (state.proofPromise === 'partial') evidenceScore += 0.15;
+
+      if (state.admissions === 'yes') evidenceScore += 0.20;
+      else if (state.admissions === 'partial') evidenceScore += 0.10;
+
+      if (state.damagesClear === 'yes') evidenceScore += 0.15;
+      else if (state.damagesClear === 'partial') evidenceScore += 0.08;
+
+      evidenceScore = Math.min(1, evidenceScore);
+
+      // Calculate opponent score (0-1)
+      let opponentScore = 0.5;
+      if (state.opponentType === 'bigCompany') opponentScore += 0.15;
+      else if (state.opponentType === 'smallBusiness') opponentScore += 0.05;
+      else if (state.opponentType === 'individual') opponentScore -= 0.10;
+
+      if (state.priorResponse === 'responsive') opponentScore += 0.20;
+      else if (state.priorResponse === 'hostile') opponentScore -= 0.15;
+
+      if (state.timeAgo === 'recent') opponentScore += 0.15;
+      else if (state.timeAgo === 'old') opponentScore -= 0.15;
+
+      opponentScore = Math.max(0, Math.min(1, opponentScore));
+
+      // Calculate leverage score (0-1)
+      let leverageScore = 0.3;
+      if (state.chargebackAvail === 'yes') leverageScore += 0.30;
+      else if (state.chargebackAvail === 'maybe') leverageScore += 0.10;
+
+      if (state.willingToSue === 'yes') leverageScore += 0.30;
+      else if (state.willingToSue === 'maybe') leverageScore += 0.15;
+
+      if (state.partialOffer === 'significant') leverageScore += 0.10;
+
+      leverageScore = Math.min(1, leverageScore);
+
+      // Calculate success probability
+      let successProb = config.baseProb;
+      successProb += evidenceScore * 0.25;
+      successProb += opponentScore * 0.15;
+      successProb += leverageScore * 0.10;
+      successProb = Math.max(0.15, Math.min(0.85, successProb));
+
+      // Calculate outcome distribution
+      const qualityScore = (evidenceScore + leverageScore) / 2;
+
+      let zeroProb = 1 - successProb;
+      let fullProb = successProb * Math.min(0.25, qualityScore * 0.35);
+      let partialProb = successProb * Math.min(0.45, 0.35 + qualityScore * 0.25);
+      let lowballProb = Math.max(0.05, successProb - fullProb - partialProb);
+
+      // Normalize
+      const total = zeroProb + lowballProb + partialProb + fullProb;
+      zeroProb /= total;
+      lowballProb /= total;
+      partialProb /= total;
+      fullProb /= total;
+
+      // Calculate amounts
+      const lowballAmount = amount * 0.15;
+      const partialAmount = amount * 0.50;
+      const fullAmount = amount * 0.90;
+
+      // Calculate expected value
+      const expectedGross = (lowballProb * lowballAmount) + (partialProb * partialAmount) + (fullProb * fullAmount);
+      const expectedNet = expectedGross - letterCost;
+
+      // Settlement range
+      const settlementLow = amount * 0.25;
+      const settlementMid = amount * 0.50;
+      const settlementHigh = amount * 0.75;
+
+      // Break-even probability
+      const breakEvenProb = letterCost / (amount * 0.5);
+
+      // Update UI
+      updateResultsUI({
+        amount,
+        letterCost,
+        successProb,
+        expectedNet,
+        breakEvenProb,
+        outcomes: {
+          zero: { prob: zeroProb },
+          lowball: { prob: lowballProb, amount: lowballAmount },
+          partial: { prob: partialProb, amount: partialAmount },
+          full: { prob: fullProb, amount: fullAmount }
+        },
+        settlement: { low: settlementLow, mid: settlementMid, high: settlementHigh },
+        evidenceScore,
+        leverageScore,
+        config
+      });
+
+      goToStep(4);
+    }
+
+    function updateResultsUI(data) {
+      const { amount, letterCost, successProb, expectedNet, breakEvenProb, outcomes, settlement, evidenceScore, leverageScore, config } = data;
+
+      // Verdict banner
+      const verdictBanner = document.getElementById('verdictBanner');
+      const verdictIcon = document.getElementById('verdictIcon');
+      const verdictTitle = document.getElementById('verdictTitle');
+      const verdictSubtitle = document.getElementById('verdictSubtitle');
+
+      if (expectedNet > 300) {
+        verdictBanner.className = 'verdict-banner positive';
+        verdictIcon.innerHTML = '&#10003;';
+        verdictTitle.textContent = 'Worth Pursuing';
+        verdictSubtitle.textContent = 'Your expected value is positive, even accounting for costs.';
+      } else if (expectedNet > 0) {
+        verdictBanner.className = 'verdict-banner neutral';
+        verdictIcon.innerHTML = '~';
+        verdictTitle.textContent = 'It\'s a Close Call';
+        verdictSubtitle.textContent = 'Consider lower-cost options or strengthening your evidence first.';
+      } else {
+        verdictBanner.className = 'verdict-banner negative';
+        verdictIcon.innerHTML = '&#10005;';
+        verdictTitle.textContent = 'May Not Be Worth the Cost';
+        verdictSubtitle.textContent = 'Consider free alternatives or strengthening your case first.';
+      }
+
+      // Key numbers
+      document.getElementById('expectedValue').textContent = formatCurrency(expectedNet, true);
+      document.getElementById('expectedValue').className = 'value ' + (expectedNet > 0 ? 'positive' : 'negative');
+      document.getElementById('successOdds').textContent = formatPercent(successProb);
+      document.getElementById('breakEvenOdds').textContent = formatPercent(Math.min(1, breakEvenProb));
+
+      // Gauge
+      const rotation = -90 + (successProb * 180);
+      document.getElementById('gaugeNeedle').style.transform = `translateX(-50%) rotate(${rotation}deg)`;
+
+      // Settlement range
+      document.getElementById('settlementLow').textContent = formatCurrency(settlement.low);
+      document.getElementById('settlementMid').textContent = formatCurrency(settlement.mid);
+      document.getElementById('settlementHigh').textContent = formatCurrency(settlement.high);
+
+      // Outcome bars
+      updateBar('barZero', outcomes.zero.prob);
+      updateBar('barLowball', outcomes.lowball.prob);
+      updateBar('barPartial', outcomes.partial.prob);
+      updateBar('barFull', outcomes.full.prob);
+
+      document.getElementById('amountLowball').textContent = formatCurrency(outcomes.lowball.amount);
+      document.getElementById('amountPartial').textContent = formatCurrency(outcomes.partial.amount);
+      document.getElementById('amountFull').textContent = formatCurrency(outcomes.full.amount);
+
+      // Stacked bar
+      document.getElementById('stackedBar').innerHTML = `
+        <div class="stacked-segment zero" style="width: ${outcomes.zero.prob * 100}%">${outcomes.zero.prob > 0.08 ? formatPercent(outcomes.zero.prob) : ''}</div>
+        <div class="stacked-segment lowball" style="width: ${outcomes.lowball.prob * 100}%">${outcomes.lowball.prob > 0.08 ? formatPercent(outcomes.lowball.prob) : ''}</div>
+        <div class="stacked-segment partial" style="width: ${outcomes.partial.prob * 100}%">${outcomes.partial.prob > 0.08 ? formatPercent(outcomes.partial.prob) : ''}</div>
+        <div class="stacked-segment full" style="width: ${outcomes.full.prob * 100}%">${outcomes.full.prob > 0.08 ? formatPercent(outcomes.full.prob) : ''}</div>
+      `;
+
+      // Legal analysis
+      updateLegalAnalysis(evidenceScore, leverageScore);
+
+      // Comparison cards
+      updateComparisonCards(config, amount, expectedNet, successProb);
+
+      // CTA
+      updateCTA(expectedNet, config, amount);
+    }
+
+    function updateBar(id, prob) {
+      const bar = document.getElementById(id);
+      const pct = prob * 100;
+      bar.style.width = pct + '%';
+      bar.textContent = pct > 8 ? formatPercent(prob) : '';
+    }
+
+    function updateLegalAnalysis(evidenceScore, leverageScore) {
+      const grid = document.getElementById('legalAnalysisGrid');
+
+      let evidenceAnalysis = '';
+      if (evidenceScore > 0.7) {
+        evidenceAnalysis = '<strong>Strong evidence position.</strong> Your documentation supports your claim well.';
+      } else if (evidenceScore > 0.4) {
+        evidenceAnalysis = '<strong>Moderate evidence.</strong> Some gaps exist. Strengthen with additional documentation if possible.';
+      } else {
+        evidenceAnalysis = '<strong>Evidence needs strengthening.</strong> Gather more documentation before proceeding.';
+      }
+
+      let leverageAnalysis = '';
+      if (leverageScore > 0.7) {
+        leverageAnalysis = '<strong>Strong leverage.</strong> You have multiple paths to resolution.';
+      } else if (leverageScore > 0.4) {
+        leverageAnalysis = '<strong>Moderate leverage.</strong> Consider all available options.';
+      } else {
+        leverageAnalysis = '<strong>Limited leverage.</strong> A formal demand letter may be your best option.';
+      }
+
+      grid.innerHTML = `
+        <div class="legal-card">
+          <div class="legal-card-header">
+            <span class="legal-card-icon">&#128269;</span>
+            <span class="legal-card-title">Evidence Strength</span>
+          </div>
+          <div class="legal-card-content">${evidenceAnalysis}</div>
+        </div>
+        <div class="legal-card">
+          <div class="legal-card-header">
+            <span class="legal-card-icon">&#128200;</span>
+            <span class="legal-card-title">Your Leverage</span>
+          </div>
+          <div class="legal-card-content">${leverageAnalysis}</div>
+        </div>
+      `;
+    }
+
+    function updateComparisonCards(config, amount, expectedNet, successProb) {
+      const container = document.getElementById('comparisonCards');
+
+      // DIY success is lower
+      const diySuccess = successProb * 0.55;
+      const diyExpected = (diySuccess * amount * 0.3) - 0;
+
+      // Small claims
+      const smallClaimsCost = 150;
+      const smallClaimsSuccess = successProb * 0.85;
+      const smallClaimsExpected = (smallClaimsSuccess * amount * 0.65) - smallClaimsCost;
+
+      let cards = `
+        <div class="comparison-card${diyExpected > expectedNet && diyExpected > smallClaimsExpected ? ' recommended' : ''}">
+          <div class="card-icon">&#128221;</div>
+          <div class="card-title">DIY Approach</div>
+          <div class="card-cost">Cost: $0</div>
+          <div class="card-expected ${diyExpected > 0 ? 'neutral' : 'negative'}">${formatCurrency(diyExpected, true)}</div>
+          <div class="card-label">Expected Value</div>
+        </div>
+        <div class="comparison-card${expectedNet > diyExpected && expectedNet > smallClaimsExpected ? ' recommended' : ''}">
+          <div class="card-icon">&#9878;</div>
+          <div class="card-title">Demand Letter</div>
+          <div class="card-cost">Cost: ${config.options[0]?.cost || '$450'}</div>
+          <div class="card-expected ${expectedNet > 0 ? 'positive' : 'negative'}">${formatCurrency(expectedNet, true)}</div>
+          <div class="card-label">Expected Value</div>
+        </div>
+        <div class="comparison-card${smallClaimsExpected > expectedNet && smallClaimsExpected > diyExpected ? ' recommended' : ''}">
+          <div class="card-icon">&#127963;</div>
+          <div class="card-title">Small Claims</div>
+          <div class="card-cost">Cost: $150-200</div>
+          <div class="card-expected ${smallClaimsExpected > 0 ? 'neutral' : 'negative'}">${formatCurrency(smallClaimsExpected, true)}</div>
+          <div class="card-label">Expected Value</div>
+        </div>
+      `;
+
+      container.innerHTML = cards;
+    }
+
+    function updateCTA(expectedNet, config, amount) {
+      const title = document.getElementById('ctaTitle');
+      const text = document.getElementById('ctaText');
+      const primaryBtn = document.getElementById('ctaPrimary');
+
+      if (expectedNet > 300) {
+        title.textContent = 'Ready to Move Forward?';
+        text.textContent = `Based on your inputs, pursuing this ${formatCurrency(amount)} case appears to be a good investment.`;
+        primaryBtn.textContent = `Get Started - ${config.options[0]?.cost || '$450'}`;
+      } else if (expectedNet > 0) {
+        title.textContent = 'Want to Discuss Your Options?';
+        text.textContent = 'This is a close call. Let\'s talk through your specific situation.';
+        primaryBtn.textContent = 'Schedule a Call';
+      } else {
+        title.textContent = 'Consider Your Alternatives';
+        text.textContent = 'Based on the numbers, you may want to explore lower-cost options first.';
+        primaryBtn.textContent = 'Learn About Alternatives';
+      }
+    }
+
+    // Formatting helpers
+    function formatCurrency(amount, showSign = false) {
+      const formatted = '$' + Math.abs(Math.round(amount)).toLocaleString();
+      if (showSign) {
+        return amount >= 0 ? '+' + formatted : '-' + formatted;
+      }
+      return formatted;
+    }
+
+    function formatPercent(prob) {
+      return Math.round(prob * 100) + '%';
+    }
+  </script>
+</body>
+</html>

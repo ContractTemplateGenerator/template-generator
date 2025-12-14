@@ -683,6 +683,47 @@
       color: #3730a3;
     }
 
+    /* Calculator CTA Button */
+    .calculator-cta {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 1.25rem;
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      border: 2px solid #3b82f6;
+      border-radius: 12px;
+      text-decoration: none;
+      margin-bottom: 1.25rem;
+      transition: all 0.2s;
+    }
+    .calculator-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+      border-color: #2563eb;
+    }
+    .calc-cta-icon {
+      font-size: 2rem;
+      flex-shrink: 0;
+    }
+    .calc-cta-text {
+      flex: 1;
+    }
+    .calc-cta-text strong {
+      display: block;
+      font-size: 1rem;
+      color: #1e40af;
+      margin-bottom: 0.15rem;
+    }
+    .calc-cta-text small {
+      font-size: 0.8rem;
+      color: #3b82f6;
+    }
+    .calc-cta-arrow {
+      font-size: 1.25rem;
+      color: #3b82f6;
+      font-weight: bold;
+    }
+
     .analysis-summary {
       background: #f8fafc;
       border: 1px solid var(--color-border);
@@ -1707,6 +1748,8 @@
         title: 'Unpaid Invoice Recovery',
         probability: 'high',
         probText: '60-70% response rate',
+        calculatorLink: '/case-evaluator/?type=unpaid-invoice',
+        calculatorText: 'Calculate Your Expected Recovery',
         factors: [
           { type: 'positive', icon: '✓', text: 'Business debtors respond better than individuals' },
           { type: 'positive', icon: '✓', text: 'Written contracts/invoices strengthen your case' },
@@ -1731,6 +1774,8 @@
         title: 'Contractor Didn\'t Deliver',
         probability: 'high',
         probText: '70-80% resolution rate',
+        calculatorLink: '/case-evaluator/?type=contractor',
+        calculatorText: 'Calculate Your Expected Recovery',
         factors: [
           { type: 'positive', icon: '✓', text: 'Licensed contractors fear CSLB complaints' },
           { type: 'positive', icon: '✓', text: 'Negative reviews are powerful leverage' },
@@ -1755,6 +1800,8 @@
         title: 'Security Deposit Not Returned',
         probability: 'high',
         probText: '75-85% win rate in small claims',
+        calculatorLink: '/case-evaluator/?type=deposit',
+        calculatorText: 'Calculate Your Expected Recovery',
         factors: [
           { type: 'positive', icon: '✓', text: 'CA law requires return within 21 days' },
           { type: 'positive', icon: '✓', text: 'Violations = up to 2x penalty damages' },
@@ -1776,6 +1823,8 @@
       },
       'refund': {
         title: 'Need a Refund',
+        calculatorLink: '/case-evaluator/?type=refund',
+        calculatorText: 'Calculate Your Expected Recovery',
         quickAssess: [
           'How did you pay? (Credit card = chargeback option)',
           'How long ago was the purchase? (60-120 days for chargeback)',
@@ -1900,6 +1949,8 @@
       },
       'breach': {
         title: 'Contract Breach',
+        calculatorLink: '/case-evaluator/?type=breach',
+        calculatorText: 'Calculate Your Expected Recovery',
         message: `<strong>Someone breached your contract? Let's assess your options.</strong><br><br>
         • <strong>What did they promise?</strong> I need to see the contract.<br>
         • <strong>What did they fail to do?</strong> Specific breaches matter.<br>
@@ -2393,9 +2444,25 @@
         `;
       });
 
+      // Build calculator link if available
+      let calcLinkHtml = '';
+      if (data.calculatorLink) {
+        calcLinkHtml = `
+          <a href="${data.calculatorLink}" class="calculator-cta">
+            <span class="calc-cta-icon">&#128202;</span>
+            <span class="calc-cta-text">
+              <strong>${data.calculatorText || 'Calculate Your Expected Value'}</strong>
+              <small>Get detailed probability analysis, settlement ranges, and EV calculations</small>
+            </span>
+            <span class="calc-cta-arrow">&#8594;</span>
+          </a>
+        `;
+      }
+
       // Insert comprehensive analysis
       document.getElementById('guidanceOptions').innerHTML = `
         ${probHtml ? `<div style="text-align:center;margin-bottom:1rem;">${probHtml}</div>` : ''}
+        ${calcLinkHtml}
         ${factorsHtml}
         ${tipsHtml}
         ${quickAssessHtml}
