@@ -777,6 +777,265 @@
     }
 
     /* ============================================
+       INTERACTIVE CASE EVALUATOR
+       ============================================ */
+    .evaluator-container {
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .evaluator-step {
+      display: none;
+      padding: 1.25rem;
+    }
+    .evaluator-step.active {
+      display: block;
+    }
+    .evaluator-question {
+      margin-bottom: 1rem;
+    }
+    .evaluator-question label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--color-text);
+      margin-bottom: 0.5rem;
+    }
+    .evaluator-question .hint {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      margin-bottom: 0.5rem;
+    }
+    .amount-input-wrap {
+      position: relative;
+      max-width: 200px;
+    }
+    .amount-input-wrap::before {
+      content: '$';
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--color-text-muted);
+    }
+    .amount-input {
+      width: 100%;
+      padding: 0.75rem 0.75rem 0.75rem 2rem;
+      font-size: 1.25rem;
+      font-weight: 600;
+      border: 2px solid var(--color-border);
+      border-radius: 8px;
+      outline: none;
+    }
+    .amount-input:focus {
+      border-color: var(--color-primary);
+    }
+    .option-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .option-btn {
+      flex: 1;
+      min-width: 120px;
+      padding: 0.65rem 0.75rem;
+      background: white;
+      border: 2px solid var(--color-border);
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--color-text);
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: center;
+    }
+    .option-btn:hover {
+      border-color: var(--color-primary);
+      background: #f0f7ff;
+    }
+    .option-btn.selected {
+      border-color: var(--color-primary);
+      background: var(--color-primary);
+      color: white;
+    }
+    .option-btn.positive.selected { background: #10b981; border-color: #10b981; }
+    .option-btn.neutral.selected { background: #f59e0b; border-color: #f59e0b; }
+    .option-btn.negative.selected { background: #ef4444; border-color: #ef4444; }
+
+    .evaluator-nav {
+      display: flex;
+      justify-content: space-between;
+      padding-top: 1rem;
+      border-top: 1px solid var(--color-border);
+      margin-top: 1rem;
+    }
+    .eval-btn {
+      padding: 0.65rem 1.25rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+    .eval-btn-back {
+      background: #f1f5f9;
+      color: var(--color-text-secondary);
+    }
+    .eval-btn-back:hover { background: #e2e8f0; }
+    .eval-btn-next {
+      background: var(--color-primary);
+      color: white;
+    }
+    .eval-btn-next:hover { background: var(--color-primary-dark); }
+    .eval-btn-results {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+    }
+    .eval-btn-results:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }
+
+    /* Results Section */
+    .eval-results {
+      display: none;
+    }
+    .eval-results.active {
+      display: block;
+    }
+    .verdict-banner {
+      text-align: center;
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin-bottom: 1.25rem;
+    }
+    .verdict-banner.positive {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+    }
+    .verdict-banner.negative {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+    }
+    .verdict-banner.neutral {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: white;
+    }
+    .verdict-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    .verdict-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+    .verdict-subtitle {
+      font-size: 0.85rem;
+      opacity: 0.9;
+    }
+    .key-numbers {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+    .key-number {
+      text-align: center;
+      padding: 1rem;
+      background: #f8fafc;
+      border-radius: 10px;
+    }
+    .key-number .value {
+      font-size: 1.5rem;
+      font-weight: 800;
+    }
+    .key-number .value.positive { color: #10b981; }
+    .key-number .value.negative { color: #ef4444; }
+    .key-number .label {
+      font-size: 0.7rem;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      margin-top: 0.25rem;
+    }
+    .outcome-bars {
+      margin-bottom: 1.25rem;
+    }
+    .outcome-bars h5 {
+      font-size: 0.85rem;
+      margin-bottom: 0.75rem;
+    }
+    .outcome-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.5rem;
+      font-size: 0.8rem;
+    }
+    .outcome-label {
+      width: 100px;
+      flex-shrink: 0;
+    }
+    .outcome-bar-wrap {
+      flex: 1;
+      height: 24px;
+      background: #f1f5f9;
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 0 0.5rem;
+    }
+    .outcome-bar {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: white;
+      border-radius: 4px;
+    }
+    .outcome-bar.none { background: #94a3b8; }
+    .outcome-bar.lowball { background: #f59e0b; }
+    .outcome-bar.partial { background: #3b82f6; }
+    .outcome-bar.full { background: #10b981; }
+    .outcome-amount {
+      width: 70px;
+      text-align: right;
+      font-weight: 600;
+    }
+    .gauge-mini {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .gauge-mini-title {
+      font-size: 0.8rem;
+      color: var(--color-text-secondary);
+      margin-bottom: 0.5rem;
+    }
+    .gauge-mini-bar {
+      height: 12px;
+      background: linear-gradient(90deg, #ef4444 0%, #f59e0b 50%, #10b981 100%);
+      border-radius: 6px;
+      position: relative;
+      margin-bottom: 0.25rem;
+    }
+    .gauge-mini-needle {
+      position: absolute;
+      top: -4px;
+      width: 4px;
+      height: 20px;
+      background: #0f172a;
+      border-radius: 2px;
+      transform: translateX(-50%);
+    }
+    .gauge-mini-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.65rem;
+      color: var(--color-text-muted);
+    }
+
+    /* ============================================
        QUICK STATS BAR
        ============================================ */
     .stats-bar {
