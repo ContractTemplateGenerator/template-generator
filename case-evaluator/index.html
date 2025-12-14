@@ -770,12 +770,188 @@
             margin-top: 0.5rem;
         }
 
+        /* Demand Letter Generator Panel */
+        .demand-letter-panel {
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            margin-top: 1rem;
+            overflow: hidden;
+            animation: slideDown 0.3s ease-out;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; max-height: 0; transform: translateY(-10px); }
+            to { opacity: 1; max-height: 2000px; transform: translateY(0); }
+        }
+        .demand-header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            color: white;
+            padding: 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .demand-header h3 { font-size: 1.1rem; margin: 0; }
+        .demand-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .demand-close:hover { background: rgba(255,255,255,0.3); }
+        .demand-content { padding: 1.5rem; }
+        .demand-intro {
+            background: #eff6ff;
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+            color: var(--gray-700);
+        }
+        .demand-paragraph {
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .demand-paragraph-header {
+            background: var(--gray-50);
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .demand-paragraph-num {
+            background: var(--primary);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .demand-paragraph-title {
+            font-weight: 600;
+            color: var(--gray-800);
+            font-size: 0.9rem;
+        }
+        .demand-paragraph-purpose {
+            margin-left: auto;
+            font-size: 0.7rem;
+            color: var(--gray-500);
+            font-style: italic;
+        }
+        .demand-paragraph-body {
+            padding: 1rem;
+        }
+        .demand-text {
+            width: 100%;
+            min-height: 80px;
+            padding: 0.75rem;
+            border: 1px solid var(--gray-200);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            resize: vertical;
+            background: white;
+        }
+        .demand-text:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        .demand-tip {
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            display: flex;
+            align-items: flex-start;
+            gap: 0.35rem;
+        }
+        .demand-tip-icon { color: var(--warning); }
+        .demand-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--gray-200);
+        }
+        .demand-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+        .demand-btn.primary {
+            background: var(--primary);
+            color: white;
+        }
+        .demand-btn.primary:hover {
+            background: var(--primary-dark);
+        }
+        .demand-btn.secondary {
+            background: var(--gray-100);
+            color: var(--gray-700);
+            border: 1px solid var(--gray-300);
+        }
+        .demand-btn.secondary:hover {
+            background: var(--gray-200);
+        }
+        .custom-badge {
+            display: inline-block;
+            background: #dcfce7;
+            color: #166534;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-left: 0.5rem;
+        }
+
         @media (max-width: 768px) {
             .main-container { padding: 1rem; }
             .ev-breakdown { grid-template-columns: 1fr; }
             .pathways-grid { grid-template-columns: 1fr; }
         }
+        /* Embed mode adjustments - target both html and body */
+        html.embed-mode, body.embed-mode { background: white; }
+        html.embed-mode .header, body.embed-mode .header { display: none; }
+        html.embed-mode .main-container, body.embed-mode .main-container {
+            min-height: auto;
+            padding: 0.5rem;
+        }
+        html.embed-mode .form-panel, body.embed-mode .form-panel {
+            position: relative;
+            top: 0;
+            max-height: none;
+        }
     </style>
+    <script>
+        // Check embed mode early and apply to html element
+        (function() {
+            var params = new URLSearchParams(window.location.search);
+            if (params.get('embed') === 'true') {
+                document.documentElement.classList.add('embed-mode');
+            }
+        })();
+    </script>
 </head>
 <body>
     <header class="header">
@@ -786,8 +962,21 @@
             </nav>
         </div>
     </header>
+    <script>
+        // Hide header in embed mode
+        if (new URLSearchParams(window.location.search).get('embed') === 'true') {
+            document.body.classList.add('embed-mode');
+        }
+    </script>
 
-    <div id="root"></div>
+    <div id="root">
+        <div style="display:flex;align-items:center;justify-content:center;height:50vh;color:#64748b;">
+            <div style="text-align:center;">
+                <div style="font-size:1.5rem;margin-bottom:0.5rem;">Loading Calculator...</div>
+                <div style="font-size:0.85rem;">If this persists, check browser console for errors</div>
+            </div>
+        </div>
+    </div>
 
     <script type="text/babel">
         const { useState, useEffect, useMemo, useCallback } = React;
@@ -817,10 +1006,12 @@
 
             // === SCORES ===
             let fts = 0; // Formation & Terms
-            if (contractType === 'signed') fts += 30;
-            else if (contractType === 'po') fts += 25;
-            else if (contractType === 'email') fts += 18;
-            else fts += 8;
+            // Oral contracts are SIGNIFICANTLY weaker - courts require corroborating evidence
+            // "he said/she said" invites disputes, statutes of frauds issues, credibility battles
+            if (contractType === 'signed') fts += 30;      // Gold standard: clear terms, signatures
+            else if (contractType === 'po') fts += 25;      // Purchase order: still written evidence
+            else if (contractType === 'email') fts += 15;   // Email chain: weaker but provable terms
+            else fts -= 15;                                 // ORAL: major penalty - shifts burden, invites "I never agreed to that"
             if (feeClause === 'yes') fts += 7;
 
             let pas = 0; // Performance & Acceptance
@@ -930,6 +1121,10 @@
 
             // === TOP DRIVERS ===
             const drivers = [];
+            // ORAL CONTRACT WARNING - This is a major issue
+            if (contractType === 'oral') {
+                drivers.push({ type: 'negative', text: 'ORAL CONTRACT: "He said/she said" invites disputes. No written terms = credibility battle. Courts skeptical.' });
+            }
             if (deliveryProof === 'strong') {
                 drivers.push({ type: 'positive', text: 'Strong documentation supports your claim.' });
             }
@@ -944,6 +1139,9 @@
             }
             if (assetInfo !== 'none') {
                 drivers.push({ type: 'positive', text: 'You have a path to money. Collection probability up.' });
+            }
+            if (contractType === 'signed') {
+                drivers.push({ type: 'positive', text: 'Signed contract = clear terms. Strongest legal position.' });
             }
             if (deliveryProof === 'none' || acceptanceStrength === 'none') {
                 drivers.push({ type: 'negative', text: 'Proof gap. Outcomes shift to haircuts without docs.' });
@@ -963,7 +1161,10 @@
 
             // === HARD TRUTH ===
             let hardTruth = '';
-            if (pCollect < 0.5 && pLiability >= 0.6) {
+            // ORAL CONTRACT is the #1 issue - put it first
+            if (contractType === 'oral') {
+                hardTruth = 'ORAL CONTRACT WARNING: Without written terms, they can dispute the price, scope, timeline - everything. Courts see this as "he said/she said." Your EV drops 40-60%. Find ANY writing: texts, emails, even notes from the conversation.';
+            } else if (pCollect < 0.5 && pLiability >= 0.6) {
                 hardTruth = 'Your paper claim is strong, but collectability is the bottleneck. Focus on finding where the money is before spending on escalation.';
             } else if (deliveryProof === 'none' || acceptanceStrength === 'none') {
                 hardTruth = 'Your biggest EV leak is proof. One clean acceptance document can add hundreds to your expected value.';
@@ -1077,16 +1278,22 @@
                         formData.acceptanceStrength === 'explicit' ? 'You approved the deliverable. After acceptance, "defect" is narrow offset territory.' : null,
                         'No contemporaneous complaint = late-raised bargaining, not genuine rejection.',
                         'Even with issues, remedy is not $0. Pay undisputed + prove offset.',
-                    ].filter(Boolean)
+                        'Demand itemized defect list with dollar offsets within 5 days.',
+                        'Silence after delivery is implied acceptance in most jurisdictions.',
+                    ].filter(Boolean),
+                    counterOffense: 'Force specificity: "List each defect with (a) contract spec violated, (b) your dollar offset, (c) evidence. Vague complaints won\'t fly in court."'
                 },
                 acceptance: {
                     name: 'No Acceptance / Not Delivered',
                     story: '"Payment wasn\'t due because work wasn\'t delivered or accepted."',
                     rebuttals: [
                         formData.deliveryProof === 'strong' ? 'Delivered with documented proof (files, logs, handoff).' : null,
-                        'Silence after review = constructive acceptance.',
+                        'Silence after review = constructive acceptance under UCC 2-606.',
                         'Identify what\'s incomplete. Undisputed portion payable now.',
-                    ].filter(Boolean)
+                        'If you used the deliverable, you accepted it. Benefits received = payment due.',
+                        'The burden shifts to you to prove non-delivery after our evidence.',
+                    ].filter(Boolean),
+                    counterOffense: 'Flip the burden: "What exactly wasn\'t delivered? Be specific. Everything you don\'t list is admitted as delivered."'
                 },
                 scope: {
                     name: 'Scope Change / "Not Included"',
@@ -1095,7 +1302,21 @@
                         'Each item maps to request + deliverable with docs.',
                         'Base scope undisputed - payable now. Fight only the delta.',
                         'Course of dealing: similar requests were paid before.',
-                    ]
+                        'Your emails requested this work. Authorization is documented.',
+                        'Quantum meruit: You received benefit, you pay reasonable value.',
+                    ],
+                    counterOffense: 'Anchor on the undisputed: "Even if [disputed item] is carved out, the remaining $X is due immediately. Separate fights."'
+                },
+                conditional: {
+                    name: 'Conditional Payment / "Not Due Yet"',
+                    story: '"Payment was contingent on [milestone/approval/third party]."',
+                    rebuttals: [
+                        'Condition was satisfied OR waived by your conduct.',
+                        'You can\'t create conditions that don\'t appear in our agreement.',
+                        'Good faith prevents manufactured conditions to avoid payment.',
+                        'The condition was within your control - you can\'t benefit from own delay.',
+                    ],
+                    counterOffense: 'Call the bluff: "Show me where in our agreement this condition appears. Absent that, payment is due unconditionally."'
                 },
                 none: {
                     name: 'No Strong Defense Expected',
@@ -1103,7 +1324,9 @@
                     rebuttals: [
                         'Push for immediate payment with clear deadline.',
                         'Any defense must be specific, itemized, evidence-backed.',
-                    ]
+                        'Silence is not a defense. Time to pay.',
+                    ],
+                    counterOffense: 'Apply pressure: "You\'ve had [X days] to raise legitimate issues. Your silence confirms the debt. Pay by [date] or expect escalation."'
                 }
             };
             return defenses[defense] || defenses.none;
@@ -1184,6 +1407,106 @@
                 </div>
             </div>
         );
+
+        // EV Calculation Breakdown
+        const EVBreakdown = ({ calc }) => {
+            const [expanded, setExpanded] = useState(false);
+
+            return (
+                <div className="result-card" style={{ background: '#fafafa' }}>
+                    <div className="collapsible-header" onClick={() => setExpanded(!expanded)}>
+                        <span className="card-title">How We Calculated Your EV</span>
+                        <span className={`collapsible-icon ${expanded ? 'open' : ''}`}>&#9660;</span>
+                    </div>
+                    <div className={`collapsible-content ${expanded ? 'open' : ''}`}>
+                        <div style={{ padding: '0.75rem 0', fontSize: '0.8rem', color: 'var(--gray-600)' }}>
+
+                            {/* Step 1: Paper Value */}
+                            <div style={{ marginBottom: '1rem', padding: '0.75rem', background: 'white', borderRadius: '8px', border: '1px solid var(--gray-200)' }}>
+                                <div style={{ fontWeight: 600, marginBottom: '0.5rem', color: 'var(--gray-800)' }}>1. Paper Value</div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+                                    <span>Principal owed</span>
+                                    <span style={{ fontWeight: 600 }}>${calc.amount.toLocaleString()}</span>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+                                    <span>+ Interest (10% annual)</span>
+                                    <span style={{ fontWeight: 600 }}>+${Math.round(calc.interestAmount).toLocaleString()}</span>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--gray-200)', paddingTop: '0.5rem', marginTop: '0.5rem' }}>
+                                    <span style={{ fontWeight: 600 }}>Paper Value</span>
+                                    <span style={{ fontWeight: 700, color: 'var(--primary)' }}>${Math.round(calc.paperValue).toLocaleString()}</span>
+                                </div>
+                            </div>
+
+                            {/* Step 2: Probability Scores */}
+                            <div style={{ marginBottom: '1rem', padding: '0.75rem', background: 'white', borderRadius: '8px', border: '1px solid var(--gray-200)' }}>
+                                <div style={{ fontWeight: 600, marginBottom: '0.5rem', color: 'var(--gray-800)' }}>2. Risk Probabilities</div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                                    <div style={{ padding: '0.5rem', background: 'var(--gray-50)', borderRadius: '6px' }}>
+                                        <div style={{ fontSize: '1.1rem', fontWeight: 700, color: calc.pLiability >= 0.7 ? 'var(--success)' : calc.pLiability >= 0.5 ? 'var(--warning)' : 'var(--danger)' }}>{Math.round(calc.pLiability * 100)}%</div>
+                                        <div style={{ fontSize: '0.7rem', color: 'var(--gray-500)' }}>Win on liability</div>
+                                    </div>
+                                    <div style={{ padding: '0.5rem', background: 'var(--gray-50)', borderRadius: '6px' }}>
+                                        <div style={{ fontSize: '1.1rem', fontWeight: 700, color: calc.pDamages >= 0.7 ? 'var(--success)' : calc.pDamages >= 0.5 ? 'var(--warning)' : 'var(--danger)' }}>{Math.round(calc.pDamages * 100)}%</div>
+                                        <div style={{ fontSize: '0.7rem', color: 'var(--gray-500)' }}>Full damages</div>
+                                    </div>
+                                    <div style={{ padding: '0.5rem', background: 'var(--gray-50)', borderRadius: '6px' }}>
+                                        <div style={{ fontSize: '1.1rem', fontWeight: 700, color: calc.pCollect >= 0.7 ? 'var(--success)' : calc.pCollect >= 0.5 ? 'var(--warning)' : 'var(--danger)' }}>{Math.round(calc.pCollect * 100)}%</div>
+                                        <div style={{ fontSize: '0.7rem', color: 'var(--gray-500)' }}>Collectability</div>
+                                    </div>
+                                    <div style={{ padding: '0.5rem', background: 'var(--gray-50)', borderRadius: '6px' }}>
+                                        <div style={{ fontSize: '1.1rem', fontWeight: 700, color: calc.pEarly >= 0.5 ? 'var(--success)' : 'var(--warning)' }}>{Math.round(calc.pEarly * 100)}%</div>
+                                        <div style={{ fontSize: '0.7rem', color: 'var(--gray-500)' }}>Early settle</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Step 3: Outcome Distribution */}
+                            <div style={{ marginBottom: '1rem', padding: '0.75rem', background: 'white', borderRadius: '8px', border: '1px solid var(--gray-200)' }}>
+                                <div style={{ fontWeight: 600, marginBottom: '0.5rem', color: 'var(--gray-800)' }}>3. Expected Outcomes</div>
+                                <div style={{ marginBottom: '0.25rem', display: 'flex', justifyContent: 'space-between' }}>
+                                    <span>{Math.round(calc.outcomes.full.prob * 100)}% x Full (${Math.round(calc.outcomes.full.amount).toLocaleString()})</span>
+                                    <span style={{ fontWeight: 600 }}>${Math.round(calc.outcomes.full.prob * calc.outcomes.full.amount).toLocaleString()}</span>
+                                </div>
+                                <div style={{ marginBottom: '0.25rem', display: 'flex', justifyContent: 'space-between' }}>
+                                    <span>{Math.round(calc.outcomes.partial.prob * 100)}% x Partial (${Math.round(calc.outcomes.partial.amount).toLocaleString()})</span>
+                                    <span style={{ fontWeight: 600 }}>${Math.round(calc.outcomes.partial.prob * calc.outcomes.partial.amount).toLocaleString()}</span>
+                                </div>
+                                <div style={{ marginBottom: '0.25rem', display: 'flex', justifyContent: 'space-between' }}>
+                                    <span>{Math.round(calc.outcomes.lowball.prob * 100)}% x Lowball (${Math.round(calc.outcomes.lowball.amount).toLocaleString()})</span>
+                                    <span style={{ fontWeight: 600 }}>${Math.round(calc.outcomes.lowball.prob * calc.outcomes.lowball.amount).toLocaleString()}</span>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--gray-200)', paddingTop: '0.5rem', marginTop: '0.5rem' }}>
+                                    <span style={{ fontWeight: 600 }}>Gross EV</span>
+                                    <span style={{ fontWeight: 700, color: 'var(--primary)' }}>${Math.round(calc.grossEV).toLocaleString()}</span>
+                                </div>
+                            </div>
+
+                            {/* Step 4: Net EV by Path */}
+                            <div style={{ padding: '0.75rem', background: 'white', borderRadius: '8px', border: '1px solid var(--gray-200)' }}>
+                                <div style={{ fontWeight: 600, marginBottom: '0.5rem', color: 'var(--gray-800)' }}>4. Net EV (after costs)</div>
+                                <div style={{ marginBottom: '0.25rem', display: 'flex', justifyContent: 'space-between' }}>
+                                    <span>Demand letter path</span>
+                                    <span style={{ fontWeight: 600 }}>${Math.round(calc.paths.demand.nev).toLocaleString()}</span>
+                                </div>
+                                <div style={{ marginBottom: '0.25rem', display: 'flex', justifyContent: 'space-between' }}>
+                                    <span>Small claims path</span>
+                                    <span style={{ fontWeight: 600 }}>${Math.round(calc.paths.smallClaims.nev).toLocaleString()}</span>
+                                </div>
+                                <div style={{ marginBottom: '0.25rem', display: 'flex', justifyContent: 'space-between' }}>
+                                    <span>Civil litigation path</span>
+                                    <span style={{ fontWeight: 600 }}>${Math.round(calc.paths.civil.nev).toLocaleString()}</span>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--gray-200)', paddingTop: '0.5rem', marginTop: '0.5rem', background: '#dcfce7', margin: '-0.5rem -0.75rem -0.75rem', padding: '0.75rem' }}>
+                                    <span style={{ fontWeight: 600 }}>Best Path Net EV</span>
+                                    <span style={{ fontWeight: 700, color: '#166534' }}>${Math.round(calc.bestNEV).toLocaleString()}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
 
         const HardTruthCard = ({ truth }) => (
             <div className="result-card truth-card">
@@ -1325,18 +1648,43 @@
                             ))}
                         </ul>
                     </div>
-                    {calc.primaryDefense !== 'none' && (
-                        <>
-                            <div className="defense-card">
-                                <div className="defense-header">Likely Defense: {defense.name}</div>
-                                <div className="defense-story">{defense.story}</div>
+
+                    {/* Defense Playbook */}
+                    <div className="defense-card">
+                        <div className="defense-header">Likely Defense: {defense.name}</div>
+                        <div className="defense-story">{defense.story}</div>
+                    </div>
+                    <div className="rebuttal-card">
+                        <div className="rebuttal-header">Your Rebuttal Arsenal</div>
+                        <ul className="rebuttal-list">{defense.rebuttals.slice(0, 4).map((r, i) => <li key={i}>{r}</li>)}</ul>
+                    </div>
+
+                    {/* Counter-Offense */}
+                    {defense.counterOffense && (
+                        <div style={{
+                            background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
+                            border: '1px solid #93c5fd',
+                            borderRadius: '8px',
+                            padding: '0.85rem',
+                            marginTop: '0.75rem'
+                        }}>
+                            <div style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.4rem',
+                                fontWeight: 600,
+                                fontSize: '0.85rem',
+                                color: '#1e40af',
+                                marginBottom: '0.35rem'
+                            }}>
+                                Counter-Offense Strategy
                             </div>
-                            <div className="rebuttal-card">
-                                <div className="rebuttal-header">Your Rebuttal</div>
-                                <ul className="rebuttal-list">{defense.rebuttals.map((r, i) => <li key={i}>{r}</li>)}</ul>
+                            <div style={{ fontSize: '0.8rem', color: '#1e3a8a', fontStyle: 'italic' }}>
+                                {defense.counterOffense}
                             </div>
-                        </>
+                        </div>
                     )}
+
                     {calc.behaviorProfile && (
                         <div className="analysis-section" style={{ marginTop: '0.75rem' }}>
                             <div className="analysis-title">Defendant Profile</div>
@@ -1360,7 +1708,7 @@
             </div>
         );
 
-        const CTACard = ({ calc }) => {
+        const CTACard = ({ calc, onGenerateLetter }) => {
             let headline = 'Ready to Pursue Your Case?';
             let subtext = 'Get a professional demand letter drafted and sent.';
             if (calc.bestNEV < 500) {
@@ -1375,8 +1723,243 @@
                     <div className="cta-title">{headline}</div>
                     <div className="cta-text">{subtext}</div>
                     <div className="cta-buttons">
-                        <a href="/intake/" className="cta-btn primary">Start Your Case</a>
-                        <a href="/Demand-Letters/" className="cta-btn secondary">View Demand Letters</a>
+                        <button onClick={onGenerateLetter} className="cta-btn primary">Generate Demand Letter</button>
+                        <a href="/intake/" className="cta-btn secondary">Start Your Case</a>
+                    </div>
+                </div>
+            );
+        };
+
+        // ============== DEMAND LETTER GENERATOR ==============
+        const DemandLetterGenerator = ({ formData, calc, onClose }) => {
+            const amount = formData.amount || 5000;
+            const daysOverdue = formData.daysOverdue || 90;
+            const contractType = formData.contractType || 'signed';
+            const deliveryProof = formData.deliveryProof || 'strong';
+            const acceptanceStrength = formData.acceptanceStrength || 'explicit';
+            const disputeLevel = formData.disputeLevel || 'none';
+
+            // Personalization fields
+            const [details, setDetails] = useState({
+                yourName: '',
+                yourCompany: '',
+                yourEmail: '',
+                defendantName: '',
+                defendantCompany: '',
+                serviceDescription: '',
+                invoiceNumber: '',
+                invoiceDate: '',
+                paymentDeadline: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                paymentMethod: ''
+            });
+
+            const updateDetail = (key, value) => {
+                setDetails(prev => ({ ...prev, [key]: value }));
+            };
+
+            // Contract description
+            const contractDesc = {
+                signed: 'a signed written agreement',
+                po: 'a purchase order',
+                email: 'email correspondence confirming the terms',
+                oral: 'our verbal agreement (with supporting correspondence)'
+            }[contractType];
+
+            // Defense-specific language
+            const defenseWarning = disputeLevel === 'specific'
+                ? 'While you have raised certain concerns, these do not excuse the underlying payment obligation. Any disputed amounts can be addressed separately.'
+                : disputeLevel === 'vague'
+                ? 'Your general expressions of dissatisfaction do not constitute a valid defense to payment.'
+                : '';
+
+            // Dynamic letter generation based on personalization
+            const generateLetter = () => {
+                const defendant = details.defendantName || '[DEFENDANT NAME]';
+                const defendantCo = details.defendantCompany ? ` of ${details.defendantCompany}` : '';
+                const sender = details.yourName || '[YOUR NAME]';
+                const senderCo = details.yourCompany ? `, ${details.yourCompany}` : '';
+                const service = details.serviceDescription || '[DESCRIPTION OF SERVICES]';
+                const invoice = details.invoiceNumber ? `Invoice #${details.invoiceNumber}` : 'the invoice';
+                const deadline = details.paymentDeadline ? new Date(details.paymentDeadline).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '[DEADLINE DATE]';
+                const payment = details.paymentMethod || '[PAYMENT INSTRUCTIONS]';
+
+                return {
+                    header: `${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}\n\nVIA EMAIL${details.yourEmail ? '' : ' AND CERTIFIED MAIL'}\n\n${defendant}${defendantCo}\n[ADDRESS]\n\nRe: Formal Demand for Payment - $${amount.toLocaleString()} Past Due${details.invoiceNumber ? ` (Invoice #${details.invoiceNumber})` : ''}\n\nDear ${defendant}:`,
+
+                    p1: `I am writing on behalf of ${sender}${senderCo} to formally demand payment of $${amount.toLocaleString()} for ${service} rendered pursuant to ${contractDesc} between us. This amount, documented in ${invoice}, has been outstanding for ${daysOverdue} days and represents a clear breach of our agreement.`,
+
+                    p2: `As you are aware, ${sender} performed and delivered the agreed-upon work in full. ${acceptanceStrength === 'explicit' ? 'You acknowledged receipt and approved the deliverables.' : acceptanceStrength === 'implied' ? 'You have used and benefited from these deliverables without objection.' : 'The work was completed as specified.'} ${deliveryProof === 'strong' ? 'We have comprehensive documentation including delivery records, correspondence, and your acknowledgments.' : deliveryProof === 'some' ? 'We have supporting documentation of performance.' : 'We can provide evidence of the work performed.'} Your obligation to pay is clear and unambiguous.`,
+
+                    p3: `Despite multiple requests for payment, you have failed to remit the amount due. ${defenseWarning} Under applicable law, your failure to pay constitutes breach of contract, entitling ${sender} to recover the principal amount plus interest, costs of collection, and attorney's fees.`,
+
+                    p4: `Our expected recovery in litigation is approximately $${Math.round(calc.bestNEV).toLocaleString()}, accounting for collection probability and legal costs. ${calc.pLiability >= 0.7 ? 'The strength of this claim makes a favorable judgment highly likely.' : 'We are fully prepared to pursue this matter through the courts.'} A judgment will appear on your record and can affect your credit and business relationships.`,
+
+                    p5: `To resolve this matter without litigation, we are willing to accept $${Math.round(calc.settlement.mid).toLocaleString()} if paid by ${deadline}. This represents a discount of ${Math.round((1 - calc.settlement.mid / calc.paperValue) * 100)}% from the full amount owed, including interest. After this date, we will pursue the full amount plus all available legal remedies.`,
+
+                    p6: `Please remit payment by ${deadline} via ${payment}. If you wish to discuss settlement terms, contact ${details.yourEmail ? `me at ${details.yourEmail}` : 'me'} immediately. Absent payment or a good-faith settlement proposal by ${deadline}, we will proceed with legal action without further notice.`,
+
+                    closing: `Sincerely,\n\n${sender}${senderCo}${details.yourEmail ? `\n${details.yourEmail}` : ''}`
+                };
+            };
+
+            const [paragraphs, setParagraphs] = useState(generateLetter());
+
+            // Regenerate letter when details change
+            useEffect(() => {
+                setParagraphs(generateLetter());
+            }, [details, amount, daysOverdue, contractType, deliveryProof, acceptanceStrength, disputeLevel]);
+
+            const updateParagraph = (key, value) => {
+                setParagraphs(prev => ({ ...prev, [key]: value }));
+            };
+
+            const [copyStatus, setCopyStatus] = useState('');
+
+            const copyToClipboard = () => {
+                const fullLetter = `${paragraphs.header}\n\n${paragraphs.p1}\n\n${paragraphs.p2}\n\n${paragraphs.p3}\n\n${paragraphs.p4}\n\n${paragraphs.p5}\n\n${paragraphs.p6}\n\n${paragraphs.closing}`;
+                navigator.clipboard.writeText(fullLetter);
+                setCopyStatus('Copied!');
+                setTimeout(() => setCopyStatus(''), 2000);
+            };
+
+            const downloadAsText = () => {
+                const fullLetter = `${paragraphs.header}\n\n${paragraphs.p1}\n\n${paragraphs.p2}\n\n${paragraphs.p3}\n\n${paragraphs.p4}\n\n${paragraphs.p5}\n\n${paragraphs.p6}\n\n${paragraphs.closing}`;
+                const blob = new Blob([fullLetter], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `demand-letter-${details.defendantName || 'draft'}-${new Date().toISOString().split('T')[0]}.txt`;
+                a.click();
+                URL.revokeObjectURL(url);
+            };
+
+            const paragraphConfig = [
+                { key: 'p1', title: 'Opening Demand', purpose: 'State the claim clearly', tip: 'Be direct. State the amount, the basis (contract), and that this is a formal demand.' },
+                { key: 'p2', title: 'Performance & Acceptance', purpose: 'Establish you delivered', tip: 'Reference specific deliverables, dates, and any acceptance/approval evidence you have.' },
+                { key: 'p3', title: 'Breach & Consequences', purpose: 'Frame the breach legally', tip: 'Note the failure to pay despite requests. Address any disputes briefly but firmly.' },
+                { key: 'p4', title: 'Litigation Preview', purpose: 'Show you\'ve done the math', tip: 'Showing you know the numbers signals you\'re serious. Mention judgment consequences.' },
+                { key: 'p5', title: 'Settlement Offer', purpose: 'Give a clear exit ramp', tip: 'Offer a specific discount with a hard deadline. Make it easy to say yes.' },
+                { key: 'p6', title: 'Call to Action', purpose: 'Specific next steps', tip: 'Provide exact payment instructions and a firm deadline. No ambiguity.' }
+            ];
+
+            return (
+                <div className="demand-letter-panel">
+                    <div className="demand-header">
+                        <h3>Demand Letter Generator <span className="custom-badge">Live Preview</span></h3>
+                        <button className="demand-close" onClick={onClose}>x</button>
+                    </div>
+                    <div className="demand-content">
+                        {/* Personalization Fields */}
+                        <div style={{
+                            background: '#f0f9ff',
+                            border: '1px solid #bae6fd',
+                            borderRadius: '10px',
+                            padding: '1rem',
+                            marginBottom: '1.5rem'
+                        }}>
+                            <div style={{ fontWeight: 600, color: '#0369a1', marginBottom: '0.75rem', fontSize: '0.9rem' }}>
+                                Fill in details to personalize your letter:
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                                <div>
+                                    <label style={{ fontSize: '0.75rem', color: '#64748b', display: 'block', marginBottom: '0.2rem' }}>Your Name *</label>
+                                    <input type="text" value={details.yourName} onChange={(e) => updateDetail('yourName', e.target.value)} placeholder="John Smith" style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85rem' }} />
+                                </div>
+                                <div>
+                                    <label style={{ fontSize: '0.75rem', color: '#64748b', display: 'block', marginBottom: '0.2rem' }}>Your Company</label>
+                                    <input type="text" value={details.yourCompany} onChange={(e) => updateDetail('yourCompany', e.target.value)} placeholder="ABC Consulting LLC" style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85rem' }} />
+                                </div>
+                                <div>
+                                    <label style={{ fontSize: '0.75rem', color: '#64748b', display: 'block', marginBottom: '0.2rem' }}>Defendant Name *</label>
+                                    <input type="text" value={details.defendantName} onChange={(e) => updateDetail('defendantName', e.target.value)} placeholder="Jane Doe" style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85rem' }} />
+                                </div>
+                                <div>
+                                    <label style={{ fontSize: '0.75rem', color: '#64748b', display: 'block', marginBottom: '0.2rem' }}>Defendant Company</label>
+                                    <input type="text" value={details.defendantCompany} onChange={(e) => updateDetail('defendantCompany', e.target.value)} placeholder="XYZ Corp" style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85rem' }} />
+                                </div>
+                                <div style={{ gridColumn: 'span 2' }}>
+                                    <label style={{ fontSize: '0.75rem', color: '#64748b', display: 'block', marginBottom: '0.2rem' }}>Service/Work Description *</label>
+                                    <input type="text" value={details.serviceDescription} onChange={(e) => updateDetail('serviceDescription', e.target.value)} placeholder="web development services" style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85rem' }} />
+                                </div>
+                                <div>
+                                    <label style={{ fontSize: '0.75rem', color: '#64748b', display: 'block', marginBottom: '0.2rem' }}>Invoice #</label>
+                                    <input type="text" value={details.invoiceNumber} onChange={(e) => updateDetail('invoiceNumber', e.target.value)} placeholder="INV-2024-001" style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85rem' }} />
+                                </div>
+                                <div>
+                                    <label style={{ fontSize: '0.75rem', color: '#64748b', display: 'block', marginBottom: '0.2rem' }}>Payment Deadline</label>
+                                    <input type="date" value={details.paymentDeadline} onChange={(e) => updateDetail('paymentDeadline', e.target.value)} style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85rem' }} />
+                                </div>
+                                <div>
+                                    <label style={{ fontSize: '0.75rem', color: '#64748b', display: 'block', marginBottom: '0.2rem' }}>Your Email</label>
+                                    <input type="email" value={details.yourEmail} onChange={(e) => updateDetail('yourEmail', e.target.value)} placeholder="you@email.com" style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85rem' }} />
+                                </div>
+                                <div>
+                                    <label style={{ fontSize: '0.75rem', color: '#64748b', display: 'block', marginBottom: '0.2rem' }}>Payment Method</label>
+                                    <input type="text" value={details.paymentMethod} onChange={(e) => updateDetail('paymentMethod', e.target.value)} placeholder="wire transfer, Zelle, or check" style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.85rem' }} />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="demand-intro">
+                            <strong>Letter Preview:</strong> Based on ${amount.toLocaleString()} owed, {contractType} contract, {daysOverdue} days overdue. Settlement offer: ${Math.round(calc.settlement.mid).toLocaleString()}
+                        </div>
+
+                        {/* Letter Header */}
+                        <div className="demand-paragraph">
+                            <div className="demand-paragraph-header">
+                                <span className="demand-paragraph-num" style={{ background: '#64748b' }}>H</span>
+                                <span className="demand-paragraph-title">Letter Header</span>
+                                <span className="demand-paragraph-purpose">Date, addressee, subject line</span>
+                            </div>
+                            <div className="demand-paragraph-body">
+                                <textarea className="demand-text" value={paragraphs.header} onChange={(e) => updateParagraph('header', e.target.value)} style={{ minHeight: '120px' }} />
+                            </div>
+                        </div>
+
+                        {paragraphConfig.map((p, i) => (
+                            <div key={p.key} className="demand-paragraph">
+                                <div className="demand-paragraph-header">
+                                    <span className="demand-paragraph-num">{i + 1}</span>
+                                    <span className="demand-paragraph-title">{p.title}</span>
+                                    <span className="demand-paragraph-purpose">{p.purpose}</span>
+                                </div>
+                                <div className="demand-paragraph-body">
+                                    <textarea
+                                        className="demand-text"
+                                        value={paragraphs[p.key]}
+                                        onChange={(e) => updateParagraph(p.key, e.target.value)}
+                                    />
+                                    <div className="demand-tip">
+                                        <span className="demand-tip-icon">i</span>
+                                        <span>{p.tip}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+
+                        {/* Closing */}
+                        <div className="demand-paragraph">
+                            <div className="demand-paragraph-header">
+                                <span className="demand-paragraph-num" style={{ background: '#64748b' }}>C</span>
+                                <span className="demand-paragraph-title">Closing</span>
+                                <span className="demand-paragraph-purpose">Sign-off</span>
+                            </div>
+                            <div className="demand-paragraph-body">
+                                <textarea className="demand-text" value={paragraphs.closing} onChange={(e) => updateParagraph('closing', e.target.value)} style={{ minHeight: '60px' }} />
+                            </div>
+                        </div>
+
+                        <div className="demand-actions">
+                            <button className="demand-btn primary" onClick={copyToClipboard}>
+                                {copyStatus || 'Copy Full Letter'}
+                            </button>
+                            <button className="demand-btn secondary" onClick={downloadAsText}>
+                                Download .txt
+                            </button>
+                            <a href="/intake/" className="demand-btn secondary">
+                                Get Attorney Help
+                            </a>
+                        </div>
                     </div>
                 </div>
             );
@@ -1384,6 +1967,11 @@
 
         // ============== MAIN APP ==============
         const App = () => {
+            // Parse URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const isEmbed = urlParams.get('embed') === 'true';
+            const demandOnly = urlParams.get('demandOnly') === 'true';
+
             const [formData, setFormData] = useState({
                 amount: 5000, contractType: 'signed', deliveryProof: 'strong', acceptanceStrength: 'explicit',
                 disputeLevel: 'none', scopeMess: 'none', defendantType: 'small_biz', assetInfo: 'none',
@@ -1391,6 +1979,7 @@
             });
             const [deltaMessage, setDeltaMessage] = useState(null);
             const [prevNEV, setPrevNEV] = useState(null);
+            const [showDemandLetter, setShowDemandLetter] = useState(demandOnly); // Auto-show if demandOnly
 
             const updateField = useCallback((field, value) => {
                 setFormData(prev => ({ ...prev, [field]: value }));
@@ -1407,8 +1996,21 @@
                 setPrevNEV(calc.bestNEV);
             }, [calc.bestNEV]);
 
+            // Demand-only mode: show just the demand letter generator
+            if (demandOnly) {
+                return (
+                    <div style={{ padding: isEmbed ? '0' : '1.5rem', maxWidth: '900px', margin: '0 auto' }}>
+                        <DemandLetterGenerator
+                            formData={formData}
+                            calc={calc}
+                            onClose={() => {}}
+                        />
+                    </div>
+                );
+            }
+
             return (
-                <div className="main-container">
+                <div className={`main-container ${isEmbed ? 'embed-mode' : ''}`}>
                     {/* FORM */}
                     <div className="form-panel">
                         <h1 className="form-title">What's Your Case Worth?</h1>
@@ -1420,7 +2022,7 @@
                                 <span className="section-title">Your Claim</span>
                             </div>
                             <div className="field-group">
-                                <label className="field-label">Amount Owed <Tooltip text="Total unpaid amount. Interest calculated automatically." /></label>
+                                <label className="field-label">Amount Owed <Tooltip text="Enter the total unpaid principal. We add 10% annual interest automatically. Include all invoices - courts prefer one action for related debts." /></label>
                                 <AmountInput value={formData.amount} onChange={(v) => updateField('amount', v)} />
                             </div>
                             <div className="field-group">
@@ -1431,7 +2033,7 @@
                                 </select>
                             </div>
                             <div className="field-group">
-                                <label className="field-label">Contract Type <Tooltip text="Signed agreements strongest. Email good. Oral invites disputes." /></label>
+                                <label className="field-label">Contract Type <Tooltip text="SIGNED = Gold standard, clear terms. PO/WRITTEN = Good evidence. EMAIL = Provable but weaker. ORAL = Major penalty - courts see 'he said/she said.' Find any writing you can!" /></label>
                                 <OptionGroup options={[{value:'signed',label:'Signed'},{value:'po',label:'PO'},{value:'email',label:'Email'},{value:'oral',label:'Oral'}]} value={formData.contractType} onChange={(v)=>updateField('contractType',v)} />
                             </div>
                         </div>
@@ -1442,19 +2044,19 @@
                                 <span className="section-title">Evidence</span>
                             </div>
                             <div className="field-group">
-                                <label className="field-label">Delivery Proof <Tooltip text="Files, timestamps, emails, receipts proving delivery." /></label>
+                                <label className="field-label">Delivery Proof <Tooltip text="STRONG = Files sent, delivery receipts, read confirmations. SOME = Emails discussing work. WEAK = No documentation. Best evidence: timestamped file transfers, signed delivery receipts." /></label>
                                 <OptionGroup options={[{value:'strong',label:'Strong'},{value:'some',label:'Some'},{value:'none',label:'Weak'}]} value={formData.deliveryProof} onChange={(v)=>updateField('deliveryProof',v)} />
                             </div>
                             <div className="field-group">
-                                <label className="field-label">Acceptance <Tooltip text="Did they approve/accept? Even 'looks good' helps." /></label>
+                                <label className="field-label">Acceptance <Tooltip text="EXPLICIT = They said 'approved', 'looks good', signed off. IMPLIED = They used it without complaint. NONE = Radio silence. Even 'thanks' or 'received' helps establish acceptance." /></label>
                                 <OptionGroup options={[{value:'explicit',label:'Explicit'},{value:'implied',label:'Implied'},{value:'none',label:'None'}]} value={formData.acceptanceStrength} onChange={(v)=>updateField('acceptanceStrength',v)} />
                             </div>
                             <div className="field-group">
-                                <label className="field-label">Quality Dispute <Tooltip text="Did they raise complaints? Specific hurts more than vague." /></label>
+                                <label className="field-label">Quality Dispute <Tooltip text="NONE = No complaints raised. VAGUE = 'Not happy' without specifics. SPECIFIC = Itemized defects with dollar offsets. Specific disputes increase haircut probability but can be rebutted." /></label>
                                 <OptionGroup options={[{value:'none',label:'None'},{value:'vague',label:'Vague'},{value:'specific',label:'Specific'}]} value={formData.disputeLevel} onChange={(v)=>updateField('disputeLevel',v)} />
                             </div>
                             <div className="field-group">
-                                <label className="field-label">Scope Issues <Tooltip text="Change orders, 'not included' issues." /></label>
+                                <label className="field-label">Scope Issues <Tooltip text="NONE = Clear scope, no disputes. SOME = Minor 'that wasn't included' issues. HEAVY = Major scope confusion, change orders, unclear boundaries. Heavy scope mess invites offsets and delays." /></label>
                                 <OptionGroup options={[{value:'none',label:'None'},{value:'some',label:'Some'},{value:'heavy',label:'Heavy'}]} value={formData.scopeMess} onChange={(v)=>updateField('scopeMess',v)} />
                             </div>
                         </div>
@@ -1465,15 +2067,15 @@
                                 <span className="section-title">Defendant</span>
                             </div>
                             <div className="field-group">
-                                <label className="field-label">Type <Tooltip text="Larger = more collectible. Individuals harder." /></label>
+                                <label className="field-label">Type <Tooltip text="LARGE = Big company, deep pockets, pay to avoid hassle. MID = Established business, usually collectible. SMALL = Small biz, cashflow dependent. INDIVIDUAL = Hardest to collect - verify assets first." /></label>
                                 <OptionGroup options={[{value:'large',label:'Large'},{value:'mid',label:'Mid'},{value:'small_biz',label:'Small'},{value:'individual',label:'Person'}]} value={formData.defendantType} onChange={(v)=>updateField('defendantType',v)} />
                             </div>
                             <div className="field-group">
-                                <label className="field-label">Know Where Money Is? <Tooltip text="Bank, processor, employer = better collection." /></label>
+                                <label className="field-label">Know Where Money Is? <Tooltip text="BANK = You know their bank (can levy). PROCESSOR = Stripe, Square, etc. (can intercept). EMPLOYER = Can garnish wages. UNKNOWN = Biggest collection risk - find this before escalating!" /></label>
                                 <OptionGroup options={[{value:'bank',label:'Bank'},{value:'processor',label:'Processor'},{value:'employer',label:'Employer'},{value:'none',label:'Unknown'}]} value={formData.assetInfo} onChange={(v)=>updateField('assetInfo',v)} />
                             </div>
                             <div className="field-group">
-                                <label className="field-label">Location</label>
+                                <label className="field-label">Location <Tooltip text="OUT OF STATE = Adds friction and cost. May need to file where they are, hire local counsel, or domesticate judgment. Adds ~$500-1500 in costs and delays." /></label>
                                 <OptionGroup options={[{value:false,label:'Same State'},{value:true,label:'Out of State'}]} value={formData.outOfState} onChange={(v)=>updateField('outOfState',v)} />
                             </div>
                         </div>
@@ -1484,11 +2086,11 @@
                                 <span className="section-title">Contract Terms</span>
                             </div>
                             <div className="field-group">
-                                <label className="field-label">Fee Clause <Tooltip text="Prevailing-party clause increases their downside." /></label>
+                                <label className="field-label">Fee Clause <Tooltip text="'Prevailing party' or 'loser pays' clause. If YES, defendant faces paying YOUR legal fees if they lose - huge leverage. Check your contract! Look for 'attorney fees', 'costs of collection'." /></label>
                                 <OptionGroup options={[{value:'yes',label:'Yes'},{value:'no',label:'No'},{value:'unknown',label:'Unsure'}]} value={formData.feeClause} onChange={(v)=>updateField('feeClause',v)} />
                             </div>
                             <div className="field-group">
-                                <label className="field-label">Personal Guaranty <Tooltip text="Expands collection targets." /></label>
+                                <label className="field-label">Personal Guaranty <Tooltip text="Did an individual personally guarantee the business debt? If YES, you can pursue BOTH the company AND the person. Check signature blocks and any 'personal guaranty' or 'individually liable' language." /></label>
                                 <OptionGroup options={[{value:'yes',label:'Yes'},{value:'no',label:'No'},{value:'unknown',label:'Unsure'}]} value={formData.guaranty} onChange={(v)=>updateField('guaranty',v)} />
                             </div>
                         </div>
@@ -1504,6 +2106,7 @@
                             <Gauge percent={calc.successProb * 100} label={calc.gaugeLabel} status={calc.gaugeStatus} />
                             <EVCard calc={calc} />
                         </div>
+                        <EVBreakdown calc={calc} />
                         <HardTruthCard truth={calc.hardTruth} />
                         <StabilityCard stability={calc.stability} sensitivity={calc.sensitivity} />
                         <OutcomeBars outcomes={calc.outcomes} />
@@ -1512,7 +2115,15 @@
                         <PathwaysGrid calc={calc} formData={formData} />
                         <LegalAnalysis calc={calc} formData={formData} />
                         <Checklist items={calc.checklist} nextStep={calc.nextStep} />
-                        <CTACard calc={calc} />
+                        <CTACard calc={calc} onGenerateLetter={() => setShowDemandLetter(true)} />
+
+                        {showDemandLetter && (
+                            <DemandLetterGenerator
+                                formData={formData}
+                                calc={calc}
+                                onClose={() => setShowDemandLetter(false)}
+                            />
+                        )}
                     </div>
 
                     {deltaMessage && <div className={`delta-toast show ${deltaMessage.type}`}>{deltaMessage.text}</div>}
@@ -1520,7 +2131,40 @@
             );
         };
 
-        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+        // Error boundary for debugging
+        class ErrorBoundary extends React.Component {
+            constructor(props) {
+                super(props);
+                this.state = { hasError: false, error: null };
+            }
+            static getDerivedStateFromError(error) {
+                return { hasError: true, error };
+            }
+            render() {
+                if (this.state.hasError) {
+                    return (
+                        <div style={{padding:'2rem',color:'#dc2626',textAlign:'center'}}>
+                            <h2>Something went wrong</h2>
+                            <pre style={{fontSize:'0.8rem',textAlign:'left',background:'#fef2f2',padding:'1rem',borderRadius:'8px',overflow:'auto'}}>
+                                {this.state.error?.toString()}
+                            </pre>
+                        </div>
+                    );
+                }
+                return this.props.children;
+            }
+        }
+
+        try {
+            ReactDOM.createRoot(document.getElementById('root')).render(
+                <ErrorBoundary>
+                    <App />
+                </ErrorBoundary>
+            );
+        } catch (e) {
+            console.error('React render error:', e);
+            document.getElementById('root').innerHTML = '<div style="padding:2rem;color:#dc2626;">Error loading app: ' + e.message + '</div>';
+        }
     </script>
 </body>
 </html>

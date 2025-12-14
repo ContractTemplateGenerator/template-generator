@@ -722,6 +722,55 @@
       font-size: 1.25rem;
       color: #3b82f6;
       font-weight: bold;
+      transition: transform 0.3s;
+    }
+    .calculator-cta {
+      cursor: pointer;
+    }
+    .calculator-cta.open .calc-cta-arrow {
+      transform: rotate(180deg);
+    }
+
+    /* Inline Calculator Panel - unfolds on click */
+    .inline-calculator-panel {
+      display: none;
+      overflow: hidden;
+      border-radius: 12px;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      animation: slideDownCalc 0.3s ease-out;
+    }
+    .inline-calculator-panel.open {
+      display: block;
+    }
+    .inline-calculator-panel iframe {
+      width: 100%;
+      height: 800px;
+      border: none;
+      background: white;
+    }
+    @keyframes slideDownCalc {
+      from { opacity: 0; max-height: 0; }
+      to { opacity: 1; max-height: 1000px; }
+    }
+
+    /* Inline Demand Letter Panel */
+    .inline-demand-panel {
+      display: none;
+      overflow: hidden;
+      border-radius: 12px;
+      margin-top: 1rem;
+      background: white;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      animation: slideDownCalc 0.3s ease-out;
+    }
+    .inline-demand-panel.open {
+      display: block;
+    }
+    .inline-demand-panel iframe {
+      width: 100%;
+      height: 700px;
+      border: none;
     }
 
     .analysis-summary {
@@ -2428,34 +2477,60 @@
 
       // Build options with bestFor badges
       let optionsHtml = '';
+      let demandLetterPanelHtml = '';
       data.options.forEach(opt => {
         const recommendedClass = opt.recommended ? ' recommended' : '';
         const bestForHtml = opt.bestFor ? `<div class="option-best-for">Best for: ${opt.bestFor}</div>` : '';
-        optionsHtml += `
-          <div class="option-card${recommendedClass}">
-            <h6>${opt.icon} ${opt.title}</h6>
-            <p>${opt.desc || ''}</p>
-            ${bestForHtml}
-            <div class="option-meta">
-              <span>Cost: <strong>${opt.cost}</strong></span>
-              <span>Time: <strong>${opt.time}</strong></span>
+
+        // Special handling for Demand Letter option - make it clickable
+        if (opt.title === 'Demand Letter') {
+          optionsHtml += `
+            <div class="option-card demand-letter-card${recommendedClass}" onclick="toggleInlineDemandLetter()" style="cursor:pointer;">
+              <h6>${opt.icon} ${opt.title} <span style="font-size:0.7rem;color:#3b82f6;">&#9660; Click to generate</span></h6>
+              <p>${opt.desc || ''}</p>
+              ${bestForHtml}
+              <div class="option-meta">
+                <span>Cost: <strong>${opt.cost}</strong></span>
+                <span>Time: <strong>${opt.time}</strong></span>
+              </div>
             </div>
-          </div>
-        `;
+          `;
+          // Add the inline demand letter panel
+          demandLetterPanelHtml = `
+            <div class="inline-demand-panel" id="inlineDemandPanel">
+              <iframe src="/case-evaluator/?demandOnly=true&embed=true" id="demandLetterIframe" frameborder="0"></iframe>
+            </div>
+          `;
+        } else {
+          optionsHtml += `
+            <div class="option-card${recommendedClass}">
+              <h6>${opt.icon} ${opt.title}</h6>
+              <p>${opt.desc || ''}</p>
+              ${bestForHtml}
+              <div class="option-meta">
+                <span>Cost: <strong>${opt.cost}</strong></span>
+                <span>Time: <strong>${opt.time}</strong></span>
+              </div>
+            </div>
+          `;
+        }
       });
 
-      // Build calculator link if available
+      // Build calculator link if available - now unfolds inline
       let calcLinkHtml = '';
       if (data.calculatorLink) {
         calcLinkHtml = `
-          <a href="${data.calculatorLink}" class="calculator-cta">
+          <div class="calculator-cta" onclick="toggleInlineCalculator()" id="calcCta">
             <span class="calc-cta-icon">&#128202;</span>
             <span class="calc-cta-text">
               <strong>${data.calculatorText || 'Calculate Your Expected Value'}</strong>
               <small>Get detailed probability analysis, settlement ranges, and EV calculations</small>
             </span>
-            <span class="calc-cta-arrow">&#8594;</span>
-          </a>
+            <span class="calc-cta-arrow" id="calcCtaArrow">&#9660;</span>
+          </div>
+          <div class="inline-calculator-panel" id="inlineCalculatorPanel">
+            <iframe src="${data.calculatorLink}&embed=true" id="calculatorIframe" frameborder="0"></iframe>
+          </div>
         `;
       }
 
@@ -2468,6 +2543,7 @@
         ${quickAssessHtml}
         <h5>Your Options</h5>
         <div class="options-grid" id="optionsGrid">${optionsHtml}</div>
+        ${demandLetterPanelHtml}
       `;
 
       // Store current topic for inline chat
@@ -2561,6 +2637,32 @@
 
     // Initial setup
     setupInlineChatHandlers();
+
+    // Toggle inline calculator panel
+    function toggleInlineCalculator() {
+      const panel = document.getElementById('inlineCalculatorPanel');
+      const cta = document.getElementById('calcCta');
+      if (panel && cta) {
+        panel.classList.toggle('open');
+        cta.classList.toggle('open');
+        if (panel.classList.contains('open')) {
+          panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }
+    }
+
+    // Toggle inline demand letter panel
+    function toggleInlineDemandLetter() {
+      const panel = document.getElementById('inlineDemandPanel');
+      const card = document.querySelector('.option-card.demand-letter-card');
+      if (panel) {
+        panel.classList.toggle('open');
+        if (card) card.classList.toggle('open');
+        if (panel.classList.contains('open')) {
+          panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }
+    }
   </script>
 
 </body>
