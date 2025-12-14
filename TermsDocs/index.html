@@ -50,6 +50,56 @@
       position: fixed;
       height: 100vh;
       z-index: 100;
+      transition: width 0.2s ease;
+    }
+
+    .sidebar.collapsed {
+      width: 60px;
+    }
+
+    .sidebar.collapsed .nav-section-title,
+    .sidebar.collapsed .nav-item span:not(.icon),
+    .sidebar.collapsed .nav-item .badge,
+    .sidebar.collapsed .user-info > div:last-child,
+    .sidebar.collapsed .logo span:last-child {
+      display: none;
+    }
+
+    .sidebar.collapsed .nav-item {
+      justify-content: center;
+      padding: 14px;
+    }
+
+    .sidebar.collapsed .sidebar-header {
+      justify-content: center;
+    }
+
+    .sidebar.collapsed .user-info {
+      justify-content: center;
+    }
+
+    .sidebar-toggle {
+      position: absolute;
+      right: -12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 24px;
+      height: 24px;
+      background: var(--color-primary);
+      border: none;
+      border-radius: 50%;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      z-index: 101;
+      box-shadow: var(--shadow-md);
+    }
+
+    .sidebar-toggle:hover {
+      background: var(--color-primary-dark);
     }
 
     .sidebar-header {
@@ -169,6 +219,12 @@
       flex: 1;
       margin-left: var(--sidebar-width);
       min-height: 100vh;
+      transition: margin-left 0.2s ease;
+    }
+
+    .sidebar.collapsed + .main-content,
+    body.sidebar-collapsed .main-content {
+      margin-left: 60px;
     }
 
     .content-header {
@@ -567,9 +623,14 @@
     /* Document Workspace */
     .workspace-container {
       display: grid;
-      grid-template-columns: 300px 1fr;
-      gap: 24px;
+      grid-template-columns: auto 1fr;
+      gap: 16px;
       height: calc(100vh - 140px);
+    }
+
+    .generator-panel:not(.collapsed) {
+      width: 220px;
+      min-width: 220px;
     }
 
     .generator-panel {
@@ -579,6 +640,55 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      transition: width 0.2s ease, min-width 0.2s ease;
+      position: relative;
+    }
+
+    .generator-panel.collapsed {
+      width: 50px !important;
+      min-width: 50px !important;
+    }
+
+    .generator-panel.collapsed .panel-header span,
+    .generator-panel.collapsed .generator-search,
+    .generator-panel.collapsed .generator-item .name {
+      display: none;
+    }
+
+    .generator-panel.collapsed .panel-header {
+      padding: 16px 8px;
+      justify-content: center;
+    }
+
+    .generator-panel.collapsed .generator-item {
+      justify-content: center;
+      padding: 12px 8px;
+    }
+
+    .generator-panel.collapsed .generator-item .icon {
+      margin: 0;
+    }
+
+    .panel-collapse-btn {
+      position: absolute;
+      right: -12px;
+      top: 16px;
+      width: 24px;
+      height: 24px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      z-index: 10;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .panel-collapse-btn:hover {
+      background: var(--color-bg);
     }
 
     .panel-header {
@@ -950,7 +1060,8 @@
 <body>
   <div class="app-container">
     <!-- Sidebar -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="mainSidebar">
+      <button class="sidebar-toggle" onclick="toggleSidebar()" title="Toggle sidebar">◀</button>
       <div class="sidebar-header">
         <a href="/" class="logo">
           <span>Terms</span><span>.Docs</span>
@@ -1134,8 +1245,9 @@
         <div class="content-body">
           <div class="workspace-container">
             <!-- Generator Panel -->
-            <div class="generator-panel">
-              <div class="panel-header">Document Generators</div>
+            <div class="generator-panel" id="generatorPanel">
+              <button class="panel-collapse-btn" onclick="toggleGeneratorPanel()" title="Toggle panel">◀</button>
+              <div class="panel-header"><span>Document Generators</span></div>
               <div class="generator-search">
                 <input type="text" placeholder="Search generators..." id="generatorSearch">
               </div>
@@ -1676,6 +1788,37 @@ You can also paste existing text to edit, or share this workspace link for real-
   </div>
 
   <script>
+    // Sidebar & Panel Toggle
+    function toggleSidebar() {
+      const sidebar = document.getElementById('mainSidebar');
+      const btn = sidebar.querySelector('.sidebar-toggle');
+      sidebar.classList.toggle('collapsed');
+      document.body.classList.toggle('sidebar-collapsed');
+      btn.textContent = sidebar.classList.contains('collapsed') ? '▶' : '◀';
+      localStorage.setItem('sidebar_collapsed', sidebar.classList.contains('collapsed'));
+    }
+
+    function toggleGeneratorPanel() {
+      const panel = document.getElementById('generatorPanel');
+      const btn = panel.querySelector('.panel-collapse-btn');
+      panel.classList.toggle('collapsed');
+      btn.textContent = panel.classList.contains('collapsed') ? '▶' : '◀';
+      localStorage.setItem('generator_panel_collapsed', panel.classList.contains('collapsed'));
+    }
+
+    // Restore collapse states on load
+    if (localStorage.getItem('sidebar_collapsed') === 'true') {
+      document.getElementById('mainSidebar').classList.add('collapsed');
+      document.body.classList.add('sidebar-collapsed');
+      document.querySelector('.sidebar-toggle').textContent = '▶';
+    }
+    if (localStorage.getItem('generator_panel_collapsed') === 'true') {
+      const panel = document.getElementById('generatorPanel');
+      const btn = document.querySelector('.panel-collapse-btn');
+      if (panel) panel.classList.add('collapsed');
+      if (btn) btn.textContent = '▶';
+    }
+
     // Tab Navigation
     function showTab(tabName) {
       // Hide all tabs
@@ -1908,7 +2051,9 @@ You can also paste existing text to edit, or share this workspace link for real-
         editorContent.appendChild(iframe);
       }
 
-      iframe.src = url;
+      // Add embed parameter to hide header in generator
+      const embedUrl = url + (url.includes('?') ? '&' : '?') + 'embed=1';
+      iframe.src = embedUrl;
       editorContent.classList.add('with-iframe');
 
       // Show loaded bar
