@@ -1446,13 +1446,20 @@
       // DEMAND / COLLECT MONEY
       'unpaid-invoice': {
         title: 'Unpaid Invoice Recovery',
-        quickAssess: [
-          'How much is owed? (Under $2,500 may not justify attorney fees)',
-          'How old is the debt? (Fresher = higher recovery rate)',
-          'Is the debtor a business or individual? (Businesses respond better)',
-          'Do you have documentation? (Contract, emails, PO?)'
+        probability: 'high',
+        probText: '60-70% response rate',
+        factors: [
+          { type: 'positive', icon: '✓', text: 'Business debtors respond better than individuals' },
+          { type: 'positive', icon: '✓', text: 'Written contracts/invoices strengthen your case' },
+          { type: 'neutral', icon: '→', text: 'Debt age matters: fresher = higher recovery' },
+          { type: 'negative', icon: '!', text: 'Under $2,500 may not justify attorney fees' }
         ],
-        message: `<strong>Unpaid invoices are my bread and butter.</strong> The key factors: amount owed, debtor type (businesses respond better), documentation strength, and age of the debt. For amounts over $2,500 with good documentation, demand letters get 60-70% response rates.`,
+        tips: [
+          { text: 'Gather all documentation (contract, invoices, emails)', impact: '+15%' },
+          { text: 'Research if debtor is still in business', impact: '+10%' },
+          { text: 'Note any prior payment history', impact: '+5%' }
+        ],
+        message: `<strong>Unpaid invoices are my bread and butter.</strong> For amounts over $2,500 with documentation, demand letters get 60-70% response rates. Key factors: documentation strength, debtor type, and debt age.`,
         options: [
           { icon: '&#128221;', title: 'Demand Letter', desc: 'Professional letter on attorney letterhead', bestFor: 'Debts $2,500+ with documentation', cost: '$450 flat', time: '3-5 days', recommended: true },
           { icon: '&#127963;', title: 'Small Claims + Ghostwriting', desc: 'I draft your court papers, you file', bestFor: 'Amounts up to $12,500, stronger case', cost: '$300-500 + $75 filing', time: '2-4 months' },
@@ -1463,13 +1470,20 @@
       },
       'contractor': {
         title: 'Contractor Didn\'t Deliver',
-        quickAssess: [
-          'Is the contractor licensed? (Unlicensed = more leverage for you)',
-          'Do you have a written agreement? (Even texts count)',
-          'How much did you pay vs. work completed?',
-          'Did they abandon the job or deliver poor quality?'
+        probability: 'high',
+        probText: '70-80% resolution rate',
+        factors: [
+          { type: 'positive', icon: '✓', text: 'Licensed contractors fear CSLB complaints' },
+          { type: 'positive', icon: '✓', text: 'Negative reviews are powerful leverage' },
+          { type: 'positive', icon: '✓', text: 'Unlicensed = they can\'t sue you for payment' },
+          { type: 'neutral', icon: '→', text: 'Written agreements (even texts) help your case' }
         ],
-        message: `<strong>Contractor disputes are extremely common.</strong> Good news: contractors fear licensing board complaints and negative reviews. A demand letter that threatens both often gets fast results. Unlicensed contractors have almost no legal recourse against you in California.`,
+        tips: [
+          { text: 'Check CSLB for license status', impact: '+20%' },
+          { text: 'Document incomplete/poor work with photos', impact: '+15%' },
+          { text: 'Keep all payment receipts', impact: '+10%' }
+        ],
+        message: `<strong>Contractor disputes are extremely common.</strong> Good news: contractors fear licensing board complaints and negative reviews. A demand letter that threatens both often gets fast results.`,
         options: [
           { icon: '&#128221;', title: 'Demand Letter', desc: 'Threatens licensing complaint if applicable', bestFor: 'Licensed contractors, clear breach', cost: '$450 flat', time: '3-5 days', recommended: true },
           { icon: '&#127970;', title: 'CSLB Complaint', desc: 'CA Contractors License Board', bestFor: 'Licensed contractor violations', cost: 'Free', time: '2-6 months' },
@@ -1480,11 +1494,18 @@
       },
       'deposit': {
         title: 'Security Deposit Not Returned',
-        quickAssess: [
-          'How long since you moved out? (21-day deadline applies)',
-          'Did landlord provide itemized deductions?',
-          'Do you have move-in/move-out photos?',
-          'How much is the deposit? (Small claims limit: $12,500)'
+        probability: 'high',
+        probText: '75-85% win rate in small claims',
+        factors: [
+          { type: 'positive', icon: '✓', text: 'CA law requires return within 21 days' },
+          { type: 'positive', icon: '✓', text: 'Violations = up to 2x penalty damages' },
+          { type: 'positive', icon: '✓', text: 'Landlords often settle to avoid court' },
+          { type: 'neutral', icon: '→', text: 'Photos of move-in/out condition help significantly' }
+        ],
+        tips: [
+          { text: 'Request itemized deduction list in writing', impact: '+15%' },
+          { text: 'Gather move-in/move-out photos', impact: '+20%' },
+          { text: 'Keep copy of lease agreement', impact: '+10%' }
         ],
         message: `<strong>Security deposit disputes have strict legal requirements.</strong> In California, landlords have 21 days to return the deposit or provide itemized deductions. Violations can result in 2x penalty damages. This is often a strong case for small claims.`,
         options: [
@@ -2041,9 +2062,50 @@
       document.getElementById('guidanceTitle').textContent = data.title;
       document.getElementById('guidanceMessage').innerHTML = data.message;
 
-      // Build quick assessment if available
+      // Build probability badge if available
+      let probHtml = '';
+      if (data.probability) {
+        probHtml = `<span class="probability-badge ${data.probability}">${data.probText}</span>`;
+      }
+
+      // Build key factors if available
+      let factorsHtml = '';
+      if (data.factors && data.factors.length > 0) {
+        factorsHtml = `
+          <div class="key-factors">
+            <h5>&#128200; Key Factors for Your Case</h5>
+            <div class="factors-grid">
+              ${data.factors.map(f => `
+                <div class="factor-card ${f.type}">
+                  <span class="factor-icon">${f.icon}</span>
+                  <span class="factor-text">${f.text}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      // Build tips if available
+      let tipsHtml = '';
+      if (data.tips && data.tips.length > 0) {
+        tipsHtml = `
+          <div class="improve-section">
+            <h5>&#128161; Improve Your Odds</h5>
+            ${data.tips.map(t => `
+              <div class="improve-item">
+                <span class="improve-icon">+</span>
+                <span>${t.text}</span>
+                <span class="improve-impact">${t.impact}</span>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      // Build quick assessment if available (fallback for subtopics without new data)
       let quickAssessHtml = '';
-      if (data.quickAssess && data.quickAssess.length > 0) {
+      if (!data.factors && data.quickAssess && data.quickAssess.length > 0) {
         quickAssessHtml = `
           <div class="quick-assess">
             <h5>&#128161; Quick Assessment Questions</h5>
@@ -2062,7 +2124,7 @@
         optionsHtml += `
           <div class="option-card${recommendedClass}">
             <h6>${opt.icon} ${opt.title}</h6>
-            <p>${opt.desc}</p>
+            <p>${opt.desc || ''}</p>
             ${bestForHtml}
             <div class="option-meta">
               <span>Cost: <strong>${opt.cost}</strong></span>
@@ -2072,8 +2134,11 @@
         `;
       });
 
-      // Insert quick assessment before options
+      // Insert comprehensive analysis
       document.getElementById('guidanceOptions').innerHTML = `
+        ${probHtml ? `<div style="text-align:center;margin-bottom:1rem;">${probHtml}</div>` : ''}
+        ${factorsHtml}
+        ${tipsHtml}
         ${quickAssessHtml}
         <h5>Your Options</h5>
         <div class="options-grid" id="optionsGrid">${optionsHtml}</div>
