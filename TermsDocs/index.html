@@ -951,6 +951,149 @@
       opacity: 1;
     }
 
+    /* Letterhead Styles */
+    .letterhead-bar {
+      display: none;
+      background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
+      color: white;
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .letterhead-bar.visible {
+      display: block;
+    }
+
+    .letterhead-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .letterhead-info {
+      flex: 1;
+    }
+
+    .letterhead-company {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .letterhead-tagline {
+      font-size: 12px;
+      opacity: 0.9;
+      margin-top: 2px;
+    }
+
+    .letterhead-contact {
+      font-size: 11px;
+      opacity: 0.8;
+      margin-top: 6px;
+    }
+
+    .letterhead-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .letterhead-actions button {
+      background: rgba(255,255,255,0.15);
+      border: none;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+
+    .letterhead-actions button:hover {
+      background: rgba(255,255,255,0.25);
+    }
+
+    /* Letterhead Modal */
+    .letterhead-modal .modal-body {
+      max-width: 500px;
+    }
+
+    .letterhead-form-group {
+      margin-bottom: 16px;
+    }
+
+    .letterhead-form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .letterhead-form-group input,
+    .letterhead-form-group textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    .letterhead-form-group input:focus,
+    .letterhead-form-group textarea:focus {
+      outline: none;
+      border-color: var(--color-primary);
+    }
+
+    .letterhead-presets {
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .letterhead-presets label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .preset-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .preset-btn {
+      padding: 8px 14px;
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      background: white;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .preset-btn:hover {
+      border-color: var(--color-primary);
+      background: #f0f4ff;
+    }
+
+    .preset-btn.active {
+      border-color: var(--color-primary);
+      background: var(--color-primary);
+      color: white;
+    }
+
+    .owner-preset {
+      display: none;
+    }
+
+    body.owner-mode .owner-preset {
+      display: inline-block;
+    }
+
     /* E-Sign Modal */
     .modal-overlay {
       position: fixed;
@@ -1333,8 +1476,23 @@
                 <span class="width-hint">↔ Widen window for side-by-side preview</span>
                 <button onclick="closeGenerator()">Back to blank editor</button>
               </div>
+              <!-- Letterhead Bar -->
+              <div class="letterhead-bar" id="letterheadBar">
+                <div class="letterhead-content">
+                  <div class="letterhead-info">
+                    <div class="letterhead-company" id="letterheadCompany"></div>
+                    <div class="letterhead-tagline" id="letterheadTagline"></div>
+                    <div class="letterhead-contact" id="letterheadContact"></div>
+                  </div>
+                  <div class="letterhead-actions">
+                    <button onclick="openLetterheadModal()">Edit</button>
+                    <button onclick="removeLetterhead()">Remove</button>
+                  </div>
+                </div>
+              </div>
+
               <div class="editor-toolbar">
-                <button class="toolbar-btn">📁 Open</button>
+                <button class="toolbar-btn" onclick="openLetterheadModal()">📋 Letterhead</button>
                 <button class="toolbar-btn">💾 Save</button>
                 <button class="toolbar-btn">📥 Download</button>
                 <div class="toolbar-divider"></div>
@@ -1795,7 +1953,147 @@ You can also paste existing text to edit, or share this workspace link for real-
     </div>
   </div>
 
+  <!-- Letterhead Modal -->
+  <div class="modal-overlay letterhead-modal" id="letterheadModal">
+    <div class="modal" style="max-width: 500px;">
+      <div class="modal-header">
+        <h2 class="modal-title">Add Letterhead</h2>
+        <button class="modal-close" onclick="closeLetterheadModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="letterhead-presets">
+          <label>Quick Presets</label>
+          <div class="preset-buttons">
+            <button class="preset-btn owner-preset" onclick="loadOwnerLetterhead()">Sergei Tokmakov, Esq.</button>
+            <button class="preset-btn" onclick="loadSavedLetterhead()">Load Saved</button>
+            <button class="preset-btn" onclick="clearLetterheadForm()">Start Fresh</button>
+          </div>
+        </div>
+        <div class="letterhead-form-group">
+          <label>Company / Law Firm Name</label>
+          <input type="text" id="lhCompany" placeholder="e.g., SMITH & JONES LLP">
+        </div>
+        <div class="letterhead-form-group">
+          <label>Tagline / Specialty (optional)</label>
+          <input type="text" id="lhTagline" placeholder="e.g., California Business Law">
+        </div>
+        <div class="letterhead-form-group">
+          <label>Contact Info</label>
+          <textarea id="lhContact" rows="3" placeholder="123 Main St, Suite 100, City, CA 90001&#10;(555) 123-4567 | email@example.com"></textarea>
+        </div>
+        <div style="margin-top: 16px;">
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px;">
+            <input type="checkbox" id="lhSaveForLater">
+            <span>Save this letterhead for future use</span>
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeLetterheadModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="applyLetterhead()">
+          <span>📋</span> Apply Letterhead
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
+    // Check for owner mode (secret URL parameter)
+    if (new URLSearchParams(window.location.search).get('owner') === '1') {
+      document.body.classList.add('owner-mode');
+      localStorage.setItem('termsdocs_owner', 'true');
+    } else if (localStorage.getItem('termsdocs_owner') === 'true') {
+      document.body.classList.add('owner-mode');
+    }
+
+    // Letterhead Functions
+    const OWNER_LETTERHEAD = {
+      company: 'SERGEI TOKMAKOV, ESQ.',
+      tagline: 'California Business & Contract Attorney',
+      contact: '1460 Broadway, New York, NY 10036\nowner@terms.law | terms.law'
+    };
+
+    function openLetterheadModal() {
+      document.getElementById('letterheadModal').classList.add('active');
+      // Load saved data if exists
+      const saved = localStorage.getItem('termsdocs_letterhead');
+      if (saved) {
+        const data = JSON.parse(saved);
+        document.getElementById('lhCompany').value = data.company || '';
+        document.getElementById('lhTagline').value = data.tagline || '';
+        document.getElementById('lhContact').value = data.contact || '';
+      }
+    }
+
+    function closeLetterheadModal() {
+      document.getElementById('letterheadModal').classList.remove('active');
+    }
+
+    function loadOwnerLetterhead() {
+      document.getElementById('lhCompany').value = OWNER_LETTERHEAD.company;
+      document.getElementById('lhTagline').value = OWNER_LETTERHEAD.tagline;
+      document.getElementById('lhContact').value = OWNER_LETTERHEAD.contact;
+      document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+
+    function loadSavedLetterhead() {
+      const saved = localStorage.getItem('termsdocs_letterhead');
+      if (saved) {
+        const data = JSON.parse(saved);
+        document.getElementById('lhCompany').value = data.company || '';
+        document.getElementById('lhTagline').value = data.tagline || '';
+        document.getElementById('lhContact').value = data.contact || '';
+        document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+        event.target.classList.add('active');
+      } else {
+        alert('No saved letterhead found. Create one and check "Save this letterhead for future use".');
+      }
+    }
+
+    function clearLetterheadForm() {
+      document.getElementById('lhCompany').value = '';
+      document.getElementById('lhTagline').value = '';
+      document.getElementById('lhContact').value = '';
+      document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+
+    function applyLetterhead() {
+      const company = document.getElementById('lhCompany').value.trim();
+      const tagline = document.getElementById('lhTagline').value.trim();
+      const contact = document.getElementById('lhContact').value.trim();
+
+      if (!company) {
+        alert('Please enter a company/firm name.');
+        return;
+      }
+
+      // Save if checkbox is checked
+      if (document.getElementById('lhSaveForLater').checked) {
+        localStorage.setItem('termsdocs_letterhead', JSON.stringify({ company, tagline, contact }));
+      }
+
+      // Update letterhead bar
+      document.getElementById('letterheadCompany').textContent = company;
+      document.getElementById('letterheadTagline').textContent = tagline;
+      document.getElementById('letterheadContact').textContent = contact.replace(/\n/g, ' | ');
+      document.getElementById('letterheadBar').classList.add('visible');
+
+      closeLetterheadModal();
+    }
+
+    function removeLetterhead() {
+      document.getElementById('letterheadBar').classList.remove('visible');
+    }
+
+    // Close letterhead modal on overlay click
+    document.getElementById('letterheadModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeLetterheadModal();
+      }
+    });
+
     // Sidebar & Panel Toggle
     function toggleSidebar() {
       const sidebar = document.getElementById('mainSidebar');
