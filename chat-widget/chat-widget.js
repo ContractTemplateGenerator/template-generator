@@ -8,10 +8,10 @@
   'use strict';
 
   const API_BASE = 'https://template-generator-aob3.vercel.app/api/telegram-chat';
-  const PHOTO_URL = 'https://template.terms.law/chat-widget/sergei_small.jpg';
+  const PHOTO_URL = 'https://terms.law/chat-widget/sergei_small.jpg';
 
   let isOpen = false;
-  let currentStatus = 'away';
+  let currentStatus = 'available'; // Default to yellow/available
   let chatStarted = false;
   let visitorId = localStorage.getItem('termslaw_chat_id') || generateId();
   let visitorName = '';
@@ -317,13 +317,13 @@
       position: fixed; bottom: 24px; right: 24px;
       width: 70px; height: 70px; border-radius: 50%;
       background: url('${PHOTO_URL}') center/cover;
-      border: 4px solid white;
+      border: 4px solid #fbbf24;
       cursor: pointer;
-      box-shadow: 0 6px 24px rgba(0,0,0,0.25);
+      box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.3), 0 6px 24px rgba(0,0,0,0.25);
       transition: all 0.3s ease;
       z-index: 999999;
     }
-    .tl-fab:hover { transform: scale(1.08); }
+    .tl-fab:hover { transform: scale(1.08); box-shadow: 0 0 0 6px rgba(251, 191, 36, 0.4), 0 8px 32px rgba(0,0,0,0.3); }
     .tl-fab.open { transform: scale(0.9); opacity: 0.5; }
 
     .tl-fab-status {
@@ -874,9 +874,13 @@
     try {
       const res = await fetch(`${API_BASE}?action=status`);
       const data = await res.json();
-      currentStatus = data.status || (data.online ? 'online' : 'away');
+      // Only go 'online' if API says so, otherwise stay 'available' (never 'away')
+      currentStatus = data.online ? 'online' : 'available';
       render();
-    } catch (e) { currentStatus = 'away'; }
+    } catch (e) {
+      // On error, stay available (not away)
+      currentStatus = 'available';
+    }
   }
 
   function generateId() {
