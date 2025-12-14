@@ -143,6 +143,30 @@
       background: #f1f5f9;
     }
 
+    /* Welcome Section */
+    .welcome-section {
+      background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+      border-bottom: 2px solid #a7f3d0;
+      padding: 24px 40px;
+    }
+
+    .welcome-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .welcome-section h2 {
+      color: #065f46;
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .welcome-section p {
+      color: #047857;
+      font-size: 1rem;
+    }
+
     /* Document Cards */
     .docs-grid {
       display: grid;
@@ -179,12 +203,17 @@
     }
 
     .doc-card-header {
-      padding: 20px 24px 16px 80px;
+      padding: 20px 24px 20px 80px;
       background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-      border-bottom: 2px solid var(--border);
       display: flex;
       justify-content: space-between;
       align-items: center;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .doc-card-header:hover {
+      background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
     }
 
     .doc-card-header h3 {
@@ -198,6 +227,32 @@
 
     .doc-card-header .doc-icon {
       font-size: 1.3rem;
+    }
+
+    .doc-card-header .expand-hint {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .doc-card-header .expand-arrow {
+      transition: transform 0.2s;
+    }
+
+    .doc-card.expanded .doc-card-header .expand-arrow {
+      transform: rotate(180deg);
+    }
+
+    .doc-card-body {
+      display: none;
+      padding: 20px;
+      border-top: 2px solid var(--border);
+    }
+
+    .doc-card.expanded .doc-card-body {
+      display: block;
     }
 
     .doc-status {
@@ -465,33 +520,29 @@
     </div>
   </header>
 
-  <!-- Private Notice -->
-  <div class="private-notice">
-    <span class="lock-icon">🔒</span>
-    <span><strong>Private & Confidential</strong> — This workroom is exclusively for Marina Repeah. Do not share this link.</span>
+  <!-- Welcome Section -->
+  <div class="welcome-section">
+    <div class="welcome-inner">
+      <h2>Hi Marina,</h2>
+      <p style="margin-bottom: 12px;">I've prepared <strong>2 documents</strong> for you:</p>
+      <ol style="margin-left: 20px; margin-bottom: 12px; line-height: 1.8;">
+        <li><strong>Research Report</strong> — My findings on Jacob Levinrad and his businesses. BBB gave him an F rating with 24 complaints. This is evidence for your dispute.</li>
+        <li><strong>Draft Dispute Letter</strong> — A letter you can submit to PayPal Credit. Review it and let me know if anything needs to change.</li>
+      </ol>
+      <p><strong>Click each document below to open it.</strong> You can leave comments or questions, and I'll see them. — <em>Sergei</em></p>
+    </div>
   </div>
 
   <!-- Main Content -->
   <main class="main-container">
-    <div class="workspace-header">
-      <div>
-        <h2>PayPal Credit Dispute — Jacob Levinrad / ELEVATE</h2>
-        <div class="client-info">Matter opened: December 12, 2025 · Last updated: December 13, 2025</div>
-      </div>
-      <div class="share-options">
-        <button class="btn btn-secondary" onclick="openShareModal('workspace')">
-          <span>🔗</span> Share Workspace
-        </button>
-      </div>
-    </div>
 
     <div class="docs-grid">
       <!-- Document 1: Research Report -->
       <div class="doc-card" id="doc-research">
         <div class="doc-number">1</div>
-        <div class="doc-card-header">
+        <div class="doc-card-header" onclick="toggleCard(this.parentElement)">
           <h3><span class="doc-icon">📊</span> Merchant Research Report</h3>
-          <span class="doc-status research">Research</span>
+          <span class="expand-hint">Click to open <span class="expand-arrow">▼</span></span>
         </div>
         <div class="doc-card-body">
           <p>Deep research on Jacob Levinrad, JL Group Consulting, and related entities. Includes BBB complaints (F rating, 24 complaints), complaint patterns, social media accounts, and evidence summary for PayPal dispute.</p>
@@ -536,9 +587,9 @@
       <!-- Document 2: Demand Letter Draft -->
       <div class="doc-card" id="doc-demand">
         <div class="doc-number">2</div>
-        <div class="doc-card-header">
+        <div class="doc-card-header" onclick="toggleCard(this.parentElement)">
           <h3><span class="doc-icon">📝</span> PayPal Dispute Letter — DRAFT</h3>
-          <span class="doc-status draft">Draft</span>
+          <span class="expand-hint">Click to open <span class="expand-arrow">▼</span></span>
         </div>
         <div class="doc-card-body">
           <p>Draft demand letter for PayPal Credit dispute. Amount: $3,000 (remaining balance after Splitit refund of $4,333.33). Strategy: Cite merchant's F rating, pattern of complaints, and inconsistent refund policy enforcement.</p>
@@ -675,6 +726,11 @@
   <script>
     const BASE_URL = window.location.origin + window.location.pathname;
     const RESEARCH_URL = '/clients/jacob-levinrad-research.html';
+
+    // Toggle card expand/collapse
+    function toggleCard(card) {
+      card.classList.toggle('expanded');
+    }
 
     // Document embed toggles
     function toggleDocEmbed(docId) {
