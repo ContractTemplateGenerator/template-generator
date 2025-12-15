@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>What's Your Case Worth? | Free Legal Case Evaluator | Terms.Law</title>
-    <meta name="description" content="Calculate your case's expected value with our advanced legal calculator. Get realistic settlement ranges, collection probability, and strategic options.">
+    <meta name="description" content="Free case value calculator built by a California attorney. Get realistic settlement ranges, collection probability, and strategic options based on real litigation experience.">
 
     <!-- React + Babel for JSX -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
@@ -412,7 +412,7 @@
             letter-spacing: 0.3px;
         }
 
-        /* Hard Truth Card */
+        /* Reality Check Card (warning style by default) */
         .truth-card {
             background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
             border: 2px solid #f59e0b;
@@ -423,6 +423,17 @@
             color: #78350f;
             font-weight: 500;
             line-height: 1.5;
+        }
+        /* Positive variant (green) */
+        .truth-card.truth-positive {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border: 2px solid #10b981;
+        }
+        .truth-card.truth-positive .truth-text {
+            color: #065f46;
+        }
+        .truth-card.truth-positive .truth-icon {
+            color: #059669;
         }
 
         /* Stability Card */
@@ -996,7 +1007,9 @@
                 guaranty = 'no',
                 outOfState = false,
                 daysOverdue = 90,
-                behaviorPattern = 'normal'
+                behaviorPattern = 'normal',
+                oralStrength = 'none',      // For oral: 'dealing', 'admission', 'witness', 'none'
+                termsRelevant = 'yes'       // For written: 'yes', 'partial', 'no'
             } = formData;
 
             // Paper Value
@@ -1006,12 +1019,29 @@
 
             // === SCORES ===
             let fts = 0; // Formation & Terms
-            // Oral contracts are SIGNIFICANTLY weaker - courts require corroborating evidence
-            // "he said/she said" invites disputes, statutes of frauds issues, credibility battles
-            if (contractType === 'signed') fts += 30;      // Gold standard: clear terms, signatures
-            else if (contractType === 'po') fts += 25;      // Purchase order: still written evidence
-            else if (contractType === 'email') fts += 15;   // Email chain: weaker but provable terms
-            else fts -= 15;                                 // ORAL: major penalty - shifts burden, invites "I never agreed to that"
+
+            // WRITTEN CONTRACTS - value depends on whether terms actually address this dispute
+            // A written contract with irrelevant terms isn't much better than no contract
+            if (contractType === 'signed') {
+                if (termsRelevant === 'yes') fts += 30;       // Gold standard: clear terms that apply
+                else if (termsRelevant === 'partial') fts += 18; // Some terms apply, others don't
+                else fts += 8;                                 // Written but terms don't help this dispute
+            } else if (contractType === 'po') {
+                if (termsRelevant === 'yes') fts += 25;       // PO with applicable terms
+                else if (termsRelevant === 'partial') fts += 15;
+                else fts += 5;                                 // PO exists but terms don't apply
+            } else if (contractType === 'email') {
+                if (termsRelevant === 'yes') fts += 15;       // Email chain with clear terms
+                else if (termsRelevant === 'partial') fts += 8;
+                else fts += 2;                                 // Email exists but no relevant terms
+            } else {
+                // ORAL CONTRACTS - much bigger penalty, varies by corroborating evidence
+                // Base penalty is severe, can be mitigated by supporting factors
+                if (oralStrength === 'dealing') fts -= 18;     // Course of dealing shows established pattern
+                else if (oralStrength === 'admission') fts -= 22; // They admitted it but still oral
+                else if (oralStrength === 'witness') fts -= 28;   // Third-party can corroborate
+                else fts -= 35;                                   // Pure "he said/she said" - worst case
+            }
             if (feeClause === 'yes') fts += 7;
 
             let pas = 0; // Performance & Acceptance
@@ -1066,7 +1096,7 @@
 
             // === EXPECTED VALUE ===
             const grossEV = (fullPayProb * fullPayAmount) + (partialProb * partialAmount) + (lowballProb * lowballAmount);
-            const demandCost = 50;
+            const demandCost = 450;
             const smallClaimsCost = 150;
             const civilCost = 2500;
 
@@ -1121,9 +1151,21 @@
 
             // === TOP DRIVERS ===
             const drivers = [];
-            // ORAL CONTRACT WARNING - This is a major issue
+            // CONTRACT TYPE WARNINGS - More nuanced now
             if (contractType === 'oral') {
-                drivers.push({ type: 'negative', text: 'ORAL CONTRACT: "He said/she said" invites disputes. No written terms = credibility battle. Courts skeptical.' });
+                if (oralStrength === 'none') {
+                    drivers.push({ type: 'negative', text: 'ORAL CONTRACT (no corroboration): Pure "he said/she said." Courts skeptical. Major credibility battle. Find ANY writing - texts, emails, anything!' });
+                } else if (oralStrength === 'witness') {
+                    drivers.push({ type: 'negative', text: 'ORAL CONTRACT (witness): Third-party helps but courts still prefer written terms. Witness credibility will be attacked.' });
+                } else if (oralStrength === 'admission') {
+                    drivers.push({ type: 'negative', text: 'ORAL CONTRACT (admission exists): Their admission helps prove the deal existed, but specific terms still disputable.' });
+                } else {
+                    drivers.push({ type: 'moderate', text: 'ORAL CONTRACT (course of dealing): Past transactions establish pattern, but still weaker than written terms.' });
+                }
+            } else if (termsRelevant === 'no') {
+                drivers.push({ type: 'negative', text: 'CONTRACT EXISTS but terms don\'t address this dispute. Written agreement is almost worthless if it\'s silent on the issue.' });
+            } else if (termsRelevant === 'partial') {
+                drivers.push({ type: 'moderate', text: 'CONTRACT PARTIALLY APPLIES: Some terms help, others don\'t. Expect arguments about what the contract covers.' });
             }
             if (deliveryProof === 'strong') {
                 drivers.push({ type: 'positive', text: 'Strong documentation supports your claim.' });
@@ -1159,21 +1201,31 @@
                 drivers.push({ type: 'negative', text: 'Out-of-state friction adds cost/time.' });
             }
 
-            // === HARD TRUTH ===
+            // === REALITY CHECK ===
             let hardTruth = '';
-            // ORAL CONTRACT is the #1 issue - put it first
-            if (contractType === 'oral') {
-                hardTruth = 'ORAL CONTRACT WARNING: Without written terms, they can dispute the price, scope, timeline - everything. Courts see this as "he said/she said." Your EV drops 40-60%. Find ANY writing: texts, emails, even notes from the conversation.';
+            let isPositiveOutlook = false;
+            // CONTRACT ISSUES are #1 - check oral and termsRelevant first
+            if (contractType === 'oral' && oralStrength === 'none') {
+                hardTruth = 'ORAL CONTRACT: Worth the paper it\'s written on. Pure "he said/she said" — courts hate this. They\'ll dispute price, scope, timeline, everything. Find ANY corroboration: texts, emails, voicemails, partial payments, witnesses. Without it, your case is a credibility contest.';
+            } else if (contractType === 'oral' && oralStrength === 'witness') {
+                hardTruth = 'ORAL CONTRACT (witness only): Third-party witness helps but expect credibility attacks. Still weaker than any written term. Their lawyer will try to discredit your witness.';
+            } else if (contractType === 'oral') {
+                hardTruth = 'ORAL CONTRACT: Even with corroboration, oral deals invite disputes on specific terms. Courts prefer written evidence. Your case is viable but expect pushback on details.';
+            } else if (termsRelevant === 'no') {
+                hardTruth = 'CONTRACT EXISTS but doesn\'t cover this dispute. Having a written agreement is almost useless if it\'s silent on the issue. You\'re essentially arguing without contractual support.';
+            } else if (termsRelevant === 'partial') {
+                hardTruth = 'CONTRACT PARTIALLY APPLIES: Some terms help your case, others don\'t. Expect arguments about what the contract actually covers. Focus on the provisions that DO apply.';
             } else if (pCollect < 0.5 && pLiability >= 0.6) {
-                hardTruth = 'Your paper claim is strong, but collectability is the bottleneck. Focus on finding where the money is before spending on escalation.';
+                hardTruth = 'I see this pattern often: strong paper claim, but collectability is the bottleneck. In my experience, you need to locate assets before spending on escalation — otherwise you end up with a judgment you can\'t collect.';
             } else if (deliveryProof === 'none' || acceptanceStrength === 'none') {
-                hardTruth = 'Your biggest EV leak is proof. One clean acceptance document can add hundreds to your expected value.';
+                hardTruth = 'Your biggest weakness is proof. I\'ve seen cases swing dramatically on a single acceptance email or signed delivery receipt. Find any documentation you can — it could add hundreds to your expected recovery.';
             } else if (disputeLevel === 'specific') {
-                hardTruth = 'Expect a haircut negotiation, not a binary win. Anchor high but prepare for partial recovery.';
+                hardTruth = 'With a specific dispute on the table, expect a haircut negotiation, not a clean win. In most cases I handle like this, the winning strategy is: anchor high, but prepare for partial recovery.';
             } else if (Math.max(nevDemand, nevSmallClaims, nevCivil) < 200) {
-                hardTruth = 'Net value looks thin. Consider whether the time/hassle is worth it, or find a way to improve leverage first.';
+                hardTruth = 'I\'ll be honest: the numbers look thin here. Before spending money on escalation, I\'d want to see if there\'s a way to improve leverage — better documentation, identified assets, or a stronger contract angle.';
             } else {
-                hardTruth = 'This looks like a real case worth pursuing. The math supports escalation.';
+                hardTruth = 'Based on these inputs, the numbers support action. In my experience, cases with this profile are worth pursuing with a demand letter or escalation.';
+                isPositiveOutlook = true;
             }
 
             // === DEFENDANT BEHAVIOR PROFILE ===
@@ -1259,6 +1311,7 @@
                 stability, sensitivity,
                 drivers: drivers.slice(0, 4),
                 hardTruth,
+                isPositiveOutlook,
                 behaviorProfile,
                 primaryDefense,
                 checklist: checklist.slice(0, 5),
@@ -1273,7 +1326,7 @@
             const defenses = {
                 quality: {
                     name: 'Quality / Defect Dispute',
-                    story: '"We refused to pay for defective work that didn\'t meet specs."',
+                    story: '"The work was defective and didn\'t meet specs."',
                     rebuttals: [
                         formData.acceptanceStrength === 'explicit' ? 'You approved the deliverable. After acceptance, "defect" is narrow offset territory.' : null,
                         'No contemporaneous complaint = late-raised bargaining, not genuine rejection.',
@@ -1291,7 +1344,7 @@
                         'Silence after review = constructive acceptance under UCC 2-606.',
                         'Identify what\'s incomplete. Undisputed portion payable now.',
                         'If you used the deliverable, you accepted it. Benefits received = payment due.',
-                        'The burden shifts to you to prove non-delivery after our evidence.',
+                        'The burden shifts to them to prove non-delivery after your evidence.',
                     ].filter(Boolean),
                     counterOffense: 'Flip the burden: "What exactly wasn\'t delivered? Be specific. Everything you don\'t list is admitted as delivered."'
                 },
@@ -1312,7 +1365,7 @@
                     story: '"Payment was contingent on [milestone/approval/third party]."',
                     rebuttals: [
                         'Condition was satisfied OR waived by your conduct.',
-                        'You can\'t create conditions that don\'t appear in our agreement.',
+                        'They can\'t create conditions that don\'t appear in the agreement.',
                         'Good faith prevents manufactured conditions to avoid payment.',
                         'The condition was within your control - you can\'t benefit from own delay.',
                     ],
@@ -1365,18 +1418,19 @@
             </div>
         );
 
-        const Gauge = ({ percent, label, status }) => {
+        const Gauge = ({ percent, label, status, hasUserInput }) => {
             const radius = 70;
             const circumference = Math.PI * radius;
             const offset = circumference - (percent / 100) * circumference;
             const getColor = () => {
+                if (!hasUserInput) return '#d1d5db'; // Grey when no input
                 if (percent >= 70) return '#059669';
                 if (percent >= 50) return '#3b82f6';
                 if (percent >= 30) return '#d97706';
                 return '#dc2626';
             };
             return (
-                <div className="gauge-card result-card">
+                <div className={`gauge-card result-card ${!hasUserInput ? 'gauge-inactive' : ''}`}>
                     <div className="card-header"><span className="card-title">Case Strength</span></div>
                     <div className="gauge-container">
                         <svg className="gauge-svg" viewBox="0 0 160 95">
@@ -1384,11 +1438,13 @@
                             <path className="gauge-fill" d="M 15 80 A 65 65 0 0 1 145 80" fill="none" stroke={getColor()} strokeDasharray={circumference} strokeDashoffset={offset} />
                         </svg>
                         <div className="gauge-value">
-                            <div className="gauge-percent">{Math.round(percent)}%</div>
-                            <div className="gauge-label-text">Success</div>
+                            <div className="gauge-percent" style={!hasUserInput ? {color: '#9ca3af'} : {}}>{hasUserInput ? Math.round(percent) + '%' : '—'}</div>
+                            <div className="gauge-label-text">{hasUserInput ? 'Success' : 'Enter details'}</div>
                         </div>
                     </div>
-                    <div className={`gauge-status ${status}`}>{label}</div>
+                    <div className={`gauge-status ${hasUserInput ? status : ''}`} style={!hasUserInput ? {background: '#f3f4f6', color: '#9ca3af'} : {}}>
+                        {hasUserInput ? label : 'Fill in your case details to see analysis'}
+                    </div>
                 </div>
             );
         };
@@ -1415,7 +1471,7 @@
             return (
                 <div className="result-card" style={{ background: '#fafafa' }}>
                     <div className="collapsible-header" onClick={() => setExpanded(!expanded)}>
-                        <span className="card-title">How We Calculated Your EV</span>
+                        <span className="card-title">How I Calculate Expected Value</span>
                         <span className={`collapsible-icon ${expanded ? 'open' : ''}`}>&#9660;</span>
                     </div>
                     <div className={`collapsible-content ${expanded ? 'open' : ''}`}>
@@ -1508,14 +1564,34 @@
             );
         };
 
-        const HardTruthCard = ({ truth }) => (
-            <div className="result-card truth-card">
+        const RealityCheckCard = ({ truth, isPositive, hasUserInput }) => {
+            if (!hasUserInput) {
+                return (
+                    <div className="result-card truth-card" style={{ background: '#f8fafc', border: '1px dashed #cbd5e1' }}>
+                        <div className="card-header">
+                            <span className="card-title" style={{ color: '#94a3b8' }}>
+                                <span className="truth-icon" style={{ background: '#e2e8f0', color: '#94a3b8' }}>?</span>
+                                Straight Talk — After You Enter Details
+                            </span>
+                        </div>
+                        <p className="truth-text" style={{ color: '#94a3b8' }}>
+                            I built this calculator from 13+ years of collection cases. Once you fill in your case details, I'll give you the same honest assessment I'd give in a paid consultation — including the hard truths most attorneys won't tell you until you've already paid.
+                        </p>
+                    </div>
+                );
+            }
+            return (
+            <div className={`result-card truth-card ${isPositive ? 'truth-positive' : ''}`}>
                 <div className="card-header">
-                    <span className="card-title"><span className="truth-icon">!</span> Hard Truth</span>
+                    <span className="card-title">
+                        <span className="truth-icon">{isPositive ? '✓' : '!'}</span>
+                        {isPositive ? 'My Assessment' : 'Hard Truth'}
+                    </span>
                 </div>
                 <div className="truth-text">{truth}</div>
             </div>
         );
+        };
 
         const StabilityCard = ({ stability, sensitivity }) => (
             <div className="result-card">
@@ -1975,14 +2051,29 @@
             const [formData, setFormData] = useState({
                 amount: 5000, contractType: 'signed', deliveryProof: 'strong', acceptanceStrength: 'explicit',
                 disputeLevel: 'none', scopeMess: 'none', defendantType: 'small_biz', assetInfo: 'none',
-                feeClause: 'no', guaranty: 'no', outOfState: false, daysOverdue: 90, behaviorPattern: 'normal'
+                feeClause: 'no', guaranty: 'no', outOfState: false, daysOverdue: 90, behaviorPattern: 'normal',
+                // Agreement strength fields
+                oralStrength: 'none',       // For oral: 'dealing', 'admission', 'witness', 'none'
+                termsRelevant: 'yes',       // For written: 'yes', 'partial', 'no'
+                // Evidence detail fields
+                deliveryProofType: 'files', // What type of delivery proof: 'files', 'emails', 'tracking', 'testimony'
+                acceptanceType: 'written',  // Type of acceptance: 'written', 'used', 'partial_payment', 'silence'
+                disputeType: 'quality',     // What they're disputing: 'quality', 'scope', 'price', 'timeline'
+                // Defendant detail fields
+                defendantBehavior: 'normal', // 'normal', 'ghosting', 'excuses', 'hostile'
+                defendantAge: 'established', // 'startup', 'established', 'unknown' - affects collectability
+                // Contract term detail fields
+                feeClauseType: 'prevailing', // 'prevailing', 'loser', 'collection' - type of fee clause
+                guarantyType: 'full'         // 'full', 'limited', 'unknown' - type of guaranty
             });
             const [deltaMessage, setDeltaMessage] = useState(null);
             const [prevNEV, setPrevNEV] = useState(null);
             const [showDemandLetter, setShowDemandLetter] = useState(demandOnly); // Auto-show if demandOnly
+            const [hasUserInput, setHasUserInput] = useState(false); // Track if user has entered anything
 
             const updateField = useCallback((field, value) => {
                 setFormData(prev => ({ ...prev, [field]: value }));
+                setHasUserInput(true); // User has made an input
             }, []);
 
             const calc = useMemo(() => calculateCase(formData), [formData]);
@@ -2036,6 +2127,31 @@
                                 <label className="field-label">Contract Type <Tooltip text="SIGNED = Gold standard, clear terms. PO/WRITTEN = Good evidence. EMAIL = Provable but weaker. ORAL = Major penalty - courts see 'he said/she said.' Find any writing you can!" /></label>
                                 <OptionGroup options={[{value:'signed',label:'Signed'},{value:'po',label:'PO'},{value:'email',label:'Email'},{value:'oral',label:'Oral'}]} value={formData.contractType} onChange={(v)=>updateField('contractType',v)} />
                             </div>
+
+                            {/* CONDITIONAL: Oral contract strength */}
+                            {formData.contractType === 'oral' && (
+                                <div className="field-group" style={{marginTop:'0.75rem', padding:'0.75rem', background:'#fef3c7', borderRadius:'8px', border:'1px solid #fcd34d'}}>
+                                    <label className="field-label" style={{color:'#92400e'}}>What supports the oral agreement? <Tooltip text="Oral contracts are enforceable but harder to prove. Course of dealing (repeated past transactions) is strongest. Written admission by debtor helps. Third-party witness adds credibility. 'Just our word' is weakest." /></label>
+                                    <select className="form-select" value={formData.oralStrength} onChange={(e) => updateField('oralStrength', e.target.value)} style={{marginTop:'0.5rem'}}>
+                                        <option value="dealing">Course of dealing (past transactions, established pattern)</option>
+                                        <option value="admission">They admitted it (text, email, voicemail)</option>
+                                        <option value="witness">Third-party witness heard the agreement</option>
+                                        <option value="none">Just our word vs. theirs (no corroboration)</option>
+                                    </select>
+                                </div>
+                            )}
+
+                            {/* CONDITIONAL: Written contract terms relevance */}
+                            {(formData.contractType === 'signed' || formData.contractType === 'po' || formData.contractType === 'email') && (
+                                <div className="field-group" style={{marginTop:'0.75rem', padding:'0.75rem', background:'#eff6ff', borderRadius:'8px', border:'1px solid #bfdbfe'}}>
+                                    <label className="field-label" style={{color:'#1e40af'}}>Do the written terms address THIS dispute? <Tooltip text="A contract only helps if its terms apply. If the PO says 'Net 30' but you're disputing quality, the payment terms don't help the quality dispute. If the contract is silent on the issue you're fighting about, it's not much better than no contract." /></label>
+                                    <select className="form-select" value={formData.termsRelevant} onChange={(e) => updateField('termsRelevant', e.target.value)} style={{marginTop:'0.5rem'}}>
+                                        <option value="yes">Yes - terms directly address this issue</option>
+                                        <option value="partial">Partially - some terms apply, others don't</option>
+                                        <option value="no">No - contract exists but doesn't cover this dispute</option>
+                                    </select>
+                                </div>
+                            )}
                         </div>
 
                         <div className="form-section">
@@ -2047,18 +2163,136 @@
                                 <label className="field-label">Delivery Proof <Tooltip text="STRONG = Files sent, delivery receipts, read confirmations. SOME = Emails discussing work. WEAK = No documentation. Best evidence: timestamped file transfers, signed delivery receipts." /></label>
                                 <OptionGroup options={[{value:'strong',label:'Strong'},{value:'some',label:'Some'},{value:'none',label:'Weak'}]} value={formData.deliveryProof} onChange={(v)=>updateField('deliveryProof',v)} />
                             </div>
+
+                            {/* CONDITIONAL: What kind of delivery proof? */}
+                            {formData.deliveryProof === 'strong' && (
+                                <div className="field-group" style={{marginTop:'0.5rem', padding:'0.6rem', background:'#ecfdf5', borderRadius:'8px', border:'1px solid #a7f3d0', fontSize:'0.8rem'}}>
+                                    <label className="field-label" style={{color:'#047857', fontSize:'0.75rem'}}>What do you have?</label>
+                                    <select className="form-select" value={formData.deliveryProofType} onChange={(e) => updateField('deliveryProofType', e.target.value)} style={{fontSize:'0.8rem', padding:'0.4rem'}}>
+                                        <option value="files">Timestamped file transfers (Dropbox, Drive, email attachments)</option>
+                                        <option value="tracking">Delivery tracking / signed receipt</option>
+                                        <option value="emails">Email chain showing delivery + acknowledgment</option>
+                                        <option value="portal">Client portal / project management logs</option>
+                                    </select>
+                                </div>
+                            )}
+                            {formData.deliveryProof === 'some' && (
+                                <div className="field-group" style={{marginTop:'0.5rem', padding:'0.6rem', background:'#fefce8', borderRadius:'8px', border:'1px solid #fde047', fontSize:'0.8rem'}}>
+                                    <label className="field-label" style={{color:'#a16207', fontSize:'0.75rem'}}>What's missing? Look for:</label>
+                                    <div style={{color:'#78716c', fontSize:'0.75rem', lineHeight:'1.4'}}>
+                                        • <strong>Read receipts</strong> on emails<br/>
+                                        • <strong>File access logs</strong> from shared drives<br/>
+                                        • <strong>Screenshots</strong> of project portals<br/>
+                                        • <strong>"Received"</strong> or <strong>"thanks"</strong> replies
+                                    </div>
+                                </div>
+                            )}
+                            {formData.deliveryProof === 'none' && (
+                                <div className="field-group" style={{marginTop:'0.5rem', padding:'0.6rem', background:'#fef2f2', borderRadius:'8px', border:'1px solid #fecaca', fontSize:'0.8rem'}}>
+                                    <label className="field-label" style={{color:'#dc2626', fontSize:'0.75rem'}}>⚠️ Major weakness. Can you get:</label>
+                                    <div style={{color:'#78716c', fontSize:'0.75rem', lineHeight:'1.4'}}>
+                                        • <strong>Witness statement</strong> from someone who saw delivery?<br/>
+                                        • <strong>Partial payment</strong> history (implies receipt)?<br/>
+                                        • <strong>Their use of the work</strong> (website live, etc.)?<br/>
+                                        • <strong>Any communication</strong> referencing the deliverable?
+                                    </div>
+                                </div>
+                            )}
+
                             <div className="field-group">
                                 <label className="field-label">Acceptance <Tooltip text="EXPLICIT = They said 'approved', 'looks good', signed off. IMPLIED = They used it without complaint. NONE = Radio silence. Even 'thanks' or 'received' helps establish acceptance." /></label>
                                 <OptionGroup options={[{value:'explicit',label:'Explicit'},{value:'implied',label:'Implied'},{value:'none',label:'None'}]} value={formData.acceptanceStrength} onChange={(v)=>updateField('acceptanceStrength',v)} />
                             </div>
+
+                            {/* CONDITIONAL: Type of acceptance */}
+                            {formData.acceptanceStrength === 'explicit' && (
+                                <div className="field-group" style={{marginTop:'0.5rem', padding:'0.6rem', background:'#ecfdf5', borderRadius:'8px', border:'1px solid #a7f3d0', fontSize:'0.8rem'}}>
+                                    <label className="field-label" style={{color:'#047857', fontSize:'0.75rem'}}>How did they accept?</label>
+                                    <select className="form-select" value={formData.acceptanceType} onChange={(e) => updateField('acceptanceType', e.target.value)} style={{fontSize:'0.8rem', padding:'0.4rem'}}>
+                                        <option value="written">Written approval ("approved", "looks good", "ship it")</option>
+                                        <option value="signed">Signed acceptance / sign-off sheet</option>
+                                        <option value="partial_payment">Made partial payment (strongest!)</option>
+                                        <option value="published">Published/deployed the work publicly</option>
+                                    </select>
+                                </div>
+                            )}
+                            {formData.acceptanceStrength === 'implied' && (
+                                <div className="field-group" style={{marginTop:'0.5rem', padding:'0.6rem', background:'#fefce8', borderRadius:'8px', border:'1px solid #fde047', fontSize:'0.8rem'}}>
+                                    <label className="field-label" style={{color:'#a16207', fontSize:'0.75rem'}}>What implies acceptance?</label>
+                                    <select className="form-select" value={formData.acceptanceType} onChange={(e) => updateField('acceptanceType', e.target.value)} style={{fontSize:'0.8rem', padding:'0.4rem'}}>
+                                        <option value="used">They used/deployed it without complaint</option>
+                                        <option value="silence">No complaints within reasonable time (30+ days)</option>
+                                        <option value="continued">Continued working relationship after delivery</option>
+                                        <option value="referenced">Referenced the work in other contexts</option>
+                                    </select>
+                                </div>
+                            )}
+                            {formData.acceptanceStrength === 'none' && (
+                                <div className="field-group" style={{marginTop:'0.5rem', padding:'0.6rem', background:'#fef2f2', borderRadius:'8px', border:'1px solid #fecaca', fontSize:'0.8rem'}}>
+                                    <label className="field-label" style={{color:'#dc2626', fontSize:'0.75rem'}}>⚠️ No acceptance is risky. Look for:</label>
+                                    <div style={{color:'#78716c', fontSize:'0.75rem', lineHeight:'1.4'}}>
+                                        • <strong>Any "thanks"</strong> or acknowledgment email<br/>
+                                        • <strong>Did they use it?</strong> Website live? Product selling?<br/>
+                                        • <strong>Partial payments</strong> imply acceptance<br/>
+                                        • <strong>How long</strong> before they complained? (30+ days = implied OK)
+                                    </div>
+                                </div>
+                            )}
+
                             <div className="field-group">
                                 <label className="field-label">Quality Dispute <Tooltip text="NONE = No complaints raised. VAGUE = 'Not happy' without specifics. SPECIFIC = Itemized defects with dollar offsets. Specific disputes increase haircut probability but can be rebutted." /></label>
                                 <OptionGroup options={[{value:'none',label:'None'},{value:'vague',label:'Vague'},{value:'specific',label:'Specific'}]} value={formData.disputeLevel} onChange={(v)=>updateField('disputeLevel',v)} />
                             </div>
+
+                            {/* CONDITIONAL: What are they disputing? */}
+                            {formData.disputeLevel === 'specific' && (
+                                <div className="field-group" style={{marginTop:'0.5rem', padding:'0.6rem', background:'#fef2f2', borderRadius:'8px', border:'1px solid #fecaca', fontSize:'0.8rem'}}>
+                                    <label className="field-label" style={{color:'#dc2626', fontSize:'0.75rem'}}>What's the specific dispute?</label>
+                                    <select className="form-select" value={formData.disputeType} onChange={(e) => updateField('disputeType', e.target.value)} style={{fontSize:'0.8rem', padding:'0.4rem'}}>
+                                        <option value="quality">Quality defects (bugs, errors, poor workmanship)</option>
+                                        <option value="incomplete">Incomplete delivery (missing features/items)</option>
+                                        <option value="late">Late delivery (missed deadlines)</option>
+                                        <option value="different">Different from what was ordered</option>
+                                    </select>
+                                    <div style={{color:'#78716c', fontSize:'0.7rem', marginTop:'0.4rem'}}>
+                                        💡 <strong>Tip:</strong> Get them to itemize in writing. Vague complaints are harder to defend but also harder to prove. Specific = potential offset.
+                                    </div>
+                                </div>
+                            )}
+                            {formData.disputeLevel === 'vague' && (
+                                <div className="field-group" style={{marginTop:'0.5rem', padding:'0.6rem', background:'#fefce8', borderRadius:'8px', border:'1px solid #fde047', fontSize:'0.8rem'}}>
+                                    <label className="field-label" style={{color:'#a16207', fontSize:'0.75rem'}}>Vague complaints = weak defense</label>
+                                    <div style={{color:'#78716c', fontSize:'0.75rem', lineHeight:'1.4'}}>
+                                        "I'm not happy" without specifics is hard to rebut BUT also hard for them to prove damages.<br/>
+                                        💡 <strong>Strategy:</strong> Force specifics. Ask "What exactly is wrong? What would fix it?" in writing.
+                                    </div>
+                                </div>
+                            )}
+
                             <div className="field-group">
                                 <label className="field-label">Scope Issues <Tooltip text="NONE = Clear scope, no disputes. SOME = Minor 'that wasn't included' issues. HEAVY = Major scope confusion, change orders, unclear boundaries. Heavy scope mess invites offsets and delays." /></label>
                                 <OptionGroup options={[{value:'none',label:'None'},{value:'some',label:'Some'},{value:'heavy',label:'Heavy'}]} value={formData.scopeMess} onChange={(v)=>updateField('scopeMess',v)} />
                             </div>
+
+                            {/* CONDITIONAL: Scope issues detail */}
+                            {formData.scopeMess === 'heavy' && (
+                                <div className="field-group" style={{marginTop:'0.5rem', padding:'0.6rem', background:'#fef2f2', borderRadius:'8px', border:'1px solid #fecaca', fontSize:'0.8rem'}}>
+                                    <label className="field-label" style={{color:'#dc2626', fontSize:'0.75rem'}}>⚠️ Heavy scope issues = haircut territory</label>
+                                    <div style={{color:'#78716c', fontSize:'0.75rem', lineHeight:'1.4'}}>
+                                        <strong>Expect:</strong> Offsets, counter-claims, "you didn't do what we asked"<br/>
+                                        <strong>Mitigate by:</strong> Finding original scope docs, change order emails, any written agreement on extras<br/>
+                                        💡 Focus on what WAS clearly agreed and delivered. Abandon fuzzy add-ons.
+                                    </div>
+                                </div>
+                            )}
+                            {formData.scopeMess === 'some' && (
+                                <div className="field-group" style={{marginTop:'0.5rem', padding:'0.6rem', background:'#fefce8', borderRadius:'8px', border:'1px solid #fde047', fontSize:'0.8rem'}}>
+                                    <label className="field-label" style={{color:'#a16207', fontSize:'0.75rem'}}>Minor scope issues are manageable</label>
+                                    <div style={{color:'#78716c', fontSize:'0.75rem', lineHeight:'1.4'}}>
+                                        💡 <strong>Tip:</strong> Concede small points to win big ones. "We'll credit X if you pay for core deliverables."
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         <div className="form-section">
@@ -2070,14 +2304,123 @@
                                 <label className="field-label">Type <Tooltip text="LARGE = Big company, deep pockets, pay to avoid hassle. MID = Established business, usually collectible. SMALL = Small biz, cashflow dependent. INDIVIDUAL = Hardest to collect - verify assets first." /></label>
                                 <OptionGroup options={[{value:'large',label:'Large'},{value:'mid',label:'Mid'},{value:'small_biz',label:'Small'},{value:'individual',label:'Person'}]} value={formData.defendantType} onChange={(v)=>updateField('defendantType',v)} />
                             </div>
+
+                            {/* CONDITIONAL: Business age/stability */}
+                            {(formData.defendantType === 'small_biz' || formData.defendantType === 'mid') && (
+                                <div className="field-group" style={{marginTop:'0.5rem', padding:'0.6rem', background:'#fefce8', borderRadius:'8px', border:'1px solid #fde047', fontSize:'0.8rem'}}>
+                                    <label className="field-label" style={{color:'#a16207', fontSize:'0.75rem'}}>How established is this business?</label>
+                                    <select className="form-select" value={formData.defendantAge} onChange={(e) => updateField('defendantAge', e.target.value)} style={{fontSize:'0.8rem', padding:'0.4rem'}}>
+                                        <option value="established">Established (5+ years, physical location, employees)</option>
+                                        <option value="growing">Growing (2-5 years, some track record)</option>
+                                        <option value="startup">Startup/New (under 2 years, uncertain future)</option>
+                                        <option value="unknown">Unknown / Can't tell</option>
+                                    </select>
+                                    <div style={{color:'#78716c', fontSize:'0.7rem', marginTop:'0.4rem'}}>
+                                        💡 Startups may fold before paying. Check their website, LinkedIn, reviews for signs of health.
+                                    </div>
+                                </div>
+                            )}
+                            {formData.defendantType === 'individual' && (
+                                <div className="field-group" style={{marginTop:'0.5rem', padding:'0.6rem', background:'#fef2f2', borderRadius:'8px', border:'1px solid #fecaca', fontSize:'0.8rem'}}>
+                                    <label className="field-label" style={{color:'#dc2626', fontSize:'0.75rem'}}>⚠️ Individuals are hardest to collect</label>
+                                    <div style={{color:'#78716c', fontSize:'0.75rem', lineHeight:'1.4'}}>
+                                        <strong>Check before escalating:</strong><br/>
+                                        • Do they own a home? (public records)<br/>
+                                        • Are they employed? (can garnish wages)<br/>
+                                        • Do they have a business? (asset to reach)<br/>
+                                        💡 Judgment-proof defendants make lawsuits pointless. Verify assets first!
+                                    </div>
+                                </div>
+                            )}
+                            {formData.defendantType === 'large' && (
+                                <div className="field-group" style={{marginTop:'0.5rem', padding:'0.6rem', background:'#ecfdf5', borderRadius:'8px', border:'1px solid #a7f3d0', fontSize:'0.8rem'}}>
+                                    <label className="field-label" style={{color:'#047857', fontSize:'0.75rem'}}>✓ Large companies usually pay</label>
+                                    <div style={{color:'#78716c', fontSize:'0.75rem', lineHeight:'1.4'}}>
+                                        Their internal cost of fighting exceeds most invoices. Get to the right person (AP, legal, exec) with clean documentation.
+                                        💡 Key: Escalate to someone who can authorize payment, not gatekeepers.
+                                    </div>
+                                </div>
+                            )}
+
                             <div className="field-group">
                                 <label className="field-label">Know Where Money Is? <Tooltip text="BANK = You know their bank (can levy). PROCESSOR = Stripe, Square, etc. (can intercept). EMPLOYER = Can garnish wages. UNKNOWN = Biggest collection risk - find this before escalating!" /></label>
                                 <OptionGroup options={[{value:'bank',label:'Bank'},{value:'processor',label:'Processor'},{value:'employer',label:'Employer'},{value:'none',label:'Unknown'}]} value={formData.assetInfo} onChange={(v)=>updateField('assetInfo',v)} />
                             </div>
+
+                            {/* CONDITIONAL: Asset info tips */}
+                            {formData.assetInfo === 'none' && (
+                                <div className="field-group" style={{marginTop:'0.5rem', padding:'0.6rem', background:'#fef2f2', borderRadius:'8px', border:'1px solid #fecaca', fontSize:'0.8rem'}}>
+                                    <label className="field-label" style={{color:'#dc2626', fontSize:'0.75rem'}}>⚠️ Find assets BEFORE spending on litigation</label>
+                                    <div style={{color:'#78716c', fontSize:'0.75rem', lineHeight:'1.4'}}>
+                                        <strong>How to find assets:</strong><br/>
+                                        • <strong>Bank:</strong> Check old checks/payments they sent you<br/>
+                                        • <strong>Payment processor:</strong> Look at their website checkout<br/>
+                                        • <strong>Property:</strong> County assessor's office (free online)<br/>
+                                        • <strong>Secretary of State:</strong> Business filings, registered agent<br/>
+                                        💡 A judgment you can't collect is worthless paper.
+                                    </div>
+                                </div>
+                            )}
+                            {(formData.assetInfo === 'bank' || formData.assetInfo === 'processor') && (
+                                <div className="field-group" style={{marginTop:'0.5rem', padding:'0.6rem', background:'#ecfdf5', borderRadius:'8px', border:'1px solid #a7f3d0', fontSize:'0.8rem'}}>
+                                    <label className="field-label" style={{color:'#047857', fontSize:'0.75rem'}}>✓ Good - you know where to collect</label>
+                                    <div style={{color:'#78716c', fontSize:'0.75rem', lineHeight:'1.4'}}>
+                                        {formData.assetInfo === 'bank' ?
+                                            'Bank levy is fast and effective once you have a judgment. Keep their account info documented.' :
+                                            'Payment processors (Stripe, Square, PayPal) can be served with a levy. Effective for businesses with regular sales.'
+                                        }
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="field-group">
+                                <label className="field-label">Their Behavior Pattern <Tooltip text="NORMAL = Professional, just slow. GHOSTING = Not responding at all. EXCUSES = 'Check is in the mail' forever. HOSTILE = Threatening, combative. Pattern affects strategy." /></label>
+                                <select className="form-select" value={formData.defendantBehavior} onChange={(e) => updateField('defendantBehavior', e.target.value)}>
+                                    <option value="normal">Normal - responds professionally, just slow to pay</option>
+                                    <option value="ghosting">Ghosting - total radio silence</option>
+                                    <option value="excuses">Excuses - "next week" forever, broken promises</option>
+                                    <option value="hostile">Hostile - aggressive, threatening, combative</option>
+                                </select>
+                            </div>
+
+                            {/* CONDITIONAL: Behavior-based advice */}
+                            {formData.defendantBehavior === 'ghosting' && (
+                                <div className="field-group" style={{marginTop:'0.5rem', padding:'0.6rem', background:'#fefce8', borderRadius:'8px', border:'1px solid #fde047', fontSize:'0.8rem'}}>
+                                    <label className="field-label" style={{color:'#a16207', fontSize:'0.75rem'}}>Ghosting usually means cash problems or hoping you'll give up</label>
+                                    <div style={{color:'#78716c', fontSize:'0.75rem', lineHeight:'1.4'}}>
+                                        💡 <strong>Escalation often breaks the silence.</strong> Attorney letter or lawsuit filing tends to get attention. If still nothing, check if they're still in business.
+                                    </div>
+                                </div>
+                            )}
+                            {formData.defendantBehavior === 'hostile' && (
+                                <div className="field-group" style={{marginTop:'0.5rem', padding:'0.6rem', background:'#fef2f2', borderRadius:'8px', border:'1px solid #fecaca', fontSize:'0.8rem'}}>
+                                    <label className="field-label" style={{color:'#dc2626', fontSize:'0.75rem'}}>⚠️ Hostile defendants often countersue</label>
+                                    <div style={{color:'#78716c', fontSize:'0.75rem', lineHeight:'1.4'}}>
+                                        <strong>Expect:</strong> Counterclaims, harassment, drawn-out fight<br/>
+                                        <strong>Strategy:</strong> Document everything, don't engage emotionally, let attorney handle<br/>
+                                        💡 Hostile parties sometimes settle quickly when they see you won't back down.
+                                    </div>
+                                </div>
+                            )}
+
                             <div className="field-group">
                                 <label className="field-label">Location <Tooltip text="OUT OF STATE = Adds friction and cost. May need to file where they are, hire local counsel, or domesticate judgment. Adds ~$500-1500 in costs and delays." /></label>
                                 <OptionGroup options={[{value:false,label:'Same State'},{value:true,label:'Out of State'}]} value={formData.outOfState} onChange={(v)=>updateField('outOfState',v)} />
                             </div>
+
+                            {/* CONDITIONAL: Out of state implications */}
+                            {formData.outOfState && (
+                                <div className="field-group" style={{marginTop:'0.5rem', padding:'0.6rem', background:'#fefce8', borderRadius:'8px', border:'1px solid #fde047', fontSize:'0.8rem'}}>
+                                    <label className="field-label" style={{color:'#a16207', fontSize:'0.75rem'}}>Out-of-state adds complexity</label>
+                                    <div style={{color:'#78716c', fontSize:'0.75rem', lineHeight:'1.4'}}>
+                                        <strong>Options:</strong><br/>
+                                        • Sue where they are (may need local counsel)<br/>
+                                        • Sue in your state if contract allows (forum selection clause?)<br/>
+                                        • Domesticate judgment after winning (extra step)<br/>
+                                        💡 Check contract for venue/jurisdiction clause first.
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         <div className="form-section">
@@ -2089,10 +2432,64 @@
                                 <label className="field-label">Fee Clause <Tooltip text="'Prevailing party' or 'loser pays' clause. If YES, defendant faces paying YOUR legal fees if they lose - huge leverage. Check your contract! Look for 'attorney fees', 'costs of collection'." /></label>
                                 <OptionGroup options={[{value:'yes',label:'Yes'},{value:'no',label:'No'},{value:'unknown',label:'Unsure'}]} value={formData.feeClause} onChange={(v)=>updateField('feeClause',v)} />
                             </div>
+
+                            {/* CONDITIONAL: Fee clause details */}
+                            {formData.feeClause === 'yes' && (
+                                <div className="field-group" style={{marginTop:'0.5rem', padding:'0.6rem', background:'#ecfdf5', borderRadius:'8px', border:'1px solid #a7f3d0', fontSize:'0.8rem'}}>
+                                    <label className="field-label" style={{color:'#047857', fontSize:'0.75rem'}}>✓ Fee clauses are powerful leverage</label>
+                                    <select className="form-select" value={formData.feeClauseType} onChange={(e) => updateField('feeClauseType', e.target.value)} style={{fontSize:'0.8rem', padding:'0.4rem'}}>
+                                        <option value="prevailing">Prevailing party gets fees (best - if you win, they pay)</option>
+                                        <option value="collection">Costs of collection clause (covers demand letter costs)</option>
+                                        <option value="loser">Loser pays (risky if you might lose, but leverage if strong)</option>
+                                    </select>
+                                    <div style={{color:'#78716c', fontSize:'0.7rem', marginTop:'0.4rem'}}>
+                                        💡 <strong>Strategy:</strong> Mention this in your demand letter. "Your liability for our legal fees grows daily."
+                                    </div>
+                                </div>
+                            )}
+                            {formData.feeClause === 'unknown' && (
+                                <div className="field-group" style={{marginTop:'0.5rem', padding:'0.6rem', background:'#fefce8', borderRadius:'8px', border:'1px solid #fde047', fontSize:'0.8rem'}}>
+                                    <label className="field-label" style={{color:'#a16207', fontSize:'0.75rem'}}>📄 Check your contract for:</label>
+                                    <div style={{color:'#78716c', fontSize:'0.75rem', lineHeight:'1.4'}}>
+                                        • <strong>"Attorney fees"</strong> or <strong>"legal fees"</strong><br/>
+                                        • <strong>"Costs of collection"</strong><br/>
+                                        • <strong>"Prevailing party"</strong><br/>
+                                        • <strong>"Loser pays"</strong><br/>
+                                        💡 Even a one-way clause (only you can recover) is valuable leverage.
+                                    </div>
+                                </div>
+                            )}
+
                             <div className="field-group">
                                 <label className="field-label">Personal Guaranty <Tooltip text="Did an individual personally guarantee the business debt? If YES, you can pursue BOTH the company AND the person. Check signature blocks and any 'personal guaranty' or 'individually liable' language." /></label>
                                 <OptionGroup options={[{value:'yes',label:'Yes'},{value:'no',label:'No'},{value:'unknown',label:'Unsure'}]} value={formData.guaranty} onChange={(v)=>updateField('guaranty',v)} />
                             </div>
+
+                            {/* CONDITIONAL: Guaranty details */}
+                            {formData.guaranty === 'yes' && (
+                                <div className="field-group" style={{marginTop:'0.5rem', padding:'0.6rem', background:'#ecfdf5', borderRadius:'8px', border:'1px solid #a7f3d0', fontSize:'0.8rem'}}>
+                                    <label className="field-label" style={{color:'#047857', fontSize:'0.75rem'}}>✓ Personal guaranty = two pockets to reach</label>
+                                    <select className="form-select" value={formData.guarantyType} onChange={(e) => updateField('guarantyType', e.target.value)} style={{fontSize:'0.8rem', padding:'0.4rem'}}>
+                                        <option value="full">Full guaranty (100% personal liability)</option>
+                                        <option value="limited">Limited guaranty (capped amount or specific debts)</option>
+                                        <option value="unknown">Not sure of the terms</option>
+                                    </select>
+                                    <div style={{color:'#78716c', fontSize:'0.7rem', marginTop:'0.4rem'}}>
+                                        💡 <strong>Strategy:</strong> Even if company folds, you can chase the individual. Name BOTH in demand letter.
+                                    </div>
+                                </div>
+                            )}
+                            {formData.guaranty === 'unknown' && (
+                                <div className="field-group" style={{marginTop:'0.5rem', padding:'0.6rem', background:'#fefce8', borderRadius:'8px', border:'1px solid #fde047', fontSize:'0.8rem'}}>
+                                    <label className="field-label" style={{color:'#a16207', fontSize:'0.75rem'}}>📄 Check for personal guaranty:</label>
+                                    <div style={{color:'#78716c', fontSize:'0.75rem', lineHeight:'1.4'}}>
+                                        • Look at <strong>signature blocks</strong> - did owner sign personally too?<br/>
+                                        • Search for <strong>"personally guarantee"</strong> or <strong>"individual liability"</strong><br/>
+                                        • Check if they signed as <strong>"Owner"</strong> vs <strong>"on behalf of Company"</strong><br/>
+                                        💡 Often hidden in the fine print. Worth finding - adds huge collection leverage!
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         <div className="disclaimer">
@@ -2103,11 +2500,11 @@
                     {/* RESULTS */}
                     <div className="results-panel">
                         <div className="top-row">
-                            <Gauge percent={calc.successProb * 100} label={calc.gaugeLabel} status={calc.gaugeStatus} />
+                            <Gauge percent={calc.successProb * 100} label={calc.gaugeLabel} status={calc.gaugeStatus} hasUserInput={hasUserInput} />
                             <EVCard calc={calc} />
                         </div>
                         <EVBreakdown calc={calc} />
-                        <HardTruthCard truth={calc.hardTruth} />
+                        <RealityCheckCard truth={calc.hardTruth} isPositive={calc.isPositiveOutlook} hasUserInput={hasUserInput} />
                         <StabilityCard stability={calc.stability} sensitivity={calc.sensitivity} />
                         <OutcomeBars outcomes={calc.outcomes} />
                         <SettlementRange settlement={calc.settlement} amount={calc.amount} />

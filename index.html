@@ -29,6 +29,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/shared/styles.css">
 
   <style>
     :root {
@@ -1345,6 +1346,51 @@
       background: #f8fafc;
     }
 
+    /* Calendly embed */
+    .calendly-container {
+      max-width: 700px;
+      margin: 0 auto 2rem;
+      background: #f8fafc;
+      border-radius: 16px;
+      padding: 1.5rem;
+      border: 1px solid var(--color-border);
+    }
+    .calendly-header {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .calendly-header h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--color-text);
+      margin-bottom: 0.25rem;
+    }
+    .calendly-header p {
+      font-size: 0.85rem;
+      color: var(--color-text-secondary);
+      margin: 0;
+    }
+    .calendly-inline-widget {
+      min-width: 320px;
+      height: 600px;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .cta-divider {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 1.5rem 0;
+      color: var(--color-text-muted);
+      font-size: 0.85rem;
+    }
+    .cta-divider::before, .cta-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--color-border);
+    }
+
     /* ============================================
        FOOTER
        ============================================ */
@@ -1412,7 +1458,6 @@
     <div class="container">
       <div class="hero-top">
         <div class="hero-identity">
-          <img src="/chat-widget/sergei_small.jpg" alt="Sergei Tokmakov" class="hero-headshot">
           <div class="hero-identity-text">
             <h2>Sergei Tokmakov, Esq.</h2>
             <p>California Business Attorney</p>
@@ -1434,7 +1479,7 @@
             Is Your Case <span class="highlight">Worth Pursuing?</span>
           </h1>
           <p class="hero-subline">
-            Select your issue below. <strong>Get attorney-curated analysis</strong> — probability of success, realistic costs, and whether legal action makes sense for your situation.
+            Select your issue below. <strong>Calculate your expected recovery</strong>, see likelihood of settlement, and <strong>start drafting a pre-filled demand letter</strong> — all with attorney-curated guidance.
           </p>
           <div class="hero-not-ai">
             <span>&#9878;</span> Not AI-generated advice. Real attorney analysis.
@@ -1673,7 +1718,7 @@
         <div class="why-card">
           <div class="why-card-icon">&#128176;</div>
           <h4>Flat-Fee Pricing</h4>
-          <p>Most services have transparent, fixed pricing. You'll know exactly what it costs before we start. No surprise bills, no hourly creep.</p>
+          <p>Most services have transparent, fixed pricing. You'll know exactly what it costs before I start. No surprise bills, no hourly creep.</p>
         </div>
       </div>
     </div>
@@ -1761,13 +1806,28 @@
   <section class="cta-section">
     <div class="container">
       <h2>Ready to Get Started?</h2>
-      <p>Email me your situation. I'll tell you your options and what it would cost — no obligation.</p>
+      <p>Book a 30-minute Zoom call or email me your situation. No obligation — I'll tell you your options.</p>
+
+      <!-- Calendly Inline Embed -->
+      <div class="calendly-container">
+        <div class="calendly-header">
+          <h3>Schedule a Free Consultation</h3>
+          <p>30-minute Zoom call with Sergei</p>
+        </div>
+        <div class="calendly-inline-widget" data-url="https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1&hide_event_type_details=1"></div>
+      </div>
+
+      <div class="cta-divider">or</div>
+
       <div class="cta-buttons">
         <a href="mailto:owner@terms.law" class="btn-cta primary">&#9993; Email Me Your Situation</a>
         <a href="#intakeContainer" class="btn-cta secondary">&#8593; Explore Your Issue Above</a>
       </div>
     </div>
   </section>
+
+  <!-- Calendly Widget Script -->
+  <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
 
   <!-- FOOTER -->
   <footer class="footer">
@@ -2486,13 +2546,17 @@
         if (opt.title === 'Demand Letter') {
           optionsHtml += `
             <div class="option-card demand-letter-card${recommendedClass}" onclick="toggleInlineDemandLetter()" style="cursor:pointer;">
-              <h6>${opt.icon} ${opt.title} <span style="font-size:0.7rem;color:#3b82f6;">&#9660; Click to generate</span></h6>
+              <h6>${opt.icon} ${opt.title}</h6>
               <p>${opt.desc || ''}</p>
               ${bestForHtml}
               <div class="option-meta">
                 <span>Cost: <strong>${opt.cost}</strong></span>
                 <span>Time: <strong>${opt.time}</strong></span>
               </div>
+              <div style="margin-top:0.75rem;padding:0.6rem 1rem;background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:white;border-radius:8px;font-size:0.85rem;font-weight:600;text-align:center;display:flex;align-items:center;justify-content:center;gap:6px;">
+                <span style="font-size:1.1rem;">&#9998;</span> Click to Draft Your Letter
+              </div>
+              <div style="font-size:0.7rem;color:#64748b;text-align:center;margin-top:0.4rem;">Opens interactive editor with pre-filled template</div>
             </div>
           `;
           // Add the inline demand letter panel
@@ -2664,6 +2728,9 @@
       }
     }
   </script>
+
+  <!-- Chat Widget - Yellow "Available" status -->
+  <script src="/chat-widget/chat-widget.js"></script>
 
 </body>
 </html>
