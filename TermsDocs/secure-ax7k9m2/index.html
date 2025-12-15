@@ -882,6 +882,23 @@
       display: block;
     }
 
+    .show-pwd-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      cursor: pointer;
+      padding: 4px 8px;
+    }
+
+    .show-pwd-btn:hover {
+      color: var(--text);
+    }
+
     .main-content {
       display: none;
     }
@@ -898,7 +915,10 @@
   <div class="password-box">
     <h2>Secure Client Workroom</h2>
     <div class="subtitle">Enter the access code provided by counsel</div>
-    <input type="password" class="password-input" id="passwordInput" placeholder="••••••••" autocomplete="off" autofocus>
+    <div style="position:relative;">
+      <input type="password" class="password-input" id="passwordInput" placeholder="••••••••" autocomplete="off" autofocus>
+      <button type="button" class="show-pwd-btn" id="showPwdBtn" onclick="togglePasswordVisibility()">Show</button>
+    </div>
     <button class="password-submit" onclick="checkPassword()">Access Workroom</button>
     <div class="password-error" id="passwordError">Incorrect access code. Please try again.</div>
   </div>
@@ -942,7 +962,7 @@
   <div class="overview-box editable-box">
     <h3>Summary</h3>
     <button class="copy-btn" onclick="copyContent(this)">Copy</button>
-    <div class="editable-content" contenteditable="true">
+    <div class="editable-content" contenteditable="true" data-field="summary">
       <p>
         The attached documents contain our proposed revisions to the Story Cannabis MSA package. The redlines fall into a few main categories: (1) clarifying payment terms and invoice timing to align cash flow with actual service delivery, (2) adding third-party integration risk allocation language—critical given the heavy reliance on systems like Dutchie, Treez, Springbig that we don't control, (3) tightening up SLA response times and carving out appropriate exclusions, and (4) various cleanup items where the original drafts had inconsistent references or missing definitions.
       </p>
@@ -1362,27 +1382,30 @@
         </div>
       </div>
       <div class="doc-card-body">
-        <div class="changes-section">
+        <div class="changes-section editable-box">
           <h5>What Changed</h5>
-          <div class="change-item">
-            <strong>Response Time Adjustments (Severity Levels 2-4)</strong> — Tightened the response windows. Sev 2 goes from 8 hours down to 1 hour during business hours. Sev 3 and 4 extended slightly (1→3 days, 2→5 days) to be more realistic for lower-priority issues.
-          </div>
-          <div class="change-item">
-            <strong>Scope Limitation Clause (new item e)</strong> — Added language clarifying Provider makes no guarantees for inquiries outside defined scope. Customer is responsible for monitoring their own external matters.
-            <div class="note">This one is important—prevents scope creep into areas we're not being paid to support.</div>
-          </div>
-          <div class="change-item">
-            <strong>Third-Party Integration Exclusions (items m-r)</strong> — New exclusion items after Force Majeure covering API outages, rate limiting, credential issues, and third-party policy changes for systems like Dutchie, Treez, etc.
-          </div>
-          <div class="change-item">
-            <strong>AI Agent Disclaimer</strong> — Added disclaimer that AI Agent support is "as-is" and doesn't constitute formal support tickets or trigger SLA commitments.
+          <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+          <div class="editable-content" contenteditable="true" data-field="sla-changes">
+            <div class="change-item">
+              <strong>Response Time Adjustments (Severity Levels 2-4)</strong> — Tightened the response windows. Sev 2 goes from 8 hours down to 1 hour during business hours. Sev 3 and 4 extended slightly (1→3 days, 2→5 days) to be more realistic for lower-priority issues.
+            </div>
+            <div class="change-item">
+              <strong>Scope Limitation Clause (new item e)</strong> — Added language clarifying Provider makes no guarantees for inquiries outside defined scope. Customer is responsible for monitoring their own external matters.
+              <div class="note">This one is important—prevents scope creep into areas we're not being paid to support.</div>
+            </div>
+            <div class="change-item">
+              <strong>Third-Party Integration Exclusions (items m-r)</strong> — New exclusion items after Force Majeure covering API outages, rate limiting, credential issues, and third-party policy changes for systems like Dutchie, Treez, etc.
+            </div>
+            <div class="change-item">
+              <strong>AI Agent Disclaimer</strong> — Added disclaimer that AI Agent support is "as-is" and doesn't constitute formal support tickets or trigger SLA commitments.
+            </div>
           </div>
         </div>
 
         <div class="rationale-section editable-box">
           <h5>Why These Matter</h5>
           <button class="copy-btn" onclick="copyContent(this)">Copy</button>
-          <div class="editable-content" contenteditable="true">
+          <div class="editable-content" contenteditable="true" data-field="sla-rationale">
             <p>
               The third-party exclusions are non-negotiable from our perspective. When Dutchie's API goes down at 2am, that's not something we can control or fix—and we shouldn't be on the hook for SLA credits because of it. The response time adjustments balance faster response for critical issues against realistic timelines for routine matters. The AI disclaimer is prophylactic; we don't want someone arguing that chatting with the AI agent counts as "opening a ticket."
             </p>
@@ -1419,39 +1442,42 @@
         </div>
       </div>
       <div class="doc-card-body">
-        <div class="changes-section">
+        <div class="changes-section editable-box">
           <h5>What Changed</h5>
-          <div class="change-item">
-            <strong>Payment Terms Restructure</strong> — Complete rewrite of Section 6.4. Setup fees now invoiced at kick-off (due before production deployment). Monthly fees commence when integration goes live, prorated for mid-month starts. Added event volume caps (100M/month) with overage pricing.
-          </div>
-          <div class="change-item">
-            <strong>Third-Party Integration Dependencies (new Section 6.5)</strong> — Four subsections covering: nature of dependencies, excluded events, Provider obligations during outages, and automatic timeline extensions.
-            <div class="note">This is the heart of our risk allocation for iPaaS work.</div>
-          </div>
-          <div class="change-item">
-            <strong>Change Management Process (new Section 8)</strong> — Formal CO process: written request → 5-day impact assessment → 5-day customer response → signed CO required. No work outside scope without executed CO.
-          </div>
-          <div class="change-item">
-            <strong>IP & License Terms (Section 7)</strong> — Fleshed out the bare-bones IP section with work product ownership, third-party component acknowledgments, customer data rights, and reservation of rights.
-          </div>
-          <div class="change-item">
-            <strong>Exhibit D Definition & References</strong> — Added definition for "Exhibit D: 2026 Technical Roadmap" and fixed broken reference in Section 3.2.3 that pointed to wrong section.
-          </div>
-          <div class="change-item">
-            <strong>PM Services Clarification</strong> — Explicit statement that project management is separate (Exhibit C-6) and not included in iPaaS fees.
-          </div>
-          <div class="change-item">
-            <strong>Suspension Rights</strong> — Provider can suspend after 45 days non-payment with 5 business days notice. Covers active integrations, deliverables, platform access, and new work.
-          </div>
-          <div class="change-item">
-            <strong>Cleanup</strong> — Fixed "any other C-5 SOW" → "any other SOW" and "Effective Date" → "C-5 SOW Effective Date" for clarity.
+          <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+          <div class="editable-content" contenteditable="true" data-field="ipaas-changes">
+            <div class="change-item">
+              <strong>Payment Terms Restructure</strong> — Complete rewrite of Section 6.4. Setup fees now invoiced at kick-off (due before production deployment). Monthly fees commence when integration goes live, prorated for mid-month starts. Added event volume caps (100M/month) with overage pricing.
+            </div>
+            <div class="change-item">
+              <strong>Third-Party Integration Dependencies (new Section 6.5)</strong> — Four subsections covering: nature of dependencies, excluded events, Provider obligations during outages, and automatic timeline extensions.
+              <div class="note">This is the heart of our risk allocation for iPaaS work.</div>
+            </div>
+            <div class="change-item">
+              <strong>Change Management Process (new Section 8)</strong> — Formal CO process: written request → 5-day impact assessment → 5-day customer response → signed CO required. No work outside scope without executed CO.
+            </div>
+            <div class="change-item">
+              <strong>IP & License Terms (Section 7)</strong> — Fleshed out the bare-bones IP section with work product ownership, third-party component acknowledgments, customer data rights, and reservation of rights.
+            </div>
+            <div class="change-item">
+              <strong>Exhibit D Definition & References</strong> — Added definition for "Exhibit D: 2026 Technical Roadmap" and fixed broken reference in Section 3.2.3 that pointed to wrong section.
+            </div>
+            <div class="change-item">
+              <strong>PM Services Clarification</strong> — Explicit statement that project management is separate (Exhibit C-6) and not included in iPaaS fees.
+            </div>
+            <div class="change-item">
+              <strong>Suspension Rights</strong> — Provider can suspend after 45 days non-payment with 5 business days notice. Covers active integrations, deliverables, platform access, and new work.
+            </div>
+            <div class="change-item">
+              <strong>Cleanup</strong> — Fixed "any other C-5 SOW" → "any other SOW" and "Effective Date" → "C-5 SOW Effective Date" for clarity.
+            </div>
           </div>
         </div>
 
         <div class="rationale-section editable-box">
           <h5>Why These Matter</h5>
           <button class="copy-btn" onclick="copyContent(this)">Copy</button>
-          <div class="editable-content" contenteditable="true">
+          <div class="editable-content" contenteditable="true" data-field="ipaas-rationale">
             <p>
               This SOW has the most redlines because it's also the most complex engagement. The payment restructure aligns cash flow with delivery milestones rather than back-loading everything. The third-party dependencies section is critical—we're building integrations with systems we don't own, and when Treez changes their API schema without warning, that's not our breach. The change management process protects both sides from scope creep and the "oh, we assumed that was included" conversations.
             </p>
@@ -1488,29 +1514,32 @@
         </div>
       </div>
       <div class="doc-card-body">
-        <div class="changes-section">
+        <div class="changes-section editable-box">
           <h5>What Changed</h5>
-          <div class="change-item">
-            <strong>Payment Terms</strong> — Aligned with same structure as iPaaS SOW (setup at kick-off, monthly upon commencement, Net 30 with 15-day grace).
-          </div>
-          <div class="change-item">
-            <strong>Cross-Reference to Change Management</strong> — Added reference to C-5 SOW Section 8 for change order process.
-          </div>
-          <div class="change-item">
-            <strong>Relationship Clarification</strong> — This SOW supports C-5 iPaaS implementation; made that explicit.
-          </div>
-          <div class="change-item">
-            <strong>Effective Date Fix</strong> — Same nomenclature cleanup as iPaaS.
-          </div>
-          <div class="change-item">
-            <strong>Suspension Language</strong> — Mirror of iPaaS suspension rights for non-payment.
+          <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+          <div class="editable-content" contenteditable="true" data-field="pm-changes">
+            <div class="change-item">
+              <strong>Payment Terms</strong> — Aligned with same structure as iPaaS SOW (setup at kick-off, monthly upon commencement, Net 30 with 15-day grace).
+            </div>
+            <div class="change-item">
+              <strong>Cross-Reference to Change Management</strong> — Added reference to C-5 SOW Section 8 for change order process.
+            </div>
+            <div class="change-item">
+              <strong>Relationship Clarification</strong> — This SOW supports C-5 iPaaS implementation; made that explicit.
+            </div>
+            <div class="change-item">
+              <strong>Effective Date Fix</strong> — Same nomenclature cleanup as iPaaS.
+            </div>
+            <div class="change-item">
+              <strong>Suspension Language</strong> — Mirror of iPaaS suspension rights for non-payment.
+            </div>
           </div>
         </div>
 
         <div class="rationale-section editable-box">
           <h5>Why These Matter</h5>
           <button class="copy-btn" onclick="copyContent(this)">Copy</button>
-          <div class="editable-content" contenteditable="true">
+          <div class="editable-content" contenteditable="true" data-field="pm-rationale">
             <p>
               Mostly harmonization—we want the PM SOW and iPaaS SOW to work together seamlessly. Same payment terms, same suspension rights, clear relationship between the two. The change management cross-reference avoids having to duplicate that whole section here.
             </p>
@@ -1547,23 +1576,26 @@
         </div>
       </div>
       <div class="doc-card-body">
-        <div class="changes-section">
+        <div class="changes-section editable-box">
           <h5>What Changed</h5>
-          <div class="change-item">
-            <strong>Payment Terms</strong> — Same alignment as other SOWs. Setup invoiced at kick-off, monthly upon go-live.
-          </div>
-          <div class="change-item">
-            <strong>Suspension Rights</strong> — Added ability to suspend services and withhold deliverables for non-payment after 45 days.
-          </div>
-          <div class="change-item">
-            <strong>Monthly Fee Commencement</strong> — Clarified that ongoing fees start when DW environment is actively receiving production data.
+          <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+          <div class="editable-content" contenteditable="true" data-field="dw-changes">
+            <div class="change-item">
+              <strong>Payment Terms</strong> — Same alignment as other SOWs. Setup invoiced at kick-off, monthly upon go-live.
+            </div>
+            <div class="change-item">
+              <strong>Suspension Rights</strong> — Added ability to suspend services and withhold deliverables for non-payment after 45 days.
+            </div>
+            <div class="change-item">
+              <strong>Monthly Fee Commencement</strong> — Clarified that ongoing fees start when DW environment is actively receiving production data.
+            </div>
           </div>
         </div>
 
         <div class="rationale-section editable-box">
           <h5>Why These Matter</h5>
           <button class="copy-btn" onclick="copyContent(this)">Copy</button>
-          <div class="editable-content" contenteditable="true">
+          <div class="editable-content" contenteditable="true" data-field="dw-rationale">
             <p>
               The DW SOW was relatively clean to begin with. Main additions are consistency with the payment/suspension terms across all SOWs. We want a single, predictable framework for how invoicing and non-payment situations work across the entire engagement.
             </p>
@@ -1716,6 +1748,7 @@ function saveFeedback() {
 
 // Load feedback from Firebase (real-time listener)
 function setupRealtimeSync() {
+  // Sync feedback (notes textareas)
   workroomRef.child('feedback').on('value', (snapshot) => {
     const data = snapshot.val();
     if (!data) return;
@@ -1746,6 +1779,33 @@ function setupRealtimeSync() {
       updateLastSaved(data.lastUpdated);
     }
   });
+
+  // Sync editable content (innerHTML preserved)
+  workroomRef.child('editableContent').on('value', (snapshot) => {
+    const data = snapshot.val();
+    if (!data) return;
+
+    document.querySelectorAll('.editable-content[data-field]').forEach(el => {
+      const field = el.dataset.field;
+      if (data[field] && !el.matches(':focus')) {
+        el.innerHTML = data[field];
+      }
+    });
+  });
+}
+
+// Save editable content to Firebase (debounced, preserves HTML)
+let saveTimeout = null;
+function saveEditableContent(el) {
+  const field = el.dataset.field;
+  if (!field) return;
+
+  clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(() => {
+    const update = {};
+    update[field] = el.innerHTML;
+    workroomRef.child('editableContent').update(update);
+  }, 800);
 }
 
 function updateSelectStyle(sel) {
@@ -1779,6 +1839,18 @@ function updateLastSaved(isoDate) {
 
 // Password protection
 const ACCESS_CODE = 'Story2026';
+
+function togglePasswordVisibility() {
+  const input = document.getElementById('passwordInput');
+  const btn = document.getElementById('showPwdBtn');
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.textContent = 'Hide';
+  } else {
+    input.type = 'password';
+    btn.textContent = 'Show';
+  }
+}
 
 function checkPassword() {
   const input = document.getElementById('passwordInput');
@@ -1825,6 +1897,13 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.feedback-select').forEach(sel => {
     sel.addEventListener('change', function() {
       updateSelectStyle(this);
+    });
+  });
+
+  // Auto-save editable content on input (preserves formatting)
+  document.querySelectorAll('.editable-content[data-field]').forEach(el => {
+    el.addEventListener('input', function() {
+      saveEditableContent(this);
     });
   });
 });
