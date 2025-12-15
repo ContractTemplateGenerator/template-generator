@@ -111,9 +111,31 @@
         }
         .form-subtitle {
             color: var(--gray-500);
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
             font-size: 0.9rem;
         }
+        .calc-lang-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+        }
+        .calc-lang-flag {
+            width: 32px;
+            height: 22px;
+            border-radius: 4px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: all 0.2s ease;
+            background-size: cover;
+            background-position: center;
+        }
+        .calc-lang-flag:hover { opacity: 0.8; transform: scale(1.1); }
+        .calc-lang-flag.active { opacity: 1; border-color: var(--primary); transform: scale(1.1); }
+        .calc-lang-flag.en { background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30"><rect fill="%23002868" width="60" height="30"/><g fill="%23fff"><rect width="60" height="3.5" y="3.5"/><rect width="60" height="3.5" y="10.5"/><rect width="60" height="3.5" y="17.5"/><rect width="60" height="3.5" y="24.5"/></g><rect fill="%23bf0a30" width="60" height="3.5" y="7"/><rect fill="%23bf0a30" width="60" height="3.5" y="14"/><rect fill="%23bf0a30" width="60" height="3.5" y="21"/><rect fill="%23002868" width="24" height="16"/></svg>'); }
+        .calc-lang-flag.ru { background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 9 6"><rect fill="%23fff" width="9" height="3"/><rect fill="%230039a6" y="2" width="9" height="2"/><rect fill="%23d52b1e" y="4" width="9" height="2"/></svg>'); }
+        .calc-lang-flag.es { background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3 2"><rect fill="%23006847" width="1" height="2"/><rect fill="%23fff" x="1" width="1" height="2"/><rect fill="%23ce1126" x="2" width="1" height="2"/></svg>'); }
 
         /* Form Sections */
         .form-section {
@@ -2070,6 +2092,55 @@
             const [prevNEV, setPrevNEV] = useState(null);
             const [showDemandLetter, setShowDemandLetter] = useState(demandOnly); // Auto-show if demandOnly
             const [hasUserInput, setHasUserInput] = useState(false); // Track if user has entered anything
+            const [currentLang, setCurrentLang] = useState(() => localStorage.getItem('termslaw_lang') || 'en');
+
+            // Translations for key UI elements
+            const t = {
+                en: {
+                    formTitle: "What's Your Case Really Worth?",
+                    formSubtitle: "13+ years of collection cases built into this calculator. I'll give you the same honest assessment I'd give in a paid consultation.",
+                    yourClaim: "Your Claim",
+                    amountOwed: "Amount Owed",
+                    daysOverdue: "Days Overdue",
+                    contractType: "Contract Type",
+                    evidence: "Evidence",
+                    deliveryProof: "Delivery Proof",
+                    acceptance: "Acceptance",
+                    defense: "Possible Defense",
+                    defendant: "Defendant"
+                },
+                ru: {
+                    formTitle: "Сколько стоит ваше дело?",
+                    formSubtitle: "13+ лет опыта в делах о взыскании долгов. Я дам вам такую же честную оценку, как на платной консультации.",
+                    yourClaim: "Ваше требование",
+                    amountOwed: "Сумма долга",
+                    daysOverdue: "Дней просрочки",
+                    contractType: "Тип договора",
+                    evidence: "Доказательства",
+                    deliveryProof: "Подтверждение доставки",
+                    acceptance: "Принятие",
+                    defense: "Возможная защита",
+                    defendant: "Должник"
+                },
+                es: {
+                    formTitle: "¿Cuánto vale su caso realmente?",
+                    formSubtitle: "13+ años de casos de cobranza integrados en esta calculadora. Le daré la misma evaluación honesta que daría en una consulta pagada.",
+                    yourClaim: "Su reclamo",
+                    amountOwed: "Monto adeudado",
+                    daysOverdue: "Días de retraso",
+                    contractType: "Tipo de contrato",
+                    evidence: "Evidencia",
+                    deliveryProof: "Prueba de entrega",
+                    acceptance: "Aceptación",
+                    defense: "Posible defensa",
+                    defendant: "Demandado"
+                }
+            }[currentLang];
+
+            const setLanguage = (lang) => {
+                setCurrentLang(lang);
+                localStorage.setItem('termslaw_lang', lang);
+            };
 
             const updateField = useCallback((field, value) => {
                 setFormData(prev => ({ ...prev, [field]: value }));
@@ -2104,8 +2175,13 @@
                 <div className={`main-container ${isEmbed ? 'embed-mode' : ''}`}>
                     {/* FORM */}
                     <div className="form-panel">
-                        <h1 className="form-title">What's Your Case Really Worth?</h1>
-                        <p className="form-subtitle">13+ years of collection cases built into this calculator. I'll give you the same honest assessment I'd give in a paid consultation.</p>
+                        <h1 className="form-title">{t.formTitle}</h1>
+                        <p className="form-subtitle">{t.formSubtitle}</p>
+                        <div className="calc-lang-toggle">
+                            <div className={`calc-lang-flag en ${currentLang === 'en' ? 'active' : ''}`} onClick={() => setLanguage('en')} title="English"></div>
+                            <div className={`calc-lang-flag ru ${currentLang === 'ru' ? 'active' : ''}`} onClick={() => setLanguage('ru')} title="Русский"></div>
+                            <div className={`calc-lang-flag es ${currentLang === 'es' ? 'active' : ''}`} onClick={() => setLanguage('es')} title="Español"></div>
+                        </div>
 
                         <div className="form-section">
                             <div className="section-header">
