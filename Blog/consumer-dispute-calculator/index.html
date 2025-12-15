@@ -1,0 +1,1529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consumer Dispute Calculator - What's Your Refund Really Worth? | Terms.Law</title>
+    <meta name="description" content="Free calculator to estimate your expected recovery value for consumer disputes. Compare chargebacks, platform disputes, demand letters, and small claims court.">
+    <link rel="canonical" href="https://terms.law/Blog/consumer-dispute-calculator/">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+    <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #1d4ed8;
+            --success: #059669;
+            --warning: #d97706;
+            --danger: #dc2626;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(to bottom, #0f172a, #1e293b, #0f172a);
+            min-height: 100vh;
+            color: var(--gray-800);
+        }
+
+        /* Header */
+        .site-header {
+            background: rgba(15, 23, 42, 0.95);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+        }
+        .logo span { color: var(--primary); }
+        .header-nav { display: flex; gap: 1.5rem; }
+        .nav-link {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+        .nav-link:hover { color: white; }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 2rem 1.5rem 1rem;
+            color: white;
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 1rem;
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 50px;
+            font-size: 0.85rem;
+            color: #86efac;
+            margin-bottom: 1rem;
+        }
+        .hero-badge .dot {
+            width: 8px;
+            height: 8px;
+            background: #4ade80;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .hero h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            line-height: 1.2;
+        }
+        .hero h1 .highlight {
+            background: linear-gradient(to right, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero p {
+            color: rgba(255,255,255,0.6);
+            font-size: 1rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* Progress Steps */
+        .progress-bar {
+            background: rgba(30, 41, 59, 0.8);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 1rem 1.5rem;
+        }
+        .progress-inner {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+        .step-num {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .step-num.active { background: var(--primary); color: white; }
+        .step-num.complete { background: var(--success); color: white; }
+        .step-num.pending { background: rgba(100, 116, 139, 0.5); color: rgba(255,255,255,0.5); }
+        .step-label {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.7);
+            display: none;
+        }
+        .step-item.active .step-label { color: white; font-weight: 500; }
+        .step-line {
+            flex: 1;
+            height: 2px;
+            background: rgba(100, 116, 139, 0.4);
+            margin: 0 0.5rem;
+        }
+        .step-line.complete { background: var(--success); }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            padding: 1.5rem 2rem;
+        }
+
+        /* Two-column layout for results */
+        .results-layout {
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            gap: 1.5rem;
+            align-items: start;
+        }
+        .results-sidebar {
+            position: sticky;
+            top: 1rem;
+        }
+        @media (max-width: 900px) {
+            .results-layout {
+                grid-template-columns: 1fr;
+            }
+            .results-sidebar {
+                position: static;
+            }
+        }
+
+        /* Form Elements */
+        .form-section { margin-bottom: 2rem; }
+        .form-section:last-child { margin-bottom: 0; }
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--gray-700);
+            margin-bottom: 0.75rem;
+        }
+        .form-label .emoji { margin-right: 0.5rem; }
+
+        .amount-input-wrap {
+            position: relative;
+        }
+        .amount-input-wrap .prefix {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+            color: var(--gray-400);
+        }
+        .amount-input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 2.5rem;
+            font-size: 1.75rem;
+            font-weight: 700;
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .amount-input:focus { border-color: var(--primary); }
+
+        .range-input {
+            width: 100%;
+            margin-top: 0.5rem;
+            accent-color: var(--primary);
+        }
+        .range-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--gray-400);
+            margin-top: 0.25rem;
+        }
+
+        /* Option Buttons */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+        }
+        @media (max-width: 700px) {
+            .options-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        .option-btn {
+            padding: 1rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+        }
+        .option-btn:hover { border-color: var(--gray-300); }
+        .option-btn.selected {
+            border-color: var(--primary);
+            background: rgba(59, 130, 246, 0.05);
+        }
+        .option-btn .icon { font-size: 1.25rem; margin-bottom: 0.25rem; }
+        .option-btn .label { font-weight: 500; color: var(--gray-800); }
+        .option-btn .desc { font-size: 0.75rem; color: var(--gray-500); margin-top: 0.25rem; }
+        .option-btn .badge {
+            display: inline-block;
+            margin-top: 0.35rem;
+            padding: 0.15rem 0.5rem;
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--success);
+            font-size: 0.7rem;
+            font-weight: 600;
+            border-radius: 50px;
+        }
+
+        /* Checkbox Options */
+        .checkbox-options { display: flex; flex-direction: column; gap: 0.75rem; }
+        .checkbox-option {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .checkbox-option:hover { border-color: var(--gray-300); }
+        .checkbox-option.checked {
+            border-color: var(--success);
+            background: rgba(5, 150, 105, 0.05);
+        }
+        .checkbox-option input { width: 20px; height: 20px; }
+        .checkbox-option .icon { font-size: 1.25rem; }
+        .checkbox-option .text { flex: 1; }
+        .checkbox-option .label { font-weight: 500; color: var(--gray-800); }
+        .checkbox-option .weight {
+            font-size: 0.8rem;
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        /* Evidence Score */
+        .score-card {
+            padding: 1rem;
+            background: var(--gray-50);
+            border-radius: 12px;
+            margin-top: 1.5rem;
+        }
+        .score-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        .score-label { font-weight: 500; color: var(--gray-700); }
+        .score-value { font-size: 1.5rem; font-weight: 700; color: var(--success); }
+        .score-bar {
+            height: 8px;
+            background: var(--gray-200);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .score-fill {
+            height: 100%;
+            background: linear-gradient(to right, #4ade80, #22c55e);
+            border-radius: 8px;
+            transition: width 0.5s ease;
+        }
+
+        /* Time Value */
+        .time-value-wrap {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .time-value-wrap input[type="range"] { flex: 1; }
+        .time-value-display {
+            text-align: right;
+            min-width: 80px;
+        }
+        .time-value-amount { font-size: 1.25rem; font-weight: 700; }
+        .time-value-unit { font-size: 0.8rem; color: var(--gray-500); }
+
+        /* Alert Box */
+        .alert-box {
+            padding: 1rem;
+            border-radius: 12px;
+            margin-top: 1rem;
+        }
+        .alert-box.warning {
+            background: rgba(234, 179, 8, 0.1);
+            border: 1px solid rgba(234, 179, 8, 0.3);
+        }
+        .alert-box label {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            cursor: pointer;
+        }
+        .alert-box input { margin-top: 0.25rem; }
+        .alert-box .title { font-weight: 600; color: var(--gray-800); }
+        .alert-box .desc { font-size: 0.85rem; color: var(--gray-600); margin-top: 0.25rem; }
+
+        /* Navigation */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--gray-200);
+        }
+        .btn {
+            padding: 0.85rem 1.5rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+        .btn-back {
+            background: transparent;
+            color: var(--gray-600);
+        }
+        .btn-back:hover { color: var(--gray-800); }
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        .btn-success:hover { background: #047857; }
+
+        /* Results Page */
+        .results-dashboard {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border-radius: 16px;
+            padding: 1.5rem;
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+        .results-title {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+        }
+        .results-stat { text-align: center; }
+        .results-stat .value { font-size: 1.5rem; font-weight: 700; }
+        .results-stat .value.green { color: #4ade80; }
+        .results-stat .value.blue { color: #60a5fa; }
+        .results-stat .value.purple { color: #c084fc; }
+        .results-stat .label { font-size: 0.7rem; color: rgba(255,255,255,0.6); margin-top: 0.25rem; }
+
+        .best-option-card {
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .best-option-icon { font-size: 2rem; }
+        .best-option-info { flex: 1; }
+        .best-option-label { font-size: 0.8rem; color: #86efac; }
+        .best-option-name { font-size: 1.1rem; font-weight: 600; }
+        .best-option-ev { text-align: right; }
+        .best-option-ev .value { font-size: 1.5rem; font-weight: 700; color: #4ade80; }
+        .best-option-ev .label { font-size: 0.7rem; color: rgba(255,255,255,0.6); }
+
+        /* Pathway Cards */
+        .pathways-section { margin-top: 1.5rem; }
+        .pathways-main { }
+        .pathways-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .pathways-list { display: flex; flex-direction: column; gap: 0.75rem; }
+
+        .pathway-card {
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s;
+            background: white;
+        }
+        .pathway-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+        .pathway-card.strong {
+            border-color: #86efac;
+            background: linear-gradient(to right, rgba(220, 252, 231, 0.3), white);
+        }
+        .pathway-card.moderate {
+            border-color: #fde047;
+            background: linear-gradient(to right, rgba(254, 249, 195, 0.3), white);
+        }
+
+        .pathway-header {
+            padding: 1rem;
+            cursor: pointer;
+        }
+        .pathway-header:hover { background: var(--gray-50); }
+
+        .pathway-top {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        .pathway-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: var(--gray-100);
+            flex-shrink: 0;
+        }
+        .pathway-card.strong .pathway-icon { background: #dcfce7; }
+        .pathway-card.moderate .pathway-icon { background: #fef9c3; }
+
+        .pathway-info { flex: 1; min-width: 0; }
+        .pathway-name-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.25rem;
+        }
+        .pathway-name { font-weight: 600; color: var(--gray-900); }
+        .pathway-badge {
+            padding: 0.2rem 0.5rem;
+            border-radius: 50px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .pathway-badge.recommended { background: #dcfce7; color: #166534; }
+        .pathway-badge.viable { background: #fef9c3; color: #854d0e; }
+        .pathway-badge.not-advised { background: #fee2e2; color: #991b1b; }
+        .pathway-desc { font-size: 0.8rem; color: var(--gray-500); }
+
+        .pathway-ev-block { text-align: right; flex-shrink: 0; }
+        .pathway-ev-value { font-size: 1.25rem; font-weight: 700; }
+        .pathway-ev-value.positive { color: var(--success); }
+        .pathway-ev-value.negative { color: var(--danger); }
+        .pathway-ev-label { font-size: 0.7rem; color: var(--gray-500); }
+
+        .ev-bar {
+            position: relative;
+            height: 28px;
+            background: var(--gray-100);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-top: 0.75rem;
+        }
+        .ev-bar-cost {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background: linear-gradient(to right, rgba(239, 68, 68, 0.15), rgba(239, 68, 68, 0.05));
+            border-right: 2px dashed rgba(239, 68, 68, 0.4);
+        }
+        .ev-bar-marker {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            border-radius: 3px;
+        }
+        .ev-bar-marker.good { background: var(--success); }
+        .ev-bar-marker.ok { background: #eab308; }
+        .ev-bar-marker.bad { background: var(--danger); }
+        .ev-bar-labels {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 0.75rem;
+            font-size: 0.7rem;
+        }
+        .ev-bar-labels .cost { color: #dc2626; font-weight: 500; }
+        .ev-bar-labels .ev { font-weight: 700; }
+        .ev-bar-labels .ev.positive { color: var(--success); }
+        .ev-bar-labels .ev.negative { color: var(--danger); }
+
+        .pathway-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.75rem;
+            font-size: 0.8rem;
+        }
+        .pathway-stats { display: flex; gap: 1rem; color: var(--gray-600); }
+        .pathway-stats strong { color: var(--success); }
+        .pathway-toggle { color: var(--primary); font-weight: 500; }
+
+        .pathway-expanded {
+            border-top: 1px solid var(--gray-200);
+            padding: 1rem;
+            background: var(--gray-50);
+        }
+        .pros-cons-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .pros-col h5 { font-size: 0.75rem; font-weight: 600; color: #166534; margin-bottom: 0.5rem; }
+        .cons-col h5 { font-size: 0.75rem; font-weight: 600; color: #991b1b; margin-bottom: 0.5rem; }
+        .pros-col ul, .cons-col ul { list-style: none; font-size: 0.8rem; color: var(--gray-600); }
+        .pros-col li::before { content: '✓ '; color: #166534; font-weight: 600; }
+        .cons-col li::before { content: '✗ '; color: #991b1b; font-weight: 600; }
+
+        .breakdown-card {
+            background: white;
+            border-radius: 8px;
+            padding: 0.85rem;
+            margin-bottom: 1rem;
+        }
+        .breakdown-title { font-size: 0.8rem; font-weight: 600; color: var(--gray-700); margin-bottom: 0.75rem; }
+        .breakdown-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+            text-align: center;
+        }
+        .breakdown-item label { display: block; font-size: 0.65rem; color: var(--gray-500); margin-bottom: 0.2rem; }
+        .breakdown-item span { font-size: 0.9rem; font-weight: 600; }
+        .breakdown-item span.positive { color: var(--success); }
+        .breakdown-item span.negative { color: var(--danger); }
+
+        .pathway-cta {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .pathway-cta:hover { background: var(--primary-dark); }
+
+        /* Strategy Card */
+        .strategy-card {
+            background: rgba(59, 130, 246, 0.08);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-top: 1.5rem;
+        }
+        .strategy-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #1e40af;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .strategy-text { font-size: 0.9rem; color: var(--gray-700); line-height: 1.6; }
+        .strategy-text strong { color: var(--gray-900); }
+
+        /* Trust Bar */
+        .trust-bar {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1.5rem;
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.5);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .results-layout { grid-template-columns: 1fr; }
+            .results-sidebar { position: static; }
+        }
+        @media (max-width: 700px) {
+            .options-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 600px) {
+            .hero h1 { font-size: 1.75rem; }
+            .card { padding: 1rem; }
+            .options-grid { grid-template-columns: 1fr; }
+            .results-grid { grid-template-columns: 1fr; gap: 0.75rem; }
+            .pathway-top { flex-direction: column; }
+            .pathway-ev-block { text-align: left; }
+            .pros-cons-grid { grid-template-columns: 1fr; }
+            .breakdown-grid { grid-template-columns: repeat(2, 1fr); }
+            .step-label { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-content">
+            <a href="/" class="logo">Terms<span>.Law</span></a>
+            <nav class="header-nav">
+                <a href="/Blog/" class="nav-link">Blog</a>
+                <a href="/case-evaluator/" class="nav-link">Debt Calculator</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="hero">
+        <div class="hero-badge">
+            <span class="dot"></span>
+            Free Legal Analysis Tool
+        </div>
+        <h1>What's Your Refund <span class="highlight">Really</span> Worth?</h1>
+        <p>Get an honest expected value calculation with multiple recovery pathways for consumer disputes</p>
+    </div>
+
+    <div id="root"></div>
+
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
+
+        const App = () => {
+            const [step, setStep] = useState(1);
+            const [formData, setFormData] = useState({
+                amount: 1500,
+                disputeType: 'refund',
+                paymentMethod: 'credit_card',
+                withinChargeback: true,
+                opponentType: 'small_business',
+                hasContract: false,
+                hasEmails: true,
+                hasReceipts: true,
+                hasScreenshots: false,
+                hourlyRate: 50
+            });
+            const [expandedPath, setExpandedPath] = useState(null);
+
+            const evidenceScore = useMemo(() => {
+                let score = 40;
+                if (formData.hasContract) score += 25;
+                if (formData.hasEmails) score += 15;
+                if (formData.hasReceipts) score += 20;
+                if (formData.hasScreenshots) score += 10;
+                return Math.min(score, 95);
+            }, [formData]);
+
+            const opponentProfiles = {
+                individual: { settlementRate: 0.35, name: 'Individual' },
+                small_business: { settlementRate: 0.65, name: 'Small Business' },
+                corporation: { settlementRate: 0.45, name: 'Corporation' },
+                platform_seller: { settlementRate: 0.75, name: 'Online Seller' }
+            };
+
+            const pathways = useMemo(() => {
+                const amount = formData.amount;
+                const evidence = evidenceScore / 100;
+                const opponent = opponentProfiles[formData.opponentType];
+                const hourly = formData.hourlyRate;
+
+                const allPaths = [
+                    {
+                        id: 'chargeback',
+                        name: 'Credit Card Chargeback',
+                        icon: '💳',
+                        available: formData.paymentMethod === 'credit_card' && formData.withinChargeback,
+                        cost: 0,
+                        timeCost: 2 * hourly,
+                        timeframe: '1-3 weeks',
+                        successRate: 0.72,
+                        desc: 'Dispute through your credit card company',
+                        pros: ['Free', 'Fast (1-3 weeks)', 'No lawyer needed', 'High success rate'],
+                        cons: ['60-120 day limit', 'Need documentation', 'May affect merchant relationship']
+                    },
+                    {
+                        id: 'platform',
+                        name: 'Platform Dispute',
+                        icon: '🖥️',
+                        available: formData.opponentType === 'platform_seller',
+                        cost: 0,
+                        timeCost: 1.5 * hourly,
+                        timeframe: '1-2 weeks',
+                        successRate: 0.68 * evidence,
+                        desc: 'Dispute through marketplace (eBay, Amazon, etc.)',
+                        pros: ['Free', 'Quick resolution', 'Platform often favors buyers'],
+                        cons: ['Platform-specific rules', 'May limit future purchases']
+                    },
+                    {
+                        id: 'diy_demand',
+                        name: 'DIY Demand Letter',
+                        icon: '✉️',
+                        available: true,
+                        cost: 0,
+                        timeCost: 3 * hourly,
+                        timeframe: '2-4 weeks',
+                        successRate: 0.25 * evidence * opponent.settlementRate,
+                        desc: 'Write and send your own formal demand letter',
+                        pros: ['Free', 'Good first step', 'Creates paper trail'],
+                        cons: ['Lower impact than attorney letter', 'Requires follow-through']
+                    },
+                    {
+                        id: 'attorney_demand',
+                        name: 'Attorney Demand Letter',
+                        icon: '⚖️',
+                        available: true,
+                        cost: 450,
+                        followUpRate: 240, // hourly rate for counter-negotiations
+                        timeCost: 0.5 * hourly,
+                        timeframe: '2-4 weeks',
+                        successRate: 0.55 * evidence * opponent.settlementRate,
+                        desc: 'Professional letter on attorney letterhead with settlement negotiation',
+                        pros: ['High credibility', 'Legal expertise', 'Basic negotiation included', 'Often resolves disputes'],
+                        cons: ['$450 flat fee', 'Extended negotiation at $240/hr']
+                    },
+                    {
+                        id: 'small_claims',
+                        name: 'Small Claims Court',
+                        icon: '🏛️',
+                        available: amount <= 12500,
+                        cost: amount <= 1500 ? 30 : amount <= 5000 ? 50 : 75,
+                        timeCost: 8 * hourly,
+                        timeframe: '2-3 months',
+                        successRate: 0.65 * evidence,
+                        desc: 'File a lawsuit in small claims court',
+                        pros: ['Binding judgment', 'No lawyer needed', 'Low filing fees'],
+                        cons: ['Time in court', 'Collection still required', 'Stress']
+                    },
+                    {
+                        id: 'regulatory',
+                        name: 'Consumer Complaint (AG/FTC)',
+                        icon: '🏢',
+                        available: formData.disputeType === 'refund' || formData.disputeType === 'scam',
+                        cost: 0,
+                        timeCost: 2 * hourly,
+                        timeframe: '1-6 months',
+                        successRate: 0.15,
+                        desc: 'File complaint with Attorney General or FTC',
+                        pros: ['Free', 'Creates official record', 'May trigger investigation'],
+                        cons: ['Low individual resolution rate', 'Slow', 'No guarantee of action']
+                    }
+                ];
+
+                return allPaths
+                    .filter(p => p.available)
+                    .map(p => {
+                        const grossEV = p.successRate * amount;
+                        const totalCost = p.cost + p.timeCost;
+                        const netEV = grossEV - totalCost;
+                        const roi = totalCost > 0 ? ((grossEV - totalCost) / totalCost * 100) : (grossEV > 0 ? 999 : 0);
+                        const rec = netEV > amount * 0.5 ? 'strong' : netEV > 0 ? 'moderate' : 'weak';
+                        return { ...p, grossEV, netEV, totalCost, roi, recommendation: rec };
+                    })
+                    .sort((a, b) => b.netEV - a.netEV);
+            }, [formData, evidenceScore]);
+
+            const bestPath = pathways[0];
+
+            // Step 1: Amount & Type
+            const Step1 = () => (
+                <div>
+                    <div className="form-section">
+                        <label className="form-label">
+                            <span className="emoji">💰</span>
+                            How much are you owed?
+                        </label>
+                        <div className="amount-input-wrap">
+                            <span className="prefix">$</span>
+                            <input
+                                type="number"
+                                className="amount-input"
+                                value={formData.amount}
+                                onChange={e => setFormData({...formData, amount: parseInt(e.target.value) || 0})}
+                            />
+                        </div>
+                        <input
+                            type="range"
+                            className="range-input"
+                            min="100"
+                            max="15000"
+                            step="100"
+                            value={formData.amount}
+                            onChange={e => setFormData({...formData, amount: parseInt(e.target.value)})}
+                        />
+                        <div className="range-labels">
+                            <span>$100</span>
+                            <span>$15,000</span>
+                        </div>
+                    </div>
+
+                    <div className="form-section">
+                        <label className="form-label">
+                            <span className="emoji">📂</span>
+                            What type of dispute is this?
+                        </label>
+                        <div className="options-grid">
+                            {[
+                                { id: 'refund', label: 'Refund/Return', icon: '🛒', desc: 'Product or service issue' },
+                                { id: 'scam', label: 'Scam/Fraud', icon: '🚨', desc: 'Deceptive practices' },
+                                { id: 'quality', label: 'Quality Dispute', icon: '⚠️', desc: 'Not as described' },
+                                { id: 'non_delivery', label: 'Non-Delivery', icon: '📦', desc: 'Never received item' }
+                            ].map(type => (
+                                <button
+                                    key={type.id}
+                                    className={`option-btn ${formData.disputeType === type.id ? 'selected' : ''}`}
+                                    onClick={() => setFormData({...formData, disputeType: type.id})}
+                                >
+                                    <div className="icon">{type.icon}</div>
+                                    <div className="label">{type.label}</div>
+                                    <div className="desc">{type.desc}</div>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+
+            // Step 2: Payment & Opponent
+            const Step2 = () => (
+                <div>
+                    <div className="form-section">
+                        <label className="form-label">
+                            <span className="emoji">💳</span>
+                            How did you pay?
+                        </label>
+                        <div className="options-grid">
+                            {[
+                                { id: 'credit_card', label: 'Credit Card', badge: '✓ Chargeback possible' },
+                                { id: 'debit_card', label: 'Debit Card', badge: '✓ Chargeback possible' },
+                                { id: 'bank_transfer', label: 'Bank Transfer' },
+                                { id: 'paypal', label: 'PayPal/Venmo' },
+                                { id: 'cash', label: 'Cash/Check' },
+                                { id: 'crypto', label: 'Crypto' }
+                            ].map(method => (
+                                <button
+                                    key={method.id}
+                                    className={`option-btn ${formData.paymentMethod === method.id ? 'selected' : ''}`}
+                                    onClick={() => setFormData({...formData, paymentMethod: method.id})}
+                                >
+                                    <div className="label">{method.label}</div>
+                                    {method.badge && <div className="badge">{method.badge}</div>}
+                                </button>
+                            ))}
+                        </div>
+
+                        {(formData.paymentMethod === 'credit_card' || formData.paymentMethod === 'debit_card') && (
+                            <div className="alert-box warning">
+                                <label>
+                                    <input
+                                        type="checkbox"
+                                        checked={formData.withinChargeback}
+                                        onChange={e => setFormData({...formData, withinChargeback: e.target.checked})}
+                                    />
+                                    <div>
+                                        <div className="title">Was this within the last 120 days?</div>
+                                        <div className="desc">Most credit cards allow chargebacks within 60-120 days</div>
+                                    </div>
+                                </label>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="form-section">
+                        <label className="form-label">
+                            <span className="emoji">👤</span>
+                            Who is the other party?
+                        </label>
+                        <div className="options-grid">
+                            {[
+                                { id: 'individual', label: 'Individual', desc: 'Private person' },
+                                { id: 'small_business', label: 'Small Business', desc: 'Local company' },
+                                { id: 'corporation', label: 'Corporation', desc: 'Large company' },
+                                { id: 'platform_seller', label: 'Online Seller', desc: 'eBay, Amazon, etc.' }
+                            ].map(type => (
+                                <button
+                                    key={type.id}
+                                    className={`option-btn ${formData.opponentType === type.id ? 'selected' : ''}`}
+                                    onClick={() => setFormData({...formData, opponentType: type.id})}
+                                >
+                                    <div className="label">{type.label}</div>
+                                    <div className="desc">{type.desc}</div>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+
+            // Step 3: Evidence
+            const Step3 = () => (
+                <div>
+                    <div className="form-section">
+                        <label className="form-label">
+                            <span className="emoji">📎</span>
+                            What evidence do you have?
+                        </label>
+                        <div className="checkbox-options">
+                            {[
+                                { id: 'hasContract', label: 'Written contract or agreement', weight: '+25%', icon: '📄' },
+                                { id: 'hasEmails', label: 'Email or text message trail', weight: '+15%', icon: '📧' },
+                                { id: 'hasReceipts', label: 'Payment receipts or records', weight: '+20%', icon: '🧾' },
+                                { id: 'hasScreenshots', label: 'Screenshots or photos', weight: '+10%', icon: '📸' }
+                            ].map(item => (
+                                <label
+                                    key={item.id}
+                                    className={`checkbox-option ${formData[item.id] ? 'checked' : ''}`}
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={formData[item.id]}
+                                        onChange={e => setFormData({...formData, [item.id]: e.target.checked})}
+                                    />
+                                    <span className="icon">{item.icon}</span>
+                                    <div className="text">
+                                        <div className="label">{item.label}</div>
+                                    </div>
+                                    <span className="weight">{item.weight}</span>
+                                </label>
+                            ))}
+                        </div>
+
+                        <div className="score-card">
+                            <div className="score-header">
+                                <span className="score-label">Evidence Strength Score</span>
+                                <span className="score-value">{evidenceScore}%</span>
+                            </div>
+                            <div className="score-bar">
+                                <div className="score-fill" style={{ width: `${evidenceScore}%` }}></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="form-section">
+                        <label className="form-label">
+                            <span className="emoji">💵</span>
+                            What's your time worth? (per hour)
+                        </label>
+                        <div className="time-value-wrap">
+                            <input
+                                type="range"
+                                min="15"
+                                max="200"
+                                step="5"
+                                value={formData.hourlyRate}
+                                onChange={e => setFormData({...formData, hourlyRate: parseInt(e.target.value)})}
+                            />
+                            <div className="time-value-display">
+                                <span className="time-value-amount">${formData.hourlyRate}</span>
+                                <span className="time-value-unit">/hr</span>
+                            </div>
+                        </div>
+                        <p style={{ fontSize: '0.75rem', color: '#9ca3af', marginTop: '0.5rem' }}>
+                            This helps calculate the true cost of DIY options vs. professional help
+                        </p>
+                    </div>
+                </div>
+            );
+
+            // Step 4: Results
+            const Step4 = () => {
+                const opponent = opponentProfiles[formData.opponentType];
+                const maxEV = formData.amount * 1.2;
+
+                // Build prefilled URL for demand letter generator
+                const buildDemandLetterURL = () => {
+                    const params = new URLSearchParams({
+                        amount: formData.amount,
+                        disputeType: formData.disputeType,
+                        opponentType: formData.opponentType,
+                        hasContract: formData.hasContract,
+                        hasEmails: formData.hasEmails,
+                        hasReceipts: formData.hasReceipts,
+                        source: 'consumer-calc'
+                    });
+                    return `/Breach-of-Contract-Demand-Letter-Generator/?${params.toString()}`;
+                };
+
+                // State for inline DIY editor
+                const [showDIYEditor, setShowDIYEditor] = useState(false);
+                const [diyLetter, setDiyLetter] = useState('');
+
+                // Generate DIY demand letter template
+                const generateDIYLetter = () => {
+                    const disputeTypes = {
+                        refund: 'refund for goods/services',
+                        scam: 'recovery of funds lost to fraudulent practices',
+                        quality: 'compensation for defective/misrepresented goods',
+                        non_delivery: 'refund for items never delivered'
+                    };
+                    const opponentTypes = {
+                        individual: 'you',
+                        small_business: 'your company',
+                        corporation: 'your company',
+                        platform_seller: 'you/your business'
+                    };
+
+                    return `DEMAND FOR PAYMENT
+
+Date: ${new Date().toLocaleDateString()}
+
+To: [RECIPIENT NAME/COMPANY]
+[ADDRESS]
+
+Re: Demand for ${disputeTypes[formData.disputeType]} - $${formData.amount.toLocaleString()}
+
+Dear Sir or Madam:
+
+I am writing to demand payment of $${formData.amount.toLocaleString()} for ${disputeTypes[formData.disputeType]}.
+
+STATEMENT OF FACTS:
+[Describe what happened - what you purchased, when, what went wrong]
+
+EVIDENCE IN MY POSSESSION:
+${formData.hasContract ? '• Written contract/agreement\n' : ''}${formData.hasEmails ? '• Email/text message correspondence\n' : ''}${formData.hasReceipts ? '• Payment receipts and records\n' : ''}${formData.hasScreenshots ? '• Screenshots/photographic evidence\n' : ''}
+DEMAND:
+I demand that ${opponentTypes[formData.opponentType]} pay me $${formData.amount.toLocaleString()} within fourteen (14) days of the date of this letter.
+
+If I do not receive payment by [DATE - 14 days from now], I will pursue all available legal remedies, which may include filing a complaint in small claims court, reporting this matter to the appropriate regulatory agencies, and any other action necessary to recover the amount owed.
+
+Please contact me at [YOUR EMAIL/PHONE] to arrange payment.
+
+Sincerely,
+
+[YOUR NAME]
+[YOUR ADDRESS]
+[YOUR EMAIL]
+[YOUR PHONE]`;
+                };
+
+                // Handle pathway CTA click
+                const handlePathwayCTA = (pathwayId) => {
+                    if (pathwayId === 'diy_demand') {
+                        if (!showDIYEditor) {
+                            setDiyLetter(generateDIYLetter());
+                        }
+                        setShowDIYEditor(!showDIYEditor);
+                        return;
+                    }
+
+                    if (pathwayId === 'attorney_demand') {
+                        window.location.href = `mailto:owner@terms.law?subject=Demand Letter Request - $${formData.amount}&body=Hi,%0A%0AI used the consumer dispute calculator and would like to discuss a demand letter.%0A%0AAmount: $${formData.amount}%0ADispute Type: ${formData.disputeType}%0AOpponent: ${formData.opponentType}%0AEvidence Score: ${evidenceScore}%25%0A%0APlease let me know next steps.`;
+                        return;
+                    }
+
+                    if (pathwayId === 'regulatory') {
+                        window.open('https://reportfraud.ftc.gov/', '_blank');
+                        return;
+                    }
+
+                    if (pathwayId === 'small_claims') {
+                        window.open('https://www.courts.ca.gov/selfhelp-smallclaims.htm', '_blank');
+                        return;
+                    }
+                };
+
+                // Get CTA text based on pathway
+                const getCTAText = (pathwayId) => {
+                    const texts = {
+                        chargeback: null, // No button needed
+                        platform: null, // No button needed
+                        diy_demand: showDIYEditor ? '▲ Close Editor' : '✍️ Open Letter Editor',
+                        attorney_demand: '✉️ Email Attorney (owner@terms.law)',
+                        small_claims: '🏛️ CA Small Claims Info →',
+                        regulatory: '📝 Report Fraud to FTC →'
+                    };
+                    return texts[pathwayId];
+                };
+
+                return (
+                    <div className="results-layout">
+                        <div className="results-sidebar">
+                            <div className="results-dashboard">
+                                <div className="results-title">📊 Your Case</div>
+                                <div className="results-grid" style={{ gridTemplateColumns: '1fr' }}>
+                                    <div className="results-stat">
+                                        <div className="value green">${formData.amount.toLocaleString()}</div>
+                                        <div className="label">Claim Amount</div>
+                                    </div>
+                                    <div className="results-stat">
+                                        <div className="value blue">{evidenceScore}%</div>
+                                        <div className="label">Evidence Strength</div>
+                                    </div>
+                                    <div className="results-stat">
+                                        <div className="value purple">{Math.round(opponent.settlementRate * 100)}%</div>
+                                        <div className="label">Settlement Likelihood</div>
+                                    </div>
+                                </div>
+                                <div className="best-option-card" style={{ flexDirection: 'column', textAlign: 'center', gap: '0.5rem' }}>
+                                    <span className="best-option-icon">{bestPath.icon}</span>
+                                    <div className="best-option-info" style={{ textAlign: 'center' }}>
+                                        <div className="best-option-label">Recommended</div>
+                                        <div className="best-option-name">{bestPath.name}</div>
+                                    </div>
+                                    <div className="best-option-ev" style={{ textAlign: 'center' }}>
+                                        <div className="value">${Math.round(bestPath.netEV).toLocaleString()}</div>
+                                        <div className="label">Expected Value</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="strategy-card" style={{ marginTop: '1rem' }}>
+                                <div className="strategy-title">💡 My Take</div>
+                                <div className="strategy-text" style={{ fontSize: '0.85rem' }}>
+                                    {bestPath.id === 'chargeback' && (
+                                        <p><strong>Start with the chargeback.</strong> Free, fast, {Math.round(bestPath.successRate * 100)}% success rate. If it fails, you can still pursue other options.</p>
+                                    )}
+                                    {bestPath.id === 'platform' && (
+                                        <p><strong>Use the platform dispute.</strong> Marketplaces usually favor buyers. Free and fast.</p>
+                                    )}
+                                    {bestPath.id === 'attorney_demand' && (
+                                        <p><strong>Attorney letter is your best bet.</strong> $450 flat, basic negotiation included. Works 8/10 times.</p>
+                                    )}
+                                    {bestPath.id === 'small_claims' && (
+                                        <p><strong>Small claims court.</strong> Low filing fees, binding judgment. Show up with your evidence.</p>
+                                    )}
+                                    {bestPath.id === 'diy_demand' && (
+                                        <p><strong>DIY demand letter first.</strong> Creates a paper trail. If ignored, escalate.</p>
+                                    )}
+                                    {bestPath.id === 'regulatory' && (
+                                        <p><strong>Regulatory complaint.</strong> Long game—tracks patterns for investigations.</p>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Contact Options */}
+                            <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                <button
+                                    onClick={() => window.Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1'})}
+                                    style={{
+                                        width: '100%',
+                                        padding: '0.75rem',
+                                        background: 'linear-gradient(135deg, #059669, #047857)',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '10px',
+                                        fontWeight: '600',
+                                        fontSize: '0.9rem',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '0.5rem'
+                                    }}
+                                >
+                                    📅 Schedule a Call
+                                </button>
+                                <button
+                                    onClick={() => window.open('https://t.me/SergeiTokmakov', '_blank')}
+                                    style={{
+                                        width: '100%',
+                                        padding: '0.75rem',
+                                        background: 'linear-gradient(135deg, #0088cc, #0077b5)',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '10px',
+                                        fontWeight: '600',
+                                        fontSize: '0.9rem',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '0.5rem'
+                                    }}
+                                >
+                                    💬 Chat with Sergei
+                                </button>
+                                <a
+                                    href={`mailto:owner@terms.law?subject=Consumer Dispute - $${formData.amount}&body=Hi Sergei,%0A%0AI used the consumer dispute calculator.%0A%0AAmount: $${formData.amount}%0ADispute Type: ${formData.disputeType}%0AEvidence Score: ${evidenceScore}%25%0A%0APlease let me know how you can help.`}
+                                    style={{
+                                        width: '100%',
+                                        padding: '0.75rem',
+                                        background: '#374151',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '10px',
+                                        fontWeight: '600',
+                                        fontSize: '0.9rem',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '0.5rem',
+                                        textDecoration: 'none'
+                                    }}
+                                >
+                                    ✉️ Email Sergei
+                                </a>
+                            </div>
+                        </div>
+
+                        <div className="pathways-main">
+                            <div className="pathways-title">🛤️ All Recovery Pathways (Ranked by EV)</div>
+                            <div className="pathways-list">
+                                {pathways.map(p => {
+                                    const isExpanded = expandedPath === p.id;
+                                    const costPct = Math.min((p.totalCost / maxEV) * 100, 50);
+                                    const evPct = Math.max(0, Math.min((p.netEV / maxEV) * 100, 100));
+                                    const successRate = Math.round(p.successRate * 100);
+                                    const roi = p.totalCost > 0 ? Math.round(p.roi) : 999;
+
+                                    return (
+                                        <div key={p.id} className={`pathway-card ${p.recommendation}`}>
+                                            <div className="pathway-header" onClick={() => setExpandedPath(isExpanded ? null : p.id)}>
+                                                <div className="pathway-top">
+                                                    <div className="pathway-icon">{p.icon}</div>
+                                                    <div className="pathway-info">
+                                                        <div className="pathway-name-row">
+                                                            <span className="pathway-name">{p.name}</span>
+                                                            <span className={`pathway-badge ${p.recommendation === 'strong' ? 'recommended' : p.recommendation === 'moderate' ? 'viable' : 'not-advised'}`}>
+                                                                {p.recommendation === 'strong' ? 'RECOMMENDED' : p.recommendation === 'moderate' ? 'VIABLE' : 'NOT ADVISED'}
+                                                            </span>
+                                                        </div>
+                                                        <div className="pathway-desc">{p.desc}</div>
+                                                    </div>
+                                                    <div className="pathway-ev-block">
+                                                        <div className={`pathway-ev-value ${p.netEV > 0 ? 'positive' : 'negative'}`}>
+                                                            ${Math.round(p.netEV).toLocaleString()}
+                                                        </div>
+                                                        <div className="pathway-ev-label">Expected Value</div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="ev-bar">
+                                                    <div className="ev-bar-cost" style={{ width: `${costPct}%` }}></div>
+                                                    <div className={`ev-bar-marker ${p.netEV > formData.amount * 0.5 ? 'good' : p.netEV > 0 ? 'ok' : 'bad'}`} style={{ left: `${evPct}%` }}></div>
+                                                    <div className="ev-bar-labels">
+                                                        <span className="cost">${Math.round(p.totalCost)} cost</span>
+                                                        <span className={`ev ${p.netEV > 0 ? 'positive' : 'negative'}`}>EV: ${Math.round(p.netEV).toLocaleString()}</span>
+                                                    </div>
+                                                </div>
+
+                                                <div className="pathway-meta">
+                                                    <div className="pathway-stats">
+                                                        <span><strong>{successRate}%</strong> success rate</span>
+                                                        <span>{p.timeframe}</span>
+                                                    </div>
+                                                    <span className="pathway-toggle">{isExpanded ? '▲ Less' : '▼ More details'}</span>
+                                                </div>
+                                            </div>
+
+                                            {isExpanded && (
+                                                <div className="pathway-expanded">
+                                                    <div className="pros-cons-grid">
+                                                        <div className="pros-col">
+                                                            <h5>✓ Pros</h5>
+                                                            <ul>{p.pros.map((pro, i) => <li key={i}>{pro}</li>)}</ul>
+                                                        </div>
+                                                        <div className="cons-col">
+                                                            <h5>✗ Cons</h5>
+                                                            <ul>{p.cons.map((con, i) => <li key={i}>{con}</li>)}</ul>
+                                                        </div>
+                                                    </div>
+
+                                                    {p.id === 'attorney_demand' && (
+                                                        <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '8px', padding: '0.85rem', marginBottom: '1rem', fontSize: '0.85rem', color: '#1e40af' }}>
+                                                            <strong>📝 Pricing breakdown:</strong> $450 flat covers the demand letter + basic settlement messages. If they counter or deny and need strategic responses, that's billed at $240/hr. Most cases settle without needing the hourly work.
+                                                        </div>
+                                                    )}
+
+                                                    <div className="breakdown-card">
+                                                        <div className="breakdown-title">📊 Detailed Breakdown</div>
+                                                        <div className="breakdown-grid">
+                                                            <div className="breakdown-item">
+                                                                <label>Out-of-pocket</label>
+                                                                <span>${p.cost}</span>
+                                                            </div>
+                                                            <div className="breakdown-item">
+                                                                <label>Time cost</label>
+                                                                <span>${Math.round(p.timeCost)}</span>
+                                                            </div>
+                                                            <div className="breakdown-item">
+                                                                <label>Potential</label>
+                                                                <span>${formData.amount.toLocaleString()}</span>
+                                                            </div>
+                                                            <div className="breakdown-item">
+                                                                <label>ROI</label>
+                                                                <span className={roi > 0 ? 'positive' : 'negative'}>{roi > 100 ? '100+' : roi}%</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Pathway-specific inline instructions */}
+                                                    {p.id === 'chargeback' && (
+                                                        <div style={{ background: '#ecfdf5', border: '1px solid #a7f3d0', borderRadius: '8px', padding: '0.85rem', fontSize: '0.85rem' }}>
+                                                            <strong>📞 How to file:</strong> Call the number on the back of your card. Say "I want to dispute a charge." Have your transaction date, amount (${formData.amount.toLocaleString()}), and merchant name ready. They'll walk you through it.
+                                                        </div>
+                                                    )}
+
+                                                    {p.id === 'platform' && (
+                                                        <div style={{ background: '#ecfdf5', border: '1px solid #a7f3d0', borderRadius: '8px', padding: '0.85rem', fontSize: '0.85rem' }}>
+                                                            <strong>🖥️ How to file:</strong> Go to your order history → Find the order → Click "Problem with order" or "Request refund" → Select the issue type → Upload any screenshots as evidence.
+                                                        </div>
+                                                    )}
+
+                                                    {/* Only show CTA button if there's text for it */}
+                                                    {getCTAText(p.id) && (
+                                                        <button
+                                                            className="pathway-cta"
+                                                            onClick={(e) => { e.stopPropagation(); handlePathwayCTA(p.id); }}
+                                                            style={{ marginTop: '1rem' }}
+                                                        >
+                                                            {getCTAText(p.id)}
+                                                        </button>
+                                                    )}
+
+                                                    {/* Inline DIY Demand Letter Editor */}
+                                                    {p.id === 'diy_demand' && showDIYEditor && (
+                                                        <div style={{ marginTop: '1rem', background: 'white', borderRadius: '8px', padding: '1rem', border: '1px solid #e5e7eb' }}>
+                                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                                                                <strong style={{ fontSize: '0.9rem' }}>✍️ Your Demand Letter</strong>
+                                                                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                                                    <button
+                                                                        onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(diyLetter); alert('Copied to clipboard!'); }}
+                                                                        style={{ padding: '0.4rem 0.75rem', fontSize: '0.75rem', background: '#f3f4f6', border: '1px solid #d1d5db', borderRadius: '6px', cursor: 'pointer' }}
+                                                                    >
+                                                                        📋 Copy
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            const blob = new Blob([diyLetter], { type: 'text/plain' });
+                                                                            const url = URL.createObjectURL(blob);
+                                                                            const a = document.createElement('a');
+                                                                            a.href = url;
+                                                                            a.download = 'demand-letter.txt';
+                                                                            a.click();
+                                                                        }}
+                                                                        style={{ padding: '0.4rem 0.75rem', fontSize: '0.75rem', background: '#3b82f6', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
+                                                                    >
+                                                                        💾 Download
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                            <textarea
+                                                                value={diyLetter}
+                                                                onChange={(e) => setDiyLetter(e.target.value)}
+                                                                onClick={(e) => e.stopPropagation()}
+                                                                style={{
+                                                                    width: '100%',
+                                                                    minHeight: '400px',
+                                                                    padding: '1rem',
+                                                                    fontFamily: 'monospace',
+                                                                    fontSize: '0.85rem',
+                                                                    lineHeight: '1.5',
+                                                                    border: '1px solid #d1d5db',
+                                                                    borderRadius: '6px',
+                                                                    resize: 'vertical',
+                                                                    background: '#fafafa'
+                                                                }}
+                                                            />
+                                                            <p style={{ fontSize: '0.75rem', color: '#6b7280', marginTop: '0.75rem' }}>
+                                                                ⚠️ Fill in the [BRACKETED] sections with your information. Print and send via certified mail for best results.
+                                                            </p>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
+            const steps = [
+                { num: 1, label: 'Amount' },
+                { num: 2, label: 'Payment' },
+                { num: 3, label: 'Evidence' },
+                { num: 4, label: 'Results' }
+            ];
+
+            return (
+                <div>
+                    <div className="progress-bar">
+                        <div className="progress-inner">
+                            {steps.map((s, i) => (
+                                <React.Fragment key={s.num}>
+                                    <div
+                                        className={`step-item ${step === s.num ? 'active' : ''}`}
+                                        onClick={() => s.num < step && setStep(s.num)}
+                                        style={{ cursor: s.num < step ? 'pointer' : 'default' }}
+                                    >
+                                        <div className={`step-num ${step === s.num ? 'active' : step > s.num ? 'complete' : 'pending'}`}>
+                                            {step > s.num ? '✓' : s.num}
+                                        </div>
+                                        <span className="step-label">{s.label}</span>
+                                    </div>
+                                    {i < steps.length - 1 && (
+                                        <div className={`step-line ${step > s.num ? 'complete' : ''}`}></div>
+                                    )}
+                                </React.Fragment>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="main-container">
+                        <div className="card">
+                            {step === 1 && <Step1 />}
+                            {step === 2 && <Step2 />}
+                            {step === 3 && <Step3 />}
+                            {step === 4 && <Step4 />}
+
+                            <div className="nav-buttons">
+                                {step > 1 ? (
+                                    <button className="btn btn-back" onClick={() => setStep(step - 1)}>← Back</button>
+                                ) : <div></div>}
+                                {step < 4 ? (
+                                    <button className="btn btn-primary" onClick={() => setStep(step + 1)}>Continue →</button>
+                                ) : (
+                                    <a
+                                        href="mailto:owner@terms.law?subject=Consumer Dispute Help"
+                                        className="btn btn-success"
+                                        style={{ textDecoration: 'none', display: 'inline-block' }}
+                                    >
+                                        ✉️ Email Sergei →
+                                    </a>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="trust-bar">
+                            <span>⚖️ CA Bar #279869</span>
+                            <span>🔒 No data stored</span>
+                            <span>📊 1,400+ cases analyzed</span>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-901N2Y3CDZ"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-901N2Y3CDZ');
+    </script>
+</body>
+</html>
