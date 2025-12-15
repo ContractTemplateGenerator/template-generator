@@ -4,6 +4,16 @@
 
 const BLOG_POSTS = [
   {
+    "id": 99001,
+    "title": "Consumer Dispute Calculator - What's Your Refund Really Worth?",
+    "slug": "consumer-dispute-calculator",
+    "date": "2025-12-15",
+    "url": "/Blog/consumer-dispute-calculator/",
+    "categories": ["Tools", "Consumer Rights"],
+    "featured": true,
+    "description": "Free calculator to estimate your expected recovery value. Compare chargebacks, DIY demand letters, attorney letters, and small claims court."
+  },
+  {
     "id": 15702,
     "title": "",
     "slug": "cfe6f15b-a970-44d2-9f6c-5f7a9dfdf361",
