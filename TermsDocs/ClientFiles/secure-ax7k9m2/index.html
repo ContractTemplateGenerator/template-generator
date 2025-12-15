@@ -789,9 +789,122 @@
     .playbook-copy-btn:hover {
       background: #f5f5f4;
     }
+
+    /* Password Gate */
+    .password-gate {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .password-gate.hidden {
+      display: none;
+    }
+
+    .password-box {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 40px 48px;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    }
+
+    .password-box h2 {
+      font-family: 'Crimson Pro', Georgia, serif;
+      font-size: 1.4rem;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+
+    .password-box .subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .password-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 1rem;
+      font-family: inherit;
+      text-align: center;
+      letter-spacing: 2px;
+      margin-bottom: 16px;
+    }
+
+    .password-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .password-input.error {
+      border-color: #dc2626;
+      background: #fef2f2;
+    }
+
+    .password-submit {
+      width: 100%;
+      padding: 12px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .password-submit:hover {
+      background: var(--primary-light);
+    }
+
+    .password-error {
+      color: #dc2626;
+      font-size: 0.8rem;
+      margin-top: 12px;
+      display: none;
+    }
+
+    .password-error.show {
+      display: block;
+    }
+
+    .main-content {
+      display: none;
+    }
+
+    .main-content.visible {
+      display: block;
+    }
   </style>
 </head>
 <body>
+
+<!-- Password Gate -->
+<div class="password-gate" id="passwordGate">
+  <div class="password-box">
+    <h2>Secure Client Workroom</h2>
+    <div class="subtitle">Enter the access code provided by counsel</div>
+    <input type="password" class="password-input" id="passwordInput" placeholder="••••••••" autocomplete="off" autofocus>
+    <button class="password-submit" onclick="checkPassword()">Access Workroom</button>
+    <div class="password-error" id="passwordError">Incorrect access code. Please try again.</div>
+  </div>
+</div>
+
+<div class="main-content" id="mainContent">
 
 <div class="confidential-bar">
   🔒 PRIVILEGED & CONFIDENTIAL — ATTORNEY WORK PRODUCT
@@ -1664,7 +1777,48 @@ function updateLastSaved(isoDate) {
   if (indicator) indicator.textContent = 'Last saved: ' + formatted;
 }
 
+// Password protection
+const ACCESS_CODE = 'Story2026';
+
+function checkPassword() {
+  const input = document.getElementById('passwordInput');
+  const error = document.getElementById('passwordError');
+
+  if (input.value === ACCESS_CODE) {
+    // Store in session
+    sessionStorage.setItem('workroom_auth', 'true');
+    unlockWorkroom();
+  } else {
+    input.classList.add('error');
+    error.classList.add('show');
+    input.value = '';
+    setTimeout(() => {
+      input.classList.remove('error');
+    }, 500);
+  }
+}
+
+function unlockWorkroom() {
+  document.getElementById('passwordGate').classList.add('hidden');
+  document.getElementById('mainContent').classList.add('visible');
+}
+
+// Check if already authenticated in this session
+function checkAuth() {
+  if (sessionStorage.getItem('workroom_auth') === 'true') {
+    unlockWorkroom();
+  }
+}
+
+// Allow Enter key to submit
+document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') {
+    checkPassword();
+  }
+});
+
 document.addEventListener('DOMContentLoaded', function() {
+  checkAuth();
   document.getElementById('doc-sla').classList.add('expanded');
   setupRealtimeSync();
 
@@ -1675,6 +1829,8 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 </script>
+
+</div><!-- end main-content -->
 
 </body>
 </html>
