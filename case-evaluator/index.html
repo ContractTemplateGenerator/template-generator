@@ -1431,7 +1431,7 @@
             };
             return (
                 <div className={`gauge-card result-card ${!hasUserInput ? 'gauge-inactive' : ''}`}>
-                    <div className="card-header"><span className="card-title">Case Strength</span></div>
+                    <div className="card-header"><span className="card-title">My Read on Your Case</span></div>
                     <div className="gauge-container">
                         <svg className="gauge-svg" viewBox="0 0 160 95">
                             <path className="gauge-bg" d="M 15 80 A 65 65 0 0 1 145 80" fill="none" />
@@ -1596,13 +1596,13 @@
         const StabilityCard = ({ stability, sensitivity }) => (
             <div className="result-card">
                 <div className="card-header">
-                    <span className="card-title">Estimate Stability</span>
+                    <span className="card-title">How Confident Am I</span>
                     <span className={`stability-badge ${stability}`}>{stability === 'high' ? 'High' : stability === 'medium' ? 'Medium' : 'Low'}</span>
                 </div>
                 <div style={{ fontSize: '0.75rem', color: 'var(--gray-600)', marginBottom: '0.75rem' }}>
-                    {stability === 'low' ? 'Result could swing significantly. Focus on unknowns below.' : stability === 'medium' ? 'Some uncertainty. Clarifying these factors would tighten the estimate.' : 'Estimate is relatively stable.'}
+                    {stability === 'low' ? 'I\'d want more information before betting on these numbers.' : stability === 'medium' ? 'Reasonably confident, but these factors could shift things.' : 'I feel good about this estimate.'}
                 </div>
-                <div style={{ fontWeight: 600, fontSize: '0.75rem', marginBottom: '0.4rem', color: 'var(--gray-700)' }}>What moves your EV most:</div>
+                <div style={{ fontWeight: 600, fontSize: '0.75rem', marginBottom: '0.4rem', color: 'var(--gray-700)' }}>What could change my assessment:</div>
                 {sensitivity.map((s, i) => (
                     <div key={i} className="sensitivity-item">
                         <span style={{ width: '100px' }}>{s.name}</span>
@@ -1621,7 +1621,7 @@
             ];
             return (
                 <div className="result-card">
-                    <div className="card-header"><span className="card-title">Outcome Distribution</span></div>
+                    <div className="card-header"><span className="card-title">How I See This Playing Out</span></div>
                     <div className="outcome-bars">
                         {bars.map(bar => {
                             const outcome = outcomes[bar.key];
@@ -1649,7 +1649,7 @@
             const midPct = (settlement.mid / amount) * 100;
             return (
                 <div className="result-card">
-                    <div className="card-header"><span className="card-title">Settlement Range</span></div>
+                    <div className="card-header"><span className="card-title">What I'd Aim For in Settlement</span></div>
                     <div className="range-visual">
                         <div className="range-fill" style={{ left: `${(lowPct / 110) * 100}%`, width: `${((highPct - lowPct) / 110) * 100}%` }} />
                         <div className="range-marker" style={{ left: `${(midPct / 110) * 100}%` }} />
@@ -1665,7 +1665,7 @@
 
         const SettlementStructures = ({ structures }) => (
             <div className="result-card">
-                <div className="card-header"><span className="card-title">Settlement Structures</span></div>
+                <div className="card-header"><span className="card-title">Settlement Approaches I'd Consider</span></div>
                 {structures.map((s, i) => (
                     <div key={i} className="structure-card">
                         <div className="structure-title">{s.title}</div>
@@ -1687,7 +1687,7 @@
             };
             return (
                 <div className="result-card">
-                    <div className="card-header"><span className="card-title">Resolution Pathways</span></div>
+                    <div className="card-header"><span className="card-title">Your Options for Resolution</span></div>
                     <div className="pathways-grid">
                         {['demand', 'smallClaims', 'civil'].map(pk => {
                             const c = getContent(pk);
@@ -1712,9 +1712,9 @@
             const defense = getDefenseContent(calc.primaryDefense, formData);
             return (
                 <div className="result-card">
-                    <div className="card-header"><span className="card-title">Legal Analysis</span></div>
+                    <div className="card-header"><span className="card-title">My Legal Analysis</span></div>
                     <div className="analysis-section">
-                        <div className="analysis-title">Top Drivers</div>
+                        <div className="analysis-title">What I'm Looking At</div>
                         <ul className="driver-list">
                             {calc.drivers.map((d, i) => (
                                 <li key={i} className="driver-item">
@@ -1727,7 +1727,7 @@
 
                     {/* Defense Playbook */}
                     <div className="defense-card">
-                        <div className="defense-header">Likely Defense: {defense.name}</div>
+                        <div className="defense-header">Defense I'd Expect: {defense.name}</div>
                         <div className="defense-story">{defense.story}</div>
                     </div>
                     <div className="rebuttal-card">
@@ -1753,7 +1753,7 @@
                                 color: '#1e40af',
                                 marginBottom: '0.35rem'
                             }}>
-                                Counter-Offense Strategy
+                                My Counter-Move
                             </div>
                             <div style={{ fontSize: '0.8rem', color: '#1e3a8a', fontStyle: 'italic' }}>
                                 {defense.counterOffense}
@@ -1773,8 +1773,8 @@
 
         const Checklist = ({ items, nextStep }) => (
             <div className="result-card checklist-card">
-                <div className="card-header"><span className="card-title">Action Checklist</span></div>
-                <p style={{ marginBottom: '0.75rem', fontWeight: 500, color: 'var(--primary-dark)', fontSize: '0.85rem' }}>Next: {nextStep}</p>
+                <div className="card-header"><span className="card-title">My Recommended Actions</span></div>
+                <p style={{ marginBottom: '0.75rem', fontWeight: 500, color: 'var(--primary-dark)', fontSize: '0.85rem' }}>Your next step: {nextStep}</p>
                 {items.map((item, i) => (
                     <div key={i} className="checklist-item">
                         <div className="checklist-check" />
@@ -1789,10 +1789,10 @@
             let subtext = 'Get a professional demand letter drafted and sent.';
             if (calc.bestNEV < 500) {
                 headline = 'Improve Before Escalating';
-                subtext = 'Focus on proof/collectability first. We can help identify leverage.';
+                subtext = 'Focus on proof/collectability first. I can help identify leverage.';
             } else if (calc.pCollect < 0.5) {
                 headline = 'Collection is Key';
-                subtext = 'Case is strong. Let us help find where the money is.';
+                subtext = 'Case is strong. Let me help find where the money is.';
             }
             return (
                 <div className="result-card cta-card">
@@ -1864,15 +1864,15 @@
 
                     p1: `I am writing on behalf of ${sender}${senderCo} to formally demand payment of $${amount.toLocaleString()} for ${service} rendered pursuant to ${contractDesc} between us. This amount, documented in ${invoice}, has been outstanding for ${daysOverdue} days and represents a clear breach of our agreement.`,
 
-                    p2: `As you are aware, ${sender} performed and delivered the agreed-upon work in full. ${acceptanceStrength === 'explicit' ? 'You acknowledged receipt and approved the deliverables.' : acceptanceStrength === 'implied' ? 'You have used and benefited from these deliverables without objection.' : 'The work was completed as specified.'} ${deliveryProof === 'strong' ? 'We have comprehensive documentation including delivery records, correspondence, and your acknowledgments.' : deliveryProof === 'some' ? 'We have supporting documentation of performance.' : 'We can provide evidence of the work performed.'} Your obligation to pay is clear and unambiguous.`,
+                    p2: `As you are aware, ${sender} performed and delivered the agreed-upon work in full. ${acceptanceStrength === 'explicit' ? 'You acknowledged receipt and approved the deliverables.' : acceptanceStrength === 'implied' ? 'You have used and benefited from these deliverables without objection.' : 'The work was completed as specified.'} ${deliveryProof === 'strong' ? 'I have comprehensive documentation including delivery records, correspondence, and your acknowledgments.' : deliveryProof === 'some' ? 'I have supporting documentation of performance.' : 'I can provide evidence of the work performed.'} Your obligation to pay is clear and unambiguous.`,
 
                     p3: `Despite multiple requests for payment, you have failed to remit the amount due. ${defenseWarning} Under applicable law, your failure to pay constitutes breach of contract, entitling ${sender} to recover the principal amount plus interest, costs of collection, and attorney's fees.`,
 
-                    p4: `Our expected recovery in litigation is approximately $${Math.round(calc.bestNEV).toLocaleString()}, accounting for collection probability and legal costs. ${calc.pLiability >= 0.7 ? 'The strength of this claim makes a favorable judgment highly likely.' : 'We are fully prepared to pursue this matter through the courts.'} A judgment will appear on your record and can affect your credit and business relationships.`,
+                    p4: `The expected recovery in litigation is approximately $${Math.round(calc.bestNEV).toLocaleString()}, accounting for collection probability and legal costs. ${calc.pLiability >= 0.7 ? 'The strength of this claim makes a favorable judgment highly likely.' : 'I am fully prepared to pursue this matter through the courts.'} A judgment will appear on your record and can affect your credit and business relationships.`,
 
-                    p5: `To resolve this matter without litigation, we are willing to accept $${Math.round(calc.settlement.mid).toLocaleString()} if paid by ${deadline}. This represents a discount of ${Math.round((1 - calc.settlement.mid / calc.paperValue) * 100)}% from the full amount owed, including interest. After this date, we will pursue the full amount plus all available legal remedies.`,
+                    p5: `To resolve this matter without litigation, I am willing to accept $${Math.round(calc.settlement.mid).toLocaleString()} if paid by ${deadline}. This represents a discount of ${Math.round((1 - calc.settlement.mid / calc.paperValue) * 100)}% from the full amount owed, including interest. After this date, I will pursue the full amount plus all available legal remedies.`,
 
-                    p6: `Please remit payment by ${deadline} via ${payment}. If you wish to discuss settlement terms, contact ${details.yourEmail ? `me at ${details.yourEmail}` : 'me'} immediately. Absent payment or a good-faith settlement proposal by ${deadline}, we will proceed with legal action without further notice.`,
+                    p6: `Please remit payment by ${deadline} via ${payment}. If you wish to discuss settlement terms, contact ${details.yourEmail ? `me at ${details.yourEmail}` : 'me'} immediately. Absent payment or a good-faith settlement proposal by ${deadline}, I will proceed with legal action without further notice.`,
 
                     closing: `Sincerely,\n\n${sender}${senderCo}${details.yourEmail ? `\n${details.yourEmail}` : ''}`
                 };
@@ -2104,8 +2104,8 @@
                 <div className={`main-container ${isEmbed ? 'embed-mode' : ''}`}>
                     {/* FORM */}
                     <div className="form-panel">
-                        <h1 className="form-title">What's Your Case Worth?</h1>
-                        <p className="form-subtitle">Live preview updates as you answer</p>
+                        <h1 className="form-title">What's Your Case Really Worth?</h1>
+                        <p className="form-subtitle">13+ years of collection cases built into this calculator. I'll give you the same honest assessment I'd give in a paid consultation.</p>
 
                         <div className="form-section">
                             <div className="section-header">
@@ -2113,7 +2113,7 @@
                                 <span className="section-title">Your Claim</span>
                             </div>
                             <div className="field-group">
-                                <label className="field-label">Amount Owed <Tooltip text="Enter the total unpaid principal. We add 10% annual interest automatically. Include all invoices - courts prefer one action for related debts." /></label>
+                                <label className="field-label">Amount Owed <Tooltip text="Enter the total unpaid principal. The calculator adds 10% annual interest automatically. Include all invoices - courts prefer one action for related debts." /></label>
                                 <AmountInput value={formData.amount} onChange={(v) => updateField('amount', v)} />
                             </div>
                             <div className="field-group">
@@ -2131,12 +2131,12 @@
                             {/* CONDITIONAL: Oral contract strength */}
                             {formData.contractType === 'oral' && (
                                 <div className="field-group" style={{marginTop:'0.75rem', padding:'0.75rem', background:'#fef3c7', borderRadius:'8px', border:'1px solid #fcd34d'}}>
-                                    <label className="field-label" style={{color:'#92400e'}}>What supports the oral agreement? <Tooltip text="Oral contracts are enforceable but harder to prove. Course of dealing (repeated past transactions) is strongest. Written admission by debtor helps. Third-party witness adds credibility. 'Just our word' is weakest." /></label>
+                                    <label className="field-label" style={{color:'#92400e'}}>What supports the oral agreement? <Tooltip text="Oral contracts are enforceable but harder to prove. Course of dealing (repeated past transactions) is strongest. Written admission by debtor helps. Third-party witness adds credibility. 'Just your word' is weakest." /></label>
                                     <select className="form-select" value={formData.oralStrength} onChange={(e) => updateField('oralStrength', e.target.value)} style={{marginTop:'0.5rem'}}>
                                         <option value="dealing">Course of dealing (past transactions, established pattern)</option>
                                         <option value="admission">They admitted it (text, email, voicemail)</option>
                                         <option value="witness">Third-party witness heard the agreement</option>
-                                        <option value="none">Just our word vs. theirs (no corroboration)</option>
+                                        <option value="none">Just your word vs. theirs (no corroboration)</option>
                                     </select>
                                 </div>
                             )}
@@ -2289,7 +2289,7 @@
                                 <div className="field-group" style={{marginTop:'0.5rem', padding:'0.6rem', background:'#fefce8', borderRadius:'8px', border:'1px solid #fde047', fontSize:'0.8rem'}}>
                                     <label className="field-label" style={{color:'#a16207', fontSize:'0.75rem'}}>Minor scope issues are manageable</label>
                                     <div style={{color:'#78716c', fontSize:'0.75rem', lineHeight:'1.4'}}>
-                                        💡 <strong>Tip:</strong> Concede small points to win big ones. "We'll credit X if you pay for core deliverables."
+                                        💡 <strong>Tip:</strong> Concede small points to win big ones. "I'll credit X if you pay for core deliverables."
                                     </div>
                                 </div>
                             )}
@@ -2443,7 +2443,7 @@
                                         <option value="loser">Loser pays (risky if you might lose, but leverage if strong)</option>
                                     </select>
                                     <div style={{color:'#78716c', fontSize:'0.7rem', marginTop:'0.4rem'}}>
-                                        💡 <strong>Strategy:</strong> Mention this in your demand letter. "Your liability for our legal fees grows daily."
+                                        💡 <strong>Strategy:</strong> Mention this in your demand letter. "Your liability for my legal fees grows daily."
                                     </div>
                                 </div>
                             )}
