@@ -6,6 +6,19 @@
     <title>Consumer Dispute Calculator - What's Your Refund Really Worth? | Terms.Law</title>
     <meta name="description" content="Free calculator to estimate your expected recovery value for consumer disputes. Compare chargebacks, platform disputes, demand letters, and small claims court.">
     <link rel="canonical" href="https://terms.law/Blog/consumer-dispute-calculator/">
+
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#3b82f6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="RefundCalc">
+    <link rel="apple-touch-icon" href="icons/icon.svg">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="RefundCalc">
+    <meta name="msapplication-TileColor" content="#3b82f6">
+    <meta name="msapplication-tap-highlight" content="no">
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
     <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
@@ -1524,6 +1537,73 @@ Sincerely,
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
         gtag('config', 'G-901N2Y3CDZ');
+    </script>
+
+    <!-- PWA Service Worker Registration -->
+    <script>
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then((registration) => {
+                        console.log('SW registered:', registration.scope);
+                    })
+                    .catch((error) => {
+                        console.log('SW registration failed:', error);
+                    });
+            });
+        }
+
+        // PWA Install Prompt
+        let deferredPrompt;
+        const installBanner = document.createElement('div');
+        installBanner.id = 'pwa-install-banner';
+        installBanner.innerHTML = `
+            <div style="position:fixed;bottom:0;left:0;right:0;background:linear-gradient(135deg,#1e293b,#0f172a);color:white;padding:1rem;display:flex;align-items:center;justify-content:space-between;z-index:9999;box-shadow:0 -4px 20px rgba(0,0,0,0.3);">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <span style="font-size:1.5rem;">📱</span>
+                    <div>
+                        <div style="font-weight:600;font-size:0.95rem;">Install RefundCalc</div>
+                        <div style="font-size:0.8rem;color:#94a3b8;">Add to home screen for quick access</div>
+                    </div>
+                </div>
+                <div style="display:flex;gap:8px;">
+                    <button id="pwa-install-btn" style="background:#3b82f6;color:white;border:none;padding:8px 16px;border-radius:8px;font-weight:600;cursor:pointer;">Install</button>
+                    <button id="pwa-dismiss-btn" style="background:transparent;color:#94a3b8;border:1px solid #475569;padding:8px 12px;border-radius:8px;cursor:pointer;">Not now</button>
+                </div>
+            </div>
+        `;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+
+            // Show install banner after 5 seconds
+            setTimeout(() => {
+                if (!localStorage.getItem('pwa-dismissed')) {
+                    document.body.appendChild(installBanner);
+
+                    document.getElementById('pwa-install-btn').addEventListener('click', async () => {
+                        installBanner.remove();
+                        deferredPrompt.prompt();
+                        const { outcome } = await deferredPrompt.userChoice;
+                        console.log('Install outcome:', outcome);
+                        deferredPrompt = null;
+                    });
+
+                    document.getElementById('pwa-dismiss-btn').addEventListener('click', () => {
+                        installBanner.remove();
+                        localStorage.setItem('pwa-dismissed', 'true');
+                    });
+                }
+            }, 5000);
+        });
+
+        // Track if app is installed
+        window.addEventListener('appinstalled', () => {
+            console.log('PWA installed');
+            gtag('event', 'pwa_install', { event_category: 'engagement' });
+        });
     </script>
 </body>
 </html>
