@@ -1321,6 +1321,96 @@
       color: var(--text-muted);
       font-size: 0.9rem;
     }
+
+    /* Comment actions (edit/delete) */
+    .comment-actions {
+      display: none;
+      gap: 8px;
+      margin-left: auto;
+    }
+
+    .comment-item:hover .comment-actions {
+      display: flex;
+    }
+
+    .comment-action-btn {
+      padding: 4px 8px;
+      font-size: 0.7rem;
+      border: 1px solid var(--border);
+      background: white;
+      border-radius: 4px;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: all 0.15s;
+    }
+
+    .comment-action-btn:hover {
+      background: #f5f5f4;
+      color: var(--text);
+    }
+
+    .comment-action-btn.delete:hover {
+      background: #fee2e2;
+      border-color: #fca5a5;
+      color: #dc2626;
+    }
+
+    /* Edit mode */
+    .comment-edit-area {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .comment-edit-input {
+      flex: 1;
+      padding: 8px 12px;
+      border: 1px solid #a78bfa;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      resize: none;
+      min-height: 60px;
+    }
+
+    .comment-edit-input:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.2);
+    }
+
+    .comment-edit-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .comment-edit-save {
+      padding: 6px 12px;
+      background: #7c3aed;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+
+    .comment-edit-save:hover {
+      background: #6d28d9;
+    }
+
+    .comment-edit-cancel {
+      padding: 6px 12px;
+      background: white;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+
+    .comment-edit-cancel:hover {
+      background: #f5f5f4;
+    }
   </style>
 </head>
 <body>
@@ -2163,20 +2253,26 @@
   <div class="comments-section" id="commentsSection">
     <div class="comments-header">
       <h3>💬 Questions & Comments</h3>
-      <p>Messages sync in real-time — Sergei will see them instantly</p>
+      <p>Leave a note or question — Sergei will be notified</p>
     </div>
     <div class="comments-body">
       <div class="comments-intro">
-        <strong>Niki</strong> — This is your space to ask questions, request changes, or leave feedback without editing the documents above. I get notified immediately when you post here. For anything urgent, use the purple chat button (bottom right) which goes straight to my phone.
+        This is your space to ask questions, request changes, or leave feedback. For anything urgent, use the purple chat button (bottom right).
       </div>
 
       <div class="comments-list" id="commentsList">
         <div class="no-comments" id="noComments">No comments yet. Be the first to leave a note!</div>
       </div>
 
-      <div class="comment-input-area">
-        <textarea class="comment-input" id="commentInput" placeholder="Type your question or comment here... (I'll be notified right away)"></textarea>
-        <button class="comment-submit" id="commentSubmit" onclick="submitComment()">Send</button>
+      <div class="comment-input-area" style="flex-direction: column; gap: 10px;">
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <label style="font-size: 0.8rem; color: var(--text-muted);">Your name:</label>
+          <input type="text" id="commentName" placeholder="Enter your name" style="padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; width: 200px;" />
+        </div>
+        <div style="display: flex; gap: 12px;">
+          <textarea class="comment-input" id="commentInput" placeholder="Type your question or comment here..."></textarea>
+          <button class="comment-submit" id="commentSubmit" onclick="submitComment()">Send</button>
+        </div>
       </div>
     </div>
   </div>
@@ -2564,15 +2660,40 @@ async function sendEmailNotification(comment) {
   */
 }
 
+// Get/save user name
+function getUserName() {
+  const nameInput = document.getElementById('commentName');
+  const saved = localStorage.getItem('workroom_username');
+  if (saved && nameInput) {
+    nameInput.value = saved;
+  }
+  return nameInput ? nameInput.value.trim() : 'Guest';
+}
+
+function saveUserName(name) {
+  localStorage.setItem('workroom_username', name);
+}
+
 // Submit a comment
 function submitComment() {
   const input = document.getElementById('commentInput');
+  const nameInput = document.getElementById('commentName');
   const text = input.value.trim();
+  const authorName = nameInput.value.trim() || 'Guest';
 
   if (!text) return;
+  if (!authorName) {
+    nameInput.focus();
+    nameInput.style.borderColor = '#dc2626';
+    setTimeout(() => { nameInput.style.borderColor = ''; }, 2000);
+    return;
+  }
+
+  // Save name for next time
+  saveUserName(authorName);
 
   const comment = {
-    author: 'Niki',
+    author: authorName,
     text: text,
     timestamp: Date.now(),
     isClient: true
@@ -2612,22 +2733,102 @@ function renderComment(data, key) {
     hour12: true
   });
 
-  const isSergeii = !comment.isClient;
-  const initials = isSergeii ? 'ST' : comment.author.charAt(0).toUpperCase();
-  const avatarClass = isSergeii ? 'comment-avatar sergei' : 'comment-avatar';
+  const isSergei = !comment.isClient;
+  const initials = isSergei ? 'ST' : (comment.author ? comment.author.charAt(0).toUpperCase() : 'G');
+  const avatarClass = isSergei ? 'comment-avatar sergei' : 'comment-avatar';
+
+  // Only show edit/delete for client comments (not Sergei's)
+  const actionsHtml = comment.isClient ? `
+    <div class="comment-actions">
+      <button class="comment-action-btn" onclick="editComment('${key}')">Edit</button>
+      <button class="comment-action-btn delete" onclick="deleteComment('${key}')">Delete</button>
+    </div>
+  ` : '';
 
   return `
     <div class="comment-item" data-key="${key}">
       <div class="${avatarClass}">${initials}</div>
-      <div class="comment-content">
-        <div class="comment-meta">
-          <span class="comment-author">${isSergeii ? 'Sergei Tokmakov' : comment.author}</span>
+      <div class="comment-content" style="flex: 1;">
+        <div class="comment-meta" style="display: flex; align-items: center;">
+          <span class="comment-author">${isSergei ? 'Sergei Tokmakov' : escapeHtml(comment.author)}</span>
           <span class="comment-time">${timeStr}</span>
+          ${actionsHtml}
         </div>
-        <div class="comment-text">${escapeHtml(comment.text)}</div>
+        <div class="comment-text" id="comment-text-${key}">${escapeHtml(comment.text)}</div>
+        <div class="comment-edit-area" id="comment-edit-${key}" style="display: none;"></div>
       </div>
     </div>
   `;
+}
+
+// Edit a comment
+function editComment(key) {
+  // Get the comment text element and edit area
+  const textEl = document.getElementById(`comment-text-${key}`);
+  const editArea = document.getElementById(`comment-edit-${key}`);
+
+  if (!textEl || !editArea) return;
+
+  // Get current text (strip HTML)
+  const currentText = textEl.innerText;
+
+  // Show edit UI
+  textEl.style.display = 'none';
+  editArea.style.display = 'flex';
+  editArea.innerHTML = `
+    <textarea class="comment-edit-input" id="edit-input-${key}">${currentText}</textarea>
+    <div class="comment-edit-actions">
+      <button class="comment-edit-save" onclick="saveEditedComment('${key}')">Save</button>
+      <button class="comment-edit-cancel" onclick="cancelEdit('${key}')">Cancel</button>
+    </div>
+  `;
+
+  // Focus the textarea
+  document.getElementById(`edit-input-${key}`).focus();
+}
+
+// Save edited comment
+function saveEditedComment(key) {
+  const input = document.getElementById(`edit-input-${key}`);
+  const newText = input.value.trim();
+
+  if (!newText) return;
+
+  // Update in Firebase
+  workroomRef.child('comments').child(key).update({
+    text: newText,
+    edited: true,
+    editedAt: Date.now()
+  }).then(() => {
+    // UI will update automatically via listener
+  }).catch(err => {
+    console.error('Failed to update comment:', err);
+    alert('Failed to save. Please try again.');
+  });
+}
+
+// Cancel edit
+function cancelEdit(key) {
+  const textEl = document.getElementById(`comment-text-${key}`);
+  const editArea = document.getElementById(`comment-edit-${key}`);
+
+  textEl.style.display = '';
+  editArea.style.display = 'none';
+  editArea.innerHTML = '';
+}
+
+// Delete a comment
+function deleteComment(key) {
+  if (!confirm('Delete this comment?')) return;
+
+  workroomRef.child('comments').child(key).remove()
+    .then(() => {
+      // UI will update automatically via listener
+    })
+    .catch(err => {
+      console.error('Failed to delete comment:', err);
+      alert('Failed to delete. Please try again.');
+    });
 }
 
 // Escape HTML to prevent XSS
@@ -2681,6 +2882,9 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('doc-sla').classList.add('expanded');
   setupRealtimeSync();
   setupCommentsSync();
+
+  // Load saved username from localStorage
+  getUserName();
 
   document.querySelectorAll('.feedback-select').forEach(sel => {
     sel.addEventListener('change', function() {
