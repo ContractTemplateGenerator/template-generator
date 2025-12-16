@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate NDA Generator | Attorney-Drafted Non-Disclosure Agreements | Terms.Law</title>
+    <meta name="description" content="Generate professional NDAs for any situation. Mutual, unilateral, employee, contractor, and investor NDAs with AI data restrictions. Free attorney-drafted templates.">
+    <link rel="canonical" href="https://terms.law/Ultimate-NDA-Generator/">
+
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#6366f1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="NDA Gen">
+    <link rel="apple-touch-icon" href="icons/icon.svg">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="NDA Gen">
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-901N2Y3CDZ"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-901N2Y3CDZ');
+    </script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+    <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+
+    <!-- React and Babel -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- DOCX generation -->
+    <script src="https://unpkg.com/docx@8.2.2/build/index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            min-height: 100vh;
+            color: var(--gray-800);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .site-header {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 52px;
+        }
+        .header-nav { display: flex; align-items: center; gap: 0.5rem; }
+        .nav-link {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .nav-link:hover { color: white; background: rgba(255,255,255,0.1); }
+        .nav-link.home-logo { font-size: 1.1rem; font-weight: 800; }
+        .logo-text {
+            background: linear-gradient(135deg, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 2rem 1rem 1rem;
+            color: white;
+        }
+        .hero h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #fff 0%, #c7d2fe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero p { color: #94a3b8; font-size: 1rem; }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            align-items: start;
+        }
+        @media (max-width: 1000px) {
+            .main-container { grid-template-columns: 1fr; }
+        }
+
+        /* Form Panel */
+        .form-panel {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+        }
+
+        /* Step Indicator */
+        .step-indicator {
+            display: flex;
+            background: var(--gray-50);
+            padding: 1rem;
+            gap: 0.25rem;
+            overflow-x: auto;
+        }
+        .step-dot {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--gray-400);
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .step-dot:hover { background: var(--gray-200); color: var(--gray-600); }
+        .step-dot.active { background: var(--primary); color: white; }
+        .step-dot.complete { background: var(--success); color: white; }
+        .step-num {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: currentColor;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+        .step-dot.active .step-num,
+        .step-dot.complete .step-num { background: rgba(255,255,255,0.3); }
+
+        /* Form Content */
+        .form-content { padding: 1.5rem; }
+        .form-section { margin-bottom: 1.5rem; }
+        .form-section:last-child { margin-bottom: 0; }
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--gray-800);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Form Fields */
+        .field-group { margin-bottom: 1rem; }
+        .field-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 0.4rem;
+        }
+        .field-hint {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            margin-top: 0.25rem;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="date"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: all 0.2s;
+            background: white;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        textarea { min-height: 100px; resize: vertical; }
+
+        /* Option Cards */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+        .options-grid.three-col { grid-template-columns: repeat(3, 1fr); }
+        @media (max-width: 600px) {
+            .options-grid, .options-grid.three-col { grid-template-columns: 1fr; }
+        }
+        .option-card {
+            padding: 1rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .option-card:hover { border-color: var(--gray-300); background: var(--gray-50); }
+        .option-card.selected { border-color: var(--primary); background: #eef2ff; }
+        .option-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .option-title { font-weight: 600; font-size: 0.9rem; color: var(--gray-800); }
+        .option-desc { font-size: 0.75rem; color: var(--gray-500); margin-top: 0.25rem; }
+
+        /* Checkbox Group */
+        .checkbox-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .checkbox-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .checkbox-item:hover { border-color: var(--gray-300); }
+        .checkbox-item.checked { border-color: var(--primary); background: #eef2ff; }
+        .checkbox-item input { display: none; }
+        .checkbox-box {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--gray-300);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+        .checkbox-item.checked .checkbox-box {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        .checkbox-box::after {
+            content: '✓';
+            color: white;
+            font-size: 0.75rem;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .checkbox-item.checked .checkbox-box::after { opacity: 1; }
+        .checkbox-content { flex: 1; }
+        .checkbox-label { font-weight: 600; font-size: 0.9rem; color: var(--gray-800); }
+        .checkbox-desc { font-size: 0.75rem; color: var(--gray-500); margin-top: 0.15rem; }
+
+        /* Toggle */
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+        }
+        .toggle-row.enabled { border-color: var(--primary); background: #eef2ff; }
+        .toggle-info { flex: 1; }
+        .toggle-label { font-weight: 600; font-size: 0.9rem; color: var(--gray-800); }
+        .toggle-desc { font-size: 0.75rem; color: var(--gray-500); }
+        .toggle-switch {
+            width: 44px;
+            height: 24px;
+            background: var(--gray-300);
+            border-radius: 12px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+        }
+        .toggle-switch.on { background: var(--primary); }
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            top: 3px;
+            left: 3px;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .toggle-switch.on::after { left: 23px; }
+
+        /* Navigation Buttons */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--gray-200);
+            background: var(--gray-50);
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .btn-back { background: var(--gray-200); color: var(--gray-700); }
+        .btn-back:hover { background: var(--gray-300); }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #059669; }
+
+        /* Preview Panel */
+        .preview-panel {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            position: sticky;
+            top: 70px;
+            max-height: calc(100vh - 90px);
+            display: flex;
+            flex-direction: column;
+        }
+        .preview-header {
+            background: var(--gray-800);
+            color: white;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .preview-title { font-weight: 700; font-size: 1rem; }
+        .preview-actions { display: flex; gap: 0.5rem; }
+        .preview-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        .preview-btn-outline {
+            background: transparent;
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        .preview-btn-outline:hover { background: rgba(255,255,255,0.1); }
+        .preview-btn-filled { background: var(--primary); color: white; }
+        .preview-btn-filled:hover { background: var(--primary-dark); }
+        .preview-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+            font-size: 0.9rem;
+            line-height: 1.8;
+            background: #fffdf7;
+            font-family: 'Times New Roman', serif;
+        }
+        .preview-content h2 {
+            text-align: center;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .preview-content p { margin-bottom: 1rem; text-align: justify; }
+        .preview-content .section-heading {
+            font-weight: bold;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .preview-content .signature-block {
+            margin-top: 3rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        .signature-party { }
+        .signature-line {
+            border-bottom: 1px solid #000;
+            margin-bottom: 0.25rem;
+            height: 2rem;
+        }
+        .signature-label { font-size: 0.8rem; }
+
+        /* Placeholder styling */
+        .placeholder { color: #dc2626; background: #fef2f2; padding: 0 0.25rem; }
+
+        /* Empty state */
+        .empty-preview {
+            text-align: center;
+            padding: 3rem;
+            color: var(--gray-400);
+        }
+        .empty-preview-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.5; }
+
+        /* Mobile */
+        @media (max-width: 1000px) {
+            .preview-panel {
+                position: static;
+                max-height: none;
+            }
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.85rem;
+        }
+        .footer a { color: rgba(255,255,255,0.7); }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-content">
+            <nav class="header-nav">
+                <a href="/" class="nav-link home-logo"><span class="logo-text">Terms.Law</span></a>
+                <a href="/Demand-Letters/demand-letters-landing.html" class="nav-link">Demands</a>
+                <a href="/Templates/contract-library-landing.html" class="nav-link">Contracts</a>
+                <a href="/INC/formation-landing.html" class="nav-link">Incorporation</a>
+                <a href="/Blog/" class="nav-link">Read</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="hero">
+        <h1>Ultimate NDA Generator</h1>
+        <p>Attorney-drafted non-disclosure agreements for any situation</p>
+    </div>
+
+    <div id="root"></div>
+
+    <div class="footer">
+        <p>Created by <a href="mailto:owner@terms.law">Sergei Tokmakov</a>, California Attorney (CA Bar #279869)</p>
+        <p style="margin-top: 0.5rem;">This generator creates templates for informational purposes. Consult an attorney for your specific situation.</p>
+    </div>
+
+    <!-- PWA Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then((reg) => console.log('SW registered:', reg.scope))
+                    .catch((err) => console.log('SW failed:', err));
+            });
+        }
+
+        // Install prompt
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+
+            setTimeout(() => {
+                if (!localStorage.getItem('nda-pwa-dismissed')) {
+                    const banner = document.createElement('div');
+                    banner.innerHTML = `
+                        <div style="position:fixed;bottom:0;left:0;right:0;background:linear-gradient(135deg,#1e1b4b,#0f172a);color:white;padding:1rem;display:flex;align-items:center;justify-content:space-between;z-index:9999;box-shadow:0 -4px 20px rgba(0,0,0,0.3);">
+                            <div style="display:flex;align-items:center;gap:12px;">
+                                <span style="font-size:1.5rem;">📱</span>
+                                <div>
+                                    <div style="font-weight:600;">Install NDA Generator</div>
+                                    <div style="font-size:0.8rem;color:#a5b4fc;">Add to home screen for quick access</div>
+                                </div>
+                            </div>
+                            <div style="display:flex;gap:8px;">
+                                <button id="pwa-install" style="background:#6366f1;color:white;border:none;padding:8px 16px;border-radius:8px;font-weight:600;cursor:pointer;">Install</button>
+                                <button id="pwa-dismiss" style="background:transparent;color:#94a3b8;border:1px solid #475569;padding:8px 12px;border-radius:8px;cursor:pointer;">Later</button>
+                            </div>
+                        </div>
+                    `;
+                    document.body.appendChild(banner);
+
+                    document.getElementById('pwa-install').onclick = async () => {
+                        banner.remove();
+                        deferredPrompt.prompt();
+                        const { outcome } = await deferredPrompt.userChoice;
+                        deferredPrompt = null;
+                    };
+
+                    document.getElementById('pwa-dismiss').onclick = () => {
+                        banner.remove();
+                        localStorage.setItem('nda-pwa-dismissed', 'true');
+                    };
+                }
+            }, 3000);
+        });
+
+        window.addEventListener('appinstalled', () => {
+            gtag('event', 'pwa_install', { event_category: 'engagement', event_label: 'nda_generator' });
+        });
+    </script>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
+
+        // US States list
+        const US_STATES = [
+            'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware',
+            'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky',
+            'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi',
+            'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico',
+            'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania',
+            'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont',
+            'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'
+        ];
+
+        // NDA Types
+        const NDA_TYPES = [
+            { id: 'mutual', icon: '🤝', title: 'Mutual NDA', desc: 'Both parties share confidential info' },
+            { id: 'unilateral', icon: '➡️', title: 'Unilateral NDA', desc: 'One party discloses, one receives' },
+            { id: 'employee', icon: '👔', title: 'Employee NDA', desc: 'For new hires and employees' },
+            { id: 'contractor', icon: '🔧', title: 'Contractor NDA', desc: 'For freelancers and vendors' },
+            { id: 'investor', icon: '💰', title: 'Investor NDA', desc: 'For fundraising discussions' },
+            { id: 'merger', icon: '🏢', title: 'M&A / Due Diligence', desc: 'For acquisition discussions' }
+        ];
+
+        // Industry presets
+        const INDUSTRIES = [
+            { id: 'tech', label: 'Technology / Software' },
+            { id: 'healthcare', label: 'Healthcare / Medical' },
+            { id: 'finance', label: 'Finance / Banking' },
+            { id: 'manufacturing', label: 'Manufacturing' },
+            { id: 'creative', label: 'Creative / Media' },
+            { id: 'retail', label: 'Retail / E-commerce' },
+            { id: 'legal', label: 'Legal Services' },
+            { id: 'other', label: 'Other / General' }
+        ];
+
+        // Main App Component
+        const App = () => {
+            const [step, setStep] = useState(1);
+            const [formData, setFormData] = useState({
+                // Step 1: NDA Type
+                ndaType: 'mutual',
+                industry: 'tech',
+
+                // Step 2: Parties
+                disclosingPartyType: 'company',
+                disclosingPartyName: '',
+                disclosingPartyState: 'Delaware',
+                disclosingPartyAddress: '',
+                disclosingPartyEmail: '',
+                disclosingPartySignerName: '',
+                disclosingPartySignerTitle: '',
+
+                receivingPartyType: 'company',
+                receivingPartyName: '',
+                receivingPartyState: 'California',
+                receivingPartyAddress: '',
+                receivingPartyEmail: '',
+                receivingPartySignerName: '',
+                receivingPartySignerTitle: '',
+
+                // Step 3: Confidential Info
+                includeTradeSecrets: true,
+                includeBusinessPlans: true,
+                includeFinancials: true,
+                includeCustomerData: true,
+                includeTechnicalInfo: true,
+                includeSourceCode: false,
+                includeAlgorithms: false,
+                includePersonnelInfo: false,
+                customConfidentialInfo: '',
+
+                // AI Restrictions (modern clause)
+                includeAIRestriction: true,
+                aiRestrictionLevel: 'strict', // strict, moderate, none
+
+                // Step 4: Terms
+                effectiveDate: new Date().toISOString().split('T')[0],
+                termLength: '2',
+                termUnit: 'years',
+                survivalPeriod: '3',
+                governingState: 'California',
+
+                // Step 5: Provisions
+                disputeResolution: 'litigation',
+                arbitrationProvider: 'JAMS',
+                includeInjunctiveRelief: true,
+                includeLiquidatedDamages: false,
+                liquidatedDamagesAmount: '',
+                includeAttorneyFees: true,
+                includeNonSolicit: false,
+                nonSolicitPeriod: '1',
+
+                // Carve-outs
+                includeCourtOrderCarveout: true,
+                includeWhistleblowerCarveout: true,
+                includeRegulatoryCarveout: true,
+
+                // Step 6: Review & Export
+                // (no additional fields)
+            });
+
+            const updateField = (field, value) => {
+                setFormData(prev => ({ ...prev, [field]: value }));
+            };
+
+            const toggleField = (field) => {
+                setFormData(prev => ({ ...prev, [field]: !prev[field] }));
+            };
+
+            // Generate NDA Text
+            const generateNDAText = () => {
+                const d = formData;
+                const isMutual = d.ndaType === 'mutual';
+                const dpName = d.disclosingPartyName || '[DISCLOSING PARTY NAME]';
+                const rpName = d.receivingPartyName || '[RECEIVING PARTY NAME]';
+                const dpType = d.disclosingPartyType === 'company' ? `a ${d.disclosingPartyState} corporation` : 'an individual';
+                const rpType = d.receivingPartyType === 'company' ? `a ${d.receivingPartyState} corporation` : 'an individual';
+
+                // Build confidential info list
+                const confInfoItems = [];
+                if (d.includeTradeSecrets) confInfoItems.push('trade secrets, inventions, and proprietary processes');
+                if (d.includeBusinessPlans) confInfoItems.push('business plans, strategies, and marketing information');
+                if (d.includeFinancials) confInfoItems.push('financial data, pricing, and revenue information');
+                if (d.includeCustomerData) confInfoItems.push('customer lists, customer data, and client information');
+                if (d.includeTechnicalInfo) confInfoItems.push('technical specifications, designs, and prototypes');
+                if (d.includeSourceCode) confInfoItems.push('source code, object code, and software architecture');
+                if (d.includeAlgorithms) confInfoItems.push('algorithms, machine learning models, and data sets');
+                if (d.includePersonnelInfo) confInfoItems.push('employee information, compensation data, and organizational structures');
+                if (d.customConfidentialInfo) confInfoItems.push(d.customConfidentialInfo);
+
+                const confInfoList = confInfoItems.map((item, i) => `(${String.fromCharCode(97 + i)}) ${item}`).join(';\n');
+
+                // AI Restriction clause
+                const aiClause = d.includeAIRestriction ? `
+
+<span class="section-heading">${isMutual ? '5' : '5'}. ARTIFICIAL INTELLIGENCE AND MACHINE LEARNING RESTRICTIONS.</span>
+
+${d.aiRestrictionLevel === 'strict' ?
+`The Receiving Party shall not, directly or indirectly: (a) use any Confidential Information to train, develop, improve, or validate any artificial intelligence, machine learning, or similar automated systems; (b) input any Confidential Information into any AI-powered tools, services, or platforms, including but not limited to large language models, chatbots, or automated analysis tools; (c) permit any third-party AI service to access, process, or analyze any Confidential Information; or (d) create any derivative works using AI systems that were exposed to Confidential Information. This restriction applies regardless of whether the AI system is operated by the Receiving Party or a third party.` :
+d.aiRestrictionLevel === 'moderate' ?
+`The Receiving Party may use AI tools to analyze Confidential Information only if: (a) the AI tool operates entirely locally and does not transmit data to external servers; (b) the Receiving Party has obtained prior written consent from the Disclosing Party; and (c) any AI-generated outputs based on Confidential Information are treated as Confidential Information under this Agreement. The Receiving Party shall not use Confidential Information to train any AI models.` :
+`[No AI restrictions included]`}` : '';
+
+                // Non-solicit clause
+                const nonSolicitClause = d.includeNonSolicit ? `
+
+<span class="section-heading">${isMutual ? '10' : '10'}. NON-SOLICITATION.</span>
+
+During the term of this Agreement and for a period of ${d.nonSolicitPeriod} year(s) thereafter, the Receiving Party shall not, directly or indirectly, solicit, recruit, or hire any employee, contractor, or consultant of the Disclosing Party with whom the Receiving Party had contact or about whom the Receiving Party received Confidential Information during the term of this Agreement.` : '';
+
+                return `<h2>${isMutual ? 'MUTUAL ' : ''}NON-DISCLOSURE AGREEMENT</h2>
+
+<p>This Non-Disclosure Agreement (this "<strong>Agreement</strong>") is entered into as of <strong>${d.effectiveDate || '[DATE]'}</strong> (the "<strong>Effective Date</strong>") by and between:</p>
+
+<p><strong>${dpName}</strong>, ${dpType}${d.disclosingPartyAddress ? `, with its principal place of business at ${d.disclosingPartyAddress}` : ''} ${isMutual ? '(each a "Party" and collectively, the "Parties")' : '(the "Disclosing Party")'}</p>
+
+<p>and</p>
+
+<p><strong>${rpName}</strong>, ${rpType}${d.receivingPartyAddress ? `, with its principal place of business at ${d.receivingPartyAddress}` : ''} ${!isMutual ? '(the "Receiving Party")' : ''}</p>
+
+<p><strong>RECITALS</strong></p>
+
+<p>WHEREAS, ${isMutual ? 'the Parties wish' : 'the Disclosing Party wishes'} to explore a potential business relationship ${d.industry !== 'other' ? `in the ${INDUSTRIES.find(i => i.id === d.industry)?.label || ''} industry` : ''} (the "<strong>Purpose</strong>"); and</p>
+
+<p>WHEREAS, in connection with the Purpose, ${isMutual ? 'each Party may disclose to the other' : 'the Disclosing Party may disclose to the Receiving Party'} certain confidential and proprietary information;</p>
+
+<p>NOW, THEREFORE, in consideration of the mutual promises contained herein and other good and valuable consideration, the receipt and sufficiency of which are hereby acknowledged, the Parties agree as follows:</p>
+
+<span class="section-heading">1. DEFINITION OF CONFIDENTIAL INFORMATION.</span>
+
+<p>"<strong>Confidential Information</strong>" means any non-public information disclosed by ${isMutual ? 'either Party' : 'the Disclosing Party'} to ${isMutual ? 'the other Party' : 'the Receiving Party'}, whether disclosed orally, in writing, or by inspection of tangible objects, including without limitation:</p>
+
+<p>${confInfoList}</p>
+
+<p>Confidential Information also includes any information that, by its nature or the circumstances of its disclosure, reasonably should be understood to be confidential.</p>
+
+<span class="section-heading">2. EXCLUSIONS FROM CONFIDENTIAL INFORMATION.</span>
+
+<p>Confidential Information shall not include information that: (a) is or becomes publicly available through no fault of the Receiving Party; (b) was rightfully in the Receiving Party's possession prior to disclosure; (c) is rightfully obtained by the Receiving Party from a third party without restriction; or (d) is independently developed by the Receiving Party without use of or reference to the Confidential Information.</p>
+
+<span class="section-heading">3. OBLIGATIONS OF ${isMutual ? 'THE PARTIES' : 'RECEIVING PARTY'}.</span>
+
+<p>${isMutual ? 'Each Party' : 'The Receiving Party'} shall: (a) hold the Confidential Information in strict confidence using at least the same degree of care used to protect its own confidential information, but in no event less than reasonable care; (b) not disclose any Confidential Information to any third party without prior written consent; (c) use the Confidential Information solely for the Purpose; and (d) limit access to Confidential Information to those employees, contractors, and advisors who have a need to know and who are bound by confidentiality obligations at least as protective as those in this Agreement.</p>
+
+<span class="section-heading">4. PERMITTED DISCLOSURES.</span>
+
+<p>${isMutual ? 'Either Party' : 'The Receiving Party'} may disclose Confidential Information to the extent required by law, regulation, or court order, provided that the ${isMutual ? 'disclosing Party' : 'Receiving Party'} shall: (a) give prompt written notice to the ${isMutual ? 'other Party' : 'Disclosing Party'} to enable it to seek a protective order; ${d.includeWhistleblowerCarveout ? '(b) Nothing in this Agreement shall prohibit or restrict any Party from reporting possible violations of law to any governmental agency or from making disclosures protected under whistleblower provisions of applicable law; ' : ''}${d.includeRegulatoryCarveout ? '(c) cooperating with governmental investigations or regulatory inquiries as required by law.' : ''}</p>
+${aiClause}
+
+<span class="section-heading">${d.includeAIRestriction ? '6' : '5'}. TERM AND TERMINATION.</span>
+
+<p>This Agreement shall commence on the Effective Date and continue for a period of ${d.termLength} ${d.termUnit} unless earlier terminated by either Party upon thirty (30) days' written notice. The obligations of confidentiality shall survive termination for a period of ${d.survivalPeriod} years.</p>
+
+<span class="section-heading">${d.includeAIRestriction ? '7' : '6'}. RETURN OF MATERIALS.</span>
+
+<p>Upon termination of this Agreement or upon request by the Disclosing Party, the Receiving Party shall promptly return or destroy all Confidential Information and any copies thereof, and shall certify in writing that it has done so.</p>
+
+<span class="section-heading">${d.includeAIRestriction ? '8' : '7'}. REMEDIES.</span>
+
+<p>${d.includeInjunctiveRelief ? 'The Parties acknowledge that any breach of this Agreement may cause irreparable harm for which monetary damages would be inadequate. Accordingly, the Disclosing Party shall be entitled to seek injunctive relief, specific performance, or other equitable remedies without the necessity of proving actual damages or posting bond. ' : ''}${d.includeLiquidatedDamages && d.liquidatedDamagesAmount ? `In addition, the Parties agree that liquidated damages in the amount of $${d.liquidatedDamagesAmount} per breach shall be payable, as the Parties agree this represents a reasonable estimate of damages. ` : ''}These remedies are in addition to any other remedies available at law or in equity.</p>
+
+<span class="section-heading">${d.includeAIRestriction ? '9' : '8'}. DISPUTE RESOLUTION.</span>
+
+<p>${d.disputeResolution === 'arbitration' ?
+`Any dispute arising out of or relating to this Agreement shall be resolved by binding arbitration administered by ${d.arbitrationProvider} in accordance with its rules. The arbitration shall take place in ${d.governingState}. The arbitrator's decision shall be final and binding, and judgment may be entered in any court of competent jurisdiction.` :
+`Any dispute arising out of or relating to this Agreement shall be resolved in the state or federal courts located in ${d.governingState}. Each Party consents to the exclusive jurisdiction of such courts.`}${d.includeAttorneyFees ? ' The prevailing party in any action shall be entitled to recover its reasonable attorneys\' fees and costs.' : ''}</p>
+${nonSolicitClause}
+
+<span class="section-heading">${d.includeAIRestriction ? (d.includeNonSolicit ? '11' : '10') : (d.includeNonSolicit ? '10' : '9')}. GOVERNING LAW.</span>
+
+<p>This Agreement shall be governed by and construed in accordance with the laws of the State of ${d.governingState}, without regard to its conflict of laws principles.</p>
+
+<span class="section-heading">${d.includeAIRestriction ? (d.includeNonSolicit ? '12' : '11') : (d.includeNonSolicit ? '11' : '10')}. MISCELLANEOUS.</span>
+
+<p>(a) <strong>Entire Agreement.</strong> This Agreement constitutes the entire agreement between the Parties concerning the subject matter hereof and supersedes all prior agreements and understandings.</p>
+
+<p>(b) <strong>Amendment.</strong> This Agreement may not be amended except by a written instrument signed by both Parties.</p>
+
+<p>(c) <strong>Severability.</strong> If any provision of this Agreement is held invalid or unenforceable, the remaining provisions shall continue in full force and effect.</p>
+
+<p>(d) <strong>No Waiver.</strong> The failure of either Party to enforce any provision shall not constitute a waiver of future enforcement.</p>
+
+<p>(e) <strong>Counterparts.</strong> This Agreement may be executed in counterparts, each of which shall be deemed an original.</p>
+
+<p><strong>IN WITNESS WHEREOF</strong>, the Parties have executed this Agreement as of the Effective Date.</p>
+
+<div class="signature-block">
+    <div class="signature-party">
+        <p><strong>${dpName}</strong></p>
+        <div class="signature-line"></div>
+        <div class="signature-label">Signature</div>
+        <br/>
+        <div class="signature-line"></div>
+        <div class="signature-label">Name: ${d.disclosingPartySignerName || '________________________'}</div>
+        <br/>
+        <div class="signature-line"></div>
+        <div class="signature-label">Title: ${d.disclosingPartySignerTitle || '________________________'}</div>
+        <br/>
+        <div class="signature-line"></div>
+        <div class="signature-label">Date: ________________________</div>
+    </div>
+    <div class="signature-party">
+        <p><strong>${rpName}</strong></p>
+        <div class="signature-line"></div>
+        <div class="signature-label">Signature</div>
+        <br/>
+        <div class="signature-line"></div>
+        <div class="signature-label">Name: ${d.receivingPartySignerName || '________________________'}</div>
+        <br/>
+        <div class="signature-line"></div>
+        <div class="signature-label">Title: ${d.receivingPartySignerTitle || '________________________'}</div>
+        <br/>
+        <div class="signature-line"></div>
+        <div class="signature-label">Date: ________________________</div>
+    </div>
+</div>`;
+            };
+
+            const ndaText = useMemo(() => generateNDAText(), [formData]);
+
+            // Copy to clipboard
+            const copyToClipboard = () => {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = ndaText;
+                const plainText = tempDiv.textContent || tempDiv.innerText;
+                navigator.clipboard.writeText(plainText);
+                alert('NDA copied to clipboard!');
+            };
+
+            // Download as DOCX
+            const downloadDocx = async () => {
+                try {
+                    const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } = docx;
+
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = ndaText;
+                    const plainText = tempDiv.textContent || tempDiv.innerText;
+
+                    const paragraphs = plainText.split('\n\n').filter(p => p.trim()).map(p => {
+                        const isHeading = p.match(/^\d+\./);
+                        return new Paragraph({
+                            children: [new TextRun({ text: p.trim(), bold: isHeading })],
+                            spacing: { after: 200 },
+                            alignment: p.includes('NON-DISCLOSURE AGREEMENT') ? AlignmentType.CENTER : AlignmentType.JUSTIFIED
+                        });
+                    });
+
+                    const doc = new Document({
+                        sections: [{ properties: {}, children: paragraphs }]
+                    });
+
+                    const blob = await Packer.toBlob(doc);
+                    saveAs(blob, `NDA-${formData.disclosingPartyName || 'Agreement'}-${new Date().toISOString().split('T')[0]}.docx`);
+                } catch (error) {
+                    console.error('DOCX generation error:', error);
+                    alert('Error generating DOCX. Please try copying instead.');
+                }
+            };
+
+            // Steps
+            const steps = [
+                { num: 1, label: 'Type' },
+                { num: 2, label: 'Parties' },
+                { num: 3, label: 'Confidential Info' },
+                { num: 4, label: 'Terms' },
+                { num: 5, label: 'Provisions' },
+                { num: 6, label: 'Review' }
+            ];
+
+            // Step 1: NDA Type
+            const Step1 = () => (
+                <div className="form-content">
+                    <div className="form-section">
+                        <div className="section-title">📋 Select NDA Type</div>
+                        <div className="options-grid three-col">
+                            {NDA_TYPES.map(type => (
+                                <div
+                                    key={type.id}
+                                    className={`option-card ${formData.ndaType === type.id ? 'selected' : ''}`}
+                                    onClick={() => updateField('ndaType', type.id)}
+                                >
+                                    <div className="option-icon">{type.icon}</div>
+                                    <div className="option-title">{type.title}</div>
+                                    <div className="option-desc">{type.desc}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="form-section">
+                        <div className="section-title">🏭 Industry</div>
+                        <select value={formData.industry} onChange={e => updateField('industry', e.target.value)}>
+                            {INDUSTRIES.map(ind => (
+                                <option key={ind.id} value={ind.id}>{ind.label}</option>
+                            ))}
+                        </select>
+                        <div className="field-hint">Helps tailor the confidential information categories</div>
+                    </div>
+                </div>
+            );
+
+            // Step 2: Parties
+            const Step2 = () => (
+                <div className="form-content">
+                    <div className="form-section">
+                        <div className="section-title">👤 {formData.ndaType === 'mutual' ? 'Party A (You)' : 'Disclosing Party'}</div>
+
+                        <div className="options-grid" style={{ marginBottom: '1rem' }}>
+                            {['company', 'individual'].map(type => (
+                                <div
+                                    key={type}
+                                    className={`option-card ${formData.disclosingPartyType === type ? 'selected' : ''}`}
+                                    onClick={() => updateField('disclosingPartyType', type)}
+                                >
+                                    <div className="option-icon">{type === 'company' ? '🏢' : '👤'}</div>
+                                    <div className="option-title">{type === 'company' ? 'Company' : 'Individual'}</div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="field-group">
+                            <label className="field-label">{formData.disclosingPartyType === 'company' ? 'Company Name' : 'Full Name'}</label>
+                            <input type="text" value={formData.disclosingPartyName} onChange={e => updateField('disclosingPartyName', e.target.value)} placeholder={formData.disclosingPartyType === 'company' ? 'Acme Corporation' : 'John Smith'} />
+                        </div>
+
+                        {formData.disclosingPartyType === 'company' && (
+                            <div className="field-group">
+                                <label className="field-label">State of Incorporation</label>
+                                <select value={formData.disclosingPartyState} onChange={e => updateField('disclosingPartyState', e.target.value)}>
+                                    {US_STATES.map(s => <option key={s} value={s}>{s}</option>)}
+                                </select>
+                            </div>
+                        )}
+
+                        <div className="field-group">
+                            <label className="field-label">Address</label>
+                            <input type="text" value={formData.disclosingPartyAddress} onChange={e => updateField('disclosingPartyAddress', e.target.value)} placeholder="123 Main St, City, State ZIP" />
+                        </div>
+
+                        {formData.disclosingPartyType === 'company' && (
+                            <>
+                                <div className="field-group">
+                                    <label className="field-label">Signer Name</label>
+                                    <input type="text" value={formData.disclosingPartySignerName} onChange={e => updateField('disclosingPartySignerName', e.target.value)} placeholder="Jane Doe" />
+                                </div>
+                                <div className="field-group">
+                                    <label className="field-label">Signer Title</label>
+                                    <input type="text" value={formData.disclosingPartySignerTitle} onChange={e => updateField('disclosingPartySignerTitle', e.target.value)} placeholder="CEO" />
+                                </div>
+                            </>
+                        )}
+                    </div>
+
+                    <div className="form-section">
+                        <div className="section-title">👤 {formData.ndaType === 'mutual' ? 'Party B (Counterparty)' : 'Receiving Party'}</div>
+
+                        <div className="options-grid" style={{ marginBottom: '1rem' }}>
+                            {['company', 'individual'].map(type => (
+                                <div
+                                    key={type}
+                                    className={`option-card ${formData.receivingPartyType === type ? 'selected' : ''}`}
+                                    onClick={() => updateField('receivingPartyType', type)}
+                                >
+                                    <div className="option-icon">{type === 'company' ? '🏢' : '👤'}</div>
+                                    <div className="option-title">{type === 'company' ? 'Company' : 'Individual'}</div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="field-group">
+                            <label className="field-label">{formData.receivingPartyType === 'company' ? 'Company Name' : 'Full Name'}</label>
+                            <input type="text" value={formData.receivingPartyName} onChange={e => updateField('receivingPartyName', e.target.value)} placeholder={formData.receivingPartyType === 'company' ? 'Beta Inc.' : 'Jane Doe'} />
+                        </div>
+
+                        {formData.receivingPartyType === 'company' && (
+                            <div className="field-group">
+                                <label className="field-label">State of Incorporation</label>
+                                <select value={formData.receivingPartyState} onChange={e => updateField('receivingPartyState', e.target.value)}>
+                                    {US_STATES.map(s => <option key={s} value={s}>{s}</option>)}
+                                </select>
+                            </div>
+                        )}
+
+                        <div className="field-group">
+                            <label className="field-label">Address</label>
+                            <input type="text" value={formData.receivingPartyAddress} onChange={e => updateField('receivingPartyAddress', e.target.value)} placeholder="456 Oak Ave, City, State ZIP" />
+                        </div>
+
+                        {formData.receivingPartyType === 'company' && (
+                            <>
+                                <div className="field-group">
+                                    <label className="field-label">Signer Name</label>
+                                    <input type="text" value={formData.receivingPartySignerName} onChange={e => updateField('receivingPartySignerName', e.target.value)} placeholder="Bob Smith" />
+                                </div>
+                                <div className="field-group">
+                                    <label className="field-label">Signer Title</label>
+                                    <input type="text" value={formData.receivingPartySignerTitle} onChange={e => updateField('receivingPartySignerTitle', e.target.value)} placeholder="CTO" />
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </div>
+            );
+
+            // Step 3: Confidential Info
+            const Step3 = () => (
+                <div className="form-content">
+                    <div className="form-section">
+                        <div className="section-title">🔒 What Information is Confidential?</div>
+                        <div className="checkbox-group">
+                            {[
+                                { field: 'includeTradeSecrets', label: 'Trade Secrets & Inventions', desc: 'Proprietary processes, formulas, methods' },
+                                { field: 'includeBusinessPlans', label: 'Business Plans & Strategy', desc: 'Marketing plans, roadmaps, competitive analysis' },
+                                { field: 'includeFinancials', label: 'Financial Information', desc: 'Revenue, pricing, forecasts, funding details' },
+                                { field: 'includeCustomerData', label: 'Customer Data', desc: 'Customer lists, contacts, purchase history' },
+                                { field: 'includeTechnicalInfo', label: 'Technical Specifications', desc: 'Designs, prototypes, architecture docs' },
+                                { field: 'includeSourceCode', label: 'Source Code', desc: 'Software code, repositories, APIs' },
+                                { field: 'includeAlgorithms', label: 'Algorithms & AI Models', desc: 'ML models, training data, AI systems' },
+                                { field: 'includePersonnelInfo', label: 'Personnel Information', desc: 'Employee data, salaries, org structure' }
+                            ].map(item => (
+                                <div
+                                    key={item.field}
+                                    className={`checkbox-item ${formData[item.field] ? 'checked' : ''}`}
+                                    onClick={() => toggleField(item.field)}
+                                >
+                                    <div className="checkbox-box"></div>
+                                    <div className="checkbox-content">
+                                        <div className="checkbox-label">{item.label}</div>
+                                        <div className="checkbox-desc">{item.desc}</div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="form-section">
+                        <div className="section-title">🤖 AI & Machine Learning Restrictions</div>
+                        <div className="toggle-row enabled">
+                            <div className="toggle-info">
+                                <div className="toggle-label">Include AI Restriction Clause</div>
+                                <div className="toggle-desc">Prevent use of confidential info in AI/ML systems</div>
+                            </div>
+                            <div
+                                className={`toggle-switch ${formData.includeAIRestriction ? 'on' : ''}`}
+                                onClick={() => toggleField('includeAIRestriction')}
+                            ></div>
+                        </div>
+
+                        {formData.includeAIRestriction && (
+                            <div className="options-grid" style={{ marginTop: '1rem' }}>
+                                {[
+                                    { id: 'strict', label: 'Strict', desc: 'No AI use whatsoever' },
+                                    { id: 'moderate', label: 'Moderate', desc: 'Local AI only with consent' }
+                                ].map(level => (
+                                    <div
+                                        key={level.id}
+                                        className={`option-card ${formData.aiRestrictionLevel === level.id ? 'selected' : ''}`}
+                                        onClick={() => updateField('aiRestrictionLevel', level.id)}
+                                    >
+                                        <div className="option-title">{level.label}</div>
+                                        <div className="option-desc">{level.desc}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="form-section">
+                        <div className="field-group">
+                            <label className="field-label">Custom Confidential Information (Optional)</label>
+                            <textarea
+                                value={formData.customConfidentialInfo}
+                                onChange={e => updateField('customConfidentialInfo', e.target.value)}
+                                placeholder="Any additional types of information you want protected..."
+                            />
+                        </div>
+                    </div>
+                </div>
+            );
+
+            // Step 4: Terms
+            const Step4 = () => (
+                <div className="form-content">
+                    <div className="form-section">
+                        <div className="section-title">📅 Agreement Term</div>
+
+                        <div className="field-group">
+                            <label className="field-label">Effective Date</label>
+                            <input type="date" value={formData.effectiveDate} onChange={e => updateField('effectiveDate', e.target.value)} />
+                        </div>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                            <div className="field-group">
+                                <label className="field-label">Term Length</label>
+                                <input type="number" value={formData.termLength} onChange={e => updateField('termLength', e.target.value)} min="1" />
+                            </div>
+                            <div className="field-group">
+                                <label className="field-label">Unit</label>
+                                <select value={formData.termUnit} onChange={e => updateField('termUnit', e.target.value)}>
+                                    <option value="months">Months</option>
+                                    <option value="years">Years</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="field-group">
+                            <label className="field-label">Survival Period After Termination (Years)</label>
+                            <select value={formData.survivalPeriod} onChange={e => updateField('survivalPeriod', e.target.value)}>
+                                <option value="1">1 Year</option>
+                                <option value="2">2 Years</option>
+                                <option value="3">3 Years</option>
+                                <option value="5">5 Years</option>
+                                <option value="perpetual">Perpetual</option>
+                            </select>
+                            <div className="field-hint">How long confidentiality obligations last after the NDA ends</div>
+                        </div>
+                    </div>
+
+                    <div className="form-section">
+                        <div className="section-title">⚖️ Governing Law</div>
+                        <div className="field-group">
+                            <label className="field-label">State</label>
+                            <select value={formData.governingState} onChange={e => updateField('governingState', e.target.value)}>
+                                {US_STATES.map(s => <option key={s} value={s}>{s}</option>)}
+                            </select>
+                            <div className="field-hint">Which state's laws govern this agreement</div>
+                        </div>
+                    </div>
+                </div>
+            );
+
+            // Step 5: Provisions
+            const Step5 = () => (
+                <div className="form-content">
+                    <div className="form-section">
+                        <div className="section-title">⚔️ Dispute Resolution</div>
+                        <div className="options-grid">
+                            {[
+                                { id: 'litigation', label: 'Litigation', desc: 'Resolve disputes in court' },
+                                { id: 'arbitration', label: 'Arbitration', desc: 'Private binding arbitration' }
+                            ].map(opt => (
+                                <div
+                                    key={opt.id}
+                                    className={`option-card ${formData.disputeResolution === opt.id ? 'selected' : ''}`}
+                                    onClick={() => updateField('disputeResolution', opt.id)}
+                                >
+                                    <div className="option-title">{opt.label}</div>
+                                    <div className="option-desc">{opt.desc}</div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {formData.disputeResolution === 'arbitration' && (
+                            <div className="field-group" style={{ marginTop: '1rem' }}>
+                                <label className="field-label">Arbitration Provider</label>
+                                <select value={formData.arbitrationProvider} onChange={e => updateField('arbitrationProvider', e.target.value)}>
+                                    <option value="JAMS">JAMS</option>
+                                    <option value="AAA">American Arbitration Association (AAA)</option>
+                                    <option value="ICC">International Chamber of Commerce (ICC)</option>
+                                </select>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="form-section">
+                        <div className="section-title">🛡️ Remedies & Protections</div>
+                        <div className="checkbox-group">
+                            <div className={`checkbox-item ${formData.includeInjunctiveRelief ? 'checked' : ''}`} onClick={() => toggleField('includeInjunctiveRelief')}>
+                                <div className="checkbox-box"></div>
+                                <div className="checkbox-content">
+                                    <div className="checkbox-label">Injunctive Relief</div>
+                                    <div className="checkbox-desc">Allow seeking court orders to stop breaches immediately</div>
+                                </div>
+                            </div>
+                            <div className={`checkbox-item ${formData.includeAttorneyFees ? 'checked' : ''}`} onClick={() => toggleField('includeAttorneyFees')}>
+                                <div className="checkbox-box"></div>
+                                <div className="checkbox-content">
+                                    <div className="checkbox-label">Attorney's Fees</div>
+                                    <div className="checkbox-desc">Loser pays winner's legal fees</div>
+                                </div>
+                            </div>
+                            <div className={`checkbox-item ${formData.includeLiquidatedDamages ? 'checked' : ''}`} onClick={() => toggleField('includeLiquidatedDamages')}>
+                                <div className="checkbox-box"></div>
+                                <div className="checkbox-content">
+                                    <div className="checkbox-label">Liquidated Damages</div>
+                                    <div className="checkbox-desc">Pre-set penalty amount for breach</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {formData.includeLiquidatedDamages && (
+                            <div className="field-group" style={{ marginTop: '1rem' }}>
+                                <label className="field-label">Liquidated Damages Amount ($)</label>
+                                <input type="number" value={formData.liquidatedDamagesAmount} onChange={e => updateField('liquidatedDamagesAmount', e.target.value)} placeholder="50000" />
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="form-section">
+                        <div className="section-title">🚫 Non-Solicitation (Optional)</div>
+                        <div className="toggle-row">
+                            <div className="toggle-info">
+                                <div className="toggle-label">Include Non-Solicitation Clause</div>
+                                <div className="toggle-desc">Prevent hiring each other's employees</div>
+                            </div>
+                            <div className={`toggle-switch ${formData.includeNonSolicit ? 'on' : ''}`} onClick={() => toggleField('includeNonSolicit')}></div>
+                        </div>
+
+                        {formData.includeNonSolicit && (
+                            <div className="field-group" style={{ marginTop: '1rem' }}>
+                                <label className="field-label">Non-Solicit Period (Years)</label>
+                                <select value={formData.nonSolicitPeriod} onChange={e => updateField('nonSolicitPeriod', e.target.value)}>
+                                    <option value="1">1 Year</option>
+                                    <option value="2">2 Years</option>
+                                </select>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="form-section">
+                        <div className="section-title">📜 Legal Carve-outs</div>
+                        <div className="checkbox-group">
+                            <div className={`checkbox-item ${formData.includeCourtOrderCarveout ? 'checked' : ''}`} onClick={() => toggleField('includeCourtOrderCarveout')}>
+                                <div className="checkbox-box"></div>
+                                <div className="checkbox-content">
+                                    <div className="checkbox-label">Court Order Exception</div>
+                                    <div className="checkbox-desc">Allow disclosure if legally required</div>
+                                </div>
+                            </div>
+                            <div className={`checkbox-item ${formData.includeWhistleblowerCarveout ? 'checked' : ''}`} onClick={() => toggleField('includeWhistleblowerCarveout')}>
+                                <div className="checkbox-box"></div>
+                                <div className="checkbox-content">
+                                    <div className="checkbox-label">Whistleblower Protection</div>
+                                    <div className="checkbox-desc">Comply with DTSA whistleblower provisions</div>
+                                </div>
+                            </div>
+                            <div className={`checkbox-item ${formData.includeRegulatoryCarveout ? 'checked' : ''}`} onClick={() => toggleField('includeRegulatoryCarveout')}>
+                                <div className="checkbox-box"></div>
+                                <div className="checkbox-content">
+                                    <div className="checkbox-label">Regulatory Compliance</div>
+                                    <div className="checkbox-desc">Allow cooperation with government investigations</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+
+            // Step 6: Review
+            const Step6 = () => (
+                <div className="form-content">
+                    <div className="form-section">
+                        <div className="section-title">✅ Review Your NDA</div>
+                        <p style={{ color: 'var(--gray-600)', marginBottom: '1rem' }}>
+                            Review the preview on the right, then download or copy your NDA.
+                        </p>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                            <button className="btn btn-success" onClick={downloadDocx} style={{ width: '100%', justifyContent: 'center' }}>
+                                📄 Download as Word (.docx)
+                            </button>
+                            <button className="btn btn-primary" onClick={copyToClipboard} style={{ width: '100%', justifyContent: 'center' }}>
+                                📋 Copy to Clipboard
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="form-section" style={{ marginTop: '2rem', padding: '1rem', background: '#f0fdf4', borderRadius: '12px', border: '1px solid #86efac' }}>
+                        <div style={{ fontWeight: '600', color: '#166534', marginBottom: '0.5rem' }}>💡 Need Customization?</div>
+                        <p style={{ fontSize: '0.9rem', color: '#166534', marginBottom: '1rem' }}>
+                            This template covers common scenarios. For complex situations, industry-specific requirements, or international deals, consider a custom NDA.
+                        </p>
+                        <button
+                            className="btn"
+                            onClick={() => window.open('mailto:owner@terms.law?subject=Custom NDA Request', '_blank')}
+                            style={{ background: '#166534', color: 'white', width: '100%', justifyContent: 'center' }}
+                        >
+                            ✉️ Request Custom NDA ($450)
+                        </button>
+                    </div>
+                </div>
+            );
+
+            // Render current step
+            const renderStep = () => {
+                switch (step) {
+                    case 1: return <Step1 />;
+                    case 2: return <Step2 />;
+                    case 3: return <Step3 />;
+                    case 4: return <Step4 />;
+                    case 5: return <Step5 />;
+                    case 6: return <Step6 />;
+                    default: return <Step1 />;
+                }
+            };
+
+            return (
+                <div className="main-container">
+                    <div className="form-panel">
+                        <div className="step-indicator">
+                            {steps.map(s => (
+                                <div
+                                    key={s.num}
+                                    className={`step-dot ${step === s.num ? 'active' : ''} ${step > s.num ? 'complete' : ''}`}
+                                    onClick={() => setStep(s.num)}
+                                >
+                                    <span className="step-num">{step > s.num ? '✓' : s.num}</span>
+                                    <span>{s.label}</span>
+                                </div>
+                            ))}
+                        </div>
+
+                        {renderStep()}
+
+                        <div className="nav-buttons">
+                            {step > 1 ? (
+                                <button className="btn btn-back" onClick={() => setStep(step - 1)}>← Back</button>
+                            ) : <div></div>}
+                            {step < 6 ? (
+                                <button className="btn btn-primary" onClick={() => setStep(step + 1)}>Continue →</button>
+                            ) : (
+                                <button className="btn btn-success" onClick={downloadDocx}>📄 Download DOCX</button>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="preview-panel">
+                        <div className="preview-header">
+                            <div className="preview-title">📝 Live Preview</div>
+                            <div className="preview-actions">
+                                <button className="preview-btn preview-btn-outline" onClick={copyToClipboard}>Copy</button>
+                                <button className="preview-btn preview-btn-filled" onClick={downloadDocx}>Download</button>
+                            </div>
+                        </div>
+                        <div className="preview-content" dangerouslySetInnerHTML={{ __html: ndaText }} />
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>
