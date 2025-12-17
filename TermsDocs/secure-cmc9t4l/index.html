@@ -541,9 +541,96 @@
       border-top: 1px solid var(--border);
     }
     .footer a { color: var(--primary); text-decoration: none; }
+
+    body.locked {
+      overflow: hidden;
+    }
+
+    .password-overlay {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      z-index: 9999;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    .password-overlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .password-modal {
+      width: 100%;
+      max-width: 420px;
+      background: var(--surface);
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+      text-align: center;
+    }
+    .password-modal h2 {
+      font-family: 'Crimson Pro', Georgia, serif;
+      color: var(--primary);
+      margin-bottom: 12px;
+      font-size: 1.4rem;
+    }
+    .password-modal p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 18px;
+    }
+    .password-input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      font-size: 1rem;
+      letter-spacing: 0.05em;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+    .password-button {
+      width: 100%;
+      padding: 12px 14px;
+      border: none;
+      border-radius: 8px;
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .password-button:hover {
+      background: var(--accent-light);
+    }
+    .password-error {
+      display: none;
+      color: #b91c1c;
+      font-size: 0.85rem;
+      margin-top: 10px;
+    }
+    .password-error.visible {
+      display: block;
+    }
   </style>
 </head>
-<body>
+<body class="locked">
+
+<div class="password-overlay" id="passwordOverlay" role="dialog" aria-modal="true">
+  <div class="password-modal">
+    <h2>Secure client workroom</h2>
+    <p>Please enter the access password to continue.</p>
+    <form id="passwordForm">
+      <input type="text" id="passwordInput" class="password-input" value="Sw!ghey5" autocomplete="off" autofocus>
+      <button type="submit" class="password-button">Unlock Workroom</button>
+      <div class="password-error" id="passwordError">Incorrect password. Please try again.</div>
+    </form>
+  </div>
+</div>
 
 <header class="header">
   <div class="header-inner">
@@ -773,6 +860,48 @@
   <span id="syncText">Saved</span>
 </div>
 
+<script>
+(function() {
+  const ACCESS_PASSWORD = 'Sw!ghey5';
+  const overlay = document.getElementById('passwordOverlay');
+  const form = document.getElementById('passwordForm');
+  const input = document.getElementById('passwordInput');
+  const error = document.getElementById('passwordError');
+
+  if (!overlay || !form || !input) {
+    return;
+  }
+
+  function unlockWorkroom() {
+    overlay.classList.add('hidden');
+    document.body.classList.remove('locked');
+  }
+
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    if (input.value.trim() === ACCESS_PASSWORD) {
+      unlockWorkroom();
+    } else if (error) {
+      error.classList.add('visible');
+      input.focus();
+      input.select();
+    }
+  });
+
+  input.addEventListener('input', () => {
+    if (error) {
+      error.classList.remove('visible');
+    }
+  });
+
+  input.focus();
+  if (typeof input.setSelectionRange === 'function') {
+    const length = input.value.length;
+    input.setSelectionRange(length, length);
+  }
+})();
+</script>
+
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -797,7 +926,7 @@ const DOC_ID = 'cmc-9t4l'; // Unique ID for this workroom
 let clientDecisions = {};
 let saveTimeout = null;
 
-// Redline data - SIMPLIFIED 12-issue list
+// Redline data - 11 key issues with ACTUAL section numbers
 // ORIGINAL = Federal Realty's exact text
 // SUGGESTED = Our proposed replacement language
 const redlines = [
@@ -805,7 +934,7 @@ const redlines = [
   {
     id: 1,
     title: "Termination Protection + Buildout Reimbursement",
-    section: "¶13 TERMINATION + ¶14 WORK + ¶31 END OF TERM",
+    section: "§7, §8, §13",
     category: "Exit Economics",
     priority: "high",
     original: "Grantor shall have the right to terminate the Agreement at any time, in its sole and absolute discretion, by giving Licensee no less than thirty (30) days written notice... Any items not removed by Licensee after the Expiration Date shall, at the option of Grantor and without notice to Licensee, be deemed abandoned...",
@@ -817,7 +946,7 @@ const redlines = [
   {
     id: 2,
     title: "Pricing Controls + Remove $100/Day Penalty",
-    section: "¶9 PAD LICENSE FEE + Exhibit B ¶75",
+    section: "§4 + Exhibit B",
     category: "Pricing",
     priority: "high",
     original: "Licensee shall not charge above prevailing market rates... increase charges without prior VP written consent... Default with no notice or cure period required... $100 per day penalty...",
@@ -829,7 +958,7 @@ const redlines = [
   {
     id: 3,
     title: "Default Cure Periods + No Equipment Seizure",
-    section: "¶15 DEFAULTS",
+    section: "§9",
     category: "Defaults",
     priority: "high",
     original: "Grantor may terminate with forty-eight (48) hours notice... take possession of all improvements, equipment, fixtures and inventory...",
@@ -841,7 +970,7 @@ const redlines = [
   {
     id: 4,
     title: "Security Deposit — Reduce + Fix Return",
-    section: "¶33 SECURITY DEPOSIT",
+    section: "§15",
     category: "Deposit",
     priority: "medium",
     original: "Deposit = 3x monthly ($25,500) or $10,000 (whichever greater). Replenish within 5 days. Request return within 60 days or waive...",
@@ -853,7 +982,7 @@ const redlines = [
   {
     id: 5,
     title: "Reporting Fines — Fault-Based Allocation",
-    section: "¶12 JURISDICTION MANDATED REPORTING",
+    section: "§6",
     category: "Regulatory",
     priority: "high",
     original: "The cost of any fines, penalties, or other repercussions for Grantor's failure to make Jurisdiction Mandated Reporting shall be borne solely by Licensee.",
@@ -865,7 +994,7 @@ const redlines = [
   {
     id: 6,
     title: "Tenant Contracts + Billing Timing",
-    section: "Exhibit B ¶79 + Exhibit B-1 ¶138",
+    section: "Exhibit B & B-1",
     category: "Operations",
     priority: "medium",
     original: "Licensee agrees not to enter into any separate contracts with tenants... If fails to invoice within 90 days, Licensee waives right to payment...",
@@ -877,7 +1006,7 @@ const redlines = [
   {
     id: 7,
     title: "Indemnity — Comparative Fault Standard",
-    section: "¶29 INDEMNITY",
+    section: "§11",
     category: "Risk",
     priority: "medium",
     original: "Except for liability arising solely from the indemnified parties' negligence, Licensee will defend, indemnify and hold harmless Grantor...",
@@ -889,7 +1018,7 @@ const redlines = [
   {
     id: 8,
     title: "Insurance — Add Cure Period",
-    section: "¶24 INSURANCE (Failure to Obtain)",
+    section: "§10",
     category: "Risk",
     priority: "medium",
     original: "Failure to maintain insurance is material breach. Grantor may terminate without notice to cure...",
@@ -901,7 +1030,7 @@ const redlines = [
   {
     id: 9,
     title: "Non-Recourse Carve-Outs",
-    section: "¶48 LIMITATION ON RIGHT OF RECOVERY",
+    section: "§18",
     category: "Risk",
     priority: "low",
     original: "Licensee agrees to look solely to the interest held by Grantor in the Project for any claims...",
@@ -913,7 +1042,7 @@ const redlines = [
   {
     id: 10,
     title: "Assignment — Allow Affiliates/Successors",
-    section: "¶47 ASSIGNMENT",
+    section: "§17",
     category: "Corporate",
     priority: "medium",
     original: "The rights granted to Licensee are personal and Licensee shall not be permitted to assign this Agreement.",
@@ -925,7 +1054,7 @@ const redlines = [
   {
     id: 11,
     title: "Complete Blanks + Confirm Exhibits",
-    section: "¶1, ¶3, ¶7; Exhibits A–E",
+    section: "Preamble & Exhibits",
     category: "Execution",
     priority: "high",
     original: "Made as of _____ ... by and between ... and _____ ... continuing until _____ (\"Term\")...",
@@ -986,8 +1115,8 @@ function initRedlines() {
           <button class="toggle-btn original-btn" onclick="event.stopPropagation(); showOriginal(${r.id})">Federal Realty's Text</button>
           <button class="toggle-btn suggested-btn active" onclick="event.stopPropagation(); showSuggested(${r.id})">My Suggestion</button>
         </div>
-        <div class="text-box text-original text-hidden" id="original-${r.id}">${r.original}</div>
-        <div class="text-box text-suggested" id="suggested-${r.id}">${r.suggested}</div>
+        <div class="text-box text-original" id="original-${r.id}" style="display:none;">${r.original}</div>
+        <div class="text-box text-suggested" id="suggested-${r.id}" style="display:block;">${r.suggested}</div>
 
         <!-- Accept/Reject decision THIRD -->
         <div class="decision-section">
@@ -1031,19 +1160,39 @@ function toggleRedline(id) {
 
 function showOriginal(id) {
   showingSuggested[id] = false;
-  document.getElementById(`original-${id}`).classList.remove('text-hidden');
-  document.getElementById(`suggested-${id}`).classList.add('text-hidden');
-  document.querySelector(`#redline-${id} .original-btn`).classList.add('active');
-  document.querySelector(`#redline-${id} .suggested-btn`).classList.remove('active');
+  const origEl = document.getElementById(`original-${id}`);
+  const sugEl = document.getElementById(`suggested-${id}`);
+  const origBtn = document.querySelector(`#redline-${id} .original-btn`);
+  const sugBtn = document.querySelector(`#redline-${id} .suggested-btn`);
+
+  if (origEl && sugEl) {
+    // Force display toggle - remove all display styling first
+    origEl.style.display = 'block';
+    sugEl.style.display = 'none';
+    origEl.classList.remove('text-hidden');
+    sugEl.classList.add('text-hidden');
+  }
+  if (origBtn) origBtn.classList.add('active');
+  if (sugBtn) sugBtn.classList.remove('active');
   updateHighlightMode(id, 'original');
 }
 
 function showSuggested(id) {
   showingSuggested[id] = true;
-  document.getElementById(`original-${id}`).classList.add('text-hidden');
-  document.getElementById(`suggested-${id}`).classList.remove('text-hidden');
-  document.querySelector(`#redline-${id} .original-btn`).classList.remove('active');
-  document.querySelector(`#redline-${id} .suggested-btn`).classList.add('active');
+  const origEl = document.getElementById(`original-${id}`);
+  const sugEl = document.getElementById(`suggested-${id}`);
+  const origBtn = document.querySelector(`#redline-${id} .original-btn`);
+  const sugBtn = document.querySelector(`#redline-${id} .suggested-btn`);
+
+  if (origEl && sugEl) {
+    // Force display toggle - remove all display styling first
+    origEl.style.display = 'none';
+    sugEl.style.display = 'block';
+    origEl.classList.add('text-hidden');
+    sugEl.classList.remove('text-hidden');
+  }
+  if (origBtn) origBtn.classList.remove('active');
+  if (sugBtn) sugBtn.classList.add('active');
   updateHighlightMode(id, 'suggested');
 }
 
