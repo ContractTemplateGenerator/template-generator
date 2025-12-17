@@ -13,11 +13,11 @@ import io
 # Install dependencies if needed
 try:
     from docx import Document
-    from docx.shared import Inches, Pt
+    from docx.shared import Inches, Pt, RGBColor
 except ImportError:
     subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'python-docx', '--user'])
     from docx import Document
-    from docx.shared import Inches, Pt
+    from docx.shared import Inches, Pt, RGBColor
 
 try:
     from PIL import Image, ImageDraw, ImageFont
@@ -71,57 +71,72 @@ def create_signature_image():
     img.save(str(PNG_PATH), 'PNG')
     print(f"Created: {PNG_PATH}")
 
+def generate_verification_code():
+    """Generate a UUID-like verification code."""
+    import random
+    chars = 'ABCDEF0123456789'
+    segments = [8, 4, 4, 4, 12]
+    return '-'.join(
+        ''.join(random.choice(chars) for _ in range(length))
+        for length in segments
+    )
+
 def create_signed_document():
     """Create signed version of the Word document."""
     print(f"Opening: {ORIGINAL_DOC}")
     doc = Document(ORIGINAL_DOC)
 
+    # Generate verification code
+    verification_code = generate_verification_code()
+    timestamp = datetime.now().strftime('%B %d, %Y at %I:%M %p')
+
     # Find "Sincerely," and insert signature after it
     for i, para in enumerate(doc.paragraphs):
         if 'Sincerely,' in para.text:
             # Find the next paragraph(s) after "Sincerely,"
-            # We need to find where to insert the signature
             for j in range(i + 1, min(i + 5, len(doc.paragraphs))):
                 next_para = doc.paragraphs[j]
                 text = next_para.text.strip()
 
-                # Look for empty paragraph or signature line placeholder
-                if text == '' or text.startswith('____') or text.startswith('['):
-                    # Clear and add signature
-                    next_para.clear()
-
-                    # Add signature image
-                    run = next_para.add_run()
-                    run.add_picture(str(PNG_PATH), width=Inches(2.8))
-
-                    # Add timestamp on new line
-                    timestamp = datetime.now().strftime('%B %d, %Y at %I:%M %p')
-                    ts_para = next_para.insert_paragraph_before('')
-                    ts_run = ts_para.add_run()
-                    ts_run.add_picture(str(PNG_PATH), width=Inches(2.8))
-
-                    # Actually, let's just replace this paragraph
-                    next_para.clear()
-                    run = next_para.add_run()
-                    run.add_picture(str(PNG_PATH), width=Inches(2.8))
-                    next_para.add_run(f'\nElectronically signed {timestamp}').font.size = Pt(8)
-                    next_para.runs[-1].font.italic = True
-
-                    print("Signature inserted!")
-                    break
-
                 # If we hit the name line, insert signature before it
                 if 'Sergei Tokmakov' in text:
-                    # Insert a new paragraph before this one with the signature
-                    new_para = next_para.insert_paragraph_before('')
-                    run = new_para.add_run()
-                    run.add_picture(str(PNG_PATH), width=Inches(2.8))
+                    # Insert signature block before the name
+                    sig_para = next_para.insert_paragraph_before('')
 
-                    timestamp = datetime.now().strftime('%B %d, %Y at %I:%M %p')
-                    new_para.add_run(f'\nElectronically signed {timestamp}').font.size = Pt(8)
-                    new_para.runs[-1].font.italic = True
+                    # Add signature image
+                    run = sig_para.add_run()
+                    run.add_picture(str(PNG_PATH), width=Inches(3.0))
 
-                    print("Signature inserted before name!")
+                    # Add signature details block
+                    details_para = next_para.insert_paragraph_before('')
+
+                    # Signed by line
+                    run1 = details_para.add_run('✓ Signed by: Sergei Tokmakov, Esq.\n')
+                    run1.font.size = Pt(9)
+                    run1.font.color.rgb = RGBColor(22, 101, 52)  # Green
+
+                    # CBN line
+                    run2 = details_para.add_run('   CBN 279869\n')
+                    run2.font.size = Pt(9)
+                    run2.font.color.rgb = RGBColor(71, 85, 105)
+
+                    # Date line
+                    run3 = details_para.add_run(f'{timestamp}\n')
+                    run3.font.size = Pt(9)
+                    run3.font.color.rgb = RGBColor(71, 85, 105)
+
+                    # Email line
+                    run4 = details_para.add_run('Verified email: owner@terms.law\n')
+                    run4.font.size = Pt(9)
+                    run4.font.color.rgb = RGBColor(71, 85, 105)
+
+                    # Verification code
+                    run5 = details_para.add_run(verification_code)
+                    run5.font.size = Pt(8)
+                    run5.font.color.rgb = RGBColor(148, 163, 184)
+                    run5.font.name = 'Courier New'
+
+                    print(f"Signature inserted with verification code: {verification_code}")
                     break
             break
 
