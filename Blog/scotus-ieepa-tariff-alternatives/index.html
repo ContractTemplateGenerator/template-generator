@@ -1606,7 +1606,7 @@
                 <div style="font-size: 0.8rem; color: var(--gray-500);">Highest Rate</div>
             </div>
             <div style="text-align: center;">
-                <div style="font-size: 1.75rem; font-weight: 700; color: var(--warning);" id="statAverage">20%</div>
+                <div style="font-size: 1.75rem; font-weight: 700; color: var(--warning);" id="statAverage">18%</div>
                 <div style="font-size: 0.8rem; color: var(--gray-500);">Average Rate</div>
             </div>
             <div style="text-align: center;">
@@ -2640,15 +2640,16 @@
 
 <script>
     // ===== TARIFF DATA (Updated Dec 17, 2025) =====
-    // Sources: White House EOs, CBP CSMS, July 31 2025 superseding order (eff. Aug 7, 2025)
-    // Programs: 'reciprocal' = trade deficit tariff; 'border' = Canada/Mexico IEEPA; 'fentanyl' = China; 'secondary' = Russia/Venezuela oil
+    // Sources: White House EOs, CBP CSMS bulletins, USTR trade figures (2024)
+    // Key dates: July 31 EO (reciprocal rates eff. Aug 7), EO 14329 India (eff. Aug 27), Swiss deal (Nov 14)
+    // Programs: 'reciprocal' = trade deficit tariff; 'border' = Canada/Mexico IEEPA; 'secondary' = Russia oil stacking
     const tariffData = [
         { country: 'China', region: 'asia', rate: 20, effDate: '2025-11-10', status: 'negotiated', program: 'fentanyl+reciprocal', notes: '10% fentanyl duty (reduced from 20% on Nov 10) + 10% reciprocal (held at 10% per May deal). Stacks with +25% Venezuelan oil secondary tariff if applicable.', tradeVol: '$427B' },
-        { country: 'Canada', region: 'americas', rate: 35, effDate: '2025-08-01', status: 'active', program: 'border', notes: 'Border IEEPA program: 35% general (raised Aug 1), 10% on energy, 40% transshipments. USMCA-qualifying goods carved out.', tradeVol: '$436B' },
-        { country: 'Mexico', region: 'americas', rate: 25, effDate: '2025-03-04', status: 'active', program: 'border', notes: 'Border IEEPA program: 25% on non-USMCA-qualifying goods. USMCA-qualifying goods exempt. Potash 10%.', tradeVol: '$475B' },
-        { country: 'India', region: 'asia', rate: 50, effDate: '2025-08-07', status: 'active', program: 'reciprocal+secondary', notes: '25% reciprocal (July 31 Annex) + 25% Russia oil duty = 50% total. Highest combined rate of any major economy.', tradeVol: '$87B' },
-        { country: 'Switzerland', region: 'europe', rate: 39, effDate: '2025-08-07', status: 'active', program: 'reciprocal', notes: '39% reciprocal rate per July 31, 2025 order. Non-EU, no framework deal.', tradeVol: '$56B' },
-        { country: 'South Africa', region: 'other', rate: 30, effDate: '2025-08-07', status: 'active', program: 'reciprocal', notes: '30% reciprocal rate. Mineral exports targeted.', tradeVol: '$12B' },
+        { country: 'Canada', region: 'americas', rate: 35, effDate: '2025-08-01', status: 'active', program: 'border', notes: 'Border IEEPA: 35% most non-USMCA goods, 10% energy/potash, 40% transshipments. USMCA-qualifying = 0%.', tradeVol: '$761.8B' },
+        { country: 'Mexico', region: 'americas', rate: 25, effDate: '2025-03-04', status: 'active', program: 'border', notes: 'Border IEEPA: 25% non-USMCA goods. USMCA-qualifying = 0% (must claim properly).', tradeVol: '$839.6B' },
+        { country: 'India', region: 'asia', rate: 50, effDate: '2025-08-27', status: 'active', program: 'reciprocal+secondary', notes: '25% reciprocal (eff. Aug 7) + 25% India-specific duty EO 14329 (eff. Aug 27) = 50% stacked. Highest major economy rate.', tradeVol: '$128.9B' },
+        { country: 'Switzerland', region: 'europe', rate: 15, effDate: '2025-11-14', status: 'negotiated', program: 'reciprocal', notes: '15% cap (down from 39% per Nov 14 framework deal). Pharma, chemicals, gold, coffee exempt per Swiss announcement.', tradeVol: '$88.4B' },
+        { country: 'South Africa', region: 'other', rate: 30, effDate: '2025-08-07', status: 'active', program: 'reciprocal', notes: '30% reciprocal rate per July 31 annex. In-transit bridge: 10% if loaded before Aug 7 and entered before Oct 5.', tradeVol: '$20.5B' },
         { country: 'Vietnam', region: 'asia', rate: 20, effDate: '2025-08-07', status: 'negotiated', program: 'reciprocal', notes: '20% per July 31 order (reduced from 46% April rate via framework).', tradeVol: '$139B' },
         { country: 'Taiwan', region: 'asia', rate: 20, effDate: '2025-08-07', status: 'active', program: 'reciprocal', notes: '20% per July 31 order (reduced from 32% April rate). Semiconductor concerns ongoing.', tradeVol: '$113B' },
         { country: 'Sri Lanka', region: 'asia', rate: 20, effDate: '2025-08-07', status: 'active', program: 'reciprocal', notes: '20% per July 31 order (reduced from 44% April rate). Apparel manufacturing.', tradeVol: '$3B' },
@@ -2675,6 +2676,26 @@
 
     let currentSort = { column: 2, ascending: false }; // Default: rate descending
     let currentFilter = 'all';
+
+    // Country flag emojis
+    const countryFlags = {
+        'China': '🇨🇳', 'Canada': '🇨🇦', 'Mexico': '🇲🇽', 'India': '🇮🇳', 'Switzerland': '🇨🇭',
+        'South Africa': '🇿🇦', 'Vietnam': '🇻🇳', 'Taiwan': '🇹🇼', 'Sri Lanka': '🇱🇰', 'Bangladesh': '🇧🇩',
+        'Cambodia': '🇰🇭', 'Thailand': '🇹🇭', 'Malaysia': '🇲🇾', 'Pakistan': '🇵🇰', 'Philippines': '🇵🇭',
+        'Indonesia': '🇮🇩', 'Turkey': '🇹🇷', 'Israel': '🇮🇱', 'South Korea': '🇰🇷', 'Japan': '🇯🇵',
+        'European Union': '🇪🇺', 'United Kingdom': '🇬🇧', 'Singapore': '🇸🇬', 'Australia': '🇦🇺',
+        'Brazil': '🇧🇷', 'Colombia': '🇨🇴', 'Chile': '🇨🇱', 'Saudi Arabia': '🇸🇦'
+    };
+    const getFlag = (country) => countryFlags[country] || '🏳️';
+
+    // Format date without timezone conversion (avoids Aug 7 → Aug 6 issue)
+    function formatDate(dateStr, long = false) {
+        const [year, month, day] = dateStr.split('-').map(Number);
+        const months = long
+            ? ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+            : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        return `${months[month - 1]} ${day}, ${year}`;
+    }
 
     // ===== TOGGLE FUNCTIONS =====
     function toggleToolCard(id) {
@@ -2723,7 +2744,7 @@
 
         tbody.innerHTML = filteredData.map(row => `
             <tr onclick="showCountryDetail('${row.country}')" style="cursor: pointer;">
-                <td><strong>${row.country}</strong></td>
+                <td><strong>${getFlag(row.country)} ${row.country}</strong></td>
                 <td><span style="text-transform: capitalize;">${row.region.replace('asia', 'Asia-Pacific').replace('europe', 'Europe').replace('americas', 'Americas').replace('other', 'Other')}</span></td>
                 <td>
                     <span style="display: inline-flex; align-items: center; gap: 0.5rem;">
@@ -2733,7 +2754,7 @@
                         </span>
                     </span>
                 </td>
-                <td>${new Date(row.effDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
+                <td>${formatDate(row.effDate)}</td>
                 <td>
                     <span style="padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; ${row.status === 'active' ? 'background: #fee2e2; color: #991b1b;' : row.status === 'negotiated' ? 'background: #d1fae5; color: #065f46;' : 'background: #fef3c7; color: #92400e;'}">${row.status}</span>
                 </td>
@@ -2771,7 +2792,7 @@
 
         content.innerHTML = `
             <div style="text-align: center; margin-bottom: 1.5rem;">
-                <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">&#127758;</div>
+                <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">${getFlag(country.country)}</div>
                 <h3 style="font-size: 1.5rem; margin: 0;">${country.country}</h3>
                 <p style="color: var(--gray-500); margin: 0.25rem 0;">${country.region.replace('asia', 'Asia-Pacific').replace('europe', 'Europe').replace('americas', 'Americas').replace('other', 'Other')}</p>
             </div>
@@ -2787,7 +2808,7 @@
             </div>
             <div style="padding: 1rem; background: ${country.status === 'active' ? '#fef2f2' : country.status === 'negotiated' ? '#ecfdf5' : '#fefce8'}; border-radius: 10px; margin-bottom: 1rem;">
                 <div style="font-weight: 600; margin-bottom: 0.5rem;">Status: <span style="color: ${country.status === 'active' ? 'var(--danger)' : country.status === 'negotiated' ? 'var(--success)' : 'var(--warning)'}; text-transform: uppercase;">${country.status}</span></div>
-                <div style="font-size: 0.9rem; color: var(--gray-600);">Effective: ${new Date(country.effDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</div>
+                <div style="font-size: 0.9rem; color: var(--gray-600);">Effective: ${formatDate(country.effDate, true)}</div>
             </div>
             <div style="padding: 1rem; background: var(--gray-50); border-radius: 10px;">
                 <div style="font-weight: 600; margin-bottom: 0.5rem;">Notes:</div>

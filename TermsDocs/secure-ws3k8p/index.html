@@ -1648,85 +1648,82 @@ function updateBottomButton() {
 }
 
 function downloadPDF() {
+  // Get the document content
   const docContent = document.getElementById('docContent');
-  const filename = documentSigned
-    ? 'Demand Letter - Shaw v Sunnova - Rescission - SIGNED.pdf'
-    : 'Demand Letter - Shaw v Sunnova - Rescission.pdf';
 
-  // Show loading state
-  const btn = event.target.closest('button');
-  const originalText = btn.innerHTML;
-  btn.innerHTML = '<span>&#8987;</span> Generating...';
-  btn.disabled = true;
-
-  // Clone content and prepare for PDF - exclude the bottom download section
+  // Clone and clean content
   const clone = docContent.cloneNode(true);
 
   // Remove the bottom download section from PDF
   const bottomSection = clone.querySelector('.bottom-download-section');
   if (bottomSection) bottomSection.remove();
 
-  // Apply styles for PDF
-  clone.style.width = '7.5in';
-  clone.style.padding = '0';
-  clone.style.margin = '0';
-  clone.style.fontSize = '12pt';
-  clone.style.lineHeight = '1.5';
-  clone.style.fontFamily = 'Times New Roman, Times, serif';
-  clone.style.color = '#000';
-  clone.style.background = '#fff';
-  clone.contentEditable = 'false';
+  // Remove contenteditable
+  clone.removeAttribute('contenteditable');
 
-  // Create wrapper with visible content
-  const wrapper = document.createElement('div');
-  wrapper.style.cssText = 'background: white; padding: 0.75in; width: 8.5in; box-sizing: border-box;';
-  wrapper.appendChild(clone);
+  // Open print window with styled content
+  const printWindow = window.open('', '_blank', 'width=816,height=1056');
 
-  // Add to DOM - must be visible for html2canvas
-  wrapper.style.position = 'fixed';
-  wrapper.style.left = '0';
-  wrapper.style.top = '0';
-  wrapper.style.zIndex = '-1000';
-  wrapper.style.opacity = '1';
-  document.body.appendChild(wrapper);
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Demand Letter - Shaw v Sunnova${documentSigned ? ' - SIGNED' : ''}</title>
+      <style>
+        @page {
+          size: letter;
+          margin: 0.75in;
+        }
+        * { box-sizing: border-box; }
+        body {
+          font-family: 'Times New Roman', Times, serif;
+          font-size: 12pt;
+          line-height: 1.5;
+          color: #000;
+          background: #fff;
+          margin: 0;
+          padding: 0.5in;
+        }
+        .doc-letterhead {
+          text-align: center;
+          margin-bottom: 24px;
+          padding-bottom: 16px;
+          border-bottom: 2px solid #000;
+        }
+        .doc-letterhead .name { font-weight: bold; font-size: 14pt; }
+        .doc-letterhead .bar, .doc-letterhead .contact { font-size: 10pt; }
+        .doc-date { margin: 24px 0; }
+        .doc-address { margin-bottom: 24px; }
+        .doc-address p { margin: 0 0 12px 0; }
+        .doc-re { margin: 20px 0; padding-left: 40px; }
+        .doc-re strong { display: block; }
+        .doc-section { margin: 20px 0; }
+        .doc-section h2 { font-size: 12pt; font-weight: bold; margin-bottom: 12px; }
+        .doc-section h3 { font-size: 12pt; font-weight: bold; margin: 16px 0 8px; }
+        .doc-list { margin-left: 24px; margin-bottom: 12px; }
+        .doc-list li { margin-bottom: 8px; }
+        .doc-signature { margin-top: 40px; }
+        p { margin-bottom: 12px; }
 
-  // Wait for fonts/images to load
-  setTimeout(() => {
-    // Configure PDF options
-    const opt = {
-      margin: [0.5, 0.75, 0.5, 0.75],
-      filename: filename,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        letterRendering: true,
-        allowTaint: true,
-        backgroundColor: '#ffffff'
-      },
-      jsPDF: {
-        unit: 'in',
-        format: 'letter',
-        orientation: 'portrait',
-        compress: true
-      },
-      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-    };
+        @media print {
+          body { padding: 0; }
+        }
+      </style>
+    </head>
+    <body>
+      ${clone.innerHTML}
+    </body>
+    </html>
+  `);
 
-    // Generate PDF
-    html2pdf().set(opt).from(wrapper).save().then(() => {
-      document.body.removeChild(wrapper);
-      btn.innerHTML = originalText;
-      btn.disabled = false;
-    }).catch(err => {
-      console.error('PDF generation failed:', err);
-      document.body.removeChild(wrapper);
-      btn.innerHTML = originalText;
-      btn.disabled = false;
-      alert('PDF generation failed. Please try again.');
-    });
-  }, 100);
+  printWindow.document.close();
+
+  // Wait for content to load, then trigger print
+  printWindow.onload = function() {
+    setTimeout(() => {
+      printWindow.print();
+    }, 250);
+  };
 }
 
 // Check if already signed on load
