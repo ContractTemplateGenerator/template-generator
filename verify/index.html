@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Signature Verification | Terms.Law</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <style>
+    :root {
+      --primary: #1a2e44;
+      --primary-light: #2d4a6f;
+      --accent: #7c3aed;
+      --bg: #fafaf9;
+      --text: #1c1917;
+      --text-muted: #78716c;
+      --border: #e7e5e4;
+      --success: #166534;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: white;
+      padding: 20px 40px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-family: 'Crimson Pro', Georgia, serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 0 20px;
+      flex: 1;
+    }
+
+    .verify-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 40px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    }
+
+    .verify-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 24px;
+      background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .verify-icon svg {
+      width: 40px;
+      height: 40px;
+      color: var(--success);
+    }
+
+    .verify-icon.invalid {
+      background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    }
+
+    .verify-icon.invalid svg {
+      color: #dc2626;
+    }
+
+    .verify-title {
+      font-family: 'Crimson Pro', Georgia, serif;
+      font-size: 1.5rem;
+      color: var(--primary);
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .verify-subtitle {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 32px;
+    }
+
+    .verify-details {
+      border-top: 1px solid var(--border);
+      padding-top: 24px;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .detail-label {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    .detail-value {
+      font-weight: 500;
+      text-align: right;
+    }
+
+    .code-display {
+      background: #f5f5f4;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+      margin-top: 24px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+      word-break: break-all;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+
+    .footer a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-muted);
+    }
+
+    .not-found {
+      text-align: center;
+    }
+
+    .not-found h2 {
+      color: #dc2626;
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Terms.Law</h1>
+</div>
+
+<div class="container">
+  <div class="verify-card" id="verifyCard">
+    <div class="loading" id="loading">
+      Verifying signature...
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <a href="https://terms.law">Terms.Law</a> - Legal Document Services
+</div>
+
+<script>
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyDxBPHNaWTatubO3CDrWbFiJJJxuEBxOQg",
+  authDomain: "terms-law.firebaseapp.com",
+  databaseURL: "https://terms-law-default-rtdb.firebaseio.com",
+  projectId: "terms-law",
+  storageBucket: "terms-law.firebasestorage.app",
+  messagingSenderId: "394698037958",
+  appId: "1:394698037958:web:6749e22542f84ef3fc1efc"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// Get verification code from URL
+function getVerificationCode() {
+  const path = window.location.pathname;
+  const filename = path.split('/').pop();
+  return filename.replace('.html', '');
+}
+
+// Look up signature in all workrooms
+async function verifySignature(code) {
+  const card = document.getElementById('verifyCard');
+
+  try {
+    // Check all workrooms for this verification code
+    const workroomsSnapshot = await db.ref('workrooms').once('value');
+    const workrooms = workroomsSnapshot.val();
+
+    let foundSignature = null;
+    let workroomName = null;
+
+    if (workrooms) {
+      for (const [name, data] of Object.entries(workrooms)) {
+        if (data.signature && data.signature.verificationCode === code) {
+          foundSignature = data.signature;
+          workroomName = name;
+          break;
+        }
+      }
+    }
+
+    if (foundSignature) {
+      const signDate = new Date(foundSignature.timestamp);
+      const dateStr = signDate.toLocaleDateString('en-US', {
+        year: 'numeric', month: 'long', day: 'numeric'
+      });
+      const timeStr = signDate.toLocaleTimeString('en-US', {
+        hour: 'numeric', minute: '2-digit', hour12: true
+      });
+
+      card.innerHTML = `
+        <div class="verify-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+        </div>
+        <h2 class="verify-title">Signature Verified</h2>
+        <p class="verify-subtitle">This document was electronically signed and is authentic.</p>
+
+        <div class="verify-details">
+          <div class="detail-row">
+            <span class="detail-label">Signed By</span>
+            <span class="detail-value">${foundSignature.signedBy}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">California Bar Number</span>
+            <span class="detail-value"><a href="https://apps.calbar.ca.gov/attorney/Licensee/Detail/279869" target="_blank" style="color: var(--primary); text-decoration: none;">279869</a></span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Date & Time</span>
+            <span class="detail-value">${dateStr}, ${timeStr}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Verified Email</span>
+            <span class="detail-value">owner@terms.law</span>
+          </div>
+        </div>
+
+        <div class="code-display">
+          ${code}
+        </div>
+      `;
+    } else {
+      showNotFound(code);
+    }
+  } catch (error) {
+    console.error('Verification error:', error);
+    showNotFound(code);
+  }
+}
+
+function showNotFound(code) {
+  const card = document.getElementById('verifyCard');
+  card.innerHTML = `
+    <div class="verify-icon invalid">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="15" y1="9" x2="9" y2="15"/>
+        <line x1="9" y1="9" x2="15" y2="15"/>
+      </svg>
+    </div>
+    <div class="not-found">
+      <h2>Signature Not Found</h2>
+      <p>The verification code could not be found in our records.</p>
+      <p style="margin-top: 16px; color: var(--text-muted); font-size: 0.85rem;">
+        This may mean the document has not been signed yet, or the code is invalid.
+      </p>
+    </div>
+    <div class="code-display">
+      ${code || 'No code provided'}
+    </div>
+  `;
+}
+
+// Initialize
+const code = getVerificationCode();
+if (code && code !== 'index') {
+  verifySignature(code);
+} else {
+  showNotFound(null);
+}
+</script>
+
+</body>
+</html>

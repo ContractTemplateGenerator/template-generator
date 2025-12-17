@@ -1,0 +1,2208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Shaw v. Sunnova — Client Workroom | Terms.Law</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    :root {
+      --primary: #1a2e44;
+      --primary-light: #2d4a6f;
+      --accent: #7c3aed;
+      --bg: #fafaf9;
+      --text: #1c1917;
+      --text-muted: #78716c;
+      --border: #e7e5e4;
+      --success: #166534;
+      --warning: #b45309;
+      --danger: #dc2626;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    /* Confidential Bar */
+    .confidential-bar {
+      background: var(--primary);
+      color: white;
+      text-align: center;
+      padding: 8px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    /* Security Notice */
+    .security-notice {
+      background: #fef3c7;
+      border-bottom: 1px solid #fde68a;
+      padding: 12px 40px;
+    }
+
+    .security-notice-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.8rem;
+      color: #92400e;
+    }
+
+    .shield-icon { font-size: 1.2rem; }
+
+    /* Letterhead */
+    .letterhead {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: white;
+      padding: 28px 40px;
+    }
+
+    .letterhead-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .letterhead h1 {
+      font-family: 'Crimson Pro', Georgia, serif;
+      font-size: 1.6rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .letterhead-date {
+      text-align: right;
+      font-size: 0.85rem;
+      opacity: 0.9;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 40px 60px;
+    }
+
+    /* Matter Header */
+    .matter-header {
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid var(--primary);
+    }
+
+    .matter-header h2 {
+      font-family: 'Crimson Pro', Georgia, serif;
+      font-size: 1.5rem;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+
+    .matter-meta {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* Case Summary Box */
+    .summary-box {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px;
+      margin-bottom: 28px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .summary-box h3 {
+      font-family: 'Crimson Pro', Georgia, serif;
+      font-size: 1.15rem;
+      color: var(--primary);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .key-issues {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .issue-card {
+      background: #f5f5f4;
+      border-radius: 8px;
+      padding: 14px 16px;
+      border-left: 4px solid var(--danger);
+    }
+
+    .issue-card h4 {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 6px;
+    }
+
+    .issue-card p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .case-facts {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .fact {
+      text-align: center;
+    }
+
+    .fact-number {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .fact-label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    /* Document Editor */
+    .doc-editor {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 28px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      overflow: hidden;
+    }
+
+    .doc-editor-header {
+      background: linear-gradient(135deg, #f5f5f4 0%, #e7e5e4 100%);
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .doc-editor-title {
+      font-family: 'Crimson Pro', Georgia, serif;
+      font-size: 1.1rem;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .doc-status {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      background: #fef3c7;
+      color: #b45309;
+    }
+
+    .doc-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .doc-btn {
+      padding: 8px 14px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      border-radius: 6px;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--text);
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Editor Toolbar */
+    .doc-toolbar {
+      background: #f5f5f4;
+      border-bottom: 1px solid var(--border);
+      padding: 10px 16px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .toolbar-group {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      padding-right: 12px;
+      border-right: 1px solid var(--border);
+    }
+
+    .toolbar-group:last-child {
+      border-right: none;
+    }
+
+    .toolbar-select {
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 0.8rem;
+      background: white;
+      cursor: pointer;
+    }
+
+    .toolbar-btn {
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 0.75rem;
+      background: white;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .toolbar-btn:hover {
+      background: #e7e5e4;
+    }
+
+    .toolbar-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .toolbar-btn-quick {
+      padding: 6px 12px;
+      border: 1px solid var(--accent);
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      background: white;
+      color: var(--accent);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .toolbar-btn-quick:hover {
+      background: var(--accent);
+      color: white;
+    }
+
+    .toolbar-btn-quick.active {
+      background: var(--accent);
+      color: white;
+    }
+
+    /* Suggesting Mode / Track Changes */
+    .suggesting-mode-indicator {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: #dcfce7;
+      border: 1px solid #86efac;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      color: #166534;
+      font-weight: 500;
+    }
+
+    .suggesting-mode-indicator.active {
+      display: flex;
+    }
+
+    .doc-insertion {
+      background: #fee2e2;
+      color: #dc2626;
+      text-decoration: underline;
+      text-decoration-color: #dc2626;
+      position: relative;
+      padding: 0 2px;
+      border-radius: 2px;
+    }
+
+    .doc-deletion {
+      background: #fee2e2;
+      color: #dc2626;
+      text-decoration: line-through;
+      position: relative;
+      padding: 0 2px;
+      border-radius: 2px;
+    }
+
+    .change-actions {
+      display: inline-flex;
+      gap: 2px;
+      margin-left: 4px;
+      vertical-align: middle;
+    }
+
+    .change-btn {
+      width: 16px;
+      height: 16px;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 10px;
+      line-height: 1;
+      padding: 0;
+    }
+
+    .change-btn.accept {
+      background: #22c55e;
+      color: white;
+    }
+
+    .change-btn.reject {
+      background: #ef4444;
+      color: white;
+    }
+
+    .change-btn:hover {
+      opacity: 0.8;
+    }
+
+    .doc-btn:hover {
+      background: #f5f5f4;
+    }
+
+    .doc-btn-primary {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .doc-btn-primary:hover {
+      background: var(--primary-light);
+    }
+
+    .doc-editor-body {
+      padding: 40px 60px;
+      min-height: 600px;
+      max-height: 800px;
+      overflow-y: auto;
+    }
+
+    .doc-content {
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 12pt;
+      line-height: 1.5;
+      color: #000;
+      outline: none;
+    }
+
+    .doc-content:focus {
+      background: #fffef5;
+    }
+
+    .doc-content p {
+      margin-bottom: 12px;
+    }
+
+    .doc-letterhead {
+      text-align: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid #000;
+    }
+
+    .doc-letterhead .name {
+      font-weight: bold;
+      font-size: 14pt;
+    }
+
+    .doc-letterhead .bar {
+      font-size: 10pt;
+    }
+
+    .doc-letterhead .contact {
+      font-size: 10pt;
+      margin-top: 4px;
+    }
+
+    .doc-date {
+      margin: 24px 0;
+    }
+
+    .doc-address {
+      margin-bottom: 24px;
+    }
+
+    .doc-re {
+      margin: 20px 0;
+      padding-left: 40px;
+    }
+
+    .doc-re strong {
+      display: block;
+    }
+
+    .doc-section {
+      margin: 20px 0;
+    }
+
+    .doc-section h2 {
+      font-size: 12pt;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+
+    .doc-section h3 {
+      font-size: 12pt;
+      font-weight: bold;
+      margin: 16px 0 8px;
+    }
+
+    .doc-list {
+      margin-left: 24px;
+      margin-bottom: 12px;
+    }
+
+    .doc-list li {
+      margin-bottom: 8px;
+    }
+
+    .doc-signature {
+      margin-top: 40px;
+    }
+
+    /* E-Sign Panel */
+    .esign-panel {
+      background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+      border: 2px solid #22c55e;
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .esign-panel.signed {
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      border-color: #0ea5e9;
+    }
+
+    .esign-info h4 {
+      font-size: 1rem;
+      color: #166534;
+      margin-bottom: 4px;
+    }
+
+    .esign-panel.signed .esign-info h4 {
+      color: #0369a1;
+    }
+
+    .esign-info p {
+      font-size: 0.8rem;
+      color: #15803d;
+    }
+
+    .esign-panel.signed .esign-info p {
+      color: #0284c7;
+    }
+
+    .esign-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .esign-btn {
+      padding: 12px 24px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .esign-btn-sign {
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+      color: white;
+      box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+    }
+
+    .esign-btn-sign:hover {
+      background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
+    }
+
+    .esign-btn-download {
+      background: white;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+    }
+
+    .esign-btn-download:hover {
+      background: var(--primary);
+      color: white;
+    }
+
+    .esign-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Digital Signature Style */
+    .signature-placeholder {
+      min-height: 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+    }
+
+    .signature-placeholder.unsigned {
+      border-bottom: 1px solid #ccc;
+      width: 200px;
+      min-height: 45px;
+      flex-direction: row;
+      align-items: center;
+    }
+
+    .signature-line {
+      color: #9ca3af;
+      font-size: 0.75rem;
+      font-style: italic;
+    }
+
+    .digital-signature-wrapper {
+      position: relative;
+    }
+
+    .digital-signature-svg {
+      height: 50px;
+      width: auto;
+    }
+
+    .signature-timestamp {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 8px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 3px;
+      font-size: 0.6rem;
+      color: #64748b;
+      font-family: 'Inter', sans-serif;
+      margin-top: 2px;
+    }
+
+    .signature-timestamp svg {
+      flex-shrink: 0;
+    }
+
+    /* DocuSign-style signature */
+    .docusign-signature {
+      border-bottom: 2px solid #1a365d;
+      padding-bottom: 4px;
+      margin-bottom: 8px;
+      display: inline-block;
+    }
+
+    .docusign-sig-text {
+      font-family: 'Brush Script MT', 'Segoe Script', cursive;
+      font-size: 28px;
+      color: #1a365d;
+      line-height: 1.2;
+    }
+
+    .docusign-details {
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      color: #64748b;
+      line-height: 1.6;
+    }
+
+    .docusign-timestamp {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: #166534;
+      font-weight: 500;
+    }
+
+    .docusign-bar {
+      color: #475569;
+      padding-left: 16px;
+    }
+
+    .docusign-bar a {
+      color: #475569;
+      text-decoration: none;
+    }
+
+    .docusign-bar a:hover {
+      color: #7c3aed;
+      text-decoration: underline;
+    }
+
+    .docusign-date {
+      color: #475569;
+    }
+
+    .docusign-email {
+      color: #475569;
+    }
+
+    .docusign-code {
+      font-family: 'Courier New', monospace;
+      font-size: 9px;
+      color: #94a3b8;
+      letter-spacing: 0.5px;
+      margin-top: 2px;
+    }
+
+    .docusign-code a {
+      color: #94a3b8;
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .docusign-code a:hover {
+      color: #7c3aed;
+      text-decoration: underline;
+    }
+
+    /* Password Gate */
+    .password-gate {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .password-gate.hidden {
+      display: none;
+    }
+
+    .password-box {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 40px 48px;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    }
+
+    .password-box h2 {
+      font-family: 'Crimson Pro', Georgia, serif;
+      font-size: 1.4rem;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+
+    .password-box .subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .password-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 1rem;
+      font-family: inherit;
+      text-align: center;
+      letter-spacing: 2px;
+      margin-bottom: 16px;
+    }
+
+    .password-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .password-input.error {
+      border-color: #dc2626;
+      background: #fef2f2;
+    }
+
+    .password-submit {
+      width: 100%;
+      padding: 12px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .password-submit:hover {
+      background: var(--primary-light);
+    }
+
+    .password-error {
+      color: #dc2626;
+      font-size: 0.8rem;
+      margin-top: 12px;
+      display: none;
+    }
+
+    .password-error.show {
+      display: block;
+    }
+
+    .main-content {
+      display: none;
+    }
+
+    .main-content.visible {
+      display: block;
+    }
+
+    /* Comments Section */
+    .comments-section {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .comments-header {
+      background: linear-gradient(135deg, var(--accent) 0%, #5b21b6 100%);
+      color: white;
+      padding: 20px 24px;
+    }
+
+    .comments-header h3 {
+      font-size: 1rem;
+      margin-bottom: 4px;
+    }
+
+    .comments-header p {
+      font-size: 0.8rem;
+      opacity: 0.9;
+    }
+
+    .comments-body {
+      padding: 20px 24px;
+    }
+
+    .comments-intro {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      padding: 12px 16px;
+      background: #f5f5f4;
+      border-radius: 8px;
+    }
+
+    .comments-list {
+      max-height: 400px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+    }
+
+    .comment-item {
+      display: flex;
+      gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .comment-item:last-child {
+      border-bottom: none;
+    }
+
+    .comment-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .comment-avatar.sergei {
+      background: var(--primary);
+    }
+
+    .comment-content {
+      flex: 1;
+    }
+
+    .comment-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .comment-author {
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+
+    .comment-time {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .comment-text {
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .comment-input-area {
+      display: flex;
+      gap: 12px;
+      flex-direction: column;
+    }
+
+    .comment-input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .comment-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .comment-submit {
+      padding: 12px 24px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s;
+      align-self: flex-end;
+    }
+
+    .comment-submit:hover {
+      background: #6d28d9;
+    }
+
+    .no-comments {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      padding: 30px;
+    }
+
+    /* Comment actions */
+    .comment-actions {
+      display: none;
+      gap: 8px;
+      margin-left: auto;
+    }
+
+    .comment-item:hover .comment-actions {
+      display: flex;
+    }
+
+    .comment-action-btn {
+      padding: 4px 8px;
+      font-size: 0.7rem;
+      border: 1px solid var(--border);
+      background: white;
+      border-radius: 4px;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: all 0.15s;
+    }
+
+    .comment-action-btn:hover {
+      background: #f5f5f4;
+      color: var(--text);
+    }
+
+    .comment-action-btn.delete:hover {
+      background: #fee2e2;
+      border-color: #fca5a5;
+      color: #dc2626;
+    }
+
+    /* Floating Chat Widget */
+    .chat-fab {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 1000;
+    }
+
+    .chat-fab-btn {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(124, 58, 237, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .chat-fab-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 28px rgba(124, 58, 237, 0.5);
+    }
+
+    .chat-fab-btn svg {
+      width: 28px;
+      height: 28px;
+      fill: white;
+    }
+
+    .chat-fab-label {
+      position: absolute;
+      right: 70px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: white;
+      padding: 8px 14px;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text);
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
+    }
+
+    .chat-fab:hover .chat-fab-label {
+      opacity: 1;
+    }
+
+    @media (max-width: 768px) {
+      .container { padding: 20px; }
+      .key-issues { grid-template-columns: 1fr; }
+      .case-facts { grid-template-columns: repeat(2, 1fr); }
+      .doc-editor-body { padding: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Password Gate -->
+<div class="password-gate" id="passwordGate">
+  <div class="password-box">
+    <h2>Secure Client Workroom</h2>
+    <div class="subtitle">Enter the access code provided by counsel</div>
+    <input type="text" class="password-input" id="passwordInput" value="Shaw2025" autocomplete="off">
+    <button class="password-submit" onclick="checkPassword()">Access Workroom</button>
+    <div class="password-error" id="passwordError">Incorrect access code. Please try again.</div>
+  </div>
+</div>
+
+<div class="main-content" id="mainContent">
+
+<div class="confidential-bar">
+  PRIVILEGED & CONFIDENTIAL - ATTORNEY WORK PRODUCT
+</div>
+
+<div class="security-notice">
+  <div class="security-notice-inner">
+    <span class="shield-icon">&#128737;</span>
+    <div><strong>Secure Client Workroom</strong> - This page is not indexed by search engines. Only those with the direct link and password can access it. Documents and communications here are protected by attorney-client privilege.</div>
+  </div>
+</div>
+
+<header class="letterhead">
+  <div class="letterhead-inner">
+    <div>
+      <h1>Sergei Tokmakov, Esq.</h1>
+      <a href="https://apps.calbar.ca.gov/attorney/Licensee/Detail/279869" target="_blank" style="font-size:0.75rem;opacity:0.7;margin-top:2px;color:white;text-decoration:none;">California Bar #279869</a>
+    </div>
+    <div class="letterhead-date">
+      Updated: December 16, 2025<br>
+      <span style="opacity:0.7">WS-3k8p</span>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="matter-header">
+    <h2>Shaw v. Sunnova/SunStrong - Demand for Rescission</h2>
+    <div class="matter-meta">
+      Contract ID: OB003396198 | 25-Year PPA | Wendy Shaw, Merced, CA
+    </div>
+  </div>
+
+  <!-- Latest Updates -->
+  <div class="summary-box" style="background: #f0fdf4; border-color: #86efac;">
+    <h3 style="color: #166534;">&#128340; Latest Updates (Dec 16, 2025)</h3>
+    <ul style="margin-left: 20px; font-size: 0.9rem; line-height: 1.8;">
+      <li><strong>Salesman name corrected:</strong> Changed from "Adam Roberts" to "Manuel Garcia" (Section B)</li>
+      <li><strong>Cost increase clarified:</strong> Updated to show 35.8% actual increase (25.8% after 10% auto-pay discount) (Section C)</li>
+      <li><strong>Call documentation strengthened:</strong> Changed to "one documented call of several calls" to reflect multiple documented hold times (Section D)</li>
+    </ul>
+  </div>
+
+  <!-- Case Summary -->
+  <div class="summary-box">
+    <h3>&#128203; Case Summary</h3>
+
+    <div class="key-issues">
+      <div class="issue-card">
+        <h4>AB 1070 Disclosure Violations</h4>
+        <p>Cover page missing required info (total cost, system size, warranty). True cost of $64,619 buried on page 36 in microscopic print. Solar Consumer Guide never provided.</p>
+      </div>
+      <div class="issue-card">
+        <h4>Undisclosed UCC-1 Filing</h4>
+        <p>Lien filed against property without disclosure during sales. Client only discovered 5 years later. Salesman falsely claimed selling home would be "easy."</p>
+      </div>
+      <div class="issue-card">
+        <h4>Material Misrepresentations</h4>
+        <p>Promised "incredible savings" but costs INCREASED 35.8% (25.8% after 10% auto-pay discount). System underperformed estimates every year (5-9% below).</p>
+      </div>
+      <div class="issue-card">
+        <h4>Constructive Abandonment</h4>
+        <p>SunStrong unreachable: 5 weeks of attempts, 2hr 48min hold time, 4 ignored certified letters. PPA prohibits outside service, yet provider unavailable.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- E-Sign Panel -->
+  <div class="esign-panel" id="esignPanel">
+    <div class="esign-info">
+      <h4 id="esignTitle">Ready for Signature</h4>
+      <p id="esignDesc">Click to apply your digital signature to this demand letter</p>
+    </div>
+    <div class="esign-actions">
+      <button class="esign-btn esign-btn-sign" id="esignBtn" onclick="applySignature()">
+        <span>&#9998;</span> Sign Document
+      </button>
+      <button class="esign-btn esign-btn-download" onclick="downloadSignedDoc()">
+        <span>&#128229;</span> Download Word
+      </button>
+      <button class="esign-btn esign-btn-download" onclick="downloadPDF()">
+        <span>&#128196;</span> Download PDF
+      </button>
+    </div>
+  </div>
+
+  <!-- Document Editor -->
+  <div class="doc-editor">
+    <div class="doc-editor-header">
+      <div class="doc-editor-title">
+        &#128196; Demand Letter - Rescission
+        <span class="doc-status">Draft</span>
+      </div>
+    </div>
+    <div class="doc-toolbar">
+      <div class="toolbar-group">
+        <select class="toolbar-select" id="fontFamily" onchange="applyFont()">
+          <option value="Arial, sans-serif">Arial</option>
+          <option value="'Times New Roman', serif" selected>Times New Roman</option>
+          <option value="Georgia, serif">Georgia</option>
+          <option value="Verdana, sans-serif">Verdana</option>
+          <option value="'Courier New', monospace">Courier New</option>
+        </select>
+        <select class="toolbar-select" id="fontSize" onchange="applyFontSize()">
+          <option value="9pt">9</option>
+          <option value="10pt">10</option>
+          <option value="11pt">11</option>
+          <option value="12pt" selected>12</option>
+          <option value="14pt">14</option>
+          <option value="16pt">16</option>
+          <option value="18pt">18</option>
+        </select>
+      </div>
+      <div class="toolbar-group">
+        <button class="toolbar-btn" onclick="execCmd('bold')" title="Bold"><b>B</b></button>
+        <button class="toolbar-btn" onclick="execCmd('italic')" title="Italic"><i>I</i></button>
+        <button class="toolbar-btn" onclick="execCmd('underline')" title="Underline"><u>U</u></button>
+        <button class="toolbar-btn" onclick="execCmd('undo')" title="Undo (Ctrl+Z)">↩</button>
+        <button class="toolbar-btn" onclick="customRedo()" title="Redo">↪</button>
+      </div>
+      <div class="toolbar-group">
+        <button class="toolbar-btn-quick" onclick="applyArial11()">Arial 11 Everything</button>
+        <button class="toolbar-btn-quick" onclick="stripFormatting()">Plain Text Everything</button>
+      </div>
+      <div class="toolbar-group">
+        <button class="toolbar-btn-quick" id="suggestingToggle" onclick="toggleSuggestingMode()">Suggesting</button>
+        <button class="toolbar-btn" onclick="suggestInsertion()" title="Insert as suggestion">+Ins</button>
+        <button class="toolbar-btn" onclick="suggestDeletion()" title="Mark selection for deletion">-Del</button>
+        <span class="suggesting-mode-indicator" id="suggestingIndicator">Suggesting ON</span>
+      </div>
+      <div class="toolbar-group" id="changeActions" style="display:none;">
+        <button class="toolbar-btn" onclick="acceptAllChanges()" style="color:#166534;">Accept All</button>
+        <button class="toolbar-btn" onclick="rejectAllChanges()" style="color:#dc2626;">Reject All</button>
+      </div>
+    </div>
+    <div class="doc-editor-body">
+      <div class="doc-content" id="docContent" contenteditable="true">
+        <div class="doc-letterhead">
+          <div class="name">SERGEI TOKMAKOV, ESQ.</div>
+          <div class="bar">California Bar No. 279869</div>
+          <div class="contact">302 Washington St., #150-1719<br>San Diego, CA 92103<br>Owner@Terms.Law | (858) 326-3858</div>
+        </div>
+
+        <div class="doc-date">December 16, 2025</div>
+
+        <p><strong>VIA CERTIFIED MAIL AND EMAIL</strong></p>
+
+        <div class="doc-address">
+          <p>SunStrong Capital Holdings, LLC<br>Legal Department<br>3575 Far West Blvd, Suite 300<br>Austin, TX 78731</p>
+          <p style="margin-top:12px;">Sunnova Energy Corporation<br>Legal Department<br>20 E. Greenway Plaza, Suite 540<br>Houston, TX 77046</p>
+        </div>
+
+        <div class="doc-re">
+          <strong>Re: DEMAND FOR RESCISSION - Contract ID OB003396198</strong>
+          Homeowner: Wendy Shaw, 1343 E. 21st Street, Merced, CA 95340
+        </div>
+
+        <p>Dear Sir or Madam:</p>
+
+        <p>This firm represents Wendy Shaw regarding the 25-year Power Purchase Agreement ("PPA") she signed on November 9, 2020. This letter constitutes formal demand for RESCISSION of the PPA and removal of the solar system from Ms. Shaw's property based on multiple violations of California law and material misrepresentations during the sales process.</p>
+
+        <div class="doc-section">
+          <h2>I. GROUNDS FOR RESCISSION</h2>
+          <p>Ms. Shaw is entitled to rescind this contract under California Civil Code &sect;&sect; 1689-1693 based on the following violations:</p>
+
+          <h3>A. AB 1070 Disclosure Violations (Cal. Bus. & Prof. Code &sect; 7169)</h3>
+          <p>California's Solar Consumer Protection Act (AB 1070) mandates specific disclosures on the FIRST PAGE of any solar contract in a clear, conspicuous manner. Your PPA fails to comply:</p>
+          <ol class="doc-list">
+            <li>The cover page disclosure is materially incomplete - it omits the total contract cost, system size, and warranty information required by law.</li>
+            <li>The actual total cost ($64,619.00 over 25 years) is buried on page 36 of 41 in print so small it requires a magnifying glass to read. This deliberate concealment defeats the purpose of AB 1070's consumer protection requirements.</li>
+            <li>The required "California Solar Consumer Protection Guide" referenced in Section 2 of the PPA Disclosures was never provided to Ms. Shaw at signing or thereafter.</li>
+          </ol>
+
+          <h3>B. Undisclosed UCC-1 Fixture Filing</h3>
+          <p>The PPA authorizes Sunnova to file a UCC-1 financing statement against Ms. Shaw's property (Section 11(d)). This was never disclosed or explained during the sales process. Ms. Shaw only learned of this filing - which clouds her title and complicates any sale or refinance - five years after signing. The salesman, Manuel Garcia, specifically assured Ms. Shaw that selling her home with the system would be "easy" - a representation that was false and known to be false given the UCC-1 filing.</p>
+
+          <h3>C. Material Misrepresentations</h3>
+          <p>Ms. Shaw was promised "incredible savings" on her electric bills. The reality:</p>
+          <ul class="doc-list">
+            <li>Her electricity costs INCREASED 35.8% (25.8% after a 10% auto-pay discount) from 2020 to 2024 - the same rate increase experienced by NON-solar customers fully exposed to utility rate hikes.</li>
+            <li>Her total annual electricity cost rose from $1,926.76 (2020, pre-solar) to $2,409.97 (2024, with solar).</li>
+            <li>The system has UNDERPERFORMED the Schedule A production estimates every single year:
+              <br>- Year 1: 9.05% below estimate
+              <br>- Year 2: 6.18% below estimate
+              <br>- Year 3: 1.01% below estimate
+              <br>- Year 4: 5.32% below estimate</li>
+          </ul>
+          <p>These are not the "estimates" of an honest company - they are inflated projections designed to induce consumers to sign.</p>
+
+          <h3>D. Breach of Contract and Constructive Abandonment</h3>
+          <p>The PPA (Section 4) prohibits Ms. Shaw from having anyone other than Sunnova/SunStrong service the system. Yet SunStrong has made itself completely unreachable:</p>
+          <ul class="doc-list">
+            <li>Ms. Shaw spent 5 weeks attempting to contact SunStrong by phone, including one documented call of several calls where she was on hold for 2 hours and 48 minutes before giving up.</li>
+            <li>Four certified letters to four different SunStrong locations were ignored.</li>
+            <li>Multiple website inquiries received only automated responses directing her to call the same unanswered phone line.</li>
+          </ul>
+          <p>A company that contractually prohibits customers from obtaining service elsewhere, while simultaneously making itself unavailable, has constructively abandoned its contractual obligations. This is not merely a breach - it renders the entire contract unenforceable.</p>
+        </div>
+
+        <div class="doc-section">
+          <h2>II. DEMAND</h2>
+          <p>Ms. Shaw demands the following within THIRTY (30) DAYS of the date of this letter:</p>
+          <ol class="doc-list">
+            <li>Full rescission of the PPA (Contract ID OB003396198);</li>
+            <li>Removal of the solar system from Ms. Shaw's property at your expense;</li>
+            <li>Termination and release of the UCC-1 financing statement;</li>
+            <li>Refund of all payments made under the PPA;</li>
+            <li>Release of any and all claims against Ms. Shaw arising from this contract.</li>
+          </ol>
+        </div>
+
+        <div class="doc-section">
+          <h2>III. CONSEQUENCES OF NON-COMPLIANCE</h2>
+          <p>If you fail to comply with these demands, Ms. Shaw will:</p>
+          <ol class="doc-list">
+            <li>File a complaint with the California Attorney General's Office;</li>
+            <li>File a complaint with the Consumer Financial Protection Bureau regarding the undisclosed UCC-1 filing;</li>
+            <li>File a complaint with the California Contractors State License Board;</li>
+            <li>Initiate arbitration under PPA Section 19 seeking rescission, restitution, and all damages permitted under California's Unfair Competition Law (Bus. & Prof. Code &sect; 17200), the Consumer Legal Remedies Act (Civ. Code &sect; 1750 et seq.), and California Civil Code &sect; 1689 et seq.;</li>
+            <li>Seek recovery of attorney's fees as the prevailing party.</li>
+          </ol>
+          <p>This letter also serves as the required notice under California Civil Code &sect; 1782 for claims under the Consumer Legal Remedies Act.</p>
+        </div>
+
+        <div class="doc-section">
+          <h2>LITIGATION HOLD</h2>
+          <p>You are hereby directed to preserve all documents, communications, and electronically stored information relating to Ms. Shaw's account, the sales process, system performance data, and any complaints from other California customers regarding similar issues.</p>
+        </div>
+
+        <p style="margin-top:24px;"><strong>Govern yourselves accordingly.</strong></p>
+
+        <div class="doc-signature">
+          <p>Sincerely,</p>
+          <div class="signature-placeholder unsigned" id="signaturePlaceholder">
+            <span class="signature-line">[ Click "Sign Document" above ]</span>
+          </div>
+          <p style="margin-top:8px;"><strong>Sergei Tokmakov, Esq.</strong><br>Attorney for Wendy Shaw</p>
+          <p style="margin-top:24px;">cc: Wendy Shaw</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Comments Section -->
+  <div class="comments-section" id="commentsSection">
+    <div class="comments-header">
+      <h3>&#128172; Questions & Comments</h3>
+      <p>Leave a note or question - Sergei will be notified</p>
+    </div>
+    <div class="comments-body">
+      <div class="comments-intro">
+        This is your space to ask questions, request changes, or leave feedback. For anything urgent, use the purple chat button (bottom right).
+      </div>
+
+      <div class="comments-list" id="commentsList">
+        <div class="no-comments" id="noComments">No comments yet. Be the first to leave a note!</div>
+      </div>
+
+      <div class="comment-input-area">
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <label style="font-size: 0.8rem; color: var(--text-muted);">Your name:</label>
+          <input type="text" id="commentName" placeholder="Enter your name" style="padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; width: 200px;" />
+        </div>
+        <div style="display: flex; gap: 12px;">
+          <textarea class="comment-input" id="commentInput" placeholder="Type your question or comment here..."></textarea>
+          <button class="comment-submit" id="commentSubmit" onclick="submitComment()">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Floating Chat Widget -->
+<div class="chat-fab" id="chatFab">
+  <div class="chat-fab-label">&#128172; Quick message to Sergei</div>
+  <button class="chat-fab-btn" onclick="scrollToComments()">
+    <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>
+  </button>
+</div>
+
+</div><!-- end main-content -->
+
+<script>
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyDxBPHNaWTatubO3CDrWbFiJJJxuEBxOQg",
+  authDomain: "terms-law.firebaseapp.com",
+  databaseURL: "https://terms-law-default-rtdb.firebaseio.com",
+  projectId: "terms-law",
+  storageBucket: "terms-law.firebasestorage.app",
+  messagingSenderId: "394698037958",
+  appId: "1:394698037958:web:6749e22542f84ef3fc1efc"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const workroomRef = db.ref('workrooms/shaw-sunnova');
+
+// Password protection
+const ACCESS_CODE = 'Shaw2025';
+
+function checkPassword() {
+  const input = document.getElementById('passwordInput');
+  const error = document.getElementById('passwordError');
+
+  if (input.value === ACCESS_CODE) {
+    sessionStorage.setItem('workroom_auth_shaw', 'true');
+    unlockWorkroom();
+  } else {
+    input.classList.add('error');
+    error.classList.add('show');
+    input.value = '';
+    setTimeout(() => {
+      input.classList.remove('error');
+    }, 500);
+  }
+}
+
+function unlockWorkroom() {
+  document.getElementById('passwordGate').classList.add('hidden');
+  document.getElementById('mainContent').classList.add('visible');
+}
+
+function checkAuth() {
+  if (sessionStorage.getItem('workroom_auth_shaw') === 'true') {
+    unlockWorkroom();
+  }
+}
+
+// Allow Enter key to submit password
+document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') {
+    checkPassword();
+  }
+});
+
+// Document functions
+function copyDocument() {
+  const content = document.getElementById('docContent');
+  const range = document.createRange();
+  range.selectNodeContents(content);
+  const selection = window.getSelection();
+  selection.removeAllRanges();
+  selection.addRange(range);
+  document.execCommand('copy');
+  selection.removeAllRanges();
+
+  // Show confirmation
+  const btn = event.target;
+  const orig = btn.innerHTML;
+  btn.innerHTML = '&#10003; Copied!';
+  setTimeout(() => { btn.innerHTML = orig; }, 1500);
+}
+
+function downloadWord() {
+  window.location.href = 'Demand%20Letter%20-%20Shaw%20v%20Sunnova%20-%20Rescission.docx';
+}
+
+function printDocument() {
+  const content = document.getElementById('docContent').innerHTML;
+  const printWindow = window.open('', '_blank');
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Demand Letter - Shaw v Sunnova</title>
+      <style>
+        body { font-family: 'Times New Roman', Times, serif; font-size: 12pt; line-height: 1.5; margin: 1in; }
+        .doc-letterhead { text-align: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid #000; }
+        .doc-letterhead .name { font-weight: bold; font-size: 14pt; }
+        .doc-letterhead .bar, .doc-letterhead .contact { font-size: 10pt; }
+        h2, h3 { font-size: 12pt; }
+        .doc-list { margin-left: 24px; }
+        .doc-list li { margin-bottom: 8px; }
+      </style>
+    </head>
+    <body>${content}</body>
+    </html>
+  `);
+  printWindow.document.close();
+  printWindow.print();
+}
+
+// ========== E-SIGNATURE FUNCTIONS ==========
+let documentSigned = false;
+let signatureTimestamp = null;
+let verificationCode = null;
+
+function generateVerificationCode() {
+  // Generate a UUID-like verification code
+  const chars = 'ABCDEF0123456789';
+  const segments = [8, 4, 4, 4, 12];
+  return segments.map(len =>
+    Array.from({length: len}, () => chars[Math.floor(Math.random() * chars.length)]).join('')
+  ).join('-');
+}
+
+function applySignature() {
+  if (documentSigned) return;
+
+  const placeholder = document.getElementById('signaturePlaceholder');
+  const panel = document.getElementById('esignPanel');
+  const btn = document.getElementById('esignBtn');
+  const title = document.getElementById('esignTitle');
+  const desc = document.getElementById('esignDesc');
+  const statusBadge = document.querySelector('.doc-status');
+
+  // Generate timestamp
+  signatureTimestamp = new Date();
+  const dateStr = signatureTimestamp.toLocaleDateString('en-US', {
+    year: 'numeric', month: 'long', day: 'numeric'
+  });
+  const timeStr = signatureTimestamp.toLocaleTimeString('en-US', {
+    hour: 'numeric', minute: '2-digit', hour12: true
+  });
+
+  // Generate verification code
+  const verificationCode = generateVerificationCode();
+
+  // Apply DocuSign-style signature
+  placeholder.classList.remove('unsigned');
+  placeholder.innerHTML = `
+    <div class="docusign-signature">
+      <div class="docusign-sig-text">/s/ Sergei Tokmakov, Esq.</div>
+    </div>
+    <div class="docusign-details">
+      <div class="docusign-timestamp">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+        Signed by: Sergei Tokmakov, Esq.
+      </div>
+      <div class="docusign-bar"><a href="https://apps.calbar.ca.gov/attorney/Licensee/Detail/279869" target="_blank">CBN 279869</a></div>
+      <div class="docusign-date">${dateStr}, ${timeStr}</div>
+      <div class="docusign-email">Verified email: owner@terms.law</div>
+      <div class="docusign-code"><a href="https://terms.law/verify/${verificationCode}.html" target="_blank">${verificationCode}</a></div>
+    </div>
+  `;
+
+  // Update panel
+  panel.classList.add('signed');
+  title.textContent = 'Document Signed';
+  desc.textContent = `Signed on ${dateStr} at ${timeStr}`;
+  btn.innerHTML = '<span>&#10003;</span> Signed';
+  btn.disabled = true;
+  btn.style.background = '#94a3b8';
+  btn.style.boxShadow = 'none';
+
+  // Update status badge
+  statusBadge.textContent = 'SIGNED';
+  statusBadge.style.background = '#dcfce7';
+  statusBadge.style.color = '#166534';
+
+  documentSigned = true;
+
+  // Save to Firebase (including verification code)
+  workroomRef.child('signature').set({
+    signed: true,
+    timestamp: signatureTimestamp.toISOString(),
+    signedBy: 'Sergei Tokmakov, Esq.',
+    verificationCode: verificationCode
+  });
+
+  // Scroll to signature
+  placeholder.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function downloadSignedDoc() {
+  // Download the appropriate version based on signature status
+  if (documentSigned) {
+    window.location.href = 'Demand%20Letter%20-%20Shaw%20v%20Sunnova%20-%20Rescission%20-%20SIGNED.docx';
+  } else {
+    window.location.href = 'Demand%20Letter%20-%20Shaw%20v%20Sunnova%20-%20Rescission.docx';
+  }
+}
+
+function downloadPDF() {
+  const docContent = document.getElementById('docContent');
+  const filename = documentSigned
+    ? 'Demand Letter - Shaw v Sunnova - Rescission - SIGNED.pdf'
+    : 'Demand Letter - Shaw v Sunnova - Rescission.pdf';
+
+  // Configure PDF options
+  const opt = {
+    margin: [0.75, 0.75, 0.75, 0.75],
+    filename: filename,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+  };
+
+  // Show loading state
+  const btn = event.target.closest('button');
+  const originalText = btn.innerHTML;
+  btn.innerHTML = '<span>&#8987;</span> Generating...';
+  btn.disabled = true;
+
+  // Generate PDF
+  html2pdf().set(opt).from(docContent).save().then(() => {
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+  }).catch(err => {
+    console.error('PDF generation failed:', err);
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+    alert('PDF generation failed. Please try again.');
+  });
+}
+
+// Check if already signed on load
+function checkSignatureStatus() {
+  workroomRef.child('signature').once('value', (snapshot) => {
+    const data = snapshot.val();
+    if (data && data.signed) {
+      // Restore signed state
+      documentSigned = true;
+      signatureTimestamp = new Date(data.timestamp);
+      verificationCode = data.verificationCode || generateVerificationCode();
+
+      const placeholder = document.getElementById('signaturePlaceholder');
+      const panel = document.getElementById('esignPanel');
+      const btn = document.getElementById('esignBtn');
+      const title = document.getElementById('esignTitle');
+      const desc = document.getElementById('esignDesc');
+      const statusBadge = document.querySelector('.doc-status');
+
+      const dateStr = signatureTimestamp.toLocaleDateString('en-US', {
+        year: 'numeric', month: 'long', day: 'numeric'
+      });
+      const timeStr = signatureTimestamp.toLocaleTimeString('en-US', {
+        hour: 'numeric', minute: '2-digit', hour12: true
+      });
+
+      placeholder.classList.remove('unsigned');
+      placeholder.innerHTML = `
+        <div class="docusign-signature">
+          <div class="docusign-sig-text">/s/ Sergei Tokmakov, Esq.</div>
+        </div>
+        <div class="docusign-details">
+          <div class="docusign-timestamp">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+            Signed by: Sergei Tokmakov, Esq.
+          </div>
+          <div class="docusign-bar"><a href="https://apps.calbar.ca.gov/attorney/Licensee/Detail/279869" target="_blank">CBN 279869</a></div>
+          <div class="docusign-date">${dateStr}, ${timeStr}</div>
+          <div class="docusign-email">Verified email: owner@terms.law</div>
+          <div class="docusign-code"><a href="https://terms.law/verify/${verificationCode}.html" target="_blank">${verificationCode}</a></div>
+        </div>
+      `;
+
+      panel.classList.add('signed');
+      title.textContent = 'Document Signed';
+      desc.textContent = `Signed on ${dateStr} at ${timeStr}`;
+      btn.innerHTML = '<span>&#10003;</span> Signed';
+      btn.disabled = true;
+      btn.style.background = '#94a3b8';
+      btn.style.boxShadow = 'none';
+
+      statusBadge.textContent = 'SIGNED';
+      statusBadge.style.background = '#dcfce7';
+      statusBadge.style.color = '#166534';
+    }
+  });
+}
+
+// ========== UNDO HISTORY STACK ==========
+let undoStack = [];
+let redoStack = [];
+const MAX_UNDO_STEPS = 50;
+
+function saveToUndoStack() {
+  const doc = document.getElementById('docContent');
+  const currentState = doc.innerHTML;
+
+  // Don't save if same as last state
+  if (undoStack.length > 0 && undoStack[undoStack.length - 1] === currentState) return;
+
+  undoStack.push(currentState);
+  if (undoStack.length > MAX_UNDO_STEPS) undoStack.shift();
+
+  // Clear redo stack on new change
+  redoStack = [];
+}
+
+function customUndo() {
+  if (undoStack.length <= 1) return; // Keep at least one state
+
+  const doc = document.getElementById('docContent');
+  const currentState = undoStack.pop();
+  redoStack.push(currentState);
+
+  doc.innerHTML = undoStack[undoStack.length - 1];
+  showToolbarConfirm('Undone');
+}
+
+function customRedo() {
+  if (redoStack.length === 0) return;
+
+  const doc = document.getElementById('docContent');
+  const state = redoStack.pop();
+  undoStack.push(state);
+  doc.innerHTML = state;
+  showToolbarConfirm('Redone');
+}
+
+// ========== SUGGESTING MODE (TRACK CHANGES) ==========
+let suggestingMode = false;
+let lastContent = '';
+
+function toggleSuggestingMode() {
+  suggestingMode = !suggestingMode;
+  const toggle = document.getElementById('suggestingToggle');
+  const indicator = document.getElementById('suggestingIndicator');
+  const changeActions = document.getElementById('changeActions');
+
+  if (suggestingMode) {
+    toggle.classList.add('active');
+    indicator.classList.add('active');
+    changeActions.style.display = 'flex';
+    lastContent = document.getElementById('docContent').innerText;
+    showToolbarConfirm('Suggesting mode ON - edits will be tracked');
+  } else {
+    toggle.classList.remove('active');
+    indicator.classList.remove('active');
+    changeActions.style.display = 'none';
+    showToolbarConfirm('Suggesting mode OFF');
+  }
+}
+
+// Track insertion point for suggesting mode
+let currentInsertionSpan = null;
+
+function setupSuggestingMode() {
+  const doc = document.getElementById('docContent');
+
+  // Handle text input in suggesting mode
+  doc.addEventListener('beforeinput', function(e) {
+    if (!suggestingMode) return;
+
+    if (e.inputType === 'insertText' || e.inputType === 'insertParagraph') {
+      e.preventDefault();
+
+      const selection = window.getSelection();
+      if (selection.rangeCount === 0) return;
+
+      const range = selection.getRangeAt(0);
+
+      // Delete selected text if any (mark as deletion)
+      if (!range.collapsed) {
+        const selectedText = range.toString();
+        if (selectedText) {
+          const del = markAsDeletion(selectedText);
+          range.deleteContents();
+          range.insertNode(del);
+          range.collapse(false);
+        }
+      }
+
+      // Insert new text as suggestion
+      const textToInsert = e.inputType === 'insertParagraph' ? '\n' : (e.data || '');
+      if (textToInsert) {
+        // Check if cursor is inside an existing insertion span
+        let parent = range.startContainer;
+        while (parent && parent !== doc) {
+          if (parent.classList && parent.classList.contains('doc-insertion')) {
+            // Append to existing insertion
+            const textNode = document.createTextNode(textToInsert);
+            range.insertNode(textNode);
+            range.collapse(false);
+            selection.removeAllRanges();
+            selection.addRange(range);
+            return;
+          }
+          parent = parent.parentNode;
+        }
+
+        // Create new insertion span
+        const ins = document.createElement('span');
+        ins.className = 'doc-insertion';
+        ins.textContent = textToInsert;
+        range.insertNode(ins);
+
+        // Move cursor to end of insertion
+        range.setStartAfter(ins);
+        range.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+    }
+
+    // Handle deletions (backspace/delete)
+    if (e.inputType === 'deleteContentBackward' || e.inputType === 'deleteContentForward') {
+      const selection = window.getSelection();
+      if (selection.rangeCount === 0) return;
+
+      const range = selection.getRangeAt(0);
+
+      // If text is selected, mark it for deletion
+      if (!range.collapsed) {
+        e.preventDefault();
+        const selectedText = range.toString();
+        if (selectedText) {
+          const del = markAsDeletion(selectedText);
+          range.deleteContents();
+          range.insertNode(del);
+          range.collapse(false);
+        }
+      }
+      // If no selection, let it delete within insertion spans normally
+      // but prevent deleting original text
+    }
+  });
+}
+
+function markAsInsertion(text) {
+  const span = document.createElement('span');
+  span.className = 'doc-insertion';
+  span.innerHTML = text + createChangeButtons('insertion');
+  return span;
+}
+
+function markAsDeletion(text) {
+  const span = document.createElement('span');
+  span.className = 'doc-deletion';
+  span.innerHTML = text + createChangeButtons('deletion');
+  return span;
+}
+
+function createChangeButtons(type) {
+  const id = 'change-' + Date.now() + Math.random().toString(36).substr(2, 5);
+  return `<span class="change-actions" data-change-id="${id}">
+    <button class="change-btn accept" onclick="acceptChange(this, '${type}')" title="Accept">✓</button>
+    <button class="change-btn reject" onclick="rejectChange(this, '${type}')" title="Reject">✗</button>
+  </span>`;
+}
+
+function acceptChange(btn, type) {
+  const wrapper = btn.closest('.doc-insertion, .doc-deletion');
+  if (!wrapper) return;
+
+  if (type === 'insertion') {
+    // Keep the text, remove the wrapper
+    const text = wrapper.textContent.replace('✓✗', '');
+    wrapper.replaceWith(document.createTextNode(text));
+  } else {
+    // Remove the deletion entirely
+    wrapper.remove();
+  }
+  saveToUndoStack();
+}
+
+function rejectChange(btn, type) {
+  const wrapper = btn.closest('.doc-insertion, .doc-deletion');
+  if (!wrapper) return;
+
+  if (type === 'insertion') {
+    // Remove the insertion entirely
+    wrapper.remove();
+  } else {
+    // Keep the deleted text (restore it)
+    const text = wrapper.textContent.replace('✓✗', '');
+    wrapper.replaceWith(document.createTextNode(text));
+  }
+  saveToUndoStack();
+}
+
+function acceptAllChanges() {
+  document.querySelectorAll('.doc-insertion').forEach(el => {
+    const text = el.textContent.replace('✓✗', '');
+    el.replaceWith(document.createTextNode(text));
+  });
+  document.querySelectorAll('.doc-deletion').forEach(el => {
+    el.remove();
+  });
+  saveToUndoStack();
+  showToolbarConfirm('All changes accepted');
+}
+
+function rejectAllChanges() {
+  document.querySelectorAll('.doc-insertion').forEach(el => {
+    el.remove();
+  });
+  document.querySelectorAll('.doc-deletion').forEach(el => {
+    const text = el.textContent.replace('✓✗', '');
+    el.replaceWith(document.createTextNode(text));
+  });
+  saveToUndoStack();
+  showToolbarConfirm('All changes rejected');
+}
+
+// Manual suggestion helpers
+function suggestInsertion() {
+  const selection = window.getSelection();
+  if (selection.rangeCount === 0) return;
+
+  const text = prompt('Text to insert:');
+  if (!text) return;
+
+  const range = selection.getRangeAt(0);
+  const ins = markAsInsertion(text);
+  range.insertNode(ins);
+  range.collapse(false);
+  saveToUndoStack();
+}
+
+function suggestDeletion() {
+  const selection = window.getSelection();
+  if (selection.rangeCount === 0 || selection.isCollapsed) {
+    alert('Select text to mark for deletion');
+    return;
+  }
+
+  const range = selection.getRangeAt(0);
+  const selectedText = range.toString();
+  const del = markAsDeletion(selectedText);
+  range.deleteContents();
+  range.insertNode(del);
+  saveToUndoStack();
+}
+
+// Editor toolbar functions
+function execCmd(cmd) {
+  if (cmd === 'undo') {
+    customUndo();
+    return;
+  }
+  document.execCommand(cmd, false, null);
+}
+
+function applyFont() {
+  const font = document.getElementById('fontFamily').value;
+  document.execCommand('fontName', false, font);
+}
+
+function applyFontSize() {
+  // execCommand fontSize only accepts 1-7, so we use CSS instead
+  const size = document.getElementById('fontSize').value;
+  const selection = window.getSelection();
+  if (selection.rangeCount > 0) {
+    const range = selection.getRangeAt(0);
+    const span = document.createElement('span');
+    span.style.fontSize = size;
+    range.surroundContents(span);
+  }
+}
+
+function applyArial11() {
+  const doc = document.getElementById('docContent');
+
+  // Only change font-family and font-size, preserve all other formatting
+  doc.style.fontFamily = 'Arial, sans-serif';
+  doc.style.fontSize = '11pt';
+
+  // Apply to all children - ONLY font-family and font-size
+  const allElements = doc.querySelectorAll('*');
+  allElements.forEach(el => {
+    el.style.fontFamily = 'Arial, sans-serif';
+    el.style.fontSize = '11pt';
+  });
+
+  // Update dropdowns
+  document.getElementById('fontFamily').value = 'Arial, sans-serif';
+  document.getElementById('fontSize').value = '11pt';
+
+  showToolbarConfirm('Arial 11 applied!');
+}
+
+function stripFormatting() {
+  const doc = document.getElementById('docContent');
+  const text = doc.innerText;
+  doc.innerHTML = text.split('\n').map(line => line.trim() ? `<p>${line}</p>` : '').join('');
+  doc.style.fontFamily = 'Arial, sans-serif';
+  doc.style.fontSize = '11pt';
+
+  showToolbarConfirm('Formatting stripped!');
+}
+
+function showToolbarConfirm(msg) {
+  const toolbar = document.querySelector('.doc-toolbar');
+  const notice = document.createElement('span');
+  notice.textContent = msg;
+  notice.style.cssText = 'color: #166534; font-size: 0.75rem; font-weight: 500; margin-left: 12px;';
+  toolbar.appendChild(notice);
+  setTimeout(() => notice.remove(), 2000);
+}
+
+// Scroll to comments
+function scrollToComments() {
+  const section = document.getElementById('commentsSection');
+  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  setTimeout(() => {
+    document.getElementById('commentInput').focus();
+  }, 500);
+}
+
+// Notification config
+const TELEGRAM_BOT_TOKEN = '7288507046:AAGw_kOqLnxZKklDkjS-lEaSp-OY1GZpbM8';
+const TELEGRAM_CHAT_ID = '227077';
+const WORKROOM_NAME = 'Shaw v. Sunnova';
+
+async function sendTelegramNotification(comment) {
+  const message = `New Comment - ${WORKROOM_NAME}\n\nFrom: ${comment.author}\n${comment.text}`;
+
+  try {
+    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT_ID,
+        text: message,
+        disable_web_page_preview: true
+      })
+    });
+  } catch (err) {
+    console.error('Telegram notification failed:', err);
+  }
+}
+
+// Username handling
+function getUserName() {
+  const nameInput = document.getElementById('commentName');
+  const saved = localStorage.getItem('workroom_username');
+  if (saved && nameInput) {
+    nameInput.value = saved;
+  }
+  return nameInput ? nameInput.value.trim() : 'Guest';
+}
+
+function saveUserName(name) {
+  localStorage.setItem('workroom_username', name);
+}
+
+// Submit comment
+function submitComment() {
+  const input = document.getElementById('commentInput');
+  const nameInput = document.getElementById('commentName');
+  const text = input.value.trim();
+  const authorName = nameInput.value.trim() || 'Guest';
+
+  if (!text) return;
+  if (!authorName) {
+    nameInput.focus();
+    nameInput.style.borderColor = '#dc2626';
+    setTimeout(() => { nameInput.style.borderColor = ''; }, 2000);
+    return;
+  }
+
+  saveUserName(authorName);
+
+  const comment = {
+    author: authorName,
+    text: text,
+    timestamp: Date.now(),
+    isClient: true
+  };
+
+  workroomRef.child('comments').push(comment)
+    .then(() => {
+      input.value = '';
+      sendTelegramNotification(comment);
+
+      const btn = document.getElementById('commentSubmit');
+      btn.textContent = 'Sent!';
+      btn.style.background = '#166534';
+      setTimeout(() => {
+        btn.textContent = 'Send';
+        btn.style.background = '';
+      }, 1500);
+    })
+    .catch(err => {
+      console.error('Failed to save comment:', err);
+      alert('Failed to send. Please try again.');
+    });
+}
+
+// Render comment
+function renderComment(data, key) {
+  const comment = data;
+  const time = new Date(comment.timestamp);
+  const timeStr = time.toLocaleString('en-US', {
+    month: 'short', day: 'numeric',
+    hour: 'numeric', minute: '2-digit',
+    hour12: true
+  });
+
+  const isSergei = !comment.isClient;
+  const initials = isSergei ? 'ST' : (comment.author ? comment.author.charAt(0).toUpperCase() : 'G');
+  const avatarClass = isSergei ? 'comment-avatar sergei' : 'comment-avatar';
+
+  const actionsHtml = comment.isClient ? `
+    <div class="comment-actions">
+      <button class="comment-action-btn" onclick="editComment('${key}')">Edit</button>
+      <button class="comment-action-btn delete" onclick="deleteComment('${key}')">Delete</button>
+    </div>
+  ` : '';
+
+  return `
+    <div class="comment-item" data-key="${key}">
+      <div class="${avatarClass}">${initials}</div>
+      <div class="comment-content" style="flex: 1;">
+        <div class="comment-meta" style="display: flex; align-items: center;">
+          <span class="comment-author">${isSergei ? 'Sergei Tokmakov' : escapeHtml(comment.author)}</span>
+          <span class="comment-time">${timeStr}</span>
+          ${actionsHtml}
+        </div>
+        <div class="comment-text" id="comment-text-${key}">${escapeHtml(comment.text)}</div>
+      </div>
+    </div>
+  `;
+}
+
+function editComment(key) {
+  const textEl = document.getElementById(`comment-text-${key}`);
+  if (!textEl) return;
+
+  const currentText = textEl.innerText;
+  textEl.innerHTML = `
+    <textarea style="width:100%;min-height:60px;padding:8px;border:1px solid var(--border);border-radius:4px;font-family:inherit;font-size:0.9rem;">${currentText}</textarea>
+    <div style="margin-top:8px;display:flex;gap:8px;">
+      <button onclick="saveEdit('${key}')" style="padding:6px 12px;background:var(--accent);color:white;border:none;border-radius:4px;cursor:pointer;">Save</button>
+      <button onclick="cancelEdit('${key}', '${encodeURIComponent(currentText)}')" style="padding:6px 12px;background:white;border:1px solid var(--border);border-radius:4px;cursor:pointer;">Cancel</button>
+    </div>
+  `;
+}
+
+function saveEdit(key) {
+  const textEl = document.getElementById(`comment-text-${key}`);
+  const textarea = textEl.querySelector('textarea');
+  const newText = textarea.value.trim();
+
+  if (!newText) return;
+
+  workroomRef.child('comments').child(key).update({ text: newText, edited: true });
+}
+
+function cancelEdit(key, originalText) {
+  const textEl = document.getElementById(`comment-text-${key}`);
+  textEl.innerHTML = escapeHtml(decodeURIComponent(originalText));
+}
+
+function deleteComment(key) {
+  if (!confirm('Delete this comment?')) return;
+  workroomRef.child('comments').child(key).remove();
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML.replace(/\n/g, '<br>');
+}
+
+// Load comments
+function setupCommentsSync() {
+  workroomRef.child('comments').on('value', (snapshot) => {
+    const comments = snapshot.val();
+    const list = document.getElementById('commentsList');
+
+    if (!comments) {
+      list.innerHTML = '<div class="no-comments">No comments yet. Be the first to leave a note!</div>';
+      return;
+    }
+
+    const sorted = Object.entries(comments).sort((a, b) => a[1].timestamp - b[1].timestamp);
+    let html = '';
+    sorted.forEach(([key, data]) => {
+      html += renderComment(data, key);
+    });
+
+    list.innerHTML = html;
+    list.scrollTop = list.scrollHeight;
+  });
+}
+
+// Save document edits
+let saveTimeout = null;
+function saveDocumentContent() {
+  clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(() => {
+    const content = document.getElementById('docContent').innerHTML;
+    workroomRef.child('documentContent').set(content);
+  }, 1000);
+}
+
+// Load document content
+function loadDocumentContent() {
+  workroomRef.child('documentContent').on('value', (snapshot) => {
+    const content = snapshot.val();
+    const docEl = document.getElementById('docContent');
+    if (content && !docEl.matches(':focus')) {
+      docEl.innerHTML = content;
+    }
+  });
+}
+
+// Init
+document.addEventListener('DOMContentLoaded', function() {
+  checkAuth();
+  setupCommentsSync();
+  loadDocumentContent();
+  getUserName();
+  setupSuggestingMode();
+  checkSignatureStatus();
+
+  const docContent = document.getElementById('docContent');
+
+  // Save initial state to undo stack
+  setTimeout(() => {
+    saveToUndoStack();
+  }, 500);
+
+  // Auto-save document edits + undo stack
+  docContent.addEventListener('input', function(e) {
+    saveDocumentContent();
+    saveToUndoStack();
+  });
+
+  // Keyboard shortcuts for undo/redo
+  docContent.addEventListener('keydown', function(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+      if (e.shiftKey) {
+        e.preventDefault();
+        customRedo();
+      } else {
+        e.preventDefault();
+        customUndo();
+      }
+    }
+  });
+
+  // Enter to submit comment
+  document.getElementById('commentInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      submitComment();
+    }
+  });
+});
+</script>
+
+</body>
+</html>
