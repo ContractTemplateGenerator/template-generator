@@ -1035,11 +1035,80 @@
       opacity: 1;
     }
 
+    /* Bottom Download Section */
+    .bottom-download-section {
+      margin-top: 50px;
+      padding-top: 30px;
+      border-top: 2px solid #e2e8f0;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .bottom-download-inner {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .bottom-esign-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 32px;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 10px;
+      cursor: pointer;
+      border: none;
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+      color: white;
+      box-shadow: 0 4px 14px rgba(34, 197, 94, 0.35);
+      transition: all 0.2s;
+    }
+
+    .bottom-esign-btn:hover {
+      background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+    }
+
+    .bottom-esign-btn.signed {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+    }
+
+    .bottom-esign-btn.signed:hover {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+    }
+
+    .bottom-download-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 16px 24px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border-radius: 10px;
+      cursor: pointer;
+      border: 2px solid var(--primary);
+      background: white;
+      color: var(--primary);
+      transition: all 0.2s;
+    }
+
+    .bottom-download-btn:hover {
+      background: var(--primary);
+      color: white;
+    }
+
     @media (max-width: 768px) {
       .container { padding: 20px; }
       .key-issues { grid-template-columns: 1fr; }
       .case-facts { grid-template-columns: repeat(2, 1fr); }
       .doc-editor-body { padding: 24px; }
+      .bottom-download-inner { flex-direction: column; }
+      .bottom-esign-btn, .bottom-download-btn { width: 100%; justify-content: center; }
     }
   </style>
 </head>
@@ -1298,6 +1367,19 @@
           <p style="margin-top:8px;"><strong>Sergei Tokmakov, Esq.</strong><br>Attorney for Wendy Shaw</p>
           <p style="margin-top:24px;">cc: Wendy Shaw</p>
         </div>
+
+        <!-- Bottom Download Section -->
+        <div class="bottom-download-section" id="bottomDownloadSection">
+          <div class="bottom-download-inner">
+            <button class="bottom-esign-btn" id="bottomEsignBtn" onclick="bottomSignAndDownload()">
+              <span class="btn-icon">&#9998;</span>
+              <span class="btn-text">eSign & Download Word</span>
+            </button>
+            <button class="bottom-download-btn" onclick="downloadPDF()">
+              <span>&#128196;</span> Download PDF
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1512,6 +1594,9 @@ function applySignature() {
 
   documentSigned = true;
 
+  // Update bottom download button
+  updateBottomButton();
+
   // Save to Firebase (including verification code)
   workroomRef.child('signature').set({
     signed: true,
@@ -1533,6 +1618,35 @@ function downloadSignedDoc() {
   }
 }
 
+// Bottom eSign & Download button - signs if needed, then downloads
+function bottomSignAndDownload() {
+  const btn = document.getElementById('bottomEsignBtn');
+
+  if (!documentSigned) {
+    // Sign first
+    applySignature();
+    // Update button to show "Download Word"
+    btn.classList.add('signed');
+    btn.innerHTML = '<span class="btn-icon">&#128229;</span><span class="btn-text">Download Word</span>';
+    // Then download after a brief delay
+    setTimeout(() => {
+      downloadSignedDoc();
+    }, 500);
+  } else {
+    // Already signed, just download
+    downloadSignedDoc();
+  }
+}
+
+// Update bottom button if already signed
+function updateBottomButton() {
+  const btn = document.getElementById('bottomEsignBtn');
+  if (documentSigned && btn) {
+    btn.classList.add('signed');
+    btn.innerHTML = '<span class="btn-icon">&#128229;</span><span class="btn-text">Download Word</span>';
+  }
+}
+
 function downloadPDF() {
   const docContent = document.getElementById('docContent');
   const filename = documentSigned
@@ -1545,62 +1659,74 @@ function downloadPDF() {
   btn.innerHTML = '<span>&#8987;</span> Generating...';
   btn.disabled = true;
 
-  // Clone content and prepare for PDF
+  // Clone content and prepare for PDF - exclude the bottom download section
   const clone = docContent.cloneNode(true);
+
+  // Remove the bottom download section from PDF
+  const bottomSection = clone.querySelector('.bottom-download-section');
+  if (bottomSection) bottomSection.remove();
+
+  // Apply styles for PDF
   clone.style.width = '7.5in';
   clone.style.padding = '0';
   clone.style.margin = '0';
-  clone.style.fontSize = '11pt';
-  clone.style.lineHeight = '1.4';
-  clone.style.fontFamily = 'Times New Roman, serif';
+  clone.style.fontSize = '12pt';
+  clone.style.lineHeight = '1.5';
+  clone.style.fontFamily = 'Times New Roman, Times, serif';
   clone.style.color = '#000';
   clone.style.background = '#fff';
+  clone.contentEditable = 'false';
 
-  // Create wrapper
+  // Create wrapper with visible content
   const wrapper = document.createElement('div');
-  wrapper.style.cssText = 'background: white; padding: 0.5in;';
+  wrapper.style.cssText = 'background: white; padding: 0.75in; width: 8.5in; box-sizing: border-box;';
   wrapper.appendChild(clone);
 
-  // Temporarily add to DOM (hidden)
-  wrapper.style.position = 'absolute';
-  wrapper.style.left = '-9999px';
+  // Add to DOM - must be visible for html2canvas
+  wrapper.style.position = 'fixed';
+  wrapper.style.left = '0';
   wrapper.style.top = '0';
+  wrapper.style.zIndex = '-1000';
+  wrapper.style.opacity = '1';
   document.body.appendChild(wrapper);
 
-  // Configure PDF options
-  const opt = {
-    margin: [0.5, 0.5, 0.5, 0.5],
-    filename: filename,
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: {
-      scale: 2,
-      useCORS: true,
-      logging: false,
-      letterRendering: true,
-      scrollY: 0,
-      windowWidth: 816
-    },
-    jsPDF: {
-      unit: 'in',
-      format: 'letter',
-      orientation: 'portrait',
-      compress: true
-    },
-    pagebreak: { mode: 'avoid-all', before: '.page-break' }
-  };
+  // Wait for fonts/images to load
+  setTimeout(() => {
+    // Configure PDF options
+    const opt = {
+      margin: [0.5, 0.75, 0.5, 0.75],
+      filename: filename,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        letterRendering: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff'
+      },
+      jsPDF: {
+        unit: 'in',
+        format: 'letter',
+        orientation: 'portrait',
+        compress: true
+      },
+      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+    };
 
-  // Generate PDF
-  html2pdf().set(opt).from(wrapper).save().then(() => {
-    document.body.removeChild(wrapper);
-    btn.innerHTML = originalText;
-    btn.disabled = false;
-  }).catch(err => {
-    console.error('PDF generation failed:', err);
-    document.body.removeChild(wrapper);
-    btn.innerHTML = originalText;
-    btn.disabled = false;
-    alert('PDF generation failed. Please try again.');
-  });
+    // Generate PDF
+    html2pdf().set(opt).from(wrapper).save().then(() => {
+      document.body.removeChild(wrapper);
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+    }).catch(err => {
+      console.error('PDF generation failed:', err);
+      document.body.removeChild(wrapper);
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+      alert('PDF generation failed. Please try again.');
+    });
+  }, 100);
 }
 
 // Check if already signed on load
@@ -1654,6 +1780,9 @@ function checkSignatureStatus() {
       statusBadge.textContent = 'SIGNED';
       statusBadge.style.background = '#dcfce7';
       statusBadge.style.color = '#166534';
+
+      // Update bottom download button
+      updateBottomButton();
     }
   });
 }
