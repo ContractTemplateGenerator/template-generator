@@ -537,10 +537,9 @@
         <button class="view-btn" data-view="grouped" title="Grouped by Topic">📁 Grouped</button>
       </div>
       <select class="sort-select" id="sortSelect">
-        <option value="date-desc">Newest First</option>
-        <option value="date-asc">Oldest First</option>
         <option value="title-asc">Title A-Z</option>
         <option value="title-desc">Title Z-A</option>
+        <option value="category">By Category</option>
       </select>
     </div>
 
@@ -572,7 +571,7 @@
     const POSTS_PER_PAGE = 50;
     let activeCategory = 'all';
     let searchQuery = '';
-    let sortBy = 'date-desc';
+    let sortBy = 'title-asc';
     let viewMode = 'list'; // 'list' or 'grouped'
     const GROUPED_THRESHOLD = 30; // Show grouped option when 30+ posts
 
@@ -793,10 +792,9 @@
       // Sort posts
       filteredPosts.sort((a, b) => {
         switch (sortBy) {
-          case 'date-asc': return a.date.localeCompare(b.date);
-          case 'title-asc': return a.title.localeCompare(b.title);
           case 'title-desc': return b.title.localeCompare(a.title);
-          default: return b.date.localeCompare(a.date);
+          case 'category': return (a.categories[0] || '').localeCompare(b.categories[0] || '') || a.title.localeCompare(b.title);
+          default: return a.title.localeCompare(b.title); // title-asc default
         }
       });
 
@@ -892,7 +890,6 @@
             <div class="post-icon ${postIconInfo.class}">${postIconInfo.icon}</div>
             <div class="post-content">
               <div class="post-title">${escapeHtml(post.title)}</div>
-              <div class="post-meta"><span>${formatDate(post.date)}</span></div>
             </div>
           `;
           postsDiv.appendChild(card);
@@ -928,7 +925,6 @@
             <div class="post-icon ${postIconInfo.class}">${postIconInfo.icon}</div>
             <div class="post-content">
               <div class="post-title">${escapeHtml(post.title)}</div>
-              <div class="post-meta"><span>${formatDate(post.date)}</span></div>
             </div>
           `;
           postsDiv.appendChild(card);
@@ -1003,9 +999,6 @@
           <div class="post-icon ${iconInfo.class}">${iconInfo.icon}</div>
           <div class="post-content">
             <div class="post-title">${escapeHtml(post.title)}</div>
-            <div class="post-meta">
-              <span>${formatDate(post.date)}</span>
-            </div>
             ${categoriesHTML}
           </div>
         `;
@@ -1033,11 +1026,6 @@
       const div = document.createElement('div');
       div.textContent = text;
       return div.innerHTML;
-    }
-
-    function formatDate(dateStr) {
-      const date = new Date(dateStr);
-      return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
     }
 
     // Start

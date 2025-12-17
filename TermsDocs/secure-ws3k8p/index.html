@@ -1479,24 +1479,20 @@ function applySignature() {
   // Generate verification code
   const verificationCode = generateVerificationCode();
 
-  // Apply DocuSign-style signature
+  // Apply DocuSign-style signature with inline styles for PDF rendering
   placeholder.classList.remove('unsigned');
   placeholder.innerHTML = `
-    <div class="docusign-signature">
-      <div class="docusign-sig-text">/s/ Sergei Tokmakov, Esq.</div>
+    <div style="border-bottom: 2px solid #1a365d; padding-bottom: 4px; margin-bottom: 8px; display: inline-block;">
+      <div style="font-family: 'Brush Script MT', 'Segoe Script', Georgia, serif; font-size: 28px; color: #1a365d; line-height: 1.2; font-style: italic;">/s/ Sergei Tokmakov, Esq.</div>
     </div>
-    <div class="docusign-details">
-      <div class="docusign-timestamp">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-          <polyline points="22 4 12 14.01 9 11.01"/>
-        </svg>
-        Signed by: Sergei Tokmakov, Esq.
+    <div style="font-family: Arial, sans-serif; font-size: 10px; color: #64748b; line-height: 1.6;">
+      <div style="display: flex; align-items: center; gap: 4px; color: #166534; font-weight: 500;">
+        ✓ Signed by: Sergei Tokmakov, Esq.
       </div>
-      <div class="docusign-bar"><a href="https://apps.calbar.ca.gov/attorney/Licensee/Detail/279869" target="_blank">CBN 279869</a></div>
-      <div class="docusign-date">${dateStr}, ${timeStr}</div>
-      <div class="docusign-email">Verified email: owner@terms.law</div>
-      <div class="docusign-code"><a href="https://terms.law/verify/${verificationCode}.html" target="_blank">${verificationCode}</a></div>
+      <div style="color: #475569; padding-left: 16px;"><a href="https://apps.calbar.ca.gov/attorney/Licensee/Detail/279869" target="_blank" style="color: #475569; text-decoration: none;">CBN 279869</a></div>
+      <div style="color: #475569;">${dateStr}, ${timeStr}</div>
+      <div style="color: #475569;">Verified email: owner@terms.law</div>
+      <div style="font-family: 'Courier New', monospace; font-size: 9px; color: #94a3b8; letter-spacing: 0.5px; margin-top: 2px;"><a href="https://terms.law/verify/${verificationCode}.html" target="_blank" style="color: #94a3b8; text-decoration: none;">${verificationCode}</a></div>
     </div>
   `;
 
@@ -1543,27 +1539,64 @@ function downloadPDF() {
     ? 'Demand Letter - Shaw v Sunnova - Rescission - SIGNED.pdf'
     : 'Demand Letter - Shaw v Sunnova - Rescission.pdf';
 
-  // Configure PDF options
-  const opt = {
-    margin: 0.75,
-    filename: filename,
-    image: { type: 'jpeg', quality: 0.95 },
-    html2canvas: { scale: 1.5 },
-    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-  };
-
   // Show loading state
   const btn = event.target.closest('button');
   const originalText = btn.innerHTML;
   btn.innerHTML = '<span>&#8987;</span> Generating...';
   btn.disabled = true;
 
-  // Generate PDF directly from docContent
-  html2pdf().set(opt).from(docContent).save().then(() => {
+  // Clone content and prepare for PDF
+  const clone = docContent.cloneNode(true);
+  clone.style.width = '7.5in';
+  clone.style.padding = '0';
+  clone.style.margin = '0';
+  clone.style.fontSize = '11pt';
+  clone.style.lineHeight = '1.4';
+  clone.style.fontFamily = 'Times New Roman, serif';
+  clone.style.color = '#000';
+  clone.style.background = '#fff';
+
+  // Create wrapper
+  const wrapper = document.createElement('div');
+  wrapper.style.cssText = 'background: white; padding: 0.5in;';
+  wrapper.appendChild(clone);
+
+  // Temporarily add to DOM (hidden)
+  wrapper.style.position = 'absolute';
+  wrapper.style.left = '-9999px';
+  wrapper.style.top = '0';
+  document.body.appendChild(wrapper);
+
+  // Configure PDF options
+  const opt = {
+    margin: [0.5, 0.5, 0.5, 0.5],
+    filename: filename,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      letterRendering: true,
+      scrollY: 0,
+      windowWidth: 816
+    },
+    jsPDF: {
+      unit: 'in',
+      format: 'letter',
+      orientation: 'portrait',
+      compress: true
+    },
+    pagebreak: { mode: 'avoid-all', before: '.page-break' }
+  };
+
+  // Generate PDF
+  html2pdf().set(opt).from(wrapper).save().then(() => {
+    document.body.removeChild(wrapper);
     btn.innerHTML = originalText;
     btn.disabled = false;
   }).catch(err => {
     console.error('PDF generation failed:', err);
+    document.body.removeChild(wrapper);
     btn.innerHTML = originalText;
     btn.disabled = false;
     alert('PDF generation failed. Please try again.');
@@ -1596,21 +1629,17 @@ function checkSignatureStatus() {
 
       placeholder.classList.remove('unsigned');
       placeholder.innerHTML = `
-        <div class="docusign-signature">
-          <div class="docusign-sig-text">/s/ Sergei Tokmakov, Esq.</div>
+        <div style="border-bottom: 2px solid #1a365d; padding-bottom: 4px; margin-bottom: 8px; display: inline-block;">
+          <div style="font-family: 'Brush Script MT', 'Segoe Script', Georgia, serif; font-size: 28px; color: #1a365d; line-height: 1.2; font-style: italic;">/s/ Sergei Tokmakov, Esq.</div>
         </div>
-        <div class="docusign-details">
-          <div class="docusign-timestamp">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-              <polyline points="22 4 12 14.01 9 11.01"/>
-            </svg>
-            Signed by: Sergei Tokmakov, Esq.
+        <div style="font-family: Arial, sans-serif; font-size: 10px; color: #64748b; line-height: 1.6;">
+          <div style="display: flex; align-items: center; gap: 4px; color: #166534; font-weight: 500;">
+            ✓ Signed by: Sergei Tokmakov, Esq.
           </div>
-          <div class="docusign-bar"><a href="https://apps.calbar.ca.gov/attorney/Licensee/Detail/279869" target="_blank">CBN 279869</a></div>
-          <div class="docusign-date">${dateStr}, ${timeStr}</div>
-          <div class="docusign-email">Verified email: owner@terms.law</div>
-          <div class="docusign-code"><a href="https://terms.law/verify/${verificationCode}.html" target="_blank">${verificationCode}</a></div>
+          <div style="color: #475569; padding-left: 16px;"><a href="https://apps.calbar.ca.gov/attorney/Licensee/Detail/279869" target="_blank" style="color: #475569; text-decoration: none;">CBN 279869</a></div>
+          <div style="color: #475569;">${dateStr}, ${timeStr}</div>
+          <div style="color: #475569;">Verified email: owner@terms.law</div>
+          <div style="font-family: 'Courier New', monospace; font-size: 9px; color: #94a3b8; letter-spacing: 0.5px; margin-top: 2px;"><a href="https://terms.law/verify/${verificationCode}.html" target="_blank" style="color: #94a3b8; text-decoration: none;">${verificationCode}</a></div>
         </div>
       `;
 
