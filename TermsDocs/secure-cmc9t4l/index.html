@@ -340,7 +340,7 @@
       grid-template-columns: 420px 1fr;
       max-width: 1600px;
       margin: 0 auto;
-      min-height: calc(100vh - 200px);
+      min-height: calc(100vh - 100px);
     }
     @media (max-width: 1100px) {
       .layout { grid-template-columns: 1fr; }
@@ -351,7 +351,7 @@
       background: var(--surface);
       border-right: 1px solid var(--border);
       overflow-y: auto;
-      max-height: calc(100vh - 140px);
+      max-height: calc(100vh - 80px);
       position: sticky;
       top: 0;
     }
@@ -663,7 +663,7 @@
       background: var(--bg);
       padding: 24px;
       overflow-y: auto;
-      max-height: calc(100vh - 140px);
+      max-height: calc(100vh - 80px);
     }
 
     .preview-toolbar {
@@ -701,6 +701,11 @@
       border-radius: 12px;
       box-shadow: 0 4px 24px rgba(0,0,0,0.08);
       overflow: hidden;
+      /* Prevent copy/paste until payment */
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
     }
     .document-header {
       background: var(--primary);
@@ -936,9 +941,8 @@
   <main class="preview-panel">
     <div class="preview-toolbar">
       <span class="preview-title">Trash Pad License Agreement — Federal Realty</span>
-      <div class="preview-actions">
-        <button class="btn" onclick="downloadWord()">Download Original</button>
-      </div>
+      <!-- Download disabled until payment -->
+      <div class="preview-actions" style="display:none;"></div>
     </div>
     <div class="document-container">
       <div class="document-header">
@@ -1105,7 +1109,7 @@
 
         <p class="doc-paragraph"><strong>Recycling:</strong> Shopping Center Agent is to notify all Serviced Tenants that they must follow the recycling program as directed by Licensee. All services shall meet or exceed the present guidelines as managed or determined by local government agencies.</p>
 
-        <p class="doc-paragraph" id="exhibit-b1-collection"><strong>Collection Procedures:</strong> The Licensee has established standard procedures for timely billing Serviced Tenants for the Services. Licensee will bill Serviced Tenants monthly for waste removal and recycling services. <span class="highlight-section original-mode" data-redline="6">90-day billing waiver doesn't apply for tenant disputes, missing data, or reconciliation issues.</span> Grantor shall have no obligation to assist Licensee in collecting of charges from Serviced Tenants.</p>
+        <p class="doc-paragraph" id="exhibit-b1-collection"><strong>Collection Procedures:</strong> The Licensee has established standard procedures for timely billing Serviced Tenants for the Services. Licensee will bill Serviced Tenants monthly for waste removal and recycling services. <em style="color:#166534;font-size:0.9em;">(Note: 90-day billing waiver doesn't apply for tenant disputes, missing data, or reconciliation issues.)</em> Grantor shall have no obligation to assist Licensee in collecting of charges from Serviced Tenants.</p>
 
         <p class="doc-paragraph"><strong>Store Openings, Closings, Transfers and Expansions:</strong> Grantor will provide notices of store openings, closings, transfers, and expansions. Licensee will coordinate special waste disposal needs and bill directly for such services.</p>
 
@@ -1235,6 +1239,18 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const DOC_ID = 'cmc-9t4l'; // Unique ID for this workroom
+
+// Prevent copy/paste until payment
+document.addEventListener('contextmenu', e => {
+  if (e.target.closest('.document-container')) {
+    e.preventDefault();
+  }
+});
+document.addEventListener('copy', e => {
+  if (e.target.closest('.document-container')) {
+    e.preventDefault();
+  }
+});
 
 // Client decisions storage
 let clientDecisions = {};
