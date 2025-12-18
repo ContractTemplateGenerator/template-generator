@@ -7,6 +7,8 @@
   <title>CMC v. Federal Realty — Contract Review | Terms.Law</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
   <style>
     :root {
       --primary: #1a2e44;
@@ -34,10 +36,38 @@
       line-height: 1.6;
     }
 
-    .header {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    /* Confidential Bar */
+    .confidential-bar {
+      background: var(--primary);
       color: white;
+      text-align: center;
+      padding: 8px;
+      font-size: 0.7rem;
+      letter-spacing: 1px;
+      font-weight: 500;
+    }
+
+    .security-notice {
+      background: #fef3c7;
+      border-bottom: 1px solid #fde68a;
+      padding: 12px 24px;
+    }
+    .security-notice-inner {
+      max-width: 1600px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.8rem;
+      color: #92400e;
+    }
+    .shield-icon { font-size: 1.2rem; }
+
+    .header {
+      background: white;
+      color: var(--primary);
       padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
     }
     .header-inner {
       max-width: 1600px;
@@ -46,24 +76,252 @@
       align-items: center;
       justify-content: space-between;
     }
-    .header h1 {
-      font-family: 'Crimson Pro', Georgia, serif;
-      font-size: 1.25rem;
+    .attorney-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .site-link {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .site-link:hover {
+      color: var(--primary);
+    }
+    .attorney-name {
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
       font-weight: 600;
+      color: var(--primary);
+    }
+    .bar-link {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+    .bar-link:hover {
+      color: var(--primary);
+      text-decoration: underline;
     }
     .header-meta {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* NDA Upload Section */
+    .nda-section {
+      background: #fefce8;
+      border: 1px solid #fde047;
+      border-radius: 12px;
+      margin: 24px;
+      max-width: 1600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .nda-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .nda-header:hover {
+      background: rgba(253, 224, 71, 0.2);
+      border-radius: 12px 12px 0 0;
+    }
+    .nda-header h3 {
+      font-family: 'Crimson Pro', Georgia, serif;
+      font-size: 1.1rem;
+      color: var(--primary);
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .nda-toggle {
+      font-size: 1.2rem;
+      color: var(--primary);
+      transition: transform 0.2s;
+    }
+    .nda-section.expanded .nda-toggle {
+      transform: rotate(180deg);
+    }
+    .nda-content {
+      display: none;
+      padding: 0 20px 20px;
+    }
+    .nda-section.expanded .nda-content {
+      display: block;
+    }
+    .nda-upload-zone {
+      border: 2px dashed #d4d4d4;
+      border-radius: 8px;
+      padding: 40px;
+      text-align: center;
+      background: white;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .nda-upload-zone:hover, .nda-upload-zone.dragover {
+      border-color: var(--accent);
+      background: #ecfeff;
+    }
+    .nda-upload-zone.has-file {
+      border-style: solid;
+      border-color: #22c55e;
+      background: #f0fdf4;
+    }
+    .nda-upload-icon {
+      font-size: 2.5rem;
+      margin-bottom: 12px;
+    }
+    .nda-upload-text {
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    .nda-upload-hint {
       font-size: 0.8rem;
-      opacity: 0.8;
+      color: #a1a1aa;
+    }
+    .nda-file-input {
+      display: none;
+    }
+    .nda-preview {
+      margin-top: 20px;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .nda-preview-header {
+      background: #f5f5f4;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .nda-filename {
+      font-weight: 600;
+      color: var(--primary);
+    }
+    .nda-canvas-container {
+      max-height: 500px;
+      overflow-y: auto;
+      padding: 20px;
+      background: #e5e5e5;
+    }
+    .nda-canvas-container canvas {
+      display: block;
+      margin: 0 auto 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .nda-sign-section {
+      padding: 20px;
+      border-top: 1px solid var(--border);
+      background: #fafafa;
+    }
+    .nda-sign-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 14px 24px;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      border: none;
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+      color: white;
+      box-shadow: 0 4px 14px rgba(34, 197, 94, 0.3);
+      transition: all 0.2s;
+    }
+    .nda-sign-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+    }
+    .nda-sign-btn:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    .nda-sign-btn.signed {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    }
+    .nda-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .nda-download-btn {
+      flex: 1;
+      padding: 12px 20px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      border: 2px solid var(--primary);
+      background: white;
+      color: var(--primary);
+      transition: all 0.2s;
+    }
+    .nda-download-btn:hover {
+      background: var(--primary);
+      color: white;
+    }
+    .nda-download-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .nda-status {
+      text-align: center;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 16px;
+      font-weight: 500;
+    }
+    .nda-status.signed {
+      background: #dcfce7;
+      color: #166534;
     }
 
     .welcome-banner {
       background: linear-gradient(135deg, #ecfeff 0%, #cffafe 100%);
       border-bottom: 1px solid #a5f3fc;
       padding: 20px 24px;
+      position: relative;
+    }
+    .welcome-banner.hidden {
+      display: none;
     }
     .welcome-inner {
       max-width: 1600px;
       margin: 0 auto;
+      position: relative;
+      padding-right: 40px;
+    }
+    .banner-close {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--primary);
+      cursor: pointer;
+      opacity: 0.5;
+      padding: 0;
+      line-height: 1;
+    }
+    .banner-close:hover {
+      opacity: 1;
     }
     .welcome-banner h2 {
       font-family: 'Crimson Pro', Georgia, serif;
@@ -632,21 +890,35 @@
   </div>
 </div>
 
+<div class="confidential-bar">
+  PRIVILEGED & CONFIDENTIAL — ATTORNEY WORK PRODUCT
+</div>
+
+<div class="security-notice">
+  <div class="security-notice-inner">
+    <span class="shield-icon">&#128737;</span>
+    <div><strong>Secure Client Workroom</strong> — This page is not indexed by search engines. Only those with the direct link and password can access it. Documents and communications here are protected by attorney-client privilege.</div>
+  </div>
+</div>
+
 <header class="header">
   <div class="header-inner">
-    <div>
-      <h1>Terms.Law</h1>
+    <div class="attorney-info">
+      <a href="https://terms.law" target="_blank" class="site-link">Terms.Law</a>
+      <span class="attorney-name">Sergei Tokmakov, Esq.</span>
+      <a href="https://apps.calbar.ca.gov/attorney/Licensee/Detail/279869" target="_blank" class="bar-link">California Bar No. 279869</a>
     </div>
     <div class="header-meta">
-      CMC-9t4l | December 2025
+      Workroom CMC-9t4l
     </div>
   </div>
 </header>
 
-<div class="welcome-banner">
+<div class="welcome-banner" id="welcomeBanner">
   <div class="welcome-inner">
     <h2>Toni, here's your contract review for the Federal Realty Trash Pad License</h2>
-    <p>I've identified <strong>11 key issues</strong> that need attention before CMC signs. Click any item below to see the problem, compare Federal Realty's language to my suggestion, and mark Accept/Reject. Your choices auto-save. Questions? Email me at owner@terms.law or call (858) 326-3858.</p>
+    <p>I've identified <strong>11 key issues</strong> that need attention before CMC signs. Click any item below to see the problem and compare Federal Realty's language to my suggestion.</p>
+    <button class="banner-close" onclick="closeBanner()" title="Close">&times;</button>
   </div>
 </div>
 
@@ -663,7 +935,7 @@
 
   <main class="preview-panel">
     <div class="preview-toolbar">
-      <span class="preview-title">Contract Preview — Santana Row</span>
+      <span class="preview-title">Trash Pad License Agreement — Federal Realty</span>
       <div class="preview-actions">
         <button class="btn" onclick="downloadWord()">Download Original</button>
       </div>
@@ -851,8 +1123,47 @@
   </main>
 </div>
 
+<!-- NDA Upload & Sign Section -->
+<div class="nda-section" id="ndaSection">
+  <div class="nda-header" onclick="toggleNdaSection()">
+    <h3>📄 Upload & Sign NDA</h3>
+    <span class="nda-toggle">▼</span>
+  </div>
+  <div class="nda-content">
+    <div class="nda-upload-zone" id="ndaUploadZone" onclick="document.getElementById('ndaFileInput').click()">
+      <div class="nda-upload-icon">📤</div>
+      <div class="nda-upload-text">Click to upload NDA or drag & drop</div>
+      <div class="nda-upload-hint">PDF files only</div>
+    </div>
+    <input type="file" id="ndaFileInput" class="nda-file-input" accept=".pdf" onchange="handleNdaUpload(event)">
+
+    <div class="nda-preview" id="ndaPreview" style="display:none;">
+      <div class="nda-preview-header">
+        <span class="nda-filename" id="ndaFilename"></span>
+        <button onclick="clearNda()" style="background:none;border:none;cursor:pointer;font-size:1.2rem;">✕</button>
+      </div>
+      <div class="nda-canvas-container" id="ndaCanvasContainer"></div>
+      <div class="nda-sign-section">
+        <button class="nda-sign-btn" id="ndaSignBtn" onclick="signNda()">
+          <span>✍️</span>
+          <span>eSign NDA</span>
+        </button>
+        <div class="nda-actions">
+          <button class="nda-download-btn" id="ndaDownloadBtn" onclick="downloadSignedNda()" disabled>
+            📥 Download Signed PDF
+          </button>
+          <button class="nda-clear-btn" id="ndaClearBtn" onclick="clearNdaAndReupload()" style="background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;padding:12px 20px;border-radius:8px;cursor:pointer;font-size:0.9rem;margin-top:10px;">
+            🗑️ Remove & Re-upload
+          </button>
+        </div>
+        <div class="nda-status" id="ndaStatus" style="display:none;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="footer">
-  <a href="https://terms.law">Terms.Law</a> — Prepared for Compactor Management Company by Sergei Tokmakov, Esq.
+  Protected by attorney-client privilege. Secure workroom access only.
 </div>
 
 <div class="sync-indicator" id="syncIndicator">
@@ -1261,6 +1572,13 @@ function downloadWord() {
   window.location.href = 'Trash%20Pad%20License%20Agmt%20-%20SR%202025.docx';
 }
 
+function closeBanner() {
+  const banner = document.getElementById('welcomeBanner');
+  if (banner) {
+    banner.classList.add('hidden');
+  }
+}
+
 // Decision management
 function setDecision(id, status) {
   // Toggle: clicking same button again clears it
@@ -1411,7 +1729,366 @@ function setupRealtimeListener() {
 loadFromFirebase().then(() => {
   setupRealtimeListener();
   initPreviewText(); // Set preview to show Federal Realty's original text
+  loadNdaFromFirebase();
 });
+
+// ========== NDA UPLOAD & SIGN ==========
+let ndaPdfBytes = null;
+let ndaSignedPdfBytes = null;
+let ndaFilename = '';
+let ndaSigned = false;
+
+// Set PDF.js worker
+if (typeof pdfjsLib !== 'undefined') {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+
+function toggleNdaSection() {
+  document.getElementById('ndaSection').classList.toggle('expanded');
+}
+
+function handleNdaUpload(event) {
+  const file = event.target.files[0];
+  if (!file || file.type !== 'application/pdf') {
+    alert('Please upload a PDF file');
+    return;
+  }
+
+  ndaFilename = file.name;
+  const reader = new FileReader();
+
+  reader.onload = async function(e) {
+    ndaPdfBytes = new Uint8Array(e.target.result);
+
+    // Show preview
+    document.getElementById('ndaUploadZone').style.display = 'none';
+    document.getElementById('ndaPreview').style.display = 'block';
+    document.getElementById('ndaFilename').textContent = ndaFilename;
+
+    // Render PDF preview
+    await renderNdaPreview();
+
+    // Save to Firebase
+    saveNdaToFirebase();
+  };
+
+  reader.readAsArrayBuffer(file);
+}
+
+async function renderNdaPreview() {
+  if (!ndaPdfBytes) return;
+
+  const container = document.getElementById('ndaCanvasContainer');
+  container.innerHTML = '';
+
+  try {
+    const pdf = await pdfjsLib.getDocument({ data: ndaPdfBytes.slice() }).promise;
+    const numPages = pdf.numPages; // Show all pages
+
+    for (let i = 1; i <= numPages; i++) {
+      const page = await pdf.getPage(i);
+      const scale = 1.2;
+      const viewport = page.getViewport({ scale });
+
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      canvas.style.cssText = 'margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);';
+
+      await page.render({ canvasContext: context, viewport }).promise;
+
+      // Add page number label
+      const pageLabel = document.createElement('div');
+      pageLabel.style.cssText = 'text-align:center;font-size:12px;color:#666;margin-bottom:15px;';
+      pageLabel.textContent = `Page ${i} of ${numPages}`;
+
+      container.appendChild(canvas);
+      container.appendChild(pageLabel);
+    }
+  } catch (err) {
+    console.error('PDF render error:', err);
+    container.innerHTML = '<p style="padding:20px;color:red;">Error rendering PDF preview</p>';
+  }
+}
+
+async function signNda() {
+  if (!ndaPdfBytes || ndaPdfBytes.length === 0) {
+    alert('Please upload an NDA first');
+    return;
+  }
+
+  const btn = document.getElementById('ndaSignBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span>⏳</span><span>Signing...</span>';
+
+  try {
+    const { PDFDocument, rgb, StandardFonts } = PDFLib;
+    // Use slice() to create a copy and avoid buffer issues
+    const pdfDoc = await PDFDocument.load(ndaPdfBytes.slice());
+    const pages = pdfDoc.getPages();
+    const lastPage = pages[pages.length - 1];
+
+    // Get page dimensions
+    const { width, height } = lastPage.getSize();
+
+    // Load font
+    const font = await pdfDoc.embedFont(StandardFonts.TimesRomanItalic);
+    const fontBold = await pdfDoc.embedFont(StandardFonts.TimesRomanBold);
+
+    // Signature details
+    const signatureTimestamp = new Date();
+    const timestampStr = signatureTimestamp.toLocaleString('en-US', {
+      month: 'long', day: 'numeric', year: 'numeric',
+      hour: 'numeric', minute: '2-digit', hour12: true
+    });
+    const verificationCode = generateVerificationCode();
+
+    // Draw signature in Party B signature field (right column)
+    // Adjusted: higher and more to the right to avoid overlapping
+    const sigX = 360;  // Further right
+    const sigY = 540;  // Higher up on page
+
+    // Handwritten-style signature using italic font
+    lastPage.drawText('/s/ Sergei Tokmakov, Esq.', {
+      x: sigX,
+      y: sigY,
+      size: 14,
+      font: font,  // Italic font for handwritten look
+      color: rgb(0.1, 0.21, 0.36)  // Dark blue ink
+    });
+
+    // Underline flourish
+    lastPage.drawLine({
+      start: { x: sigX - 5, y: sigY - 5 },
+      end: { x: sigX + 175, y: sigY - 5 },
+      thickness: 0.75,
+      color: rgb(0.1, 0.21, 0.36)
+    });
+
+    // Signed by
+    lastPage.drawText('Signed by: Sergei Tokmakov, Esq.', {
+      x: sigX,
+      y: sigY - 22,
+      size: 9,
+      font: fontBold,
+      color: rgb(0.08, 0.4, 0.2)  // Green
+    });
+
+    // Bar number with URL
+    lastPage.drawText('CBN 279869', {
+      x: sigX,
+      y: sigY - 35,
+      size: 8,
+      font: font,
+      color: rgb(0.28, 0.33, 0.41)
+    });
+
+    // Timestamp
+    lastPage.drawText(timestampStr, {
+      x: sigX,
+      y: sigY - 47,
+      size: 8,
+      font: font,
+      color: rgb(0.28, 0.33, 0.41)
+    });
+
+    // Verified email
+    lastPage.drawText('Verified email: owner@terms.law', {
+      x: sigX,
+      y: sigY - 59,
+      size: 8,
+      font: font,
+      color: rgb(0.28, 0.33, 0.41)
+    });
+
+    // Verification code
+    lastPage.drawText(verificationCode, {
+      x: sigX,
+      y: sigY - 71,
+      size: 7,
+      font: font,
+      color: rgb(0.58, 0.64, 0.72)
+    });
+
+    // Save signed PDF
+    ndaSignedPdfBytes = await pdfDoc.save();
+    ndaSigned = true;
+
+    // Update UI
+    btn.classList.add('signed');
+    btn.innerHTML = '<span>✓</span><span>Signed</span>';
+
+    document.getElementById('ndaDownloadBtn').disabled = false;
+
+    const status = document.getElementById('ndaStatus');
+    status.style.display = 'block';
+    status.className = 'nda-status signed';
+    status.innerHTML = `✓ Signed on ${timestampStr}<br><small>Verification: ${verificationCode}</small>`;
+
+    // Re-render preview with signed version
+    ndaPdfBytes = ndaSignedPdfBytes;
+    await renderNdaPreview();
+
+    // Save to Firebase
+    saveNdaToFirebase();
+
+    showSyncIndicator('synced', 'NDA signed & saved');
+
+  } catch (err) {
+    console.error('Signing error:', err);
+    alert('Error signing PDF: ' + err.message);
+    btn.disabled = false;
+    btn.innerHTML = '<span>✍️</span><span>eSign NDA</span>';
+  }
+}
+
+function generateVerificationCode() {
+  const chars = 'ABCDEF0123456789';
+  const segments = [8, 4, 4, 4, 12];
+  return segments.map(len =>
+    Array.from({ length: len }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
+  ).join('-');
+}
+
+function downloadSignedNda() {
+  if (!ndaSignedPdfBytes && !ndaPdfBytes) return;
+
+  const bytes = ndaSignedPdfBytes || ndaPdfBytes;
+  const blob = new Blob([bytes], { type: 'application/pdf' });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = ndaFilename.replace('.pdf', ' - SIGNED.pdf');
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
+function clearNda() {
+  ndaPdfBytes = null;
+  ndaSignedPdfBytes = null;
+  ndaFilename = '';
+  ndaSigned = false;
+
+  document.getElementById('ndaUploadZone').style.display = 'block';
+  document.getElementById('ndaPreview').style.display = 'none';
+  document.getElementById('ndaFileInput').value = '';
+  document.getElementById('ndaSignBtn').disabled = false;
+  document.getElementById('ndaSignBtn').classList.remove('signed');
+  document.getElementById('ndaSignBtn').innerHTML = '<span>✍️</span><span>eSign NDA</span>';
+  document.getElementById('ndaDownloadBtn').disabled = true;
+  document.getElementById('ndaStatus').style.display = 'none';
+
+  // Clear from Firebase
+  db.collection('workrooms').doc(DOC_ID).update({
+    nda: firebase.firestore.FieldValue.delete()
+  });
+}
+
+function clearNdaAndReupload() {
+  if (confirm('Remove the current NDA and upload a new one?')) {
+    clearNda();
+  }
+}
+
+function uint8ArrayToBase64(bytes) {
+  // Process in chunks to avoid call stack limit for large PDFs
+  let binary = '';
+  const chunkSize = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize));
+  }
+  return btoa(binary);
+}
+
+function saveNdaToFirebase() {
+  if (!ndaPdfBytes) return;
+
+  // Convert to base64 (handles large files)
+  const base64 = uint8ArrayToBase64(ndaPdfBytes);
+
+  db.collection('workrooms').doc(DOC_ID).set({
+    nda: {
+      filename: ndaFilename,
+      data: base64,
+      signed: ndaSigned,
+      updatedAt: new Date().toISOString()
+    }
+  }, { merge: true });
+}
+
+async function loadNdaFromFirebase() {
+  try {
+    const doc = await db.collection('workrooms').doc(DOC_ID).get();
+    if (doc.exists && doc.data().nda) {
+      const nda = doc.data().nda;
+
+      // Convert base64 back to Uint8Array
+      const binary = atob(nda.data);
+      ndaPdfBytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) {
+        ndaPdfBytes[i] = binary.charCodeAt(i);
+      }
+
+      ndaFilename = nda.filename;
+      ndaSigned = nda.signed;
+
+      if (ndaSigned) {
+        ndaSignedPdfBytes = ndaPdfBytes;
+      }
+
+      // Show preview
+      document.getElementById('ndaUploadZone').style.display = 'none';
+      document.getElementById('ndaPreview').style.display = 'block';
+      document.getElementById('ndaFilename').textContent = ndaFilename;
+
+      // Expand section
+      document.getElementById('ndaSection').classList.add('expanded');
+
+      // Render
+      await renderNdaPreview();
+
+      // Update button state if signed
+      if (ndaSigned) {
+        const btn = document.getElementById('ndaSignBtn');
+        btn.classList.add('signed');
+        btn.innerHTML = '<span>✓</span><span>Signed</span>';
+        btn.disabled = true;
+        document.getElementById('ndaDownloadBtn').disabled = false;
+
+        const status = document.getElementById('ndaStatus');
+        status.style.display = 'block';
+        status.className = 'nda-status signed';
+        status.innerHTML = `✓ Signed and ready for download`;
+      }
+    }
+  } catch (err) {
+    console.error('Error loading NDA:', err);
+  }
+}
+
+// Drag and drop support
+const uploadZone = document.getElementById('ndaUploadZone');
+if (uploadZone) {
+  uploadZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    uploadZone.classList.add('dragover');
+  });
+  uploadZone.addEventListener('dragleave', () => {
+    uploadZone.classList.remove('dragover');
+  });
+  uploadZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadZone.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      document.getElementById('ndaFileInput').files = e.dataTransfer.files;
+      handleNdaUpload({ target: { files: [file] } });
+    }
+  });
+}
 </script>
 
 </body>
