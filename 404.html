@@ -189,11 +189,18 @@
     </div>
 
     <script>
-        // Track 404 errors in GA
-        gtag('event', '404_error', {
-            'page_path': window.location.pathname,
-            'page_referrer': document.referrer
-        });
+        // Redirect /amp/ URLs to base URL (WordPress AMP legacy)
+        const path = window.location.pathname;
+        if (path.match(/\/amp\/?$/i)) {
+            const newPath = path.replace(/\/amp\/?$/i, '/');
+            window.location.replace(newPath);
+        } else {
+            // Track 404 errors in GA (only if not redirecting)
+            gtag('event', '404_error', {
+                'page_path': path,
+                'page_referrer': document.referrer
+            });
+        }
     </script>
 </body>
 </html>
