@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brax Technologies, Inc. — Formation Status | Terms.Law</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #f8fafc;
+            min-height: 100vh;
+            color: #334155;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 12px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .logo-link {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .header-divider { color: #cbd5e1; }
+        .matter-title { font-size: 13px; color: #64748b; }
+        .header-right {
+            font-size: 12px;
+            color: #64748b;
+        }
+        .header-right a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px 40px;
+        }
+
+        /* Company Profile Card */
+        .profile-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 16px;
+        }
+        .profile-main h1 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 2px;
+        }
+        .profile-main .type {
+            font-size: 12px;
+            color: #64748b;
+        }
+        .profile-stats {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+        .stat {
+            text-align: right;
+        }
+        .stat-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+        .stat-value.green { color: #16a34a; }
+        .stat-value.red { color: #dc2626; }
+        .stat-label {
+            font-size: 10px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: 24px;
+        }
+        .section-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-title.urgent { color: #dc2626; border-bottom-color: #fecaca; }
+        .section-title.progress { color: #2563eb; border-bottom-color: #bfdbfe; }
+        .section-count {
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        /* Compact Cards */
+        .card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+        .card:hover { border-color: #cbd5e1; }
+        .card.expanded { border-color: #3b82f6; }
+
+        .card-header {
+            padding: 10px 14px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+        .card-header:hover { background: #f8fafc; }
+
+        .card-title {
+            font-size: 13px;
+            font-weight: 500;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-subtitle {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        .badge {
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .badge.waiting { background: #fef2f2; color: #dc2626; }
+        .badge.drafting { background: #eff6ff; color: #2563eb; }
+        .badge.ready { background: #f0fdf4; color: #16a34a; }
+        .badge.pending { background: #fefce8; color: #ca8a04; }
+
+        .expand-icon {
+            color: #94a3b8;
+            font-size: 10px;
+            transition: transform 0.2s;
+        }
+        .card.expanded .expand-icon { transform: rotate(180deg); }
+
+        .card-body {
+            display: none;
+            padding: 0 14px 14px;
+            border-top: 1px solid #f1f5f9;
+        }
+        .card.expanded .card-body { display: block; }
+
+        /* Form inputs */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        .form-group { }
+        .form-group.full { grid-column: span 2; }
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            color: #64748b;
+            margin-bottom: 4px;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: inherit;
+        }
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+        .form-group textarea { resize: vertical; min-height: 60px; }
+
+        .btn {
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-sm { padding: 4px 8px; font-size: 11px; }
+
+        /* Terms table */
+        .terms-grid {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 4px 12px;
+            font-size: 12px;
+            margin: 10px 0;
+            padding: 10px;
+            background: #f8fafc;
+            border-radius: 4px;
+        }
+        .terms-grid dt { color: #64748b; }
+        .terms-grid dd { color: #0f172a; font-weight: 500; }
+
+        /* Document Editor */
+        .doc-editor-wrap {
+            margin-top: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .doc-toolbar {
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 6px 10px;
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .toolbar-btn {
+            padding: 4px 8px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .toolbar-btn:hover { background: #f1f5f9; }
+        .toolbar-select {
+            padding: 4px 6px;
+            border: 1px solid #e2e8f0;
+            border-radius: 3px;
+            font-size: 11px;
+            background: white;
+        }
+        .toolbar-divider {
+            width: 1px;
+            height: 18px;
+            background: #e2e8f0;
+            margin: 0 4px;
+        }
+
+        .doc-editor {
+            min-height: 300px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 20px 30px;
+            background: white;
+            font-family: 'Times New Roman', serif;
+            font-size: 11pt;
+            line-height: 1.4;
+            color: #000;
+        }
+        .doc-editor:focus { outline: none; }
+        .doc-editor p { margin-bottom: 8px; text-align: justify; }
+
+        .doc-status {
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+            padding: 6px 10px;
+            font-size: 10px;
+            color: #64748b;
+            display: flex;
+            justify-content: space-between;
+        }
+        .save-ind { display: flex; align-items: center; gap: 4px; }
+        .save-ind.saved { color: #16a34a; }
+        .save-ind.unsaved { color: #dc2626; }
+
+        /* Doc links */
+        .doc-links {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .doc-link {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 12px;
+            color: #334155;
+        }
+        .doc-link:hover { border-color: #3b82f6; background: #eff6ff; }
+        .doc-link .icon { font-size: 14px; }
+
+        /* Cap Table */
+        .cap-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        .cap-table th, .cap-table td {
+            padding: 8px 10px;
+            text-align: left;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .cap-table th {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: #64748b;
+            font-weight: 600;
+            background: #f8fafc;
+        }
+        .cap-table .num { font-family: 'SF Mono', monospace; color: #16a34a; }
+        .cap-table .pct { color: #64748b; }
+
+        /* Completed list */
+        .completed-list {
+            list-style: none;
+        }
+        .completed-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 0;
+            font-size: 12px;
+            color: #475569;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .completed-item:last-child { border-bottom: none; }
+        .completed-item .check { color: #16a34a; }
+        .completed-item .date { margin-left: auto; font-size: 11px; color: #94a3b8; }
+
+        /* Activity */
+        .activity-list { font-size: 12px; }
+        .activity-item {
+            display: flex;
+            gap: 10px;
+            padding: 6px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .activity-item:last-child { border-bottom: none; }
+        .activity-date { color: #94a3b8; min-width: 70px; font-size: 11px; }
+        .activity-text { color: #475569; }
+
+        /* Footer */
+        .footer {
+            margin-top: 30px;
+            padding: 16px;
+            border-top: 1px solid #e2e8f0;
+            text-align: center;
+            font-size: 11px;
+            color: #94a3b8;
+        }
+        .footer a { color: #2563eb; text-decoration: none; }
+
+        /* Loading */
+        .spinner {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid #e2e8f0;
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @media (max-width: 600px) {
+            .profile-card { grid-template-columns: 1fr; }
+            .profile-stats { justify-content: flex-start; }
+            .form-grid { grid-template-columns: 1fr; }
+            .form-group.full { grid-column: span 1; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Password Screen Overlay -->
+    <div id="passwordOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #0f172a, #1e293b); z-index: 9999; display: flex; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 12px; padding: 40px; max-width: 400px; width: 90%; text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.3);">
+            <div style="font-size: 48px; margin-bottom: 16px;">🔒</div>
+            <h1 style="font-size: 20px; font-weight: 600; color: #0f172a; margin-bottom: 8px;">Secure Client Workroom</h1>
+            <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; padding: 10px; margin-bottom: 20px;">
+                <span style="font-size: 11px; color: #991b1b; font-weight: 600;">CONFIDENTIAL — ATTORNEY-CLIENT PRIVILEGE</span>
+            </div>
+
+            <input type="password" id="passwordInput" value="Kx7m#9" style="width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; margin-bottom: 16px; text-align: center;" onkeypress="if(event.key==='Enter')checkPassword()">
+
+            <button onclick="checkPassword()" style="width: 100%; padding: 12px 16px; background: #2563eb; color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer;">Access Workroom</button>
+
+            <p style="font-size: 11px; color: #94a3b8; margin-top: 20px;">
+                <a href="https://terms.law" style="color: #64748b; text-decoration: none;">Terms.Law</a> · Sergei Tokmakov, Esq. · <a href="https://apps.calbar.ca.gov/attorney/Licensee/Detail/279869" style="color: #64748b; text-decoration: none;">CA Bar #279869</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function checkPassword() {
+            const input = document.getElementById('passwordInput').value;
+            if (input === 'Kx7m#9') {
+                document.getElementById('passwordOverlay').style.display = 'none';
+                sessionStorage.setItem('braxAuth', 'true');
+            } else {
+                document.getElementById('passwordInput').style.borderColor = '#dc2626';
+                document.getElementById('passwordInput').value = '';
+                document.getElementById('passwordInput').placeholder = 'Incorrect password';
+            }
+        }
+
+        // Check if already authenticated this session
+        if (sessionStorage.getItem('braxAuth') === 'true') {
+            document.getElementById('passwordOverlay').style.display = 'none';
+        }
+    </script>
+
+    <!-- Security Banner -->
+    <div id="securityBanner" style="background: #1e293b; color: #e2e8f0; padding: 10px 20px; font-size: 12px; display: flex; justify-content: center; align-items: center; gap: 20px;">
+        <span>🔒 <strong>CONFIDENTIAL</strong> — This page is not indexed or searchable. Access requires link + password. Contents protected by attorney-client privilege.</span>
+        <button onclick="document.getElementById('securityBanner').style.display='none'" style="background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 16px; padding: 0 4px;">×</button>
+    </div>
+
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <a href="https://terms.law" class="logo-link">Terms.Law</a>
+                <span class="header-divider">|</span>
+                <span class="matter-title">Client Workroom</span>
+            </div>
+            <div class="header-right">
+                Sergei Tokmakov, Esq. · <a href="https://apps.calbar.ca.gov/attorney/Licensee/Detail/279869" target="_blank">CA Bar #279869</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- For Client Review - TOP PRIORITY -->
+        <div class="section">
+            <div class="section-title" style="color: #a16207; border-bottom-color: #fde047;">👀 For Client Review <span class="section-count" style="background: #fef9c3;">1</span></div>
+
+            <div class="card expanded" id="contrib-card">
+                <div class="card-header" onclick="toggle('contrib-card')" style="background: #fffbeb;">
+                    <div>
+                        <div class="card-title">Lunar Direct LLC Roll-In <span class="expand-icon">▼</span></div>
+                        <div class="card-subtitle">Contribution Agreement — review and approve</div>
+                    </div>
+                    <span class="badge" style="background: #fef9c3; color: #a16207; border: 1px solid #fde047;">REVIEWING</span>
+                </div>
+                <div class="card-body">
+                    <dl class="terms-grid">
+                        <dt>Contribution</dt><dd>100% of Lunar Direct LLC</dd>
+                        <dt>Consideration</dt><dd>Stock (no cash)</dd>
+                        <dt>Effective</dt><dd>December 1, 2025</dd>
+                        <dt>Contributor</dt><dd>Dominic (sole member)</dd>
+                    </dl>
+
+                    <div class="doc-editor-wrap">
+                        <div class="doc-toolbar">
+                            <select class="toolbar-select" onchange="execCmd('fontName', this.value)">
+                                <option value="Times New Roman">Times</option>
+                                <option value="Arial">Arial</option>
+                                <option value="Georgia">Georgia</option>
+                            </select>
+                            <select class="toolbar-select" onchange="execFontSize(this.value)">
+                                <option value="2">10pt</option>
+                                <option value="3" selected>12pt</option>
+                                <option value="4">14pt</option>
+                            </select>
+                            <div class="toolbar-divider"></div>
+                            <button class="toolbar-btn" onclick="execCmd('bold')"><b>B</b></button>
+                            <button class="toolbar-btn" onclick="execCmd('italic')"><i>I</i></button>
+                            <button class="toolbar-btn" onclick="execCmd('underline')"><u>U</u></button>
+                            <div class="toolbar-divider"></div>
+                            <button class="toolbar-btn" onclick="loadDoc()">↻</button>
+                            <button class="toolbar-btn" onclick="saveDoc()" style="background:#16a34a;color:white;border-color:#16a34a;">Save</button>
+                            <div class="toolbar-divider"></div>
+                            <button class="toolbar-btn" onclick="downloadWord()" style="background:#2563eb;color:white;border-color:#2563eb;">📄 Word</button>
+                        </div>
+                        <div class="doc-editor" id="docEditor" contenteditable="true">
+                            <p style="text-align:center;color:#64748b;"><span class="spinner"></span> Loading...</p>
+                        </div>
+                        <div class="doc-status">
+                            <span>CONTRIBUTION AND ASSIGNMENT.docx</span>
+                            <span class="save-ind saved" id="saveInd">✓ Saved</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Welcome Box -->
+        <div style="background: linear-gradient(135deg, #eff6ff, #dbeafe); border: 1px solid #bfdbfe; border-radius: 8px; padding: 16px 20px; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 300px;">
+                    <div style="font-weight: 600; color: #1d4ed8; margin-bottom: 6px; display: flex; align-items: center; gap: 10px;">
+                        🔒 Secure Client Workroom
+                        <span style="background: #dc2626; color: white; font-size: 9px; padding: 2px 6px; border-radius: 3px; letter-spacing: 0.5px;">CONFIDENTIAL</span>
+                    </div>
+                    <div style="font-size: 12px; color: #1e40af; line-height: 1.5;">
+                        This is a privileged attorney-client communication. Contents are confidential and protected by attorney-client privilege. Items marked <span style="color:#dc2626;font-weight:600;">WAITING</span> need your input.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Company Profile -->
+        <div class="profile-card">
+            <div class="profile-main">
+                <h1>Brax Technologies, Inc.</h1>
+                <div class="type">Delaware Public Benefit Corporation</div>
+            </div>
+            <div class="profile-stats">
+                <div class="stat">
+                    <div class="stat-value green">Filed</div>
+                    <div class="stat-label">Status</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value red">1</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">100M</div>
+                    <div class="stat-label">Shares</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Waiting on Client -->
+        <div class="section">
+            <div class="section-title urgent">⚠ Waiting on Client <span class="section-count">1</span></div>
+
+            <div class="card" id="ein-card">
+                <div class="card-header" onclick="toggle('ein-card')">
+                    <div>
+                        <div class="card-title">EIN Application (Form SS-4) <span class="expand-icon">▼</span></div>
+                        <div class="card-subtitle">Need SSN, name, address, phone for IRS filing</div>
+                    </div>
+                    <span class="badge waiting">Waiting</span>
+                </div>
+                <div class="card-body">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Full Legal Name</label>
+                            <input type="text" id="ein-name" placeholder="As on SSN card">
+                        </div>
+                        <div class="form-group">
+                            <label>SSN</label>
+                            <input type="text" id="ein-ssn" placeholder="XXX-XX-XXXX">
+                        </div>
+                        <div class="form-group">
+                            <label>Phone</label>
+                            <input type="text" id="ein-phone" placeholder="(555) 123-4567">
+                        </div>
+                        <div class="form-group">
+                            <label>Address</label>
+                            <input type="text" id="ein-address" placeholder="Street, City, State ZIP">
+                        </div>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <button class="btn btn-primary" onclick="submitEIN()">Email to Sergei</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Ready for Signature -->
+        <div class="section">
+            <div class="section-title">✍ Ready for Signature <span class="section-count">2</span></div>
+            <div class="doc-links">
+                <a href="BYLAWS%20-%20Brax%20Technologies,%20Inc..docx" class="doc-link" target="_blank">
+                    <span class="icon">📄</span> Bylaws <span class="badge ready">Sign</span>
+                </a>
+                <a href="WRITTEN%20CONSENT%20-%20Brax%20Technologies,%20Inc..docx" class="doc-link" target="_blank">
+                    <span class="icon">📄</span> Written Consent <span class="badge ready">Sign</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Cap Table -->
+        <div class="section">
+            <div class="section-title">📊 Cap Table</div>
+            <div class="card">
+                <table class="cap-table">
+                    <thead>
+                        <tr><th>Stockholder</th><th>Class</th><th>Shares</th><th>%</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Dominic</td><td>Class A</td><td class="num">78,000,000</td><td class="pct">78%</td></tr>
+                        <tr><td>Rob Braxman Trust</td><td>Class A</td><td class="num">22,000,000</td><td class="pct">22%</td></tr>
+                        <tr style="background:#f8fafc;font-weight:600;"><td>Total</td><td></td><td class="num">100,000,000</td><td class="pct">100%</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Completed -->
+        <div class="section">
+            <div class="section-title">✓ Completed <span class="section-count">6</span></div>
+            <div class="card" style="padding: 10px 14px;">
+                <ul class="completed-list">
+                    <li class="completed-item"><span class="check">✓</span> Certificate of Incorporation filed <span class="date">Dec 10</span></li>
+                    <li class="completed-item"><span class="check">✓</span> Public Benefit purpose defined <span class="date">Dec 10</span></li>
+                    <li class="completed-item"><span class="check">✓</span> Registered Agent: Harvard Business Services <span class="date">Dec 10</span></li>
+                    <li class="completed-item"><span class="check">✓</span> Stock structure: 100M Class A authorized <span class="date">Dec 8</span></li>
+                    <li class="completed-item"><span class="check">✓</span> Bylaws drafted <span class="date">Dec 16</span></li>
+                    <li class="completed-item"><span class="check">✓</span> Written Consent drafted <span class="date">Dec 16</span></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- All Documents -->
+        <div class="section">
+            <div class="section-title">📁 All Documents</div>
+            <div class="doc-links">
+                <a href="Brax%20Technologies,%20Inc.%20Cert%20of%20Inc.docx" class="doc-link" target="_blank"><span class="icon">📄</span> Cert of Inc</a>
+                <a href="BYLAWS%20-%20Brax%20Technologies,%20Inc..docx" class="doc-link" target="_blank"><span class="icon">📄</span> Bylaws</a>
+                <a href="WRITTEN%20CONSENT%20-%20Brax%20Technologies,%20Inc..docx" class="doc-link" target="_blank"><span class="icon">📄</span> Written Consent</a>
+                <a href="CONTRIBUTION%20AND%20ASSIGNMENT%20OF%20MEMBERSHIP%20INTERESTS.docx" class="doc-link" target="_blank"><span class="icon">📄</span> Contribution Agr</a>
+                <a href="Gmail%20-%20Checking%20In%20-%20Brax.pdf" class="doc-link" target="_blank"><span class="icon">📎</span> Email: Checking In</a>
+                <a href="Gmail%20-%20PBC%20creation%20in%20Delaware.pdf" class="doc-link" target="_blank"><span class="icon">📎</span> Email: PBC Creation</a>
+            </div>
+        </div>
+
+        <!-- Activity Log -->
+        <div class="section">
+            <div class="section-title">📋 Activity Log</div>
+            <div class="card" style="padding: 10px 14px;">
+                <div class="activity-list">
+                    <div class="activity-item"><span class="activity-date">Dec 17</span><span class="activity-text">Workroom created. Requested EIN info from client.</span></div>
+                    <div class="activity-item"><span class="activity-date">Dec 16</span><span class="activity-text">Drafted Contribution Agreement for Lunar Direct roll-in.</span></div>
+                    <div class="activity-item"><span class="activity-date">Dec 16</span><span class="activity-text">Drafted Bylaws and Written Consent.</span></div>
+                    <div class="activity-item"><span class="activity-date">Dec 10</span><span class="activity-text">Cert of Inc filed. Brax Technologies is now a Delaware PBC.</span></div>
+                    <div class="activity-item"><span class="activity-date">Dec 8</span><span class="activity-text">Finalized stock structure. Cap table: Dominic 78%, Trust 22%.</span></div>
+                    <div class="activity-item"><span class="activity-date">Oct 7</span><span class="activity-text">Initial consultation for Delaware PBC formation.</span></div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <a href="https://terms.law">Terms.Law</a> · Sergei Tokmakov, Esq. · <a href="https://apps.calbar.ca.gov/attorney/Licensee/Detail/279869">CA Bar #279869</a>
+        </footer>
+    </div>
+
+    <script>
+        function toggle(id) {
+            const card = document.getElementById(id);
+            const wasExpanded = card.classList.contains('expanded');
+            card.classList.toggle('expanded');
+            if (id === 'contrib-card' && !wasExpanded) loadDoc();
+        }
+
+        let modified = false;
+
+        function execCmd(cmd, val = null) {
+            document.execCommand(cmd, false, val);
+            document.getElementById('docEditor').focus();
+            markUnsaved();
+        }
+
+        function execFontSize(size) {
+            document.execCommand('fontSize', false, size);
+            document.getElementById('docEditor').focus();
+            markUnsaved();
+        }
+
+        function markUnsaved() {
+            modified = true;
+            const ind = document.getElementById('saveInd');
+            ind.className = 'save-ind unsaved';
+            ind.textContent = '● Unsaved';
+        }
+
+        function markSaved() {
+            modified = false;
+            const ind = document.getElementById('saveInd');
+            ind.className = 'save-ind saved';
+            ind.textContent = '✓ Saved';
+        }
+
+        function loadDoc() {
+            const editor = document.getElementById('docEditor');
+            editor.innerHTML = `
+<p style="text-align:center;font-weight:bold;font-size:14pt;">CONTRIBUTION AND ASSIGNMENT OF MEMBERSHIP INTERESTS</p>
+<p style="text-align:center;">(Lunar Direct LLC to Brax Technologies, Inc.)</p>
+
+<p>This Contribution and Assignment of Membership Interests (this "Agreement") is entered into by and between:</p>
+
+<p>1. <strong>Dominic Gingras</strong>, an individual ("Contributor"), with an address at 447 Broadway, 2nd Floor, Suite 143, New York, NY 10013; and</p>
+
+<p>2. <strong>Brax Technologies, Inc.</strong>, a Delaware public benefit corporation (the "Corporation" or "Brax"), with its principal office at 447 Broadway, 2nd Floor, Suite 143, New York, NY 10013.</p>
+
+<p><strong>Effective Date:</strong> December 1, 2025 (the "Effective Date").</p>
+
+<p style="font-weight:bold;margin-top:16px;">RECITALS</p>
+
+<p>Contributor represents that he is the sole member of Lunar Direct LLC, a Wyoming limited liability company (the "Company").</p>
+
+<p>Contributor desires to contribute and assign to Brax, and Brax desires to accept, 100% of Contributor's right, title, and interest in and to the membership interests of the Company, effective as of the Effective Date, so that the Company will be a wholly-owned subsidiary of Brax.</p>
+
+<p>The parties intend this Agreement to be a non-cash roll-in (no cash consideration paid by Brax to Contributor).</p>
+
+<p>NOW, THEREFORE, for good and valuable consideration, the receipt and sufficiency of which are hereby acknowledged, the parties agree as follows:</p>
+
+<p style="font-weight:bold;margin-top:16px;">1. DEFINITIONS</p>
+
+<p><strong>1.1 Membership Interests</strong><br>"Membership Interests" means all of Contributor's membership interest(s) in the Company, constituting 100% of the outstanding membership interests of the Company, including all associated economic rights, governance/voting rights (if any), rights to profits and distributions, and any rights under the Company's operating agreement or applicable law arising from such membership.</p>
+
+<p><strong>1.2 Company</strong><br>"Company" means Lunar Direct LLC, a Wyoming limited liability company.</p>
+
+<p style="font-weight:bold;margin-top:16px;">2. CONTRIBUTION AND ASSIGNMENT; ACCEPTANCE</p>
+
+<p><strong>2.1 Contribution and Assignment</strong><br>Effective as of the Effective Date, Contributor hereby contributes, assigns, transfers, conveys, and delivers to Brax all of Contributor's right, title, and interest in and to the Membership Interests, free and clear of all liens, pledges, security interests, options, claims, and encumbrances of any kind (other than restrictions arising under applicable securities laws).</p>
+
+<p><strong>2.2 Acceptance by Brax</strong><br>Brax hereby accepts the contribution and assignment of the Membership Interests effective as of the Effective Date.</p>
+
+<p><strong>2.3 No Cash Consideration</strong><br>The parties confirm that this is a no-cash roll-in transaction: no cash is paid by Brax to Contributor in connection with the transfer of the Membership Interests.</p>
+
+<p style="font-weight:bold;margin-top:16px;">3. ADMISSION OF BRAX AS MEMBER; WITHDRAWAL OF CONTRIBUTOR</p>
+
+<p><strong>3.1 Admission</strong><br>Effective as of the Effective Date, Brax is admitted as the sole member of the Company and shall thereafter own 100% of the outstanding membership interests of the Company.</p>
+
+<p><strong>3.2 Withdrawal</strong><br>Effective as of the Effective Date, Contributor withdraws as a member of the Company and shall have no further rights as a member of the Company following the Effective Date.</p>
+
+<p><strong>3.3 Operating Agreement and Records</strong><br>Contributor, as the sole member of the Company prior to the Effective Date, hereby approves any amendments, updates, or restatements of the Company's operating agreement and internal records that are reasonably necessary to reflect that Brax is the sole member as of the Effective Date.</p>
+
+<p style="font-weight:bold;margin-top:16px;">4. REPRESENTATIONS AND WARRANTIES OF CONTRIBUTOR</p>
+
+<p>Contributor represents and warrants to Brax that, as of the Effective Date:</p>
+
+<p><strong>4.1 Ownership</strong><br>Contributor is the sole legal and beneficial owner of the Membership Interests and has not previously transferred, assigned, or encumbered the Membership Interests.</p>
+
+<p><strong>4.2 Authority</strong><br>Contributor has full power and authority to enter into this Agreement and to consummate the transactions contemplated hereby.</p>
+
+<p><strong>4.3 No Conflicts</strong><br>The execution and delivery of this Agreement does not violate any agreement binding on Contributor or, to Contributor's knowledge, any applicable law.</p>
+
+<p><strong>4.4 No Other Members</strong><br>There are no other members of the Company and no outstanding rights to acquire any membership interests in the Company.</p>
+
+<p style="font-weight:bold;margin-top:16px;">5. REPRESENTATIONS AND WARRANTIES OF BRAX</p>
+
+<p>Brax represents and warrants to Contributor that, as of the Effective Date:</p>
+
+<p><strong>5.1 Organization; Authority</strong><br>Brax is duly organized and validly existing under the laws of the State of Delaware and has full power and authority to enter into this Agreement and to consummate the transactions contemplated hereby.</p>
+
+<p style="font-weight:bold;margin-top:16px;">6. FURTHER ASSURANCES</p>
+
+<p>Each party shall execute and deliver such further documents and take such further actions as may be reasonably necessary or advisable to carry out the intent of this Agreement, including updating the Company's internal records to reflect Brax as the sole member.</p>
+
+<p style="font-weight:bold;margin-top:16px;">7. MISCELLANEOUS</p>
+
+<p><strong>7.1 Governing Law</strong><br>This Agreement shall be governed by and construed in accordance with the laws of the State of Wyoming, without regard to conflicts-of-law principles.</p>
+
+<p><strong>7.2 Entire Agreement</strong><br>This Agreement constitutes the entire agreement between the parties with respect to the subject matter hereof and supersedes all prior and contemporaneous understandings or agreements, whether written or oral, relating to such subject matter.</p>
+
+<p><strong>7.3 Amendments</strong><br>This Agreement may be amended only by a written instrument executed by both parties.</p>
+
+<p><strong>7.4 Counterparts; Electronic Signatures</strong><br>This Agreement may be executed in counterparts, each of which shall be deemed an original, and all of which together shall constitute one instrument. Signatures delivered by PDF, electronic signature service, or other electronic means shall be effective as originals.</p>
+
+<p style="margin-top:30px;"><strong>CONTRIBUTOR:</strong></p>
+<p>_______________________________<br>Dominic Gingras</p>
+<p>Date: _____________________</p>
+
+<p style="margin-top:20px;"><strong>BRAX TECHNOLOGIES, INC.</strong><br>a Delaware public benefit corporation</p>
+<p>By: _____________________________<br>Name: Dominic Gingras<br>Title: Chief Executive Officer & President</p>
+<p>Date: _____________________</p>
+            `;
+            markSaved();
+            editor.addEventListener('input', markUnsaved);
+        }
+
+        function saveDoc() {
+            const content = document.getElementById('docEditor').innerHTML;
+            localStorage.setItem('brax-contrib', content);
+            markSaved();
+        }
+
+        function downloadWord() {
+            const content = document.getElementById('docEditor').innerHTML;
+            const html = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head>
+<meta charset='utf-8'>
+<title>Contribution Agreement</title>
+<!--[if gte mso 9]>
+<xml>
+<w:WordDocument>
+<w:View>Print</w:View>
+<w:Zoom>100</w:Zoom>
+</w:WordDocument>
+</xml>
+<![endif]-->
+<style>
+@page { margin: 1in; }
+body { font-family: 'Times New Roman', serif; font-size: 12pt; line-height: 1.5; margin: 0; padding: 0; }
+p { margin: 0 0 12px 0; text-align: justify; }
+</style>
+</head>
+<body>${content}</body>
+</html>`;
+            const blob = new Blob([html], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Contribution Agreement - Lunar Direct to Brax.doc';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function submitEIN() {
+            const name = document.getElementById('ein-name').value;
+            const ssn = document.getElementById('ein-ssn').value;
+            const phone = document.getElementById('ein-phone').value;
+            const addr = document.getElementById('ein-address').value;
+            if (!name || !ssn || !phone || !addr) { alert('Please fill all fields.'); return; }
+            const subj = encodeURIComponent('Brax Technologies - EIN Information');
+            const body = encodeURIComponent(`Name: ${name}\nSSN: ${ssn}\nPhone: ${phone}\nAddress: ${addr}`);
+            window.location.href = `mailto:owner@terms.law?subject=${subj}&body=${body}`;
+        }
+
+        window.addEventListener('beforeunload', e => { if (modified) { e.preventDefault(); e.returnValue = ''; } });
+
+        // Load doc when page loads (card is expanded by default)
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDoc();
+        });
+    </script>
+</body>
+</html>
