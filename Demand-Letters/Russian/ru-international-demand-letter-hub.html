@@ -195,10 +195,14 @@
             border-radius: 50%;
             cursor: pointer;
             z-index: 10;
-            display: flex;
+            display: none;
             align-items: center;
             justify-content: center;
             font-size: 18px;
+        }
+
+        .ru-intl-dl-scroll-btn.visible {
+            display: flex;
         }
 
         .ru-intl-dl-scroll-btn.left { left: 5px; }
@@ -2630,6 +2634,27 @@ function scrollRuIntlDlTabs(amount) {
         tabsRow.scrollBy({ left: amount, behavior: 'smooth' });
     }
 }
+
+// Check if tabs need scroll arrows
+function updateTabScrollArrows() {
+    var tabsRow = document.getElementById('ruIntlDlTabs');
+    if (!tabsRow) return;
+
+    var scrollBtns = document.querySelectorAll('.ru-intl-dl-scroll-btn');
+    var needsScroll = tabsRow.scrollWidth > tabsRow.clientWidth;
+
+    scrollBtns.forEach(function(btn) {
+        if (needsScroll) {
+            btn.classList.add('visible');
+        } else {
+            btn.classList.remove('visible');
+        }
+    });
+}
+
+// Initialize scroll arrows on load and resize
+window.addEventListener('load', updateTabScrollArrows);
+window.addEventListener('resize', updateTabScrollArrows);
 
 // FAQ toggle
 function toggleRuIntlDlFaq(button, event) {
