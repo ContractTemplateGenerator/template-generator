@@ -452,16 +452,17 @@
     /* Document Browser */
     .doc-browser {
       display: grid;
-      grid-template-columns: 280px 1fr;
+      grid-template-columns: 340px 1fr;
       gap: 24px;
-      min-height: 500px;
+      min-height: 600px;
     }
 
     .doc-sidebar {
       background: white;
       border: 1px solid var(--border);
       border-radius: 10px;
-      overflow: hidden;
+      overflow-y: auto;
+      max-height: 700px;
     }
 
     .doc-folder {
@@ -514,28 +515,45 @@
       background: white;
     }
 
-    .doc-folder.open .folder-files { max-height: 500px; }
+    .doc-folder.open .folder-files { max-height: 1000px; }
 
     .file-item {
       padding: 10px 16px 10px 40px;
       font-size: 0.8rem;
-      color: var(--text-muted);
+      color: var(--text);
       cursor: pointer;
       display: flex;
-      align-items: center;
-      gap: 8px;
+      flex-direction: column;
+      gap: 2px;
       border-bottom: 1px solid #f5f5f4;
       transition: all 0.15s;
     }
 
     .file-item:hover {
       background: #faf5ff;
-      color: var(--accent);
     }
 
     .file-item.active {
       background: var(--accent);
       color: white;
+    }
+
+    .file-item.active .file-desc {
+      color: rgba(255,255,255,0.8);
+    }
+
+    .file-name {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
+    }
+
+    .file-desc {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      padding-left: 22px;
+      line-height: 1.4;
     }
 
     .file-icon { font-size: 0.9rem; }
@@ -544,43 +562,115 @@
       background: white;
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 24px;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
+      overflow: hidden;
     }
 
-    .preview-icon {
-      font-size: 3rem;
-      margin-bottom: 16px;
+    .preview-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      background: #fafaf9;
     }
 
     .preview-title {
       font-weight: 600;
       color: var(--primary);
-      margin-bottom: 8px;
+      font-size: 0.95rem;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .preview-desc {
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       color: var(--text-muted);
-      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .preview-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 400px;
+      background: #f5f5f4;
+      position: relative;
+    }
+
+    .preview-content iframe,
+    .preview-content embed {
+      width: 100%;
+      height: 100%;
+      min-height: 500px;
+      border: none;
+    }
+
+    .preview-content img {
+      max-width: 100%;
+      max-height: 500px;
+      object-fit: contain;
+    }
+
+    .preview-placeholder {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-muted);
+    }
+
+    .preview-placeholder-icon {
+      font-size: 3rem;
+      margin-bottom: 16px;
+    }
+
+    .preview-footer {
+      padding: 12px 20px;
+      border-top: 1px solid var(--border);
+      background: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     .preview-btn {
       background: var(--primary);
       color: white;
-      padding: 10px 24px;
+      padding: 8px 20px;
       border-radius: 6px;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: 500;
       text-decoration: none;
       transition: background 0.2s;
     }
 
     .preview-btn:hover { background: var(--primary-light); }
+
+    .preview-btn-secondary {
+      background: white;
+      color: var(--primary);
+      border: 1px solid var(--border);
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .preview-btn-secondary:hover {
+      background: #f5f5f4;
+    }
+
+    .file-type-badge {
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: var(--info-bg);
+      color: var(--info);
+    }
 
     /* Tables */
     .data-table {
@@ -1413,11 +1503,13 @@
             <span class="folder-arrow">▶</span>
           </div>
           <div class="folder-files">
-            <div class="file-item" onclick="previewDoc('Case Summary.docx', 'Case summary document with key facts and party information', 'drive-download-20251220T234142Z-3-001/Case Summary/Case Summary.docx')">
-              <span class="file-icon">📄</span> Case Summary.docx
+            <div class="file-item" onclick="previewDoc('Case Summary', 'Comprehensive case summary with all parties, property details, settlement terms, and factual chronology', 'drive-download-20251220T234142Z-3-001/Case Summary/Case Summary.docx')">
+              <div class="file-name"><span class="file-icon">📝</span> Case Summary.docx</div>
+              <div class="file-desc">All parties, property details, settlement terms</div>
             </div>
-            <div class="file-item" onclick="previewDoc('MSC Brief PDF', 'Mandatory Settlement Conference brief - 9000 Arlington', 'drive-download-20251220T234142Z-3-001/Case Summary/9000 - MSC Brief PDF.pdf')">
-              <span class="file-icon">📄</span> 9000 - MSC Brief PDF.pdf
+            <div class="file-item" onclick="previewDoc('MSC Brief', 'Mandatory Settlement Conference brief filed for 9000 Arlington Ave LLC', 'drive-download-20251220T234142Z-3-001/Case Summary/9000 - MSC Brief PDF.pdf')">
+              <div class="file-name"><span class="file-icon">📕</span> MSC Brief.pdf</div>
+              <div class="file-desc">Settlement conference brief - 9000 Arlington</div>
             </div>
           </div>
         </div>
@@ -1430,8 +1522,9 @@
             <span class="folder-arrow">▶</span>
           </div>
           <div class="folder-files">
-            <div class="file-item" onclick="previewDoc('Settlement Agreement (11/18/2025)', 'Final Long Form Settlement Agreement and General Release', 'drive-download-20251220T234142Z-3-001/Settlement Agreement(s)/2025.11.18. SAR (9000 Arlington)-Final-1 (1) (1).pdf')">
-              <span class="file-icon">📄</span> Settlement Agreement 11-18.pdf
+            <div class="file-item" onclick="previewDoc('Settlement Agreement (11/18/2025)', 'Final Long Form Settlement Agreement and General Release — $350K from Ultimate Floors + $5K from BAIC payable to Cole Moscatel', 'drive-download-20251220T234142Z-3-001/Settlement Agreement(s)/2025.11.18. SAR (9000 Arlington)-Final-1 (1) (1).pdf')">
+              <div class="file-name"><span class="file-icon">📕</span> Settlement Agreement.pdf</div>
+              <div class="file-desc">Long Form Agreement — $355K settlement terms</div>
             </div>
           </div>
         </div>
@@ -1444,41 +1537,53 @@
             <span class="folder-arrow">▶</span>
           </div>
           <div class="folder-files">
-            <div class="file-item" onclick="previewDoc('Email - Ken to Page', 'Correspondence from Ken Taylor to Paige', 'drive-download-20251220T234142Z-3-001/Email Correspondence/Email - Ken to Page.pdf')">
-              <span class="file-icon">📧</span> Email - Ken to Paige.pdf
+            <div class="file-item" onclick="previewDoc('Ken Taylor to Paige', 'Correspondence from opposing counsel Ken Taylor to Paige Gold regarding check status', 'drive-download-20251220T234142Z-3-001/Email Correspondence/Email - Ken to Page.pdf')">
+              <div class="file-name"><span class="file-icon">📧</span> Ken to Paige.pdf</div>
+              <div class="file-desc">Opposing counsel re: check status</div>
             </div>
-            <div class="file-item" onclick="previewDoc('Email - Paige/Ken', 'Correspondence between Paige and Ken', 'drive-download-20251220T234142Z-3-001/Email Correspondence/Email - Paige_Ken.pdf')">
-              <span class="file-icon">📧</span> Email - Paige_Ken.pdf
+            <div class="file-item" onclick="previewDoc('Paige / Ken Correspondence', 'Back-and-forth between Cole\'s counsel Paige and opposing counsel Ken Taylor', 'drive-download-20251220T234142Z-3-001/Email Correspondence/Email - Paige_Ken.pdf')">
+              <div class="file-name"><span class="file-icon">📧</span> Paige_Ken Thread.pdf</div>
+              <div class="file-desc">Attorney correspondence thread</div>
             </div>
-            <div class="file-item" onclick="previewDoc('Email Thread - Borrower & Lender', 'Email thread with borrower and lender', 'drive-download-20251220T234142Z-3-001/Email Correspondence/Email Thread with Borrower & Lender.pdf')">
-              <span class="file-icon">📧</span> Borrower & Lender Thread.pdf
+            <div class="file-item" onclick="previewDoc('Borrower & Lender Thread', 'Email thread between Cole, lender Robert Abbasi, and counsel regarding foreclosure postponements', 'drive-download-20251220T234142Z-3-001/Email Correspondence/Email Thread with Borrower & Lender.pdf')">
+              <div class="file-name"><span class="file-icon">📧</span> Borrower & Lender.pdf</div>
+              <div class="file-desc">Foreclosure postponement negotiations</div>
             </div>
-            <div class="file-item" onclick="previewDoc('Cole to Opposing Counsel (11/26)', 'Cole email to opposing counsel', 'drive-download-20251220T234142Z-3-001/Email Correspondence/Email from Cole to Opposing Counsel - 11_26.pdf')">
-              <span class="file-icon">📧</span> Cole to Opp. Counsel 11-26.pdf
+            <div class="file-item" onclick="previewDoc('Cole to Opp. Counsel (11/26)', 'Cole asks Ken Taylor when check will arrive; states urgent need for funds', 'drive-download-20251220T234142Z-3-001/Email Correspondence/Email from Cole to Opposing Counsel - 11_26.pdf')">
+              <div class="file-name"><span class="file-icon">📧</span> Cole to Ken 11-26.pdf</div>
+              <div class="file-desc">Cole asks when check will arrive</div>
             </div>
-            <div class="file-item" onclick="previewDoc('Cole to Opposing Counsel (12/1)', 'Cole email warning of asset loss', 'drive-download-20251220T234142Z-3-001/Email Correspondence/Email from Cole to Opposing Counsel - 12_1.pdf')">
-              <span class="file-icon">📧</span> Cole to Opp. Counsel 12-1.pdf
+            <div class="file-item" onclick="previewDoc('Cole to Opp. Counsel (12/1)', 'Cole warns he will lose multi-million-dollar asset without immediate payment; 30-day deadline passed', 'drive-download-20251220T234142Z-3-001/Email Correspondence/Email from Cole to Opposing Counsel - 12_1.pdf')">
+              <div class="file-name"><span class="file-icon">📧</span> Cole to Ken 12-1.pdf</div>
+              <div class="file-desc">⚠️ Warning of imminent asset loss</div>
             </div>
-            <div class="file-item" onclick="previewDoc('Cole to Opposing Counsel (12/9)', 'Cole email demanding confirmed date', 'drive-download-20251220T234142Z-3-001/Email Correspondence/Email from Cole to Opposing Counsel - December 9.pdf')">
-              <span class="file-icon">📧</span> Cole to Opp. Counsel 12-9.pdf
+            <div class="file-item" onclick="previewDoc('Cole to Opp. Counsel (12/9)', 'Cole demands confirmed delivery date; threatens emergency relief; W-9 sent 10/29, update 11/5', 'drive-download-20251220T234142Z-3-001/Email Correspondence/Email from Cole to Opposing Counsel - December 9.pdf')">
+              <div class="file-name"><span class="file-icon">📧</span> Cole to Ken 12-9.pdf</div>
+              <div class="file-desc">Demands confirmed date, threatens relief</div>
             </div>
-            <div class="file-item" onclick="previewDoc('Email from Leah (10/29) with W-9', 'Original W-9 and payment instructions email', 'drive-download-20251220T234142Z-3-001/Email Correspondence/Email from Leah (Oct. 29) with W-9 (1).pdf')">
-              <span class="file-icon">📧</span> Leah W-9 Email 10-29.pdf
+            <div class="file-item" onclick="previewDoc('Leah Schoen W-9 Email (10/29)', 'Original W-9 and payment instructions sent by attorney Leah Schoen — starts 30-day clock', 'drive-download-20251220T234142Z-3-001/Email Correspondence/Email from Leah (Oct. 29) with W-9 (1).pdf')">
+              <div class="file-name"><span class="file-icon">📧</span> W-9 Email 10-29.pdf</div>
+              <div class="file-desc">⭐ Original W-9 — starts 30-day clock</div>
             </div>
-            <div class="file-item" onclick="previewDoc('Email from Paige (12/9)', 'Paige email regarding check status', 'drive-download-20251220T234142Z-3-001/Email Correspondence/Email from Paige - 12_9.pdf')">
-              <span class="file-icon">📧</span> Paige Email 12-9.pdf
+            <div class="file-item" onclick="previewDoc('Paige Email (12/9)', 'Paige Gold relays Ken Taylor\'s voicemail about check being overnighted', 'drive-download-20251220T234142Z-3-001/Email Correspondence/Email from Paige - 12_9.pdf')">
+              <div class="file-name"><span class="file-icon">📧</span> Paige Email 12-9.pdf</div>
+              <div class="file-desc">Relays "check being overnighted"</div>
             </div>
-            <div class="file-item" onclick="previewDoc('Borrower/Lender/Counsel Thread', 'Email thread with all parties', 'drive-download-20251220T234142Z-3-001/Email Correspondence/Email thread with borrower_lender_counsel.pdf')">
-              <span class="file-icon">📧</span> Borrower/Lender/Counsel.pdf
+            <div class="file-item" onclick="previewDoc('Borrower/Lender/Counsel Thread', 'Full email thread between Cole, Robert Abbasi (lender), and all counsel', 'drive-download-20251220T234142Z-3-001/Email Correspondence/Email thread with borrower_lender_counsel.pdf')">
+              <div class="file-name"><span class="file-icon">📧</span> Full Thread - All Parties.pdf</div>
+              <div class="file-desc">Complete thread with all parties</div>
             </div>
-            <div class="file-item" onclick="previewDoc('Lender/Borrower Thread', 'Email thread between lender and borrower', 'drive-download-20251220T234142Z-3-001/Email Correspondence/Email thread with lender_borrower.pdf')">
-              <span class="file-icon">📧</span> Lender/Borrower Thread.pdf
+            <div class="file-item" onclick="previewDoc('Lender/Borrower Thread', 'Email thread between Cole and Robert Abbasi (lender) re: foreclosure extensions', 'drive-download-20251220T234142Z-3-001/Email Correspondence/Email thread with lender_borrower.pdf')">
+              <div class="file-name"><span class="file-icon">📧</span> Cole & Abbasi Thread.pdf</div>
+              <div class="file-desc">Foreclosure extension negotiations</div>
             </div>
-            <div class="file-item" onclick="previewDoc('Letter - Paige to Lender (12/3)', 'Paige letter explaining check status', 'drive-download-20251220T234142Z-3-001/Email Correspondence/Ltr from Paige to Lender - 12_3_2025.pdf')">
-              <span class="file-icon">📧</span> Paige Letter 12-3.pdf
+            <div class="file-item" onclick="previewDoc('Paige Letter to Lender (12/3)', 'Paige Gold\'s letter stating opposing counsel said check was mailed; expects receipt by Friday', 'drive-download-20251220T234142Z-3-001/Email Correspondence/Ltr from Paige to Lender - 12_3_2025.pdf')">
+              <div class="file-name"><span class="file-icon">📧</span> Paige Letter 12-3.pdf</div>
+              <div class="file-desc">Says check mailed, expects by Friday</div>
             </div>
-            <div class="file-item" onclick="previewDoc('Letter - Paige to Lender (12/11)', 'Paige letter re unexpected delay', 'drive-download-20251220T234142Z-3-001/Email Correspondence/Ltr from Paige to Lender - 12_11_2025.pdf')">
-              <span class="file-icon">📧</span> Paige Letter 12-11.pdf
+            <div class="file-item" onclick="previewDoc('Paige Letter to Lender (12/11)', 'Paige\'s letter explaining "unexpected delay" — opposing counsel led her to believe check would arrive but it hasn\'t', 'drive-download-20251220T234142Z-3-001/Email Correspondence/Ltr from Paige to Lender - 12_11_2025.pdf')">
+              <div class="file-name"><span class="file-icon">📧</span> Paige Letter 12-11.pdf</div>
+              <div class="file-desc">⚠️ "Unexpected delay" — check not arrived</div>
             </div>
           </div>
         </div>
@@ -1491,20 +1596,25 @@
             <span class="folder-arrow">▶</span>
           </div>
           <div class="folder-files">
-            <div class="file-item" onclick="previewDoc('Text Screenshot 1', 'Text message screenshot', 'drive-download-20251220T234142Z-3-001/Text Message Correspondence/IMG_5712.jpg')">
-              <span class="file-icon">📱</span> IMG_5712.jpg
+            <div class="file-item" onclick="previewDoc('Text Messages (12/10 AM)', 'Cole asks Paige if Ken can confirm check arrives today; 2.5 hrs away', 'drive-download-20251220T234142Z-3-001/Text Message Correspondence/IMG_5712.jpg')">
+              <div class="file-name"><span class="file-icon">📱</span> Texts 12-10 AM.jpg</div>
+              <div class="file-desc">Cole asks for delivery confirmation</div>
             </div>
-            <div class="file-item" onclick="previewDoc('Text Screenshot 2', 'Text message screenshot', 'drive-download-20251220T234142Z-3-001/Text Message Correspondence/IMG_5714.PNG')">
-              <span class="file-icon">📱</span> IMG_5714.PNG
+            <div class="file-item" onclick="previewDoc('Text Messages (12/10 PM)', 'Paige relays: check signed yesterday, sent today, should arrive tomorrow', 'drive-download-20251220T234142Z-3-001/Text Message Correspondence/IMG_5714.PNG')">
+              <div class="file-name"><span class="file-icon">📱</span> Texts 12-10 PM.png</div>
+              <div class="file-desc">"Check signed yesterday, sent today"</div>
             </div>
-            <div class="file-item" onclick="previewDoc('Text Screenshot 3', 'Text message screenshot', 'drive-download-20251220T234142Z-3-001/Text Message Correspondence/IMG_5715.PNG')">
-              <span class="file-icon">📱</span> IMG_5715.PNG
+            <div class="file-item" onclick="previewDoc('Text Messages (12/11)', 'Cole requests tracking number; Paige says she\'ll ask Ken', 'drive-download-20251220T234142Z-3-001/Text Message Correspondence/IMG_5715.PNG')">
+              <div class="file-name"><span class="file-icon">📱</span> Texts 12-11.png</div>
+              <div class="file-desc">Cole requests tracking number</div>
             </div>
-            <div class="file-item" onclick="previewDoc('Text Screenshot 4', 'Text message screenshot - Dec 12 morning', 'drive-download-20251220T234142Z-3-001/Text Message Correspondence/IMG_5716.PNG')">
-              <span class="file-icon">📱</span> IMG_5716.PNG
+            <div class="file-item" onclick="previewDoc('Text Messages (12/12 Morning)', '10:08 AM — Ken says check went out yesterday, should arrive today; 11:37 AM — Paige: send photo when received; 1:07 PM — Cole: "My house was just foreclosed on"', 'drive-download-20251220T234142Z-3-001/Text Message Correspondence/IMG_5716.PNG')">
+              <div class="file-name"><span class="file-icon">📱</span> Texts 12-12 Morning.png</div>
+              <div class="file-desc">⚠️ Final texts before foreclosure</div>
             </div>
-            <div class="file-item" onclick="previewDoc('Text Screenshot 5', 'Text message screenshot', 'drive-download-20251220T234142Z-3-001/Text Message Correspondence/IMG_5717.jpg')">
-              <span class="file-icon">📱</span> IMG_5717.jpg
+            <div class="file-item" onclick="previewDoc('Text Messages (Additional)', 'Additional text message correspondence', 'drive-download-20251220T234142Z-3-001/Text Message Correspondence/IMG_5717.jpg')">
+              <div class="file-name"><span class="file-icon">📱</span> Additional Texts.jpg</div>
+              <div class="file-desc">Additional correspondence</div>
             </div>
           </div>
         </div>
@@ -1517,17 +1627,21 @@
             <span class="folder-arrow">▶</span>
           </div>
           <div class="folder-files">
-            <div class="file-item" onclick="previewDoc('Foreclosure Notice', 'Foreclosure notice document', 'drive-download-20251220T234142Z-3-001/Foreclosure Documents/041_20251103183220812.pdf')">
-              <span class="file-icon">📄</span> Foreclosure Notice.pdf
+            <div class="file-item" onclick="previewDoc('Foreclosure Notice', 'Notice of Default / Notice of Trustee Sale for 23476 Palm Drive', 'drive-download-20251220T234142Z-3-001/Foreclosure Documents/041_20251103183220812.pdf')">
+              <div class="file-name"><span class="file-icon">📕</span> Foreclosure Notice.pdf</div>
+              <div class="file-desc">NOD / NTS for 23476 Palm Drive</div>
             </div>
-            <div class="file-item" onclick="previewDoc('Demand for Payoff', 'Demand for payoff - 23476 Palm Drive', 'drive-download-20251220T234142Z-3-001/Foreclosure Documents/21858 Demand for Payoff - 23476 Palm Drive (1).pdf')">
-              <span class="file-icon">📄</span> Demand for Payoff.pdf
+            <div class="file-item" onclick="previewDoc('Demand for Payoff', 'Lender\'s demand for payoff on 23476 Palm Drive — $500K second deed of trust', 'drive-download-20251220T234142Z-3-001/Foreclosure Documents/21858 Demand for Payoff - 23476 Palm Drive (1).pdf')">
+              <div class="file-name"><span class="file-icon">📕</span> Demand for Payoff.pdf</div>
+              <div class="file-desc">$500K second deed of trust payoff</div>
             </div>
-            <div class="file-item" onclick="previewDoc('Loan Documents - 1st Lien', 'First deed of trust loan documents', 'drive-download-20251220T234142Z-3-001/Foreclosure Documents/Loan Documents - 1st Lien.pdf')">
-              <span class="file-icon">📄</span> Loan Docs - 1st Lien.pdf
+            <div class="file-item" onclick="previewDoc('Loan Documents - 1st Lien', 'First deed of trust loan documents — $2.5M (not in default)', 'drive-download-20251220T234142Z-3-001/Foreclosure Documents/Loan Documents - 1st Lien.pdf')">
+              <div class="file-name"><span class="file-icon">📕</span> 1st Lien Loan Docs.pdf</div>
+              <div class="file-desc">$2.5M first DOT — not in default</div>
             </div>
-            <div class="file-item" onclick="previewDoc('Loan Documents - 2nd Lien', 'Second deed of trust loan documents (foreclosing)', 'drive-download-20251220T234142Z-3-001/Foreclosure Documents/Loan Documents - 2nd Lien.pdf')">
-              <span class="file-icon">📄</span> Loan Docs - 2nd Lien.pdf
+            <div class="file-item" onclick="previewDoc('Loan Documents - 2nd Lien', 'Second deed of trust loan documents — $500K (foreclosing lien)', 'drive-download-20251220T234142Z-3-001/Foreclosure Documents/Loan Documents - 2nd Lien.pdf')">
+              <div class="file-name"><span class="file-icon">📕</span> 2nd Lien Loan Docs.pdf</div>
+              <div class="file-desc">$500K second DOT — foreclosing lien</div>
             </div>
           </div>
         </div>
@@ -1540,11 +1654,13 @@
             <span class="folder-arrow">▶</span>
           </div>
           <div class="folder-files">
-            <div class="file-item" onclick="previewDoc('Appraisal Report', 'Full appraisal report for property', 'drive-download-20251220T234142Z-3-001/Subject Property - Appraisal-BOV/Appraisal report (2).pdf')">
-              <span class="file-icon">📄</span> Appraisal Report.pdf
+            <div class="file-item" onclick="previewDoc('Appraisal Report', 'Full property appraisal for 23476 Palm Drive — pre-renovation value $8,250,000', 'drive-download-20251220T234142Z-3-001/Subject Property - Appraisal-BOV/Appraisal report (2).pdf')">
+              <div class="file-name"><span class="file-icon">📕</span> Appraisal Report.pdf</div>
+              <div class="file-desc">Pre-renovation value: $8.25M</div>
             </div>
-            <div class="file-item" onclick="previewDoc('Broker Opinion of Value', 'BOV image', 'drive-download-20251220T234142Z-3-001/Subject Property - Appraisal-BOV/BOV.png')">
-              <span class="file-icon">🖼️</span> BOV.png
+            <div class="file-item" onclick="previewDoc('Broker Opinion of Value', 'BOV showing post-renovation estimated value $10-12M', 'drive-download-20251220T234142Z-3-001/Subject Property - Appraisal-BOV/BOV.png')">
+              <div class="file-name"><span class="file-icon">🖼️</span> BOV.png</div>
+              <div class="file-desc">Post-renovation estimate: $10-12M</div>
             </div>
           </div>
         </div>
@@ -1557,8 +1673,9 @@
             <span class="folder-arrow">▶</span>
           </div>
           <div class="folder-files">
-            <div class="file-item" onclick="previewDoc('Timeline of Events', 'Detailed timeline of bad faith/foreclosure case', 'drive-download-20251220T234142Z-3-001/Timeline of Events (IN PROGRESS)/Timeline of Events - Bad Faith_Foreclosure Case.docx')">
-              <span class="file-icon">📄</span> Timeline of Events.docx
+            <div class="file-item" onclick="previewDoc('Timeline of Events', 'Detailed chronological timeline from contract formation through foreclosure — all dates, communications, and representations', 'drive-download-20251220T234142Z-3-001/Timeline of Events (IN PROGRESS)/Timeline of Events - Bad Faith_Foreclosure Case.docx')">
+              <div class="file-name"><span class="file-icon">📝</span> Timeline of Events.docx</div>
+              <div class="file-desc">Full chronology — contract to foreclosure</div>
             </div>
           </div>
         </div>
@@ -1566,13 +1683,14 @@
         <div class="doc-folder">
           <div class="folder-header" onclick="toggleFolder(this)">
             <span class="folder-icon">📁</span>
-            <span class="folder-name">Upwork Chat Log</span>
+            <span class="folder-name">Project Scope</span>
             <span class="folder-count">1</span>
             <span class="folder-arrow">▶</span>
           </div>
           <div class="folder-files">
-            <div class="file-item" onclick="previewDoc('GPT Chat Export', 'Upwork conversation and project scope', 'gpt.txt')">
-              <span class="file-icon">📄</span> gpt.txt
+            <div class="file-item" onclick="previewDoc('Upwork Project Brief', 'Original project scope and Cole\'s questions — legal research memo requirements', 'gpt.txt')">
+              <div class="file-name"><span class="file-icon">📄</span> Project Brief.txt</div>
+              <div class="file-desc">Cole\'s original questions & scope</div>
             </div>
           </div>
         </div>
@@ -1580,9 +1698,18 @@
       </div>
 
       <div class="doc-preview" id="docPreview">
-        <div class="preview-icon">📂</div>
-        <div class="preview-title">Select a Document</div>
-        <div class="preview-desc">Click on a file in the sidebar to preview and download</div>
+        <div class="preview-header">
+          <div class="preview-title">
+            <span>📂</span> Select a Document
+          </div>
+          <div class="preview-desc">Click on a file in the sidebar to preview</div>
+        </div>
+        <div class="preview-content">
+          <div class="preview-placeholder">
+            <div class="preview-placeholder-icon">📄</div>
+            <div>Select a document from the sidebar to preview it here</div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1717,16 +1844,58 @@
   function previewDoc(title, desc, path) {
     const preview = document.getElementById('docPreview');
     const ext = path.split('.').pop().toLowerCase();
+
     let icon = '📄';
-    if (['jpg', 'jpeg', 'png', 'gif'].includes(ext)) icon = '🖼️';
-    else if (ext === 'pdf') icon = '📕';
-    else if (ext === 'docx') icon = '📝';
+    let typeLabel = ext.toUpperCase();
+    let previewContent = '';
+
+    if (['jpg', 'jpeg', 'png', 'gif'].includes(ext)) {
+      icon = '🖼️';
+      typeLabel = 'IMAGE';
+      previewContent = `<img src="${path}" alt="${title}" style="max-width: 100%; max-height: 500px; object-fit: contain;">`;
+    } else if (ext === 'pdf') {
+      icon = '📕';
+      typeLabel = 'PDF';
+      previewContent = `<embed src="${path}" type="application/pdf" style="width: 100%; height: 100%; min-height: 500px;">`;
+    } else if (ext === 'docx') {
+      icon = '📝';
+      typeLabel = 'DOCX';
+      previewContent = `
+        <div class="preview-placeholder">
+          <div class="preview-placeholder-icon">📝</div>
+          <div style="margin-bottom: 12px;"><strong>${title}</strong></div>
+          <div style="font-size: 0.85rem; margin-bottom: 16px;">Word documents cannot be previewed in browser.<br>Click "Open Document" to download and view.</div>
+        </div>
+      `;
+    } else if (ext === 'txt') {
+      icon = '📄';
+      typeLabel = 'TEXT';
+      previewContent = `<iframe src="${path}" style="width: 100%; height: 100%; min-height: 500px; border: none; background: white;"></iframe>`;
+    } else {
+      previewContent = `
+        <div class="preview-placeholder">
+          <div class="preview-placeholder-icon">${icon}</div>
+          <div style="margin-bottom: 12px;"><strong>${title}</strong></div>
+          <div style="font-size: 0.85rem;">Preview not available for this file type.</div>
+        </div>
+      `;
+    }
 
     preview.innerHTML = `
-      <div class="preview-icon">${icon}</div>
-      <div class="preview-title">${title}</div>
-      <div class="preview-desc">${desc}</div>
-      <a href="${path}" target="_blank" class="preview-btn">Open Document</a>
+      <div class="preview-header">
+        <div class="preview-title">
+          <span>${icon}</span> ${title}
+          <span class="file-type-badge">${typeLabel}</span>
+        </div>
+        <div class="preview-desc">${desc}</div>
+      </div>
+      <div class="preview-content">
+        ${previewContent}
+      </div>
+      <div class="preview-footer">
+        <a href="${path}" download class="preview-btn-secondary">⬇ Download</a>
+        <a href="${path}" target="_blank" class="preview-btn">Open in New Tab →</a>
+      </div>
     `;
 
     // Highlight active file
