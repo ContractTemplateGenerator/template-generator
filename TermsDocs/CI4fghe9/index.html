@@ -8,6 +8,101 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
+    /* Password Wall Styles */
+    #passwordWall {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, #1a2e44 0%, #2d4a6f 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    #passwordWall.hidden {
+      display: none;
+    }
+
+    .password-box {
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 400px;
+      width: 90%;
+    }
+
+    .password-box h2 {
+      font-family: 'Crimson Pro', Georgia, serif;
+      color: #1a2e44;
+      margin-bottom: 10px;
+      font-size: 24px;
+    }
+
+    .password-box p {
+      color: #78716c;
+      margin-bottom: 24px;
+      font-size: 14px;
+    }
+
+    .password-input-group {
+      margin-bottom: 20px;
+    }
+
+    .password-input-group input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e7e5e4;
+      border-radius: 8px;
+      font-size: 16px;
+      font-family: 'Inter', sans-serif;
+      transition: border-color 0.3s;
+    }
+
+    .password-input-group input:focus {
+      outline: none;
+      border-color: #7c3aed;
+    }
+
+    .password-submit {
+      width: 100%;
+      padding: 12px;
+      background: #7c3aed;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .password-submit:hover {
+      background: #6d28d9;
+    }
+
+    .password-error {
+      color: #dc2626;
+      font-size: 14px;
+      margin-top: 12px;
+      display: none;
+    }
+
+    .password-error.visible {
+      display: block;
+    }
+
+    #mainContent {
+      display: none;
+    }
+
+    #mainContent.visible {
+      display: block;
+    }
+
     :root {
       --primary: #1a2e44;
       --primary-light: #2d4a6f;
@@ -777,6 +872,21 @@
 </head>
 <body>
 
+<div id="passwordWall">
+  <div class="password-box">
+    <h2>Protected Content</h2>
+    <p>Please enter the password to access this document.</p>
+    <form id="passwordForm" onsubmit="checkPassword(event)">
+      <div class="password-input-group">
+        <input type="password" id="passwordInput" placeholder="Enter password" autocomplete="off" required>
+      </div>
+      <button type="submit" class="password-submit">Access Document</button>
+      <div id="passwordError" class="password-error">Incorrect password. Please try again.</div>
+    </form>
+  </div>
+</div>
+
+<div id="mainContent">
 <div class="confidential-bar">
   Attorney-Client Privileged &amp; Confidential Work Product
 </div>
@@ -2074,6 +2184,31 @@
     </div>
   </div>
 </footer>
+</div>
+
+<script>
+function checkPassword(event) {
+  event.preventDefault();
+  const password = document.getElementById('passwordInput').value;
+  const correctPassword = '4hgjy5';
+
+  if (password === correctPassword) {
+    document.getElementById('passwordWall').classList.add('hidden');
+    document.getElementById('mainContent').classList.add('visible');
+    sessionStorage.setItem('authenticated', 'true');
+  } else {
+    document.getElementById('passwordError').classList.add('visible');
+    document.getElementById('passwordInput').value = '';
+    document.getElementById('passwordInput').focus();
+  }
+}
+
+// Check if already authenticated in this session
+if (sessionStorage.getItem('authenticated') === 'true') {
+  document.getElementById('passwordWall').classList.add('hidden');
+  document.getElementById('mainContent').classList.add('visible');
+}
+</script>
 
 </body>
 </html>
