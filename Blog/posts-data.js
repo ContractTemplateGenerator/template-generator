@@ -4,6 +4,16 @@
 
 const BLOG_POSTS = [
   {
+    "id": 99003,
+    "title": "Independent Contractor Agreements for Spas, Salons & Massage Therapists",
+    "slug": "independent-contractor-agreement-spa-salon-massage-therapist",
+    "date": "2025-12-20",
+    "url": "/Blog/independent-contractor-agreement-spa-salon-massage-therapist/",
+    "categories": ["Contractors & Employees", "Free Templates", "Document Generators"],
+    "featured": true,
+    "description": "Complete guide to independent contractor agreements for massage therapists, estheticians, hair stylists. State-by-state classification rules, ABC test, contract clauses, and free generator."
+  },
+  {
     "id": 99001,
     "title": "Consumer Dispute Calculator - What's Your Refund Really Worth?",
     "slug": "consumer-dispute-calculator",
