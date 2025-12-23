@@ -12386,46 +12386,6 @@ const BLOG_POSTS = [
     ]
   },
   {
-    "id": 1402,
-    "title": "Default Kit",
-    "slug": "default-kit-2",
-    "date": "2022-04-12",
-    "url": "https://terms.law/2022/04/12/default-kit-2/",
-    "categories": []
-  },
-  {
-    "id": 1409,
-    "title": "Home",
-    "slug": "home",
-    "date": "2022-04-12",
-    "url": "https://terms.law/2022/04/12/home/",
-    "categories": []
-  },
-  {
-    "id": 1410,
-    "title": "Pages",
-    "slug": "pages",
-    "date": "2022-04-12",
-    "url": "https://terms.law/2022/04/12/pages/",
-    "categories": []
-  },
-  {
-    "id": 1439,
-    "title": "Author page",
-    "slug": "author-page",
-    "date": "2022-04-12",
-    "url": "https://terms.law/2022/04/12/author-page/",
-    "categories": []
-  },
-  {
-    "id": 1448,
-    "title": "Custom Styles",
-    "slug": "wp-global-styles-fox-2",
-    "date": "2022-04-12",
-    "url": "https://terms.law/2022/04/12/wp-global-styles-fox-2/",
-    "categories": []
-  },
-  {
     "id": 172,
     "title": "The Government of the Russian Federation Has Decided How It Will Regulate Cryptocurrencies – It Will Not Ban, but It Will Not Leave Anonymity",
     "slug": "the-government-of-the-russian-federation-has-decided-how-it-will-regulate-cryptocurrencies-it-will-not-ban-but-it-will-not-leave-anonymity",
