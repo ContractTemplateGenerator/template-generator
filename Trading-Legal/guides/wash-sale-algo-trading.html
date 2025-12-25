@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wash Sale Rule: Algorithmic Trading | Terms.Law</title>
+  <meta name="description" content="Complete guide to wash sale rules for algorithmic traders. Understand IRC Section 1091, 61-day window, high-frequency trading implications, and MTM election exemptions.">
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-901N2Y3CDZ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-901N2Y3CDZ');
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --accent: #8b5cf6;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --dark: #0f172a;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
+      --gray-400: #94a3b8;
+      --gray-500: #64748b;
+      --gray-600: #475569;
+      --gray-700: #334155;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-700);
+      line-height: 1.7;
+    }
+
+    .header {
+      background: var(--dark);
+      border-bottom: 1px solid var(--gray-200);
+      padding: 0.75rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      font-weight: 800;
+      font-size: 1rem;
+      color: white;
+      text-decoration: none;
+    }
+    .logo span { color: var(--gray-300); font-weight: 500; }
+    .nav-links { display: flex; gap: 1.5rem; }
+    .nav-links a { color: var(--gray-300); text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--primary); }
+
+    .hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #dc2626 100%);
+      padding: 1.5rem 2rem 2rem;
+    }
+    .hero-inner { max-width: 1400px; margin: 0 auto; }
+    .breadcrumb { font-size: 0.8rem; color: var(--gray-300); margin-bottom: 0.75rem; }
+    .breadcrumb a { color: var(--gray-300); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--primary); }
+    .hero h1 { font-size: 1.75rem; font-weight: 800; color: white; margin-bottom: 0.5rem; line-height: 1.2; }
+    .hero-meta { display: flex; gap: 1.5rem; color: var(--gray-300); font-size: 0.8rem; flex-wrap: wrap; }
+
+    .main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 3rem;
+    }
+    @media (max-width: 1000px) { .main { grid-template-columns: 1fr; } }
+
+    .content {
+      background: white;
+      border-radius: 16px;
+      padding: 3rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .content h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-top: 2.5rem;
+      margin-bottom: 0.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--gray-200);
+    }
+    .content h2:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+    .content h3 { font-size: 1.2rem; font-weight: 700; color: var(--dark); margin-top: 2rem; margin-bottom: 0.75rem; }
+    .content p { margin-bottom: 1.25rem; }
+    .content ul, .content ol { margin-bottom: 1.25rem; padding-left: 1.5rem; }
+    .content li { margin-bottom: 0.5rem; }
+    .content a { color: var(--primary); text-decoration: none; }
+    .content a:hover { text-decoration: underline; }
+
+    .callout { padding: 1.5rem; border-radius: 12px; margin: 1.5rem 0; }
+    .callout-info { background: #eff6ff; border-left: 4px solid var(--primary); }
+    .callout-warning { background: #fffbeb; border-left: 4px solid var(--warning); }
+    .callout-success { background: #f0fdf4; border-left: 4px solid var(--success); }
+    .callout-danger { background: #fef2f2; border-left: 4px solid var(--danger); }
+    .callout h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .callout-info h4 { color: #1e40af; }
+    .callout-warning h4 { color: #92400e; }
+    .callout-success h4 { color: #166534; }
+    .callout-danger h4 { color: #991b1b; }
+    .callout p { margin-bottom: 0; font-size: 0.95rem; }
+
+    .benefit-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    @media (max-width: 600px) { .benefit-grid { grid-template-columns: 1fr; } }
+    .benefit-card {
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      border-radius: 12px;
+      padding: 1.25rem;
+    }
+    .benefit-card h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .benefit-card p { font-size: 0.9rem; color: var(--gray-600); margin: 0; }
+
+    table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.95rem; }
+    th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--gray-200); }
+    th { background: var(--gray-50); font-weight: 600; color: var(--dark); }
+
+    .calculator {
+      background: linear-gradient(135deg, #eff6ff, #dbeafe);
+      border: 2px solid var(--primary);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+    }
+    .calculator h3 { font-size: 1.3rem; font-weight: 700; color: var(--dark); margin-bottom: 1.5rem; text-align: center; }
+    .calc-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+    @media (max-width: 600px) { .calc-row { grid-template-columns: 1fr; } }
+    .calc-input { display: flex; flex-direction: column; gap: 0.5rem; }
+    .calc-input label { font-size: 0.9rem; font-weight: 600; color: var(--gray-700); }
+    .calc-input input, .calc-input select {
+      padding: 10px 12px;
+      border: 1px solid var(--gray-300);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-family: inherit;
+    }
+    .calc-input input:focus, .calc-input select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    .calc-button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 1rem;
+      width: 100%;
+    }
+    .calc-button:hover { background: var(--primary-dark); }
+    .calc-result {
+      background: white;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+      display: none;
+    }
+    .calc-result.show { display: block; }
+    .calc-result h4 { font-size: 1.1rem; font-weight: 700; color: var(--dark); margin-bottom: 1rem; }
+    .result-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--gray-200); }
+    .result-row:last-child { border-bottom: none; font-weight: 700; font-size: 1.1rem; color: var(--danger); }
+    .result-label { color: var(--gray-600); }
+    .result-value { font-weight: 600; color: var(--dark); }
+
+    .comparison-table {
+      background: var(--gray-50);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+    }
+    .comparison-table h3 { font-size: 1.2rem; font-weight: 700; color: var(--dark); margin-bottom: 1rem; }
+
+    .sidebar { position: sticky; top: 80px; height: fit-content; }
+    .sidebar-card { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 0.75rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .sidebar-card h3 { font-size: 0.9rem; font-weight: 700; color: var(--dark); margin-bottom: 0.5rem; }
+    .toc-list { list-style: none; padding: 0; }
+    .toc-list li { margin-bottom: 8px; }
+    .toc-list a { color: var(--gray-600); text-decoration: none; font-size: 0.85rem; display: block; padding: 6px 12px; border-radius: 6px; }
+    .toc-list a:hover { background: var(--gray-100); color: var(--primary); }
+
+    .cta-card {
+      background: linear-gradient(135deg, var(--success), #059669);
+      color: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+    }
+    .cta-card h3 { color: white; margin-bottom: 0.75rem; }
+    .cta-card p { font-size: 0.9rem; opacity: 0.9; margin-bottom: 1rem; }
+    .cta-card .btn {
+      display: inline-block;
+      padding: 10px 24px;
+      background: white;
+      color: var(--success);
+      border-radius: 8px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .code-block {
+      background: var(--gray-100);
+      padding: 1.25rem;
+      border-radius: 8px;
+      font-family: 'Monaco', 'Courier New', monospace;
+      font-size: 0.85rem;
+      margin: 1rem 0;
+      overflow-x: auto;
+    }
+
+    .disclaimer { margin-top: 2rem; padding: 1rem; background: #fef3c7; border-radius: 8px; font-size: 0.8rem; color: #92400e; }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <a href="../index.html" class="logo">Terms.Law <span>/ Trading Legal Hub</span></a>
+    <div class="nav-links">
+      <a href="./">Guides</a>
+      <a href="../index.html">Hub Home</a>
+      <a href="../index.html#consult">Consult</a>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="breadcrumb">
+      <a href="../index.html">Hub</a> / <a href="./">Tax</a> / Wash Sale Rule
+    </div>
+    <h1>Wash Sale Rule: Algorithmic Trading</h1>
+    <div class="hero-meta">
+      <span>&#128197; Updated Dec 2025</span>
+      <span>&#9201; 15 min read</span>
+      <span>&#128176; Tax Compliance</span>
+    </div>
+  </div>
+</section>
+
+<main class="main">
+  <article class="content">
+    <h2 id="overview">IRC Section 1091 Overview</h2>
+    <p>
+      The <strong>wash sale rule</strong> under IRC Section 1091 prevents taxpayers from claiming a tax deduction for a security sold at a loss if they purchase a "substantially identical" security within <strong>30 days before or after</strong> the sale date (a 61-day window total).
+    </p>
+    <p>
+      For algorithmic traders executing hundreds or thousands of trades per day, wash sale rules create a massive compliance burden and can dramatically increase your tax liability—even if you had net losses for the year.
+    </p>
+
+    <div class="callout callout-danger">
+      <h4>&#9888; Critical for Algo Traders</h4>
+      <p>Wash sales can turn a profitable trading year into a tax disaster. Disallowed losses get deferred, but if you stop trading that security, those losses may become permanently non-deductible. High-frequency traders face exponential wash sale tracking complexity.</p>
+    </div>
+
+    <h3>The Problem Illustrated</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Transaction</th>
+          <th>Price</th>
+          <th>Gain/Loss</th>
+          <th>Wash Sale?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Jan 5</td>
+          <td>Buy 100 AAPL</td>
+          <td>$150</td>
+          <td>—</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>Jan 10</td>
+          <td>Sell 100 AAPL</td>
+          <td>$145</td>
+          <td>($500)</td>
+          <td>Yes (repurchased Jan 15)</td>
+        </tr>
+        <tr>
+          <td>Jan 15</td>
+          <td>Buy 100 AAPL</td>
+          <td>$143</td>
+          <td>—</td>
+          <td>Triggers wash sale</td>
+        </tr>
+        <tr>
+          <td colspan="5" style="background: #fef2f2; color: #991b1b; font-weight: 600;">
+            Result: $500 loss is disallowed and added to basis of Jan 15 purchase
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 id="61-day-window">The 61-Day Window (30 Before/30 After)</h2>
+    <p>
+      The wash sale rule applies to a <strong>61-day period</strong>: 30 days before the loss sale + the sale date + 30 days after.
+    </p>
+
+    <h3>How the Window Works</h3>
+    <ul>
+      <li><strong>Day of sale:</strong> The date you realize the loss</li>
+      <li><strong>30 days before:</strong> Purchases in this window can trigger wash sales</li>
+      <li><strong>30 days after:</strong> Purchases in this window can trigger wash sales</li>
+      <li><strong>Total window:</strong> 61 calendar days</li>
+    </ul>
+
+    <div class="callout callout-info">
+      <h4>&#128197; Calendar Days, Not Trading Days</h4>
+      <p>The 61-day window counts calendar days, not trading days. Weekends and holidays count toward the 30-day periods before and after the loss sale.</p>
+    </div>
+
+    <h3>Complex Scenario: Multiple Purchases</h3>
+    <p>
+      When you make multiple purchases within the 61-day window, the IRS applies wash sale rules using <strong>FIFO (First-In-First-Out)</strong> matching by default, but the actual rules are more complex:
+    </p>
+    <ul>
+      <li>Wash sales match against replacement shares purchased within the window</li>
+      <li>If you buy shares before AND after the loss sale, purchases are matched in chronological order</li>
+      <li>Partial wash sales can occur if you don't repurchase the full quantity</li>
+      <li>Multiple lots can create cascading wash sales</li>
+    </ul>
+
+    <h2 id="substantially-identical">Substantially Identical Securities</h2>
+    <p>
+      The wash sale rule only applies when you repurchase a <strong>"substantially identical"</strong> security. The IRS has not provided a comprehensive definition, but guidance exists:
+    </p>
+
+    <h3>Clear Substantially Identical</h3>
+    <div class="benefit-grid">
+      <div class="benefit-card">
+        <h4>&#10003; Same Stock</h4>
+        <p>AAPL sold and repurchased = substantially identical</p>
+      </div>
+      <div class="benefit-card">
+        <h4>&#10003; Same Company, Different Class</h4>
+        <p>GOOG (Class C) vs GOOGL (Class A) = generally identical</p>
+      </div>
+      <div class="benefit-card">
+        <h4>&#10003; Convertible Securities</h4>
+        <p>Bonds convertible to stock may be substantially identical to the stock</p>
+      </div>
+      <div class="benefit-card">
+        <h4>&#10003; Call Options (In-the-Money)</h4>
+        <p>Selling stock at a loss and buying deep ITM calls may trigger wash sale</p>
+      </div>
+    </div>
+
+    <h3>NOT Substantially Identical</h3>
+    <div class="benefit-grid">
+      <div class="benefit-card">
+        <h4>&#10007; Different Companies (Same Sector)</h4>
+        <p>JPM vs BAC = different securities, even if correlated</p>
+      </div>
+      <div class="benefit-card">
+        <h4>&#10007; ETFs Tracking Same Index</h4>
+        <p>SPY vs VOO = IRS has ruled these are NOT substantially identical</p>
+      </div>
+      <div class="benefit-card">
+        <h4>&#10007; Bonds (Different Issuers/Terms)</h4>
+        <p>10-year Treasury vs 30-year Treasury = different securities</p>
+      </div>
+      <div class="benefit-card">
+        <h4>&#10007; Preferred vs Common Stock</h4>
+        <p>Generally not substantially identical (unless convertible)</p>
+      </div>
+    </div>
+
+    <div class="callout callout-warning">
+      <h4>&#9888; Gray Areas</h4>
+      <p>Options, futures, and complex derivatives exist in a gray area. The IRS has issued limited guidance. Conservative approach: assume wash sale rules apply to economically similar positions.</p>
+    </div>
+
+    <h2 id="hft-wash-sales">High-Frequency Trading Wash Sales</h2>
+    <p>
+      High-frequency and algorithmic traders face unique wash sale challenges due to the sheer volume and speed of trades:
+    </p>
+
+    <h3>The Compounding Problem</h3>
+    <ol>
+      <li><strong>Volume amplification:</strong> 1,000+ trades/day = millions of potential wash sale comparisons</li>
+      <li><strong>Rolling positions:</strong> Continuous trading makes nearly every loss sale a wash sale</li>
+      <li><strong>Loss deferrals compound:</strong> Disallowed losses stack into basis adjustments across hundreds of lots</li>
+      <li><strong>Year-end positions:</strong> If you hold positions at year-end, deferred losses remain suspended</li>
+      <li><strong>Tracking nightmare:</strong> Manual calculation is impossible; sophisticated software required</li>
+    </ol>
+
+    <h3>Real-World HFT Example</h3>
+    <div class="code-block">
+<strong>Algo Trader Statistics (2025):</strong>
+• Total trades: 45,000
+• Symbols traded: 150
+• Gross profit: $250,000
+• Gross loss: $220,000
+• Net P&L: $30,000
+
+<strong>Wash Sale Impact:</strong>
+• Loss sales: 22,000
+• Wash sales triggered: 18,500 (84%)
+• Disallowed losses: $195,000
+• Deferred to next year: $175,000 (held positions)
+• Permanently lost: $20,000 (stopped trading certain symbols)
+
+<strong>Tax Consequence:</strong>
+• Taxable gain WITHOUT wash sale adjustment: $30,000
+• Taxable gain WITH wash sale disallowance: $225,000
+• Additional tax owed (37% bracket): ~$72,000
+• Actual cash profit: $30,000
+    </div>
+
+    <div class="callout callout-danger">
+      <h4>&#9888; Insolvency Risk</h4>
+      <p>HFT traders can owe more in taxes than they made in actual profits. This has bankrupted traders who didn't understand wash sale implications. You can have a small net gain but owe six figures in taxes due to disallowed losses.</p>
+    </div>
+
+    <h3>HFT Wash Sale Mitigation Strategies</h3>
+    <ul>
+      <li><strong>475(f) Mark-to-Market Election:</strong> Completely exempts you from wash sale rules (see below)</li>
+      <li><strong>Trade ETFs instead of individual stocks:</strong> Rotate between SPY/VOO/IVV to harvest losses</li>
+      <li><strong>31-day loss harvesting:</strong> Wait 31 days before repurchasing (kills HFT strategies)</li>
+      <li><strong>Trade futures instead of stocks:</strong> Section 1256 contracts have different rules</li>
+      <li><strong>Use different accounts carefully:</strong> Wash sales apply across all your accounts AND your IRA</li>
+    </ul>
+
+    <h2 id="options-wash-sales">Options & Wash Sales</h2>
+    <p>
+      Options and stock interactions for wash sale purposes are complex and not fully settled by IRS guidance:
+    </p>
+
+    <h3>General Rules</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Wash Sale Risk</th>
+          <th>IRS Position</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Sell stock at loss, buy same stock call option</td>
+          <td>High</td>
+          <td>Likely triggers wash sale if deep ITM</td>
+        </tr>
+        <tr>
+          <td>Sell stock at loss, sell put option</td>
+          <td>High</td>
+          <td>Cash-secured put = substantially identical position</td>
+        </tr>
+        <tr>
+          <td>Sell call option at loss, buy same call</td>
+          <td>High</td>
+          <td>Same strike/expiration = substantially identical</td>
+        </tr>
+        <tr>
+          <td>Sell call option at loss, buy different strike</td>
+          <td>Moderate</td>
+          <td>Gray area; depends on how similar</td>
+        </tr>
+        <tr>
+          <td>Sell stock at loss, buy OTM call</td>
+          <td>Low-Moderate</td>
+          <td>Unclear; conservative approach assumes risk</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Options-Specific Considerations</h3>
+    <ul>
+      <li><strong>Strike price matters:</strong> Deep ITM calls are more likely substantially identical to stock</li>
+      <li><strong>Expiration date:</strong> Same strike but different expiration may avoid wash sale</li>
+      <li><strong>LEAPS vs short-term:</strong> Long-dated options are more stock-like</li>
+      <li><strong>Covered calls:</strong> Selling covered calls after realizing a loss can trigger issues</li>
+    </ul>
+
+    <div class="callout callout-warning">
+      <h4>&#9888; Conservative Approach Recommended</h4>
+      <p>Due to limited IRS guidance on options wash sales, take a conservative approach. Assume any economically similar option position could trigger wash sale rules. Document your reasoning if you take an aggressive position.</p>
+    </div>
+
+    <h2 id="crypto-wash-sales">Crypto Wash Sales (Post-2025)</h2>
+    <p>
+      Prior to 2025, cryptocurrencies were <strong>NOT</strong> subject to wash sale rules because the IRS treated them as property, not securities. Section 1091 only applies to "stocks or securities."
+    </p>
+
+    <div class="callout callout-danger">
+      <h4>&#128197; 2025 Tax Law Change</h4>
+      <p><strong>The Infrastructure Investment and Jobs Act (enacted 2021, effective 2025)</strong> extended wash sale rules to digital assets, including cryptocurrencies. Starting with 2025 tax year, crypto trades ARE subject to wash sale rules.</p>
+    </div>
+
+    <h3>What Changed for Crypto (2025+)</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Aspect</th>
+          <th>Before 2025</th>
+          <th>2025 and After</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Wash Sale Rules Apply?</td>
+          <td>No</td>
+          <td>Yes</td>
+        </tr>
+        <tr>
+          <td>Tax Loss Harvesting</td>
+          <td>Unrestricted</td>
+          <td>61-day window restrictions</td>
+        </tr>
+        <tr>
+          <td>Same-Day Buy/Sell</td>
+          <td>Both transactions count</td>
+          <td>Loss may be disallowed</td>
+        </tr>
+        <tr>
+          <td>Cross-Exchange Trading</td>
+          <td>No restrictions</td>
+          <td>All accounts aggregated</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Crypto-Specific Complications</h3>
+    <ul>
+      <li><strong>Substantially identical determination:</strong> Is BTC on Coinbase substantially identical to BTC on Kraken? (Yes)</li>
+      <li><strong>Wrapped tokens:</strong> Is WBTC substantially identical to BTC? (Unclear, likely yes)</li>
+      <li><strong>Different blockchains:</strong> Is ETH substantially identical to ETH on Arbitrum? (Gray area)</li>
+      <li><strong>Stablecoins:</strong> USDC vs USDT vs DAI = likely NOT substantially identical</li>
+      <li><strong>DeFi positions:</strong> Staked/locked crypto may or may not trigger wash sales</li>
+      <li><strong>NFTs:</strong> Each NFT is unique; wash sale rules likely don't apply to specific NFTs</li>
+    </ul>
+
+    <h3>Crypto Trading Strategies Post-2025</h3>
+    <ol>
+      <li><strong>Harvest to stablecoins:</strong> Sell crypto at loss, wait 31 days before repurchasing</li>
+      <li><strong>Rotate similar assets:</strong> Sell BTC, buy ETH (not substantially identical)</li>
+      <li><strong>475(f) election:</strong> Mark-to-market exemption applies to crypto traders too</li>
+      <li><strong>Strategic timing:</strong> Plan loss harvesting around year-end with 31-day gaps</li>
+    </ol>
+
+    <h2 id="tracking-reporting">Tracking & Reporting Burden</h2>
+    <p>
+      Wash sale tracking and reporting requirements are substantial, especially for active traders:
+    </p>
+
+    <h3>What You Must Track</h3>
+    <ul>
+      <li><strong>Every purchase and sale</strong> with dates, quantities, and prices</li>
+      <li><strong>61-day window</strong> for each loss sale</li>
+      <li><strong>Replacement shares</strong> purchased in each window</li>
+      <li><strong>Disallowed loss amounts</strong> for each wash sale</li>
+      <li><strong>Adjusted basis</strong> of replacement shares (original basis + disallowed loss)</li>
+      <li><strong>Holding period</strong> adjustments (tacks on holding period of sold shares)</li>
+    </ul>
+
+    <h3>Form 8949 Reporting</h3>
+    <p>
+      Wash sales must be reported on <strong>Form 8949 (Sales and Other Dispositions of Capital Assets)</strong>:
+    </p>
+    <ul>
+      <li>Column (f): Report the disallowed loss amount</li>
+      <li>Code "W" in column (f) indicates wash sale adjustment</li>
+      <li>Adjusted gain/loss appears in column (h)</li>
+      <li>Each transaction must be reported individually (could be thousands of rows)</li>
+    </ul>
+
+    <div class="callout callout-warning">
+      <h4>&#9888; Broker Reporting Limitations</h4>
+      <p>Brokers are required to track and report wash sales on Form 1099-B, BUT only for identical securities within the same account. Brokers DO NOT track wash sales across multiple accounts, between brokers, or with IRAs. You must track these yourself.</p>
+    </div>
+
+    <h3>Cross-Account Tracking</h3>
+    <p>
+      Wash sale rules apply across <strong>ALL</strong> your accounts:
+    </p>
+    <ul>
+      <li>Multiple brokerage accounts</li>
+      <li>Your spouse's accounts (if filing jointly)</li>
+      <li>Traditional and Roth IRAs (see below)</li>
+      <li>401(k) plans with brokerage windows</li>
+      <li>Entity accounts you control (single-member LLC, etc.)</li>
+    </ul>
+
+    <h2 id="ira-coordination">IRA Wash Sale Coordination</h2>
+    <p>
+      One of the most dangerous wash sale traps involves IRAs:
+    </p>
+
+    <div class="callout callout-danger">
+      <h4>&#9888; IRA Wash Sale Black Hole</h4>
+      <p>If you sell a security at a loss in your taxable account and repurchase it in your IRA within 61 days, the loss is PERMANENTLY DISALLOWED. You cannot deduct it, and you cannot add it to the basis of the IRA shares (IRAs don't have cost basis for tax purposes).</p>
+    </div>
+
+    <h3>How the IRA Trap Works</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Account</th>
+          <th>Transaction</th>
+          <th>Result</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Nov 15</td>
+          <td>Taxable</td>
+          <td>Sell 100 AAPL at $10,000 loss</td>
+          <td>Loss realized</td>
+        </tr>
+        <tr>
+          <td>Nov 20</td>
+          <td>IRA</td>
+          <td>Buy 100 AAPL</td>
+          <td>Wash sale triggered</td>
+        </tr>
+        <tr>
+          <td colspan="4" style="background: #fef2f2; color: #991b1b; font-weight: 600;">
+            Result: $10,000 loss permanently disallowed (cannot be added to IRA basis)
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>IRA Best Practices</h3>
+    <ul>
+      <li><strong>Never buy in IRA after selling at loss in taxable</strong> (within 61 days)</li>
+      <li><strong>Use different securities:</strong> If selling AAPL in taxable, buy MSFT in IRA</li>
+      <li><strong>Wait 31+ days:</strong> If you must repurchase same security, wait outside the window</li>
+      <li><strong>Segregate strategies:</strong> Trade different assets in IRA vs taxable accounts</li>
+      <li><strong>Track religiously:</strong> Most brokers don't flag IRA wash sales</li>
+    </ul>
+
+    <h2 id="mtm-exemption">475(f) Mark-to-Market Exemption</h2>
+    <p>
+      The <strong>Section 475(f) mark-to-market election</strong> is the most powerful solution to wash sale rules for qualifying traders:
+    </p>
+
+    <div class="callout callout-success">
+      <h4>&#10003; Complete Wash Sale Exemption</h4>
+      <p>Traders who make the 475(f) election are completely exempt from wash sale rules. IRC Section 475(d) specifically excludes mark-to-market traders from Section 1091.</p>
+    </div>
+
+    <h3>How 475(f) Works</h3>
+    <p>
+      Under the mark-to-market election:
+    </p>
+    <ul>
+      <li>All positions are marked to fair market value on December 31</li>
+      <li>Gains and losses are treated as <strong>ordinary income/loss</strong> (not capital)</li>
+      <li>Wash sale rules don't apply</li>
+      <li>No $3,000 capital loss limitation</li>
+      <li>No long-term capital gains rates (trade-off)</li>
+    </ul>
+
+    <h3>Who Qualifies for 475(f)?</h3>
+    <p>
+      You must first qualify for <strong>Trader Tax Status (TTS)</strong>:
+    </p>
+    <ul>
+      <li>Trade substantially full-time (typically 4+ hours/day)</li>
+      <li>Execute frequent trades (often 4+ trades/day, 15-20+ trades/week)</li>
+      <li>Seek to profit from short-term market movements, not long-term appreciation</li>
+      <li>Maintain regular, continuous trading throughout the year</li>
+    </ul>
+
+    <div class="callout callout-info">
+      <h4>&#128197; Election Deadline</h4>
+      <p>The 475(f) election must be made by the due date (without extensions) of the prior year's tax return. For 2026 election, you must file by April 15, 2026. Late elections are generally not permitted.</p>
+    </div>
+
+    <h3>475(f) vs Regular Treatment Comparison</h3>
+    <div class="comparison-table">
+      <h3>Tax Treatment Comparison</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>Regular (Capital Gains)</th>
+            <th>475(f) Mark-to-Market</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Wash Sale Rules</strong></td>
+            <td>Apply (major burden)</td>
+            <td>Do NOT apply</td>
+          </tr>
+          <tr>
+            <td><strong>Loss Limitation</strong></td>
+            <td>$3,000/year cap</td>
+            <td>Unlimited deduction</td>
+          </tr>
+          <tr>
+            <td><strong>Tax Rate on Gains</strong></td>
+            <td>0%/15%/20% (long-term)</td>
+            <td>Ordinary rates (up to 37%)</td>
+          </tr>
+          <tr>
+            <td><strong>Year-End Positions</strong></td>
+            <td>No tax until sold</td>
+            <td>Taxed as if sold Dec 31</td>
+          </tr>
+          <tr>
+            <td><strong>Loss Carryforward</strong></td>
+            <td>Indefinite (capital loss)</td>
+            <td>2-year NOL carryforward</td>
+          </tr>
+          <tr>
+            <td><strong>Business Expense Deductions</strong></td>
+            <td>Limited (2% AGI floor, eliminated)</td>
+            <td>Full Schedule C deductions</td>
+          </tr>
+          <tr>
+            <td><strong>Self-Employment Tax</strong></td>
+            <td>None</td>
+            <td>Generally none (trading isn't SE activity)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>When 475(f) Makes Sense</h3>
+    <ol>
+      <li><strong>High-frequency traders:</strong> Wash sale tracking is impossible/impractical</li>
+      <li><strong>Traders with losses:</strong> Need to deduct more than $3,000/year</li>
+      <li><strong>Short-term traders:</strong> Most gains already short-term (no loss of preferential rates)</li>
+      <li><strong>Professional traders:</strong> Trading is your primary business</li>
+    </ol>
+
+    <h3>When to Avoid 475(f)</h3>
+    <ul>
+      <li>You frequently hold positions long-term (lose 0%/15%/20% rates)</li>
+      <li>You have large unrealized gains at year-end (will be taxed even if not sold)</li>
+      <li>You're not sure you qualify for TTS (election is hard to revoke)</li>
+      <li>You trade irregularly or part-time</li>
+    </ul>
+
+    <p>
+      <strong>See our complete guide:</strong> <a href="475f-election.html">Section 475(f) Mark-to-Market Election</a>
+    </p>
+
+    <h2 id="software-solutions">Software Solutions</h2>
+    <p>
+      Given the complexity of wash sale tracking, specialized software is essential for active traders:
+    </p>
+
+    <h3>Leading Tax Software for Traders</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Software</th>
+          <th>Features</th>
+          <th>Best For</th>
+          <th>Price Range</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>TradeLog</strong></td>
+          <td>Wash sale tracking, multi-account, imports from 100+ brokers, Form 8949 generation</td>
+          <td>Active stock/options traders</td>
+          <td>$199-$599/year</td>
+        </tr>
+        <tr>
+          <td><strong>GainsKeeper</strong></td>
+          <td>Real-time wash sale tracking, tax-lot optimization, multi-asset support</td>
+          <td>Stocks, bonds, mutual funds</td>
+          <td>$199-$499/year</td>
+        </tr>
+        <tr>
+          <td><strong>CryptoTrader.Tax</strong></td>
+          <td>Crypto-specific wash sales (post-2025), DeFi tracking, NFTs</td>
+          <td>Crypto traders</td>
+          <td>$49-$299/year</td>
+        </tr>
+        <tr>
+          <td><strong>TokenTax</strong></td>
+          <td>Crypto wash sales, exchange imports, staking income</td>
+          <td>Crypto/DeFi traders</td>
+          <td>$65-$500/year</td>
+        </tr>
+        <tr>
+          <td><strong>TradeStation Tax Center</strong></td>
+          <td>Built into broker platform, automatic wash sale adjustments</td>
+          <td>TradeStation customers</td>
+          <td>Free with account</td>
+        </tr>
+        <tr>
+          <td><strong>Interactive Brokers Reports</strong></td>
+          <td>Comprehensive tax reports, wash sale tracking within IB accounts</td>
+          <td>IB customers</td>
+          <td>Free with account</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Key Software Features to Look For</h3>
+    <ul>
+      <li><strong>Multi-broker import:</strong> Aggregate trades from all your accounts</li>
+      <li><strong>Cross-account wash sale detection:</strong> Track wash sales across brokers</li>
+      <li><strong>IRA coordination:</strong> Flag potential IRA wash sale black holes</li>
+      <li><strong>Real-time tracking:</strong> Monitor wash sale impact before year-end</li>
+      <li><strong>Tax-lot optimization:</strong> Suggest which lots to sell to minimize wash sales</li>
+      <li><strong>Form 8949 generation:</strong> Export directly to tax software</li>
+      <li><strong>Audit trail:</strong> Detailed documentation for IRS examination</li>
+    </ul>
+
+    <div class="callout callout-info">
+      <h4>&#128161; Pro Tip: Test Before Year-End</h4>
+      <p>Don't wait until tax season to set up wash sale tracking software. Import your trades mid-year to identify problems early. You may be able to adjust your strategy to minimize wash sale impact before December 31.</p>
+    </div>
+
+    <h3>Manual Tracking Methods (Not Recommended for HFT)</h3>
+    <p>
+      For traders with low volume (under 100 trades/year), manual tracking is possible:
+    </p>
+    <ol>
+      <li><strong>Spreadsheet approach:</strong> Track every trade with date, symbol, quantity, price</li>
+      <li><strong>61-day window calculation:</strong> For each loss sale, check +/- 30 days for purchases</li>
+      <li><strong>Basis adjustment tracking:</strong> Add disallowed losses to replacement share basis</li>
+      <li><strong>Form 8949 preparation:</strong> Report each transaction with Code W adjustments</li>
+    </ol>
+
+    <p>
+      <strong>Reality check:</strong> Manual tracking breaks down quickly beyond ~50 trades. For algorithmic/HFT traders with thousands of trades, manual tracking is impossible.
+    </p>
+
+    <h2 id="calculator">Wash Sale Impact Calculator</h2>
+
+    <div class="calculator">
+      <h3>Wash Sale Tax Impact Calculator</h3>
+      <p style="text-align: center; color: var(--gray-600); font-size: 0.9rem; margin-bottom: 1.5rem;">
+        Estimate how wash sales affect your tax liability
+      </p>
+
+      <div class="calc-row">
+        <div class="calc-input">
+          <label for="grossGains">Gross Trading Gains ($)</label>
+          <input type="number" id="grossGains" placeholder="250000">
+        </div>
+        <div class="calc-input">
+          <label for="grossLosses">Gross Trading Losses ($)</label>
+          <input type="number" id="grossLosses" placeholder="220000">
+        </div>
+      </div>
+
+      <div class="calc-row">
+        <div class="calc-input">
+          <label for="washSalePct">Estimated Wash Sale % (of losses)</label>
+          <input type="number" id="washSalePct" placeholder="75" min="0" max="100">
+        </div>
+        <div class="calc-input">
+          <label for="deferredPct">% Deferred to Next Year (held positions)</label>
+          <input type="number" id="deferredPct" placeholder="80" min="0" max="100">
+        </div>
+      </div>
+
+      <div class="calc-row">
+        <div class="calc-input">
+          <label for="otherIncome">Other Income (W-2, business, etc.) ($)</label>
+          <input type="number" id="otherIncome" placeholder="150000">
+        </div>
+        <div class="calc-input">
+          <label for="taxRate">Your Tax Bracket (%)</label>
+          <select id="taxRate">
+            <option value="10">10%</option>
+            <option value="12">12%</option>
+            <option value="22">22%</option>
+            <option value="24">24%</option>
+            <option value="32">32%</option>
+            <option value="35">35%</option>
+            <option value="37" selected>37%</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="calc-button" onclick="calculateWashSale()">Calculate Tax Impact</button>
+
+      <div class="calc-result" id="calcResult">
+        <h4>Tax Impact Analysis</h4>
+        <div class="result-row">
+          <span class="result-label">Net Trading Gain/Loss (Before Wash Sales):</span>
+          <span class="result-value" id="netPL">$0</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Total Wash Sale Losses:</span>
+          <span class="result-value" id="washSaleLosses">$0</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Disallowed & Deferred:</span>
+          <span class="result-value" id="deferredLosses">$0</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Permanently Lost (stopped trading):</span>
+          <span class="result-value" id="permanentLoss">$0</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Adjusted Taxable Trading Income:</span>
+          <span class="result-value" id="adjustedIncome">$0</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Total Taxable Income:</span>
+          <span class="result-value" id="totalIncome">$0</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Additional Tax Due to Wash Sales:</span>
+          <span class="result-value" id="additionalTax" style="color: var(--danger); font-size: 1.3rem;">$0</span>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function calculateWashSale() {
+        const grossGains = parseFloat(document.getElementById('grossGains').value) || 0;
+        const grossLosses = parseFloat(document.getElementById('grossLosses').value) || 0;
+        const washSalePct = parseFloat(document.getElementById('washSalePct').value) || 0;
+        const deferredPct = parseFloat(document.getElementById('deferredPct').value) || 0;
+        const otherIncome = parseFloat(document.getElementById('otherIncome').value) || 0;
+        const taxRate = parseFloat(document.getElementById('taxRate').value) || 37;
+
+        const netPL = grossGains - grossLosses;
+        const washSaleLosses = grossLosses * (washSalePct / 100);
+        const deferredLosses = washSaleLosses * (deferredPct / 100);
+        const permanentLoss = washSaleLosses - deferredLosses;
+        const adjustedIncome = grossGains - (grossLosses - washSaleLosses);
+        const totalIncome = adjustedIncome + otherIncome;
+        const normalTax = (netPL + otherIncome) * (taxRate / 100);
+        const washSaleTax = totalIncome * (taxRate / 100);
+        const additionalTax = washSaleTax - normalTax;
+
+        document.getElementById('netPL').textContent = '$' + netPL.toLocaleString();
+        document.getElementById('washSaleLosses').textContent = '$' + washSaleLosses.toLocaleString();
+        document.getElementById('deferredLosses').textContent = '$' + deferredLosses.toLocaleString();
+        document.getElementById('permanentLoss').textContent = '$' + permanentLoss.toLocaleString();
+        document.getElementById('adjustedIncome').textContent = '$' + adjustedIncome.toLocaleString();
+        document.getElementById('totalIncome').textContent = '$' + totalIncome.toLocaleString();
+        document.getElementById('additionalTax').textContent = '$' + additionalTax.toLocaleString();
+
+        document.getElementById('calcResult').classList.add('show');
+      }
+    </script>
+
+    <div class="disclaimer" style="margin-top: 1rem;">
+      <strong>Calculator Note:</strong> This calculator provides estimates only. Actual tax impact depends on your complete tax situation, filing status, deductions, and other factors. Consult a tax professional for personalized advice.
+    </div>
+
+    <h2 id="action-plan">Action Plan for Traders</h2>
+
+    <h3>Immediate Steps</h3>
+    <ol>
+      <li><strong>Assess your current exposure:</strong> Use the calculator above to estimate wash sale impact</li>
+      <li><strong>Get tracking software:</strong> Don't wait until January; set up now</li>
+      <li><strong>Review year-to-date trades:</strong> Understand how many wash sales you've already triggered</li>
+      <li><strong>Consider 475(f) election:</strong> If you qualify for TTS, this may solve your problems</li>
+    </ol>
+
+    <h3>Before Year-End Strategy</h3>
+    <ul>
+      <li><strong>Strategic loss harvesting:</strong> Plan loss sales with 31-day gaps</li>
+      <li><strong>Close problematic positions:</strong> Consider exiting positions to reset basis</li>
+      <li><strong>Avoid IRA purchases:</strong> Never buy in IRA what you sold at loss in taxable (61-day rule)</li>
+      <li><strong>Document everything:</strong> Maintain detailed records for audit defense</li>
+    </ul>
+
+    <h3>Long-Term Solutions</h3>
+    <ol>
+      <li><strong>475(f) Mark-to-Market Election:</strong> File by April 15 for next year (completely eliminates wash sales)</li>
+      <li><strong>Modify trading strategy:</strong> Trade different but correlated assets (SPY/VOO rotation)</li>
+      <li><strong>Segment accounts:</strong> Use different securities in taxable vs IRA accounts</li>
+      <li><strong>Professional tax help:</strong> Work with CPA experienced in trader taxation</li>
+    </ol>
+
+    <div class="callout callout-success">
+      <h4>&#128161; Best Practice Summary</h4>
+      <p><strong>For HFT/Algo Traders:</strong> The 475(f) election is nearly always the right answer. Wash sale tracking is impractical, and the tax consequences can be catastrophic. If you trade frequently enough to qualify for TTS, make the election.</p>
+    </div>
+
+    <div class="disclaimer">
+      <strong>Disclaimer:</strong> This guide provides general information about wash sale rules and tax strategies. Tax law is complex and your situation may differ significantly. The calculator provides estimates only and should not be relied upon for tax filing. Consult a qualified tax professional (CPA or tax attorney) experienced in trader taxation before making any tax elections or implementing tax strategies. This is not legal or tax advice.
+    </div>
+  </article>
+
+  <aside class="sidebar">
+    <div class="sidebar-card">
+      <h3>On This Page</h3>
+      <ul class="toc-list">
+        <li><a href="#overview">IRC §1091 Overview</a></li>
+        <li><a href="#61-day-window">61-Day Window</a></li>
+        <li><a href="#substantially-identical">Substantially Identical</a></li>
+        <li><a href="#hft-wash-sales">HFT Wash Sales</a></li>
+        <li><a href="#options-wash-sales">Options & Wash Sales</a></li>
+        <li><a href="#crypto-wash-sales">Crypto (Post-2025)</a></li>
+        <li><a href="#tracking-reporting">Tracking & Reporting</a></li>
+        <li><a href="#ira-coordination">IRA Coordination</a></li>
+        <li><a href="#mtm-exemption">475(f) MTM Exemption</a></li>
+        <li><a href="#software-solutions">Software Solutions</a></li>
+        <li><a href="#calculator">Calculator</a></li>
+        <li><a href="#action-plan">Action Plan</a></li>
+      </ul>
+    </div>
+
+    <div class="cta-card">
+      <h3>Need Tax Help?</h3>
+      <p>Connect with CPAs experienced in trader taxation and 475(f) elections</p>
+      <a href="../index.html#consult" class="btn">Get Professional Help</a>
+    </div>
+
+    <div class="sidebar-card" style="background: #fef3c7; border: 2px solid var(--warning);">
+      <h3 style="color: #92400e;">Related Guides</h3>
+      <ul class="toc-list">
+        <li><a href="475f-election.html">475(f) MTM Election</a></li>
+        <li><a href="advertising-algo-results.html">Advertising Algo Results</a></li>
+        <li><a href="sec-exam-algorithmic-trading.html">SEC Algo Trading Exam</a></li>
+      </ul>
+    </div>
+  </aside>
+</main>
+
+</body>
+</html>

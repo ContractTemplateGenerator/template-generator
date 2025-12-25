@@ -1,0 +1,1801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Andrew Egan - Algorithmic Trading Platform Analysis</title>
+  <meta name="description" content="Attorney work product analyzing regulatory pathways for algorithmic trading platform with proprietary and SaaS models.">
+  <meta name="robots" content="noindex, nofollow">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1e40af;
+      --dark: #0f172a;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
+      --gray-400: #94a3b8;
+      --gray-600: #475569;
+      --gray-700: #334155;
+      --gray-800: #1e293b;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.6;
+      color: var(--gray-800);
+      background: white;
+    }
+
+    header {
+      background: var(--dark);
+      color: white;
+      padding: 1.5rem 0;
+      border-bottom: 3px solid var(--primary);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    nav {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: white;
+      text-decoration: none;
+    }
+
+    .logo span {
+      color: var(--gray-300);
+      font-weight: 400;
+    }
+
+    .nav-links a {
+      color: var(--gray-300);
+      text-decoration: none;
+      margin-left: 2rem;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: white;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+    }
+
+    .header-section {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      padding: 3rem 2rem;
+      margin: -3rem -2rem 3rem -2rem;
+      border-radius: 0 0 1rem 1rem;
+    }
+
+    .header-section h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      line-height: 1.2;
+    }
+
+    .client-info {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 1.5rem;
+      border-radius: 0.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .client-info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .client-info-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .client-info-label {
+      font-size: 0.875rem;
+      opacity: 0.9;
+      margin-bottom: 0.25rem;
+    }
+
+    .client-info-value {
+      font-weight: 600;
+      font-size: 1.125rem;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      background: var(--warning);
+      color: white;
+      border-radius: 0.25rem;
+      font-weight: 600;
+      font-size: 0.875rem;
+      margin-top: 1rem;
+    }
+
+    .section {
+      margin-bottom: 3rem;
+    }
+
+    .section h2 {
+      font-size: 1.75rem;
+      color: var(--dark);
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--primary);
+    }
+
+    .section h3 {
+      font-size: 1.375rem;
+      color: var(--gray-700);
+      margin: 2rem 0 1rem 0;
+    }
+
+    .section h4 {
+      font-size: 1.125rem;
+      color: var(--gray-700);
+      margin: 1.5rem 0 0.75rem 0;
+    }
+
+    .alert {
+      padding: 1.5rem;
+      border-radius: 0.5rem;
+      margin: 1.5rem 0;
+      border-left: 4px solid;
+    }
+
+    .alert-info {
+      background: #eff6ff;
+      border-color: var(--primary);
+      color: #1e40af;
+    }
+
+    .alert-warning {
+      background: #fffbeb;
+      border-color: var(--warning);
+      color: #92400e;
+    }
+
+    .alert-danger {
+      background: #fef2f2;
+      border-color: var(--danger);
+      color: #991b1b;
+    }
+
+    .alert-success {
+      background: #f0fdf4;
+      border-color: var(--success);
+      color: #166534;
+    }
+
+    .model-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+
+    .model-card {
+      background: var(--gray-50);
+      border: 2px solid var(--gray-200);
+      border-radius: 0.75rem;
+      padding: 2rem;
+      transition: all 0.3s;
+    }
+
+    .model-card:hover {
+      border-color: var(--primary);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+    }
+
+    .model-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 1rem;
+    }
+
+    .regulatory-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .reg-indicator {
+      padding: 1rem;
+      border-radius: 0.5rem;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .reg-high {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .reg-medium {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .reg-low {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .checklist {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+
+    .checklist-item {
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--gray-100);
+      display: flex;
+      align-items: flex-start;
+    }
+
+    .checklist-item:last-child {
+      border-bottom: none;
+    }
+
+    .checklist-icon {
+      color: var(--primary);
+      margin-right: 0.75rem;
+      flex-shrink: 0;
+      font-weight: 700;
+    }
+
+    .intake-form {
+      background: var(--gray-50);
+      border: 2px solid var(--primary);
+      border-radius: 0.75rem;
+      padding: 2rem;
+      margin: 2rem 0;
+    }
+
+    .form-section {
+      margin-bottom: 2rem;
+    }
+
+    .form-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .form-section h4 {
+      color: var(--dark);
+      margin-bottom: 1rem;
+      font-size: 1.125rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      color: var(--gray-700);
+      margin-bottom: 0.5rem;
+    }
+
+    .form-help {
+      font-size: 0.875rem;
+      color: var(--gray-600);
+      margin-top: 0.25rem;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--gray-300);
+      border-radius: 0.375rem;
+      font-family: inherit;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .form-group textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 2rem;
+      margin-top: 0.5rem;
+    }
+
+    .radio-option {
+      display: flex;
+      align-items: center;
+    }
+
+    .radio-option input {
+      width: auto;
+      margin-right: 0.5rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      background: white;
+      border-radius: 0.5rem;
+      overflow: hidden;
+      border: 1px solid var(--gray-200);
+    }
+
+    th {
+      background: var(--dark);
+      color: white;
+      padding: 1rem;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 1rem;
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:nth-child(even) {
+      background: var(--gray-50);
+    }
+
+    .cta {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      padding: 2.5rem;
+      border-radius: 0.75rem;
+      text-align: center;
+      margin: 3rem 0;
+    }
+
+    .cta h3 {
+      color: white;
+      font-size: 1.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .cta p {
+      font-size: 1.125rem;
+      margin-bottom: 1.5rem;
+      opacity: 0.95;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 1rem 2rem;
+      background: white;
+      color: var(--primary);
+      text-decoration: none;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      transition: all 0.2s;
+      margin: 0.5rem;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: white;
+      border: 2px solid white;
+    }
+
+    footer {
+      background: var(--dark);
+      color: var(--gray-400);
+      padding: 2rem 0;
+      text-align: center;
+      margin-top: 4rem;
+    }
+
+    @media (max-width: 768px) {
+      .header-section h1 {
+        font-size: 2rem;
+      }
+
+      .model-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .regulatory-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .radio-group {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      nav {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .nav-links {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+      }
+
+      .nav-links a {
+        margin-left: 0;
+      }
+    }
+
+    .progress-indicator {
+      background: white;
+      border: 2px solid var(--gray-200);
+      border-radius: 0.5rem;
+      padding: 1rem;
+      margin: 1rem 0;
+      font-size: 0.875rem;
+      color: var(--gray-600);
+    }
+
+    .highlight {
+      background: #fef9c3;
+      padding: 0.125rem 0.375rem;
+      border-radius: 0.25rem;
+    }
+
+    ul {
+      margin: 1rem 0;
+      padding-left: 2rem;
+    }
+
+    li {
+      margin: 0.5rem 0;
+    }
+
+    strong {
+      color: var(--dark);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 2px solid var(--gray-200);
+      margin: 2rem 0 2rem 0;
+      overflow-x: auto;
+    }
+
+    .tab {
+      padding: 1rem 1.5rem;
+      background: transparent;
+      border: none;
+      color: var(--gray-600);
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .tab:hover {
+      color: var(--primary);
+      background: var(--gray-50);
+    }
+
+    .tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .upwork-response {
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      border: 2px solid var(--primary);
+      border-radius: 0.75rem;
+      padding: 2rem;
+      margin: 2rem 0;
+    }
+
+    .upwork-response h3 {
+      color: var(--primary);
+      margin-bottom: 1rem;
+      font-size: 1.25rem;
+    }
+
+    .message-box {
+      background: white;
+      border: 1px solid var(--gray-300);
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.8;
+      color: var(--gray-800);
+      margin-bottom: 1rem;
+      white-space: pre-wrap;
+    }
+
+    .copy-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .copy-btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    .copy-status {
+      display: inline-block;
+      margin-left: 1rem;
+      color: var(--success);
+      font-weight: 600;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .copy-status.show {
+      opacity: 1;
+    }
+
+    #password-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, var(--dark) 0%, #1e293b 50%, #312e81 100%);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .password-box {
+      background: white;
+      border-radius: 1rem;
+      padding: 3rem;
+      max-width: 450px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .password-box h2 {
+      color: var(--dark);
+      margin-bottom: 0.5rem;
+      font-size: 1.75rem;
+    }
+
+    .password-box p {
+      color: var(--gray-600);
+      margin-bottom: 2rem;
+    }
+
+    .password-input-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .password-input-group label {
+      display: block;
+      font-weight: 600;
+      color: var(--gray-700);
+      margin-bottom: 0.5rem;
+    }
+
+    .password-input-group input {
+      width: 100%;
+      padding: 0.875rem;
+      border: 2px solid var(--gray-300);
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+
+    .password-input-group input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    #password-error {
+      color: var(--danger);
+      font-size: 0.875rem;
+      margin-top: 0.5rem;
+      display: none;
+    }
+
+    .password-submit {
+      width: 100%;
+      padding: 1rem;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .password-submit:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+<body>
+  <div id="password-overlay">
+    <div class="password-box">
+      <h2>Protected Document</h2>
+      <p>This attorney work product is password protected. Please enter the access code to continue.</p>
+      <div class="password-input-group">
+        <label for="password-input">Access Code</label>
+        <input type="text" id="password-input" placeholder="Enter password" onkeypress="if(event.key === 'Enter') checkPassword()">
+        <div id="password-error">Incorrect password. Please try again.</div>
+      </div>
+      <button class="password-submit" onclick="checkPassword()">Access Document</button>
+    </div>
+  </div>
+
+  <header>
+    <nav>
+      <a href="../index.html" class="logo">Terms<span>.Law</span></a>
+      <div class="nav-links">
+        <a href="./index.html">Guides</a>
+        <a href="../workbench.html">Workbench</a>
+        <a href="../index.html#consult">Consultation</a>
+      </div>
+    </nav>
+  </header>
+
+  <div class="container">
+    <div class="header-section">
+      <h1>Algorithmic Trading Platform Analysis</h1>
+      <p style="font-size: 1.125rem; opacity: 0.95; margin-top: 0.5rem;">Attorney Work Product - Preliminary Regulatory Assessment</p>
+
+      <div class="client-info">
+        <div class="client-info-grid">
+          <div class="client-info-item">
+            <div class="client-info-label">Client</div>
+            <div class="client-info-value">Andrew Egan</div>
+          </div>
+          <div class="client-info-item">
+            <div class="client-info-label">Project</div>
+            <div class="client-info-value">AI Trading Platform</div>
+          </div>
+          <div class="client-info-item">
+            <div class="client-info-label">Analysis Date</div>
+            <div class="client-info-value">December 2025</div>
+          </div>
+          <div class="client-info-item">
+            <div class="client-info-label">Background</div>
+            <div class="client-info-value">BlackRock (10 yrs), SunLife/Sunbase</div>
+          </div>
+        </div>
+        <span class="status-badge">⚠ PENDING CLIENT INPUT - SEE INTAKE FORM BELOW</span>
+      </div>
+    </div>
+
+    <div class="upwork-response">
+      <h3>📋 Upwork Response (Copy & Paste)</h3>
+      <div class="message-box" id="upworkMessage">Hi Andrew,
+
+I've started putting together a comprehensive regulatory analysis for your algorithmic trading platform. You can review it here:
+
+<strong>🔗 Live Analysis:</strong> https://terms.law/Trading-Legal/andrew-egan-intake.html
+
+<strong>🔐 Access Password:</strong> $rd#j6
+
+<strong>What's Inside:</strong>
+
+This preliminary work product analyzes both business models you're considering:
+
+• <strong>Model 1 (Prop Trading + Profit Split):</strong> Trading your own capital with users receiving profit splits. I break down the regulatory triggers (CTA/CPO risk is medium-high, especially if trading futures/swaps), address your broker's concerns about "managing third-party funds" (they're right to flag it), and outline three potential structures with different compliance burdens.
+
+• <strong>Model 2 (SaaS Platform - Option Alpha Model):</strong> Non-custodial software where users connect their own broker APIs. This has significantly lower regulatory risk if structured properly. I detail exactly where the compliance boundaries are (personalized advice vs. tools, user-directed automation, API key security).
+
+The analysis also covers:
+- Your specific concern about brokers viewing profit-sharing arrangements as pooled vehicles
+- International vs. US structures (spoiler: offshore doesn't eliminate US regulation if you're targeting US customers)
+- Crypto considerations for both models
+- Recommended reading from the Trading Legal Hub based on which model you choose
+
+<strong>Next Step:</strong> I've included a detailed intake form (see "Intake Form" tab) with specific questions about your custody model, revenue structure, target customers, and technical architecture. Your answers will let me provide definitive guidance on which licenses you actually need (if any) and help you avoid the regulatory landmines.
+
+The page uses tabs to organize everything - just click through Overview → Model Analysis → International → Resources → Intake Form.
+
+Let me know if you have any immediate questions after reviewing, or just fill out the intake form and I'll provide the next level of detail within 3-5 days.
+
+Best,
+[Your Name]</div>
+      <button class="copy-btn" onclick="copyUpworkMessage()">Copy Message to Clipboard</button>
+      <span class="copy-status" id="copyStatus">✓ Copied!</span>
+    </div>
+
+    <div class="alert alert-info">
+      <strong>Purpose of This Document:</strong> This preliminary analysis addresses your December 22-24 inquiry regarding regulatory pathways for your algorithmic trading platform. Based on your BlackRock background and existing AI Agent + Orchestrator system, this document analyzes both proposed business models and identifies critical questions needed for definitive guidance. Please complete the intake form below to enable precise recommendations.
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab(event, 'overview')">Overview</button>
+      <button class="tab" onclick="switchTab(event, 'models')">Model Analysis</button>
+      <button class="tab" onclick="switchTab(event, 'international')">International</button>
+      <button class="tab" onclick="switchTab(event, 'resources')">Resources</button>
+      <button class="tab" onclick="switchTab(event, 'intake')">Intake Form</button>
+    </div>
+
+    <div id="overview" class="tab-content active">
+    <section class="section">
+      <h2>Executive Summary</h2>
+
+      <p>Based on your description of an AI Agent + Orchestrator algorithmic trading system with two potential commercial models, the regulatory analysis diverges significantly depending on which path you pursue:</p>
+
+      <div class="model-grid">
+        <div class="model-card">
+          <div class="model-title">Model 1: Proprietary Trading + Profit Split</div>
+          <p style="margin-bottom: 1rem;"><strong>Structure:</strong> You trade your own capital, users pay subscription + receive profit split</p>
+
+          <div class="regulatory-grid">
+            <div class="reg-indicator reg-low">
+              <div style="font-size: 0.75rem; margin-bottom: 0.25rem;">RIA Risk</div>
+              <div>LOW</div>
+            </div>
+            <div class="reg-indicator reg-high">
+              <div style="font-size: 0.75rem; margin-bottom: 0.25rem;">CTA/CPO Risk</div>
+              <div>MEDIUM-HIGH</div>
+            </div>
+            <div class="reg-indicator reg-medium">
+              <div style="font-size: 0.75rem; margin-bottom: 0.25rem;">State MTL Risk</div>
+              <div>MEDIUM</div>
+            </div>
+          </div>
+
+          <ul style="font-size: 0.9rem; margin-top: 1rem;">
+            <li><strong>Key Risk:</strong> Profit split may trigger pooled investment vehicle treatment</li>
+            <li><strong>Your Concern:</strong> Broker calling it "managing third-party funds" is legitimate issue</li>
+            <li><strong>CFTC Angle:</strong> If trading futures/swaps, CTA registration likely required</li>
+            <li><strong>Structure Options:</strong> Master account vs separately managed accounts</li>
+          </ul>
+        </div>
+
+        <div class="model-card">
+          <div class="model-title">Model 2: SaaS Platform (Option Alpha Model)</div>
+          <p style="margin-bottom: 1rem;"><strong>Structure:</strong> Software subscription, users connect their own broker APIs, non-custodial</p>
+
+          <div class="regulatory-grid">
+            <div class="reg-indicator reg-low">
+              <div style="font-size: 0.75rem; margin-bottom: 0.25rem;">RIA Risk</div>
+              <div>LOW</div>
+            </div>
+            <div class="reg-indicator reg-low">
+              <div style="font-size: 0.75rem; margin-bottom: 0.25rem;">CTA/CPO Risk</div>
+              <div>LOW</div>
+            </div>
+            <div class="reg-indicator reg-low">
+              <div style="font-size: 0.75rem; margin-bottom: 0.25rem;">State MTL Risk</div>
+              <div>VERY LOW</div>
+            </div>
+          </div>
+
+          <ul style="font-size: 0.9rem; margin-top: 1rem;">
+            <li><strong>Key Advantage:</strong> Pure software provider, no advisory/trading registration</li>
+            <li><strong>Critical Boundary:</strong> Must avoid personalized trade recommendations</li>
+            <li><strong>Safe Harbor:</strong> User-directed automation via their own API keys</li>
+            <li><strong>Revenue Model:</strong> SaaS subscription + marketplace fees (avoid performance fees)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="alert alert-warning">
+        <strong>Critical Distinction:</strong> Your broker's concern about "managing third-party funds" is more applicable to Model 1. In Model 2, you never touch user funds or hold API keys - users connect directly to their own brokers. However, the specific language you use in marketing and the degree of "orchestration" your AI provides will determine regulatory classification.
+      </div>
+    </section>
+    </div>
+
+    <div id="models" class="tab-content">
+    <section class="section">
+      <h2>Detailed Model Analysis</h2>
+
+      <h3>Model 1: Proprietary Trading with Profit Split</h3>
+
+      <h4>How This Model Works (As I Understand It)</h4>
+      <div class="checklist">
+        <div class="checklist-item">
+          <span class="checklist-icon">→</span>
+          <div>You operate algorithmic trading strategies using your own capital in your own brokerage account(s)</div>
+        </div>
+        <div class="checklist-item">
+          <span class="checklist-icon">→</span>
+          <div>Users pay a subscription fee for access to performance tracking/educational content</div>
+        </div>
+        <div class="checklist-item">
+          <span class="checklist-icon">→</span>
+          <div>Users receive a percentage of profits generated by your trading (the "split")</div>
+        </div>
+        <div class="checklist-item">
+          <span class="checklist-icon">→</span>
+          <div>Users do not contribute capital or have funds at risk (they only gain upside)</div>
+        </div>
+      </div>
+
+      <h4>Primary Regulatory Concerns</h4>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Regulation</th>
+            <th>Trigger Analysis</th>
+            <th>Risk Level</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Investment Adviser (RIA)</strong></td>
+            <td>
+              <strong>Lower risk</strong> if you're only trading your own money. However, if users are deemed to have an "investment" via profit split rights, SEC may argue advisory relationship exists.
+            </td>
+            <td><span class="highlight">Medium</span></td>
+          </tr>
+          <tr>
+            <td><strong>Commodity Trading Advisor (CTA)</strong></td>
+            <td>
+              <strong>Higher risk</strong> if trading futures/forex/swaps. CFTC treats profit-sharing arrangements as "directing accounts" even without customer funds. Your background suggests strategies may include derivatives.
+            </td>
+            <td><span class="highlight">Medium-High</span></td>
+          </tr>
+          <tr>
+            <td><strong>Commodity Pool Operator (CPO)</strong></td>
+            <td>
+              <strong>Significant risk</strong> if structured as pooled vehicle. If users collectively have rights to profit share from single trading operation, CFTC may deem this a commodity pool.
+            </td>
+            <td><span class="highlight">High</span></td>
+          </tr>
+          <tr>
+            <td><strong>Broker-Dealer</strong></td>
+            <td>
+              <strong>Lower risk</strong> since you're not effecting securities transactions for others. However, your broker's concern suggests they may view the arrangement differently.
+            </td>
+            <td><span class="highlight">Low-Medium</span></td>
+          </tr>
+          <tr>
+            <td><strong>State Money Transmitter</strong></td>
+            <td>
+              <strong>Risk depends on payment flow</strong>. If you're paying profit splits to users, some states may argue money transmission. Structure of payments matters.
+            </td>
+            <td><span class="highlight">Medium</span></td>
+          </tr>
+          <tr>
+            <td><strong>Securities (Howey Test)</strong></td>
+            <td>
+              <strong>Moderate risk</strong>. Profit split rights could be deemed securities if: (1) investment of money, (2) common enterprise, (3) expectation of profits, (4) from efforts of others. The fact users don't contribute capital helps, but "investment" could be subscription fee.
+            </td>
+            <td><span class="highlight">Medium</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="alert alert-danger">
+        <strong>Your Broker's Concern Is Valid:</strong> When you tell a broker "I'll be paying profit splits to subscribers based on my trading," they hear "pooled investment vehicle" or "managing other people's money." Even though subscribers don't contribute capital, the profit-sharing arrangement creates beneficial ownership interests that brokers view as regulatory red flags. This is especially true if your account is titled in a way that suggests multiple beneficiaries.
+      </div>
+
+      <h4>Potential Structures for Model 1</h4>
+
+      <div class="checklist">
+        <div class="checklist-item">
+          <span class="checklist-icon">A.</span>
+          <div>
+            <strong>Separate Managed Accounts (Lower Risk)</strong><br>
+            Each subscriber has their own brokerage account at their broker of choice. You obtain limited trading authorization. Your AI system executes identical trades across all accounts. Subscribers pay you directly via subscription + performance fee.
+            <br><br>
+            <strong>Regulatory Impact:</strong> This likely triggers CTA/RIA registration since you're exercising trading authority over customer accounts, but avoids pooled vehicle issues. More compliant structure but requires individual account agreements.
+          </div>
+        </div>
+        <div class="checklist-item">
+          <span class="checklist-icon">B.</span>
+          <div>
+            <strong>Profit-Share via Separate Legal Entity (Medium Risk)</strong><br>
+            Create Delaware LLC or LP. Members/limited partners receive units. Their "investment" is subscription fees (not trading capital). Trading profits flow to entity, distributed per operating agreement.
+            <br><br>
+            <strong>Regulatory Impact:</strong> Almost certainly triggers CPO registration if trading commodities. May trigger RIA if deemed securities-focused. Requires sophisticated legal structuring and ongoing compliance. This is essentially a hedge fund lite.
+          </div>
+        </div>
+        <div class="checklist-item">
+          <span class="checklist-icon">C.</span>
+          <div>
+            <strong>Pure Prop Trading + Contest/Rewards (Lower Reg Risk, Higher Gambling Risk)</strong><br>
+            You trade your own capital. Subscribers pay for "education" and "community access." You periodically distribute "rewards" or "prizes" based on various criteria (tenure, engagement, random drawings). Avoid language suggesting profit-sharing rights.
+            <br><br>
+            <strong>Regulatory Impact:</strong> Reduces securities/commodities registration risk but introduces gambling/sweepstakes compliance issues. Must avoid structure where payments are contingent on investment returns.
+          </div>
+        </div>
+      </div>
+
+      <h3>Model 2: SaaS Platform (Non-Custodial Automation)</h3>
+
+      <h4>How This Model Works</h4>
+      <div class="checklist">
+        <div class="checklist-item">
+          <span class="checklist-icon">→</span>
+          <div>Users subscribe to your platform (monthly/annual SaaS fee)</div>
+        </div>
+        <div class="checklist-item">
+          <span class="checklist-icon">→</span>
+          <div>Users connect their own brokerage accounts via API keys (TD Ameritrade, Interactive Brokers, Tradier, Alpaca, etc.)</div>
+        </div>
+        <div class="checklist-item">
+          <span class="checklist-icon">→</span>
+          <div>Your AI Agent + Orchestrator system analyzes markets and generates trade signals</div>
+        </div>
+        <div class="checklist-item">
+          <span class="checklist-icon">→</span>
+          <div>Users configure which strategies to enable, risk parameters, position sizing</div>
+        </div>
+        <div class="checklist-item">
+          <span class="checklist-icon">→</span>
+          <div>Platform executes trades <strong>on behalf of user based on their settings</strong> via broker API</div>
+        </div>
+        <div class="checklist-item">
+          <span class="checklist-icon">→</span>
+          <div>You never hold user funds, never have custody, never receive API keys in plaintext (secure vault/encryption)</div>
+        </div>
+      </div>
+
+      <h4>Why Model 2 Has Lower Regulatory Risk</h4>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Regulatory Test</th>
+            <th>Analysis for Model 2</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>RIA "Investment Advice"</strong></td>
+            <td>
+              <strong>Safe if properly structured.</strong> SEC guidance distinguishes between (a) personalized investment advice and (b) impersonal trading tools. Platform providing "general algorithms" that users customize = impersonal. Platform analyzing user's portfolio and recommending specific trades = personalized.
+              <br><br>
+              <strong>Key:</strong> Market your platform as a tool/software, not advice. Avoid language like "we recommend" or "our analysis suggests." Use "the algorithm detected" or "based on your selected strategy."
+            </td>
+          </tr>
+          <tr>
+            <td><strong>CTA "Trading Authority"</strong></td>
+            <td>
+              <strong>Safe if user-directed.</strong> CFTC treats automated trading as user-directed if: (1) user controls which strategies to enable, (2) user sets risk parameters, (3) user can disable at any time, (4) user maintains custody via their own broker.
+              <br><br>
+              <strong>Key:</strong> Users must affirmatively enable each strategy. Default should be "off." Provide kill switch and position override controls.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Broker-Dealer</strong></td>
+            <td>
+              <strong>No risk.</strong> You're not executing trades for compensation - users' own brokers execute. You're providing software that connects to broker APIs. Similar to how TradingView or ThinkorSwim work.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Money Transmitter</strong></td>
+            <td>
+              <strong>No risk.</strong> You never touch user funds. Payment flow is: User → Broker (for trades), User → You (for SaaS subscription). No transmission of monetary value.
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Fiduciary Duty</strong></td>
+            <td>
+              <strong>Low risk if disclaimers are proper.</strong> No custody = no custodial duty. No discretion (user configures) = no advisory duty. However, if your AI makes material decisions without user input, this could create implicit fiduciary relationship.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="alert alert-success">
+        <strong>Model 2 Competitive Advantage:</strong> This is the Option Alpha / TradingView / QuantConnect model. It's proven, scalable, and keeps you in the software business rather than the financial services business. Your BlackRock systems experience is perfectly suited to building institutional-grade automation for retail users. The marketplace opportunity (users sharing strategies, backtests, etc.) is substantial and low-risk if properly structured.
+      </div>
+
+      <h4>Critical Compliance Boundaries for Model 2</h4>
+
+      <div class="checklist">
+        <div class="checklist-item">
+          <span class="checklist-icon">✓</span>
+          <div><strong>Do:</strong> Provide algorithmic strategies that users can enable/disable/configure</div>
+        </div>
+        <div class="checklist-item">
+          <span class="checklist-icon">✓</span>
+          <div><strong>Do:</strong> Allow users to set risk parameters, position limits, max drawdown triggers</div>
+        </div>
+        <div class="checklist-item">
+          <span class="checklist-icon">✓</span>
+          <div><strong>Do:</strong> Provide robust backtesting and paper trading before live execution</div>
+        </div>
+        <div class="checklist-item">
+          <span class="checklist-icon">✓</span>
+          <div><strong>Do:</strong> Clearly disclose that strategies may lose money, past performance doesn't predict future results</div>
+        </div>
+        <div class="checklist-item">
+          <span class="checklist-icon">✓</span>
+          <div><strong>Do:</strong> Encrypt API keys, use secure key management (AWS KMS, HashiCorp Vault)</div>
+        </div>
+        <div class="checklist-item">
+          <span class="checklist-icon">✗</span>
+          <div><strong>Don't:</strong> Provide personalized recommendations based on user's financial situation</div>
+        </div>
+        <div class="checklist-item">
+          <span class="checklist-icon">✗</span>
+          <div><strong>Don't:</strong> Market the platform as "we manage your account" or "our experts trade for you"</div>
+        </div>
+        <div class="checklist-item">
+          <span class="checklist-icon">✗</span>
+          <div><strong>Don't:</strong> Charge performance fees or profit splits (stay with flat SaaS subscription)</div>
+        </div>
+        <div class="checklist-item">
+          <span class="checklist-icon">✗</span>
+          <div><strong>Don't:</strong> Execute trades without user's prior configuration and consent</div>
+        </div>
+        <div class="checklist-item">
+          <span class="checklist-icon">✗</span>
+          <div><strong>Don't:</strong> Store API keys in plaintext or transmit unencrypted</div>
+        </div>
+      </div>
+    </section>
+    </div>
+
+    <div id="international" class="tab-content">
+    <section class="section">
+      <h2>International vs. US Structures</h2>
+
+      <p>You mentioned interest in offshore structures to "eliminate regulation." Important reality check:</p>
+
+      <div class="alert alert-warning">
+        <strong>Myth:</strong> Operating offshore eliminates US regulatory obligations.<br><br>
+        <strong>Reality:</strong> If you're a US person targeting US customers, SEC/CFTC jurisdiction follows. Offshore structure may actually <em>increase</em> regulatory scrutiny (viewed as evasion attempt) and complicate banking, broker relationships, and investor trust.
+      </div>
+
+      <h4>When Offshore Structures Make Sense</h4>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Scenario</th>
+            <th>Jurisdiction</th>
+            <th>Advantages</th>
+            <th>Disadvantages</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Crypto-Only Platform</strong></td>
+            <td>Cayman Islands, BVI, Switzerland</td>
+            <td>Lighter crypto regulation, established fund structures, institutional credibility</td>
+            <td>Still need US compliance for US users, expensive ($50-100K+ setup), banking challenges</td>
+          </tr>
+          <tr>
+            <td><strong>Non-US Customer Base</strong></td>
+            <td>Singapore, Dubai (DIFC), UK (FCA)</td>
+            <td>Access to non-US markets, potentially lighter reqs than SEC, favorable tax treatment</td>
+            <td>Must exclude US persons entirely (including from website/marketing), limits market size</td>
+          </tr>
+          <tr>
+            <td><strong>Institutional Fund</strong></td>
+            <td>Delaware (US) or Cayman</td>
+            <td>Familiar structure for institutional allocators, US entities easier for US investors</td>
+            <td>Full US regulation applies, high compliance costs, not applicable to SaaS model</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="alert alert-info">
+        <strong>Recommendation for Your Situation:</strong> If pursuing Model 2 (SaaS platform), US entity (Delaware LLC or C-Corp) is simplest and most credible. International expansion comes later after proving US model. If pursuing Model 1 (prop trading), offshore structure doesn't reduce regulatory burden and complicates your broker relationships (they'll require US entity for US-based trading).
+      </div>
+
+      <h4>Crypto-Specific Considerations</h4>
+
+      <p>If your algorithms trade crypto assets:</p>
+
+      <ul>
+        <li><strong>Centralized Exchange Tokens:</strong> SEC treats many as securities (Howey test). Trading on Coinbase/Kraken is safer than DeFi protocols.</li>
+        <li><strong>Decentralized Protocols:</strong> Using Uniswap, Aave, etc. via smart contracts introduces additional compliance questions (especially if you're providing the interface).</li>
+        <li><strong>Stablecoins:</strong> USDC/USDT generally okay for trading, but providing custody or issuance triggers money transmission + potential securities laws.</li>
+        <li><strong>Derivatives:</strong> Crypto futures/options on CME = CFTC jurisdiction. Offshore perpetuals (Binance, Bybit) = user must self-custody and trade directly (you can't facilitate for US persons).</li>
+      </ul>
+
+      <p><strong>For Model 2:</strong> Supporting crypto is straightforward if users connect their own Coinbase/Kraken APIs. You're just software. Same logic as supporting TD Ameritrade.</p>
+
+      <p><strong>For Model 1:</strong> If you're trading crypto with profit splits, even more likely to trigger securities/commodities regulation. Offshore structure doesn't help if you or subscribers are US persons.</p>
+    </section>
+    </div>
+
+    <div id="resources" class="tab-content">
+    <section class="section">
+      <h2>Recommended Reading for Your Situation</h2>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin: 2rem 0;">
+        <div style="background: var(--gray-50); padding: 1.5rem; border-radius: 0.5rem; border-left: 4px solid var(--primary);">
+          <h4 style="margin-top: 0;">If Pursuing Model 1 (Prop + Profit Split)</h4>
+          <ul style="font-size: 0.9rem; margin: 0; padding-left: 1.5rem;">
+            <li><a href="./cta-registration-guide.html">CTA Registration Guide</a></li>
+            <li><a href="./cpo-compliance-checklist.html">CPO Compliance Checklist</a></li>
+            <li><a href="./pooled-investment-vehicles.html">Pooled Investment Vehicles</a></li>
+            <li><a href="./performance-fee-structures.html">Performance Fee Structures</a></li>
+            <li><a href="./separately-managed-accounts.html">Separately Managed Accounts</a></li>
+          </ul>
+        </div>
+
+        <div style="background: var(--gray-50); padding: 1.5rem; border-radius: 0.5rem; border-left: 4px solid var(--success);">
+          <h4 style="margin-top: 0;">If Pursuing Model 2 (SaaS Platform)</h4>
+          <ul style="font-size: 0.9rem; margin: 0; padding-left: 1.5rem;">
+            <li><a href="./robo-adviser-compliance.html">Robo-Adviser Compliance</a></li>
+            <li><a href="./sec-exam-algorithmic-trading.html">SEC Examination: Algorithmic Trading</a></li>
+            <li><a href="./broker-api-terms-review.html">Broker API Terms Review</a></li>
+            <li><a href="./advertising-algo-results.html">Advertising Algorithmic Results</a></li>
+            <li><a href="./ai-fiduciary-duty.html">AI and Fiduciary Duty</a></li>
+          </ul>
+        </div>
+
+        <div style="background: var(--gray-50); padding: 1.5rem; border-radius: 0.5rem; border-left: 4px solid var(--warning);">
+          <h4 style="margin-top: 0;">Universal Compliance Topics</h4>
+          <ul style="font-size: 0.9rem; margin: 0; padding-left: 1.5rem;">
+            <li><a href="./sec-vs-cftc-jurisdiction.html">SEC vs. CFTC Jurisdiction</a></li>
+            <li><a href="./custody-rule-compliance.html">Custody Rule Compliance</a></li>
+            <li><a href="./cybersecurity-requirements.html">Cybersecurity Requirements</a></li>
+            <li><a href="./state-registration-analysis.html">State Registration Analysis</a></li>
+            <li><a href="./international-expansion.html">International Expansion</a></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+    </div>
+
+    <div id="intake" class="tab-content">
+    <section class="section">
+      <h2>Next Steps: Intake Form</h2>
+
+      <div class="alert alert-warning">
+        <strong>Important:</strong> The analysis above is preliminary and based on limited information. To provide definitive guidance on which regulatory registrations you need, please complete the intake form below. I've identified the specific details that will determine your compliance obligations.
+      </div>
+
+      <div class="intake-form">
+        <h3 style="margin-top: 0; color: var(--dark);">Client Intake: Algorithmic Trading Platform</h3>
+        <p style="margin-bottom: 2rem; color: var(--gray-600);">Please provide as much detail as possible. If uncertain, provide your best estimate or mark "TBD."</p>
+
+        <form id="intakeForm">
+          <div class="form-section">
+            <h4>1. Business Model Selection</h4>
+
+            <div class="form-group">
+              <label>Which model are you leaning toward? *</label>
+              <div class="radio-group">
+                <div class="radio-option">
+                  <input type="radio" id="model1" name="businessModel" value="model1">
+                  <label for="model1" style="font-weight: normal;">Model 1: Proprietary Trading + Profit Split</label>
+                </div>
+                <div class="radio-option">
+                  <input type="radio" id="model2" name="businessModel" value="model2">
+                  <label for="model2" style="font-weight: normal;">Model 2: SaaS Platform (Non-Custodial)</label>
+                </div>
+                <div class="radio-option">
+                  <input type="radio" id="modelBoth" name="businessModel" value="both">
+                  <label for="modelBoth" style="font-weight: normal;">Both / Hybrid</label>
+                </div>
+                <div class="radio-option">
+                  <input type="radio" id="modelUndecided" name="businessModel" value="undecided">
+                  <label for="modelUndecided" style="font-weight: normal;">Undecided</label>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="modelReasoning">What factors are driving your decision between models?</label>
+              <textarea id="modelReasoning" name="modelReasoning" placeholder="E.g., revenue potential, regulatory complexity, scalability, technical feasibility..."></textarea>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h4>2. Trading Strategy Details</h4>
+
+            <div class="form-group">
+              <label for="assetClasses">What asset classes will the algorithms trade? *</label>
+              <textarea id="assetClasses" name="assetClasses" placeholder="E.g., US equities, equity options, futures (specify contracts), forex, crypto (spot/derivatives), fixed income..."></textarea>
+              <div class="form-help">Critical for determining SEC vs. CFTC jurisdiction</div>
+            </div>
+
+            <div class="form-group">
+              <label for="strategyTypes">Describe the algorithmic strategies (high-level)</label>
+              <textarea id="strategyTypes" name="strategyTypes" placeholder="E.g., momentum, mean reversion, statistical arbitrage, market making, volatility trading, delta-neutral options..."></textarea>
+              <div class="form-help">Understanding strategy helps assess whether it's "advice" or "tools"</div>
+            </div>
+
+            <div class="form-group">
+              <label for="holdingPeriod">Typical holding period?</label>
+              <select id="holdingPeriod" name="holdingPeriod">
+                <option value="">-- Select --</option>
+                <option value="hft">High-Frequency (seconds to minutes)</option>
+                <option value="intraday">Intraday (minutes to hours)</option>
+                <option value="swing">Swing (days to weeks)</option>
+                <option value="position">Position (weeks to months)</option>
+                <option value="mixed">Mixed</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="leverage">Will strategies use leverage/margin?</label>
+              <div class="radio-group">
+                <div class="radio-option">
+                  <input type="radio" id="leverageYes" name="leverage" value="yes">
+                  <label for="leverageYes" style="font-weight: normal;">Yes</label>
+                </div>
+                <div class="radio-option">
+                  <input type="radio" id="leverageNo" name="leverage" value="no">
+                  <label for="leverageNo" style="font-weight: normal;">No</label>
+                </div>
+                <div class="radio-option">
+                  <input type="radio" id="leverageOptional" name="leverage" value="optional">
+                  <label for="leverageOptional" style="font-weight: normal;">User-configurable</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h4>3. Custody and Execution Model</h4>
+
+            <div class="form-group">
+              <label>In Model 2 (SaaS), how would custody work? *</label>
+              <div class="radio-group">
+                <div class="radio-option">
+                  <input type="radio" id="custodyUser" name="custodyModel" value="userBroker">
+                  <label for="custodyUser" style="font-weight: normal;">User maintains custody at their own broker (we never touch funds/keys)</label>
+                </div>
+                <div class="radio-option">
+                  <input type="radio" id="custodyPlatform" name="custodyModel" value="platformBroker">
+                  <label for="custodyPlatform" style="font-weight: normal;">Platform has custodial relationship/omnibus account</label>
+                </div>
+                <div class="radio-option">
+                  <input type="radio" id="custodyUndecided" name="custodyModel" value="undecided">
+                  <label for="custodyUndecided" style="font-weight: normal;">Undecided</label>
+                </div>
+              </div>
+              <div class="form-help">This is THE critical question for RIA/BD registration</div>
+            </div>
+
+            <div class="form-group">
+              <label for="apiKeyHandling">How will you handle broker API keys?</label>
+              <textarea id="apiKeyHandling" name="apiKeyHandling" placeholder="E.g., encrypted at rest using AWS KMS, never stored in plaintext, users can revoke at any time, keys stay in secure enclave..."></textarea>
+              <div class="form-help">SEC/CFTC scrutinize API key security heavily</div>
+            </div>
+
+            <div class="form-group">
+              <label for="brokerPartners">Which broker(s) will you integrate with?</label>
+              <textarea id="brokerPartners" name="brokerPartners" placeholder="E.g., Interactive Brokers, TD Ameritrade, Tradier, Alpaca, TradeStation, Coinbase Prime, Kraken..."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="executionMethod">How are trades executed?</label>
+              <div class="radio-group">
+                <div class="radio-option">
+                  <input type="radio" id="execDirect" name="executionMethod" value="directAPI">
+                  <label for="execDirect" style="font-weight: normal;">Direct to broker via API (platform sends orders)</label>
+                </div>
+                <div class="radio-option">
+                  <input type="radio" id="execSignal" name="executionMethod" value="signalOnly">
+                  <label for="execSignal" style="font-weight: normal;">Signal generation only (user manually executes)</label>
+                </div>
+                <div class="radio-option">
+                  <input type="radio" id="execBoth" name="executionMethod" value="both">
+                  <label for="execBoth" style="font-weight: normal;">Both (user chooses automation level)</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h4>4. Revenue Model</h4>
+
+            <div class="form-group">
+              <label for="pricingStructure">How will you charge users? *</label>
+              <textarea id="pricingStructure" name="pricingStructure" placeholder="E.g., $99/month SaaS subscription, tiered pricing ($49 basic / $199 pro / $499 institutional), performance fee (X% of profits), profit split (user gets Y% of trading gains), marketplace fee (Z% on strategy sales)..."></textarea>
+              <div class="form-help">Performance fees significantly increase regulatory risk</div>
+            </div>
+
+            <div class="form-group">
+              <label>Will there be performance-based fees?</label>
+              <div class="radio-group">
+                <div class="radio-option">
+                  <input type="radio" id="perfFeeYes" name="performanceFee" value="yes">
+                  <label for="perfFeeYes" style="font-weight: normal;">Yes (% of profits or profit split)</label>
+                </div>
+                <div class="radio-option">
+                  <input type="radio" id="perfFeeNo" name="performanceFee" value="no">
+                  <label for="perfFeeNo" style="font-weight: normal;">No (flat subscription only)</label>
+                </div>
+                <div class="radio-option">
+                  <input type="radio" id="perfFeeConsidering" name="performanceFee" value="considering">
+                  <label for="perfFeeConsidering" style="font-weight: normal;">Considering it</label>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="anticipatedRevenue">Anticipated revenue in Year 1?</label>
+              <input type="text" id="anticipatedRevenue" name="anticipatedRevenue" placeholder="E.g., $500K, $2M, $10M...">
+              <div class="form-help">Helps assess exemption eligibility (some require <$25M AUM or <$2M revenue)</div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h4>5. Customer Profile</h4>
+
+            <div class="form-group">
+              <label>Target customer type?</label>
+              <div class="radio-group">
+                <div class="radio-option">
+                  <input type="radio" id="customerRetail" name="customerType" value="retail">
+                  <label for="customerRetail" style="font-weight: normal;">Retail investors</label>
+                </div>
+                <div class="radio-option">
+                  <input type="radio" id="customerAccredited" name="customerType" value="accredited">
+                  <label for="customerAccredited" style="font-weight: normal;">Accredited investors only</label>
+                </div>
+                <div class="radio-option">
+                  <input type="radio" id="customerInstitutional" name="customerType" value="institutional">
+                  <label for="customerInstitutional" style="font-weight: normal;">Institutional (QPs, family offices, funds)</label>
+                </div>
+                <div class="radio-option">
+                  <input type="radio" id="customerMixed" name="customerType" value="mixed">
+                  <label for="customerMixed" style="font-weight: normal;">Mixed</label>
+                </div>
+              </div>
+              <div class="form-help">Retail = higher regulatory burden. Accredited/QP = exemptions available.</div>
+            </div>
+
+            <div class="form-group">
+              <label for="customerGeography">Geographic target?</label>
+              <div class="radio-group">
+                <div class="radio-option">
+                  <input type="radio" id="geoUS" name="customerGeography" value="us">
+                  <label for="geoUS" style="font-weight: normal;">US only</label>
+                </div>
+                <div class="radio-option">
+                  <input type="radio" id="geoGlobal" name="customerGeography" value="global">
+                  <label for="geoGlobal" style="font-weight: normal;">Global (including US)</label>
+                </div>
+                <div class="radio-option">
+                  <input type="radio" id="geoNonUS" name="customerGeography" value="nonUS">
+                  <label for="geoNonUS" style="font-weight: normal;">Non-US only</label>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="minimumAccount">Minimum account size requirement?</label>
+              <input type="text" id="minimumAccount" name="minimumAccount" placeholder="E.g., $10K, $50K, $100K, no minimum...">
+            </div>
+
+            <div class="form-group">
+              <label for="anticipatedUsers">Anticipated number of users in Year 1?</label>
+              <input type="text" id="anticipatedUsers" name="anticipatedUsers" placeholder="E.g., 100, 1000, 10000...">
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h4>6. Technical Architecture</h4>
+
+            <div class="form-group">
+              <label for="techStack">Current tech stack?</label>
+              <textarea id="techStack" name="techStack" placeholder="E.g., Python backtesting, TypeScript frontend, AWS infrastructure, PostgreSQL, Redis, WebSocket feeds from Polygon.io..."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="aiModel">Describe the AI Agent + Orchestrator model</label>
+              <textarea id="aiModel" name="aiModel" placeholder="E.g., LLM-based signal generation, ensemble ML models for price prediction, reinforcement learning for execution, rule-based risk management..."></textarea>
+              <div class="form-help">Understanding AI architecture helps assess "black box" disclosure requirements</div>
+            </div>
+
+            <div class="form-group">
+              <label>Will users be able to create/share their own strategies?</label>
+              <div class="radio-group">
+                <div class="radio-option">
+                  <input type="radio" id="ugcYes" name="userGeneratedContent" value="yes">
+                  <label for="ugcYes" style="font-weight: normal;">Yes (marketplace model)</label>
+                </div>
+                <div class="radio-option">
+                  <input type="radio" id="ugcNo" name="userGeneratedContent" value="no">
+                  <label for="ugcNo" style="font-weight: normal;">No (only platform-provided strategies)</label>
+                </div>
+                <div class="radio-option">
+                  <input type="radio" id="ugcFuture" name="userGeneratedContent" value="future">
+                  <label for="ugcFuture" style="font-weight: normal;">Planned for future</label>
+                </div>
+              </div>
+              <div class="form-help">User-generated content introduces testimonial/endorsement compliance issues</div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h4>7. Entity and Team</h4>
+
+            <div class="form-group">
+              <label for="entityStatus">Current entity status?</label>
+              <div class="radio-group">
+                <div class="radio-option">
+                  <input type="radio" id="entityNone" name="entityStatus" value="none">
+                  <label for="entityNone" style="font-weight: normal;">No entity yet</label>
+                </div>
+                <div class="radio-option">
+                  <input type="radio" id="entityLLC" name="entityStatus" value="llc">
+                  <label for="entityLLC" style="font-weight: normal;">LLC formed</label>
+                </div>
+                <div class="radio-option">
+                  <input type="radio" id="entityCorp" name="entityStatus" value="corp">
+                  <label for="entityCorp" style="font-weight: normal;">C-Corp or S-Corp formed</label>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="entityState">If entity exists, which state?</label>
+              <input type="text" id="entityState" name="entityState" placeholder="E.g., Delaware, California, Florida...">
+            </div>
+
+            <div class="form-group">
+              <label for="teamSize">Team size and composition?</label>
+              <textarea id="teamSize" name="teamSize" placeholder="E.g., solo founder, 3 engineers + 1 designer, hiring CCO..."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Do you have securities licenses (Series 65, 7, etc.)?</label>
+              <div class="radio-group">
+                <div class="radio-option">
+                  <input type="radio" id="licenseYes" name="hasLicenses" value="yes">
+                  <label for="licenseYes" style="font-weight: normal;">Yes</label>
+                </div>
+                <div class="radio-option">
+                  <input type="radio" id="licenseNo" name="hasLicenses" value="no">
+                  <label for="licenseNo" style="font-weight: normal;">No</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h4>8. Timeline and Urgency</h4>
+
+            <div class="form-group">
+              <label for="launchTimeline">Target launch date?</label>
+              <input type="text" id="launchTimeline" name="launchTimeline" placeholder="E.g., Q2 2025, 6 months, already live in beta...">
+            </div>
+
+            <div class="form-group">
+              <label for="currentStatus">Current product status?</label>
+              <div class="radio-group">
+                <div class="radio-option">
+                  <input type="radio" id="statusConcept" name="currentStatus" value="concept">
+                  <label for="statusConcept" style="font-weight: normal;">Concept stage</label>
+                </div>
+                <div class="radio-option">
+                  <input type="radio" id="statusDev" name="currentStatus" value="development">
+                  <label for="statusDev" style="font-weight: normal;">In development</label>
+                </div>
+                <div class="radio-option">
+                  <input type="radio" id="statusBeta" name="currentStatus" value="beta">
+                  <label for="statusBeta" style="font-weight: normal;">Beta testing</label>
+                </div>
+                <div class="radio-option">
+                  <input type="radio" id="statusLive" name="currentStatus" value="live">
+                  <label for="statusLive" style="font-weight: normal;">Already live</label>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="urgentQuestions">Most urgent compliance questions right now?</label>
+              <textarea id="urgentQuestions" name="urgentQuestions" placeholder="E.g., Can I start beta testing without RIA registration? What entity should I form? How do I handle broker conversations? Can I advertise backtested returns?"></textarea>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h4>9. Specific Concerns from Your Message</h4>
+
+            <div class="form-group">
+              <label for="brokerConcern">You mentioned your broker expressed concern about 'managing third-party funds.' Can you provide more context?</label>
+              <textarea id="brokerConcern" name="brokerConcern" placeholder="E.g., which broker, what account type were you opening, exact language they used, what triggered the question..."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="profitSplitStructure">If doing profit splits (Model 1), how do you envision this working operationally?</label>
+              <textarea id="profitSplitStructure" name="profitSplitStructure" placeholder="E.g., users pay $99/month + receive 30% of net profits monthly, minimum subscription period, profit calculated how, paid via ACH/check/crypto..."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="internationalReasoning">Why are you considering international/offshore structures?</label>
+              <textarea id="internationalReasoning" name="internationalReasoning" placeholder="E.g., lower compliance costs, access to non-US customers, tax optimization, crypto-friendly jurisdiction, heard it's easier..."></textarea>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h4>10. Additional Context</h4>
+
+            <div class="form-group">
+              <label for="additionalInfo">Anything else I should know?</label>
+              <textarea id="additionalInfo" name="additionalInfo" placeholder="Any other relevant details about your background, business model, concerns, or goals..."></textarea>
+            </div>
+          </div>
+
+          <div style="background: var(--gray-100); padding: 1.5rem; border-radius: 0.5rem; margin-top: 2rem;">
+            <p style="margin: 0; font-weight: 600; color: var(--dark);">How to Submit This Form:</p>
+            <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; color: var(--gray-600);">
+              1. Fill out as many fields as possible above<br>
+              2. Click "Copy Responses" button below to copy your answers to clipboard<br>
+              3. Email responses to me, or paste into our next consultation call<br>
+              4. I'll provide specific regulatory recommendations based on your answers
+            </p>
+          </div>
+
+          <div style="margin-top: 2rem; text-align: center;">
+            <button type="button" onclick="copyFormData()" style="padding: 1rem 3rem; background: var(--primary); color: white; border: none; border-radius: 0.5rem; font-size: 1.125rem; font-weight: 600; cursor: pointer;">
+              Copy Responses to Clipboard
+            </button>
+            <p id="copyStatus" style="margin-top: 1rem; font-weight: 600; color: var(--success); display: none;">✓ Copied! Responses ready to send.</p>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>What Happens Next</h2>
+
+      <div class="checklist">
+        <div class="checklist-item">
+          <span class="checklist-icon">1.</span>
+          <div><strong>You complete the intake form above</strong> and send me your responses (or we discuss on a call)</div>
+        </div>
+        <div class="checklist-item">
+          <span class="checklist-icon">2.</span>
+          <div><strong>I analyze your specific model</strong> against SEC, CFTC, state, and international regulatory frameworks</div>
+        </div>
+        <div class="checklist-item">
+          <span class="checklist-icon">3.</span>
+          <div><strong>I provide definitive registration recommendations:</strong> Which licenses you need (if any), exemptions you qualify for, compliance program requirements, estimated costs/timeline</div>
+        </div>
+        <div class="checklist-item">
+          <span class="checklist-icon">4.</span>
+          <div><strong>We design your compliance-forward architecture:</strong> Terms of service language, user disclosures, API key security protocols, marketing guardrails</div>
+        </div>
+        <div class="checklist-item">
+          <span class="checklist-icon">5.</span>
+          <div><strong>I connect you with specialist resources:</strong> Compliance consultants for RIA/CTA setup (if needed), broker introductions for API partnerships, entity formation counsel (Delaware vs offshore)</div>
+        </div>
+      </div>
+
+      <div class="alert alert-info" style="margin-top: 2rem;">
+        <strong>Timeline Estimate:</strong> Once I have your intake responses, I can provide detailed written guidance within 3-5 business days. For complex structures (e.g., Model 1 with offshore entity), we may need a follow-up call to finalize recommendations.
+      </div>
+    </section>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2025 Terms.Law. This page contains attorney work product prepared for Andrew Egan. Not legal advice.</p>
+    <p style="margin-top: 0.5rem; font-size: 0.875rem;">For informational purposes only. Consult qualified legal counsel for advice specific to your situation.</p>
+  </footer>
+
+  <script>
+    // Check password on page load
+    window.addEventListener('DOMContentLoaded', function() {
+      const correctPassword = '$rd#j6';
+      const storedPassword = sessionStorage.getItem('andrew-access');
+
+      if (storedPassword !== correctPassword) {
+        document.getElementById('password-overlay').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+      }
+    });
+
+    function checkPassword() {
+      const correctPassword = '$rd#j6';
+      const input = document.getElementById('password-input').value;
+      const errorMsg = document.getElementById('password-error');
+
+      if (input === correctPassword) {
+        sessionStorage.setItem('andrew-access', correctPassword);
+        document.getElementById('password-overlay').style.display = 'none';
+        document.body.style.overflow = 'auto';
+      } else {
+        errorMsg.style.display = 'block';
+        document.getElementById('password-input').value = '';
+      }
+    }
+
+    function copyUpworkMessage() {
+      const message = document.getElementById('upworkMessage').innerText;
+      navigator.clipboard.writeText(message).then(() => {
+        const status = document.getElementById('copyStatus');
+        status.classList.add('show');
+        setTimeout(() => {
+          status.classList.remove('show');
+        }, 2000);
+      });
+    }
+
+    function switchTab(event, tabId) {
+      // Hide all tab contents
+      const tabContents = document.querySelectorAll('.tab-content');
+      tabContents.forEach(content => {
+        content.classList.remove('active');
+      });
+
+      // Remove active class from all tabs
+      const tabs = document.querySelectorAll('.tab');
+      tabs.forEach(tab => {
+        tab.classList.remove('active');
+      });
+
+      // Show selected tab content and mark tab as active
+      document.getElementById(tabId).classList.add('active');
+      event.target.classList.add('active');
+
+      // Scroll to top of content
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function copyFormData() {
+      const form = document.getElementById('intakeForm');
+      const formData = new FormData(form);
+
+      let output = 'ANDREW EGAN - ALGORITHMIC TRADING PLATFORM INTAKE\n';
+      output += '='.repeat(60) + '\n\n';
+
+      // Business Model Selection
+      output += '1. BUSINESS MODEL SELECTION\n';
+      output += '-'.repeat(40) + '\n';
+      const businessModel = formData.get('businessModel');
+      output += `Business Model: ${businessModel ? businessModel : 'Not selected'}\n`;
+      const modelReasoning = document.getElementById('modelReasoning').value;
+      output += `Reasoning: ${modelReasoning ? modelReasoning : 'Not provided'}\n\n`;
+
+      // Trading Strategy Details
+      output += '2. TRADING STRATEGY DETAILS\n';
+      output += '-'.repeat(40) + '\n';
+      output += `Asset Classes: ${document.getElementById('assetClasses').value || 'Not provided'}\n`;
+      output += `Strategy Types: ${document.getElementById('strategyTypes').value || 'Not provided'}\n`;
+      output += `Holding Period: ${document.getElementById('holdingPeriod').value || 'Not selected'}\n`;
+      output += `Leverage: ${formData.get('leverage') || 'Not selected'}\n\n`;
+
+      // Custody and Execution
+      output += '3. CUSTODY AND EXECUTION MODEL\n';
+      output += '-'.repeat(40) + '\n';
+      output += `Custody Model: ${formData.get('custodyModel') || 'Not selected'}\n`;
+      output += `API Key Handling: ${document.getElementById('apiKeyHandling').value || 'Not provided'}\n`;
+      output += `Broker Partners: ${document.getElementById('brokerPartners').value || 'Not provided'}\n`;
+      output += `Execution Method: ${formData.get('executionMethod') || 'Not selected'}\n\n`;
+
+      // Revenue Model
+      output += '4. REVENUE MODEL\n';
+      output += '-'.repeat(40) + '\n';
+      output += `Pricing Structure: ${document.getElementById('pricingStructure').value || 'Not provided'}\n`;
+      output += `Performance Fee: ${formData.get('performanceFee') || 'Not selected'}\n`;
+      output += `Anticipated Revenue Y1: ${document.getElementById('anticipatedRevenue').value || 'Not provided'}\n\n`;
+
+      // Customer Profile
+      output += '5. CUSTOMER PROFILE\n';
+      output += '-'.repeat(40) + '\n';
+      output += `Customer Type: ${formData.get('customerType') || 'Not selected'}\n`;
+      output += `Geography: ${formData.get('customerGeography') || 'Not selected'}\n`;
+      output += `Minimum Account: ${document.getElementById('minimumAccount').value || 'Not provided'}\n`;
+      output += `Anticipated Users Y1: ${document.getElementById('anticipatedUsers').value || 'Not provided'}\n\n`;
+
+      // Technical Architecture
+      output += '6. TECHNICAL ARCHITECTURE\n';
+      output += '-'.repeat(40) + '\n';
+      output += `Tech Stack: ${document.getElementById('techStack').value || 'Not provided'}\n`;
+      output += `AI Model: ${document.getElementById('aiModel').value || 'Not provided'}\n`;
+      output += `User-Generated Content: ${formData.get('userGeneratedContent') || 'Not selected'}\n\n`;
+
+      // Entity and Team
+      output += '7. ENTITY AND TEAM\n';
+      output += '-'.repeat(40) + '\n';
+      output += `Entity Status: ${formData.get('entityStatus') || 'Not selected'}\n`;
+      output += `Entity State: ${document.getElementById('entityState').value || 'Not provided'}\n`;
+      output += `Team Size: ${document.getElementById('teamSize').value || 'Not provided'}\n`;
+      output += `Securities Licenses: ${formData.get('hasLicenses') || 'Not selected'}\n\n`;
+
+      // Timeline
+      output += '8. TIMELINE AND URGENCY\n';
+      output += '-'.repeat(40) + '\n';
+      output += `Launch Timeline: ${document.getElementById('launchTimeline').value || 'Not provided'}\n`;
+      output += `Current Status: ${formData.get('currentStatus') || 'Not selected'}\n`;
+      output += `Urgent Questions: ${document.getElementById('urgentQuestions').value || 'Not provided'}\n\n`;
+
+      // Specific Concerns
+      output += '9. SPECIFIC CONCERNS\n';
+      output += '-'.repeat(40) + '\n';
+      output += `Broker Concern Context: ${document.getElementById('brokerConcern').value || 'Not provided'}\n`;
+      output += `Profit Split Structure: ${document.getElementById('profitSplitStructure').value || 'Not provided'}\n`;
+      output += `International Reasoning: ${document.getElementById('internationalReasoning').value || 'Not provided'}\n\n`;
+
+      // Additional
+      output += '10. ADDITIONAL CONTEXT\n';
+      output += '-'.repeat(40) + '\n';
+      output += `${document.getElementById('additionalInfo').value || 'Not provided'}\n\n`;
+
+      output += '='.repeat(60) + '\n';
+      output += 'End of intake form. Ready to send to counsel.\n';
+
+      // Copy to clipboard
+      navigator.clipboard.writeText(output).then(() => {
+        const status = document.getElementById('copyStatus');
+        status.style.display = 'block';
+        setTimeout(() => {
+          status.style.display = 'none';
+        }, 3000);
+      });
+    }
+  </script>
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-901N2Y3CDZ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-901N2Y3CDZ');
+  </script>
+</body>
+</html>
