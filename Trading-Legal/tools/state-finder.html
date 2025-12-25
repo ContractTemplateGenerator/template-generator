@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-901N2Y3CDZ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-901N2Y3CDZ');
+  </script>
+
+  
+  <title>State Registration Finder | Terms.Law</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --accent: #8b5cf6;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --dark: #0f172a;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
+      --gray-400: #94a3b8;
+      --gray-500: #64748b;
+      --gray-600: #475569;
+      --gray-700: #334155;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-700);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .header {
+      background: var(--dark);
+      border-bottom: 1px solid var(--gray-200);
+      padding: 0.75rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      font-weight: 800;
+      font-size: 1rem;
+      color: white;
+      text-decoration: none;
+    }
+    .logo span { color: var(--gray-300); font-weight: 500; }
+    .nav-links { display: flex; gap: 1rem; }
+    .nav-links a {
+      color: var(--gray-300);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+    .nav-links a:hover { color: var(--primary); }
+
+    .main {
+      padding: 3rem 2rem;
+    }
+
+    .tool-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    .tool-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--warning), #d97706);
+      color: white;
+      padding: 6px 16px;
+      border-radius: 100px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .tool-header h1 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--dark);
+      margin-bottom: 0.75rem;
+    }
+    .tool-header p {
+      font-size: 1rem;
+      color: var(--gray-600);
+    }
+
+    .search-bar {
+      max-width: 600px;
+      margin: 0 auto 2rem;
+      display: flex;
+      gap: 12px;
+    }
+    .search-input {
+      flex: 1;
+      padding: 14px 20px;
+      border: 2px solid var(--gray-200);
+      border-radius: 12px;
+      font-size: 1rem;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+    .search-input:focus {
+      outline: none;
+      border-color: white;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
+    .search-btn {
+      padding: 14px 28px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .search-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .filter-row {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+    .filter-btn {
+      padding: 8px 20px;
+      background: white;
+      border: 2px solid var(--gray-200);
+      border-radius: 100px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--gray-600);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .filter-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .filter-btn.active {
+      background: var(--primary);
+      border-color: white;
+      color: white;
+    }
+
+    .states-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .state-card {
+      background: white;
+      border-radius: 16px;
+      border: 2px solid var(--gray-200);
+      overflow: hidden;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    .state-card:hover {
+      border-color: var(--primary);
+      box-shadow: 0 8px 24px rgba(59, 130, 246, 0.15);
+      transform: translateY(-2px);
+    }
+    .state-card.expanded { border-color: var(--primary); }
+
+    .state-header {
+      padding: 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .state-info { display: flex; align-items: center; gap: 12px; }
+    .state-abbr {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--gray-100), var(--gray-200));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1rem;
+      color: var(--dark);
+    }
+    .state-name {
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--dark);
+    }
+    .state-status {
+      padding: 6px 14px;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .state-status.required { background: #fee2e2; color: #991b1b; }
+    .state-status.exempt { background: #dcfce7; color: #166534; }
+    .state-status.conditional { background: #fef3c7; color: #92400e; }
+
+    .state-details {
+      padding: 0 1.25rem 1.25rem;
+      display: none;
+    }
+    .state-card.expanded .state-details { display: block; }
+
+    .detail-section {
+      margin-bottom: 0.5rem;
+    }
+    .detail-section:last-child { margin-bottom: 0; }
+    .detail-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--gray-500);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+    .detail-value {
+      font-size: 0.9rem;
+      color: var(--dark);
+    }
+    .detail-value a {
+      color: white;
+      text-decoration: none;
+    }
+    .detail-value a:hover { text-decoration: underline; }
+
+    .requirement-pills {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    .pill {
+      padding: 4px 10px;
+      background: var(--gray-100);
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--gray-600);
+    }
+    .pill.ia { background: #dbeafe; color: #1e40af; }
+    .pill.mtl { background: #fce7f3; color: #9d174d; }
+    .pill.bd { background: #f3e8ff; color: #6b21a8; }
+
+    .summary-bar {
+      background: var(--dark);
+      border-radius: 16px;
+      padding: 1.5rem 2rem;
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: 1rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .summary-stat {
+      text-align: center;
+    }
+    .summary-value {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--dark);
+    }
+    .summary-value.danger { color: var(--danger); }
+    .summary-value.warning { color: var(--warning); }
+    .summary-value.success { color: var(--success); }
+    .summary-label {
+      font-size: 0.85rem;
+      color: var(--gray-300);
+    }
+
+    .disclaimer {
+      margin-top: 2rem;
+      padding: 1rem;
+      background: #fef3c7;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      color: #92400e;
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <a href="../index.html" class="logo">Terms.Law <span>/ State Finder</span></a>
+    <div class="nav-links">
+      <a href="../workbench.html">Workbench</a>
+      <a href="../index.html">Hub Home</a>
+      <a href="../index.html#consult">Consult</a>
+    </div>
+  </div>
+</header>
+
+<main class="main">
+  <div class="tool-header">
+    <span class="tool-badge">State Lookup Tool</span>
+    <h1>State Registration Finder</h1>
+    <p>Find state-specific requirements for Investment Advisers and Money Transmitters</p>
+  </div>
+
+  <div class="search-bar">
+    <input type="text" class="search-input" id="searchInput" placeholder="Search by state name..." onkeyup="filterStates()">
+    <button class="search-btn" onclick="filterStates()">Search</button>
+  </div>
+
+  <div class="filter-row">
+    <button class="filter-btn active" data-filter="all" onclick="setFilter('all')">All States</button>
+    <button class="filter-btn" data-filter="required" onclick="setFilter('required')">Registration Required</button>
+    <button class="filter-btn" data-filter="exempt" onclick="setFilter('exempt')">Exemptions Available</button>
+    <button class="filter-btn" data-filter="mtl" onclick="setFilter('mtl')">MTL Required</button>
+  </div>
+
+  <div class="summary-bar">
+    <div class="summary-stat">
+      <div class="summary-value" id="totalStates">51</div>
+      <div class="summary-label">Jurisdictions</div>
+    </div>
+    <div class="summary-stat">
+      <div class="summary-value danger" id="requiredCount">47</div>
+      <div class="summary-label">IA Registration Required</div>
+    </div>
+    <div class="summary-stat">
+      <div class="summary-value warning" id="mtlCount">48</div>
+      <div class="summary-label">MTL States</div>
+    </div>
+    <div class="summary-stat">
+      <div class="summary-value success" id="exemptCount">15</div>
+      <div class="summary-label">De Minimis Exemptions</div>
+    </div>
+  </div>
+
+  <div class="states-grid" id="statesGrid">
+    <!-- Populated by JS -->
+  </div>
+
+  <div class="disclaimer">
+    <strong>Disclaimer:</strong> This tool provides general information about state registration requirements. Requirements change frequently. Always verify current requirements with the state regulator before relying on this information. This is not legal advice.
+  </div>
+</main>
+
+<script>
+// State data
+const states = [
+  {
+    abbr: 'AL', name: 'Alabama',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$300', mtlFee: '$500',
+    regulator: 'Alabama Securities Commission',
+    regulatorUrl: 'https://asc.alabama.gov/',
+    notes: 'Notice filing for SEC-registered advisers',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'AK', name: 'Alaska',
+    iaStatus: 'required', mtlStatus: 'exempt',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: 'N/A',
+    regulator: 'Alaska Division of Banking & Securities',
+    regulatorUrl: 'https://www.commerce.alaska.gov/web/dbs/',
+    notes: 'No money transmitter license requirement',
+    requirements: ['ia']
+  },
+  {
+    abbr: 'AZ', name: 'Arizona',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$250', mtlFee: '$1,000',
+    regulator: 'Arizona Corporation Commission',
+    regulatorUrl: 'https://www.azcc.gov/securities/',
+    notes: 'Fintech sandbox available',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'AR', name: 'Arkansas',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: '$2,500',
+    regulator: 'Arkansas Securities Department',
+    regulatorUrl: 'https://securities.arkansas.gov/',
+    notes: '',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'CA', name: 'California',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: '$5,000',
+    regulator: 'CA Dept of Financial Protection & Innovation',
+    regulatorUrl: 'https://dfpi.ca.gov/',
+    notes: 'Largest state market; strict enforcement',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'CO', name: 'Colorado',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: '$3,000',
+    regulator: 'Colorado Division of Securities',
+    regulatorUrl: 'https://www.sos.state.co.us/pubs/securities/',
+    notes: '',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'CT', name: 'Connecticut',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$500', mtlFee: '$1,750',
+    regulator: 'CT Department of Banking',
+    regulatorUrl: 'https://portal.ct.gov/dob/',
+    notes: '',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'DE', name: 'Delaware',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$150', mtlFee: '$2,000',
+    regulator: 'Delaware Division of Securities',
+    regulatorUrl: 'https://www.justice.delaware.gov/investor-protection/',
+    notes: 'Popular incorporation state',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'FL', name: 'Florida',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: '$2,500',
+    regulator: 'Florida Office of Financial Regulation',
+    regulatorUrl: 'https://www.flofr.gov/',
+    notes: 'Large retail investor base',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'GA', name: 'Georgia',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$250', mtlFee: '$2,500',
+    regulator: 'Georgia Secretary of State',
+    regulatorUrl: 'https://sos.ga.gov/securities-division/',
+    notes: '',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'HI', name: 'Hawaii',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: '$500',
+    regulator: 'Hawaii DCCA',
+    regulatorUrl: 'https://cca.hawaii.gov/sec/',
+    notes: '',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'ID', name: 'Idaho',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: '$1,000',
+    regulator: 'Idaho Dept of Finance',
+    regulatorUrl: 'https://www.finance.idaho.gov/',
+    notes: '',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'IL', name: 'Illinois',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: '$2,000',
+    regulator: 'Illinois Secretary of State',
+    regulatorUrl: 'https://www.ilsos.gov/departments/securities/',
+    notes: '',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'IN', name: 'Indiana',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: '$500',
+    regulator: 'Indiana Secretary of State',
+    regulatorUrl: 'https://www.in.gov/sos/securities/',
+    notes: '',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'IA', name: 'Iowa',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$100', mtlFee: '$1,000',
+    regulator: 'Iowa Insurance Division',
+    regulatorUrl: 'https://iid.iowa.gov/',
+    notes: '',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'KS', name: 'Kansas',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$100', mtlFee: '$1,000',
+    regulator: 'Kansas Securities Commissioner',
+    regulatorUrl: 'https://www.securities.kansas.gov/',
+    notes: '',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'KY', name: 'Kentucky',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: '$1,000',
+    regulator: 'Kentucky DFI',
+    regulatorUrl: 'https://kfi.ky.gov/',
+    notes: '',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'LA', name: 'Louisiana',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: '$1,000',
+    regulator: 'Louisiana Office of Financial Institutions',
+    regulatorUrl: 'https://ofi.la.gov/',
+    notes: '',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'ME', name: 'Maine',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: '$500',
+    regulator: 'Maine Office of Securities',
+    regulatorUrl: 'https://www.maine.gov/pfr/securities/',
+    notes: '',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'MD', name: 'Maryland',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: '$3,000',
+    regulator: 'Maryland Office of Financial Regulation',
+    regulatorUrl: 'https://www.labor.maryland.gov/finance/',
+    notes: '',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'MA', name: 'Massachusetts',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: '$1,000',
+    regulator: 'Massachusetts Securities Division',
+    regulatorUrl: 'https://www.sec.state.ma.us/sct/',
+    notes: 'Aggressive enforcement',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'MI', name: 'Michigan',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: '$1,000',
+    regulator: 'Michigan DIFS',
+    regulatorUrl: 'https://www.michigan.gov/difs/',
+    notes: '',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'MN', name: 'Minnesota',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: '$2,500',
+    regulator: 'Minnesota Commerce Dept',
+    regulatorUrl: 'https://mn.gov/commerce/',
+    notes: '',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'MS', name: 'Mississippi',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: '$500',
+    regulator: 'Mississippi Secretary of State',
+    regulatorUrl: 'https://www.sos.ms.gov/regulation-enforcement/',
+    notes: '',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'MO', name: 'Missouri',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: '$1,000',
+    regulator: 'Missouri Secretary of State',
+    regulatorUrl: 'https://www.sos.mo.gov/securities/',
+    notes: '',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'MT', name: 'Montana',
+    iaStatus: 'required', mtlStatus: 'exempt',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: 'N/A',
+    regulator: 'Montana State Auditor',
+    regulatorUrl: 'https://csimt.gov/',
+    notes: 'No MTL requirement',
+    requirements: ['ia']
+  },
+  {
+    abbr: 'NE', name: 'Nebraska',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: '$1,000',
+    regulator: 'Nebraska Dept of Banking',
+    regulatorUrl: 'https://ndbf.nebraska.gov/',
+    notes: '',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'NV', name: 'Nevada',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: '$2,500',
+    regulator: 'Nevada Secretary of State',
+    regulatorUrl: 'https://www.nvsos.gov/sos/licensing/securities-licensing',
+    notes: '',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'NH', name: 'New Hampshire',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: '$500',
+    regulator: 'NH Bureau of Securities',
+    regulatorUrl: 'https://www.sos.nh.gov/securities-regulation',
+    notes: '',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'NJ', name: 'New Jersey',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$300', mtlFee: '$2,000',
+    regulator: 'NJ Bureau of Securities',
+    regulatorUrl: 'https://www.njconsumeraffairs.gov/bos/',
+    notes: '',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'NM', name: 'New Mexico',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: '$500',
+    regulator: 'New Mexico RLD',
+    regulatorUrl: 'https://www.rld.state.nm.us/securities/',
+    notes: '',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'NY', name: 'New York',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$300', mtlFee: '$3,000',
+    regulator: 'NY Dept of Financial Services',
+    regulatorUrl: 'https://www.dfs.ny.gov/',
+    notes: 'BitLicense for crypto; strict requirements',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'NC', name: 'North Carolina',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: '$1,500',
+    regulator: 'NC Secretary of State',
+    regulatorUrl: 'https://www.sosnc.gov/divisions/securities',
+    notes: '',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'ND', name: 'North Dakota',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: '$500',
+    regulator: 'ND Securities Commissioner',
+    regulatorUrl: 'https://www.nd.gov/securities/',
+    notes: '',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'OH', name: 'Ohio',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: '$2,000',
+    regulator: 'Ohio Division of Securities',
+    regulatorUrl: 'https://www.com.ohio.gov/secu/',
+    notes: '',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'OK', name: 'Oklahoma',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: '$1,000',
+    regulator: 'Oklahoma Dept of Securities',
+    regulatorUrl: 'https://www.securities.ok.gov/',
+    notes: '',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'OR', name: 'Oregon',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: '$2,500',
+    regulator: 'Oregon DCBS',
+    regulatorUrl: 'https://dfr.oregon.gov/',
+    notes: '',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'PA', name: 'Pennsylvania',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: '$1,000',
+    regulator: 'PA Securities Commission',
+    regulatorUrl: 'https://www.psc.pa.gov/',
+    notes: '',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'RI', name: 'Rhode Island',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$300', mtlFee: '$500',
+    regulator: 'RI Dept of Business Regulation',
+    regulatorUrl: 'https://dbr.ri.gov/',
+    notes: '',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'SC', name: 'South Carolina',
+    iaStatus: 'required', mtlStatus: 'exempt',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: 'N/A',
+    regulator: 'SC Office of the Attorney General',
+    regulatorUrl: 'https://www.scag.gov/securities/',
+    notes: 'No MTL requirement',
+    requirements: ['ia']
+  },
+  {
+    abbr: 'SD', name: 'South Dakota',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: '$500',
+    regulator: 'SD Division of Securities',
+    regulatorUrl: 'https://dlr.sd.gov/securities/',
+    notes: '',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'TN', name: 'Tennessee',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: '$1,500',
+    regulator: 'TN Dept of Commerce & Insurance',
+    regulatorUrl: 'https://www.tn.gov/commerce/securities.html',
+    notes: '',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'TX', name: 'Texas',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: '$2,500',
+    regulator: 'Texas State Securities Board',
+    regulatorUrl: 'https://www.ssb.texas.gov/',
+    notes: 'Large market; active enforcement',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'UT', name: 'Utah',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: '$1,000',
+    regulator: 'Utah Division of Securities',
+    regulatorUrl: 'https://www.securities.utah.gov/',
+    notes: 'Regulatory sandbox available',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'VT', name: 'Vermont',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: '$500',
+    regulator: 'VT Dept of Financial Regulation',
+    regulatorUrl: 'https://dfr.vermont.gov/',
+    notes: '',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'VA', name: 'Virginia',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: '$1,000',
+    regulator: 'Virginia State Corporation Commission',
+    regulatorUrl: 'https://www.scc.virginia.gov/pages/Securities-Retail-Franchising',
+    notes: '',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'WA', name: 'Washington',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: '$3,100',
+    regulator: 'WA Dept of Financial Institutions',
+    regulatorUrl: 'https://dfi.wa.gov/',
+    notes: '',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'WV', name: 'West Virginia',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: '$1,000',
+    regulator: 'WV State Auditor',
+    regulatorUrl: 'https://www.wvsao.gov/securities/',
+    notes: '',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'WI', name: 'Wisconsin',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: '$1,000',
+    regulator: 'Wisconsin DFI',
+    regulatorUrl: 'https://www.wdfi.org/',
+    notes: '',
+    requirements: ['ia', 'mtl']
+  },
+  {
+    abbr: 'WY', name: 'Wyoming',
+    iaStatus: 'required', mtlStatus: 'conditional',
+    deMinimis: '5 clients',
+    iaFee: '$200', mtlFee: 'Varies',
+    regulator: 'Wyoming Secretary of State',
+    regulatorUrl: 'https://sos.wyo.gov/',
+    notes: 'Crypto-friendly; SPDI charter available',
+    requirements: ['ia']
+  },
+  {
+    abbr: 'DC', name: 'District of Columbia',
+    iaStatus: 'required', mtlStatus: 'required',
+    deMinimis: '5 clients',
+    iaFee: '$250', mtlFee: '$1,000',
+    regulator: 'DC Dept of Insurance, Securities, and Banking',
+    regulatorUrl: 'https://disb.dc.gov/',
+    notes: '',
+    requirements: ['ia', 'mtl']
+  }
+];
+
+let currentFilter = 'all';
+
+function renderStates(statesToRender) {
+  const grid = document.getElementById('statesGrid');
+  grid.innerHTML = statesToRender.map(state => `
+    <div class="state-card" onclick="toggleCard(this)">
+      <div class="state-header">
+        <div class="state-info">
+          <div class="state-abbr">${state.abbr}</div>
+          <div class="state-name">${state.name}</div>
+        </div>
+        <span class="state-status ${state.iaStatus}">${
+          state.iaStatus === 'required' ? 'Required' :
+          state.iaStatus === 'exempt' ? 'Exempt' : 'Conditional'
+        }</span>
+      </div>
+      <div class="state-details">
+        <div class="detail-section">
+          <div class="detail-label">Requirements</div>
+          <div class="requirement-pills">
+            ${state.requirements.includes('ia') ? '<span class="pill ia">IA Registration</span>' : ''}
+            ${state.requirements.includes('mtl') ? '<span class="pill mtl">Money Transmitter</span>' : ''}
+            ${state.requirements.includes('bd') ? '<span class="pill bd">Broker-Dealer</span>' : ''}
+          </div>
+        </div>
+        <div class="detail-section">
+          <div class="detail-label">De Minimis Exemption</div>
+          <div class="detail-value">${state.deMinimis}</div>
+        </div>
+        <div class="detail-section">
+          <div class="detail-label">Registration Fees</div>
+          <div class="detail-value">IA: ${state.iaFee} | MTL: ${state.mtlFee}</div>
+        </div>
+        <div class="detail-section">
+          <div class="detail-label">Regulator</div>
+          <div class="detail-value">
+            <a href="${state.regulatorUrl}" target="_blank">${state.regulator}</a>
+          </div>
+        </div>
+        ${state.notes ? `
+          <div class="detail-section">
+            <div class="detail-label">Notes</div>
+            <div class="detail-value">${state.notes}</div>
+          </div>
+        ` : ''}
+      </div>
+    </div>
+  `).join('');
+
+  updateSummary(statesToRender);
+}
+
+function toggleCard(card) {
+  card.classList.toggle('expanded');
+}
+
+function filterStates() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+
+  let filtered = states;
+
+  // Apply search filter
+  if (search) {
+    filtered = filtered.filter(s =>
+      s.name.toLowerCase().includes(search) ||
+      s.abbr.toLowerCase().includes(search)
+    );
+  }
+
+  // Apply category filter
+  if (currentFilter !== 'all') {
+    if (currentFilter === 'required') {
+      filtered = filtered.filter(s => s.iaStatus === 'required');
+    } else if (currentFilter === 'exempt') {
+      filtered = filtered.filter(s => s.iaStatus === 'exempt' || s.mtlStatus === 'exempt');
+    } else if (currentFilter === 'mtl') {
+      filtered = filtered.filter(s => s.mtlStatus === 'required');
+    }
+  }
+
+  renderStates(filtered);
+}
+
+function setFilter(filter) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.filter === filter);
+  });
+  filterStates();
+}
+
+function updateSummary(filtered) {
+  const iaRequired = filtered.filter(s => s.iaStatus === 'required').length;
+  const mtlRequired = filtered.filter(s => s.mtlStatus === 'required').length;
+  const exempt = filtered.filter(s => s.deMinimis).length;
+
+  document.getElementById('totalStates').textContent = filtered.length;
+  document.getElementById('requiredCount').textContent = iaRequired;
+  document.getElementById('mtlCount').textContent = mtlRequired;
+  document.getElementById('exemptCount').textContent = exempt;
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+  renderStates(states);
+});
+</script>
+
+</body>
+</html>

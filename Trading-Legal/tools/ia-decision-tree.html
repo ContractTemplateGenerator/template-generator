@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-901N2Y3CDZ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-901N2Y3CDZ');
+  </script>
+
+  
+  <title>Investment Adviser Decision Tree | Terms.Law</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --accent: #8b5cf6;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --dark: #0f172a;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
+      --gray-400: #94a3b8;
+      --gray-500: #64748b;
+      --gray-600: #475569;
+      --gray-700: #334155;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-700);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .header {
+      background: var(--dark);
+      border-bottom: 1px solid var(--gray-200);
+      padding: 0.75rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      font-weight: 800;
+      font-size: 1rem;
+      color: white;
+      text-decoration: none;
+    }
+    .logo span { color: var(--gray-400); font-weight: 500; }
+    .nav-links { display: flex; gap: 1rem; }
+    .nav-links a {
+      color: var(--gray-300);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+    .nav-links a:hover { color: white; }
+
+    /* Main */
+    .main {
+      padding: 3rem 2rem;
+    }
+
+    .content-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .tool-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    .tool-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white;
+      padding: 6px 16px;
+      border-radius: 100px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .tool-header h1 {
+      font-size: 2.25rem;
+      font-weight: 800;
+      color: var(--dark);
+      margin-bottom: 0.75rem;
+    }
+    .tool-header p {
+      font-size: 1rem;
+      color: var(--gray-500);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Progress */
+    .progress-bar {
+      background: var(--gray-200);
+      height: 6px;
+      border-radius: 3px;
+      margin-bottom: 2rem;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: 3px;
+      transition: width 0.4s ease;
+    }
+    .progress-text {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--gray-500);
+      margin-bottom: 2rem;
+    }
+
+    /* Question Card */
+    .question-card {
+      background: var(--dark);
+      border-radius: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+      overflow: hidden;
+    }
+    .question-header {
+      background: linear-gradient(135deg, var(--dark), #1e3a5f);
+      padding: 1.5rem 2rem;
+    }
+    .question-number {
+      font-size: 0.8rem;
+      color: var(--gray-400);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+    .question-text {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: white;
+      line-height: 1.4;
+    }
+    .question-body {
+      padding: 2rem;
+      background: white;
+    }
+    .question-hint {
+      background: var(--gray-50);
+      border-left: 4px solid var(--primary);
+      padding: 1rem 1.25rem;
+      margin-bottom: 0.75rem;
+      font-size: 0.9rem;
+      color: var(--gray-600);
+    }
+
+    /* Options */
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .option-btn {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 1rem 1.25rem;
+      background: white;
+      border: 2px solid var(--gray-200);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: left;
+    }
+    .option-btn:hover {
+      border-color: white;
+      background: var(--gray-50);
+    }
+    .option-btn.selected {
+      border-color: white;
+      background: #eff6ff;
+    }
+    .option-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid var(--gray-300);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 14px;
+      color: transparent;
+    }
+    .option-btn.selected .option-icon {
+      background: var(--primary);
+      border-color: white;
+      color: white;
+    }
+    .option-content { flex: 1; }
+    .option-label {
+      font-weight: 600;
+      color: var(--dark);
+      font-size: 0.95rem;
+    }
+    .option-desc {
+      font-size: 0.85rem;
+      color: var(--gray-500);
+      margin-top: 4px;
+    }
+
+    /* Navigation */
+    .nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--gray-200);
+    }
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-primary:disabled {
+      background: var(--gray-300);
+      cursor: not-allowed;
+    }
+    .btn-outline {
+      background: white;
+      color: var(--gray-700);
+      border: 1px solid var(--gray-300);
+    }
+    .btn-outline:hover { background: var(--gray-50); }
+
+    /* Result Card */
+    .result-card {
+      background: var(--dark);
+      border-radius: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    .result-header {
+      padding: 2rem;
+      text-align: center;
+    }
+    .result-header.success { background: linear-gradient(135deg, #059669, #10b981); }
+    .result-header.warning { background: linear-gradient(135deg, #d97706, #f59e0b); }
+    .result-header.danger { background: linear-gradient(135deg, #dc2626, #ef4444); }
+    .result-header.info { background: linear-gradient(135deg, var(--primary), var(--accent)); }
+    .result-icon {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+    }
+    .result-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: white;
+      margin-bottom: 0.5rem;
+    }
+    .result-subtitle {
+      color: rgba(255,255,255,0.9);
+      font-size: 1rem;
+    }
+    .result-body {
+      padding: 2rem;
+    }
+    .result-section {
+      margin-bottom: 0.75rem;
+    }
+    .result-section h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .result-section p, .result-section li {
+      font-size: 0.95rem;
+      color: var(--gray-700);
+      margin-bottom: 0.5rem;
+    }
+    .result-section ul {
+      padding-left: 1.5rem;
+    }
+    .result-cta {
+      background: var(--gray-50);
+      padding: 1.5rem 2rem;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .result-cta .btn { flex: 1; justify-content: center; }
+
+    /* Answer Summary */
+    .answer-summary {
+      background: var(--gray-50);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .answer-summary h4 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 0.5rem;
+    }
+    .answer-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--gray-200);
+      font-size: 0.85rem;
+    }
+    .answer-item:last-child { border-bottom: none; }
+    .answer-q { color: var(--gray-500); }
+    .answer-a { font-weight: 600; color: var(--dark); }
+
+    /* Hidden */
+    .hidden { display: none !important; }
+
+    /* Disclaimer */
+    .disclaimer {
+      margin-top: 2rem;
+      padding: 1rem;
+      background: #fef3c7;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      color: #92400e;
+    }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <a href="../index.html" class="logo">Terms.Law <span>/ IA Decision Tree</span></a>
+    <div class="nav-links">
+      <a href="../workbench.html">Workbench</a>
+      <a href="../index.html">Hub Home</a>
+      <a href="../index.html#consult">Consult</a>
+    </div>
+  </div>
+</header>
+
+<main class="main">
+<div class="content-container">
+  <div class="tool-header">
+    <span class="tool-badge">Interactive Tool</span>
+    <h1>Do I Need to Register as an Investment Adviser?</h1>
+    <p>Answer a few questions to determine your SEC and state registration requirements</p>
+  </div>
+
+  <div id="questionView">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+    </div>
+    <div class="progress-text" id="progressText">Question 1 of 8</div>
+
+    <div class="question-card">
+      <div class="question-header">
+        <div class="question-number" id="questionNumber">Question 1</div>
+        <div class="question-text" id="questionText">Loading...</div>
+      </div>
+      <div class="question-body">
+        <div class="question-hint" id="questionHint"></div>
+        <div class="options-list" id="optionsList"></div>
+        <div class="nav-buttons">
+          <button class="btn btn-outline" id="backBtn" onclick="goBack()">
+            &#8592; Back
+          </button>
+          <button class="btn btn-primary" id="nextBtn" onclick="goNext()" disabled>
+            Next &#8594;
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="resultView" class="hidden">
+    <!-- Populated by JS -->
+  </div>
+
+  <div class="disclaimer">
+    <strong>Disclaimer:</strong> This tool provides general educational information only. It is not legal advice and does not create an attorney-client relationship. Consult with a qualified securities attorney for advice specific to your situation.
+  </div>
+</div>
+</main>
+
+<script>
+// =====================================================
+// DECISION TREE DATA
+// =====================================================
+const questions = [
+  {
+    id: 'advice_type',
+    question: 'What type of service does your platform provide?',
+    hint: 'The SEC focuses on whether you provide "advice" about securities - recommendations or guidance on buying, selling, or holding.',
+    options: [
+      {
+        value: 'recommendations',
+        label: 'Specific Buy/Sell Recommendations',
+        desc: 'We tell users which securities to buy or sell'
+      },
+      {
+        value: 'signals',
+        label: 'Trading Signals or Alerts',
+        desc: 'We provide signals but users decide to act'
+      },
+      {
+        value: 'pure_tool',
+        label: 'Pure Analysis Tools',
+        desc: 'Backtesting, charting, or data visualization only'
+      },
+      {
+        value: 'managed',
+        label: 'Managed Accounts / Auto-Trading',
+        desc: 'We execute trades on behalf of users'
+      }
+    ]
+  },
+  {
+    id: 'securities_type',
+    question: 'Which types of assets does your platform cover?',
+    hint: '"Securities" includes stocks, bonds, ETFs, mutual funds, and options on these. Futures, forex, and crypto have different regulators.',
+    options: [
+      {
+        value: 'securities_only',
+        label: 'Only Securities (stocks, ETFs, options)',
+        desc: 'No futures, forex, or crypto'
+      },
+      {
+        value: 'mixed',
+        label: 'Mix of Securities and Other Assets',
+        desc: 'Includes some combination'
+      },
+      {
+        value: 'non_securities',
+        label: 'Only Non-Securities (futures, forex, crypto)',
+        desc: 'No stocks, bonds, or options'
+      }
+    ]
+  },
+  {
+    id: 'compensation',
+    question: 'How do you receive compensation?',
+    hint: 'Investment adviser status requires receiving compensation for advice. The form of compensation matters.',
+    options: [
+      {
+        value: 'aum_fee',
+        label: 'Percentage of Assets Under Management',
+        desc: 'Fee based on portfolio value'
+      },
+      {
+        value: 'performance',
+        label: 'Performance-Based Fee',
+        desc: 'Fee tied to trading profits'
+      },
+      {
+        value: 'subscription',
+        label: 'Flat Subscription Fee',
+        desc: 'Monthly or annual subscription'
+      },
+      {
+        value: 'free',
+        label: 'Free (No Compensation)',
+        desc: 'No fees from users'
+      }
+    ]
+  },
+  {
+    id: 'individualized',
+    question: 'Is your advice tailored to individual clients?',
+    hint: 'Individualized advice based on a client\'s specific situation is more likely to trigger registration than general advice to all subscribers.',
+    options: [
+      {
+        value: 'yes',
+        label: 'Yes, Tailored to Each Client',
+        desc: 'Based on their goals, risk tolerance, etc.'
+      },
+      {
+        value: 'partial',
+        label: 'Partially - Based on Selected Categories',
+        desc: 'Users select risk level or strategy type'
+      },
+      {
+        value: 'no',
+        label: 'No - Same Advice to All Users',
+        desc: 'Everyone sees the same signals/recommendations'
+      }
+    ]
+  },
+  {
+    id: 'client_count',
+    question: 'How many clients do you expect in the next 12 months?',
+    hint: 'The "private adviser" exemption (now repealed for most) had a 15-client threshold. Some states still use similar thresholds.',
+    options: [
+      {
+        value: 'under_15',
+        label: 'Fewer than 15 Clients',
+        desc: 'Small initial user base'
+      },
+      {
+        value: '15_to_100',
+        label: '15 to 100 Clients',
+        desc: 'Growing user base'
+      },
+      {
+        value: 'over_100',
+        label: 'More than 100 Clients',
+        desc: 'Scaling for mass market'
+      }
+    ]
+  },
+  {
+    id: 'client_type',
+    question: 'What types of clients will you serve?',
+    hint: 'Some exemptions are available if you only serve qualified clients (accredited investors, institutional clients, etc.)',
+    options: [
+      {
+        value: 'retail',
+        label: 'Retail Investors (General Public)',
+        desc: 'Anyone can sign up'
+      },
+      {
+        value: 'accredited',
+        label: 'Accredited Investors Only',
+        desc: 'High net worth or income requirements'
+      },
+      {
+        value: 'institutional',
+        label: 'Institutional Only',
+        desc: 'Funds, banks, insurance companies'
+      }
+    ]
+  },
+  {
+    id: 'aum_level',
+    question: 'What is your expected assets under management (AUM)?',
+    hint: 'AUM thresholds determine whether you register with the SEC (over $110M) or state regulators (under $100M).',
+    options: [
+      {
+        value: 'under_25m',
+        label: 'Under $25 Million',
+        desc: 'State registration only'
+      },
+      {
+        value: '25m_100m',
+        label: '$25 Million - $100 Million',
+        desc: 'State registration (SEC optional)'
+      },
+      {
+        value: '100m_110m',
+        label: '$100 Million - $110 Million',
+        desc: 'Can choose SEC or state'
+      },
+      {
+        value: 'over_110m',
+        label: 'Over $110 Million',
+        desc: 'Must register with SEC'
+      },
+      {
+        value: 'not_applicable',
+        label: 'N/A - No AUM Model',
+        desc: 'Not managing client assets'
+      }
+    ]
+  },
+  {
+    id: 'state_location',
+    question: 'Where will you be located and where are your clients?',
+    hint: 'You typically need to register in your home state plus states where you have clients exceeding the "de minimis" threshold (usually 5 clients per state).',
+    options: [
+      {
+        value: 'single_state',
+        label: 'Single State Only',
+        desc: 'Office and all clients in one state'
+      },
+      {
+        value: 'few_states',
+        label: 'A Few States (2-5)',
+        desc: 'Regional presence'
+      },
+      {
+        value: 'nationwide',
+        label: 'Nationwide',
+        desc: 'Clients across many states'
+      }
+    ]
+  }
+];
+
+// =====================================================
+// STATE
+// =====================================================
+let currentQuestion = 0;
+let answers = {};
+let selectedOption = null;
+
+// =====================================================
+// FUNCTIONS
+// =====================================================
+function renderQuestion() {
+  const q = questions[currentQuestion];
+  selectedOption = answers[q.id] || null;
+
+  // Update progress
+  const progress = ((currentQuestion) / questions.length) * 100;
+  document.getElementById('progressFill').style.width = progress + '%';
+  document.getElementById('progressText').textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
+
+  // Update question
+  document.getElementById('questionNumber').textContent = `Question ${currentQuestion + 1}`;
+  document.getElementById('questionText').textContent = q.question;
+  document.getElementById('questionHint').textContent = q.hint;
+
+  // Render options
+  const optionsList = document.getElementById('optionsList');
+  optionsList.innerHTML = q.options.map(opt => `
+    <button class="option-btn ${selectedOption === opt.value ? 'selected' : ''}"
+            onclick="selectOption('${opt.value}')">
+      <div class="option-icon">&#10003;</div>
+      <div class="option-content">
+        <div class="option-label">${opt.label}</div>
+        <div class="option-desc">${opt.desc}</div>
+      </div>
+    </button>
+  `).join('');
+
+  // Update buttons
+  document.getElementById('backBtn').style.visibility = currentQuestion === 0 ? 'hidden' : 'visible';
+  document.getElementById('nextBtn').disabled = !selectedOption;
+  document.getElementById('nextBtn').textContent = currentQuestion === questions.length - 1 ? 'See Results' : 'Next \u2192';
+}
+
+function selectOption(value) {
+  const q = questions[currentQuestion];
+  selectedOption = value;
+  answers[q.id] = value;
+
+  // Update UI
+  document.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+  document.getElementById('nextBtn').disabled = false;
+}
+
+function goBack() {
+  if (currentQuestion > 0) {
+    currentQuestion--;
+    renderQuestion();
+  }
+}
+
+function goNext() {
+  if (!selectedOption) return;
+
+  if (currentQuestion === questions.length - 1) {
+    showResults();
+  } else {
+    currentQuestion++;
+    renderQuestion();
+  }
+}
+
+function showResults() {
+  document.getElementById('questionView').classList.add('hidden');
+  document.getElementById('resultView').classList.remove('hidden');
+
+  const result = analyzeAnswers();
+  document.getElementById('resultView').innerHTML = renderResult(result);
+}
+
+function analyzeAnswers() {
+  // Determine result based on answers
+  let requiresRegistration = false;
+  let registrationLevel = 'none'; // none, state, sec
+  let exemptions = [];
+  let concerns = [];
+  let recommendations = [];
+
+  // Check if providing investment advice
+  if (answers.advice_type === 'pure_tool') {
+    return {
+      status: 'success',
+      title: 'Likely No Registration Required',
+      subtitle: 'Pure analysis tools generally don\'t trigger IA registration',
+      explanation: 'Providing analytical tools without specific recommendations typically does not constitute investment advice under the Investment Advisers Act.',
+      recommendations: [
+        'Document your "tools only" positioning clearly',
+        'Avoid any language suggesting specific recommendations',
+        'Consider disclaimers about user responsibility',
+        'Monitor for scope creep that could trigger registration'
+      ],
+      concerns: [
+        'If you later add recommendations, reassess immediately',
+        'Marketing language matters - avoid "advice" terminology'
+      ]
+    };
+  }
+
+  // Non-securities only
+  if (answers.securities_type === 'non_securities') {
+    return {
+      status: 'info',
+      title: 'Different Regulator Applies',
+      subtitle: 'SEC Investment Adviser rules don\'t apply to non-securities',
+      explanation: 'If you only cover futures, forex, or crypto, the Investment Advisers Act doesn\'t apply. However, other regulations do:',
+      recommendations: [
+        'Futures/Commodities: Check CFTC CTA/CPO registration',
+        'Crypto: Check FinCEN MSB requirements and state licenses',
+        'Forex: Check NFA registration requirements',
+        'Use the other decision trees for these regulators'
+      ],
+      concerns: []
+    };
+  }
+
+  // Definitely providing advice about securities
+  if (answers.advice_type === 'managed' || answers.advice_type === 'recommendations') {
+    requiresRegistration = true;
+  }
+
+  // Signals with compensation
+  if (answers.advice_type === 'signals' && answers.compensation !== 'free') {
+    if (answers.individualized === 'yes' || answers.individualized === 'partial') {
+      requiresRegistration = true;
+    } else {
+      concerns.push('Impersonal advice (newsletters) may have an exclusion, but modern platforms often don\'t qualify');
+      requiresRegistration = true; // Conservative approach
+    }
+  }
+
+  // Check exemptions
+  if (answers.client_type === 'institutional') {
+    exemptions.push('Private Fund Adviser Exemption may apply if only advising qualifying funds');
+  }
+
+  // Determine SEC vs State
+  if (requiresRegistration) {
+    if (answers.aum_level === 'over_110m') {
+      registrationLevel = 'sec';
+    } else if (answers.aum_level === '100m_110m') {
+      registrationLevel = 'either';
+    } else {
+      registrationLevel = 'state';
+    }
+  }
+
+  // Build result
+  if (!requiresRegistration) {
+    return {
+      status: 'success',
+      title: 'Registration May Not Be Required',
+      subtitle: 'But conduct a thorough legal analysis to confirm',
+      explanation: 'Based on your answers, you may not meet the definition of "investment adviser" requiring registration. However, this analysis is preliminary.',
+      recommendations: [
+        'Consult with a securities attorney to confirm',
+        'Document your business model carefully',
+        'Avoid scope creep into advisory activities',
+        'Review your marketing for compliance'
+      ],
+      concerns: [
+        'Regulatory interpretation can change',
+        'Facts and circumstances matter significantly'
+      ]
+    };
+  }
+
+  if (registrationLevel === 'sec') {
+    return {
+      status: 'danger',
+      title: 'SEC Registration Required',
+      subtitle: 'You likely need to register as an Investment Adviser with the SEC',
+      explanation: 'Your business model involves providing investment advice about securities for compensation, and your AUM exceeds the $110M threshold for SEC registration.',
+      recommendations: [
+        'Engage securities counsel immediately',
+        'Begin Form ADV preparation',
+        'Develop compliance policies and procedures',
+        'Appoint a Chief Compliance Officer',
+        'Budget $15,000-$30,000+ for initial registration'
+      ],
+      concerns: [
+        'Operating as an unregistered adviser is a serious violation',
+        'SEC registration involves ongoing compliance obligations',
+        'Annual Form ADV updates required'
+      ]
+    };
+  }
+
+  if (registrationLevel === 'state') {
+    return {
+      status: 'warning',
+      title: 'State Registration Required',
+      subtitle: 'You likely need to register with state securities regulators',
+      explanation: 'Your business model involves providing investment advice about securities for compensation. With AUM under $100M, you\'ll register with state(s) rather than the SEC.',
+      recommendations: [
+        'Identify which states require registration',
+        'Register in your home state first',
+        'Check "de minimis" rules for other states',
+        'Prepare Form ADV and state-specific forms',
+        'Budget $5,000-$15,000 for initial registration'
+      ],
+      concerns: [
+        'Multi-state registration can be complex',
+        answers.state_location === 'nationwide' ? 'Nationwide presence means many state registrations' : '',
+        'State requirements vary significantly'
+      ].filter(Boolean)
+    };
+  }
+
+  return {
+    status: 'warning',
+    title: 'Registration Likely Required',
+    subtitle: 'SEC or state registration based on your AUM',
+    explanation: 'Your business model appears to involve investment advice about securities for compensation, triggering registration requirements.',
+    recommendations: [
+      'Consult with a securities attorney',
+      'Determine your registration threshold',
+      'Begin compliance planning',
+      'Review your business structure for optimization'
+    ],
+    concerns: exemptions.concat(concerns)
+  };
+}
+
+function renderResult(result) {
+  const statusClass = result.status;
+
+  return `
+    <div class="result-card">
+      <div class="result-header ${statusClass}">
+        <div class="result-icon">
+          ${statusClass === 'success' ? '&#10003;' : statusClass === 'danger' ? '&#9888;' : statusClass === 'warning' ? '&#9888;' : '&#8505;'}
+        </div>
+        <h2 class="result-title">${result.title}</h2>
+        <p class="result-subtitle">${result.subtitle}</p>
+      </div>
+      <div class="result-body">
+        <div class="result-section">
+          <h3>&#128203; Analysis</h3>
+          <p>${result.explanation}</p>
+        </div>
+
+        ${result.recommendations.length > 0 ? `
+          <div class="result-section">
+            <h3>&#10003; Recommended Next Steps</h3>
+            <ul>
+              ${result.recommendations.map(r => `<li>${r}</li>`).join('')}
+            </ul>
+          </div>
+        ` : ''}
+
+        ${result.concerns.length > 0 ? `
+          <div class="result-section">
+            <h3>&#9888; Important Considerations</h3>
+            <ul>
+              ${result.concerns.map(c => `<li>${c}</li>`).join('')}
+            </ul>
+          </div>
+        ` : ''}
+
+        <div class="answer-summary">
+          <h4>Your Answers</h4>
+          ${Object.entries(answers).map(([key, value]) => {
+            const q = questions.find(q => q.id === key);
+            const opt = q?.options.find(o => o.value === value);
+            return `
+              <div class="answer-item">
+                <span class="answer-q">${q?.question.substring(0, 40)}...</span>
+                <span class="answer-a">${opt?.label || value}</span>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+      <div class="result-cta">
+        <button class="btn btn-outline" onclick="restartQuiz()">
+          &#8634; Start Over
+        </button>
+        <a href="../guides/investment-adviser-registration.html" class="btn btn-primary">
+          Read Full Guide &#8594;
+        </a>
+      </div>
+    </div>
+  `;
+}
+
+function restartQuiz() {
+  currentQuestion = 0;
+  answers = {};
+  selectedOption = null;
+  document.getElementById('resultView').classList.add('hidden');
+  document.getElementById('questionView').classList.remove('hidden');
+  renderQuestion();
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+  renderQuestion();
+});
+</script>
+
+</body>
+</html>

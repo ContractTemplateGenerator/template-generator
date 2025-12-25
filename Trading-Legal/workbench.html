@@ -1,0 +1,1602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-901N2Y3CDZ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-901N2Y3CDZ');
+  </script>
+
+  
+  <title>Founder Compliance Workbench | Terms.Law</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --accent: #8b5cf6;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --dark: #0f172a;
+      --dark-lighter: #1e293b;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
+      --gray-400: #94a3b8;
+      --gray-500: #64748b;
+      --gray-600: #475569;
+      --gray-700: #334155;
+      --gray-800: #1e293b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--gray-100);
+      color: var(--gray-700);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* Layout */
+    .app-container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      background: var(--dark);
+      color: white;
+      padding: 1.5rem;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .sidebar-logo {
+      font-weight: 800;
+      font-size: 1.1rem;
+    }
+    .sidebar-logo span { color: var(--gray-300); font-weight: 500; }
+
+    .sidebar-nav { flex: 1; }
+    .nav-section {
+      margin-bottom: 1.5rem;
+    }
+    .nav-section-title {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gray-500);
+      margin-bottom: 0.75rem;
+      padding-left: 12px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      color: var(--gray-400);
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
+    .nav-item.active { background: var(--primary); color: white; }
+    .nav-icon { width: 20px; text-align: center; }
+
+    .sidebar-footer {
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    .save-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      color: var(--success);
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      padding: 2rem;
+      overflow-y: auto;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    .page-title {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--dark);
+    }
+    .page-subtitle {
+      color: var(--gray-500);
+      font-size: 0.95rem;
+    }
+
+    .btn {
+      padding: 0.6rem 1.25rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border: none;
+      text-decoration: none;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-outline { background: white; color: var(--gray-700); border: 1px solid var(--gray-300); }
+    .btn-outline:hover { background: var(--gray-50); border-color: var(--gray-400); }
+    .btn-danger { background: #fef2f2; color: var(--danger); border: 1px solid #fecaca; }
+    .btn-danger:hover { background: #fee2e2; }
+
+    /* Cards */
+    .card {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid var(--gray-200);
+      margin-bottom: 1.5rem;
+    }
+    .card-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--dark);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .card-body { padding: 1.5rem; }
+
+    /* Grid */
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+
+    @media (max-width: 1200px) { .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 900px) {
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+      .sidebar { width: 220px; }
+    }
+    @media (max-width: 768px) {
+      .app-container { flex-direction: column; }
+      .sidebar { width: 100%; }
+    }
+
+    /* Form Elements */
+    .form-group { margin-bottom: 1.25rem; }
+    .form-label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--gray-700);
+      margin-bottom: 6px;
+    }
+    .form-label .required { color: var(--danger); }
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--gray-300);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    .form-textarea { resize: vertical; min-height: 100px; }
+    .form-hint {
+      font-size: 0.8rem;
+      color: var(--gray-500);
+      margin-top: 4px;
+    }
+
+    /* Checkbox Group */
+    .checkbox-group { display: flex; flex-wrap: wrap; gap: 12px; }
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .checkbox-item:hover { border-color: var(--primary); }
+    .checkbox-item.checked { background: #eff6ff; border-color: var(--primary); }
+    .checkbox-item input { display: none; }
+    .checkbox-item span { font-size: 0.85rem; font-weight: 500; }
+
+    /* Risk Score */
+    .risk-display {
+      text-align: center;
+      padding: 2rem;
+    }
+    .risk-gauge {
+      width: 160px;
+      height: 160px;
+      margin: 0 auto 1rem;
+      position: relative;
+    }
+    .risk-gauge svg { transform: rotate(-90deg); }
+    .risk-gauge .bg { stroke: var(--gray-200); }
+    .risk-gauge .fill { stroke-linecap: round; transition: stroke-dashoffset 0.5s, stroke 0.5s; }
+    .risk-gauge .fill.low { stroke: var(--success); }
+    .risk-gauge .fill.medium { stroke: var(--warning); }
+    .risk-gauge .fill.high { stroke: var(--danger); }
+    .risk-score {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+    .risk-score .value {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--dark);
+    }
+    .risk-score .label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .risk-score .label.low { color: var(--success); }
+    .risk-score .label.medium { color: var(--warning); }
+    .risk-score .label.high { color: var(--danger); }
+
+    /* Regulatory Flags */
+    .flag-list { list-style: none; }
+    .flag-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 16px;
+      margin-bottom: 8px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+    .flag-item.high { background: #fef2f2; border-left: 4px solid var(--danger); }
+    .flag-item.medium { background: #fffbeb; border-left: 4px solid var(--warning); }
+    .flag-item.low { background: #f0fdf4; border-left: 4px solid var(--success); }
+    .flag-item .flag-icon { font-size: 1.1rem; }
+    .flag-item .flag-content { flex: 1; }
+    .flag-item .flag-title { font-weight: 600; color: var(--dark); }
+    .flag-item .flag-desc { font-size: 0.85rem; color: var(--gray-600); margin-top: 2px; }
+
+    /* Checklist */
+    .checklist-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px;
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .checklist-item:last-child { border-bottom: none; }
+    .checklist-checkbox {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      border: 2px solid var(--gray-300);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+    .checklist-checkbox:hover { border-color: var(--primary); }
+    .checklist-checkbox.checked {
+      background: var(--success);
+      border-color: var(--success);
+      color: white;
+    }
+    .checklist-content { flex: 1; }
+    .checklist-title { font-weight: 600; color: var(--dark); font-size: 0.9rem; }
+    .checklist-desc { font-size: 0.8rem; color: var(--gray-500); margin-top: 2px; }
+    .checklist-item.completed .checklist-title { text-decoration: line-through; color: var(--gray-400); }
+
+    /* Stats Row */
+    .stats-row {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      flex: 1;
+      background: white;
+      border-radius: 12px;
+      border: 1px solid var(--gray-200);
+      padding: 1.5rem;
+    }
+    .stat-card .stat-value {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--dark);
+    }
+    .stat-card .stat-label {
+      font-size: 0.85rem;
+      color: var(--gray-500);
+    }
+    .stat-card .stat-change {
+      font-size: 0.8rem;
+      margin-top: 4px;
+    }
+    .stat-card .stat-change.positive { color: var(--success); }
+    .stat-card .stat-change.negative { color: var(--danger); }
+
+    /* Tab content */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--gray-500);
+    }
+    .empty-state .icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    .empty-state h3 {
+      font-size: 1.25rem;
+      color: var(--dark);
+      margin-bottom: 0.5rem;
+    }
+
+    /* Progress Bar */
+    .progress-bar {
+      height: 8px;
+      background: var(--gray-200);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--primary);
+      border-radius: 4px;
+      transition: width 0.3s;
+    }
+
+    /* Badge */
+    .badge {
+      display: inline-flex;
+      padding: 4px 10px;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .badge-success { background: #dcfce7; color: #166534; }
+    .badge-warning { background: #fef3c7; color: #92400e; }
+    .badge-danger { background: #fee2e2; color: #991b1b; }
+    .badge-info { background: #dbeafe; color: #1e40af; }
+
+    /* Setup Wizard Overlay */
+    .wizard-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .wizard-overlay.hidden { display: none; }
+    .wizard-modal {
+      background: white;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+    }
+    .wizard-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    .wizard-header h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--dark);
+    }
+    .wizard-body { padding: 1.5rem; }
+    .wizard-footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--gray-200);
+      display: flex;
+      justify-content: space-between;
+    }
+    .wizard-progress {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 1.5rem;
+    }
+    .wizard-step {
+      flex: 1;
+      height: 4px;
+      background: var(--gray-200);
+      border-radius: 2px;
+    }
+    .wizard-step.complete { background: var(--primary); }
+    .wizard-step.current { background: var(--accent); }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">Terms.Law <span>/ Workbench</span></div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Overview</div>
+        <a href="#" class="nav-item active" data-tab="dashboard">
+          <span class="nav-icon">&#128200;</span> Dashboard
+        </a>
+        <a href="#" class="nav-item" data-tab="profile">
+          <span class="nav-icon">&#128100;</span> Project Profile
+        </a>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Compliance</div>
+        <a href="#" class="nav-item" data-tab="regulatory">
+          <span class="nav-icon">&#128203;</span> Regulatory Map
+        </a>
+        <a href="#" class="nav-item" data-tab="checklist">
+          <span class="nav-icon">&#9989;</span> Checklist
+        </a>
+        <a href="#" class="nav-item" data-tab="timeline">
+          <span class="nav-icon">&#128197;</span> Timeline
+        </a>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Resources</div>
+        <a href="#" class="nav-item" data-tab="tools">
+          <span class="nav-icon">&#128295;</span> Interactive Tools
+        </a>
+        <a href="#" class="nav-item" data-tab="documents">
+          <span class="nav-icon">&#128196;</span> Documents
+        </a>
+        <a href="#" class="nav-item" data-tab="budget">
+          <span class="nav-icon">&#128176;</span> Budget Planner
+        </a>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Help</div>
+        <a href="index.html" class="nav-item">
+          <span class="nav-icon">&#127968;</span> Back to Hub
+        </a>
+        <a href="#" class="nav-item">
+          <span class="nav-icon">&#128172;</span> Schedule Call
+        </a>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="save-status" id="saveStatus">
+        <span>&#9679;</span> All changes saved
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <!-- Dashboard Tab -->
+    <div id="dashboard" class="tab-content active">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Compliance Dashboard</h1>
+          <p class="page-subtitle">Your regulatory status at a glance</p>
+        </div>
+        <button class="btn btn-primary" onclick="showWizard()">
+          &#9998; Update Profile
+        </button>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-value" id="statRisk">--</div>
+          <div class="stat-label">Risk Score</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statFlags">--</div>
+          <div class="stat-label">Active Flags</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statTasks">--</div>
+          <div class="stat-label">Tasks Complete</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statBudget">--</div>
+          <div class="stat-label">Est. Budget</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">&#128737; Risk Assessment</h3>
+          </div>
+          <div class="card-body">
+            <div class="risk-display" id="riskDisplay">
+              <div class="risk-gauge">
+                <svg width="160" height="160">
+                  <circle class="bg" cx="80" cy="80" r="70" fill="none" stroke-width="14"/>
+                  <circle class="fill medium" id="riskCircle" cx="80" cy="80" r="70" fill="none" stroke-width="14"
+                          stroke-dasharray="440" stroke-dashoffset="440"/>
+                </svg>
+                <div class="risk-score">
+                  <div class="value" id="riskValue">--</div>
+                  <div class="label medium" id="riskLabel">NOT ASSESSED</div>
+                </div>
+              </div>
+              <p style="color: var(--gray-500); font-size: 0.9rem; margin-top: 1rem;" id="riskExplanation">
+                Complete your project profile to get your risk assessment.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">&#128681; Active Regulatory Flags</h3>
+          </div>
+          <div class="card-body">
+            <ul class="flag-list" id="flagList">
+              <li class="flag-item medium">
+                <span class="flag-icon">&#9888;</span>
+                <div class="flag-content">
+                  <div class="flag-title">Profile Incomplete</div>
+                  <div class="flag-desc">Complete your project profile to see regulatory flags</div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">&#9989; Priority Action Items</h3>
+          <a href="#" class="btn btn-outline" onclick="switchTab('checklist'); return false;">View All</a>
+        </div>
+        <div class="card-body" id="priorityTasks">
+          <div class="checklist-item">
+            <div class="checklist-checkbox">&#10003;</div>
+            <div class="checklist-content">
+              <div class="checklist-title">Complete Project Profile</div>
+              <div class="checklist-desc">Answer questions about your business model</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Tab -->
+    <div id="profile" class="tab-content">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Project Profile</h1>
+          <p class="page-subtitle">Your business model and regulatory posture</p>
+        </div>
+        <div>
+          <button class="btn btn-outline" onclick="showWizard()">&#9998; Edit Profile</button>
+          <button class="btn btn-danger" onclick="resetProfile()" style="margin-left: 8px;">&#128465; Reset</button>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">&#128736; Business Model</h3>
+          </div>
+          <div class="card-body" id="profileBusiness">
+            <p style="color: var(--gray-500);">No profile data. Click "Edit Profile" to get started.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">&#128176; Assets & Clients</h3>
+          </div>
+          <div class="card-body" id="profileAssets">
+            <p style="color: var(--gray-500);">No profile data.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">&#128270; Regulatory Exposure</h3>
+          </div>
+          <div class="card-body" id="profileRegulatory">
+            <p style="color: var(--gray-500);">No profile data.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">&#128221; Current Status</h3>
+          </div>
+          <div class="card-body" id="profileStatus">
+            <p style="color: var(--gray-500);">No profile data.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Regulatory Map Tab -->
+    <div id="regulatory" class="tab-content">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Regulatory Map</h1>
+          <p class="page-subtitle">Your exposure across federal and state regulators</p>
+        </div>
+      </div>
+
+      <div class="grid-2" id="regulatoryCards">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+
+    <!-- Checklist Tab -->
+    <div id="checklist" class="tab-content">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Compliance Checklist</h1>
+          <p class="page-subtitle">Track your regulatory requirements</p>
+        </div>
+        <div>
+          <span id="checklistProgress" style="margin-right: 1rem; color: var(--gray-500);">0% complete</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body" id="checklistItems">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Tools Tab -->
+    <div id="tools" class="tab-content">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Interactive Tools</h1>
+          <p class="page-subtitle">Decision trees, calculators, and validators</p>
+        </div>
+      </div>
+
+      <div class="grid-3" id="toolsGrid">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+
+    <!-- Documents Tab -->
+    <div id="documents" class="tab-content">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Document Library</h1>
+          <p class="page-subtitle">Templates, checklists, and guides</p>
+        </div>
+      </div>
+
+      <div class="grid-3" id="documentsGrid">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+
+    <!-- Budget Tab -->
+    <div id="budget" class="tab-content">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Regulatory Budget Planner</h1>
+          <p class="page-subtitle">Estimate your compliance costs</p>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">&#128176; Cost Breakdown</h3>
+          </div>
+          <div class="card-body" id="budgetBreakdown">
+            <p style="color: var(--gray-500);">Complete your profile to see budget estimates.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">&#128197; Annual Recurring</h3>
+          </div>
+          <div class="card-body" id="budgetRecurring">
+            <p style="color: var(--gray-500);">Complete your profile to see recurring costs.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Timeline Tab -->
+    <div id="timeline" class="tab-content">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Compliance Timeline</h1>
+          <p class="page-subtitle">Key milestones and deadlines</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body" id="timelineContent">
+          <p style="color: var(--gray-500);">Complete your profile to generate your timeline.</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Setup Wizard Overlay -->
+<div class="wizard-overlay hidden" id="wizardOverlay">
+  <div class="wizard-modal">
+    <div class="wizard-header">
+      <h2 id="wizardTitle">Project Profile Setup</h2>
+    </div>
+    <div class="wizard-body">
+      <div class="wizard-progress" id="wizardProgress">
+        <div class="wizard-step current"></div>
+        <div class="wizard-step"></div>
+        <div class="wizard-step"></div>
+        <div class="wizard-step"></div>
+        <div class="wizard-step"></div>
+      </div>
+
+      <div id="wizardStepContent">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+    <div class="wizard-footer">
+      <button class="btn btn-outline" id="wizardBack" onclick="prevStep()">Back</button>
+      <button class="btn btn-primary" id="wizardNext" onclick="nextStep()">Next</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// =====================================================
+// STATE MANAGEMENT
+// =====================================================
+const STORAGE_KEY = 'tradingLegalProfile';
+
+let profile = {
+  // Step 1: Business Model
+  projectName: '',
+  businessType: '', // pure_saas, robo_adviser, signal_provider, hedge_fund, prop_trading
+  businessDescription: '',
+
+  // Step 2: Assets & Strategies
+  assetClasses: [], // stocks, options, futures, crypto, forex
+  tradingStrategies: [], // momentum, mean_reversion, arbitrage, market_making, ml_based
+  executionType: '', // signals_only, auto_execute, discretionary
+
+  // Step 3: Clients & Revenue
+  clientTypes: [], // retail, accredited, institutional, family_office
+  revenueModel: '', // subscription, aum_fee, performance_fee, per_trade
+  expectedAUM: '', // under_1m, 1m_25m, 25m_150m, over_150m
+  expectedClients: '', // under_15, 15_100, over_100
+
+  // Step 4: Current Status
+  entityFormed: false,
+  stateOfFormation: '',
+  launchStage: '', // idea, mvp, beta, live
+  existingRegistrations: [], // none, ria, cta, bd, msb
+
+  // Step 5: Specific Concerns
+  concerns: [], // sec_registration, cta_cpo, money_transmitter, marketing, taxes, contracts
+
+  // Calculated
+  completedAt: null,
+  checklistItems: {},
+  lastUpdated: null
+};
+
+// Load from localStorage
+function loadProfile() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    try {
+      profile = JSON.parse(saved);
+      return true;
+    } catch (e) {
+      console.error('Failed to parse profile:', e);
+    }
+  }
+  return false;
+}
+
+// Save to localStorage
+function saveProfile() {
+  profile.lastUpdated = new Date().toISOString();
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
+  showSaveStatus();
+}
+
+function showSaveStatus() {
+  const status = document.getElementById('saveStatus');
+  status.innerHTML = '<span style="color: var(--success)">&#9679;</span> Saved just now';
+  setTimeout(() => {
+    status.innerHTML = '<span style="color: var(--success)">&#9679;</span> All changes saved';
+  }, 2000);
+}
+
+function resetProfile() {
+  if (confirm('Are you sure you want to reset your profile? This cannot be undone.')) {
+    localStorage.removeItem(STORAGE_KEY);
+    location.reload();
+  }
+}
+
+// =====================================================
+// TAB NAVIGATION
+// =====================================================
+function switchTab(tabId) {
+  // Update nav
+  document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+  document.querySelector(`[data-tab="${tabId}"]`)?.classList.add('active');
+
+  // Update content
+  document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+  document.getElementById(tabId)?.classList.add('active');
+}
+
+// =====================================================
+// WIZARD
+// =====================================================
+let wizardStep = 1;
+const TOTAL_STEPS = 5;
+
+const wizardSteps = [
+  {
+    title: 'Business Model',
+    fields: `
+      <div class="form-group">
+        <label class="form-label">Project Name <span class="required">*</span></label>
+        <input type="text" class="form-input" id="w_projectName" placeholder="e.g., AlgoTrader Pro">
+      </div>
+      <div class="form-group">
+        <label class="form-label">What are you building? <span class="required">*</span></label>
+        <select class="form-select" id="w_businessType">
+          <option value="">Select one...</option>
+          <option value="pure_saas">Pure SaaS Platform (users bring own brokerage)</option>
+          <option value="robo_adviser">Robo-Adviser / Managed Accounts</option>
+          <option value="signal_provider">Signal / Alert Provider</option>
+          <option value="hedge_fund">Hedge Fund / Pooled Investment</option>
+          <option value="prop_trading">Proprietary Trading Firm</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Brief Description</label>
+        <textarea class="form-textarea" id="w_businessDescription" placeholder="Describe your platform in 2-3 sentences..."></textarea>
+      </div>
+    `
+  },
+  {
+    title: 'Assets & Strategies',
+    fields: `
+      <div class="form-group">
+        <label class="form-label">Asset Classes Traded <span class="required">*</span></label>
+        <div class="checkbox-group" id="w_assetClasses">
+          <label class="checkbox-item"><input type="checkbox" value="stocks"><span>Stocks/ETFs</span></label>
+          <label class="checkbox-item"><input type="checkbox" value="options"><span>Options</span></label>
+          <label class="checkbox-item"><input type="checkbox" value="futures"><span>Futures</span></label>
+          <label class="checkbox-item"><input type="checkbox" value="crypto"><span>Crypto</span></label>
+          <label class="checkbox-item"><input type="checkbox" value="forex"><span>Forex</span></label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Trading Strategies</label>
+        <div class="checkbox-group" id="w_tradingStrategies">
+          <label class="checkbox-item"><input type="checkbox" value="momentum"><span>Momentum</span></label>
+          <label class="checkbox-item"><input type="checkbox" value="mean_reversion"><span>Mean Reversion</span></label>
+          <label class="checkbox-item"><input type="checkbox" value="arbitrage"><span>Arbitrage</span></label>
+          <label class="checkbox-item"><input type="checkbox" value="market_making"><span>Market Making</span></label>
+          <label class="checkbox-item"><input type="checkbox" value="ml_based"><span>ML/AI-Based</span></label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">How are trades executed? <span class="required">*</span></label>
+        <select class="form-select" id="w_executionType">
+          <option value="">Select one...</option>
+          <option value="signals_only">Signals/Alerts Only (user executes)</option>
+          <option value="auto_execute">Auto-Execute via API</option>
+          <option value="discretionary">Discretionary (we decide when)</option>
+        </select>
+      </div>
+    `
+  },
+  {
+    title: 'Clients & Revenue',
+    fields: `
+      <div class="form-group">
+        <label class="form-label">Target Client Types <span class="required">*</span></label>
+        <div class="checkbox-group" id="w_clientTypes">
+          <label class="checkbox-item"><input type="checkbox" value="retail"><span>Retail Investors</span></label>
+          <label class="checkbox-item"><input type="checkbox" value="accredited"><span>Accredited Investors</span></label>
+          <label class="checkbox-item"><input type="checkbox" value="institutional"><span>Institutional</span></label>
+          <label class="checkbox-item"><input type="checkbox" value="family_office"><span>Family Offices</span></label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Primary Revenue Model <span class="required">*</span></label>
+        <select class="form-select" id="w_revenueModel">
+          <option value="">Select one...</option>
+          <option value="subscription">Flat Subscription Fee</option>
+          <option value="aum_fee">AUM-Based Fee</option>
+          <option value="performance_fee">Performance Fee</option>
+          <option value="per_trade">Per-Trade Commission</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Expected AUM (if applicable)</label>
+        <select class="form-select" id="w_expectedAUM">
+          <option value="">Select one...</option>
+          <option value="under_1m">Under $1M</option>
+          <option value="1m_25m">$1M - $25M</option>
+          <option value="25m_150m">$25M - $150M</option>
+          <option value="over_150m">Over $150M</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Expected Number of Clients (Year 1)</label>
+        <select class="form-select" id="w_expectedClients">
+          <option value="">Select one...</option>
+          <option value="under_15">Under 15</option>
+          <option value="15_100">15 - 100</option>
+          <option value="over_100">Over 100</option>
+        </select>
+      </div>
+    `
+  },
+  {
+    title: 'Current Status',
+    fields: `
+      <div class="form-group">
+        <label class="form-label">Have you formed a legal entity?</label>
+        <div class="checkbox-group" id="w_entityFormed">
+          <label class="checkbox-item"><input type="radio" name="entityFormed" value="yes"><span>Yes</span></label>
+          <label class="checkbox-item"><input type="radio" name="entityFormed" value="no"><span>No</span></label>
+        </div>
+      </div>
+      <div class="form-group" id="stateField" style="display:none">
+        <label class="form-label">State of Formation</label>
+        <input type="text" class="form-input" id="w_stateOfFormation" placeholder="e.g., Delaware">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Launch Stage <span class="required">*</span></label>
+        <select class="form-select" id="w_launchStage">
+          <option value="">Select one...</option>
+          <option value="idea">Idea / Planning</option>
+          <option value="mvp">Building MVP</option>
+          <option value="beta">Beta Testing</option>
+          <option value="live">Live with Users</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Existing Registrations</label>
+        <div class="checkbox-group" id="w_existingRegistrations">
+          <label class="checkbox-item"><input type="checkbox" value="none"><span>None</span></label>
+          <label class="checkbox-item"><input type="checkbox" value="ria"><span>RIA</span></label>
+          <label class="checkbox-item"><input type="checkbox" value="cta"><span>CTA</span></label>
+          <label class="checkbox-item"><input type="checkbox" value="bd"><span>Broker-Dealer</span></label>
+          <label class="checkbox-item"><input type="checkbox" value="msb"><span>MSB</span></label>
+        </div>
+      </div>
+    `
+  },
+  {
+    title: 'Your Concerns',
+    fields: `
+      <div class="form-group">
+        <label class="form-label">What regulatory areas concern you most?</label>
+        <p class="form-hint" style="margin-bottom: 12px">Select all that apply - this helps us prioritize your resources</p>
+        <div class="checkbox-group" id="w_concerns">
+          <label class="checkbox-item"><input type="checkbox" value="sec_registration"><span>SEC Registration</span></label>
+          <label class="checkbox-item"><input type="checkbox" value="cta_cpo"><span>CTA/CPO Registration</span></label>
+          <label class="checkbox-item"><input type="checkbox" value="money_transmitter"><span>Money Transmitter</span></label>
+          <label class="checkbox-item"><input type="checkbox" value="marketing"><span>Marketing Compliance</span></label>
+          <label class="checkbox-item"><input type="checkbox" value="taxes"><span>Trader Taxes</span></label>
+          <label class="checkbox-item"><input type="checkbox" value="contracts"><span>Platform Contracts</span></label>
+        </div>
+      </div>
+    `
+  }
+];
+
+function showWizard() {
+  wizardStep = 1;
+  document.getElementById('wizardOverlay').classList.remove('hidden');
+  renderWizardStep();
+}
+
+function hideWizard() {
+  document.getElementById('wizardOverlay').classList.add('hidden');
+}
+
+function renderWizardStep() {
+  const step = wizardSteps[wizardStep - 1];
+  document.getElementById('wizardTitle').textContent = `Step ${wizardStep}: ${step.title}`;
+  document.getElementById('wizardStepContent').innerHTML = step.fields;
+
+  // Update progress
+  document.querySelectorAll('.wizard-step').forEach((el, i) => {
+    el.className = 'wizard-step';
+    if (i < wizardStep - 1) el.classList.add('complete');
+    if (i === wizardStep - 1) el.classList.add('current');
+  });
+
+  // Update buttons
+  document.getElementById('wizardBack').style.display = wizardStep === 1 ? 'none' : 'block';
+  document.getElementById('wizardNext').textContent = wizardStep === TOTAL_STEPS ? 'Complete' : 'Next';
+
+  // Load saved values
+  loadWizardValues();
+
+  // Setup checkbox styling
+  setupCheckboxes();
+
+  // Setup entity formed toggle
+  if (wizardStep === 4) {
+    document.querySelectorAll('input[name="entityFormed"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        document.getElementById('stateField').style.display = radio.value === 'yes' ? 'block' : 'none';
+      });
+    });
+  }
+}
+
+function setupCheckboxes() {
+  document.querySelectorAll('.checkbox-item input').forEach(input => {
+    input.addEventListener('change', function() {
+      this.closest('.checkbox-item').classList.toggle('checked', this.checked);
+    });
+    // Set initial state
+    if (input.checked) {
+      input.closest('.checkbox-item').classList.add('checked');
+    }
+  });
+}
+
+function loadWizardValues() {
+  // Load existing profile values into wizard fields
+  if (profile.projectName) {
+    const el = document.getElementById('w_projectName');
+    if (el) el.value = profile.projectName;
+  }
+  if (profile.businessType) {
+    const el = document.getElementById('w_businessType');
+    if (el) el.value = profile.businessType;
+  }
+  if (profile.businessDescription) {
+    const el = document.getElementById('w_businessDescription');
+    if (el) el.value = profile.businessDescription;
+  }
+
+  // Checkboxes
+  ['assetClasses', 'tradingStrategies', 'clientTypes', 'existingRegistrations', 'concerns'].forEach(field => {
+    const container = document.getElementById('w_' + field);
+    if (container && profile[field]) {
+      profile[field].forEach(val => {
+        const checkbox = container.querySelector(`input[value="${val}"]`);
+        if (checkbox) {
+          checkbox.checked = true;
+          checkbox.closest('.checkbox-item').classList.add('checked');
+        }
+      });
+    }
+  });
+
+  // Selects
+  ['executionType', 'revenueModel', 'expectedAUM', 'expectedClients', 'launchStage'].forEach(field => {
+    const el = document.getElementById('w_' + field);
+    if (el && profile[field]) el.value = profile[field];
+  });
+
+  // Entity formed radio
+  if (wizardStep === 4 && profile.entityFormed !== undefined) {
+    const radio = document.querySelector(`input[name="entityFormed"][value="${profile.entityFormed ? 'yes' : 'no'}"]`);
+    if (radio) {
+      radio.checked = true;
+      radio.closest('.checkbox-item').classList.add('checked');
+      if (profile.entityFormed) {
+        document.getElementById('stateField').style.display = 'block';
+        document.getElementById('w_stateOfFormation').value = profile.stateOfFormation || '';
+      }
+    }
+  }
+}
+
+function saveWizardStep() {
+  // Step 1
+  const projectName = document.getElementById('w_projectName');
+  if (projectName) profile.projectName = projectName.value;
+
+  const businessType = document.getElementById('w_businessType');
+  if (businessType) profile.businessType = businessType.value;
+
+  const businessDescription = document.getElementById('w_businessDescription');
+  if (businessDescription) profile.businessDescription = businessDescription.value;
+
+  // Step 2
+  const executionType = document.getElementById('w_executionType');
+  if (executionType) profile.executionType = executionType.value;
+
+  // Step 3
+  const revenueModel = document.getElementById('w_revenueModel');
+  if (revenueModel) profile.revenueModel = revenueModel.value;
+
+  const expectedAUM = document.getElementById('w_expectedAUM');
+  if (expectedAUM) profile.expectedAUM = expectedAUM.value;
+
+  const expectedClients = document.getElementById('w_expectedClients');
+  if (expectedClients) profile.expectedClients = expectedClients.value;
+
+  // Step 4
+  const entityRadio = document.querySelector('input[name="entityFormed"]:checked');
+  if (entityRadio) profile.entityFormed = entityRadio.value === 'yes';
+
+  const stateOfFormation = document.getElementById('w_stateOfFormation');
+  if (stateOfFormation) profile.stateOfFormation = stateOfFormation.value;
+
+  const launchStage = document.getElementById('w_launchStage');
+  if (launchStage) profile.launchStage = launchStage.value;
+
+  // Checkbox groups
+  ['assetClasses', 'tradingStrategies', 'clientTypes', 'existingRegistrations', 'concerns'].forEach(field => {
+    const container = document.getElementById('w_' + field);
+    if (container) {
+      profile[field] = Array.from(container.querySelectorAll('input:checked')).map(cb => cb.value);
+    }
+  });
+}
+
+function nextStep() {
+  saveWizardStep();
+
+  if (wizardStep === TOTAL_STEPS) {
+    profile.completedAt = new Date().toISOString();
+    saveProfile();
+    hideWizard();
+    updateDashboard();
+    return;
+  }
+
+  wizardStep++;
+  renderWizardStep();
+}
+
+function prevStep() {
+  saveWizardStep();
+  wizardStep--;
+  renderWizardStep();
+}
+
+// =====================================================
+// RISK CALCULATION
+// =====================================================
+function calculateRisk() {
+  let score = 0;
+  let flags = [];
+
+  // Business type risk
+  if (profile.businessType === 'robo_adviser') {
+    score += 3;
+    flags.push({ level: 'high', regulator: 'SEC', title: 'Investment Adviser Registration Required', desc: 'Robo-advisers must register as investment advisers' });
+  } else if (profile.businessType === 'hedge_fund') {
+    score += 4;
+    flags.push({ level: 'high', regulator: 'SEC', title: 'Private Fund Adviser Rules', desc: 'Hedge funds trigger SEC and state requirements' });
+  } else if (profile.businessType === 'signal_provider') {
+    score += 2;
+    flags.push({ level: 'medium', regulator: 'SEC', title: 'Potential IA Classification', desc: 'Signal providers may be deemed investment advisers' });
+  } else if (profile.businessType === 'pure_saas') {
+    score += 1;
+    flags.push({ level: 'low', regulator: 'SEC', title: 'Pure Software Positioning', desc: 'Lower risk but requires careful structuring' });
+  }
+
+  // Asset class risks
+  if (profile.assetClasses.includes('futures')) {
+    score += 2;
+    flags.push({ level: 'high', regulator: 'CFTC', title: 'CTA/CPO Registration', desc: 'Trading futures triggers CFTC registration requirements' });
+  }
+  if (profile.assetClasses.includes('crypto')) {
+    score += 2;
+    flags.push({ level: 'medium', regulator: 'FinCEN', title: 'MSB Registration', desc: 'Crypto activities may require MSB registration' });
+    flags.push({ level: 'medium', regulator: 'State', title: 'Money Transmitter Licenses', desc: 'Crypto may trigger state MTL requirements' });
+  }
+
+  // Execution type risk
+  if (profile.executionType === 'discretionary') {
+    score += 2;
+    flags.push({ level: 'high', regulator: 'SEC', title: 'Discretionary Authority', desc: 'Discretionary trading requires investment adviser registration' });
+  } else if (profile.executionType === 'auto_execute') {
+    score += 1;
+  }
+
+  // Client type risks
+  if (profile.clientTypes.includes('retail')) {
+    score += 1;
+    flags.push({ level: 'medium', regulator: 'State', title: 'Retail Client Protections', desc: 'Retail clients trigger additional state requirements' });
+  }
+
+  // AUM thresholds
+  if (profile.expectedAUM === 'over_150m') {
+    flags.push({ level: 'high', regulator: 'SEC', title: 'SEC Registration Threshold', desc: 'AUM over $150M requires SEC registration (not state)' });
+  } else if (profile.expectedAUM === '25m_150m') {
+    flags.push({ level: 'medium', regulator: 'State', title: 'State Registration Required', desc: 'AUM $25M-$150M typically requires state registration' });
+  }
+
+  // Revenue model
+  if (profile.revenueModel === 'aum_fee' || profile.revenueModel === 'performance_fee') {
+    score += 1;
+    if (!flags.find(f => f.regulator === 'SEC' && f.title.includes('Investment Adviser'))) {
+      flags.push({ level: 'high', regulator: 'SEC', title: 'AUM/Performance Fees', desc: 'Fee structure suggests investment adviser status' });
+    }
+  }
+
+  // Normalize score to 1-10
+  score = Math.min(Math.max(score, 1), 10);
+
+  return { score, flags };
+}
+
+// =====================================================
+// DASHBOARD UPDATE
+// =====================================================
+function updateDashboard() {
+  if (!profile.completedAt) {
+    document.getElementById('statRisk').textContent = '--';
+    document.getElementById('statFlags').textContent = '--';
+    return;
+  }
+
+  const { score, flags } = calculateRisk();
+
+  // Update stats
+  document.getElementById('statRisk').textContent = score.toFixed(1);
+  document.getElementById('statFlags').textContent = flags.length;
+  document.getElementById('statTasks').textContent = '0/12';
+
+  // Estimate budget
+  let budget = 5000;
+  if (profile.businessType === 'robo_adviser' || profile.businessType === 'hedge_fund') budget += 15000;
+  if (profile.assetClasses.includes('futures')) budget += 8000;
+  if (profile.clientTypes.includes('retail')) budget += 3000;
+  document.getElementById('statBudget').textContent = '$' + budget.toLocaleString();
+
+  // Update risk gauge
+  const riskLevel = score <= 3 ? 'low' : score <= 6 ? 'medium' : 'high';
+  const riskCircle = document.getElementById('riskCircle');
+  const circumference = 440;
+  const offset = circumference - (score / 10) * circumference;
+  riskCircle.style.strokeDashoffset = offset;
+  riskCircle.className = 'fill ' + riskLevel;
+
+  document.getElementById('riskValue').textContent = score.toFixed(1);
+  const riskLabel = document.getElementById('riskLabel');
+  riskLabel.textContent = riskLevel.toUpperCase() + ' RISK';
+  riskLabel.className = 'label ' + riskLevel;
+
+  document.getElementById('riskExplanation').textContent =
+    riskLevel === 'high' ? 'Your business model has significant regulatory exposure. Professional guidance recommended.' :
+    riskLevel === 'medium' ? 'Moderate regulatory exposure. Review the flagged areas carefully.' :
+    'Lower regulatory risk, but stay vigilant on compliance requirements.';
+
+  // Update flags
+  const flagList = document.getElementById('flagList');
+  if (flags.length > 0) {
+    flagList.innerHTML = flags.map(f => `
+      <li class="flag-item ${f.level}">
+        <span class="flag-icon">${f.level === 'high' ? '&#9888;' : f.level === 'medium' ? '&#9888;' : '&#10003;'}</span>
+        <div class="flag-content">
+          <div class="flag-title"><strong>${f.regulator}:</strong> ${f.title}</div>
+          <div class="flag-desc">${f.desc}</div>
+        </div>
+      </li>
+    `).join('');
+  }
+
+  // Update profile display
+  updateProfileDisplay();
+  updateRegulatoryMap(flags);
+  updateChecklist();
+  updateToolsGrid();
+  updateBudget(budget);
+}
+
+function updateProfileDisplay() {
+  const businessLabels = {
+    pure_saas: 'Pure SaaS Platform',
+    robo_adviser: 'Robo-Adviser',
+    signal_provider: 'Signal Provider',
+    hedge_fund: 'Hedge Fund',
+    prop_trading: 'Prop Trading Firm'
+  };
+
+  document.getElementById('profileBusiness').innerHTML = `
+    <p><strong>Project:</strong> ${profile.projectName || 'Not set'}</p>
+    <p><strong>Type:</strong> ${businessLabels[profile.businessType] || 'Not set'}</p>
+    <p><strong>Execution:</strong> ${profile.executionType?.replace('_', ' ') || 'Not set'}</p>
+    <p style="margin-top: 12px; color: var(--gray-500)">${profile.businessDescription || ''}</p>
+  `;
+
+  document.getElementById('profileAssets').innerHTML = `
+    <p><strong>Asset Classes:</strong> ${profile.assetClasses.join(', ') || 'None'}</p>
+    <p><strong>Strategies:</strong> ${profile.tradingStrategies.join(', ') || 'None'}</p>
+    <p><strong>Target Clients:</strong> ${profile.clientTypes.join(', ') || 'None'}</p>
+    <p><strong>Revenue Model:</strong> ${profile.revenueModel?.replace('_', ' ') || 'Not set'}</p>
+  `;
+
+  document.getElementById('profileRegulatory').innerHTML = `
+    <p><strong>Expected AUM:</strong> ${profile.expectedAUM?.replace('_', '-').replace('m', 'M') || 'Not set'}</p>
+    <p><strong>Expected Clients:</strong> ${profile.expectedClients?.replace('_', '-') || 'Not set'}</p>
+    <p><strong>Concerns:</strong> ${profile.concerns.join(', ') || 'None selected'}</p>
+  `;
+
+  document.getElementById('profileStatus').innerHTML = `
+    <p><strong>Entity Formed:</strong> ${profile.entityFormed ? 'Yes' : 'No'}</p>
+    ${profile.entityFormed ? `<p><strong>State:</strong> ${profile.stateOfFormation}</p>` : ''}
+    <p><strong>Stage:</strong> ${profile.launchStage || 'Not set'}</p>
+    <p><strong>Registrations:</strong> ${profile.existingRegistrations.join(', ') || 'None'}</p>
+  `;
+}
+
+function updateRegulatoryMap(flags) {
+  const regulators = {
+    SEC: { icon: '&#128203;', name: 'Securities & Exchange Commission', flags: [] },
+    CFTC: { icon: '&#128200;', name: 'Commodity Futures Trading Commission', flags: [] },
+    FinCEN: { icon: '&#128176;', name: 'Financial Crimes Enforcement Network', flags: [] },
+    State: { icon: '&#127968;', name: 'State Regulators', flags: [] }
+  };
+
+  flags.forEach(f => {
+    if (regulators[f.regulator]) {
+      regulators[f.regulator].flags.push(f);
+    }
+  });
+
+  const cards = Object.entries(regulators).map(([key, reg]) => {
+    const hasHigh = reg.flags.some(f => f.level === 'high');
+    const hasMedium = reg.flags.some(f => f.level === 'medium');
+    const status = hasHigh ? 'danger' : hasMedium ? 'warning' : 'success';
+    const statusLabel = hasHigh ? 'Action Required' : hasMedium ? 'Monitor' : 'Clear';
+
+    return `
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">${reg.icon} ${key}</h3>
+          <span class="badge badge-${status}">${statusLabel}</span>
+        </div>
+        <div class="card-body">
+          <p style="font-size: 0.85rem; color: var(--gray-500); margin-bottom: 12px">${reg.name}</p>
+          ${reg.flags.length > 0 ? `
+            <ul class="flag-list">
+              ${reg.flags.map(f => `
+                <li class="flag-item ${f.level}" style="margin-bottom: 6px">
+                  <div class="flag-content">
+                    <div class="flag-title">${f.title}</div>
+                  </div>
+                </li>
+              `).join('')}
+            </ul>
+          ` : '<p style="color: var(--success)">No flags for this regulator</p>'}
+        </div>
+      </div>
+    `;
+  });
+
+  document.getElementById('regulatoryCards').innerHTML = cards.join('');
+}
+
+function updateChecklist() {
+  const items = [
+    { id: 'profile', title: 'Complete Project Profile', desc: 'Define your business model', done: !!profile.completedAt || profile.checklistItems['profile'] },
+    { id: 'entity', title: 'Form Legal Entity', desc: 'LLC or Corporation in chosen state', done: profile.checklistItems['entity'] || false },
+    { id: 'ia_analysis', title: 'Investment Adviser Analysis', desc: 'Determine if SEC/state registration required', done: profile.checklistItems['ia_analysis'] || false },
+    { id: 'cta_analysis', title: 'CTA/CPO Analysis', desc: 'Determine if CFTC registration required', done: profile.checklistItems['cta_analysis'] || false },
+    { id: 'mtl_analysis', title: 'Money Transmitter Analysis', desc: 'Check state licensing requirements', done: profile.checklistItems['mtl_analysis'] || false },
+    { id: 'terms', title: 'Draft Terms of Service', desc: 'Platform user agreement', done: profile.checklistItems['terms'] || false },
+    { id: 'privacy', title: 'Draft Privacy Policy', desc: 'Data handling disclosures', done: profile.checklistItems['privacy'] || false },
+    { id: 'disclosures', title: 'Prepare Risk Disclosures', desc: 'Required risk warnings', done: profile.checklistItems['disclosures'] || false },
+    { id: 'aml', title: 'AML/KYC Program', desc: 'If MSB registration required', done: profile.checklistItems['aml'] || false },
+    { id: 'marketing', title: 'Marketing Compliance Review', desc: 'Verify claims and disclosures', done: profile.checklistItems['marketing'] || false },
+    { id: 'tax_election', title: '475(f) Election Analysis', desc: 'Trader tax status optimization', done: profile.checklistItems['tax_election'] || false },
+    { id: 'budget', title: 'Finalize Compliance Budget', desc: 'Registration and ongoing costs', done: profile.checklistItems['budget'] || false }
+  ];
+
+  const completed = items.filter(i => i.done).length;
+  document.getElementById('checklistProgress').textContent = `${Math.round(completed/items.length*100)}% complete`;
+
+  document.getElementById('checklistItems').innerHTML = items.map(item => `
+    <div class="checklist-item ${item.done ? 'completed' : ''}">
+      <div class="checklist-checkbox ${item.done ? 'checked' : ''}" onclick="toggleChecklist('${item.id}')">
+        ${item.done ? '&#10003;' : ''}
+      </div>
+      <div class="checklist-content">
+        <div class="checklist-title">${item.title}</div>
+        <div class="checklist-desc">${item.desc}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleChecklist(id) {
+  profile.checklistItems[id] = !profile.checklistItems[id];
+  saveProfile();
+  updateChecklist();
+}
+
+function updateToolsGrid() {
+  const tools = [
+    { icon: '&#127919;', title: 'IA Decision Tree', desc: 'Determine if you need SEC/state registration', link: 'tools/ia-decision-tree.html', status: 'available' },
+    { icon: '&#128202;', title: '475(f) Tax Calculator', desc: 'Estimate trader tax status savings', link: 'tools/tax-calculator.html', status: 'available' },
+    { icon: '&#127968;', title: 'State Finder', desc: 'Find which states require registration', link: 'tools/state-finder.html', status: 'available' },
+    { icon: '&#9989;', title: 'Business Model Validator', desc: 'Test your "pure software" positioning', link: '#', status: 'coming' },
+    { icon: '&#128176;', title: 'Cost Estimator', desc: 'Estimate compliance costs', link: '#', status: 'coming' },
+    { icon: '&#128221;', title: 'Marketing Checker', desc: 'Review ad copy for compliance', link: '#', status: 'coming' }
+  ];
+
+  document.getElementById('toolsGrid').innerHTML = tools.map(tool => `
+    <div class="card" style="margin-bottom: 0">
+      <div class="card-body" style="text-align: center">
+        <div style="font-size: 2.5rem; margin-bottom: 12px">${tool.icon}</div>
+        <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 8px">${tool.title}</h3>
+        <p style="font-size: 0.85rem; color: var(--gray-500); margin-bottom: 16px">${tool.desc}</p>
+        ${tool.status === 'available'
+          ? `<a href="${tool.link}" class="btn btn-primary" style="width: 100%">Launch Tool</a>`
+          : `<span class="badge badge-info">Coming Soon</span>`
+        }
+      </div>
+    </div>
+  `).join('');
+}
+
+function updateBudget(estimatedTotal) {
+  const breakdown = [];
+
+  if (profile.businessType === 'robo_adviser' || profile.businessType === 'hedge_fund') {
+    breakdown.push({ item: 'SEC/State IA Registration', cost: '$3,000 - $8,000' });
+    breakdown.push({ item: 'Form ADV Preparation', cost: '$2,000 - $5,000' });
+  }
+  if (profile.assetClasses.includes('futures')) {
+    breakdown.push({ item: 'NFA Registration (CTA)', cost: '$1,000 - $3,000' });
+    breakdown.push({ item: 'Disclosure Document', cost: '$2,000 - $4,000' });
+  }
+  if (profile.assetClasses.includes('crypto')) {
+    breakdown.push({ item: 'MSB Registration', cost: '$500 - $1,500' });
+    breakdown.push({ item: 'AML Program Setup', cost: '$2,000 - $5,000' });
+  }
+  breakdown.push({ item: 'Entity Formation', cost: '$500 - $1,500' });
+  breakdown.push({ item: 'Terms of Service', cost: '$1,000 - $3,000' });
+  breakdown.push({ item: 'Privacy Policy', cost: '$500 - $1,500' });
+
+  document.getElementById('budgetBreakdown').innerHTML = `
+    <table style="width: 100%; font-size: 0.9rem">
+      ${breakdown.map(b => `
+        <tr style="border-bottom: 1px solid var(--gray-100)">
+          <td style="padding: 10px 0">${b.item}</td>
+          <td style="padding: 10px 0; text-align: right; font-weight: 600">${b.cost}</td>
+        </tr>
+      `).join('')}
+      <tr>
+        <td style="padding: 12px 0; font-weight: 700">Estimated Total</td>
+        <td style="padding: 12px 0; text-align: right; font-weight: 700; color: var(--primary)">$${estimatedTotal.toLocaleString()}+</td>
+      </tr>
+    </table>
+  `;
+
+  document.getElementById('budgetRecurring').innerHTML = `
+    <table style="width: 100%; font-size: 0.9rem">
+      <tr style="border-bottom: 1px solid var(--gray-100)">
+        <td style="padding: 10px 0">Annual Compliance Review</td>
+        <td style="padding: 10px 0; text-align: right; font-weight: 600">$2,000 - $5,000</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--gray-100)">
+        <td style="padding: 10px 0">Form ADV Annual Update</td>
+        <td style="padding: 10px 0; text-align: right; font-weight: 600">$500 - $1,500</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--gray-100)">
+        <td style="padding: 10px 0">State Renewal Fees</td>
+        <td style="padding: 10px 0; text-align: right; font-weight: 600">$100 - $500/state</td>
+      </tr>
+      <tr>
+        <td style="padding: 12px 0; font-weight: 700">Annual Recurring</td>
+        <td style="padding: 12px 0; text-align: right; font-weight: 700; color: var(--warning)">$3,000 - $10,000</td>
+      </tr>
+    </table>
+  `;
+}
+
+// =====================================================
+// INITIALIZATION
+// =====================================================
+document.addEventListener('DOMContentLoaded', () => {
+  // Load profile
+  const hasProfile = loadProfile();
+
+  // Setup tab navigation
+  document.querySelectorAll('.nav-item[data-tab]').forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.preventDefault();
+      switchTab(item.dataset.tab);
+    });
+  });
+
+  // Update dashboard if profile exists
+  if (hasProfile && profile.completedAt) {
+    updateDashboard();
+  } else {
+    // Show wizard for first-time users
+    setTimeout(showWizard, 500);
+  }
+
+  // Initialize tools grid
+  updateToolsGrid();
+});
+
+// Close wizard on overlay click
+document.getElementById('wizardOverlay').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('wizardOverlay')) {
+    hideWizard();
+  }
+});
+</script>
+
+</body>
+</html>

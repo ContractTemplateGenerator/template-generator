@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-901N2Y3CDZ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-901N2Y3CDZ');
+  </script>
+
+  
+  <title>475(f) Trader Tax Calculator | Terms.Law</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --accent: #8b5cf6;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --dark: #0f172a;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
+      --gray-400: #94a3b8;
+      --gray-500: #64748b;
+      --gray-600: #475569;
+      --gray-700: #334155;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-700);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .header {
+      background: var(--dark);
+      border-bottom: 1px solid var(--gray-200);
+      padding: 0.75rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      font-weight: 800;
+      font-size: 1rem;
+      color: white;
+      text-decoration: none;
+    }
+    .logo span { color: var(--gray-300); font-weight: 500; }
+    .nav-links { display: flex; gap: 1rem; }
+    .nav-links a {
+      color: var(--gray-300);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+    .nav-links a:hover { color: var(--primary); }
+
+    .main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+    }
+
+    .tool-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    .tool-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--success), #059669);
+      color: white;
+      padding: 6px 16px;
+      border-radius: 100px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .tool-header h1 {
+      font-size: 2.25rem;
+      font-weight: 800;
+      color: var(--dark);
+      margin-bottom: 0.75rem;
+    }
+    .tool-header p {
+      font-size: 1rem;
+      color: var(--gray-600);
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .calculator-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+    @media (max-width: 900px) {
+      .calculator-grid { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .card-header h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--dark);
+    }
+    .card-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+    }
+    .card-body { padding: 1.5rem; }
+
+    .form-group { margin-bottom: 1.25rem; }
+    .form-label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--gray-700);
+      margin-bottom: 6px;
+    }
+    .form-input, .form-select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--gray-300);
+      border-radius: 8px;
+      font-size: 1rem;
+      font-family: inherit;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-input:focus, .form-select:focus {
+      outline: none;
+      border-color: white;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    .form-hint {
+      font-size: 0.8rem;
+      color: var(--gray-500);
+      margin-top: 4px;
+    }
+
+    .input-group {
+      display: flex;
+      align-items: stretch;
+    }
+    .input-prefix, .input-suffix {
+      padding: 12px 14px;
+      background: var(--gray-100);
+      border: 1px solid var(--gray-300);
+      font-size: 1rem;
+      color: var(--gray-500);
+      display: flex;
+      align-items: center;
+    }
+    .input-prefix { border-right: none; border-radius: 8px 0 0 8px; }
+    .input-suffix { border-left: none; border-radius: 0 8px 8px 0; }
+    .input-group .form-input {
+      border-radius: 0;
+      flex: 1;
+    }
+    .input-group .form-input:first-child { border-radius: 8px 0 0 8px; }
+    .input-group .form-input:last-child { border-radius: 0 8px 8px 0; }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      width: 100%;
+      margin-top: 1rem;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white;
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+
+    /* Results */
+    .results-card {
+      position: sticky;
+      top: 80px;
+    }
+    .result-header {
+      background: linear-gradient(135deg, var(--dark), #1e3a5f);
+      padding: 1.5rem;
+      text-align: center;
+      color: white;
+    }
+    .result-header h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      opacity: 0.8;
+      margin-bottom: 0.5rem;
+    }
+    .result-value {
+      font-size: 1.75rem;
+      font-weight: 800;
+    }
+    .result-value.savings { color: #4ade80; }
+    .result-value.loss { color: #f87171; }
+    .result-label {
+      font-size: 0.85rem;
+      opacity: 0.7;
+      margin-top: 0.25rem;
+    }
+
+    .result-breakdown {
+      padding: 1.5rem;
+    }
+    .breakdown-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--gray-100);
+      font-size: 0.9rem;
+    }
+    .breakdown-row:last-child { border-bottom: none; }
+    .breakdown-label { color: var(--gray-600); }
+    .breakdown-value { font-weight: 600; color: var(--dark); }
+    .breakdown-row.highlight {
+      background: var(--gray-50);
+      margin: 0 -1.5rem;
+      padding: 12px 1.5rem;
+    }
+    .breakdown-row.highlight .breakdown-value { color: var(--primary); }
+    .breakdown-row.total {
+      background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+      margin: 0 -1.5rem;
+      padding: 12px 1.5rem;
+      font-weight: 700;
+    }
+    .breakdown-row.total .breakdown-value { color: #166534; font-size: 1rem; }
+
+    .qualification-box {
+      margin: 1.5rem;
+      padding: 1rem;
+      border-radius: 12px;
+      font-size: 0.9rem;
+    }
+    .qualification-box.qualified {
+      background: #dcfce7;
+      border: 1px solid #86efac;
+    }
+    .qualification-box.qualified h4 { color: #166534; }
+    .qualification-box.not-qualified {
+      background: #fef3c7;
+      border: 1px solid #fcd34d;
+    }
+    .qualification-box.not-qualified h4 { color: #92400e; }
+    .qualification-box h4 {
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .qualification-box ul {
+      margin-left: 1.5rem;
+      margin-top: 0.5rem;
+    }
+    .qualification-box li { margin-bottom: 0.25rem; }
+
+    .info-card {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-top: 2rem;
+    }
+    .info-card h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #1e40af;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .info-card p {
+      font-size: 0.9rem;
+      color: #1e3a8a;
+    }
+
+    .disclaimer {
+      margin-top: 2rem;
+      padding: 1rem;
+      background: #fef3c7;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      color: #92400e;
+    }
+
+    /* Tabs for input sections */
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid var(--gray-200);
+      margin-bottom: 0.75rem;
+    }
+    .tab {
+      padding: 10px 16px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--gray-500);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s;
+    }
+    .tab:hover { color: var(--gray-700); }
+    .tab.active {
+      color: white;
+      border-bottom-color: white;
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <a href="../index.html" class="logo">Terms.Law <span>/ Tax Calculator</span></a>
+    <div class="nav-links">
+      <a href="../workbench.html">Workbench</a>
+      <a href="../index.html">Hub Home</a>
+      <a href="../index.html#consult">Consult</a>
+    </div>
+  </div>
+</header>
+
+<main class="main">
+  <div class="tool-header">
+    <span class="tool-badge">Tax Calculator</span>
+    <h1>Section 475(f) Mark-to-Market Election</h1>
+    <p>Estimate your potential tax savings from electing trader tax status and mark-to-market accounting</p>
+  </div>
+
+  <div class="calculator-grid">
+    <div>
+      <!-- Input Card -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon">&#128202;</div>
+          <h2>Your Trading Activity</h2>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label class="form-label">Filing Status</label>
+            <select class="form-select" id="filingStatus" onchange="calculate()">
+              <option value="single">Single</option>
+              <option value="married">Married Filing Jointly</option>
+              <option value="head">Head of Household</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Other Income (W-2, Business, etc.)</label>
+            <div class="input-group">
+              <span class="input-prefix">$</span>
+              <input type="number" class="form-input" id="otherIncome" value="150000" onchange="calculate()">
+            </div>
+            <div class="form-hint">Your non-trading taxable income</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Net Trading Gains (Realized)</label>
+            <div class="input-group">
+              <span class="input-prefix">$</span>
+              <input type="number" class="form-input" id="tradingGains" value="50000" onchange="calculate()">
+            </div>
+            <div class="form-hint">Total realized gains from trading</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Net Trading Losses (Realized)</label>
+            <div class="input-group">
+              <span class="input-prefix">$</span>
+              <input type="number" class="form-input" id="tradingLosses" value="20000" onchange="calculate()">
+            </div>
+            <div class="form-hint">Total realized losses from trading</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Short-Term Gains Percentage</label>
+            <div class="input-group">
+              <input type="number" class="form-input" id="shortTermPct" value="80" min="0" max="100" onchange="calculate()">
+              <span class="input-suffix">%</span>
+            </div>
+            <div class="form-hint">Percentage of gains that are short-term (&lt;1 year)</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Trading Expenses (Annual)</label>
+            <div class="input-group">
+              <span class="input-prefix">$</span>
+              <input type="number" class="form-input" id="tradingExpenses" value="5000" onchange="calculate()">
+            </div>
+            <div class="form-hint">Data feeds, software, education, home office, etc.</div>
+          </div>
+
+          <button class="btn btn-primary" onclick="calculate()">
+            Calculate Savings
+          </button>
+        </div>
+      </div>
+
+      <!-- Qualification Assessment -->
+      <div class="card" style="margin-top: 1.5rem;">
+        <div class="card-header">
+          <div class="card-icon">&#9989;</div>
+          <h2>Trader Tax Status Qualification</h2>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label class="form-label">Average Trades Per Day</label>
+            <select class="form-select" id="tradesPerDay" onchange="assessQualification()">
+              <option value="1">1-2 trades/day</option>
+              <option value="4" selected>4+ trades/day</option>
+              <option value="10">10+ trades/day</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Average Holding Period</label>
+            <select class="form-select" id="holdingPeriod" onchange="assessQualification()">
+              <option value="intraday" selected>Intraday (same day)</option>
+              <option value="days">Days to weeks</option>
+              <option value="months">Months</option>
+              <option value="years">Years</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Time Spent Trading</label>
+            <select class="form-select" id="timeSpent" onchange="assessQualification()">
+              <option value="full">Full-time (30+ hrs/week)</option>
+              <option value="substantial" selected>Substantial (15-30 hrs/week)</option>
+              <option value="part">Part-time (&lt;15 hrs/week)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Primary Income Source</label>
+            <select class="form-select" id="incomeSource" onchange="assessQualification()">
+              <option value="trading">Trading is primary income</option>
+              <option value="mixed" selected>Mixed (trading + other)</option>
+              <option value="other">Other income is primary</option>
+            </select>
+          </div>
+
+          <div id="qualificationResult"></div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <!-- Results Card -->
+      <div class="card results-card">
+        <div class="result-header">
+          <h3>Estimated Annual Tax Savings</h3>
+          <div class="result-value savings" id="totalSavings">$0</div>
+          <div class="result-label">with 475(f) election</div>
+        </div>
+
+        <div class="result-breakdown">
+          <h4 style="font-size: 0.85rem; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Without 475(f) Election</h4>
+
+          <div class="breakdown-row">
+            <span class="breakdown-label">Net Capital Gains</span>
+            <span class="breakdown-value" id="netGainsNoElection">$0</span>
+          </div>
+          <div class="breakdown-row">
+            <span class="breakdown-label">Loss Deduction (max $3,000)</span>
+            <span class="breakdown-value" id="lossDeductionNoElection">$0</span>
+          </div>
+          <div class="breakdown-row">
+            <span class="breakdown-label">Carryforward Losses</span>
+            <span class="breakdown-value" id="carryforwardLosses">$0</span>
+          </div>
+          <div class="breakdown-row">
+            <span class="breakdown-label">Trading Expenses Deductible</span>
+            <span class="breakdown-value" id="expensesNoElection">$0</span>
+          </div>
+          <div class="breakdown-row highlight">
+            <span class="breakdown-label">Total Tax (Without)</span>
+            <span class="breakdown-value" id="taxNoElection">$0</span>
+          </div>
+
+          <h4 style="font-size: 0.85rem; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.05em; margin: 1.5rem 0 1rem;">With 475(f) Election</h4>
+
+          <div class="breakdown-row">
+            <span class="breakdown-label">Trading Ordinary Income</span>
+            <span class="breakdown-value" id="ordinaryIncome">$0</span>
+          </div>
+          <div class="breakdown-row">
+            <span class="breakdown-label">Full Loss Deduction</span>
+            <span class="breakdown-value" id="fullLossDeduction">$0</span>
+          </div>
+          <div class="breakdown-row">
+            <span class="breakdown-label">Expense Deductions</span>
+            <span class="breakdown-value" id="expenseDeductions">$0</span>
+          </div>
+          <div class="breakdown-row">
+            <span class="breakdown-label">SE Tax on Trading</span>
+            <span class="breakdown-value" id="seTax">$0</span>
+          </div>
+          <div class="breakdown-row highlight">
+            <span class="breakdown-label">Total Tax (With)</span>
+            <span class="breakdown-value" id="taxWithElection">$0</span>
+          </div>
+
+          <div class="breakdown-row total">
+            <span class="breakdown-label">Your Savings</span>
+            <span class="breakdown-value" id="savingsAmount">$0</span>
+          </div>
+        </div>
+
+        <div class="info-card" style="margin: 1.5rem; margin-top: 0;">
+          <h3>&#128161; Key Benefits of 475(f)</h3>
+          <p>
+            <strong>1. No $3,000 loss limit</strong> - Deduct full trading losses against ordinary income<br>
+            <strong>2. No wash sale rules</strong> - Losses aren't deferred for repurchases<br>
+            <strong>3. Business expense deductions</strong> - Trading costs fully deductible
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    <strong>Disclaimer:</strong> This calculator provides estimates for educational purposes only. Actual tax liability depends on many factors not considered here. Consult a qualified tax professional before making any tax elections. The 475(f) election must be made by the due date (not including extensions) of the tax return for the year prior to the year it takes effect.
+  </div>
+</main>
+
+<script>
+// Tax brackets 2024 (simplified)
+const TAX_BRACKETS = {
+  single: [
+    { min: 0, max: 11600, rate: 0.10 },
+    { min: 11600, max: 47150, rate: 0.12 },
+    { min: 47150, max: 100525, rate: 0.22 },
+    { min: 100525, max: 191950, rate: 0.24 },
+    { min: 191950, max: 243725, rate: 0.32 },
+    { min: 243725, max: 609350, rate: 0.35 },
+    { min: 609350, max: Infinity, rate: 0.37 }
+  ],
+  married: [
+    { min: 0, max: 23200, rate: 0.10 },
+    { min: 23200, max: 94300, rate: 0.12 },
+    { min: 94300, max: 201050, rate: 0.22 },
+    { min: 201050, max: 383900, rate: 0.24 },
+    { min: 383900, max: 487450, rate: 0.32 },
+    { min: 487450, max: 731200, rate: 0.35 },
+    { min: 731200, max: Infinity, rate: 0.37 }
+  ],
+  head: [
+    { min: 0, max: 16550, rate: 0.10 },
+    { min: 16550, max: 63100, rate: 0.12 },
+    { min: 63100, max: 100500, rate: 0.22 },
+    { min: 100500, max: 191950, rate: 0.24 },
+    { min: 191950, max: 243700, rate: 0.32 },
+    { min: 243700, max: 609350, rate: 0.35 },
+    { min: 609350, max: Infinity, rate: 0.37 }
+  ]
+};
+
+// Capital gains rates
+const LTCG_RATES = {
+  single: [
+    { max: 47025, rate: 0 },
+    { max: 518900, rate: 0.15 },
+    { max: Infinity, rate: 0.20 }
+  ],
+  married: [
+    { max: 94050, rate: 0 },
+    { max: 583750, rate: 0.15 },
+    { max: Infinity, rate: 0.20 }
+  ],
+  head: [
+    { max: 63000, rate: 0 },
+    { max: 551350, rate: 0.15 },
+    { max: Infinity, rate: 0.20 }
+  ]
+};
+
+function getVal(id) {
+  return parseFloat(document.getElementById(id).value) || 0;
+}
+
+function formatCurrency(amount) {
+  const sign = amount < 0 ? '-' : '';
+  return sign + '$' + Math.abs(amount).toLocaleString('en-US', { maximumFractionDigits: 0 });
+}
+
+function calculateOrdinaryTax(income, status) {
+  const brackets = TAX_BRACKETS[status];
+  let tax = 0;
+  let remaining = income;
+
+  for (const bracket of brackets) {
+    const taxableInBracket = Math.min(remaining, bracket.max - bracket.min);
+    if (taxableInBracket <= 0) break;
+    tax += taxableInBracket * bracket.rate;
+    remaining -= taxableInBracket;
+  }
+
+  return tax;
+}
+
+function calculateLTCGTax(gains, totalIncome, status) {
+  const brackets = LTCG_RATES[status];
+  for (const bracket of brackets) {
+    if (totalIncome <= bracket.max) {
+      return gains * bracket.rate;
+    }
+  }
+  return gains * 0.20;
+}
+
+function calculate() {
+  const status = document.getElementById('filingStatus').value;
+  const otherIncome = getVal('otherIncome');
+  const tradingGains = getVal('tradingGains');
+  const tradingLosses = getVal('tradingLosses');
+  const shortTermPct = getVal('shortTermPct') / 100;
+  const tradingExpenses = getVal('tradingExpenses');
+
+  const netTradingPL = tradingGains - tradingLosses;
+  const shortTermGains = tradingGains * shortTermPct;
+  const longTermGains = tradingGains * (1 - shortTermPct);
+
+  // ======================================
+  // WITHOUT 475(f) ELECTION
+  // ======================================
+
+  let taxNoElection = 0;
+  let lossDeductionNoElection = 0;
+  let carryforwardLosses = 0;
+
+  if (netTradingPL >= 0) {
+    // Gains scenario
+    // Short-term gains taxed as ordinary income
+    // Long-term gains taxed at capital gains rates
+    const netShortTerm = shortTermGains - (tradingLosses * shortTermPct);
+    const netLongTerm = longTermGains - (tradingLosses * (1 - shortTermPct));
+
+    const ordinaryWithST = otherIncome + Math.max(0, netShortTerm);
+    taxNoElection = calculateOrdinaryTax(ordinaryWithST, status);
+
+    if (netLongTerm > 0) {
+      taxNoElection += calculateLTCGTax(netLongTerm, ordinaryWithST + netLongTerm, status);
+    }
+  } else {
+    // Loss scenario - limited to $3,000 deduction
+    lossDeductionNoElection = Math.min(Math.abs(netTradingPL), 3000);
+    carryforwardLosses = Math.max(0, Math.abs(netTradingPL) - 3000);
+
+    const adjustedIncome = otherIncome - lossDeductionNoElection;
+    taxNoElection = calculateOrdinaryTax(adjustedIncome, status);
+  }
+
+  // No expense deduction without TTS (misc itemized eliminated by TCJA)
+  const expensesNoElection = 0;
+
+  // ======================================
+  // WITH 475(f) ELECTION
+  // ======================================
+
+  // All gains/losses become ordinary income/loss
+  // Full loss deduction allowed
+  // Expenses deductible on Schedule C
+
+  const ordinaryTradingIncome = netTradingPL;
+  const adjustedOrdinaryIncome = otherIncome + ordinaryTradingIncome - tradingExpenses;
+
+  let taxWithElection = calculateOrdinaryTax(Math.max(0, adjustedOrdinaryIncome), status);
+
+  // Self-employment tax on trading income if positive (15.3% up to $168,600, 2.9% above)
+  let seTax = 0;
+  if (ordinaryTradingIncome > 0) {
+    const seIncome = ordinaryTradingIncome * 0.9235; // 92.35% is subject to SE tax
+    if (seIncome <= 168600) {
+      seTax = seIncome * 0.153;
+    } else {
+      seTax = 168600 * 0.153 + (seIncome - 168600) * 0.029;
+    }
+    // Can deduct half of SE tax
+    const seDeduction = seTax / 2;
+    taxWithElection = calculateOrdinaryTax(Math.max(0, adjustedOrdinaryIncome - seDeduction), status);
+  }
+
+  taxWithElection += seTax;
+
+  // ======================================
+  // SAVINGS
+  // ======================================
+
+  const savings = taxNoElection - taxWithElection;
+
+  // Update UI
+  document.getElementById('netGainsNoElection').textContent = formatCurrency(netTradingPL);
+  document.getElementById('lossDeductionNoElection').textContent = formatCurrency(-lossDeductionNoElection);
+  document.getElementById('carryforwardLosses').textContent = formatCurrency(carryforwardLosses);
+  document.getElementById('expensesNoElection').textContent = formatCurrency(expensesNoElection);
+  document.getElementById('taxNoElection').textContent = formatCurrency(taxNoElection);
+
+  document.getElementById('ordinaryIncome').textContent = formatCurrency(ordinaryTradingIncome);
+  document.getElementById('fullLossDeduction').textContent = ordinaryTradingIncome < 0 ? formatCurrency(ordinaryTradingIncome) : '$0';
+  document.getElementById('expenseDeductions').textContent = formatCurrency(-tradingExpenses);
+  document.getElementById('seTax').textContent = formatCurrency(seTax);
+  document.getElementById('taxWithElection').textContent = formatCurrency(taxWithElection);
+
+  document.getElementById('savingsAmount').textContent = formatCurrency(savings);
+  document.getElementById('totalSavings').textContent = formatCurrency(savings);
+
+  const savingsEl = document.getElementById('totalSavings');
+  savingsEl.className = 'result-value ' + (savings > 0 ? 'savings' : savings < 0 ? 'loss' : '');
+
+  assessQualification();
+}
+
+function assessQualification() {
+  const tradesPerDay = document.getElementById('tradesPerDay').value;
+  const holdingPeriod = document.getElementById('holdingPeriod').value;
+  const timeSpent = document.getElementById('timeSpent').value;
+  const incomeSource = document.getElementById('incomeSource').value;
+
+  let score = 0;
+  let factors = [];
+  let concerns = [];
+
+  // Trades per day
+  if (tradesPerDay === '10') {
+    score += 3;
+    factors.push('High trade frequency (10+ daily)');
+  } else if (tradesPerDay === '4') {
+    score += 2;
+    factors.push('Moderate trade frequency (4+ daily)');
+  } else {
+    score += 0;
+    concerns.push('Low trade frequency may be problematic');
+  }
+
+  // Holding period
+  if (holdingPeriod === 'intraday') {
+    score += 3;
+    factors.push('Intraday holding period');
+  } else if (holdingPeriod === 'days') {
+    score += 2;
+    factors.push('Short holding period (days)');
+  } else if (holdingPeriod === 'months') {
+    score += 1;
+    concerns.push('Longer holding period weakens case');
+  } else {
+    score += 0;
+    concerns.push('Long-term holding period is problematic');
+  }
+
+  // Time spent
+  if (timeSpent === 'full') {
+    score += 3;
+    factors.push('Full-time trading activity');
+  } else if (timeSpent === 'substantial') {
+    score += 2;
+    factors.push('Substantial time commitment');
+  } else {
+    score += 1;
+    concerns.push('Part-time activity may be insufficient');
+  }
+
+  // Income source
+  if (incomeSource === 'trading') {
+    score += 2;
+    factors.push('Trading is primary income source');
+  } else if (incomeSource === 'mixed') {
+    score += 1;
+  } else {
+    concerns.push('Trading not primary income');
+  }
+
+  const resultEl = document.getElementById('qualificationResult');
+
+  if (score >= 8) {
+    resultEl.innerHTML = `
+      <div class="qualification-box qualified">
+        <h4>&#10003; Likely Qualifies for Trader Tax Status</h4>
+        <p>Based on your activity, you likely meet the IRS requirements for trader tax status.</p>
+        <ul>
+          ${factors.map(f => `<li>${f}</li>`).join('')}
+        </ul>
+      </div>
+    `;
+  } else if (score >= 5) {
+    resultEl.innerHTML = `
+      <div class="qualification-box not-qualified" style="background: #fef3c7; border-color: #fcd34d;">
+        <h4 style="color: #92400e;">&#9888; May Qualify - Consult Professional</h4>
+        <p>Your situation has some favorable factors but also some concerns. Professional guidance recommended.</p>
+        <strong>Favorable:</strong>
+        <ul>${factors.map(f => `<li>${f}</li>`).join('')}</ul>
+        ${concerns.length > 0 ? `<strong>Concerns:</strong><ul>${concerns.map(c => `<li>${c}</li>`).join('')}</ul>` : ''}
+      </div>
+    `;
+  } else {
+    resultEl.innerHTML = `
+      <div class="qualification-box not-qualified">
+        <h4>&#9888; Unlikely to Qualify</h4>
+        <p>Based on your activity level, you may not meet IRS requirements for trader tax status.</p>
+        <ul>
+          ${concerns.map(c => `<li>${c}</li>`).join('')}
+        </ul>
+      </div>
+    `;
+  }
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+  calculate();
+});
+</script>
+
+</body>
+</html>
