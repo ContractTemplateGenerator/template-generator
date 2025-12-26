@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OPTION 3: Unified Site-Wide Mega-Header | Terms.Law</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #7c3aed;
+            --success: #10b981;
+            --respond-red: #dc2626;
+            --write-blue: #2563eb;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-800);
+            line-height: 1.6;
+        }
+
+        /* Mockup Banner */
+        .mockup-banner {
+            background: linear-gradient(90deg, #dcfce7 0%, #d1fae5 100%);
+            border-bottom: 2px solid #10b981;
+            padding: 12px 20px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: #065f46;
+            position: sticky;
+            top: 0;
+            z-index: 1001;
+        }
+        .mockup-banner code {
+            background: rgba(0,0,0,0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        /* ========================================
+           UNIFIED SITE-WIDE MEGA-HEADER
+           Same header appears on EVERY page of Terms.Law
+           ======================================== */
+        .site-header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            position: sticky;
+            top: 46px;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            height: 60px;
+        }
+
+        .site-logo {
+            font-size: 1.15rem;
+            font-weight: 800;
+            text-decoration: none;
+            background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-right: 32px;
+        }
+
+        .site-nav {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            flex: 1;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 18px 16px;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            border-bottom: 2px solid transparent;
+        }
+
+        .nav-link:hover {
+            color: #fff;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            border-bottom-color: var(--primary);
+        }
+
+        .nav-link .arrow {
+            font-size: 10px;
+            transition: transform 0.2s;
+        }
+
+        .nav-item:hover .arrow {
+            transform: rotate(180deg);
+        }
+
+        .nav-cta {
+            margin-left: auto;
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            color: #fff !important;
+            padding: 10px 20px !important;
+            border-radius: 8px;
+            font-weight: 600 !important;
+            border-bottom: none !important;
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+        }
+
+        /* Mega Menu - Generic */
+        .mega-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: #fff;
+            border-radius: 0 0 16px 16px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+            z-index: 100;
+        }
+
+        .nav-item:hover .mega-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .mega-menu.wide { min-width: 700px; }
+        .mega-menu.medium { min-width: 500px; }
+        .mega-menu.narrow { min-width: 280px; }
+
+        .mega-menu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--gray-200);
+            background: var(--gray-50);
+        }
+
+        .mega-menu-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--gray-700);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .mega-menu-viewall {
+            font-size: 12px;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .mega-menu-grid {
+            display: grid;
+            gap: 0;
+        }
+
+        .mega-menu-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+        .mega-menu-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+
+        .mega-menu-section {
+            padding: 16px 20px;
+            border-right: 1px solid var(--gray-100);
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .mega-menu-section:nth-child(3n) {
+            border-right: none;
+        }
+
+        .mega-menu-section-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--gray-800);
+            margin-bottom: 8px;
+        }
+
+        .mega-menu-section-title .icon {
+            font-size: 16px;
+        }
+
+        .mega-menu-links {
+            list-style: none;
+        }
+
+        .mega-menu-links li {
+            margin-bottom: 4px;
+        }
+
+        .mega-menu-links a {
+            font-size: 12px;
+            color: var(--gray-600);
+            text-decoration: none;
+            transition: color 0.15s;
+        }
+
+        .mega-menu-links a:hover {
+            color: var(--primary);
+        }
+
+        .mega-menu-more {
+            font-size: 11px;
+            color: var(--gray-400);
+            margin-top: 4px;
+        }
+
+        .mega-menu-footer {
+            display: flex;
+            gap: 10px;
+            padding: 12px 20px;
+            background: var(--gray-50);
+            border-radius: 0 0 16px 16px;
+            flex-wrap: wrap;
+        }
+
+        .mega-menu-footer a {
+            font-size: 11px;
+            color: var(--gray-500);
+            text-decoration: none;
+            padding: 4px 10px;
+            background: #fff;
+            border-radius: 20px;
+            border: 1px solid var(--gray-200);
+            transition: all 0.15s;
+        }
+
+        .mega-menu-footer a:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Simple Dropdown */
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: #fff;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+            min-width: 220px;
+            padding: 8px 0;
+        }
+
+        .nav-item:hover .dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 18px;
+            color: var(--gray-700);
+            text-decoration: none;
+            font-size: 13px;
+            transition: background 0.15s;
+        }
+
+        .dropdown a:hover {
+            background: var(--gray-50);
+        }
+
+        .dropdown .icon {
+            font-size: 16px;
+            width: 22px;
+            text-align: center;
+        }
+
+        /* Hero - Main Homepage */
+        .hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #312e81 100%);
+            padding: 60px 24px 80px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 2.75rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 16px;
+        }
+
+        .hero h1 .gradient {
+            background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #f472b6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.15rem;
+            color: #94a3b8;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Content */
+        .content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        .content h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .section-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .section-card {
+            background: #fff;
+            border: 2px solid var(--gray-200);
+            border-radius: 16px;
+            padding: 28px;
+            transition: all 0.2s;
+        }
+
+        .section-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 8px 30px rgba(37, 99, 235, 0.1);
+        }
+
+        .section-card-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 12px;
+        }
+
+        .section-card-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+        }
+
+        .section-card-icon.blue { background: #dbeafe; }
+        .section-card-icon.green { background: #d1fae5; }
+        .section-card-icon.purple { background: #ede9fe; }
+        .section-card-icon.orange { background: #ffedd5; }
+
+        .section-card h3 {
+            font-size: 1.15rem;
+            margin-bottom: 4px;
+        }
+
+        .section-card .count {
+            font-size: 0.85rem;
+            color: var(--gray-400);
+        }
+
+        .section-card p {
+            font-size: 0.95rem;
+            color: var(--gray-500);
+            line-height: 1.6;
+        }
+
+        /* Explanation Box */
+        .explain-box {
+            background: #ecfdf5;
+            border: 2px solid #10b981;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 40px auto;
+            max-width: 900px;
+        }
+
+        .explain-box h3 {
+            color: #065f46;
+            margin-bottom: 12px;
+        }
+
+        .explain-box p {
+            color: #047857;
+            margin-bottom: 8px;
+        }
+
+        .explain-box ul {
+            margin-left: 20px;
+            color: #047857;
+        }
+
+        .explain-box li {
+            margin-bottom: 4px;
+        }
+
+        .explain-box code {
+            background: rgba(0,0,0,0.08);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Mockup Banner -->
+    <div class="mockup-banner">
+        📐 OPTION 3: Unified Site-Wide Mega-Header &nbsp;|&nbsp;
+        <code>Same header with mega-menus appears on EVERY page of Terms.Law</code>
+    </div>
+
+    <!-- ========================================
+         UNIFIED SITE-WIDE MEGA-HEADER
+         This header appears on EVERY page across the entire site
+         ======================================== -->
+    <header class="site-header">
+        <div class="header-content">
+            <a href="/" class="site-logo">Terms.Law</a>
+
+            <nav class="site-nav">
+                <!-- Demands - Mega Menu -->
+                <div class="nav-item">
+                    <a href="/Demand-Letters/" class="nav-link">
+                        Demands <span class="arrow">▼</span>
+                    </a>
+                    <div class="mega-menu wide">
+                        <div class="mega-menu-header">
+                            <span class="mega-menu-title">Demand Letters</span>
+                            <a href="/Demand-Letters/" class="mega-menu-viewall">View All 140+ Guides →</a>
+                        </div>
+                        <div class="mega-menu-grid cols-3">
+                            <div class="mega-menu-section">
+                                <div class="mega-menu-section-title"><span class="icon">💼</span> Business</div>
+                                <ul class="mega-menu-links">
+                                    <li><a href="#">Unpaid Invoices</a></li>
+                                    <li><a href="#">Breach of Contract</a></li>
+                                    <li><a href="#">Partnership Disputes</a></li>
+                                </ul>
+                                <div class="mega-menu-more">+ 8 more</div>
+                            </div>
+                            <div class="mega-menu-section">
+                                <div class="mega-menu-section-title"><span class="icon">👷</span> Employment</div>
+                                <ul class="mega-menu-links">
+                                    <li><a href="#">Wage & Hour Claims</a></li>
+                                    <li><a href="#">Wrongful Termination</a></li>
+                                    <li><a href="#">Discrimination</a></li>
+                                </ul>
+                                <div class="mega-menu-more">+ 12 more</div>
+                            </div>
+                            <div class="mega-menu-section">
+                                <div class="mega-menu-section-title"><span class="icon">🛒</span> Consumer</div>
+                                <ul class="mega-menu-links">
+                                    <li><a href="#">Defective Products</a></li>
+                                    <li><a href="#">Lemon Law</a></li>
+                                    <li><a href="#">Refund Demands</a></li>
+                                </ul>
+                                <div class="mega-menu-more">+ 6 more</div>
+                            </div>
+                            <div class="mega-menu-section">
+                                <div class="mega-menu-section-title"><span class="icon">🏠</span> Landlord-Tenant</div>
+                                <ul class="mega-menu-links">
+                                    <li><a href="#">Security Deposit</a></li>
+                                    <li><a href="#">Habitability</a></li>
+                                    <li><a href="#">Lease Violations</a></li>
+                                </ul>
+                                <div class="mega-menu-more">+ 5 more</div>
+                            </div>
+                            <div class="mega-menu-section">
+                                <div class="mega-menu-section-title"><span class="icon">🏗️</span> Home Services</div>
+                                <ul class="mega-menu-links">
+                                    <li><a href="#">Contractor Disputes</a></li>
+                                    <li><a href="#">HVAC Issues</a></li>
+                                    <li><a href="#">Roofing Defects</a></li>
+                                </ul>
+                                <div class="mega-menu-more">+ 7 more</div>
+                            </div>
+                            <div class="mega-menu-section">
+                                <div class="mega-menu-section-title"><span class="icon">📩</span> Respond</div>
+                                <ul class="mega-menu-links">
+                                    <li><a href="#">Business Responses</a></li>
+                                    <li><a href="#">Employment Responses</a></li>
+                                    <li><a href="#">Consumer Responses</a></li>
+                                </ul>
+                                <div class="mega-menu-more">View all responses</div>
+                            </div>
+                        </div>
+                        <div class="mega-menu-footer">
+                            <a href="#">📱 Platforms</a>
+                            <a href="#">🎨 IP & Content</a>
+                            <a href="#">👨‍👩‍👧 Family</a>
+                            <a href="#">🐕 Animals</a>
+                            <a href="#">🔧 Tools</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contracts - Mega Menu -->
+                <div class="nav-item">
+                    <a href="/Templates/" class="nav-link">
+                        Contracts <span class="arrow">▼</span>
+                    </a>
+                    <div class="mega-menu medium">
+                        <div class="mega-menu-header">
+                            <span class="mega-menu-title">Contract Templates</span>
+                            <a href="/Templates/" class="mega-menu-viewall">View Library →</a>
+                        </div>
+                        <div class="mega-menu-grid cols-2">
+                            <div class="mega-menu-section">
+                                <div class="mega-menu-section-title"><span class="icon">🤝</span> Business</div>
+                                <ul class="mega-menu-links">
+                                    <li><a href="#">Service Agreement</a></li>
+                                    <li><a href="#">NDA / Confidentiality</a></li>
+                                    <li><a href="#">Partnership Agreement</a></li>
+                                    <li><a href="#">Consulting Agreement</a></li>
+                                </ul>
+                            </div>
+                            <div class="mega-menu-section">
+                                <div class="mega-menu-section-title"><span class="icon">💼</span> Employment</div>
+                                <ul class="mega-menu-links">
+                                    <li><a href="#">Employment Agreement</a></li>
+                                    <li><a href="#">Contractor Agreement</a></li>
+                                    <li><a href="#">Non-Compete</a></li>
+                                    <li><a href="#">Offer Letter</a></li>
+                                </ul>
+                            </div>
+                            <div class="mega-menu-section">
+                                <div class="mega-menu-section-title"><span class="icon">🏠</span> Real Estate</div>
+                                <ul class="mega-menu-links">
+                                    <li><a href="#">Lease Agreement</a></li>
+                                    <li><a href="#">Sublease</a></li>
+                                    <li><a href="#">Property Management</a></li>
+                                </ul>
+                            </div>
+                            <div class="mega-menu-section">
+                                <div class="mega-menu-section-title"><span class="icon">💰</span> Finance</div>
+                                <ul class="mega-menu-links">
+                                    <li><a href="#">Promissory Note</a></li>
+                                    <li><a href="#">Loan Agreement</a></li>
+                                    <li><a href="#">SAFE / Convertible Note</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formation - Dropdown -->
+                <div class="nav-item">
+                    <a href="/INC/" class="nav-link">
+                        Formation <span class="arrow">▼</span>
+                    </a>
+                    <div class="dropdown">
+                        <a href="#"><span class="icon">🏢</span> LLC Formation</a>
+                        <a href="#"><span class="icon">📈</span> Corporation</a>
+                        <a href="#"><span class="icon">📝</span> Operating Agreement</a>
+                        <a href="#"><span class="icon">📋</span> Bylaws</a>
+                        <a href="#"><span class="icon">🏛️</span> State Guides</a>
+                        <a href="#"><span class="icon">→</span> All Formation Tools</a>
+                    </div>
+                </div>
+
+                <!-- Trading - Dropdown -->
+                <div class="nav-item">
+                    <a href="/Trading-Legal/" class="nav-link">
+                        Trading <span class="arrow">▼</span>
+                    </a>
+                    <div class="dropdown">
+                        <a href="#"><span class="icon">📊</span> SEC Compliance</a>
+                        <a href="#"><span class="icon">🌾</span> CFTC / Futures</a>
+                        <a href="#"><span class="icon">🪙</span> Crypto & DeFi</a>
+                        <a href="#"><span class="icon">🤖</span> Robo-Advisers</a>
+                        <a href="#"><span class="icon">🌍</span> International</a>
+                        <a href="#"><span class="icon">→</span> All 50+ Guides</a>
+                    </div>
+                </div>
+
+                <!-- Blog -->
+                <a href="/Blog/" class="nav-link">Read</a>
+
+                <!-- CTA -->
+                <a href="mailto:owner@terms.law" class="nav-link nav-cta">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero - Main Homepage -->
+    <section class="hero">
+        <h1>Legal Templates & Guidance<br><span class="gradient">From a Real Attorney</span></h1>
+        <p>Demand letters, contracts, business formation, and trading compliance — all backed by California-licensed legal expertise since 2011.</p>
+    </section>
+
+    <!-- Explanation -->
+    <div class="explain-box">
+        <h3>🔍 Option 3: Unified Site-Wide Mega-Header</h3>
+        <p><strong>How it works:</strong></p>
+        <ul>
+            <li>This <strong>same header</strong> appears on every page across Terms.Law — home, Demand Letters, Contracts, Formation, Trading, Blog</li>
+            <li>Each section (Demands, Contracts, Formation, Trading) has its own mega-menu/dropdown</li>
+            <li>User can navigate between sections instantly without "leaving" one to "enter" another</li>
+            <li>Consistent experience everywhere on the site</li>
+        </ul>
+        <p style="margin-top: 12px;"><strong>Pros:</strong> Unified experience, cross-section discovery, professional feel, one component to maintain</p>
+        <p><strong>Cons:</strong> Biggest refactor, mega-menus may overwhelm smaller sections, less customized per section</p>
+    </div>
+
+    <!-- Sample Content - Site Overview -->
+    <div class="content">
+        <h2>Explore Legal Resources</h2>
+        <div class="section-grid">
+            <div class="section-card">
+                <div class="section-card-header">
+                    <div class="section-card-icon blue">✉️</div>
+                    <div>
+                        <h3>Demand Letters</h3>
+                        <span class="count">140+ guides</span>
+                    </div>
+                </div>
+                <p>Write or respond to demand letters with attorney-drafted templates and legal strategies.</p>
+            </div>
+            <div class="section-card">
+                <div class="section-card-header">
+                    <div class="section-card-icon purple">📄</div>
+                    <div>
+                        <h3>Contract Templates</h3>
+                        <span class="count">50+ templates</span>
+                    </div>
+                </div>
+                <p>Business agreements, employment contracts, NDAs, and more — all customizable.</p>
+            </div>
+            <div class="section-card">
+                <div class="section-card-header">
+                    <div class="section-card-icon green">🏢</div>
+                    <div>
+                        <h3>Business Formation</h3>
+                        <span class="count">State-by-state</span>
+                    </div>
+                </div>
+                <p>LLC and corporation formation guides, operating agreements, and bylaws.</p>
+            </div>
+            <div class="section-card">
+                <div class="section-card-header">
+                    <div class="section-card-icon orange">📊</div>
+                    <div>
+                        <h3>Trading Legal</h3>
+                        <span class="count">50+ guides</span>
+                    </div>
+                </div>
+                <p>SEC, CFTC, crypto compliance, robo-advisers, and algorithmic trading regulations.</p>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

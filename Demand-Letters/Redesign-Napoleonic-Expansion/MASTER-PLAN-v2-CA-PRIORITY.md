@@ -181,6 +181,31 @@ Every page should link to:
 
 **AND: Update existing blog posts to link TO new demand letter pages**
 
+#### 5. Breadcrumb Navigation (MANDATORY)
+**Every page MUST have breadcrumb navigation** showing the user's location in the site hierarchy.
+
+Format: `Home › Demands › [Category] › [Subcategory] › [Page Title]`
+
+Example: `Home › Demands › California › Employment › Unpaid Wages`
+
+Requirements:
+- All breadcrumb links must be clickable (except current page)
+- Consistent styling across all pages
+- Placed immediately below the header, before main content
+- CSS class: `.breadcrumb`
+
+```html
+<nav class="breadcrumb">
+  <a href="/">Home</a>
+  <span class="separator">›</span>
+  <a href="/Demand-Letters/">Demands</a>
+  <span class="separator">›</span>
+  <a href="/Demand-Letters/california/">California</a>
+  <span class="separator">›</span>
+  <span class="current">Unpaid Wages</span>
+</nav>
+```
+
 ---
 
 ## The Generator Engine Architecture
