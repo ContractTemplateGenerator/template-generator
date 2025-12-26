@@ -1284,50 +1284,88 @@
             <p class="section-description">Check which insurance policies might cover your demand letter. Many people don't realize their insurance may pay for defense costs and settlements.</p>
 
             <div class="insurance-checker">
-                <p style="color: var(--text-muted); margin-bottom: 20px; font-weight: 500;">Select all insurance types you currently have:</p>
+                <p style="color: var(--text-muted); margin-bottom: 20px; font-weight: 500;">Step 1: What type of demand letter did you receive?</p>
 
-                <div class="insurance-types">
-                    <div class="insurance-type" onclick="toggleInsurance(this)">
+                <div class="insurance-types" style="margin-bottom: 25px;">
+                    <div class="insurance-type" data-claim="bodily-injury" onclick="toggleInsurance(this)">
                         <div class="insurance-checkbox"></div>
-                        <span class="insurance-label">General Liability Insurance</span>
+                        <span class="insurance-label">Bodily Injury / Personal Injury</span>
                     </div>
-                    <div class="insurance-type" onclick="toggleInsurance(this)">
+                    <div class="insurance-type" data-claim="property-damage" onclick="toggleInsurance(this)">
                         <div class="insurance-checkbox"></div>
-                        <span class="insurance-label">Professional Liability (E&O)</span>
+                        <span class="insurance-label">Property Damage</span>
                     </div>
-                    <div class="insurance-type" onclick="toggleInsurance(this)">
+                    <div class="insurance-type" data-claim="professional-error" onclick="toggleInsurance(this)">
                         <div class="insurance-checkbox"></div>
-                        <span class="insurance-label">Directors & Officers (D&O)</span>
+                        <span class="insurance-label">Professional Services / Malpractice</span>
                     </div>
-                    <div class="insurance-type" onclick="toggleInsurance(this)">
+                    <div class="insurance-type" data-claim="employment" onclick="toggleInsurance(this)">
                         <div class="insurance-checkbox"></div>
-                        <span class="insurance-label">Employment Practices Liability (EPLI)</span>
+                        <span class="insurance-label">Employment (Wrongful Termination, Discrimination)</span>
                     </div>
-                    <div class="insurance-type" onclick="toggleInsurance(this)">
+                    <div class="insurance-type" data-claim="contract" onclick="toggleInsurance(this)">
                         <div class="insurance-checkbox"></div>
-                        <span class="insurance-label">Homeowner's Insurance</span>
+                        <span class="insurance-label">Breach of Contract / Business Dispute</span>
                     </div>
-                    <div class="insurance-type" onclick="toggleInsurance(this)">
+                    <div class="insurance-type" data-claim="defamation" onclick="toggleInsurance(this)">
                         <div class="insurance-checkbox"></div>
-                        <span class="insurance-label">Renter's Insurance</span>
+                        <span class="insurance-label">Defamation / Libel / Slander</span>
                     </div>
-                    <div class="insurance-type" onclick="toggleInsurance(this)">
+                    <div class="insurance-type" data-claim="auto" onclick="toggleInsurance(this)">
                         <div class="insurance-checkbox"></div>
-                        <span class="insurance-label">Auto Insurance</span>
+                        <span class="insurance-label">Auto Accident</span>
                     </div>
-                    <div class="insurance-type" onclick="toggleInsurance(this)">
+                    <div class="insurance-type" data-claim="landlord-tenant" onclick="toggleInsurance(this)">
                         <div class="insurance-checkbox"></div>
-                        <span class="insurance-label">Umbrella/Excess Liability</span>
+                        <span class="insurance-label">Landlord-Tenant Dispute</span>
                     </div>
                 </div>
 
-                <button class="calc-btn" onclick="checkInsurance()">Check My Coverage</button>
+                <p style="color: var(--text-muted); margin-bottom: 20px; font-weight: 500;">Step 2: Select all insurance types you currently have:</p>
+
+                <div class="insurance-types" id="insurancePolicies">
+                    <div class="insurance-type" data-policy="general-liability" onclick="toggleInsurance(this)">
+                        <div class="insurance-checkbox"></div>
+                        <span class="insurance-label">General Liability Insurance</span>
+                    </div>
+                    <div class="insurance-type" data-policy="professional-liability" onclick="toggleInsurance(this)">
+                        <div class="insurance-checkbox"></div>
+                        <span class="insurance-label">Professional Liability (E&O)</span>
+                    </div>
+                    <div class="insurance-type" data-policy="d-and-o" onclick="toggleInsurance(this)">
+                        <div class="insurance-checkbox"></div>
+                        <span class="insurance-label">Directors & Officers (D&O)</span>
+                    </div>
+                    <div class="insurance-type" data-policy="epli" onclick="toggleInsurance(this)">
+                        <div class="insurance-checkbox"></div>
+                        <span class="insurance-label">Employment Practices Liability (EPLI)</span>
+                    </div>
+                    <div class="insurance-type" data-policy="homeowners" onclick="toggleInsurance(this)">
+                        <div class="insurance-checkbox"></div>
+                        <span class="insurance-label">Homeowner's Insurance</span>
+                    </div>
+                    <div class="insurance-type" data-policy="renters" onclick="toggleInsurance(this)">
+                        <div class="insurance-checkbox"></div>
+                        <span class="insurance-label">Renter's Insurance</span>
+                    </div>
+                    <div class="insurance-type" data-policy="auto" onclick="toggleInsurance(this)">
+                        <div class="insurance-checkbox"></div>
+                        <span class="insurance-label">Auto Insurance</span>
+                    </div>
+                    <div class="insurance-type" data-policy="umbrella" onclick="toggleInsurance(this)">
+                        <div class="insurance-checkbox"></div>
+                        <span class="insurance-label">Umbrella/Excess Liability</span>
+                    </div>
+                    <div class="insurance-type" data-policy="none" onclick="toggleInsurance(this)">
+                        <div class="insurance-checkbox"></div>
+                        <span class="insurance-label">I don't have any of these</span>
+                    </div>
+                </div>
+
+                <button class="calc-btn" onclick="checkInsurance()">Analyze My Coverage</button>
 
                 <div class="insurance-result" id="insuranceResult">
-                    <h4>&#9989; Next Steps for Your Insurance</h4>
-                    <ol class="insurance-steps" id="insuranceSteps">
-                        <!-- Populated by JavaScript -->
-                    </ol>
+                    <div id="insuranceOutput"></div>
                 </div>
             </div>
         </section>
@@ -1746,32 +1784,241 @@
             checkbox.innerHTML = element.classList.contains('checked') ? '&#10003;' : '';
         }
 
-        // Check insurance coverage
+        // Check insurance coverage - intelligent matching
         function checkInsurance() {
-            const checkedTypes = document.querySelectorAll('.insurance-type.checked');
             const resultDiv = document.getElementById('insuranceResult');
-            const stepsList = document.getElementById('insuranceSteps');
+            const outputDiv = document.getElementById('insuranceOutput');
 
-            if (checkedTypes.length === 0) {
-                stepsList.innerHTML = `
-                    <li>Even without insurance, you may have options. Some demand letters can be resolved through negotiation.</li>
-                    <li>Consider whether purchasing insurance for future protection makes sense for your situation.</li>
-                    <li>Consult with an attorney to understand your exposure and defense options.</li>
+            // Get selected claim types
+            const claimTypes = Array.from(document.querySelectorAll('.insurance-type[data-claim].checked'))
+                .map(el => el.dataset.claim);
+
+            // Get selected policies
+            const policies = Array.from(document.querySelectorAll('.insurance-type[data-policy].checked'))
+                .map(el => el.dataset.policy);
+
+            // Validation
+            if (claimTypes.length === 0) {
+                outputDiv.innerHTML = `
+                    <div style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                        <strong style="color: #92400e;">&#9888; Please select at least one claim type</strong>
+                        <p style="color: #78350f; margin: 10px 0 0 0;">Select what type of demand letter you received in Step 1 above.</p>
+                    </div>
                 `;
-            } else {
-                const steps = [
-                    '<strong>Notify your insurance carrier immediately.</strong> Most policies require prompt notice of claims or potential claims. Delay can void coverage.',
-                    '<strong>Send a copy of the demand letter</strong> to your insurance company\'s claims department, along with a written notice that you are tendering the matter for defense and indemnity.',
-                    '<strong>Do not admit fault or make payments</strong> without your insurer\'s approval - this could void your coverage.',
-                    '<strong>Request confirmation in writing</strong> that your insurer has received the tender and is investigating coverage.',
-                    '<strong>Ask about reservation of rights.</strong> Insurers sometimes accept defense under a "reservation of rights" letter, which means they may deny coverage later.',
-                    '<strong>Keep records</strong> of all communications with your insurance company, including dates, names, and what was discussed.',
-                    '<strong>Respond to the demand letter</strong> in coordination with your insurer. They may provide or appoint counsel to represent you.'
-                ];
-
-                stepsList.innerHTML = steps.map(step => `<li>${step}</li>`).join('');
+                resultDiv.classList.add('visible');
+                return;
             }
 
+            if (policies.length === 0) {
+                outputDiv.innerHTML = `
+                    <div style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                        <strong style="color: #92400e;">&#9888; Please select your insurance policies</strong>
+                        <p style="color: #78350f; margin: 10px 0 0 0;">Select all insurance types you have in Step 2, or select "I don't have any of these."</p>
+                    </div>
+                `;
+                resultDiv.classList.add('visible');
+                return;
+            }
+
+            // Coverage matching logic
+            const coverageMatrix = {
+                'bodily-injury': {
+                    'general-liability': { covered: true, likelihood: 'HIGH', note: 'General liability typically covers third-party bodily injury claims. This is exactly what GL is designed for.' },
+                    'homeowners': { covered: true, likelihood: 'MEDIUM', note: 'Homeowner\'s liability coverage may apply if the injury occurred on your property or was caused by your negligence.' },
+                    'renters': { covered: true, likelihood: 'MEDIUM', note: 'Renter\'s liability coverage may apply if you caused the injury. Coverage limits are typically lower than homeowner\'s.' },
+                    'auto': { covered: true, likelihood: 'HIGH', note: 'If the injury is auto-related, your auto liability coverage should respond. File immediately.' },
+                    'umbrella': { covered: true, likelihood: 'HIGH', note: 'Umbrella policy provides excess coverage above your primary policy limits. Notify them if claim exceeds primary limits.' },
+                    'professional-liability': { covered: false, likelihood: 'LOW', note: 'E&O typically excludes bodily injury unless it arises from professional services.' },
+                    'epli': { covered: false, likelihood: 'LOW', note: 'EPLI is for employment claims, not general bodily injury.' },
+                    'd-and-o': { covered: false, likelihood: 'LOW', note: 'D&O is for management liability, not bodily injury.' }
+                },
+                'property-damage': {
+                    'general-liability': { covered: true, likelihood: 'HIGH', note: 'GL covers property damage to third parties. Standard covered claim.' },
+                    'homeowners': { covered: true, likelihood: 'MEDIUM', note: 'Your liability coverage may apply if you damaged someone else\'s property.' },
+                    'renters': { covered: true, likelihood: 'MEDIUM', note: 'Liability portion may cover damage you cause to others\' property.' },
+                    'auto': { covered: true, likelihood: 'HIGH', note: 'If auto-related, your property damage liability coverage applies.' },
+                    'umbrella': { covered: true, likelihood: 'HIGH', note: 'Umbrella provides excess coverage for property damage claims.' },
+                    'professional-liability': { covered: false, likelihood: 'LOW', note: 'E&O typically excludes property damage.' },
+                    'epli': { covered: false, likelihood: 'LOW', note: 'EPLI does not cover property damage.' },
+                    'd-and-o': { covered: false, likelihood: 'LOW', note: 'D&O does not cover property damage.' }
+                },
+                'professional-error': {
+                    'professional-liability': { covered: true, likelihood: 'HIGH', note: 'This is exactly what E&O insurance covers - claims of professional negligence, errors, or omissions.' },
+                    'd-and-o': { covered: true, likelihood: 'MEDIUM', note: 'May cover if you\'re a director/officer and the claim relates to your management decisions.' },
+                    'general-liability': { covered: false, likelihood: 'LOW', note: 'GL specifically EXCLUDES professional services. Do not rely on GL for malpractice claims.' },
+                    'homeowners': { covered: false, likelihood: 'LOW', note: 'Home-based business liability is typically excluded from homeowner\'s policies.' },
+                    'umbrella': { covered: true, likelihood: 'MEDIUM', note: 'Some umbrella policies provide excess coverage over E&O, but many exclude professional liability.' }
+                },
+                'employment': {
+                    'epli': { covered: true, likelihood: 'HIGH', note: 'EPLI is specifically designed for employment claims - wrongful termination, discrimination, harassment, retaliation.' },
+                    'd-and-o': { covered: true, likelihood: 'MEDIUM', note: 'D&O may cover employment claims against directors and officers, especially in smaller companies.' },
+                    'general-liability': { covered: false, likelihood: 'LOW', note: 'GL excludes employment-related claims. This is a common coverage gap.' },
+                    'umbrella': { covered: false, likelihood: 'LOW', note: 'Most umbrella policies exclude employment claims.' },
+                    'professional-liability': { covered: false, likelihood: 'LOW', note: 'E&O does not cover employment disputes.' }
+                },
+                'contract': {
+                    'general-liability': { covered: false, likelihood: 'LOW', note: 'GL excludes breach of contract. The "contractual liability" coverage only applies to assumed tort liability.' },
+                    'professional-liability': { covered: true, likelihood: 'MEDIUM', note: 'E&O may cover if the contract breach relates to your professional services and the policy doesn\'t exclude contract claims.' },
+                    'd-and-o': { covered: true, likelihood: 'MEDIUM', note: 'D&O may cover if you\'re sued personally for business contract disputes.' },
+                    'umbrella': { covered: false, likelihood: 'LOW', note: 'Umbrella policies typically exclude breach of contract claims.' }
+                },
+                'defamation': {
+                    'general-liability': { covered: true, likelihood: 'HIGH', note: 'GL "personal and advertising injury" coverage includes defamation, libel, and slander.' },
+                    'homeowners': { covered: true, likelihood: 'MEDIUM', note: 'Personal liability coverage often includes personal injury offenses like defamation.' },
+                    'renters': { covered: true, likelihood: 'MEDIUM', note: 'Liability coverage may include personal injury offenses.' },
+                    'd-and-o': { covered: true, likelihood: 'HIGH', note: 'D&O policies typically cover defamation claims against officers and directors.' },
+                    'umbrella': { covered: true, likelihood: 'HIGH', note: 'Umbrella coverage typically follows form and covers defamation claims.' },
+                    'professional-liability': { covered: true, likelihood: 'MEDIUM', note: 'Some E&O policies cover defamation arising from professional services.' }
+                },
+                'auto': {
+                    'auto': { covered: true, likelihood: 'HIGH', note: 'Your auto liability coverage is designed for exactly this. File a claim immediately.' },
+                    'umbrella': { covered: true, likelihood: 'HIGH', note: 'Umbrella provides excess coverage above your auto policy limits.' },
+                    'general-liability': { covered: false, likelihood: 'LOW', note: 'GL has an auto exclusion. You need your auto policy.' },
+                    'homeowners': { covered: false, likelihood: 'LOW', note: 'Homeowner\'s excludes auto-related claims.' }
+                },
+                'landlord-tenant': {
+                    'homeowners': { covered: true, likelihood: 'MEDIUM', note: 'If you\'re a landlord, your homeowner\'s liability may cover tenant claims, but landlord policies are better.' },
+                    'general-liability': { covered: true, likelihood: 'HIGH', note: 'If you have a landlord or commercial policy, it should cover tenant injury/property claims.' },
+                    'renters': { covered: false, likelihood: 'LOW', note: 'As a tenant, your renter\'s policy won\'t help with landlord disputes (you\'re the claimant, not defendant).' },
+                    'umbrella': { covered: true, likelihood: 'MEDIUM', note: 'Umbrella may provide excess coverage for landlord liability claims.' }
+                }
+            };
+
+            // Generate results
+            let html = '';
+            let hasAnyCoverage = false;
+            let coverageResults = [];
+
+            // Check if "none" was selected
+            if (policies.includes('none')) {
+                html = `
+                    <div style="background: #fef2f2; border: 2px solid #dc2626; border-radius: 12px; padding: 25px; margin-bottom: 20px;">
+                        <h4 style="color: #991b1b; margin: 0 0 15px 0;">&#9888; No Insurance Coverage Available</h4>
+                        <p style="color: #7f1d1d; margin: 0 0 15px 0;">Without insurance, you'll need to handle this demand letter yourself or hire an attorney at your own expense.</p>
+                        <div style="background: white; border-radius: 8px; padding: 15px; margin-top: 15px;">
+                            <strong style="color: #1f2937;">Your options:</strong>
+                            <ul style="margin: 10px 0 0 0; padding-left: 20px; color: #374151;">
+                                <li>Negotiate directly with the claimant to reduce or settle the claim</li>
+                                <li>Consult with an attorney about your defense options and potential exposure</li>
+                                <li>Consider whether the claim has merit and what a reasonable settlement might be</li>
+                                <li>For future protection, consider purchasing appropriate liability insurance</li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Analyze each claim type against each policy
+                claimTypes.forEach(claim => {
+                    const claimName = document.querySelector(`[data-claim="${claim}"]`).querySelector('.insurance-label').textContent;
+
+                    policies.forEach(policy => {
+                        if (policy === 'none') return;
+
+                        const policyName = document.querySelector(`[data-policy="${policy}"]`).querySelector('.insurance-label').textContent;
+                        const coverage = coverageMatrix[claim]?.[policy];
+
+                        if (coverage) {
+                            coverageResults.push({
+                                claim: claimName,
+                                policy: policyName,
+                                ...coverage
+                            });
+                            if (coverage.covered) hasAnyCoverage = true;
+                        }
+                    });
+                });
+
+                // Sort by likelihood
+                const order = { 'HIGH': 1, 'MEDIUM': 2, 'LOW': 3 };
+                coverageResults.sort((a, b) => order[a.likelihood] - order[b.likelihood]);
+
+                // Build results HTML
+                const goodCoverage = coverageResults.filter(r => r.likelihood === 'HIGH' && r.covered);
+                const maybeCoverage = coverageResults.filter(r => r.likelihood === 'MEDIUM' && r.covered);
+                const unlikelyCoverage = coverageResults.filter(r => !r.covered || r.likelihood === 'LOW');
+
+                if (goodCoverage.length > 0) {
+                    html += `
+                        <div style="background: #ecfdf5; border: 2px solid #059669; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                            <h4 style="color: #065f46; margin: 0 0 15px 0;">&#9989; Likely Covered - Take Action Now</h4>
+                            ${goodCoverage.map(r => `
+                                <div style="background: white; border-radius: 8px; padding: 15px; margin-bottom: 10px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                        <strong style="color: #1f2937;">${r.policy}</strong>
+                                        <span style="background: #059669; color: white; padding: 2px 10px; border-radius: 20px; font-size: 12px;">HIGH</span>
+                                    </div>
+                                    <p style="color: #374151; margin: 0; font-size: 14px;">${r.note}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+
+                if (maybeCoverage.length > 0) {
+                    html += `
+                        <div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                            <h4 style="color: #92400e; margin: 0 0 15px 0;">&#128270; Possible Coverage - Worth Filing</h4>
+                            ${maybeCoverage.map(r => `
+                                <div style="background: white; border-radius: 8px; padding: 15px; margin-bottom: 10px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                        <strong style="color: #1f2937;">${r.policy}</strong>
+                                        <span style="background: #f59e0b; color: white; padding: 2px 10px; border-radius: 20px; font-size: 12px;">MEDIUM</span>
+                                    </div>
+                                    <p style="color: #374151; margin: 0; font-size: 14px;">${r.note}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+
+                if (unlikelyCoverage.length > 0 && (goodCoverage.length > 0 || maybeCoverage.length > 0)) {
+                    html += `
+                        <div style="background: #f3f4f6; border: 1px solid #d1d5db; border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                            <h4 style="color: #6b7280; margin: 0 0 15px 0;">&#10060; Unlikely to Cover This Claim</h4>
+                            ${unlikelyCoverage.slice(0, 3).map(r => `
+                                <div style="background: white; border-radius: 8px; padding: 12px; margin-bottom: 8px;">
+                                    <strong style="color: #6b7280; font-size: 14px;">${r.policy}</strong>
+                                    <p style="color: #9ca3af; margin: 5px 0 0 0; font-size: 13px;">${r.note}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+
+                if (!hasAnyCoverage) {
+                    html = `
+                        <div style="background: #fef2f2; border: 2px solid #dc2626; border-radius: 12px; padding: 25px; margin-bottom: 20px;">
+                            <h4 style="color: #991b1b; margin: 0 0 15px 0;">&#9888; Coverage Gap Detected</h4>
+                            <p style="color: #7f1d1d; margin: 0;">Based on your claim type and insurance policies, you may not have coverage for this specific demand. The policies you have don't typically cover this type of claim.</p>
+                            ${unlikelyCoverage.slice(0, 3).map(r => `
+                                <div style="background: white; border-radius: 8px; padding: 12px; margin-top: 10px;">
+                                    <strong style="color: #6b7280; font-size: 14px;">${r.policy}</strong>
+                                    <p style="color: #9ca3af; margin: 5px 0 0 0; font-size: 13px;">${r.note}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+
+                // Add action steps if there's any coverage
+                if (hasAnyCoverage) {
+                    html += `
+                        <div style="background: #eff6ff; border: 2px solid #3b82f6; border-radius: 12px; padding: 20px;">
+                            <h4 style="color: #1e40af; margin: 0 0 15px 0;">&#128203; Your Next Steps</h4>
+                            <ol style="margin: 0; padding-left: 20px; color: #1e3a5f;">
+                                <li style="margin-bottom: 12px;"><strong>Notify your insurer within 24-48 hours.</strong> Call the claims hotline on your policy card. Delay can void coverage.</li>
+                                <li style="margin-bottom: 12px;"><strong>Send written notice.</strong> Email or fax the demand letter to your insurer's claims department with a cover letter stating you are "tendering this matter for defense and indemnity."</li>
+                                <li style="margin-bottom: 12px;"><strong>Do NOT admit fault, apologize, or make any payments.</strong> This could void your coverage.</li>
+                                <li style="margin-bottom: 12px;"><strong>Get claim number and adjuster contact info.</strong> Document everything in writing.</li>
+                                <li style="margin-bottom: 12px;"><strong>Watch for "Reservation of Rights" letter.</strong> If you receive one, consider consulting an independent attorney.</li>
+                                <li style="margin-bottom: 0;"><strong>Do not respond to the demand letter</strong> until your insurer provides guidance or assigns counsel.</li>
+                            </ol>
+                        </div>
+                    `;
+                }
+            }
+
+            outputDiv.innerHTML = html;
             resultDiv.classList.add('visible');
             resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
