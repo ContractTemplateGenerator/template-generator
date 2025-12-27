@@ -805,8 +805,104 @@ function genDownloadDoc() {
     genShowToast('Document downloaded!', 'success');
 }
 
+function genSetupInlineEditing() {
+    document.querySelectorAll('.gen-highlight[contenteditable="true"]').forEach(function(el) {
+        el.addEventListener('blur', function() {
+            const fieldId = this.dataset.field;
+            const newValue = this.textContent.trim();
+            if (newValue.startsWith('[') && newValue.endsWith(']')) return;
+            const inputMap = {
+                'yourName': 'genYourName',
+                'yourAddress': 'genYourAddress',
+                'yourEmail': 'genYourEmail',
+                'sellerName': 'genSellerName',
+                'sellerAddress': 'genSellerAddress',
+                'petName': 'genPetName',
+                'petBreed': 'genPetBreed',
+                'purchaseDate': 'genPurchaseDate',
+                'state': 'genState',
+                'diagnosis': 'genDiagnosis',
+                'diagnosisDate': 'genDiagnosisDate',
+                'vetClinic': 'genVetClinic',
+                'sellerClaims': 'genSellerClaims',
+                'fraudDetails': 'genFraudDetails'
+            };
+            const inputId = inputMap[fieldId];
+            if (inputId) {
+                const input = document.getElementById(inputId);
+                if (input) {
+                    input.value = newValue;
+                    this.classList.remove('empty');
+                    genHasCustomEdits = true;
+                }
+            }
+        });
+        el.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                this.blur();
+            }
+        });
+        el.addEventListener('focus', function() {
+            this.classList.add('gen-highlight-anim');
+            setTimeout(() => this.classList.remove('gen-highlight-anim'), 1500);
+        });
+    });
+}
+
+function genToggleEditMode() {
+    const preview = document.getElementById('genDocPreview');
+    const btn = document.getElementById('genEditModeBtn');
+    const toolbar = document.getElementById('genEditToolbar');
+
+    if (!genIsEditMode) {
+        genSavedHTML = preview.innerHTML;
+        preview.contentEditable = 'true';
+        preview.classList.add('full-edit-mode');
+        btn.classList.add('active');
+        btn.textContent = '✏️ Editing...';
+        toolbar.classList.add('visible');
+        genIsEditMode = true;
+        genShowToast('Edit mode enabled. Click Save when done.', 'success');
+    } else {
+        genCancelEdits();
+    }
+}
+
+function genSaveEdits() {
+    const preview = document.getElementById('genDocPreview');
+    const btn = document.getElementById('genEditModeBtn');
+    const toolbar = document.getElementById('genEditToolbar');
+
+    preview.contentEditable = 'false';
+    preview.classList.remove('full-edit-mode');
+    btn.classList.remove('active');
+    btn.textContent = '✏️ Edit Mode';
+    toolbar.classList.remove('visible');
+    genIsEditMode = false;
+    genHasCustomEdits = true;
+    genShowToast('Edits saved!', 'success');
+}
+
+function genCancelEdits() {
+    const preview = document.getElementById('genDocPreview');
+    const btn = document.getElementById('genEditModeBtn');
+    const toolbar = document.getElementById('genEditToolbar');
+
+    preview.innerHTML = genSavedHTML;
+    preview.contentEditable = 'false';
+    preview.classList.remove('full-edit-mode');
+    btn.classList.remove('active');
+    btn.textContent = '✏️ Edit Mode';
+    toolbar.classList.remove('visible');
+    genIsEditMode = false;
+    genSetupInlineEditing();
+    genShowToast('Edits cancelled', 'success');
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     genUpdatePreview();
+    genSetupInlineEditing();
 });
 </script>
 
