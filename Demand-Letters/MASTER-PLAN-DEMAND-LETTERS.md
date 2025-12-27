@@ -17,7 +17,7 @@
 
 ## CURRENT INVENTORY (Dec 27, 2025)
 
-### California Pillar Pages: 48 Total
+### California Pillar Pages: 59 Total
 
 | Category | CA Pages | General Pages | Status |
 |----------|----------|---------------|--------|
@@ -27,8 +27,8 @@
 | └─ Premises-Liability | 1 | - | Light |
 | └─ Root-level PI | 13 | - | Growing |
 | **Employment** | **6** | 17 | Good |
-| **Insurance** | **2** | 6 | Needs growth |
-| **Business** | **1** | 18 | Needs CA depth |
+| **Insurance** | **10** | 6 | STRONG |
+| **Business** | **8** | 18 | Good |
 | **Consumer** | **2** | 19 | Needs CA depth |
 | **Landlord-Tenant** | **2** | 15 | Needs CA depth |
 | **Real-Estate** | **2** | 5 | Light |
@@ -89,12 +89,13 @@ All major categories have index.html pages including:
 | 1.7 | Consumer | CLRA violations, auto-renewal fraud, subscription traps |
 | 1.8 | Real-Estate | agent-negligence, title-defect, HOA disputes |
 
-**Completed CA Pillar Pages (48):**
+**Completed CA Pillar Pages (59):**
 - PI/Car-Accidents: 9 pages (rear-end, t-bone, multi-vehicle, parking-lot, highway, intersection, sideswipe, rollover, uber-lyft)
 - PI/root: 13 pages (motorcycle, pedestrian, bicycle, grocery-slip-fall, premises-liability, etc.)
 - Employment: 6 pages (wages, overtime, harassment, discrimination, wrongful-termination, personnel-file)
-- Insurance: 2 pages (bad-faith, property-damage)
-- Others: 18 pages across Business, Consumer, Landlord-Tenant, Real-Estate, Automotive, Home-Services, Medical
+- Insurance: 10 pages (bad-faith, property-damage, undervalued-claim, policy-interpretation, claim-investigation, reservation-of-rights, first-party-property, life-insurance-denial, UM/UIM, delayed-payment)
+- Business: 8 pages (breach-of-contract, vendor-non-performance, nda-breach, non-compete, franchise-dispute, commercial-lease-breach, unpaid-invoice, partnership-dispute)
+- Others: 11 pages across Consumer, Landlord-Tenant, Real-Estate, Automotive, Home-Services, Medical
 
 ### PHASE 2: Category Deepening
 **Goal**: Get every category to 10+ CA pillar pages
@@ -102,8 +103,8 @@ All major categories have index.html pages including:
 **Priority gaps:**
 | Category | Current CA | Target | Gap |
 |----------|-----------|--------|-----|
-| Insurance | 2 | 10 | +8 |
-| Business | 1 | 8 | +7 |
+| Insurance | 10 | 10 | ✅ DONE |
+| Business | 8 | 8 | ✅ DONE |
 | Consumer | 2 | 8 | +6 |
 | Landlord-Tenant | 2 | 8 | +6 |
 | Real-Estate | 2 | 6 | +4 |
@@ -197,8 +198,10 @@ All demand letter pages should display:
 ## SUCCESS METRICS
 
 ### Content Metrics
-- [x] 48 California pillar pages built
+- [x] 59 California pillar pages built
 - [ ] 100+ CA pillar pages (Phase 1 complete)
+- [x] Insurance category at 10+ CA pages ✓
+- [x] Business category at 8 CA pages ✓
 - [ ] All 13 categories have 10+ CA pages
 - [ ] Respond-side parity for top 50 pages
 
