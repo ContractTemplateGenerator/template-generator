@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demand Letter Workbench | Terms.Law</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --respond-red: #dc2626;
+            --success: #10b981;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--gray-100);
+            color: var(--gray-800);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 800;
+            text-decoration: none;
+            background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 24px;
+        }
+
+        .header-nav a {
+            color: var(--gray-300);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .header-nav a:hover { color: white; }
+
+        /* Control Panel */
+        .control-panel {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            padding: 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .control-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #64748b;
+        }
+
+        /* Situation Dropdown */
+        .situation-select {
+            padding: 12px 40px 12px 16px;
+            font-size: 1rem;
+            font-weight: 600;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='white'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            min-width: 280px;
+        }
+
+        .situation-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .situation-select option {
+            background: var(--gray-800);
+            color: white;
+        }
+
+        /* Toggle Buttons */
+        .toggle-group {
+            display: flex;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            padding: 4px;
+        }
+
+        .toggle-btn {
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: transparent;
+            color: #94a3b8;
+        }
+
+        .toggle-btn:hover {
+            color: white;
+        }
+
+        .toggle-btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 2px 10px rgba(37, 99, 235, 0.4);
+        }
+
+        .toggle-btn.active.respond {
+            background: var(--respond-red);
+            box-shadow: 0 2px 10px rgba(220, 38, 38, 0.4);
+        }
+
+        /* Language Toggles */
+        .lang-toggle {
+            display: flex;
+            gap: 4px;
+        }
+
+        .lang-btn {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: rgba(255,255,255,0.05);
+            color: #94a3b8;
+        }
+
+        .lang-btn:hover {
+            border-color: rgba(255,255,255,0.4);
+            color: white;
+        }
+
+        .lang-btn.active {
+            background: white;
+            border-color: white;
+            color: var(--gray-800);
+        }
+
+        .lang-btn.unavailable {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            margin-left: auto;
+            display: flex;
+            gap: 12px;
+        }
+
+        .action-btn {
+            padding: 12px 24px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .action-btn.primary {
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            color: white;
+        }
+
+        .action-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+        }
+
+        .action-btn.secondary {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        .action-btn.secondary:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        /* Content Area */
+        .content-area {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+
+        .content-frame {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            min-height: 600px;
+            overflow: hidden;
+        }
+
+        .content-frame iframe {
+            width: 100%;
+            height: 800px;
+            border: none;
+        }
+
+        /* Loading State */
+        .loading-overlay {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: rgba(255,255,255,0.9);
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .loading-overlay.visible {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--gray-200);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: var(--gray-800);
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .status-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-badge.write {
+            background: rgba(37, 99, 235, 0.2);
+            color: #60a5fa;
+        }
+
+        .status-badge.respond {
+            background: rgba(220, 38, 38, 0.2);
+            color: #f87171;
+        }
+
+        .status-badge.lang {
+            background: rgba(255,255,255,0.1);
+            color: #94a3b8;
+        }
+
+        .status-path {
+            font-size: 0.8rem;
+            color: #64748b;
+            font-family: monospace;
+        }
+
+        /* Generator Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .modal-overlay.visible {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 1400px;
+            height: 90vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gray-100);
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background: var(--gray-200);
+        }
+
+        .modal-content iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .control-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .action-buttons {
+                margin-left: 0;
+                justify-content: center;
+            }
+
+            .situation-select {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <a href="../demand-letters-landing.html" class="logo">Terms.Law</a>
+        <nav class="header-nav">
+            <a href="../demand-letters-landing.html">All Demand Letters</a>
+            <a href="../generator/">Generator</a>
+            <a href="mailto:owner@terms.law">Contact</a>
+        </nav>
+    </header>
+
+    <!-- Control Panel -->
+    <div class="control-panel">
+        <div class="control-container">
+            <!-- Situation Selector -->
+            <div class="control-group">
+                <span class="control-label">Situation</span>
+                <select id="situationSelect" class="situation-select" onchange="updateContent()">
+                    <optgroup label="Employment">
+                        <option value="unpaid-wages" selected>Unpaid Wages</option>
+                        <option value="wrongful-termination">Wrongful Termination</option>
+                        <option value="discrimination">Workplace Discrimination</option>
+                    </optgroup>
+                    <optgroup label="Landlord-Tenant">
+                        <option value="security-deposit">Security Deposit</option>
+                        <option value="habitability">Habitability Issues</option>
+                    </optgroup>
+                    <optgroup label="Personal Injury">
+                        <option value="car-accident">Car Accident</option>
+                        <option value="slip-fall">Slip & Fall</option>
+                    </optgroup>
+                    <optgroup label="Business">
+                        <option value="unpaid-invoice">Unpaid Invoice</option>
+                        <option value="breach-contract">Breach of Contract</option>
+                    </optgroup>
+                    <optgroup label="Consumer">
+                        <option value="defective-product">Defective Product</option>
+                        <option value="refund">Refund Demand</option>
+                    </optgroup>
+                    <optgroup label="Insurance">
+                        <option value="claim-denial">Claim Denial</option>
+                        <option value="bad-faith">Bad Faith</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <!-- Write/Respond Toggle -->
+            <div class="control-group">
+                <span class="control-label">Side</span>
+                <div class="toggle-group" id="sideToggle">
+                    <button class="toggle-btn active" data-side="write" onclick="setSide('write')">
+                        ✍️ Write
+                    </button>
+                    <button class="toggle-btn" data-side="respond" onclick="setSide('respond')">
+                        📩 Respond
+                    </button>
+                </div>
+            </div>
+
+            <!-- State Toggle -->
+            <div class="control-group">
+                <span class="control-label">State</span>
+                <div class="lang-toggle" id="stateToggle">
+                    <button class="lang-btn active" data-state="ca" onclick="setState('ca')">CA</button>
+                    <button class="lang-btn" data-state="az" onclick="setState('az')">AZ</button>
+                    <button class="lang-btn" data-state="nv" onclick="setState('nv')">NV</button>
+                    <button class="lang-btn" data-state="or" onclick="setState('or')">OR</button>
+                    <button class="lang-btn" data-state="wa" onclick="setState('wa')">WA</button>
+                    <button class="lang-btn" data-state="other" onclick="setState('other')">Other</button>
+                </div>
+            </div>
+
+            <!-- Language Toggle -->
+            <div class="control-group">
+                <span class="control-label">Language</span>
+                <div class="lang-toggle" id="langToggle">
+                    <button class="lang-btn active" data-lang="en" onclick="setLang('en')">EN</button>
+                    <button class="lang-btn" data-lang="ru" onclick="setLang('ru')">RU</button>
+                    <button class="lang-btn" data-lang="es" onclick="setLang('es')">ES</button>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="action-btn secondary" onclick="openGenerator()">
+                    ⚡ Generate Letter
+                </button>
+                <a href="mailto:owner@terms.law" class="action-btn primary">
+                    📧 Contact Attorney
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+        <div class="status-info">
+            <span class="status-badge write" id="sideBadge">✍️ Write Side</span>
+            <span class="status-badge lang" id="stateBadge">🌴 California</span>
+            <span class="status-badge lang" id="langBadge">🇺🇸 English</span>
+        </div>
+        <span class="status-path" id="contentPath">content/unpaid-wages/ca-write-en.html</span>
+    </div>
+
+    <!-- Content Area -->
+    <div class="content-area">
+        <div class="content-frame" style="position: relative;">
+            <div class="loading-overlay" id="loadingOverlay">
+                <div class="loading-spinner"></div>
+                <span>Loading content...</span>
+            </div>
+            <iframe id="contentFrame" src="content/unpaid-wages/write-en.html"></iframe>
+        </div>
+    </div>
+
+    <!-- Generator Modal -->
+    <div class="modal-overlay" id="generatorModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeGenerator()">&times;</button>
+            <iframe id="generatorFrame" src=""></iframe>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let currentSituation = 'unpaid-wages';
+        let currentSide = 'write';
+        let currentState = 'ca';
+        let currentLang = 'en';
+
+        // State names for display
+        const stateNames = {
+            ca: '🌴 California',
+            az: '🌵 Arizona',
+            nv: '🎰 Nevada',
+            or: '🌲 Oregon',
+            wa: '☔ Washington',
+            other: '🇺🇸 All Other States'
+        };
+
+        // Update content based on selections
+        function updateContent() {
+            currentSituation = document.getElementById('situationSelect').value;
+            loadContent();
+            updateURL();
+        }
+
+        function setSide(side) {
+            currentSide = side;
+
+            // Update toggle buttons
+            document.querySelectorAll('#sideToggle .toggle-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.side === side) {
+                    btn.classList.add('active');
+                    if (side === 'respond') btn.classList.add('respond');
+                    else btn.classList.remove('respond');
+                }
+            });
+
+            // Update badge
+            const badge = document.getElementById('sideBadge');
+            if (side === 'write') {
+                badge.className = 'status-badge write';
+                badge.textContent = '✍️ Write Side';
+            } else {
+                badge.className = 'status-badge respond';
+                badge.textContent = '📩 Respond Side';
+            }
+
+            loadContent();
+            updateURL();
+        }
+
+        function setState(state) {
+            currentState = state;
+
+            // Update toggle buttons
+            document.querySelectorAll('#stateToggle .lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.state === state) btn.classList.add('active');
+            });
+
+            // Update badge
+            document.getElementById('stateBadge').textContent = stateNames[state] || state.toUpperCase();
+
+            loadContent();
+            updateURL();
+        }
+
+        function setLang(lang) {
+            currentLang = lang;
+
+            // Update toggle buttons
+            document.querySelectorAll('#langToggle .lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.lang === lang) btn.classList.add('active');
+            });
+
+            // Update badge
+            const flags = { en: '🇺🇸 English', ru: '🇷🇺 Русский', es: '🇪🇸 Español' };
+            document.getElementById('langBadge').textContent = flags[lang];
+
+            loadContent();
+            updateURL();
+        }
+
+        function loadContent() {
+            // Path format: content/{situation}/{state}-{side}-{lang} (no .html - serve strips it)
+            const path = `content/${currentSituation}/${currentState}-${currentSide}-${currentLang}`;
+            document.getElementById('contentPath').textContent = path + '.html';
+
+            // Show loading
+            document.getElementById('loadingOverlay').classList.add('visible');
+
+            const iframe = document.getElementById('contentFrame');
+            iframe.onload = () => {
+                document.getElementById('loadingOverlay').classList.remove('visible');
+            };
+            iframe.onerror = () => {
+                document.getElementById('loadingOverlay').classList.remove('visible');
+            };
+            iframe.src = path;
+        }
+
+        function updateURL() {
+            const params = new URLSearchParams();
+            params.set('s', currentSituation);
+            params.set('state', currentState);
+            params.set('side', currentSide);
+            params.set('lang', currentLang);
+            history.replaceState(null, '', '?' + params.toString());
+        }
+
+        function openGenerator() {
+            // Map state codes to generator state names
+            const stateMap = { ca: 'california', az: 'arizona', nv: 'nevada', or: 'oregon', wa: 'washington', other: 'other' };
+            const situationMap = {
+                'unpaid-wages': 'unpaid-wages',
+                'security-deposit': 'security-deposit',
+                'unpaid-invoice': 'unpaid-invoice',
+                'breach-contract': 'breach-of-contract'
+            };
+
+            const genState = stateMap[currentState] || 'california';
+            const genSituation = situationMap[currentSituation] || 'unpaid-wages';
+            document.getElementById('generatorFrame').src = `../generator/?state=${genState}&situation=${genSituation}`;
+            document.getElementById('generatorModal').classList.add('visible');
+        }
+
+        function closeGenerator() {
+            document.getElementById('generatorModal').classList.remove('visible');
+            document.getElementById('generatorFrame').src = '';
+        }
+
+        // Close modal on escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeGenerator();
+        });
+
+        // Parse URL params on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+
+            if (params.get('s')) {
+                currentSituation = params.get('s');
+                document.getElementById('situationSelect').value = currentSituation;
+            }
+
+            if (params.get('state')) {
+                setState(params.get('state'));
+            }
+
+            if (params.get('side')) {
+                setSide(params.get('side'));
+            }
+
+            if (params.get('lang')) {
+                setLang(params.get('lang'));
+            }
+
+            loadContent();
+        });
+    </script>
+</body>
+</html>

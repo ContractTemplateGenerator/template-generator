@@ -622,12 +622,12 @@
                     <div class="selector-box">
                         <div class="selector-label">State</div>
                         <select id="stateSelect" class="selector-select" onchange="loadStateModule()">
-                            <option value="">Select State...</option>
                             <option value="california" selected>California</option>
-                            <option value="texas">Texas</option>
-                            <option value="new-york">New York</option>
-                            <option value="florida">Florida</option>
-                            <!-- More states will be added -->
+                            <option value="arizona">Arizona</option>
+                            <option value="nevada">Nevada</option>
+                            <option value="oregon">Oregon</option>
+                            <option value="washington">Washington</option>
+                            <option value="other">All Other States</option>
                         </select>
                     </div>
                     <div class="selector-box">
@@ -998,6 +998,335 @@
             },
             getPenaltyLanguage: function(situation) {
                 return 'Under Florida Statutes Section 448.08, I am entitled to recover unpaid wages plus attorney\'s fees and costs. If this matter proceeds to court, I will seek all available remedies.';
+            }
+        },
+
+        'arizona': {
+            name: 'Arizona',
+            abbreviation: 'AZ',
+            wageClaimInfo: {
+                agency: 'Arizona Industrial Commission',
+                agencyUrl: 'https://www.azica.gov/',
+                waitingTimePenalty: 'Treble damages for willful nonpayment (A.R.S. § 23-355)',
+                interestRate: '10% per annum (A.R.S. § 44-1201)',
+                statuteOfLimitations: '1 year for wage claims (A.R.S. § 23-364)',
+                smallClaimsLimit: '$3,500'
+            },
+            statutes: {
+                'unpaid-wages': [
+                    { code: 'A.R.S. § 23-351', desc: 'Payment of wages - timing requirements' },
+                    { code: 'A.R.S. § 23-353', desc: 'Final wages due within 7 days or next payday' },
+                    { code: 'A.R.S. § 23-355', desc: 'Treble damages for willful withholding of wages' }
+                ],
+                'breach-of-contract': [
+                    { code: 'A.R.S. § 44-1201', desc: 'Interest rate on judgments (10%)' },
+                    { code: 'A.R.S. § 12-548', desc: '6-year statute of limitations for written contracts' }
+                ],
+                'security-deposit': [
+                    { code: 'A.R.S. § 33-1321', desc: 'Security deposit requirements and limits' },
+                    { code: 'A.R.S. § 33-1321(D)', desc: '14-day deadline to return deposit' },
+                    { code: 'A.R.S. § 33-1321(E)', desc: 'Wrongful retention: 2x deposit penalty' }
+                ],
+                'unpaid-invoice': [
+                    { code: 'A.R.S. § 44-1201', desc: '10% interest on unpaid amounts' },
+                    { code: 'A.R.S. § 12-341.01', desc: 'Attorney fees in contract actions' }
+                ]
+            },
+            getSummary: function(situation) {
+                const statutes = this.statutes[situation] || [];
+                let html = '<ul>';
+                statutes.forEach(s => {
+                    html += `<li><strong>${s.code}:</strong> ${s.desc}</li>`;
+                });
+                html += '</ul>';
+                return html;
+            },
+            getDeadlineRecommendation: function(situation) {
+                switch(situation) {
+                    case 'security-deposit':
+                        return 'Arizona requires return within 14 days. A 10-day demand is reasonable.';
+                    case 'unpaid-wages':
+                        return 'Arizona has a short 1-year statute of limitations. Act quickly.';
+                    default:
+                        return '14-21 days is typical for Arizona demands.';
+                }
+            },
+            getLegalCitations: function(situation) {
+                const statutes = this.statutes[situation] || [];
+                return statutes.map(s => s.code).join(', ');
+            },
+            getPenaltyLanguage: function(situation) {
+                switch(situation) {
+                    case 'unpaid-wages':
+                        return 'Under Arizona Revised Statutes Section 23-355, willful withholding of wages entitles me to treble damages (three times the amount owed), plus costs and reasonable attorney fees.';
+                    case 'security-deposit':
+                        return 'Under A.R.S. § 33-1321(E), if you wrongfully withhold any portion of my security deposit, you may be liable for twice the amount wrongfully withheld, plus court costs.';
+                    default:
+                        return 'Under Arizona law (A.R.S. § 44-1201), I am entitled to interest at the rate of 10% per annum on all amounts owed.';
+                }
+            }
+        },
+
+        'nevada': {
+            name: 'Nevada',
+            abbreviation: 'NV',
+            wageClaimInfo: {
+                agency: 'Nevada Labor Commissioner',
+                agencyUrl: 'https://labor.nv.gov/',
+                waitingTimePenalty: 'Continued wages up to 30 days (NRS 608.040)',
+                interestRate: 'Prime + 2% (NRS 99.040)',
+                statuteOfLimitations: '2 years for wage claims',
+                smallClaimsLimit: '$10,000'
+            },
+            statutes: {
+                'unpaid-wages': [
+                    { code: 'NRS 608.020', desc: 'Semi-monthly wage payment required' },
+                    { code: 'NRS 608.040', desc: 'Final wages due immediately upon termination' },
+                    { code: 'NRS 608.050', desc: 'Penalty: wages continue up to 30 days' }
+                ],
+                'breach-of-contract': [
+                    { code: 'NRS 99.040', desc: 'Interest rate: prime + 2%' },
+                    { code: 'NRS 11.190', desc: '6-year statute of limitations for written contracts' }
+                ],
+                'security-deposit': [
+                    { code: 'NRS 118A.242', desc: 'Security deposit requirements' },
+                    { code: 'NRS 118A.242(3)', desc: '30-day deadline to return deposit' },
+                    { code: 'NRS 118A.242(5)', desc: 'Failure to return: full deposit forfeited to tenant' }
+                ],
+                'unpaid-invoice': [
+                    { code: 'NRS 99.040', desc: 'Interest at prime rate + 2%' },
+                    { code: 'NRS 18.010', desc: 'Attorney fees available in contract disputes' }
+                ]
+            },
+            getSummary: function(situation) {
+                const statutes = this.statutes[situation] || [];
+                let html = '<ul>';
+                statutes.forEach(s => {
+                    html += `<li><strong>${s.code}:</strong> ${s.desc}</li>`;
+                });
+                html += '</ul>';
+                return html;
+            },
+            getDeadlineRecommendation: function(situation) {
+                switch(situation) {
+                    case 'security-deposit':
+                        return 'Nevada allows 30 days. A 14-day demand is reasonable.';
+                    case 'unpaid-wages':
+                        return 'Nevada requires immediate payment upon termination. 7-10 days is appropriate.';
+                    default:
+                        return '14-21 days is typical for Nevada demands.';
+                }
+            },
+            getLegalCitations: function(situation) {
+                const statutes = this.statutes[situation] || [];
+                return statutes.map(s => s.code).join(', ');
+            },
+            getPenaltyLanguage: function(situation) {
+                switch(situation) {
+                    case 'unpaid-wages':
+                        return 'Under Nevada Revised Statutes 608.050, if final wages are not paid when due, my wages continue at the same rate for up to 30 days until paid. This penalty accrues automatically.';
+                    case 'security-deposit':
+                        return 'Under NRS 118A.242(5), if you fail to return my deposit or provide an itemized statement within 30 days, you forfeit all right to withhold any portion of the deposit.';
+                    default:
+                        return 'Under Nevada law, I am entitled to interest at the prime rate plus 2% on all amounts owed from the date payment was due.';
+                }
+            }
+        },
+
+        'oregon': {
+            name: 'Oregon',
+            abbreviation: 'OR',
+            wageClaimInfo: {
+                agency: 'Oregon Bureau of Labor and Industries (BOLI)',
+                agencyUrl: 'https://www.oregon.gov/boli/',
+                waitingTimePenalty: 'Penalty wages up to 30 days (ORS 652.150)',
+                interestRate: '9% per annum (ORS 82.010)',
+                statuteOfLimitations: '2 years for wage claims',
+                smallClaimsLimit: '$10,000'
+            },
+            statutes: {
+                'unpaid-wages': [
+                    { code: 'ORS 652.140', desc: 'Final wages due immediately upon termination' },
+                    { code: 'ORS 652.145', desc: 'Resignation: wages due by end of next business day' },
+                    { code: 'ORS 652.150', desc: 'Penalty wages: up to 30 days of wages' }
+                ],
+                'breach-of-contract': [
+                    { code: 'ORS 82.010', desc: 'Legal interest rate: 9% per annum' },
+                    { code: 'ORS 12.080', desc: '6-year statute of limitations for written contracts' }
+                ],
+                'security-deposit': [
+                    { code: 'ORS 90.300', desc: 'Security deposit requirements' },
+                    { code: 'ORS 90.300(13)', desc: '31-day deadline to return deposit' },
+                    { code: 'ORS 90.300(16)', desc: 'Bad faith: 2x deposit penalty' }
+                ],
+                'unpaid-invoice': [
+                    { code: 'ORS 82.010', desc: '9% interest on unpaid amounts' },
+                    { code: 'ORS 20.096', desc: 'Attorney fees in contract disputes' }
+                ]
+            },
+            getSummary: function(situation) {
+                const statutes = this.statutes[situation] || [];
+                let html = '<ul>';
+                statutes.forEach(s => {
+                    html += `<li><strong>${s.code}:</strong> ${s.desc}</li>`;
+                });
+                html += '</ul>';
+                return html;
+            },
+            getDeadlineRecommendation: function(situation) {
+                switch(situation) {
+                    case 'security-deposit':
+                        return 'Oregon allows 31 days. A 14-day demand is reasonable.';
+                    case 'unpaid-wages':
+                        return 'Oregon requires immediate payment upon termination. 7-10 days is appropriate.';
+                    default:
+                        return '14-21 days is typical for Oregon demands.';
+                }
+            },
+            getLegalCitations: function(situation) {
+                const statutes = this.statutes[situation] || [];
+                return statutes.map(s => s.code).join(', ');
+            },
+            getPenaltyLanguage: function(situation) {
+                switch(situation) {
+                    case 'unpaid-wages':
+                        return 'Under Oregon Revised Statutes 652.150, if final wages are willfully withheld, I am entitled to penalty wages equal to 8 hours of pay for each day wages remain unpaid, up to 30 days.';
+                    case 'security-deposit':
+                        return 'Under ORS 90.300(16), if you retain any portion of my deposit in bad faith, you may be liable for twice the amount wrongfully withheld, plus court costs and attorney fees.';
+                    default:
+                        return 'Under Oregon law (ORS 82.010), I am entitled to interest at the rate of 9% per annum on all amounts owed.';
+                }
+            }
+        },
+
+        'washington': {
+            name: 'Washington',
+            abbreviation: 'WA',
+            wageClaimInfo: {
+                agency: 'Washington Department of Labor & Industries',
+                agencyUrl: 'https://www.lni.wa.gov/',
+                waitingTimePenalty: 'Double damages for willful withholding (RCW 49.52.070)',
+                interestRate: '12% per annum (RCW 19.52.010)',
+                statuteOfLimitations: '3 years for wage claims',
+                smallClaimsLimit: '$10,000'
+            },
+            statutes: {
+                'unpaid-wages': [
+                    { code: 'RCW 49.48.010', desc: 'Wages due at regular pay intervals' },
+                    { code: 'RCW 49.48.010', desc: 'Final wages due at end of pay period' },
+                    { code: 'RCW 49.52.050', desc: 'Willful withholding is a misdemeanor' },
+                    { code: 'RCW 49.52.070', desc: 'Double damages for willful withholding' }
+                ],
+                'breach-of-contract': [
+                    { code: 'RCW 19.52.010', desc: 'Legal interest rate: 12% per annum' },
+                    { code: 'RCW 4.16.040', desc: '6-year statute of limitations for written contracts' }
+                ],
+                'security-deposit': [
+                    { code: 'RCW 59.18.260', desc: 'Security deposit requirements' },
+                    { code: 'RCW 59.18.280', desc: '21-day deadline to return deposit' },
+                    { code: 'RCW 59.18.280', desc: 'Bad faith: 2x deposit plus attorney fees' }
+                ],
+                'unpaid-invoice': [
+                    { code: 'RCW 19.52.010', desc: '12% interest on unpaid amounts' },
+                    { code: 'RCW 4.84.330', desc: 'Attorney fees in contract disputes' }
+                ]
+            },
+            getSummary: function(situation) {
+                const statutes = this.statutes[situation] || [];
+                let html = '<ul>';
+                statutes.forEach(s => {
+                    html += `<li><strong>${s.code}:</strong> ${s.desc}</li>`;
+                });
+                html += '</ul>';
+                return html;
+            },
+            getDeadlineRecommendation: function(situation) {
+                switch(situation) {
+                    case 'security-deposit':
+                        return 'Washington requires return within 21 days. A 14-day demand is reasonable.';
+                    case 'unpaid-wages':
+                        return 'Washington requires payment by next regular payday. 10-14 days is appropriate.';
+                    default:
+                        return '14-21 days is typical for Washington demands.';
+                }
+            },
+            getLegalCitations: function(situation) {
+                const statutes = this.statutes[situation] || [];
+                return statutes.map(s => s.code).join(', ');
+            },
+            getPenaltyLanguage: function(situation) {
+                switch(situation) {
+                    case 'unpaid-wages':
+                        return 'Under RCW 49.52.070, willful withholding of wages entitles me to double the amount of wages unlawfully withheld, plus costs and reasonable attorney fees. Additionally, willful withholding is a misdemeanor under RCW 49.52.050.';
+                    case 'security-deposit':
+                        return 'Under RCW 59.18.280, if you fail to return my deposit within 21 days or act in bad faith, you may be liable for twice the amount wrongfully withheld, plus court costs and reasonable attorney fees.';
+                    default:
+                        return 'Under Washington law (RCW 19.52.010), I am entitled to interest at the rate of 12% per annum on all amounts owed.';
+                }
+            }
+        },
+
+        'other': {
+            name: 'Your State',
+            abbreviation: '',
+            wageClaimInfo: {
+                agency: 'Your state labor department or U.S. Department of Labor',
+                agencyUrl: 'https://www.dol.gov/agencies/whd',
+                waitingTimePenalty: 'Varies by state',
+                interestRate: 'Typically 6-10% per annum (varies by state)',
+                statuteOfLimitations: 'Typically 2-6 years (varies by state)',
+                smallClaimsLimit: 'Typically $5,000-$25,000 (varies by state)'
+            },
+            statutes: {
+                'unpaid-wages': [
+                    { code: '29 U.S.C. § 206', desc: 'Federal minimum wage (FLSA)' },
+                    { code: '29 U.S.C. § 207', desc: 'Federal overtime requirements (FLSA)' },
+                    { code: '29 U.S.C. § 216(b)', desc: 'FLSA liquidated damages (double wages)' }
+                ],
+                'breach-of-contract': [
+                    { code: 'Common Law', desc: 'Breach of contract - entitled to expectation damages' },
+                    { code: 'UCC § 2-709', desc: 'Seller\'s right to recover price (goods contracts)' }
+                ],
+                'security-deposit': [
+                    { code: 'State Landlord-Tenant Law', desc: 'Most states require return within 14-45 days' },
+                    { code: 'State Security Deposit Statute', desc: 'Check your state\'s specific requirements' }
+                ],
+                'unpaid-invoice': [
+                    { code: 'UCC § 2-709', desc: 'Seller\'s right to recover price of accepted goods' },
+                    { code: 'Common Law', desc: 'Breach of contract for non-payment' }
+                ]
+            },
+            getSummary: function(situation) {
+                const statutes = this.statutes[situation] || [];
+                let html = '<ul>';
+                statutes.forEach(s => {
+                    html += `<li><strong>${s.code}:</strong> ${s.desc}</li>`;
+                });
+                html += '<li><em>Note: Laws vary by state. Look up your specific state statutes for exact citations and deadlines.</em></li>';
+                html += '</ul>';
+                return html;
+            },
+            getDeadlineRecommendation: function(situation) {
+                switch(situation) {
+                    case 'security-deposit':
+                        return 'Most states require 14-45 days. Check your state law for the exact deadline.';
+                    default:
+                        return '14-21 days is standard for most demand letters.';
+                }
+            },
+            getLegalCitations: function(situation) {
+                const statutes = this.statutes[situation] || [];
+                return statutes.map(s => s.code).join(', ');
+            },
+            getPenaltyLanguage: function(situation) {
+                switch(situation) {
+                    case 'unpaid-wages':
+                        return 'Under federal law (FLSA), willful violations may result in liquidated damages equal to the amount of unpaid wages. Many states provide additional penalties. I will pursue all remedies available under applicable federal and state law.';
+                    case 'security-deposit':
+                        return 'Most states impose penalties for wrongful withholding of security deposits, often including statutory damages of 2-3 times the deposit amount plus attorney fees. I will pursue all remedies available under your state\'s landlord-tenant laws.';
+                    default:
+                        return 'I am entitled to recover all damages caused by your breach, plus interest at the legal rate. If this matter proceeds to court, I will also seek attorney fees and costs as permitted by law.';
+                }
             }
         }
     };
@@ -1669,7 +1998,22 @@ ${data.paymentHistory ? `
     // INITIALIZATION
     // ========================================
     document.addEventListener('DOMContentLoaded', function() {
-        // Load default modules
+        // Check for URL parameters (for iframe/modal embedding)
+        const urlParams = new URLSearchParams(window.location.search);
+        const presetState = urlParams.get('state');
+        const presetSituation = urlParams.get('situation');
+
+        // Set state if provided
+        if (presetState && StateModules[presetState]) {
+            document.getElementById('stateSelect').value = presetState;
+        }
+
+        // Set situation if provided
+        if (presetSituation && SituationModules[presetSituation]) {
+            document.getElementById('situationSelect').value = presetSituation;
+        }
+
+        // Load modules
         loadStateModule();
         loadSituationModule();
     });
