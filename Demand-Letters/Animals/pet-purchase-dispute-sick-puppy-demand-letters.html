@@ -50,7 +50,17 @@
 .gen-highlight.empty{background:linear-gradient(135deg,#fee2e2 0%,#fecaca 100%);border-bottom-color:#ef4444;color:#dc2626}
 .gen-toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;background:#1f2937;color:#fff;border-radius:8px;font-size:0.85rem;font-weight:500;box-shadow:0 4px 15px rgba(0,0,0,0.2);transform:translateY(80px);opacity:0;transition:all 0.3s ease;z-index:1000}
 .gen-toast.visible{transform:translateY(0);opacity:1}
-.gen-toast.success{background:#27ae60}</style>
+.gen-toast.success{background:#27ae60}
+.gen-toolbar-btn.active{background:#10b981;border-color:#10b981;color:#fff}
+.gen-edit-toolbar{display:none;align-items:center;gap:8px;padding:8px 16px;background:#f3f4f6;border-bottom:1px solid #e5e7eb}
+.gen-edit-toolbar.visible{display:flex}
+.gen-edit-btn{padding:6px 12px;font-size:0.8rem;font-weight:600;border:1px solid #d1d5db;border-radius:4px;background:#fff;color:#374151;cursor:pointer}
+.gen-edit-btn:hover{background:#f9fafb}
+.gen-edit-btn.save{background:#10b981;border-color:#10b981;color:#fff}
+.gen-edit-btn.cancel{background:#ef4444;border-color:#ef4444;color:#fff}
+#genDocPreview.full-edit-mode{background:#fffef0;border:2px dashed #f59e0b}
+.gen-highlight-anim{animation:highlightPulse 1.5s ease-out}
+@keyframes highlightPulse{0%{box-shadow:0 0 0 0 rgba(245,158,11,0.7)}70%{box-shadow:0 0 0 10px rgba(245,158,11,0)}100%{box-shadow:0 0 0 0 rgba(245,158,11,0)}}</style>
 </head>
 <body>
 <nav class="breadcrumb"><a href="/">Home</a><span class="separator">›</span><a href="/Demand-Letters/">Demands</a><span class="separator">›</span><a href="/Demand-Letters/Animals/">Animals</a><span class="separator">›</span><span class="current">Pet Purchase Disputes</span></nav>
@@ -405,10 +415,19 @@
 <div class="gen-preview-toolbar">
 <span style="font-weight:600;color:#374151;">Live Preview</span>
 <div>
+<button class="gen-toolbar-btn" id="genEditModeBtn" onclick="genToggleEditMode()">✏️ Edit Mode</button>
 <button class="gen-toolbar-btn" onclick="genCopyToClipboard()">Copy</button>
 <button class="gen-toolbar-btn" onclick="genPrintDocument()">Print</button>
 <button class="gen-toolbar-btn primary" onclick="genDownloadDoc()">Download .doc</button>
 </div>
+</div>
+<div class="gen-edit-toolbar" id="genEditToolbar">
+<button class="gen-edit-btn" onclick="document.execCommand('bold')"><b>B</b></button>
+<button class="gen-edit-btn" onclick="document.execCommand('italic')"><i>I</i></button>
+<button class="gen-edit-btn" onclick="document.execCommand('underline')"><u>U</u></button>
+<div style="flex:1;"></div>
+<button class="gen-edit-btn save" onclick="genSaveEdits()">Save</button>
+<button class="gen-edit-btn cancel" onclick="genCancelEdits()">Cancel</button>
 </div>
 <div id="genDocPreview"></div>
 </div>
@@ -520,12 +539,28 @@
 <script>
 function switchTab(tabId,event){const allTabs=document.querySelectorAll('.demand-letter-hub .dl-tab-content');const allButtons=document.querySelectorAll('.demand-letter-hub .dl-tab-button');allTabs.forEach(tab=>tab.classList.remove('active'));allButtons.forEach(btn=>btn.classList.remove('active'));document.getElementById(tabId).classList.add('active');event.currentTarget.classList.add('active');window.scrollTo({top:document.querySelector('.demand-letter-hub').offsetTop-20,behavior:'smooth'})}
 
+// Generator state variables
+let genLastEditedField = null;
+let genIsEditMode = false;
+let genSavedHTML = '';
+let genHasCustomEdits = false;
+
 // Generator helper functions
-function genH(value, placeholder) {
+function genH(value, placeholder, fieldId) {
     const isEmpty = !value || value.trim() === '';
     const displayValue = isEmpty ? '[' + placeholder + ']' : value;
     const emptyClass = isEmpty ? ' empty' : '';
-    return '<span class="gen-highlight' + emptyClass + '">' + displayValue + '</span>';
+    return '<span class="gen-highlight' + emptyClass + '" data-field="' + fieldId + '" contenteditable="true">' + displayValue + '</span>';
+}
+
+function genTrackEdit(fieldId) {
+    if (genHasCustomEdits) {
+        if (!confirm('Regenerating will overwrite your custom edits. Continue?')) {
+            return false;
+        }
+    }
+    genHasCustomEdits = false;
+    return true;
 }
 
 function getClaimInfo(claimType) {
@@ -566,15 +601,15 @@ function getRemedyText(remedy, petName, purchasePrice, vetCosts) {
     const remedies = {
         'refund': {
             title: 'FULL REFUND',
-            text: 'I am returning ' + genH(petName,'Pet Name') + ' to you and demand immediate refund of:<ul class="gen-doc-list"><li>Purchase price: $' + purchasePrice.toLocaleString() + '</li><li>Veterinary costs incurred: $' + vetCosts.toLocaleString() + '</li><li><strong>TOTAL REFUND DUE: $' + (purchasePrice + vetCosts).toLocaleString() + '</strong></li></ul>' + genH(petName,'Pet Name') + ' will be made available for return upon receipt of full refund.'
+            text: 'I am returning ' + genH(petName,'Pet Name','petName') + ' to you and demand immediate refund of:<ul class="gen-doc-list"><li>Purchase price: $' + purchasePrice.toLocaleString() + '</li><li>Veterinary costs incurred: $' + vetCosts.toLocaleString() + '</li><li><strong>TOTAL REFUND DUE: $' + (purchasePrice + vetCosts).toLocaleString() + '</strong></li></ul>' + genH(petName,'Pet Name','petName') + ' will be made available for return upon receipt of full refund.'
         },
         'reimbursement': {
             title: 'KEEP PET + REIMBURSEMENT',
-            text: 'I wish to keep ' + genH(petName,'Pet Name') + ' and demand reimbursement of my veterinary costs:<ul class="gen-doc-list"><li>Veterinary costs: $' + vetCosts.toLocaleString() + '</li><li>Statutory cap: Up to ' + (purchasePrice * 1.5).toLocaleString() + ' (150% of purchase price)</li></ul>'
+            text: 'I wish to keep ' + genH(petName,'Pet Name','petName') + ' and demand reimbursement of my veterinary costs:<ul class="gen-doc-list"><li>Veterinary costs: $' + vetCosts.toLocaleString() + '</li><li>Statutory cap: Up to ' + (purchasePrice * 1.5).toLocaleString() + ' (150% of purchase price)</li></ul>'
         },
         'exchange': {
             title: 'EXCHANGE FOR HEALTHY PET',
-            text: 'I am willing to exchange ' + genH(petName,'Pet Name') + ' for a comparable healthy puppy of similar breed and value, plus reimbursement of diagnostic veterinary costs of $' + vetCosts.toLocaleString() + '.'
+            text: 'I am willing to exchange ' + genH(petName,'Pet Name','petName') + ' for a comparable healthy puppy of similar breed and value, plus reimbursement of diagnostic veterinary costs of $' + vetCosts.toLocaleString() + '.'
         }
     };
     return remedies[remedy] || remedies['refund'];
@@ -614,7 +649,7 @@ function genUpdatePreview() {
 
     let outcomeText = '';
     if (outcome === 'died') {
-        outcomeText = '<p class="gen-doc-p">Tragically, ' + genH(petName,'Pet Name') + ' died from this condition. My beloved companion is gone forever due to your sale of a sick/defective animal.</p>';
+        outcomeText = '<p class="gen-doc-p">Tragically, ' + genH(petName,'Pet Name','petName') + ' died from this condition. My beloved companion is gone forever due to your sale of a sick/defective animal.</p>';
     }
 
     let claimsList = '<ul class="gen-doc-list">';
@@ -633,38 +668,38 @@ function genUpdatePreview() {
 <div class="gen-doc-date">${today}</div>
 
 <div class="gen-doc-address">
-${genH(yourName,'Your Name')}<br>
-${genH(yourAddress,'Your Address')}<br>
-${genH(yourEmail,'Your Email')}
+${genH(yourName,'Your Name','yourName')}<br>
+${genH(yourAddress,'Your Address','yourAddress')}<br>
+${genH(yourEmail,'Your Email','yourEmail')}
 </div>
 
 <div class="gen-doc-address">
-${genH(sellerName,'Seller Name')}<br>
-${genH(sellerAddress,'Seller Address')}
+${genH(sellerName,'Seller Name','sellerName')}<br>
+${genH(sellerAddress,'Seller Address','sellerAddress')}
 </div>
 
 <p class="gen-doc-p" style="font-weight:600;">CERTIFIED MAIL - RETURN RECEIPT REQUESTED</p>
 
-<div class="gen-doc-re">Re: ${genH(state,'State')} ${claimInfo.subject} - ${genH(petName,'Pet Name')}</div>
+<div class="gen-doc-re">Re: ${genH(state,'State','state')} ${claimInfo.subject} - ${genH(petName,'Pet Name','petName')}</div>
 
-<p class="gen-doc-p">Dear ${genH(sellerName,sellerLabel)}:</p>
+<p class="gen-doc-p">Dear ${genH(sellerName,sellerLabel,'sellerName')}:</p>
 
 <p class="gen-doc-p">${claimInfo.intro}</p>
 
 <div class="gen-doc-section">PURCHASE DETAILS</div>
 
 <ul class="gen-doc-list">
-<li>Date of purchase: ${genH(purchaseDate,'Purchase Date')}</li>
-<li>Puppy: ${genH(petBreed,'Breed')}</li>
+<li>Date of purchase: ${genH(purchaseDate,'Purchase Date','purchaseDate')}</li>
+<li>Puppy: ${genH(petBreed,'Breed','petBreed')}</li>
 <li>Purchase price: $${purchasePrice.toLocaleString()}</li>
-<li>Seller's representations at time of sale: ${genH(sellerClaims,'Seller Claims')}</li>
+<li>Seller's representations at time of sale: ${genH(sellerClaims,'Seller Claims','sellerClaims')}</li>
 </ul>
 
 <div class="gen-doc-section">VETERINARY DIAGNOSIS</div>
 
-<p class="gen-doc-p">On ${genH(diagnosisDate,'Diagnosis Date')}, ${genH(vetClinic,'Veterinarian/Clinic')} examined ${genH(petName,'Pet Name')} and diagnosed:</p>
+<p class="gen-doc-p">On ${genH(diagnosisDate,'Diagnosis Date','diagnosisDate')}, ${genH(vetClinic,'Veterinarian/Clinic','vetClinic')} examined ${genH(petName,'Pet Name','petName')} and diagnosed:</p>
 
-<p class="gen-doc-p"><strong>${genH(diagnosis,'Diagnosis')}</strong></p>
+<p class="gen-doc-p"><strong>${genH(diagnosis,'Diagnosis','diagnosis')}</strong></p>
 
 <p class="gen-doc-p">The veterinarian has certified that this condition ${claimType === 'congenital' ? 'is congenital/hereditary in nature and existed at birth' : 'existed at the time of sale or developed shortly thereafter during the statutory examination period'}.</p>
 
@@ -672,7 +707,7 @@ ${outcomeText}
 
 <div class="gen-doc-section">YOUR MISREPRESENTATIONS</div>
 
-<p class="gen-doc-p">${genH(fraudDetails,'Details of False Representations')}</p>
+<p class="gen-doc-p">${genH(fraudDetails,'Details of False Representations','fraudDetails')}</p>
 
 <div class="gen-doc-section">LEGAL BASIS FOR CLAIM</div>
 
@@ -697,19 +732,19 @@ ${damagesList}
 <p class="gen-doc-p">If I do not receive a satisfactory response within 14 days:</p>
 <ul class="gen-doc-list">
 <li>I will file a lawsuit seeking all available damages, including statutory damages, punitive damages, and attorney fees where authorized by law</li>
-<li>I will file complaints with the ${genH(state,'State')} Attorney General Consumer Protection Division</li>
-<li>I will report to the ${genH(state,'State')} Department of Agriculture and any applicable pet dealer licensing authority</li>
+<li>I will file complaints with the ${genH(state,'State','state')} Attorney General Consumer Protection Division</li>
+<li>I will report to the ${genH(state,'State','state')} Department of Agriculture and any applicable pet dealer licensing authority</li>
 <li>I will file a complaint with the Better Business Bureau</li>
 <li>I will post public reviews warning other buyers about your practices</li>
 </ul>
 
-<p class="gen-doc-p">I purchased ${genH(petName,'Pet Name')} in good faith, relying on your representations. ${outcome === 'died' ? 'My beloved pet is now dead' : 'My pet is seriously ill'} because you sold me a sick/defective animal. ${genH(state,'State')} law protects consumers from exactly this situation.</p>
+<p class="gen-doc-p">I purchased ${genH(petName,'Pet Name','petName')} in good faith, relying on your representations. ${outcome === 'died' ? 'My beloved pet is now dead' : 'My pet is seriously ill'} because you sold me a sick/defective animal. ${genH(state,'State','state')} law protects consumers from exactly this situation.</p>
 
 <p class="gen-doc-p">Comply with the law. Provide the requested remedy within 14 days.</p>
 
 <div class="gen-doc-sig">
 Sincerely,<br><br>
-<div class="gen-doc-sig-line">${genH(yourName,'Your Name')}</div>
+<div class="gen-doc-sig-line">${genH(yourName,'Your Name','yourName')}</div>
 </div>
 
 <p class="gen-doc-p" style="margin-top:30px;font-size:0.9em;"><strong>Enclosures:</strong><br>

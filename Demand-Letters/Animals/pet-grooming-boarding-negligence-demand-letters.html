@@ -50,7 +50,17 @@
 .gen-highlight.empty{background:linear-gradient(135deg,#fee2e2 0%,#fecaca 100%);border-bottom-color:#ef4444;color:#dc2626}
 .gen-toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;background:#1f2937;color:#fff;border-radius:8px;font-size:0.85rem;font-weight:500;box-shadow:0 4px 15px rgba(0,0,0,0.2);transform:translateY(80px);opacity:0;transition:all 0.3s ease;z-index:1000}
 .gen-toast.visible{transform:translateY(0);opacity:1}
-.gen-toast.success{background:#27ae60}</style>
+.gen-toast.success{background:#27ae60}
+.gen-toolbar-btn.active{background:#10b981;border-color:#10b981;color:#fff}
+.gen-edit-toolbar{display:none;align-items:center;gap:8px;padding:8px 16px;background:#f3f4f6;border-bottom:1px solid #e5e7eb}
+.gen-edit-toolbar.visible{display:flex}
+.gen-edit-btn{padding:6px 12px;font-size:0.8rem;font-weight:600;border:1px solid #d1d5db;border-radius:4px;background:#fff;color:#374151;cursor:pointer}
+.gen-edit-btn:hover{background:#f9fafb}
+.gen-edit-btn.save{background:#10b981;border-color:#10b981;color:#fff}
+.gen-edit-btn.cancel{background:#ef4444;border-color:#ef4444;color:#fff}
+#genDocPreview.full-edit-mode{background:#fffef0;border:2px dashed #f59e0b}
+.gen-highlight-anim{animation:highlightPulse 1.5s ease-out}
+@keyframes highlightPulse{0%{box-shadow:0 0 0 0 rgba(245,158,11,0.7)}70%{box-shadow:0 0 0 10px rgba(245,158,11,0)}100%{box-shadow:0 0 0 0 rgba(245,158,11,0)}}</style>
 </head>
 <body>
 <nav class="breadcrumb"><a href="/">Home</a><span class="separator">›</span><a href="/Demand-Letters/">Demands</a><span class="separator">›</span><a href="/Demand-Letters/Animals/">Animals</a><span class="separator">›</span><span class="current">Grooming Boarding Negligence</span></nav>
@@ -354,10 +364,19 @@
 <div class="gen-preview-toolbar">
 <span style="font-weight:600;color:#374151;">Live Preview</span>
 <div>
+<button class="gen-toolbar-btn" id="genEditModeBtn" onclick="genToggleEditMode()">✏️ Edit Mode</button>
 <button class="gen-toolbar-btn" onclick="genCopyToClipboard()">Copy</button>
 <button class="gen-toolbar-btn" onclick="genPrintDocument()">Print</button>
 <button class="gen-toolbar-btn primary" onclick="genDownloadDoc()">Download .doc</button>
 </div>
+</div>
+<div class="gen-edit-toolbar" id="genEditToolbar">
+<button class="gen-edit-btn" onclick="document.execCommand('bold')"><b>B</b></button>
+<button class="gen-edit-btn" onclick="document.execCommand('italic')"><i>I</i></button>
+<button class="gen-edit-btn" onclick="document.execCommand('underline')"><u>U</u></button>
+<div style="flex:1;"></div>
+<button class="gen-edit-btn save" onclick="genSaveEdits()">Save</button>
+<button class="gen-edit-btn cancel" onclick="genCancelEdits()">Cancel</button>
 </div>
 <div id="genDocPreview"></div>
 </div>
@@ -477,12 +496,28 @@
 <script>
 function switchTab(tabId,event){const allTabs=document.querySelectorAll('.demand-letter-hub .dl-tab-content');const allButtons=document.querySelectorAll('.demand-letter-hub .dl-tab-button');allTabs.forEach(tab=>tab.classList.remove('active'));allButtons.forEach(btn=>btn.classList.remove('active'));document.getElementById(tabId).classList.add('active');event.currentTarget.classList.add('active');window.scrollTo({top:document.querySelector('.demand-letter-hub').offsetTop-20,behavior:'smooth'})}
 
+// Generator state variables
+let genLastEditedField = null;
+let genIsEditMode = false;
+let genSavedHTML = '';
+let genHasCustomEdits = false;
+
 // Generator helper functions
-function genH(value, placeholder) {
+function genH(value, placeholder, fieldId) {
     const isEmpty = !value || value.trim() === '';
     const displayValue = isEmpty ? '[' + placeholder + ']' : value;
     const emptyClass = isEmpty ? ' empty' : '';
-    return '<span class="gen-highlight' + emptyClass + '">' + displayValue + '</span>';
+    return '<span class="gen-highlight' + emptyClass + '" data-field="' + fieldId + '" contenteditable="true">' + displayValue + '</span>';
+}
+
+function genTrackEdit(fieldId) {
+    if (genHasCustomEdits) {
+        if (!confirm('Regenerating will overwrite your custom edits. Continue?')) {
+            return false;
+        }
+    }
+    genHasCustomEdits = false;
+    return true;
 }
 
 function genUpdateInjuryOptions() {
@@ -615,9 +650,9 @@ function genUpdatePreview() {
 
     let outcomeText = '';
     if (outcome === 'died') {
-        outcomeText = '<p class="gen-doc-p">Tragically, ' + genH(petName,'Pet Name') + ' died as a result of these injuries on ' + genH('','Date of Death') + '. My beloved companion of ' + genH(petAge,'Age') + ' is gone forever due to your negligence.</p>';
+        outcomeText = '<p class="gen-doc-p">Tragically, ' + genH(petName,'Pet Name','petName') + ' died as a result of these injuries on ' + genH('','Date of Death','deathDate') + '. My beloved companion of ' + genH(petAge,'Age','petAge') + ' is gone forever due to your negligence.</p>';
     } else {
-        outcomeText = '<p class="gen-doc-p">' + genH(petName,'Pet Name') + ' is still recovering from these injuries. The trauma and suffering caused by your negligence has affected our entire family.</p>';
+        outcomeText = '<p class="gen-doc-p">' + genH(petName,'Pet Name','petName') + ' is still recovering from these injuries. The trauma and suffering caused by your negligence has affected our entire family.</p>';
     }
 
     let damagesList = '<ul class="gen-doc-list">';
@@ -636,31 +671,31 @@ function genUpdatePreview() {
 <div class="gen-doc-date">${today}</div>
 
 <div class="gen-doc-address">
-${genH(yourName,'Your Name')}<br>
-${genH(yourAddress,'Your Address')}<br>
-${genH(yourEmail,'Your Email')}
+${genH(yourName,'Your Name','yourName')}<br>
+${genH(yourAddress,'Your Address','yourAddress')}<br>
+${genH(yourEmail,'Your Email','yourEmail')}
 </div>
 
 <div class="gen-doc-address">
-${genH(facilityName,'Facility Name')}<br>
-${genH(facilityAddress,'Facility Address')}
+${genH(facilityName,'Facility Name','facilityName')}<br>
+${genH(facilityAddress,'Facility Address','facilityAddress')}
 </div>
 
-<div class="gen-doc-re">Re: ${citations.title} - ${genH(petName,'Pet Name')} - Demand for Compensation</div>
+<div class="gen-doc-re">Re: ${citations.title} - ${genH(petName,'Pet Name','petName')} - Demand for Compensation</div>
 
-<p class="gen-doc-p">Dear ${genH(facilityName,facilityLabel)}:</p>
+<p class="gen-doc-p">Dear ${genH(facilityName,facilityLabel,'facilityName')}:</p>
 
-<p class="gen-doc-p">I am writing regarding the serious injuries my ${petType}, ${genH(petName,'Pet Name')}, sustained while in your care on ${genH(incidentDate,'Incident Date')} due to your negligent ${facilityType === 'grooming' ? 'grooming practices' : 'supervision and care'}.</p>
+<p class="gen-doc-p">I am writing regarding the serious injuries my ${petType}, ${genH(petName,'Pet Name','petName')}, sustained while in your care on ${genH(incidentDate,'Incident Date','incidentDate')} due to your negligent ${facilityType === 'grooming' ? 'grooming practices' : 'supervision and care'}.</p>
 
 <div class="gen-doc-section">FACTS</div>
 
-<p class="gen-doc-p">I brought ${genH(petName,'Pet Name')}, my ${genH(petAge,'Age')} ${genH(petBreed,'Breed')}, to your ${facilityType === 'grooming' ? 'salon' : 'facility'} on ${genH(incidentDate,'Date')} for ${genH(service,'Service')}. ${genH(petName,'Pet Name')} was healthy with no injuries or health issues when I dropped ${him_her} off.</p>
+<p class="gen-doc-p">I brought ${genH(petName,'Pet Name','petName')}, my ${genH(petAge,'Age','petAge')} ${genH(petBreed,'Breed','petBreed')}, to your ${facilityType === 'grooming' ? 'salon' : 'facility'} on ${genH(incidentDate,'Date','incidentDate')} for ${genH(service,'Service','service')}. ${genH(petName,'Pet Name','petName')} was healthy with no injuries or health issues when I dropped ${him_her} off.</p>
 
-<p class="gen-doc-p">When I picked ${genH(petName,'Pet Name')} up, I discovered: ${genH(injuries,'Injuries Sustained')}</p>
+<p class="gen-doc-p">When I picked ${genH(petName,'Pet Name','petName')} up, I discovered: ${genH(injuries,'Injuries Sustained','injuries')}</p>
 
-<p class="gen-doc-p">When I asked your staff what happened, they stated: ${genH(facilityResponse,'Facility Response')}</p>
+<p class="gen-doc-p">When I asked your staff what happened, they stated: ${genH(facilityResponse,'Facility Response','facilityResponse')}</p>
 
-<p class="gen-doc-p">I immediately took ${genH(petName,'Pet Name')} to ${genH(vetClinic,'Vet Clinic')}, where the veterinarian diagnosed: ${genH(vetDiagnosis,'Vet Diagnosis')}</p>
+<p class="gen-doc-p">I immediately took ${genH(petName,'Pet Name','petName')} to ${genH(vetClinic,'Vet Clinic','vetClinic')}, where the veterinarian diagnosed: ${genH(vetDiagnosis,'Vet Diagnosis','vetDiagnosis')}</p>
 
 ${outcomeText}
 
@@ -674,7 +709,7 @@ ${violationsList}
 
 <div class="gen-doc-section">BAILMENT BREACH</div>
 
-<p class="gen-doc-p">I entrusted ${genH(petName,'Pet Name')} to your care as a professional ${facilityType === 'grooming' ? 'groomer' : 'boarding facility'}. Under bailment law, you had a duty to return ${him_her} in substantially the same condition. You breached this duty. Once I prove the bailment and injury, the burden shifts to you to demonstrate you exercised reasonable care—which you clearly did not.</p>
+<p class="gen-doc-p">I entrusted ${genH(petName,'Pet Name','petName')} to your care as a professional ${facilityType === 'grooming' ? 'groomer' : 'boarding facility'}. Under bailment law, you had a duty to return ${him_her} in substantially the same condition. You breached this duty. Once I prove the bailment and injury, the burden shifts to you to demonstrate you exercised reasonable care—which you clearly did not.</p>
 
 <div class="gen-doc-section">DAMAGES</div>
 
@@ -708,11 +743,11 @@ ${damagesList}
 <li>I will report this incident to local consumer protection agencies and news media</li>
 </ul>
 
-<p class="gen-doc-p">${genH(petName,'Pet Name')} is a beloved member of my family. Your negligence caused serious, preventable harm. Make this right.</p>
+<p class="gen-doc-p">${genH(petName,'Pet Name','petName')} is a beloved member of my family. Your negligence caused serious, preventable harm. Make this right.</p>
 
 <div class="gen-doc-sig">
 Sincerely,<br><br>
-<div class="gen-doc-sig-line">${genH(yourName,'Your Name')}</div>
+<div class="gen-doc-sig-line">${genH(yourName,'Your Name','yourName')}</div>
 </div>
 
 <p class="gen-doc-p" style="margin-top:30px;font-size:0.9em;"><strong>Enclosures:</strong><br>
@@ -771,8 +806,104 @@ function genDownloadDoc() {
     genShowToast('Document downloaded!', 'success');
 }
 
+function genSetupInlineEditing() {
+    document.querySelectorAll('.gen-highlight[contenteditable="true"]').forEach(function(el) {
+        el.addEventListener('blur', function() {
+            const fieldId = this.dataset.field;
+            const newValue = this.textContent.trim();
+            if (newValue.startsWith('[') && newValue.endsWith(']')) return;
+            const inputMap = {
+                'yourName': 'genYourName',
+                'yourAddress': 'genYourAddress',
+                'yourEmail': 'genYourEmail',
+                'facilityName': 'genFacilityName',
+                'facilityAddress': 'genFacilityAddress',
+                'petName': 'genPetName',
+                'petBreed': 'genPetBreed',
+                'petAge': 'genPetAge',
+                'incidentDate': 'genIncidentDate',
+                'service': 'genService',
+                'injuries': 'genInjuries',
+                'facilityResponse': 'genFacilityResponse',
+                'vetClinic': 'genVetClinic',
+                'vetDiagnosis': 'genVetDiagnosis'
+            };
+            const inputId = inputMap[fieldId];
+            if (inputId) {
+                const input = document.getElementById(inputId);
+                if (input) {
+                    input.value = newValue;
+                    this.classList.remove('empty');
+                    genHasCustomEdits = true;
+                }
+            }
+        });
+        el.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                this.blur();
+            }
+        });
+        el.addEventListener('focus', function() {
+            this.classList.add('gen-highlight-anim');
+            setTimeout(() => this.classList.remove('gen-highlight-anim'), 1500);
+        });
+    });
+}
+
+function genToggleEditMode() {
+    const preview = document.getElementById('genDocPreview');
+    const btn = document.getElementById('genEditModeBtn');
+    const toolbar = document.getElementById('genEditToolbar');
+
+    if (!genIsEditMode) {
+        genSavedHTML = preview.innerHTML;
+        preview.contentEditable = 'true';
+        preview.classList.add('full-edit-mode');
+        btn.classList.add('active');
+        btn.textContent = '✏️ Editing...';
+        toolbar.classList.add('visible');
+        genIsEditMode = true;
+        genShowToast('Edit mode enabled. Click Save when done.', 'success');
+    } else {
+        genCancelEdits();
+    }
+}
+
+function genSaveEdits() {
+    const preview = document.getElementById('genDocPreview');
+    const btn = document.getElementById('genEditModeBtn');
+    const toolbar = document.getElementById('genEditToolbar');
+
+    preview.contentEditable = 'false';
+    preview.classList.remove('full-edit-mode');
+    btn.classList.remove('active');
+    btn.textContent = '✏️ Edit Mode';
+    toolbar.classList.remove('visible');
+    genIsEditMode = false;
+    genHasCustomEdits = true;
+    genShowToast('Edits saved!', 'success');
+}
+
+function genCancelEdits() {
+    const preview = document.getElementById('genDocPreview');
+    const btn = document.getElementById('genEditModeBtn');
+    const toolbar = document.getElementById('genEditToolbar');
+
+    preview.innerHTML = genSavedHTML;
+    preview.contentEditable = 'false';
+    preview.classList.remove('full-edit-mode');
+    btn.classList.remove('active');
+    btn.textContent = '✏️ Edit Mode';
+    toolbar.classList.remove('visible');
+    genIsEditMode = false;
+    genSetupInlineEditing();
+    genShowToast('Edits cancelled', 'success');
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     genUpdatePreview();
+    genSetupInlineEditing();
 });
 </script>
 

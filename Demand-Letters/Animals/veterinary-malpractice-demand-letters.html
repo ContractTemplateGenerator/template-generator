@@ -34,6 +34,16 @@
 .gen-toolbar-btn:hover{background:#f3f4f6;border-color:#9ca3af}
 .gen-toolbar-btn.primary{background:#3498db;border-color:#3498db;color:#fff}
 .gen-toolbar-btn.primary:hover{background:#2980b9}
+.gen-toolbar-btn.active{background:#10b981;border-color:#10b981;color:#fff}
+.gen-edit-toolbar{display:none;align-items:center;gap:8px;padding:8px 16px;background:#f3f4f6;border-bottom:1px solid #e5e7eb}
+.gen-edit-toolbar.visible{display:flex}
+.gen-edit-btn{padding:6px 12px;border:1px solid #d1d5db;border-radius:4px;background:#fff;cursor:pointer;font-size:14px}
+.gen-edit-btn:hover{background:#e5e7eb}
+.gen-edit-btn.save{background:#10b981;color:#fff;border-color:#10b981}
+.gen-edit-btn.cancel{background:#ef4444;color:#fff;border-color:#ef4444}
+#genDocPreview.full-edit-mode{background:#fffef0;border:2px dashed #f59e0b}
+.gen-highlight-anim{animation:highlightPulse 1.5s ease-out}
+@keyframes highlightPulse{0%{background:#fef08a}100%{background:#fef3c7}}
 #genDocPreview{font-family:'Times New Roman',Georgia,serif;font-size:14px;line-height:1.8;color:#1a1a1a;padding:40px;flex:1;overflow-y:auto;max-height:700px}
 .gen-doc-date{text-align:right;margin-bottom:24px;color:#555}
 .gen-doc-address{margin-bottom:24px;line-height:1.5}
@@ -648,10 +658,19 @@ Clear misdiagnosis + high replacement value + sympathetic facts = strong settlem
         <div class="gen-preview-toolbar">
             <span style="font-weight:600;color:#374151;">Live Preview</span>
             <div>
+                <button class="gen-toolbar-btn" id="genEditModeBtn" onclick="genToggleEditMode()">✏️ Edit Mode</button>
                 <button class="gen-toolbar-btn" onclick="genCopyToClipboard()">📋 Copy</button>
                 <button class="gen-toolbar-btn" onclick="genPrintDocument()">🖨️ Print</button>
                 <button class="gen-toolbar-btn primary" onclick="genDownloadDoc()">⬇️ Download</button>
             </div>
+        </div>
+        <div class="gen-edit-toolbar" id="genEditToolbar">
+            <button class="gen-edit-btn" onclick="document.execCommand('bold')"><b>B</b></button>
+            <button class="gen-edit-btn" onclick="document.execCommand('italic')"><i>I</i></button>
+            <button class="gen-edit-btn" onclick="document.execCommand('underline')"><u>U</u></button>
+            <div style="flex:1;"></div>
+            <button class="gen-edit-btn save" onclick="genSaveEdits()">Save</button>
+            <button class="gen-edit-btn cancel" onclick="genCancelEdits()">Cancel</button>
         </div>
         <div id="genDocPreview">
             <!-- Generated content appears here -->
@@ -965,12 +984,29 @@ function switchTab(tabId,event){const allTabs=document.querySelectorAll('.demand
 function toggleFaq(button,event){event.preventDefault();const faqItem=button.parentElement;const answer=faqItem.querySelector('.faq-answer');const isOpen=button.classList.contains('active');document.querySelectorAll('.demand-letter-hub .faq-question').forEach(btn=>{btn.classList.remove('active');btn.parentElement.querySelector('.faq-answer').style.maxHeight=null});if(!isOpen){button.classList.add('active');answer.style.maxHeight=answer.scrollHeight+'px'}}
 function copyToClipboard(btn){const letter=btn.parentElement;const text=letter.textContent.replace('Copy to Clipboard','').replace('Copied!','').trim();navigator.clipboard.writeText(text).then(()=>{btn.textContent='Copied!';btn.classList.add('copied');setTimeout(()=>{btn.textContent='Copy to Clipboard';btn.classList.remove('copied')},2000)}).catch(err=>console.error('Copy failed:',err))}
 
+// Generator State
+let genLastEditedField = null;
+let genIsEditMode = false;
+let genSavedHTML = '';
+let genHasCustomEdits = false;
+
 // Generator Functions
-function genH(value, placeholder) {
+function genH(value, placeholder, fieldId) {
     const isEmpty = !value || value.trim() === '';
     const displayValue = isEmpty ? '[' + placeholder + ']' : value;
     const emptyClass = isEmpty ? ' empty' : '';
-    return '<span class="gen-highlight' + emptyClass + '">' + displayValue + '</span>';
+    return '<span class="gen-highlight' + emptyClass + '" data-field="' + fieldId + '" contenteditable="true">' + displayValue + '</span>';
+}
+
+// Track field edits
+function genTrackEdit(fieldId) {
+    if (genHasCustomEdits) {
+        const proceed = confirm('You have custom edits in the preview.\n\nChanging form inputs will regenerate the document and your edits will be lost.\n\nClick OK to regenerate, or Cancel to keep your edits.');
+        if (!proceed) return;
+        genHasCustomEdits = false;
+    }
+    genLastEditedField = fieldId;
+    genUpdatePreview();
 }
 
 function getMalpracticeCitations(type) {
@@ -1077,17 +1113,17 @@ function genUpdatePreview() {
     if (data.petOutcome === 'died') {
         damagesSection = `
             <ul class="gen-doc-list">
-                <li><strong>Fair Market Value / Replacement Cost:</strong> ${genH(data.petValue, 'Pet Value')}</li>
-                <li><strong>Original Procedure Fee (refund demanded):</strong> ${genH(data.originalFee, 'Original Fee')}</li>
-                <li><strong>Emergency Veterinary Bills:</strong> ${genH(data.emergencyBills, 'Emergency Bills')}</li>
+                <li><strong>Fair Market Value / Replacement Cost:</strong> ${genH(data.petValue, 'Pet Value', 'petValue')}</li>
+                <li><strong>Original Procedure Fee (refund demanded):</strong> ${genH(data.originalFee, 'Original Fee', 'originalFee')}</li>
+                <li><strong>Emergency Veterinary Bills:</strong> ${genH(data.emergencyBills, 'Emergency Bills', 'emergencyBills')}</li>
             </ul>
         `;
     } else {
         damagesSection = `
             <ul class="gen-doc-list">
-                <li><strong>Emergency/Corrective Treatment:</strong> ${genH(data.emergencyBills, 'Emergency Bills')}</li>
-                <li><strong>Original Procedure Fee (refund demanded):</strong> ${genH(data.originalFee, 'Original Fee')}</li>
-                ${data.petValue ? '<li><strong>Diminished Value / Ongoing Care:</strong> ' + data.petValue + '</li>' : ''}
+                <li><strong>Emergency/Corrective Treatment:</strong> ${genH(data.emergencyBills, 'Emergency Bills', 'emergencyBills')}</li>
+                <li><strong>Original Procedure Fee (refund demanded):</strong> ${genH(data.originalFee, 'Original Fee', 'originalFee')}</li>
+                ${data.petValue ? '<li><strong>Diminished Value / Ongoing Care:</strong> ' + genH(data.petValue, 'Pet Value', 'petValue') + '</li>' : ''}
             </ul>
         `;
     }
@@ -1096,26 +1132,26 @@ function genUpdatePreview() {
         <div class="gen-doc-date">${today}</div>
         <div class="gen-doc-address">
             <strong>VIA CERTIFIED MAIL, RETURN RECEIPT REQUESTED</strong><br><br>
-            ${genH(data.vetName, 'Veterinarian Name')}, DVM<br>
-            ${genH(data.clinicName, 'Clinic Name')}<br>
-            ${genH(data.clinicAddress, 'Clinic Address').replace(/\n/g, '<br>')}
+            ${genH(data.vetName, 'Veterinarian Name', 'vetName')}, DVM<br>
+            ${genH(data.clinicName, 'Clinic Name', 'clinicName')}<br>
+            ${genH(data.clinicAddress, 'Clinic Address', 'clinicAddress').replace(/\n/g, '<br>')}
         </div>
         <div class="gen-doc-re">
             <strong>RE: VETERINARY MALPRACTICE - DEMAND FOR COMPENSATION</strong><br>
-            Patient: ${genH(data.petName, 'Pet Name')} (${genH(data.petBreed, 'Breed')}, ${genH(data.petAge, 'Age')})<br>
-            Date of Incident: ${genH(data.incidentDate, 'Date')}<br>
+            Patient: ${genH(data.petName, 'Pet Name', 'petName')} (${genH(data.petBreed, 'Breed', 'petBreed')}, ${genH(data.petAge, 'Age', 'petAge')})<br>
+            Date of Incident: ${genH(data.incidentDate, 'Date', 'incidentDate')}<br>
             Issue: ${citations.title}
         </div>
 
-        <p class="gen-doc-p">Dear Dr. ${genH(data.vetName, 'Veterinarian Name')}:</p>
+        <p class="gen-doc-p">Dear Dr. ${genH(data.vetName, 'Veterinarian Name', 'vetName2')}:</p>
 
-        <p class="gen-doc-p">I am writing regarding your veterinary malpractice that caused ${outcomeText} to my ${petPronoun}, ${genH(data.petName, 'Pet Name')}, during and after ${genH(data.procedure, 'procedure')} performed at your clinic on ${genH(data.incidentDate, 'date')}.</p>
+        <p class="gen-doc-p">I am writing regarding your veterinary malpractice that caused ${outcomeText} to my ${petPronoun}, ${genH(data.petName, 'Pet Name', 'petName2')}, during and after ${genH(data.procedure, 'procedure', 'procedure')} performed at your clinic on ${genH(data.incidentDate, 'date', 'incidentDate2')}.</p>
 
         <div class="gen-doc-section">Background</div>
-        <p class="gen-doc-p">${genH(data.petName, 'Pet Name')} is a ${genH(data.petAge, 'age')} ${genH(data.petBreed, 'breed')} whom I have cared for diligently. On ${genH(data.incidentDate, 'date')}, I brought ${genH(data.petName, 'Pet Name')} to your clinic for ${genH(data.procedure, 'procedure')}.</p>
+        <p class="gen-doc-p">${genH(data.petName, 'Pet Name', 'petName3')} is a ${genH(data.petAge, 'age', 'petAge2')} ${genH(data.petBreed, 'breed', 'petBreed2')} whom I have cared for diligently. On ${genH(data.incidentDate, 'date', 'incidentDate3')}, I brought ${genH(data.petName, 'Pet Name', 'petName4')} to your clinic for ${genH(data.procedure, 'procedure', 'procedure2')}.</p>
 
         <div class="gen-doc-section">Statement of Facts</div>
-        <p class="gen-doc-p">${genH(data.whatHappened, 'Describe what happened, what went wrong, and the resulting harm...')}</p>
+        <p class="gen-doc-p">${genH(data.whatHappened, 'Describe what happened, what went wrong, and the resulting harm...', 'whatHappened')}</p>
 
         <div class="gen-doc-section">Standard of Care Violation</div>
         <p class="gen-doc-p">${citations.standard}</p>
@@ -1127,7 +1163,7 @@ function genUpdatePreview() {
         ${damagesSection}
 
         <div class="gen-doc-deadline">
-            <strong>TOTAL DEMAND:</strong> ${genH(data.demandAmount, 'Total Amount')}
+            <strong>TOTAL DEMAND:</strong> ${genH(data.demandAmount, 'Total Amount', 'demandAmount')}
         </div>
 
         <div class="gen-doc-section">Insurance</div>
@@ -1139,7 +1175,7 @@ function genUpdatePreview() {
         </ul>
 
         <div class="gen-doc-section">Deadline & Consequences</div>
-        <p class="gen-doc-p">I expect a response to this demand within ${genH(data.deadline, '14 days')}. If we cannot resolve this matter within 30 days, I will:</p>
+        <p class="gen-doc-p">I expect a response to this demand within ${genH(data.deadline, '14 days', 'deadline')}. If we cannot resolve this matter within 30 days, I will:</p>
         <ul class="gen-doc-list">
             <li>File a complaint with the State Veterinary Medical Board</li>
             <li>File a civil lawsuit for veterinary malpractice, professional negligence, and breach of duty of care</li>
@@ -1148,12 +1184,12 @@ function genUpdatePreview() {
             <li>Post public reviews to warn other pet owners</li>
         </ul>
 
-        <p class="gen-doc-p">${data.petOutcome === 'died' ? genH(data.petName, 'Pet Name') + ' is gone because of your negligence. I cannot bring my beloved pet back, but I can hold you accountable.' : 'Please make this right. Tender to your insurance and let us resolve this professionally.'}</p>
+        <p class="gen-doc-p">${data.petOutcome === 'died' ? genH(data.petName, 'Pet Name', 'petName5') + ' is gone because of your negligence. I cannot bring my beloved pet back, but I can hold you accountable.' : 'Please make this right. Tender to your insurance and let us resolve this professionally.'}</p>
 
         <div class="gen-doc-sig">
             <p>Sincerely,</p>
             <div class="gen-doc-sig-line">
-                ${genH(data.senderName, 'Your Name')}<br>
+                ${genH(data.senderName, 'Your Name', 'senderName')}<br>
                 ${data.senderAddress ? data.senderAddress.replace(/\n/g, '<br>') + '<br>' : ''}
                 ${data.senderPhone ? 'Phone: ' + data.senderPhone + '<br>' : ''}
                 ${data.senderEmail ? 'Email: ' + data.senderEmail : ''}
@@ -1161,11 +1197,24 @@ function genUpdatePreview() {
         </div>
 
         <div class="gen-doc-warning" style="margin-top: 30px;">
-            <strong>ENCLOSURES:</strong> Emergency clinic records, itemized vet bills, photos of ${genH(data.petName, 'Pet Name')}, original consent forms, timeline of events
+            <strong>ENCLOSURES:</strong> Emergency clinic records, itemized vet bills, photos of ${genH(data.petName, 'Pet Name', 'petName6')}, original consent forms, timeline of events
         </div>
     `;
 
     document.getElementById('genDocPreview').innerHTML = html;
+    genSetupInlineEditing();
+
+    // Scroll to and highlight edited field
+    if (genLastEditedField) {
+        setTimeout(function() {
+            const el = document.querySelector('[data-field="' + genLastEditedField + '"]');
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                el.classList.add('gen-highlight-anim');
+                setTimeout(function() { el.classList.remove('gen-highlight-anim'); }, 1500);
+            }
+        }, 50);
+    }
 }
 
 function genShowToast(message, type) {
@@ -1209,10 +1258,116 @@ function genDownloadDoc() {
     genShowToast('Downloaded!', 'success');
 }
 
+// Inline editing setup
+function genSetupInlineEditing() {
+    document.querySelectorAll('.gen-highlight[contenteditable="true"]').forEach(function(el) {
+        el.addEventListener('blur', function() {
+            const fieldId = this.dataset.field;
+            const newValue = this.textContent.trim();
+            if (newValue.startsWith('[') && newValue.endsWith(']')) return;
+            const inputMap = {
+                'senderName': 'genSenderName',
+                'senderAddress': 'genSenderAddress',
+                'senderPhone': 'genSenderPhone',
+                'senderEmail': 'genSenderEmail',
+                'vetName': 'genVetName',
+                'vetName2': 'genVetName',
+                'clinicName': 'genClinicName',
+                'clinicAddress': 'genClinicAddress',
+                'petName': 'genPetName',
+                'petName2': 'genPetName',
+                'petName3': 'genPetName',
+                'petName4': 'genPetName',
+                'petName5': 'genPetName',
+                'petName6': 'genPetName',
+                'petBreed': 'genPetBreed',
+                'petBreed2': 'genPetBreed',
+                'petAge': 'genPetAge',
+                'petAge2': 'genPetAge',
+                'incidentDate': 'genIncidentDate',
+                'incidentDate2': 'genIncidentDate',
+                'incidentDate3': 'genIncidentDate',
+                'procedure': 'genProcedure',
+                'procedure2': 'genProcedure',
+                'whatHappened': 'genWhatHappened',
+                'originalFee': 'genOriginalFee',
+                'emergencyBills': 'genEmergencyBills',
+                'petValue': 'genPetValue',
+                'demandAmount': 'genDemandAmount',
+                'deadline': 'genDeadline'
+            };
+            const inputId = inputMap[fieldId];
+            if (inputId) {
+                const input = document.getElementById(inputId);
+                if (input) {
+                    input.value = newValue;
+                    this.classList.remove('empty');
+                }
+            }
+        });
+        el.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                this.blur();
+            }
+        });
+    });
+}
+
+// Edit mode toggle
+function genToggleEditMode() {
+    const doc = document.getElementById('genDocPreview');
+    const btn = document.getElementById('genEditModeBtn');
+    const toolbar = document.getElementById('genEditToolbar');
+    if (!genIsEditMode) {
+        genIsEditMode = true;
+        genSavedHTML = doc.innerHTML;
+        doc.contentEditable = 'true';
+        doc.classList.add('full-edit-mode');
+        btn.innerHTML = '💾 Save Edits';
+        btn.classList.add('active');
+        toolbar.classList.add('visible');
+        genShowToast('Edit mode enabled. Click anywhere to edit.', 'success');
+    } else {
+        genSaveEdits();
+    }
+}
+
+function genSaveEdits() {
+    const doc = document.getElementById('genDocPreview');
+    const btn = document.getElementById('genEditModeBtn');
+    const toolbar = document.getElementById('genEditToolbar');
+    genIsEditMode = false;
+    genHasCustomEdits = true;
+    doc.contentEditable = 'false';
+    doc.classList.remove('full-edit-mode');
+    btn.innerHTML = '✏️ Edit Mode';
+    btn.classList.remove('active');
+    toolbar.classList.remove('visible');
+    genShowToast('Edits saved!', 'success');
+}
+
+function genCancelEdits() {
+    const doc = document.getElementById('genDocPreview');
+    const btn = document.getElementById('genEditModeBtn');
+    const toolbar = document.getElementById('genEditToolbar');
+    if (genSavedHTML) doc.innerHTML = genSavedHTML;
+    genIsEditMode = false;
+    genHasCustomEdits = false;
+    doc.contentEditable = 'false';
+    doc.classList.remove('full-edit-mode');
+    btn.innerHTML = '✏️ Edit Mode';
+    btn.classList.remove('active');
+    toolbar.classList.remove('visible');
+    genSetupInlineEditing();
+    genShowToast('Changes discarded');
+}
+
 // Initialize preview on page load
 document.addEventListener('DOMContentLoaded', function() {
     genUpdatePreview();
 });
+if (document.readyState !== 'loading') genUpdatePreview();
 </script>
 
 </body>
