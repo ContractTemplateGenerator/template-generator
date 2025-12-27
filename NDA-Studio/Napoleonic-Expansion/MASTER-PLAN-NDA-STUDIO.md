@@ -713,6 +713,8 @@ TIER 5: M&A / HIGH-VALUE ($2,000-5,000)
 ├── Standstill provisions
 ├── Data room setup guidance
 ├── Full deal support
+
+HOURLY RATE: $240/hr (for all hourly engagements)
 ```
 
 ### Conversion Triggers
