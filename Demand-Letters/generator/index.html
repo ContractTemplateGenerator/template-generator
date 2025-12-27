@@ -634,7 +634,7 @@
                         <div class="selector-label">Situation</div>
                         <select id="situationSelect" class="selector-select" onchange="loadSituationModule()">
                             <option value="">Select Type...</option>
-                            <option value="unpaid-wages" selected>Unpaid Wages</option>
+                            <option value="unpaid-wages">Unpaid Wages</option>
                             <option value="breach-of-contract">Breach of Contract</option>
                             <option value="security-deposit">Security Deposit</option>
                             <option value="unpaid-invoice">Unpaid Invoice</option>
@@ -1199,8 +1199,6 @@ ${data.paymentHistory ? `
 <p class="doc-paragraph">Please direct all correspondence and settlement offers to the address listed above.</p>
                 `;
             }
-        },
-
         },
 
         'insurance-um-uim': {
@@ -2066,14 +2064,18 @@ ${data.invokeAppraisal && data.invokeAppraisal.toLowerCase().includes('yes') ? `
         const presetState = urlParams.get('state');
         const presetSituation = urlParams.get('situation');
 
-        // Set state if provided
+        // Set state if provided, default to california
         if (presetState && StateModules[presetState]) {
             document.getElementById('stateSelect').value = presetState;
+        } else {
+            document.getElementById('stateSelect').value = 'california';
         }
 
-        // Set situation if provided
+        // Set situation if provided, default to unpaid-wages for standalone
         if (presetSituation && SituationModules[presetSituation]) {
             document.getElementById('situationSelect').value = presetSituation;
+        } else if (!presetSituation) {
+            document.getElementById('situationSelect').value = 'unpaid-wages';
         }
 
         // Load modules

@@ -9,111 +9,108 @@
 - Time-sensitive (deadlines, statutes of limitation)
 - Convertible (willing to pay for professional help)
 
-**Current Status**: 378+ pages live, covering 25+ categories
+**Current Status**: 400+ pages live, **48 California pillar pages** built
 
-**Competitive Moat**: CA Attorney + Scale + Interactive Generators + Trilingual (Russian + Spanish) + Multi-State Expansion
+**Competitive Moat**: CA Attorney + Scale + Trilingual (Russian + Spanish) + Multi-State Expansion
 
 ---
 
-## CURRENT EMPIRE STATUS
+## CURRENT INVENTORY (Dec 27, 2025)
 
-### Total Pages: 378+
+### California Pillar Pages: 48 Total
 
-| Category | Pages | Status |
-|----------|-------|--------|
-| Russian (bilingual) | 69 | Deep |
-| California-specific | 26 | Solid |
-| PI (Personal Injury) | 23 | Growing |
-| Consumer | 19 | Comprehensive |
-| Business | 18 | Comprehensive |
-| Employment | 17 | Comprehensive |
-| Landlord-Tenant | 15 | Comprehensive |
-| Debt | 13 | Good |
-| Government-Professional | 11 | Good |
-| Medical | 11 | Good |
-| Family | 10 | Good |
-| Premises-Liability | 7 | Moderate |
-| Home-Services-Construction | 7 | Moderate |
-| Platforms-Fintech | 11 | Good (merged) |
-| Automotive | 6 | Moderate |
-| IP-Defamation-Privacy | 14 | Good (merged) |
-| Influencer-Media | 6 | Moderate |
-| Insurance | 6 | Moderate |
-| Real-Estate | 5 | Light |
-| Animals | 4 | Light (has generators) |
-| Licensing | 4 | Light |
-| Root-level specialty guides | 57 | Mixed |
-| Spanish (bilingual) | 0 | PHASE 5 |
-| State variants (AZ/NV/OR) | 0 | PHASE 6 |
+| Category | CA Pages | General Pages | Status |
+|----------|----------|---------------|--------|
+| **PI (Personal Injury)** | **24** | 23+ | STRONG |
+| └─ Car-Accidents | 9 | - | Deep |
+| └─ Dog-Bites | 1 | - | Light |
+| └─ Premises-Liability | 1 | - | Light |
+| └─ Root-level PI | 13 | - | Growing |
+| **Employment** | **6** | 17 | Good |
+| **Insurance** | **2** | 6 | Needs growth |
+| **Business** | **1** | 18 | Needs CA depth |
+| **Consumer** | **2** | 19 | Needs CA depth |
+| **Landlord-Tenant** | **2** | 15 | Needs CA depth |
+| **Real-Estate** | **2** | 5 | Light |
+| **Automotive** | **2** | 6 | Moderate |
+| **Home-Services** | **2** | 7 | Moderate |
+| **Medical** | **1** | 11 | Needs growth |
+| **Premises-Liability (root)** | **2** | 7 | Merged into PI |
+| **Defamation** | **1** | - | Light |
+| **Government-Professional** | **1** | 11 | Light |
+| **Russian (bilingual)** | - | 69 | Deep |
+
+### Category Index Pages: 38 Total
+All major categories have index.html pages including:
+- PI subcategories (Car-Accidents, Dog-Bites, Other-PI, Premises-Liability, Transportation)
+- All 13 main categories
+- Platforms/Stripe subpages
+- Generator and Workbench
 
 ---
 
 ## CONSOLIDATED TAXONOMY (13 Categories)
 
-**Category consolidation to simplify navigation:**
-
-| Old (Fragmented) | New (Consolidated) | Subclusters |
-|-----------------|-------------------|-------------|
-| Platforms (4) + Platforms-Fintech (7) | **Platforms & Fintech** | Stripe, PayPal, Amazon, crypto exchanges, app stores |
-| Defamation (4) + IP-Content (6) + Privacy-Data (4) | **IP, Defamation & Privacy** | DMCA, reviews, trade secrets, CCPA, doxxing |
-| Premises-Liability (7) | Merged into **Personal Injury** | Slip/fall, retail, hotels, apartments |
-
 **Final 13 Top-Level Categories:**
 
-1. **Personal Injury** - car accidents, premises, dog bites, med mal, wrongful death
+1. **Personal Injury (PI/)** - car accidents, premises, dog bites, med mal, wrongful death
 2. **Employment** - wages, discrimination, harassment, trade secrets, retaliation
-3. **Business & Commercial** - invoices, breach, partnerships, vendor disputes
+3. **Business** - invoices, breach, partnerships, vendor disputes
 4. **Consumer** - refunds, fraud, subscriptions, lemon law, CLRA
 5. **Landlord-Tenant** - deposits, habitability, evictions, commercial lease
-6. **Debt & Credit** - collection, disputes, credit reporting, medical debt
+6. **Debt** - collection, disputes, credit reporting, medical debt
 7. **Insurance** - denials, bad faith, undervaluation, delay tactics
-8. **Platforms & Fintech** - Stripe, PayPal, Amazon, crypto, app stores
-9. **IP, Defamation & Privacy** - DMCA, reviews, trade secrets, CCPA, doxxing
-10. **Home Services & Construction** - contractors, warranties, liens, defects
-11. **Real Estate** - earnest money, disclosure, brokers, title issues
-12. **Government & Licensing** - claims, agencies, boards, regulatory
-13. **Family & Medical** - estates, malpractice, professional licensing
+8. **Platforms-Fintech** - Stripe, PayPal, Amazon, crypto, app stores
+9. **IP-Defamation-Privacy** - DMCA, reviews, trade secrets, CCPA, doxxing
+10. **Home-Services-Construction** - contractors, warranties, liens, defects
+11. **Real-Estate** - earnest money, disclosure, brokers, title issues
+12. **Government-Professional** - claims, agencies, boards, regulatory
+13. **Medical/Family** - estates, malpractice, professional licensing
 
 ---
 
-## BUILD PHASES (Revised Priority Order)
+## BUILD PHASES (Revised Dec 2025)
 
-### PHASE 1: Category Deepening (Current Priority)
-**Goal**: Get every category to 15+ pages before expanding to new languages/states
+### PHASE 1: California Pillar Pages (CURRENT)
+**Goal**: Build CA-specific pillar pages for all high-intent situations
 
-**Rationale**: Build the English content base first. Google indexes new pages gradually. While indexing happens, we deepen and refine. State/Spanish versions are adaptations of existing content—they require the base content to exist first.
+**Strategy**: California-ONLY first. CA pages can rank for both "california X demand letter" AND generic "X demand letter" queries.
 
-**Priority gaps to fill:**
-| Category | Current | Target | Gap |
-|----------|---------|--------|-----|
-| Insurance | 6 | 15+ | +9 |
-| Real-Estate | 5 | 12+ | +7 |
-| Automotive | 6 | 12+ | +6 |
-| Home-Services | 7 | 15+ | +8 |
-| Animals | 4 | 10+ | +6 |
-| Licensing | 4 | 10+ | +6 |
+**Build order** (by category, 10 pages per batch):
 
-### PHASE 2: Personal Injury Blitz
-**Goal**: Expand PI from 23 pages to 50+ pages
+| Batch | Category Focus | Target Pages |
+|-------|---------------|--------------|
+| 1.1 | PI Car Accidents | rear-end, t-bone, multi-vehicle, parking lot, highway, intersection ✅ |
+| 1.2 | Mixed High-Priority | breach-of-contract, habitability, lemon-law, defective-product, etc. ✅ |
+| 1.3 | PI Expansion | motorcycle, pedestrian, bicycle, slip-fall, premises-liability ✅ |
+| 1.4 | Insurance | bad-faith, property-damage, UM/UIM, delayed-payment |
+| 1.5 | Employment | discrimination, retaliation, PAGA, meal-break violations |
+| 1.6 | Home-Services | contractor-abandonment, solar-fraud, home-warranty ✅ |
+| 1.7 | Consumer | CLRA violations, auto-renewal fraud, subscription traps |
+| 1.8 | Real-Estate | agent-negligence, title-defect, HOA disputes |
 
-**High-value subclusters:**
-- Car accidents (rear-end, T-bone, multi-vehicle, highway, parking lot, intersection)
-- Motorcycle & bicycle accidents
-- Pedestrian accidents (crosswalk, jaywalking, e-scooter)
-- Premises liability (retail, hotel, apartment, restaurant, gym)
-- Dog bites (by breed, by location, insurance issues)
-- Medical malpractice (misdiagnosis, surgical errors, medication errors)
-- Product liability (defective products, recalls, manufacturing defects)
-- Wrongful death (by cause, by relationship, damages calculation)
+**Completed CA Pillar Pages (48):**
+- PI/Car-Accidents: 9 pages (rear-end, t-bone, multi-vehicle, parking-lot, highway, intersection, sideswipe, rollover, uber-lyft)
+- PI/root: 13 pages (motorcycle, pedestrian, bicycle, grocery-slip-fall, premises-liability, etc.)
+- Employment: 6 pages (wages, overtime, harassment, discrimination, wrongful-termination, personnel-file)
+- Insurance: 2 pages (bad-faith, property-damage)
+- Others: 18 pages across Business, Consumer, Landlord-Tenant, Real-Estate, Automotive, Home-Services, Medical
+
+### PHASE 2: Category Deepening
+**Goal**: Get every category to 10+ CA pillar pages
+
+**Priority gaps:**
+| Category | Current CA | Target | Gap |
+|----------|-----------|--------|-----|
+| Insurance | 2 | 10 | +8 |
+| Business | 1 | 8 | +7 |
+| Consumer | 2 | 8 | +6 |
+| Landlord-Tenant | 2 | 8 | +6 |
+| Real-Estate | 2 | 6 | +4 |
+| Medical | 1 | 5 | +4 |
 
 ### PHASE 3: Respond-Side Parity
-**Goal**: Audit existing write-side pages, build respond mirrors, cross-link
-
-**Process:**
-1. **Audit** - Scan each category folder for pages without respond counterparts
-2. **Build mirrors** - Create respond-side content for each orphaned write page
-3. **Cross-link** - Add Write↔Respond links on both sides
-4. **Use unified toggle** - Implement iframe/modal toggle so users can switch Write/Respond without leaving the page
+**Goal**: Build respond/defense guides for each write-side page
 
 **Two-sided coverage priority:**
 | Write Side | Respond Side | Status |
@@ -125,297 +122,107 @@
 | Consumer claims | Business/seller responses | Light |
 | PI demands | Insurance/defendant responses | Light |
 
-### PHASE 4: Generator Rollout
-**Goal**: Add interactive generators to top 100 pages
+### PHASE 4: Spanish Language Expansion
+**Goal**: 50+ Spanish pages targeting high-volume consumer issues
 
-**Priority order based on traffic:**
-- Top 20 pages → Advanced contenteditable generators
-- Top 50 pages → Lightweight snippet generators
-- Remaining → Keep widget playbook (tabs + checklist + FAQ)
-
-**Reference implementation**: `california/saas-termination-dispute-demand-letters.html`
-
-### PHASE 5: Spanish Language Expansion
-**Goal**: 100+ Spanish pages targeting high-volume consumer issues
-
-**Why Phase 5 (not earlier)**: Spanish pages are adaptations of English content. Build the English base first, then translate/adapt. This also gives time for English pages to start ranking before we expand.
-
-**Target subclusters:**
-- Landlord-tenant (deposits, habitability, evictions) - "inquilino-propietario"
-- Employment (wages, discrimination, termination) - "empleo"
+**Target clusters:**
+- Landlord-tenant (deposits, habitability) - "inquilino-propietario"
+- Employment (wages, discrimination) - "empleo"
 - Consumer fraud (cars, contractors) - "consumidor"
-- Debt collection defense - "deudas"
 - Personal injury basics - "lesiones-personales"
 
-**Spanish SEO keywords:**
-- "carta de demanda" (demand letter)
-- "carta de reclamo" (complaint letter)
-- "derechos del inquilino" (tenant rights)
-- "salarios no pagados" (unpaid wages)
-- "accidente de auto reclamo" (car accident claim)
+### PHASE 5: State Expansion (AZ, NV, OR)
+**Goal**: Adapt top 30 CA pages for each neighboring state
 
-### PHASE 6: State Expansion (AZ, NV, OR)
-**Goal**: Adapt top 30-50 pages for each neighboring state
-
-**Why Phase 6 (last)**: State versions require the base content to exist. They're systematic adaptations—update statutes, adjust court procedures, keep same structure. Best done as a batch operation after core content is mature.
-
-**Priority states (geographic credibility):**
+**Priority states:**
 | State | Priority | Rationale |
 |-------|----------|-----------|
-| Arizona (AZ) | HIGH | Borders CA, large population, Phoenix market |
-| Nevada (NV) | HIGH | Borders CA, Las Vegas market, many CA ties |
-| Oregon (OR) | HIGH | Borders CA, Portland market, tech overlap |
+| Arizona (AZ) | HIGH | Borders CA, Phoenix market |
+| Nevada (NV) | HIGH | Las Vegas market, CA ties |
+| Oregon (OR) | HIGH | Portland market, tech overlap |
 
-**Folder structure:**
-```
-Demand-Letters/
-├── Arizona/
-├── Nevada/
-├── Oregon/
-├── Spanish/
-```
+### PHASE 6: Generator Module Expansion (DEFERRED)
+**Goal**: Add situation modules to generator for pages that don't have them
 
----
+**Current generator supports only:**
+- `unpaid-wages` ✅
+- `breach-of-contract` ✅
+- `security-deposit` ✅
+- `unpaid-invoice` ✅
 
-## INTERACTIVE GENERATORS
+**Deferred until**: Core CA pillar content is complete. Sample Language sections in pillar pages provide sufficient user value without generator.
 
-### Generator Architecture: Modular Modal Approach
-
-**CRITICAL**: Do NOT build full generators from scratch for each page. Use the centralized generator with modals.
-
-**Core Generator**: `generator/index.html`
-- Two-panel layout with inline editing
-- State modules (CA, TX, NY, FL - expandable)
-- Situation modules (wages, contracts, deposits, invoices - expandable)
-- URL parameter support: `?state=california&situation=unpaid-wages`
-- Copy, Print, Download .doc functionality
-
-**Per-Page Integration (lightweight modal)**:
-```html
-<!-- Add to any demand letter page -->
-<button onclick="openGenerator('california', 'unpaid-wages')">Generate My Letter</button>
-
-<div id="generatorModal" class="generator-modal">
-  <div class="modal-content">
-    <button class="close-btn" onclick="closeGenerator()">&times;</button>
-    <iframe id="generatorFrame" src=""></iframe>
-  </div>
-</div>
-
-<script>
-function openGenerator(state, situation) {
-  document.getElementById('generatorFrame').src =
-    '../generator/?state=' + state + '&situation=' + situation;
-  document.getElementById('generatorModal').style.display = 'flex';
-}
-function closeGenerator() {
-  document.getElementById('generatorModal').style.display = 'none';
-}
-</script>
-```
-
-**This approach means**:
-- Generator updates happen in ONE place (`generator/index.html`)
-- Adding new situations = update SituationModules object only
-- Adding new states = update StateModules object only
-- 500+ pages get ~15 lines of modal code, not 1,600+ lines of duplicate generator
-
-### Current State/Situation Coverage
-
-**States Available**: California, Texas, New York, Florida
-
-**Situations Available**:
-- `unpaid-wages` - Employment wages
-- `breach-of-contract` - Business contracts
-- `security-deposit` - Landlord-tenant deposits
-- `unpaid-invoice` - Business invoices
-
-### Expansion Roadmap
-
-**Priority situations to add**:
-1. Car accident injury (PI)
-2. Habitability complaints (Landlord-Tenant)
-3. Consumer refund (Consumer)
-4. Discrimination/harassment (Employment)
-5. Insurance bad faith (Insurance)
+**Future modules to add:**
+- car-accident
+- habitability
+- bad-faith-insurance
+- discrimination
+- lemon-law
+- contractor-dispute
 
 ---
 
-## UNIFIED VARIANT TOGGLE ARCHITECTURE
+## PAGE TEMPLATE: CA Pillar Page Format
 
-### The Vision: One Page, Multiple Variants
+Each California pillar page includes:
 
-Instead of separate URLs for Write/Respond and English/Russian/Spanish, use **inline toggles** that load variant content into the same page frame without navigation.
+1. **Mega Header** - Site-wide navigation
+2. **Hero Section** - Title, subtitle, key stats (statute, penalties, deadline)
+3. **Breadcrumb** - Category > Subcategory > Page
+4. **Sticky Sidebar** - 7-8 section links + CTA
+5. **Main Content Sections:**
+   - Overview
+   - Legal Basis (CA statutes, case law)
+   - Elements/Requirements
+   - Damages & Penalties
+   - Evidence Checklist (interactive)
+   - Sample Language (copy-paste paragraphs)
+   - Next Steps
+6. **Footer** - Terms.Law links
 
-```
-┌─────────────────────────────────────────────────────────┐
-│  Unpaid Wages Demand Letter                             │
-│  ──────────────────────────────────────────────────────│
-│  [✓ Write] [ Respond ]     [ EN ] [ RU ] [ ES ]        │
-│  ──────────────────────────────────────────────────────│
-│                                                         │
-│  ┌─────────────────────────────────────────────────┐   │
-│  │                                                 │   │
-│  │   (Content loads here via iframe/AJAX)         │   │
-│  │                                                 │   │
-│  │   Current: Write-side, English                 │   │
-│  │                                                 │   │
-│  └─────────────────────────────────────────────────┘   │
-│                                                         │
-└─────────────────────────────────────────────────────────┘
-```
-
-### Benefits
-
-1. **One canonical URL** - SEO juice stays concentrated
-2. **No page reload** - Fast UX, user doesn't lose scroll position
-3. **Easier maintenance** - Shell page is lightweight, variants are modular
-4. **Reduced file count** - 1 shell + 6 variants vs 6 separate full pages
-
-### Implementation
-
-**Shell page** (the canonical URL):
-- Header, navigation, CTAs, footer
-- Toggle buttons for Write/Respond
-- Toggle buttons for EN/RU/ES
-- iframe or div for variant content
-
-**Variant content files** (loaded into frame):
-- `_write-en.html` - Write-side English
-- `_respond-en.html` - Respond-side English
-- `_write-ru.html` - Write-side Russian
-- `_respond-ru.html` - Respond-side Russian
-- `_write-es.html` - Write-side Spanish
-- `_respond-es.html` - Respond-side Spanish
-
-**Toggle logic**:
-```javascript
-function loadVariant(side, lang) {
-  const src = `./_${side}-${lang}.html`;
-  document.getElementById('variantFrame').src = src;
-  // Update toggle button states
-  // Update URL hash for bookmarking: #respond-ru
-}
-```
-
-### Rollout Priority
-
-1. **Phase 3** - Implement for Write↔Respond toggles on new respond-side pages
-2. **Phase 5** - Add language toggles when Spanish content is built
-3. **Retrofit** - Gradually update existing Russian pages to use toggle architecture
+**NO generator iframe** unless situation module exists in `/generator/`.
 
 ---
 
 ## STANDARD FEE STRUCTURE
 
 All demand letter pages should display:
-
 - **Hourly rate**: $240/hr
-- **Demand letters**: $450 flat fee (base starting point)
+- **Demand letters**: $450 flat fee (base)
 - **Contingency**: 33-40% of recovery
 - **Case evaluation**: Paid consultation
-
-**DO NOT** use ranges like "$300-$500/hr" or "$800-$1,500" for demand letters.
 
 ---
 
 ## SUCCESS METRICS
 
 ### Content Metrics
-- [ ] 500+ pages published
-- [ ] All 13 categories have 15+ pages
-- [ ] PI category expanded to 50+ pages
-- [ ] Respond-side parity for all major topics
+- [x] 48 California pillar pages built
+- [ ] 100+ CA pillar pages (Phase 1 complete)
+- [ ] All 13 categories have 10+ CA pages
+- [ ] Respond-side parity for top 50 pages
 
-### Generator Metrics
-- [ ] 100+ pages with interactive generators
-- [ ] All high-traffic pages have generators
-- [ ] Consistent user experience across generators
-
-### SEO Metrics (6-month projections)
-- [ ] 50,000+ organic visits/month to demand letter section
+### SEO Metrics (6-month targets)
+- [ ] 50,000+ organic visits/month
 - [ ] 500+ ranking keywords (top 10)
 - [ ] Featured snippets for demand letter queries
 
 ### Conversion Metrics
 - [ ] 5% visitor → inquiry conversion rate
 - [ ] $10K+ monthly revenue from demand letter services
-- [ ] 50+ demand letter drafting requests/month
 
 ---
 
 ## COMPETITIVE MOAT
 
-### Why Terms.Law Wins
-
 | Competitor | Their Weakness | Your Advantage |
 |------------|----------------|----------------|
-| LegalZoom | Generic templates, no depth | Scenario-specific guides, CA expertise |
-| Rocket Lawyer | No state-specific content | Deep CA + neighboring state coverage |
-| Random template sites | No attorney credibility | Licensed CA attorney, real practice |
-| AI chatbots | No E-E-A-T, hallucinations | Attorney-authored, Google-trusted |
-| Other attorneys | Not building at scale | 378+ pages and growing, interactive tools |
-
-### Unique Assets
-
-1. **Russian Language Moat** - 69 pages in Russian = zero competition
-2. **Spanish Language Moat** - 40M+ Spanish speakers, zero attorney-quality competition (Phase 5)
-3. **Interactive Generators** - Advanced contenteditable editors
-4. **Two-Sided Coverage** - Both sender AND recipient perspectives
-5. **Geographic Focus** - CA base expanding to AZ/NV/OR (Phase 6)
-6. **Scale + Quality** - Mass production with attorney oversight
+| LegalZoom | Generic templates | CA-specific guides, statutes, case law |
+| Rocket Lawyer | No state-specific content | Deep CA coverage |
+| Random template sites | No attorney credibility | Licensed CA attorney |
+| AI chatbots | No E-E-A-T | Attorney-authored, Google-trusted |
+| Other attorneys | Not building at scale | 400+ pages and growing |
 
 ---
 
-## NEXT ACTIONS
-
-**Immediate (Phase 1-2):**
-1. Deepen Insurance category (+9 pages)
-2. Deepen Real-Estate category (+7 pages)
-3. Expand PI car accidents cluster (+10 pages)
-4. Build respond-side parity for Employment and Business
-
-**After indexing begins (Phase 3-4):**
-5. Complete respond-side coverage for all major topics
-6. Roll out generators to top 50 pages by traffic
-
-**After English base is mature (Phase 5-6):**
-7. Build Spanish hub with 50 core pages
-8. Adapt top 30 pages for AZ/NV/OR
-
----
-
-## CLUSTER KIT METHODOLOGY
-
-**UPDATED DEC 2025: CA-FIRST STRATEGY**
-
-Build CALIFORNIA-ONLY pillar pages first. Avoids Google duplicate content flags for a new domain.
-
-**Why CA-Only First:**
-- You're a CA-licensed attorney = strongest moat, highest E-E-A-T
-- New domains need trust - general + state pages look like thin content farming
-- CA pages can rank for BOTH "california X demand letter" AND "X demand letter"
-- Generator handles all 6 states automatically via URL params - no separate pages needed yet
-
-For each high-intent cluster, build:
-
-1. **CA Pillar Page** - California-specific with statutes, case law, penalties (7-tab format)
-2. **Generator Module** - Situation module with all 6 states (CA, AZ, NV, OR, WA, Other)
-3. **Respond guide** - for recipients of such letters
-4. **Cross-links** - to related CA pillar pages
-
-**PHASE 6+ (FUTURE):** General/all-states pages after CA pages are indexed and ranking.
-
----
-
-## BUILD SESSION PLANNING
-
-See `BUILD-PLAN-500-PAGES.html` for visual roadmap with:
-- Batch breakdowns for next 500 pages
-- Token usage estimates per 5-hour session
-- Priority ordering by SEO impact
-- Phase timeline
-
----
-
-*Last updated: December 26, 2025*
+*Last updated: December 27, 2025*
