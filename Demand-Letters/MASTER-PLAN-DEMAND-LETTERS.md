@@ -387,16 +387,24 @@ All demand letter pages should display:
 
 ## CLUSTER KIT METHODOLOGY
 
-For each high-intent cluster, build the **minimum viable kit** before expanding variants:
+**UPDATED DEC 2025: CA-FIRST STRATEGY**
 
-1. **Main guide (GENERAL)** - nationwide applicable
-2. **Main guide (CA)** - California-specific version
-3. **Evidence checklist** - what to gather
-4. **Respond guide** - for recipients of such letters
-5. **Snippet library** - sender + recipient sample language
-6. **Mini tool** - deadline calculator, interest calculator, checklist scoring
+Build CALIFORNIA-ONLY pillar pages first. Avoids Google duplicate content flags for a new domain.
 
-This ensures complete coverage before horizontal expansion.
+**Why CA-Only First:**
+- You're a CA-licensed attorney = strongest moat, highest E-E-A-T
+- New domains need trust - general + state pages look like thin content farming
+- CA pages can rank for BOTH "california X demand letter" AND "X demand letter"
+- Generator handles all 6 states automatically via URL params - no separate pages needed yet
+
+For each high-intent cluster, build:
+
+1. **CA Pillar Page** - California-specific with statutes, case law, penalties (7-tab format)
+2. **Generator Module** - Situation module with all 6 states (CA, AZ, NV, OR, WA, Other)
+3. **Respond guide** - for recipients of such letters
+4. **Cross-links** - to related CA pillar pages
+
+**PHASE 6+ (FUTURE):** General/all-states pages after CA pages are indexed and ranking.
 
 ---
 
