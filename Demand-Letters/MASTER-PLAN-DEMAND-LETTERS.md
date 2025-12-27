@@ -11,7 +11,7 @@
 
 **Current Status**: 377 pages live, covering 25+ categories
 
-**Competitive Moat**: CA Attorney + Scale + Interactive Generators + Bilingual (Russian) + Multi-State Expansion
+**Competitive Moat**: CA Attorney + Scale + Interactive Generators + Trilingual (Russian + Spanish) + Multi-State Expansion
 
 ---
 
@@ -22,6 +22,7 @@
 | Category | Pages | Status |
 |----------|-------|--------|
 | Russian (bilingual) | 69 | Deep |
+| Spanish (bilingual) | 0 | NOT STARTED - PRIORITY |
 | California-specific | 24 | Solid |
 | Consumer | 19 | Comprehensive |
 | Business | 18 | Comprehensive |
@@ -135,6 +136,63 @@ For each neighboring state (AZ, NV, OR):
 
 ---
 
+## SPANISH LANGUAGE EXPANSION
+
+### The Opportunity
+
+**40+ million Spanish speakers in the US** - massively underserved legal market:
+- California: 15M+ Spanish speakers (39% of state)
+- Arizona: 2M+ Spanish speakers (30% of state)
+- Nevada: 800K+ Spanish speakers (28% of state)
+- Texas: 10M+ Spanish speakers (if future expansion)
+
+**Zero competition** for Spanish-language demand letter content with attorney credibility.
+
+### Spanish Build Strategy
+
+**Phase 1: Core Topics (50 pages)**
+- Adapt top 50 English demand letter pages
+- Focus on high-volume consumer issues:
+  - Landlord-tenant (security deposits, habitability, evictions)
+  - Employment (unpaid wages, discrimination, wrongful termination)
+  - Consumer fraud (car purchases, contractor disputes)
+  - Debt collection defense
+  - Personal injury basics
+
+**Phase 2: State-Specific Spanish (30 pages)**
+- California Spanish versions
+- Arizona Spanish versions (high Hispanic population)
+
+**Phase 3: Deep Coverage (70 pages)**
+- Expand all major categories to Spanish
+- Target: 150 Spanish pages total
+
+### Spanish Folder Structure
+
+```
+Demand-Letters/
+├── Spanish/
+│   ├── index.html (Spanish landing page)
+│   ├── inquilino-propietario/ (landlord-tenant)
+│   ├── empleo/ (employment)
+│   ├── consumidor/ (consumer)
+│   ├── deudas/ (debt)
+│   ├── lesiones-personales/ (personal injury)
+│   └── california/ (CA-specific Spanish)
+```
+
+### Spanish SEO Keywords
+
+Target Spanish search queries:
+- "carta de demanda" (demand letter)
+- "carta de reclamo" (complaint letter)
+- "abogado gratis" (free lawyer)
+- "derechos del inquilino" (tenant rights)
+- "salarios no pagados" (unpaid wages)
+- "accidente de auto reclamo" (car accident claim)
+
+---
+
 ## PRIORITY GAPS (Next Build Phase)
 
 ### Tier 1: Critical Expansion
@@ -238,10 +296,11 @@ Deploy advanced generators (contenteditable + inline editing) to ALL demand lett
 ### Unique Assets
 
 1. **Russian Language Moat** - 69 pages in Russian = zero competition
-2. **Interactive Generators** - Advanced contenteditable editors
-3. **Two-Sided Coverage** - Both sender AND recipient perspectives
-4. **Geographic Focus** - CA base expanding to AZ/NV/OR (credible)
-5. **Scale + Quality** - Mass production with attorney oversight
+2. **Spanish Language Moat** - 40M+ Spanish speakers, zero attorney-quality competition
+3. **Interactive Generators** - Advanced contenteditable editors
+4. **Two-Sided Coverage** - Both sender AND recipient perspectives
+5. **Geographic Focus** - CA base expanding to AZ/NV/OR (credible)
+6. **Scale + Quality** - Mass production with attorney oversight
 
 ---
 
@@ -249,8 +308,20 @@ Deploy advanced generators (contenteditable + inline editing) to ALL demand lett
 
 1. **Immediate**: Build out PI (Personal Injury) category - add 10+ pages
 2. **This week**: Create Arizona, Nevada, Oregon subfolders
-3. **This month**: Adapt top 15 CA pages for each neighboring state
-4. **Ongoing**: Roll out advanced generators to all existing pages
+3. **This week**: Create Spanish subfolder and first 10 Spanish pages
+4. **This month**: Adapt top 15 CA pages for each neighboring state
+5. **This month**: Build 50 core Spanish pages (landlord-tenant, employment, consumer)
+6. **Ongoing**: Roll out advanced generators to all existing pages
+
+---
+
+## BUILD SESSION PLANNING
+
+See `BUILD-PLAN-500-PAGES.html` for visual roadmap with:
+- Batch breakdowns for next 500 pages
+- Token usage estimates per 5-hour session
+- Priority ordering by SEO impact
+- Language/state expansion timeline
 
 ---
 
