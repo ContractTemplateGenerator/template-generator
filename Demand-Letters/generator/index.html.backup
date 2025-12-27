@@ -639,10 +639,8 @@
                             <option value="security-deposit">Security Deposit</option>
                             <option value="unpaid-invoice">Unpaid Invoice</option>
                             <option value="car-accident">Car Accident Injury</option>
-                            <option value="insurance-um-uim">UM/UIM Insurance Dispute</option>
                             <option value="insurance-delayed-payment">Insurance Delayed Payment</option>
                             <option value="insurance-bad-faith">Insurance Bad Faith Denial</option>
-                            <option value="insurance-undervalued">Undervalued Insurance Claim</option>
                             <!-- More situations will be added -->
                         </select>
                     </div>
@@ -822,11 +820,646 @@
                     { code: 'Vehicle Code § 17150', desc: 'Owner liability for permissive use of vehicle' },
                     { code: 'Civil Code § 3333', desc: 'Measure of damages for personal injury torts' }
                 ],
-                'insurance-undervalued': [
-                    { code: 'Ins. Code § 790.03(h)', desc: 'Unfair claims settlement practices - failing to offer fair settlements' },
-                    { code: 'Cal. Code Regs. tit. 10, § 2695.7', desc: 'Fair Claims Settlement Practices - valuation standards' },
-                    { code: 'Ins. Code § 790.03(h)(5)', desc: 'Failing to affirm or deny coverage within reasonable time' },
-                    { code: 'Civil Code § 3294', desc: 'Punitive damages for bad faith conduct' }
+                'insurance-investigation': [
+                    { code: 'Cal. Ins. Code § 790.03(h)', desc: 'Unfair Claims Settlement Practices Act - prohibits unfair claim practices' },
+                    { code: 'CCR Title 10 § 2695.7(d)', desc: 'Fair Claims Settlement Practices - thorough investigation required' },
+                    { code: 'CCR Title 10 § 2695.7(b)', desc: 'Must accept or deny claim within 40 days of proof of claim' },
+                    { code: 'CCR Title 10 § 2695.7(c)', desc: 'Must provide written explanation for claim denial' },
+                    { code: 'Cal. Ins. Code § 790.03(h)(3)', desc: 'Failing to adopt reasonable standards for prompt investigation' },
+                    { code: 'Cal. Ins. Code § 790.03(h)(5)', desc: 'Not attempting in good faith to effectuate fair settlements' }
+                ],
+                'insurance-bad-faith': [
+                    { code: 'Cal. Ins. Code § 790.03(h)', desc: 'Unfair Claims Settlement Practices Act - defines bad faith practices' },
+                    { code: 'Civil Code § 3294', desc: 'Punitive damages for oppression, fraud, or malice' },
+                    { code: 'Brandt v. Superior Court (1985)', desc: 'Attorney fees recoverable to obtain policy benefits' },
+                    { code: 'Egan v. Mutual of Omaha (1979)', desc: 'Duty of good faith and fair dealing' },
+                    { code: 'Gruenberg v. Aetna (1973)', desc: 'Tort of insurance bad faith recognized' },
+                    { code: 'CCP § 339', desc: '2-year statute of limitations for bad faith claims' }
+                ]
+            },
+
+            // Get summary for state info box
+            getSummary: function(situation) {
+                const statutes = this.statutes[situation] || [];
+                let html = '<ul>';
+                statutes.forEach(s => {
+                    html += `<li><strong>${s.code}:</strong> ${s.desc}</li>`;
+                });
+                html += '</ul>';
+                return html;
+            },
+
+            // Get deadline recommendation
+            getDeadlineRecommendation: function(situation) {
+                switch(situation) {
+                    case 'unpaid-wages':
+                        return 'For wage claims, 10-14 days is typical. Labor Commissioner complaints can be filed anytime within 3 years.';
+                    case 'security-deposit':
+                        return 'Landlord has 21 days by law. A 14-day demand deadline is reasonable before filing suit.';
+                    case 'breach-of-contract':
+                        return '14-30 days is standard for contract disputes.';
+                    case 'car-accident':
+                        return '30 days is standard for insurance demand letters. California has a 2-year statute of limitations.';
+                    case 'insurance-investigation':
+                        return '30 days is appropriate for insurance investigation complaints. CDI complaints can be filed anytime.';
+                    case 'insurance-bad-faith':
+                        return '30 days is standard for bad faith demands. California has a 2-year statute of limitations for bad faith claims.';
+                    default:
+                        return '14-21 days is typical for most demands.';
+                }
+            },
+
+            // Get legal citations for letter
+            getLegalCitations: function(situation) {
+                const statutes = this.statutes[situation] || [];
+                return statutes.map(s => s.code).join(', ');
+            },
+
+            // Get specific penalty language
+            getPenaltyLanguage: function(situation) {
+                switch(situation) {
+                    case 'unpaid-wages':
+                        return 'Under California Labor Code Section 203, employees are entitled to waiting time penalties of up to 30 days of wages when final wages are not paid on time. Additionally, Labor Code Section 1194 provides for recovery of attorney fees and costs.';
+                    case 'security-deposit':
+                        return 'Under California Civil Code Section 1950.5(l), if you fail to return the security deposit within 21 days or if you withhold amounts in bad faith, you may be liable for up to twice the amount of the deposit as statutory damages, plus actual damages.';
+                    case 'car-accident':
+                        return 'Under California law, I am entitled to recover all economic damages (medical expenses, lost wages, property damage) and non-economic damages (pain and suffering, emotional distress). California Civil Code § 3333 provides for recovery of "the amount which will compensate for all the detriment proximately caused" by the negligent act.';
+                    case 'insurance-investigation':
+                        return 'Under California Insurance Code Section 790.03(h) and the Fair Claims Settlement Practices Regulations (CCR Title 10, Section 2695.7), insurers must conduct thorough and objective investigations. Failure to do so constitutes an unfair claims settlement practice. You may be subject to penalties from the California Department of Insurance, and I may pursue a bad faith insurance claim seeking compensatory damages, consequential damages, emotional distress damages, and punitive damages for your willful misconduct.';
+                    case 'insurance-bad-faith':
+                        return 'Under California law, insurers owe a duty of good faith and fair dealing to their policyholders. Egan v. Mutual of Omaha (1979) 24 Cal.3d 809. Your unreasonable denial of my claim constitutes bad faith, exposing you to liability for the policy benefits, consequential damages, emotional distress, and attorney fees incurred to obtain policy benefits (Brandt v. Superior Court (1985) 37 Cal.3d 813). Given your oppressive and malicious conduct, I reserve the right to seek punitive damages under Civil Code Section 3294.';
+                    default:
+                        return 'Under California Civil Code Section 3289, I am entitled to interest at the rate of 10% per annum on all amounts owed from the date payment was due.';
+                }
+            }
+        },
+
+        'texas': {
+            name: 'Texas',
+            abbreviation: 'TX',
+            wageClaimInfo: {
+                agency: 'Texas Workforce Commission (TWC)',
+                agencyUrl: 'https://www.twc.texas.gov/',
+                waitingTimePenalty: 'None (Texas has limited wage protections)',
+                interestRate: '6% per annum (Tex. Fin. Code § 302.002)',
+                statuteOfLimitations: '2 years for wage claims',
+                smallClaimsLimit: '$20,000 (Justice Court)'
+            },
+            statutes: {
+                'unpaid-wages': [
+                    { code: 'Tex. Lab. Code § 61.001', desc: 'Definition of wages' },
+                    { code: 'Tex. Lab. Code § 61.014', desc: 'Wages due on regular pay schedule' },
+                    { code: 'Tex. Lab. Code § 61.018', desc: 'Wage claim filing with TWC' }
+                ],
+                'breach-of-contract': [
+                    { code: 'Tex. Fin. Code § 302.002', desc: 'Prejudgment interest at 6%' },
+                    { code: 'Tex. Civ. Prac. & Rem. § 16.004', desc: '4-year statute of limitations' }
+                ],
+                'security-deposit': [
+                    { code: 'Tex. Prop. Code § 92.103', desc: '30-day deadline to return deposit' },
+                    { code: 'Tex. Prop. Code § 92.109', desc: 'Landlord liability: 3x wrongfully withheld + $100 + attorney fees' }
+                ]
+            },
+            getSummary: function(situation) {
+                const statutes = this.statutes[situation] || [];
+                let html = '<ul>';
+                statutes.forEach(s => {
+                    html += `<li><strong>${s.code}:</strong> ${s.desc}</li>`;
+                });
+                html += '</ul>';
+                return html;
+            },
+            getDeadlineRecommendation: function(situation) {
+                if (situation === 'security-deposit') {
+                    return 'Texas law gives landlords 30 days. A 14-day demand is reasonable.';
+                }
+                return '14-21 days is typical.';
+            },
+            getLegalCitations: function(situation) {
+                const statutes = this.statutes[situation] || [];
+                return statutes.map(s => s.code).join(', ');
+            },
+            getPenaltyLanguage: function(situation) {
+                if (situation === 'security-deposit') {
+                    return 'Under Texas Property Code Section 92.109, bad faith retention of a security deposit makes you liable for the sum of $100, three times the amount of the deposit wrongfully withheld, and reasonable attorney\'s fees.';
+                }
+                return 'Under Texas Finance Code Section 302.002, I am entitled to prejudgment interest at 6% per annum.';
+            }
+        },
+
+        'new-york': {
+            name: 'New York',
+            abbreviation: 'NY',
+            wageClaimInfo: {
+                agency: 'NY Department of Labor',
+                agencyUrl: 'https://dol.ny.gov/',
+                waitingTimePenalty: 'Liquidated damages up to 100% of wages owed (Labor Law § 198)',
+                interestRate: '9% per annum (CPLR § 5004)',
+                statuteOfLimitations: '6 years for wage claims',
+                smallClaimsLimit: '$10,000 (NYC), $5,000 (outside NYC)'
+            },
+            statutes: {
+                'unpaid-wages': [
+                    { code: 'Labor Law § 191', desc: 'Frequency of wage payment requirements' },
+                    { code: 'Labor Law § 198', desc: 'Liquidated damages - 100% of unpaid wages' },
+                    { code: 'Labor Law § 198(1-a)', desc: 'Attorney fees to prevailing employee' }
+                ],
+                'security-deposit': [
+                    { code: 'GOL § 7-103', desc: 'Deposit must be held in trust' },
+                    { code: 'GOL § 7-108', desc: '14-day return requirement after move-out' }
+                ]
+            },
+            getSummary: function(situation) {
+                const statutes = this.statutes[situation] || [];
+                let html = '<ul>';
+                statutes.forEach(s => {
+                    html += `<li><strong>${s.code}:</strong> ${s.desc}</li>`;
+                });
+                html += '</ul>';
+                return html;
+            },
+            getDeadlineRecommendation: function(situation) {
+                return '10-14 days is typical for New York claims.';
+            },
+            getLegalCitations: function(situation) {
+                const statutes = this.statutes[situation] || [];
+                return statutes.map(s => s.code).join(', ');
+            },
+            getPenaltyLanguage: function(situation) {
+                if (situation === 'unpaid-wages') {
+                    return 'Under New York Labor Law Section 198, I am entitled to recover the full amount of unpaid wages plus liquidated damages equal to 100% of the wages owed, plus reasonable attorney\'s fees and costs.';
+                }
+                return 'Under CPLR Section 5004, I am entitled to interest at 9% per annum.';
+            }
+        },
+
+        'florida': {
+            name: 'Florida',
+            abbreviation: 'FL',
+            wageClaimInfo: {
+                agency: 'No state wage enforcement agency',
+                agencyUrl: 'https://www.dol.gov/agencies/whd',
+                waitingTimePenalty: 'None under state law',
+                interestRate: 'Variable (F.S. § 55.03)',
+                statuteOfLimitations: '5 years for written contracts (F.S. § 95.11)',
+                smallClaimsLimit: '$8,000'
+            },
+            statutes: {
+                'unpaid-wages': [
+                    { code: 'F.S. § 448.08', desc: 'Recovery of wages due - attorney fees available' },
+                    { code: '29 U.S.C. § 216(b)', desc: 'FLSA liquidated damages (federal law)' }
+                ],
+                'security-deposit': [
+                    { code: 'F.S. § 83.49', desc: 'Deposit return requirements' },
+                    { code: 'F.S. § 83.49(3)', desc: '15-30 day return timeline depending on claim' }
+                ]
+            },
+            getSummary: function(situation) {
+                const statutes = this.statutes[situation] || [];
+                let html = '<ul>';
+                statutes.forEach(s => {
+                    html += `<li><strong>${s.code}:</strong> ${s.desc}</li>`;
+                });
+                if (situation === 'unpaid-wages') {
+                    html += '<li><em>Note: Florida has no state agency for wage claims. Consider federal DOL complaint or small claims court.</em></li>';
+                }
+                html += '</ul>';
+                return html;
+            },
+            getDeadlineRecommendation: function(situation) {
+                return '14-21 days is typical.';
+            },
+            getLegalCitations: function(situation) {
+                const statutes = this.statutes[situation] || [];
+                return statutes.map(s => s.code).join(', ');
+            },
+            getPenaltyLanguage: function(situation) {
+                return 'Under Florida Statutes Section 448.08, I am entitled to recover unpaid wages plus attorney\'s fees and costs. If this matter proceeds to court, I will seek all available remedies.';
+            }
+        },
+
+        'arizona': {
+            name: 'Arizona',
+            abbreviation: 'AZ',
+            wageClaimInfo: {
+                agency: 'Arizona Industrial Commission',
+                agencyUrl: 'https://www.azica.gov/',
+                waitingTimePenalty: 'Treble damages for willful nonpayment (A.R.S. § 23-355)',
+                interestRate: '10% per annum (A.R.S. § 44-1201)',
+                statuteOfLimitations: '1 year for wage claims (A.R.S. § 23-364)',
+                smallClaimsLimit: '$3,500'
+            },
+            statutes: {
+                'unpaid-wages': [
+                    { code: 'A.R.S. § 23-351', desc: 'Payment of wages - timing requirements' },
+                    { code: 'A.R.S. § 23-353', desc: 'Final wages due within 7 days or next payday' },
+                    { code: 'A.R.S. § 23-355', desc: 'Treble damages for willful withholding of wages' }
+                ],
+                'breach-of-contract': [
+                    { code: 'A.R.S. § 44-1201', desc: 'Interest rate on judgments (10%)' },
+                    { code: 'A.R.S. § 12-548', desc: '6-year statute of limitations for written contracts' }
+                ],
+                'security-deposit': [
+                    { code: 'A.R.S. § 33-1321', desc: 'Security deposit requirements and limits' },
+                    { code: 'A.R.S. § 33-1321(D)', desc: '14-day deadline to return deposit' },
+                    { code: 'A.R.S. § 33-1321(E)', desc: 'Wrongful retention: 2x deposit penalty' }
+                ],
+                'unpaid-invoice': [
+                    { code: 'A.R.S. § 44-1201', desc: '10% interest on unpaid amounts' },
+                    { code: 'A.R.S. § 12-341.01', desc: 'Attorney fees in contract actions' }
+                ],
+                'car-accident': [
+                    { code: 'A.R.S. § 12-542', desc: '2-year statute of limitations for personal injury' },
+                    { code: 'A.R.S. § 12-2505', desc: 'Pure comparative negligence - recovery reduced by percentage of fault' },
+                    { code: 'A.R.S. § 28-4135', desc: 'Mandatory liability insurance requirements' }
+                ],
+                'insurance-investigation': [
+                    { code: 'A.R.S. § 20-461', desc: 'Unfair claims settlement practices - prohibition' },
+                    { code: 'A.R.S. § 20-461(A)(3)', desc: 'Failing to adopt reasonable standards for prompt investigation' },
+                    { code: 'A.R.S. § 20-461(A)(4)', desc: 'Refusing to pay claims without conducting reasonable investigation' },
+                    { code: 'A.R.S. § 20-461(A)(5)', desc: 'Not attempting in good faith to effectuate fair settlements' },
+                    { code: 'A.A.C. R20-6-801', desc: 'Claims practices regulations - investigation standards' }
+                ],
+                'insurance-bad-faith': [
+                    { code: 'A.R.S. § 20-461', desc: 'Unfair claims settlement practices' },
+                    { code: 'Rawlings v. Apodaca (1986)', desc: 'Tort of insurance bad faith recognized in Arizona' },
+                    { code: 'A.R.S. § 12-542', desc: '2-year statute of limitations for bad faith claims' },
+                    { code: 'Filasky v. Preferred Risk (1990)', desc: 'Punitive damages available for bad faith' },
+                    { code: 'Noble v. National American Life (1981)', desc: 'Duty of good faith and fair dealing' }
+                ]
+            },
+            getSummary: function(situation) {
+                const statutes = this.statutes[situation] || [];
+                let html = '<ul>';
+                statutes.forEach(s => {
+                    html += `<li><strong>${s.code}:</strong> ${s.desc}</li>`;
+                });
+                html += '</ul>';
+                return html;
+            },
+            getDeadlineRecommendation: function(situation) {
+                switch(situation) {
+                    case 'security-deposit':
+                        return 'Arizona requires return within 14 days. A 10-day demand is reasonable.';
+                    case 'unpaid-wages':
+                        return 'Arizona has a short 1-year statute of limitations. Act quickly.';
+                    case 'car-accident':
+                        return '30 days is standard for insurance demands. Arizona has a 2-year statute of limitations.';
+                    case 'insurance-investigation':
+                        return '30 days is appropriate for insurance investigation complaints. ADOI complaints can be filed anytime.';
+                    case 'insurance-bad-faith':
+                        return '30 days is standard for bad faith demands. Arizona has a 2-year statute of limitations.';
+                    default:
+                        return '14-21 days is typical for Arizona demands.';
+                }
+            },
+            getLegalCitations: function(situation) {
+                const statutes = this.statutes[situation] || [];
+                return statutes.map(s => s.code).join(', ');
+            },
+            getPenaltyLanguage: function(situation) {
+                switch(situation) {
+                    case 'unpaid-wages':
+                        return 'Under Arizona Revised Statutes Section 23-355, willful withholding of wages entitles me to treble damages (three times the amount owed), plus costs and reasonable attorney fees.';
+                    case 'security-deposit':
+                        return 'Under A.R.S. § 33-1321(E), if you wrongfully withhold any portion of my security deposit, you may be liable for twice the amount wrongfully withheld, plus court costs.';
+                    case 'car-accident':
+                        return 'Under Arizona law, I am entitled to recover all damages caused by your insured\'s negligence. Arizona follows pure comparative negligence (A.R.S. § 12-2505), meaning damages are reduced only by the injured party\'s percentage of fault. I am seeking full compensation for my economic and non-economic damages.';
+                    case 'insurance-investigation':
+                        return 'Under A.R.S. § 20-461, insurers are prohibited from failing to adopt reasonable standards for prompt investigation and from refusing to pay claims without conducting a reasonable investigation. Your inadequate investigation constitutes an unfair claims settlement practice. I may file a complaint with the Arizona Department of Insurance and Financial Institutions and pursue a bad faith insurance claim seeking compensatory damages, consequential damages, and punitive damages.';
+                    case 'insurance-bad-faith':
+                        return 'Under Arizona law, insurers owe a duty of good faith and fair dealing to their policyholders. Rawlings v. Apodaca (1986) 151 Ariz. 422. Your unreasonable denial of my claim constitutes bad faith, exposing you to liability for policy benefits, consequential damages, emotional distress, and punitive damages under Filasky v. Preferred Risk Mutual Insurance Co. (1990) 162 Ariz. 553.';
+                    default:
+                        return 'Under Arizona law (A.R.S. § 44-1201), I am entitled to interest at the rate of 10% per annum on all amounts owed.';
+                }
+            }
+        },
+
+        'nevada': {
+            name: 'Nevada',
+            abbreviation: 'NV',
+            wageClaimInfo: {
+                agency: 'Nevada Labor Commissioner',
+                agencyUrl: 'https://labor.nv.gov/',
+                waitingTimePenalty: 'Continued wages up to 30 days (NRS 608.040)',
+                interestRate: 'Prime + 2% (NRS 99.040)',
+                statuteOfLimitations: '2 years for wage claims',
+                smallClaimsLimit: '$10,000'
+            },
+            statutes: {
+                'unpaid-wages': [
+                    { code: 'NRS 608.020', desc: 'Semi-monthly wage payment required' },
+                    { code: 'NRS 608.040', desc: 'Final wages due immediately upon termination' },
+                    { code: 'NRS 608.050', desc: 'Penalty: wages continue up to 30 days' }
+                ],
+                'breach-of-contract': [
+                    { code: 'NRS 99.040', desc: 'Interest rate: prime + 2%' },
+                    { code: 'NRS 11.190', desc: '6-year statute of limitations for written contracts' }
+                ],
+                'security-deposit': [
+                    { code: 'NRS 118A.242', desc: 'Security deposit requirements' },
+                    { code: 'NRS 118A.242(3)', desc: '30-day deadline to return deposit' },
+                    { code: 'NRS 118A.242(5)', desc: 'Failure to return: full deposit forfeited to tenant' }
+                ],
+                'unpaid-invoice': [
+                    { code: 'NRS 99.040', desc: 'Interest at prime rate + 2%' },
+                    { code: 'NRS 18.010', desc: 'Attorney fees available in contract disputes' }
+                ],
+                'car-accident': [
+                    { code: 'NRS 11.190', desc: '2-year statute of limitations for personal injury' },
+                    { code: 'NRS 41.141', desc: 'Modified comparative negligence - no recovery if 51%+ at fault' },
+                    { code: 'NRS 485.185', desc: 'Mandatory minimum liability insurance' }
+                ],
+                'insurance-investigation': [
+                    { code: 'NRS 686A.310', desc: 'Unfair practices in settling claims - prohibition' },
+                    { code: 'NRS 686A.310(1)(c)', desc: 'Failing to adopt reasonable standards for prompt investigation' },
+                    { code: 'NRS 686A.310(1)(d)', desc: 'Not attempting in good faith to effectuate fair settlements' },
+                    { code: 'NRS 686A.310(1)(e)', desc: 'Compelling litigation by unreasonable denial' },
+                    { code: 'NAC 686A.660-690', desc: 'Claims handling regulations and investigation standards' }
+                ],
+                'insurance-bad-faith': [
+                    { code: 'NRS 686A.310', desc: 'Unfair practices in settling claims' },
+                    { code: 'United Fire Ins. Co. v. McClelland (1986)', desc: 'Bad faith tort recognized in Nevada' },
+                    { code: 'NRS 11.190(4)(e)', desc: '4-year statute of limitations for bad faith claims' },
+                    { code: 'Ainsworth v. Combined Ins. Co. (1988)', desc: 'Emotional distress damages available' },
+                    { code: 'NRS 42.005', desc: 'Punitive damages for oppression, fraud, or malice' }
+                ]
+            },
+            getSummary: function(situation) {
+                const statutes = this.statutes[situation] || [];
+                let html = '<ul>';
+                statutes.forEach(s => {
+                    html += `<li><strong>${s.code}:</strong> ${s.desc}</li>`;
+                });
+                html += '</ul>';
+                return html;
+            },
+            getDeadlineRecommendation: function(situation) {
+                switch(situation) {
+                    case 'security-deposit':
+                        return 'Nevada allows 30 days. A 14-day demand is reasonable.';
+                    case 'unpaid-wages':
+                        return 'Nevada requires immediate payment upon termination. 7-10 days is appropriate.';
+                    case 'car-accident':
+                        return '30 days is standard for insurance demands. Nevada has a 2-year statute of limitations.';
+                    case 'insurance-investigation':
+                        return '30 days is appropriate for insurance investigation complaints. NDOI complaints can be filed anytime.';
+                    case 'insurance-bad-faith':
+                        return '30 days is standard for bad faith demands. Nevada has a 4-year statute of limitations.';
+                    default:
+                        return '14-21 days is typical for Nevada demands.';
+                }
+            },
+            getLegalCitations: function(situation) {
+                const statutes = this.statutes[situation] || [];
+                return statutes.map(s => s.code).join(', ');
+            },
+            getPenaltyLanguage: function(situation) {
+                switch(situation) {
+                    case 'unpaid-wages':
+                        return 'Under Nevada Revised Statutes 608.050, if final wages are not paid when due, my wages continue at the same rate for up to 30 days until paid. This penalty accrues automatically.';
+                    case 'security-deposit':
+                        return 'Under NRS 118A.242(5), if you fail to return my deposit or provide an itemized statement within 30 days, you forfeit all right to withhold any portion of the deposit.';
+                    case 'car-accident':
+                        return 'Under Nevada law (NRS 41.141), I am entitled to recover all damages caused by your insured\'s negligence. Nevada follows modified comparative negligence, meaning I am entitled to full recovery as the non-at-fault party. I am seeking compensation for all economic and non-economic damages.';
+                    case 'insurance-investigation':
+                        return 'Under NRS 686A.310, insurers are prohibited from failing to adopt reasonable standards for prompt investigation and from not attempting in good faith to effectuate fair settlements. Your inadequate investigation constitutes an unfair claims settlement practice. I may file a complaint with the Nevada Division of Insurance and pursue a bad faith insurance claim seeking compensatory damages, consequential damages, and punitive damages for your willful misconduct.';
+                    case 'insurance-bad-faith':
+                        return 'Under Nevada law, insurers owe a duty of good faith and fair dealing to their policyholders. United Fire Ins. Co. v. McClelland (1986) 105 Nev. 504. Your unreasonable denial of my claim constitutes bad faith, exposing you to liability for policy benefits, consequential damages, emotional distress (Ainsworth v. Combined Ins. Co. (1988) 104 Nev. 587), and punitive damages under NRS 42.005.';
+                    default:
+                        return 'Under Nevada law, I am entitled to interest at the prime rate plus 2% on all amounts owed from the date payment was due.';
+                }
+            }
+        },
+
+        'oregon': {
+            name: 'Oregon',
+            abbreviation: 'OR',
+            wageClaimInfo: {
+                agency: 'Oregon Bureau of Labor and Industries (BOLI)',
+                agencyUrl: 'https://www.oregon.gov/boli/',
+                waitingTimePenalty: 'Penalty wages up to 30 days (ORS 652.150)',
+                interestRate: '9% per annum (ORS 82.010)',
+                statuteOfLimitations: '2 years for wage claims',
+                smallClaimsLimit: '$10,000'
+            },
+            statutes: {
+                'unpaid-wages': [
+                    { code: 'ORS 652.140', desc: 'Final wages due immediately upon termination' },
+                    { code: 'ORS 652.145', desc: 'Resignation: wages due by end of next business day' },
+                    { code: 'ORS 652.150', desc: 'Penalty wages: up to 30 days of wages' }
+                ],
+                'breach-of-contract': [
+                    { code: 'ORS 82.010', desc: 'Legal interest rate: 9% per annum' },
+                    { code: 'ORS 12.080', desc: '6-year statute of limitations for written contracts' }
+                ],
+                'security-deposit': [
+                    { code: 'ORS 90.300', desc: 'Security deposit requirements' },
+                    { code: 'ORS 90.300(13)', desc: '31-day deadline to return deposit' },
+                    { code: 'ORS 90.300(16)', desc: 'Bad faith: 2x deposit penalty' }
+                ],
+                'unpaid-invoice': [
+                    { code: 'ORS 82.010', desc: '9% interest on unpaid amounts' },
+                    { code: 'ORS 20.096', desc: 'Attorney fees in contract disputes' }
+                ],
+                'car-accident': [
+                    { code: 'ORS 12.110', desc: '2-year statute of limitations for personal injury' },
+                    { code: 'ORS 31.600', desc: 'Modified comparative negligence - no recovery if 51%+ at fault' },
+                    { code: 'ORS 806.060', desc: 'Mandatory minimum liability insurance requirements' }
+                ],
+                'insurance-investigation': [
+                    { code: 'ORS 746.230', desc: 'Unfair claim settlement practices - prohibition' },
+                    { code: 'ORS 746.230(1)(c)', desc: 'Failing to adopt reasonable standards for prompt investigation' },
+                    { code: 'ORS 746.230(1)(d)', desc: 'Not attempting in good faith to effectuate fair settlements' },
+                    { code: 'ORS 746.230(1)(f)', desc: 'Not attempting prompt, fair, equitable settlement when liability is clear' },
+                    { code: 'OAR 836-080-0225', desc: 'Standards for prompt investigation of claims' }
+                ],
+                'insurance-bad-faith': [
+                    { code: 'ORS 746.230', desc: 'Unfair claim settlement practices' },
+                    { code: 'Best v. U.S. National Ins. (1995)', desc: 'Bad faith tort recognized in Oregon' },
+                    { code: 'ORS 12.110', desc: '2-year statute of limitations for bad faith claims' },
+                    { code: 'ORS 31.710', desc: 'Punitive damages standards' },
+                    { code: 'Farris v. U.S. Fidelity (1978)', desc: 'Duty of good faith and fair dealing' }
+                ]
+            },
+            getSummary: function(situation) {
+                const statutes = this.statutes[situation] || [];
+                let html = '<ul>';
+                statutes.forEach(s => {
+                    html += `<li><strong>${s.code}:</strong> ${s.desc}</li>`;
+                });
+                html += '</ul>';
+                return html;
+            },
+            getDeadlineRecommendation: function(situation) {
+                switch(situation) {
+                    case 'security-deposit':
+                        return 'Oregon allows 31 days. A 14-day demand is reasonable.';
+                    case 'unpaid-wages':
+                        return 'Oregon requires immediate payment upon termination. 7-10 days is appropriate.';
+                    case 'car-accident':
+                        return '30 days is standard for insurance demands. Oregon has a 2-year statute of limitations.';
+                    case 'insurance-investigation':
+                        return '30 days is appropriate for insurance investigation complaints. DCBS complaints can be filed anytime.';
+                    case 'insurance-bad-faith':
+                        return '30 days is standard for bad faith demands. Oregon has a 2-year statute of limitations.';
+                    default:
+                        return '14-21 days is typical for Oregon demands.';
+                }
+            },
+            getLegalCitations: function(situation) {
+                const statutes = this.statutes[situation] || [];
+                return statutes.map(s => s.code).join(', ');
+            },
+            getPenaltyLanguage: function(situation) {
+                switch(situation) {
+                    case 'unpaid-wages':
+                        return 'Under Oregon Revised Statutes 652.150, if final wages are willfully withheld, I am entitled to penalty wages equal to 8 hours of pay for each day wages remain unpaid, up to 30 days.';
+                    case 'security-deposit':
+                        return 'Under ORS 90.300(16), if you retain any portion of my deposit in bad faith, you may be liable for twice the amount wrongfully withheld, plus court costs and attorney fees.';
+                    case 'car-accident':
+                        return 'Under Oregon law (ORS 31.600), I am entitled to recover all damages caused by your insured\'s negligence. Oregon follows modified comparative negligence. As the non-at-fault party, I am entitled to full compensation for all economic damages (medical bills, lost wages, property damage) and non-economic damages (pain and suffering).';
+                    case 'insurance-investigation':
+                        return 'Under ORS 746.230, insurers are prohibited from failing to adopt reasonable standards for prompt investigation and from not attempting in good faith to effectuate fair settlements. Your inadequate investigation constitutes an unfair claims settlement practice. I may file a complaint with the Oregon Division of Financial Regulation and pursue a bad faith insurance claim seeking compensatory damages, consequential damages, and punitive damages.';
+                    case 'insurance-bad-faith':
+                        return 'Under Oregon law, insurers owe a duty of good faith and fair dealing to their policyholders. Farris v. U.S. Fidelity & Guaranty Co. (1978) 284 Or. 453. Your unreasonable denial of my claim constitutes bad faith, exposing you to liability for policy benefits, consequential damages, emotional distress, and punitive damages under ORS 31.710.';
+                    default:
+                        return 'Under Oregon law (ORS 82.010), I am entitled to interest at the rate of 9% per annum on all amounts owed.';
+                }
+            }
+        },
+
+        'washington': {
+            name: 'Washington',
+            abbreviation: 'WA',
+            wageClaimInfo: {
+                agency: 'Washington Department of Labor & Industries',
+                agencyUrl: 'https://www.lni.wa.gov/',
+                waitingTimePenalty: 'Double damages for willful withholding (RCW 49.52.070)',
+                interestRate: '12% per annum (RCW 19.52.010)',
+                statuteOfLimitations: '3 years for wage claims',
+                smallClaimsLimit: '$10,000'
+            },
+            statutes: {
+                'unpaid-wages': [
+                    { code: 'RCW 49.48.010', desc: 'Wages due at regular pay intervals' },
+                    { code: 'RCW 49.48.010', desc: 'Final wages due at end of pay period' },
+                    { code: 'RCW 49.52.050', desc: 'Willful withholding is a misdemeanor' },
+                    { code: 'RCW 49.52.070', desc: 'Double damages for willful withholding' }
+                ],
+                'breach-of-contract': [
+                    { code: 'RCW 19.52.010', desc: 'Legal interest rate: 12% per annum' },
+                    { code: 'RCW 4.16.040', desc: '6-year statute of limitations for written contracts' }
+                ],
+                'security-deposit': [
+                    { code: 'RCW 59.18.260', desc: 'Security deposit requirements' },
+                    { code: 'RCW 59.18.280', desc: '21-day deadline to return deposit' },
+                    { code: 'RCW 59.18.280', desc: 'Bad faith: 2x deposit plus attorney fees' }
+                ],
+                'unpaid-invoice': [
+                    { code: 'RCW 19.52.010', desc: '12% interest on unpaid amounts' },
+                    { code: 'RCW 4.84.330', desc: 'Attorney fees in contract disputes' }
+                ],
+                'car-accident': [
+                    { code: 'RCW 4.16.080', desc: '3-year statute of limitations for personal injury' },
+                    { code: 'RCW 4.22.005', desc: 'Pure comparative negligence - recovery reduced by percentage of fault' },
+                    { code: 'RCW 46.29.090', desc: 'Mandatory minimum liability insurance requirements' }
+                ],
+                'insurance-investigation': [
+                    { code: 'RCW 48.30.015', desc: 'Unfair practices in claims handling - prohibition' },
+                    { code: 'WAC 284-30-330', desc: 'Specific unfair claims settlement practices' },
+                    { code: 'WAC 284-30-350', desc: 'Standards for prompt investigation of claims' },
+                    { code: 'WAC 284-30-360', desc: 'Standards for prompt, fair, equitable settlements' },
+                    { code: 'RCW 48.30.010', desc: 'General prohibition on unfair practices' }
+                ],
+                'insurance-bad-faith': [
+                    { code: 'RCW 48.30.015', desc: 'Unfair practices in claims handling' },
+                    { code: 'Tank v. State Farm (1986)', desc: 'Bad faith tort recognized in Washington' },
+                    { code: 'RCW 4.16.080', desc: '3-year statute of limitations for bad faith claims' },
+                    { code: 'RCW 48.30.010', desc: 'General prohibition on unfair practices' },
+                    { code: 'Olympic Steamship v. Centennial Ins. (1991)', desc: 'Consequential damages available' }
+                ]
+            },
+            getSummary: function(situation) {
+                const statutes = this.statutes[situation] || [];
+                let html = '<ul>';
+                statutes.forEach(s => {
+                    html += `<li><strong>${s.code}:</strong> ${s.desc}</li>`;
+                });
+                html += '</ul>';
+                return html;
+            },
+            getDeadlineRecommendation: function(situation) {
+                switch(situation) {
+                    case 'security-deposit':
+                        return 'Washington requires return within 21 days. A 14-day demand is reasonable.';
+                    case 'unpaid-wages':
+                        return 'Washington requires payment by next regular payday. 10-14 days is appropriate.';
+                    case 'car-accident':
+                        return '30 days is standard for insurance demands. Washington has a 3-year statute of limitations.';
+                    case 'insurance-investigation':
+                        return '30 days is appropriate for insurance investigation complaints. OIC complaints can be filed anytime.';
+                    case 'insurance-bad-faith':
+                        return '30 days is standard for bad faith demands. Washington has a 3-year statute of limitations.';
+                    default:
+                        return '14-21 days is typical for Washington demands.';
+                }
+            },
+            getLegalCitations: function(situation) {
+                const statutes = this.statutes[situation] || [];
+                return statutes.map(s => s.code).join(', ');
+            },
+            getPenaltyLanguage: function(situation) {
+                switch(situation) {
+                    case 'unpaid-wages':
+                        return 'Under RCW 49.52.070, willful withholding of wages entitles me to double the amount of wages unlawfully withheld, plus costs and reasonable attorney fees. Additionally, willful withholding is a misdemeanor under RCW 49.52.050.';
+                    case 'security-deposit':
+                        return 'Under RCW 59.18.280, if you fail to return my deposit within 21 days or act in bad faith, you may be liable for twice the amount wrongfully withheld, plus court costs and reasonable attorney fees.';
+                    case 'car-accident':
+                        return 'Under Washington law (RCW 4.22.005), I am entitled to recover all damages caused by your insured\'s negligence. Washington follows pure comparative negligence, meaning I am entitled to full recovery as the non-at-fault party. I am seeking compensation for all economic and non-economic damages.';
+                    case 'insurance-investigation':
+                        return 'Under RCW 48.30.015 and WAC 284-30-330, insurers are prohibited from failing to adopt reasonable standards for prompt investigation and from not attempting in good faith to effectuate fair settlements. Your inadequate investigation constitutes an unfair claims settlement practice. I may file a complaint with the Washington Office of the Insurance Commissioner and pursue a bad faith insurance claim seeking compensatory damages, consequential damages, and punitive damages.';
+                    case 'insurance-bad-faith':
+                        return 'Under Washington law, insurers owe a duty of good faith and fair dealing to their policyholders. Tank v. State Farm Fire & Casualty Co. (1986) 105 Wash.2d 381. Your unreasonable denial of my claim constitutes bad faith, exposing you to liability for policy benefits, consequential damages (Olympic Steamship Co. v. Centennial Ins. Co. (1991) 117 Wash.2d 37), emotional distress, and other tort damages.';
+                    default:
+                        return 'Under Washington law (RCW 19.52.010), I am entitled to interest at the rate of 12% per annum on all amounts owed.';
+                }
+            }
+        },
+
+        'other': {
+            name: 'Your State',
+            abbreviation: '',
+            wageClaimInfo: {
+                agency: 'Your state labor department or U.S. Department of Labor',
+                agencyUrl: 'https://www.dol.gov/agencies/whd',
+                waitingTimePenalty: 'Varies by state',
+                interestRate: 'Typically 6-10% per annum (varies by state)',
+                statuteOfLimitations: 'Typically 2-6 years (varies by state)',
+                smallClaimsLimit: 'Typically $5,000-$25,000 (varies by state)'
+            },
+            statutes: {
+                'unpaid-wages': [
+                    { code: '29 U.S.C. § 206', desc: 'Federal minimum wage (FLSA)' },
+                    { code: '29 U.S.C. § 207', desc: 'Federal overtime requirements (FLSA)' },
+                    { code: '29 U.S.C. § 216(b)', desc: 'FLSA liquidated damages (double wages)' }
+                ],
+                'breach-of-contract': [
+                    { code: 'Common Law', desc: 'Breach of contract - entitled to expectation damages' },
+                    { code: 'UCC § 2-709', desc: 'Seller\'s right to recover price (goods contracts)' }
+                ],
+                'security-deposit': [
+                    { code: 'State Landlord-Tenant Law', desc: 'Most states require return within 14-45 days' },
+                    { code: 'State Security Deposit Statute', desc: 'Check your state\'s specific requirements' }
+                ],
+                'unpaid-invoice': [
+                    { code: 'UCC § 2-709', desc: 'Seller\'s right to recover price of accepted goods' },
+                    { code: 'Common Law', desc: 'Breach of contract for non-payment' }
+                ],
+                'car-accident': [
+                    { code: 'State Negligence Law', desc: 'Negligent drivers are liable for damages they cause' },
+                    { code: 'Comparative/Contributory Negligence', desc: 'Most states allow recovery even if partially at fault' },
+                    { code: 'State Insurance Requirements', desc: 'Most states require minimum liability insurance' }
                 ],
                 'insurance-investigation': [
                     { code: 'NAIC Model Unfair Claims Settlement Practices Act', desc: 'Model law adopted by most states prohibiting unfair claims practices' },
@@ -839,21 +1472,6 @@
                     { code: 'State Bad Faith Law', desc: 'Most states recognize tort of insurance bad faith' },
                     { code: 'Common Law Duty of Good Faith', desc: 'Insurers owe duty of good faith to insureds' },
                     { code: 'State Punitive Damages Statute', desc: 'Punitive damages may be available for egregious conduct' }
-                ],
-                'insurance-um-uim': [
-                    { code: 'State UM/UIM Statute', desc: 'Most states require UM coverage; UIM is often optional' },
-                    { code: 'Policy Contract Terms', desc: 'Coverage limits and conditions per your policy' },
-                    { code: 'State Stacking Rules', desc: 'Some states permit stacking; others prohibit it' },
-                    { code: 'Arbitration Provisions', desc: 'Many policies require arbitration for UM/UIM disputes' },
-                    { code: 'State Unfair Claims Practices Act', desc: 'Bad faith in handling UM/UIM claims is prohibited' }
-                ],
-                'insurance-delayed-payment': [
-                    { code: 'Cal. Ins. Code § 790.03(h)', desc: 'Unfair Claims Settlement Practices - prohibits unreasonable delays' },
-                    { code: 'CCR Title 10 § 2695.7(b)', desc: '40-day deadline to accept or deny claims after proof submitted' },
-                    { code: 'CCR Title 10 § 2695.7(h)', desc: 'Interest due on delayed payments at rate in contract or 10%' },
-                    { code: 'Cal. Ins. Code § 790.03(h)(3)', desc: 'Failure to adopt reasonable standards for prompt investigation' },
-                    { code: 'Cal. Ins. Code § 790.03(h)(5)', desc: 'Not attempting in good faith to effectuate prompt settlement' },
-                    { code: 'Egan v. Mutual of Omaha (1979)', desc: 'Unreasonable delay constitutes bad faith' }
                 ]
             },
             getSummary: function(situation) {
@@ -876,12 +1494,6 @@
                         return '30 days is appropriate for insurance investigation complaints. State insurance department complaints can be filed anytime.';
                     case 'insurance-bad-faith':
                         return '30 days is standard for bad faith demands. Most states have 2-4 year statutes of limitations.';
-                    case 'insurance-um-uim':
-                        return '30 days is standard for UM/UIM demands. Most policies provide for arbitration if claim is denied.';
-                    case 'insurance-undervalued':
-                        return '14-21 days is standard for undervalued claim disputes. Consider invoking the appraisal clause for faster resolution.';
-                    case 'insurance-delayed-payment':
-                        return '14 days is appropriate for delayed payment demands. California requires insurers to accept or deny claims within 40 days of proof of claim submission.';
                     default:
                         return '14-21 days is standard for most demand letters.';
                 }
@@ -902,12 +1514,6 @@
                         return 'Under your state\'s Unfair Claims Settlement Practices Act and insurance regulations, insurers are required to conduct thorough, objective investigations of claims. Your inadequate investigation violates these requirements and may constitute bad faith. I may file a complaint with your state\'s Department of Insurance and pursue a bad faith insurance claim seeking compensatory damages, consequential damages, and punitive damages where permitted by law.';
                     case 'insurance-bad-faith':
                         return 'Under applicable state law, insurers owe a duty of good faith and fair dealing to their policyholders. Your unreasonable denial of my claim constitutes bad faith, exposing you to liability for policy benefits, consequential damages, emotional distress, and punitive damages where permitted by law. I intend to pursue all available remedies.';
-                    case 'insurance-um-uim':
-                        return 'Under applicable state law, I am entitled to UM/UIM benefits up to my policy limits when injured by an uninsured or underinsured motorist. Most states require insurers to offer UM coverage, and I elected this coverage under my policy. If this claim is not resolved, I will invoke my right to binding arbitration as provided in my policy and under state law. Unreasonable denial or delay of UM/UIM benefits may constitute bad faith, exposing you to compensatory damages, consequential damages, emotional distress, and punitive damages where permitted by law.';
-                    case 'insurance-undervalued':
-                        return 'Under California Insurance Code Section 790.03(h) and the Fair Claims Settlement Practices Regulations (Cal. Code Regs. tit. 10, Section 2695.7), insurers must conduct prompt, fair investigations and offer fair settlements based on actual cash value or fair market value. Your lowball offer fails to meet these standards and may constitute an unfair claims practice. If you persist in undervaluing my claim, I will file a complaint with the California Department of Insurance, invoke the appraisal clause in my policy, and pursue a bad faith lawsuit seeking policy benefits, consequential damages, and punitive damages under Civil Code Section 3294.';
-                    case 'insurance-delayed-payment':
-                        return 'Under California Insurance Code Section 790.03(h) and the Fair Claims Settlement Practices Regulations (CCR Title 10, Section 2695.7), insurers must accept or deny claims within 40 days after receiving proof of claim. Your unreasonable delay violates these requirements and constitutes an unfair claims practice. Pursuant to CCR Section 2695.7(h), you owe interest on delayed payments. If you continue to delay, I will file a complaint with the California Department of Insurance and pursue a bad faith lawsuit seeking policy benefits, interest, consequential damages, and punitive damages under Civil Code Section 3294.';
                     default:
                         return 'I am entitled to recover all damages caused by your breach, plus interest at the legal rate. If this matter proceeds to court, I will also seek attorney fees and costs as permitted by law.';
                 }
@@ -1201,92 +1807,6 @@ ${data.paymentHistory ? `
             }
         },
 
-        },
-
-        'insurance-um-uim': {
-            name: 'UM/UIM Insurance Dispute',
-            category: 'Insurance',
-
-            formFields: [
-                { id: 'accidentDate', label: 'Date of Accident', type: 'date', placeholder: '' },
-                { id: 'accidentLocation', label: 'Accident Location', type: 'text', placeholder: 'e.g., Intersection of Main St and Oak Ave, Los Angeles, CA' },
-                { id: 'policyNumber', label: 'Your Policy Number', type: 'text', placeholder: 'Your UM/UIM policy number' },
-                { id: 'claimNumber', label: 'Claim Number', type: 'text', placeholder: 'Insurance claim number (if assigned)' },
-                { id: 'umPolicyLimits', label: 'UM/UIM Policy Limits', type: 'text', placeholder: 'e.g., $100,000/$300,000 or $250,000' },
-                { id: 'atFaultDriver', label: 'At-Fault Driver (if known)', type: 'text', placeholder: 'Name of at-fault driver, or "Unknown/Hit-and-Run"' },
-                { id: 'atFaultCoverage', label: 'At-Fault Driver Coverage Status', type: 'text', placeholder: 'e.g., Uninsured, Underinsured ($15,000 limits), Hit-and-run' },
-                { id: 'accidentDescription', label: 'How the Accident Occurred', type: 'textarea', placeholder: 'Describe how the accident happened and why the other driver was at fault' },
-                { id: 'injuryDescription', label: 'Injuries Sustained', type: 'textarea', placeholder: 'Describe your injuries (e.g., whiplash, broken bones, soft tissue damage)' },
-                { id: 'medicalTreatment', label: 'Medical Treatment Received', type: 'textarea', placeholder: 'List hospitals, doctors, treatments, physical therapy, etc.' },
-                { id: 'medicalBills', label: 'Total Medical Bills', type: 'text', placeholder: 'e.g., $75,000' },
-                { id: 'lostWages', label: 'Lost Wages', type: 'text', placeholder: 'e.g., $12,000' },
-                { id: 'propertyDamage', label: 'Property Damage (Vehicle)', type: 'text', placeholder: 'e.g., $8,000 repair cost or total loss value' },
-                { id: 'painSuffering', label: 'Pain and Suffering Amount', type: 'text', placeholder: 'Typically 1.5x to 5x medical bills' },
-                { id: 'atFaultPaid', label: 'Amount Received from At-Fault (if any)', type: 'text', placeholder: 'e.g., $15,000 (their policy limits)' },
-                { id: 'stackingApplicable', label: 'Policy Stacking Applicable?', type: 'text', placeholder: 'e.g., Yes - 2 vehicles on policy, or N/A' }
-            ],
-
-            generateLetterBody: function(data, stateModule) {
-                const stateCitations = stateModule.getLegalCitations('insurance-um-uim');
-                const penaltyLanguage = stateModule.getPenaltyLanguage('insurance-um-uim');
-
-                return \`
-<p class="doc-paragraph">I am writing to make a formal demand under my Uninsured/Underinsured Motorist (UM/UIM) coverage for injuries and damages I sustained in a motor vehicle accident on \${h(data.accidentDate, 'Date of Accident', 'accidentDate')}.</p>
-
-<div class="doc-section-header">Policy Information</div>
-<ul class="doc-list">
-    <li><strong>Policy Number:</strong> \${h(data.policyNumber, 'Policy Number', 'policyNumber')}</li>
-    \${data.claimNumber ? \`<li><strong>Claim Number:</strong> \${h(data.claimNumber, 'Claim #', 'claimNumber')}</li>\` : ''}
-    <li><strong>UM/UIM Policy Limits:</strong> \${h(data.umPolicyLimits, 'Policy Limits', 'umPolicyLimits')}</li>
-    \${data.stackingApplicable ? \`<li><strong>Stacking:</strong> \${h(data.stackingApplicable, 'Stacking Status', 'stackingApplicable')}</li>\` : ''}
-</ul>
-
-<div class="doc-section-header">Accident Details</div>
-<ul class="doc-list">
-    <li><strong>Date of Accident:</strong> \${h(data.accidentDate, 'Date', 'accidentDate')}</li>
-    <li><strong>Location:</strong> \${h(data.accidentLocation, 'Location', 'accidentLocation')}</li>
-    <li><strong>At-Fault Driver:</strong> \${h(data.atFaultDriver, 'At-Fault Driver', 'atFaultDriver')}</li>
-    <li><strong>At-Fault Coverage Status:</strong> \${h(data.atFaultCoverage, 'Coverage Status', 'atFaultCoverage')}</li>
-</ul>
-
-<div class="doc-section-header">Liability</div>
-<p class="doc-paragraph">\${h(data.accidentDescription, 'Description of how the accident occurred', 'accidentDescription')}</p>
-
-<p class="doc-paragraph">The at-fault driver was either uninsured, underinsured, or fled the scene (hit-and-run), triggering my UM/UIM coverage under my policy with you. Under \${stateModule.name} law (<span class="legal-cite">\${stateCitations}</span>), I am entitled to recover damages from my own UM/UIM coverage up to the policy limits.</p>
-
-<div class="doc-section-header">Injuries and Medical Treatment</div>
-<p class="doc-paragraph">As a direct result of this accident, I sustained the following injuries:</p>
-<p class="doc-paragraph">\${h(data.injuryDescription, 'Description of injuries', 'injuryDescription')}</p>
-
-<p class="doc-paragraph">I have received the following medical treatment:</p>
-<p class="doc-paragraph">\${h(data.medicalTreatment, 'Medical treatment received', 'medicalTreatment')}</p>
-
-<div class="doc-section-header">Damages Summary</div>
-<ul class="doc-list">
-    <li><strong>Medical Expenses:</strong> \${h(data.medicalBills, 'Medical Bills', 'medicalBills')}</li>
-    <li><strong>Lost Wages:</strong> \${h(data.lostWages, 'Lost Wages', 'lostWages')}</li>
-    <li><strong>Property Damage:</strong> \${h(data.propertyDamage, 'Property Damage', 'propertyDamage')}</li>
-    <li><strong>Pain and Suffering:</strong> \${h(data.painSuffering, 'Pain & Suffering Amount', 'painSuffering')}</li>
-    \${data.atFaultPaid ? \`<li><strong>Less: Amount Received from At-Fault:</strong> (\${h(data.atFaultPaid, 'Amount from At-Fault', 'atFaultPaid')})</li>\` : ''}
-</ul>
-
-<p class="doc-paragraph">\${penaltyLanguage}</p>
-
-<div class="doc-section-header">Demand</div>
-<p class="doc-paragraph">Based on the foregoing, I hereby demand payment of \${h(data.demandAmount, 'Total Demand Amount', 'demandAmount')} from my UM/UIM coverage as compensation for my injuries and damages, less any amounts already received from the at-fault party's insurance.</p>
-
-<div class="doc-deadline">
-<strong>DEADLINE:</strong> This demand must be responded to within \${h(data.demandDeadline, '30 days', 'demandDeadline')} of the date of this letter.
-</div>
-
-<p class="doc-paragraph">If I do not receive an adequate response or reasonable settlement offer within this timeframe, I will invoke my right to binding arbitration as provided in my policy and under state law. I reserve all rights to pursue bad faith claims if this claim is unreasonably denied or delayed.</p>
-
-<p class="doc-paragraph">Please direct all correspondence and settlement offers to the address listed above.</p>
-                \`;
-            }
-        },
-
-        'insurance-investigation': {
         'insurance-investigation': {
             name: 'Insurance Claim Investigation Complaint',
             category: 'Insurance',
@@ -1446,167 +1966,6 @@ ${data.paymentHistory ? `
 <p class="doc-paragraph">You are hereby placed on notice to preserve all documents and communications related to my claim, including the complete claims file, internal communications, claims manuals, and any documents showing how similar claims have been handled. Destruction of evidence after receipt of this letter may result in adverse consequences in litigation.</p>
                 `;
             }
-        }
-        },
-
-        'insurance-delayed-payment': {
-            name: 'Insurance Delayed Payment',
-            category: 'Insurance',
-
-            formFields: [
-                { id: 'claimNumber', label: 'Claim Number', type: 'text', placeholder: 'e.g., CLM-2024-123456' },
-                { id: 'policyNumber', label: 'Policy Number', type: 'text', placeholder: 'e.g., POL-987654321' },
-                { id: 'insuranceCompany', label: 'Insurance Company Name', type: 'text', placeholder: 'e.g., State Farm, Allstate, etc.' },
-                { id: 'claimDate', label: 'Date Claim Filed', type: 'date', placeholder: '' },
-                { id: 'claimType', label: 'Type of Claim', type: 'text', placeholder: 'e.g., Auto, Homeowner, Health, Life' },
-                { id: 'claimDescription', label: 'Description of Claim', type: 'textarea', placeholder: 'Describe the incident or loss that prompted your claim' },
-                { id: 'documentationSubmitted', label: 'Documentation Submitted', type: 'textarea', placeholder: 'List all documents, photos, estimates submitted to support your claim' },
-                { id: 'communicationHistory', label: 'Communication History', type: 'textarea', placeholder: 'Describe your communications with the insurer (dates, promises made, delays experienced)' },
-                { id: 'daysSinceClaim', label: 'Days Since Claim Filed', type: 'text', placeholder: 'e.g., 45 days' },
-                { id: 'delayExcuses', label: 'Reasons Given for Delay (if any)', type: 'textarea', placeholder: 'What excuses has the insurance company given for not paying?' }
-            ],
-
-            generateLetterBody: function(data, stateModule) {
-                const stateCitations = stateModule.getLegalCitations('insurance-delayed-payment');
-                const penaltyLanguage = stateModule.getPenaltyLanguage('insurance-delayed-payment');
-
-                return \`
-<p class="doc-paragraph">I am writing to formally demand immediate payment of my insurance claim that has been unreasonably delayed in violation of \${stateModule.name} insurance regulations and the implied covenant of good faith and fair dealing.</p>
-
-<div class="doc-section-header">Claim Information</div>
-<ul class="doc-list">
-    <li><strong>Claim Number:</strong> \${h(data.claimNumber, 'Claim Number', 'claimNumber')}</li>
-    <li><strong>Policy Number:</strong> \${h(data.policyNumber, 'Policy Number', 'policyNumber')}</li>
-    <li><strong>Insurance Company:</strong> \${h(data.insuranceCompany, 'Insurance Company', 'insuranceCompany')}</li>
-    <li><strong>Type of Claim:</strong> \${h(data.claimType, 'Claim Type', 'claimType')}</li>
-    <li><strong>Date Claim Filed:</strong> \${h(data.claimDate, 'Claim Date', 'claimDate')}</li>
-    <li><strong>Days Since Filing:</strong> \${h(data.daysSinceClaim, 'Days', 'daysSinceClaim')}</li>
-</ul>
-
-<div class="doc-section-header">Description of Claim</div>
-<p class="doc-paragraph">\${h(data.claimDescription, 'Description of the incident or loss', 'claimDescription')}</p>
-
-<div class="doc-section-header">Documentation Submitted</div>
-<p class="doc-paragraph">I have provided all documentation reasonably requested to support my claim, including:</p>
-<p class="doc-paragraph">\${h(data.documentationSubmitted, 'List of documents submitted', 'documentationSubmitted')}</p>
-
-<div class="doc-section-header">Unreasonable Delay</div>
-<p class="doc-paragraph">\${h(data.communicationHistory, 'Communication history with insurer', 'communicationHistory')}</p>
-
-\${data.delayExcuses ? \`<p class="doc-paragraph">You have offered the following reasons for the delay: \${h(data.delayExcuses, 'Delay excuses', 'delayExcuses')}</p>\` : ''}
-
-<p class="doc-paragraph">These delays are unreasonable and constitute a breach of your duty to handle my claim promptly and in good faith.</p>
-
-<div class="doc-section-header">Legal Basis</div>
-<p class="doc-paragraph">Under \${stateModule.name} law (<span class="legal-cite">\${stateCitations}</span>), insurance companies are required to promptly investigate, process, and pay valid claims within statutory timeframes. Your failure to do so constitutes an unfair claims practice.</p>
-
-<p class="doc-paragraph">\${penaltyLanguage}</p>
-
-<div class="doc-section-header">Demand</div>
-<p class="doc-paragraph">I hereby demand immediate payment of \${h(data.demandAmount, 'Claim Amount', 'demandAmount')} representing the full value of my claim, plus any applicable interest for the period of unreasonable delay.</p>
-
-<div class="doc-deadline">
-<strong>DEADLINE:</strong> Payment must be received within \${h(data.demandDeadline, '14 days', 'demandDeadline')} of the date of this letter.
-</div>
-
-<p class="doc-paragraph">If I do not receive payment by this deadline, I will pursue all available legal remedies, including:</p>
-<ul class="doc-list">
-    <li>Filing a complaint with the \${stateModule.name} Department of Insurance</li>
-    <li>Filing a lawsuit for breach of contract and bad faith</li>
-    <li>Seeking all compensatory damages, consequential damages, and punitive damages where permitted by law</li>
-    <li>Seeking recovery of attorney fees and costs</li>
-</ul>
-
-<p class="doc-paragraph">I expect prompt resolution of this matter.</p>
-                \`;
-            }
-        },
-
-        'insurance-undervalued': {
-            name: 'Insurance Undervalued Claim',
-            category: 'Insurance',
-
-            formFields: [
-                { id: 'claimNumber', label: 'Claim Number', type: 'text', placeholder: 'e.g., CLM-2024-12345' },
-                { id: 'policyNumber', label: 'Policy Number', type: 'text', placeholder: 'e.g., POL-123456789' },
-                { id: 'dateOfLoss', label: 'Date of Loss/Incident', type: 'date', placeholder: '' },
-                { id: 'claimType', label: 'Type of Claim', type: 'text', placeholder: 'e.g., Auto collision, Property damage, Total loss' },
-                { id: 'propertyDescription', label: 'Property/Vehicle Description', type: 'textarea', placeholder: 'e.g., 2021 Toyota Camry SE, VIN: 12345..., or describe damaged property' },
-                { id: 'insurerOffer', label: 'Insurance Company Offer', type: 'text', placeholder: 'e.g., $8,500' },
-                { id: 'offerDate', label: 'Date of Offer', type: 'date', placeholder: '' },
-                { id: 'actualValue', label: 'Actual Cash Value / Fair Market Value', type: 'text', placeholder: 'e.g., $14,200' },
-                { id: 'valuationBasis', label: 'Basis for Your Valuation', type: 'textarea', placeholder: 'Describe how you determined the value (comparable sales, repair estimates, dealer quotes, diminished value assessment, etc.)' },
-                { id: 'disputeReason', label: 'Why the Offer is Inadequate', type: 'textarea', placeholder: "Explain why the insurer's valuation is wrong (ignored condition, wrong comparables, failed to include features, undervalued repairs, etc.)" },
-                { id: 'repairEstimates', label: 'Repair Estimates (if applicable)', type: 'text', placeholder: 'e.g., $12,500 from certified body shop' },
-                { id: 'diminishedValue', label: 'Diminished Value (if applicable)', type: 'text', placeholder: 'e.g., $3,000 post-repair diminished value' },
-                { id: 'invokeAppraisal', label: 'Request Appraisal Clause?', type: 'text', placeholder: 'Yes or No - invokes policy appraisal process' }
-            ],
-
-            generateLetterBody: function(data, stateModule) {
-                const stateCitations = stateModule.getLegalCitations('insurance-undervalued');
-                const penaltyLanguage = stateModule.getPenaltyLanguage('insurance-undervalued');
-
-                return `
-<p class="doc-paragraph">I am writing to formally dispute and reject the settlement offer made by ${h(data.recipientName, 'Insurance Company', 'recipientName')} regarding my insurance claim. Your offer significantly undervalues my covered loss and fails to provide the full compensation I am entitled to under my policy and applicable law.</p>
-
-<div class="doc-section-header">Claim Information</div>
-<ul class="doc-list">
-    <li><strong>Claim Number:</strong> ${h(data.claimNumber, 'Claim #', 'claimNumber')}</li>
-    <li><strong>Policy Number:</strong> ${h(data.policyNumber, 'Policy #', 'policyNumber')}</li>
-    <li><strong>Date of Loss:</strong> ${h(data.dateOfLoss, 'Date of Loss', 'dateOfLoss')}</li>
-    <li><strong>Type of Claim:</strong> ${h(data.claimType, 'Claim Type', 'claimType')}</li>
-</ul>
-
-<div class="doc-section-header">Property/Vehicle Information</div>
-<p class="doc-paragraph">${h(data.propertyDescription, 'Description of property or vehicle', 'propertyDescription')}</p>
-
-<div class="doc-section-header">Your Inadequate Offer</div>
-<p class="doc-paragraph">On ${h(data.offerDate, 'Offer Date', 'offerDate')}, you offered ${h(data.insurerOffer, 'Insurer Offer', 'insurerOffer')} to settle my claim. I reject this offer as it substantially undervalues my loss.</p>
-
-<div class="doc-section-header">Actual Value of My Loss</div>
-<p class="doc-paragraph">The actual cash value / fair market value of my loss is ${h(data.actualValue, 'Actual Value', 'actualValue')}. This valuation is based on:</p>
-<p class="doc-paragraph">${h(data.valuationBasis, 'Basis for valuation', 'valuationBasis')}</p>
-
-<div class="doc-section-header">Why Your Offer is Inadequate</div>
-<p class="doc-paragraph">${h(data.disputeReason, 'Reasons offer is inadequate', 'disputeReason')}</p>
-
-${data.repairEstimates ? `
-<p class="doc-paragraph"><strong>Repair Estimates:</strong> I have obtained repair estimates totaling ${h(data.repairEstimates, 'Repair Estimate Amount', 'repairEstimates')} from qualified repair facilities.</p>
-` : ''}
-
-${data.diminishedValue ? `
-<p class="doc-paragraph"><strong>Diminished Value:</strong> In addition to repair costs, I am entitled to ${h(data.diminishedValue, 'Diminished Value', 'diminishedValue')} for the inherent diminished value of my vehicle following this loss. A repaired vehicle is worth less than one that was never damaged, and I am entitled to compensation for this loss.</p>
-` : ''}
-
-<div class="doc-section-header">Legal Basis</div>
-<p class="doc-paragraph">Under ${stateModule.name} law (<span class="legal-cite">${stateCitations}</span>), you are required to handle claims in good faith and provide fair compensation for covered losses. Your lowball offer fails to meet this standard.</p>
-
-<p class="doc-paragraph">${penaltyLanguage}</p>
-
-${data.invokeAppraisal && data.invokeAppraisal.toLowerCase().includes('yes') ? `
-<div class="doc-section-header">Invocation of Appraisal Clause</div>
-<p class="doc-paragraph"><strong>NOTICE:</strong> Pursuant to the appraisal clause in my insurance policy, I hereby formally invoke my right to the appraisal process. I request that you acknowledge this invocation and provide the name of your appointed appraiser within the timeframe specified in the policy. I will appoint my own competent appraiser and the two appraisers shall select an umpire as provided in the policy. The appraisal process does not waive any of my rights to pursue bad faith claims if this matter is not resolved fairly.</p>
-` : ''}
-
-<div class="doc-section-header">Demand</div>
-<p class="doc-paragraph">I hereby demand that you reconsider your valuation and provide fair compensation of ${h(data.demandAmount, 'Demand Amount', 'demandAmount')} to fully compensate me for my covered loss.</p>
-
-<div class="doc-deadline">
-<strong>DEADLINE:</strong> I require a response and revised offer within ${h(data.demandDeadline, '14 days', 'demandDeadline')} of the date of this letter.
-</div>
-
-<p class="doc-paragraph">If you fail to provide fair compensation by this deadline, I will pursue all available remedies including:</p>
-<ul class="doc-list">
-    <li>Filing a complaint with the ${stateModule.name} Department of Insurance</li>
-    <li>Invoking the appraisal clause in my policy (if not already invoked)</li>
-    <li>Filing a lawsuit for breach of contract and insurance bad faith</li>
-    <li>Seeking all compensatory damages, consequential damages, and penalties available under law</li>
-</ul>
-
-<p class="doc-paragraph">I have documented your handling of this claim and will present evidence of any bad faith practices in subsequent proceedings.</p>
-                `;
-            }
-        }
         }
     };
     </script>

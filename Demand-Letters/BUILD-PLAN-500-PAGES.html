@@ -96,10 +96,98 @@ h1{font-size:2.5rem;text-align:center;margin-bottom:10px;background:linear-gradi
 
 <div class="rationale" style="border-left:4px solid #22c55e;margin-top:16px">
 <strong>NEW: Workbench Architecture (Dec 2025)</strong><br>
-<strong>Generator Engine:</strong> Modular generator at <code>/generator/</code> supports 6 states (CA, AZ, NV, OR, WA, Other) with URL params <code>?state=california&situation=unpaid-wages</code><br>
-<strong>Pillar Pages:</strong> Full tabbed guides (Overview, Legal, Checklist, Samples, Generator iframe, Next Steps) built for CA only<br>
-<strong>Workbench:</strong> Quick-access shell at <code>/workbench/</code> loads pillar pages via toggles (situation, state, side, language)<br>
-<strong>Benefit:</strong> Generator handles all 6 states automatically—no separate state pages needed until Phase 6
+<strong>Generator Engine:</strong> Standalone modular tool at <code>/generator/</code> — supports 6 states (CA, AZ, NV, OR, WA, Other) with URL params <code>?state=california&situation=unpaid-wages</code>. Contains all situation modules (form fields + letter templates) and state modules (statutes + penalties).<br>
+<strong>Pillar Guide Pages:</strong> Full 7-tab SEO pages: Overview, Legal Basis, Checklist, <u>Damages</u>, Sample Language, Generator (iframe), Next Steps. Each is a standalone HTML file with unique content that embeds the shared generator via iframe.<br>
+<strong>Workbench:</strong> Dev shell at <code>/workbench/</code> for quick preview via toggles (situation, state, side, language).<br>
+<strong>How They Connect:</strong> Pillar pages → embed generator iframe → generator handles the actual letter creation. Pillar = SEO content, Generator = tool.<br>
+<strong>Benefit:</strong> Generator handles all 6 states automatically. Build CA pillar pages first; other states get generator functionality immediately without separate pages until Phase 6.
+</div>
+
+<div class="rationale" style="border-left:4px solid #f59e0b;margin-top:16px">
+<strong>PAGE TYPES: Old vs New Approach</strong><br><br>
+
+<strong style="color:#ef4444">OLD: Simple Generator Pages</strong><br>
+Just a form that generates a letter. Minimal content, poor SEO value. Example: a page with just "Fill in your details → Get letter"<br><br>
+
+<strong style="color:#22c55e">NEW: Comprehensive Pillar Guide Pages</strong><br>
+Full educational experience with 7 tabs of unique content. The generator is ONE tab (embedded via iframe). User gets:<br>
+• <strong>Overview</strong> — What this claim is, key stats, when to use<br>
+• <strong>Legal Basis</strong> — State statutes, case law citations, elements to prove<br>
+• <strong>Checklist</strong> — Evidence to gather, interactive checkboxes<br>
+• <strong>Damages</strong> — How to calculate what you're owed, sample calculations<br>
+• <strong>Sample Language</strong> — Copy-paste paragraphs for DIY letters<br>
+• <strong>Generator</strong> — Embedded tool (iframe to shared generator engine)<br>
+• <strong>Next Steps</strong> — What to do if they pay/don't pay, resources<br><br>
+
+<strong style="color:#3b82f6">WHY THIS IS BETTER FOR SEO:</strong><br>
+• More content = more keywords = better rankings for related queries<br>
+• User spends more time on page (engagement signal)<br>
+• Answers questions Google users are asking ("how do I calculate waiting time penalties?")<br>
+• Natural internal linking opportunities<br>
+• Each pillar page can rank for 10+ related keywords instead of just 1<br><br>
+
+<strong style="color:#8b5cf6">THE BUILD STRATEGY:</strong><br>
+1. Build ONE shared generator engine (already done) with all situations + all states<br>
+2. Build pillar guide pages for each situation (CA first) — these embed the generator<br>
+3. Generator handles multi-state automatically via URL params — no need for separate state pages until Phase 6<br>
+4. Result: 1 pillar page + 1 generator = coverage for 6 states immediately
+</div>
+
+<div class="rationale" style="border-left:4px solid #22d3ee;margin-top:16px;background:#0c1425">
+<strong style="color:#22d3ee">⚠️ INTERPRETING THE PHASES BELOW</strong><br><br>
+All "pages" listed in Phases 1-4 should be built as <strong>Pillar Guide Pages</strong> (7-tab format with embedded generator), NOT simple generator pages.<br><br>
+
+<strong style="color:#22c55e">PRODUCTION URL STRUCTURE (NOT WORKBENCH!):</strong><br>
+Pages must go directly to production paths for Google to index them:<br>
+<code>/Demand-Letters/[Category]/[situation-name].html</code><br><br>
+Examples:<br>
+• <code>/Demand-Letters/Insurance/bad-faith-claim-denial.html</code><br>
+• <code>/Demand-Letters/Employment/unpaid-overtime-wages.html</code><br>
+• <code>/Demand-Letters/PI/rear-end-collision.html</code><br><br>
+
+<strong style="color:#f59e0b">DUAL-PAGE STRATEGY (2x SEO VALUE!):</strong><br>
+For each situation, build TWO pages to maximize Google rankings:<br><br>
+<table style="width:100%;border-collapse:collapse;margin:10px 0">
+<tr style="border-bottom:1px solid #475569">
+<td style="padding:8px;color:#94a3b8"><strong>General Page</strong></td>
+<td style="padding:8px;color:#94a3b8"><strong>California Page</strong></td>
+</tr>
+<tr style="border-bottom:1px solid #334155">
+<td style="padding:8px"><code>/Insurance/bad-faith-denial.html</code></td>
+<td style="padding:8px"><code>/Insurance/california-bad-faith-denial.html</code></td>
+</tr>
+<tr>
+<td style="padding:8px;font-size:0.85rem">Educational, no state citations<br>Ranks for "bad faith demand letter"</td>
+<td style="padding:8px;font-size:0.85rem">CA statutes, deadlines, case law<br>Ranks for "california bad faith demand letter"</td>
+</tr>
+</table><br>
+
+<strong>Per situation, you build:</strong><br>
+• 1 situation module in <code>/generator/</code> (form fields + letter template + statutes for ALL 6 states)<br>
+• 1 General pillar page (educational, state-agnostic)<br>
+• 1 California pillar page (CA-specific statutes, deadlines, penalties)<br>
+= <strong>2 pages per situation = 2x SEO coverage</strong><br><br>
+
+<strong style="color:#3b82f6">SAFE PARALLEL AGENT BUILD ORDER:</strong><br>
+Agents editing the same file will conflict! Use this safe pattern:<br><br>
+<code>Step 1: ONE agent adds ALL situation modules to generator (sequential)</code><br>
+<code>Step 2: Wait for Step 1 to complete</code><br>
+<code>Step 3: Launch parallel agents for pillar pages (each agent = different file)</code><br><br>
+
+Example for 5 situations:<br>
+• Agent 0: Add 5 modules to generator/index.html (one agent, sequential)<br>
+• Agents 1-5: Build 5 General pages (parallel, different files)<br>
+• Agents 6-10: Build 5 CA pages (parallel, different files)<br>
+= 10 production pages from one batch<br><br>
+
+<strong style="color:#f59e0b">REQUIRED: Breadcrumb Navigation</strong><br>
+Every pillar page MUST include breadcrumb navigation at the top:<br>
+<code>&lt;nav class="breadcrumb"&gt;
+  &lt;a href="/Demand-Letters/"&gt;Demand Letters&lt;/a&gt; →
+  &lt;a href="/Demand-Letters/Insurance/"&gt;Insurance&lt;/a&gt; →
+  &lt;span&gt;Bad Faith Denial&lt;/span&gt;
+&lt;/nav&gt;</code><br>
+This improves SEO, user navigation, and site structure signals.
 </div>
 
 <div class="legend">
