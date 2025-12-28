@@ -126,11 +126,105 @@ All major categories have index.html pages including:
 ### PHASE 4: Spanish Language Expansion
 **Goal**: 50+ Spanish pages targeting high-volume consumer issues
 
-**Target clusters:**
-- Landlord-tenant (deposits, habitability) - "inquilino-propietario"
-- Employment (wages, discrimination) - "empleo"
-- Consumer fraud (cars, contractors) - "consumidor"
-- Personal injury basics - "lesiones-personales"
+**Directory Structure**: `/Demand-Letters/Spanish/`
+
+**Current Status**: 0 pages built | Target: 50+ pages
+
+#### Phase 4A: Core Spanish Pages (30 pages)
+
+**Inquilino-Propietario (Landlord-Tenant) - 10 pages:**
+| Page | URL | Write/Respond |
+|------|-----|---------------|
+| Depósito de Seguridad | /Spanish/inquilino/deposito-seguridad.html | Write |
+| Habitabilidad | /Spanish/inquilino/habitabilidad.html | Write |
+| Reparaciones Urgentes | /Spanish/inquilino/reparaciones.html | Write |
+| Devolución de Depósito | /Spanish/inquilino/devolucion-deposito.html | Write |
+| Aumento de Renta Ilegal | /Spanish/inquilino/aumento-renta.html | Write |
+| Desalojo Ilegal | /Spanish/inquilino/desalojo-ilegal.html | Write |
+| Moho y Plagas | /Spanish/inquilino/moho-plagas.html | Write |
+| Retención de Depósito (Respuesta) | /Spanish/propietario/retencion-deposito.html | Respond |
+| Queja de Habitabilidad (Respuesta) | /Spanish/propietario/respuesta-habitabilidad.html | Respond |
+| Index: Inquilino-Propietario | /Spanish/inquilino/index.html | Index |
+
+**Empleo (Employment) - 10 pages:**
+| Page | URL | Write/Respond |
+|------|-----|---------------|
+| Salarios No Pagados | /Spanish/empleo/salarios-no-pagados.html | Write |
+| Horas Extra No Pagadas | /Spanish/empleo/horas-extra.html | Write |
+| Discriminación Laboral | /Spanish/empleo/discriminacion.html | Write |
+| Acoso en el Trabajo | /Spanish/empleo/acoso-laboral.html | Write |
+| Despido Injusto | /Spanish/empleo/despido-injusto.html | Write |
+| Represalia del Empleador | /Spanish/empleo/represalia.html | Write |
+| Robo de Propinas | /Spanish/empleo/robo-propinas.html | Write |
+| Clasificación Errónea | /Spanish/empleo/clasificacion-erronea.html | Write |
+| Expediente de Personal | /Spanish/empleo/expediente-personal.html | Write |
+| Index: Empleo | /Spanish/empleo/index.html | Index |
+
+**Consumidor (Consumer) - 10 pages:**
+| Page | URL | Write/Respond |
+|------|-----|---------------|
+| Fraude de Auto Usado | /Spanish/consumidor/fraude-auto.html | Write |
+| Fraude de Contratista | /Spanish/consumidor/fraude-contratista.html | Write |
+| Garantía Incumplida | /Spanish/consumidor/garantia.html | Write |
+| Reembolso Negado | /Spanish/consumidor/reembolso.html | Write |
+| Publicidad Falsa | /Spanish/consumidor/publicidad-falsa.html | Write |
+| Suscripción No Autorizada | /Spanish/consumidor/suscripcion.html | Write |
+| Cobro Excesivo | /Spanish/consumidor/cobro-excesivo.html | Write |
+| Ley del Limón | /Spanish/consumidor/ley-limon.html | Write |
+| Producto Defectuoso | /Spanish/consumidor/producto-defectuoso.html | Write |
+| Index: Consumidor | /Spanish/consumidor/index.html | Index |
+
+#### Phase 4B: Expansion Pages (20+ pages)
+
+**Lesiones Personales (Personal Injury) - 8 pages:**
+| Page | URL | Write/Respond |
+|------|-----|---------------|
+| Accidente de Auto | /Spanish/lesiones/accidente-auto.html | Write |
+| Accidente de Trabajo | /Spanish/lesiones/accidente-trabajo.html | Write |
+| Mordida de Perro | /Spanish/lesiones/mordida-perro.html | Write |
+| Resbalón y Caída | /Spanish/lesiones/resbalon-caida.html | Write |
+| Accidente de Moto | /Spanish/lesiones/accidente-moto.html | Write |
+| Accidente de Peatón | /Spanish/lesiones/accidente-peaton.html | Write |
+| Accidente de Bicicleta | /Spanish/lesiones/accidente-bicicleta.html | Write |
+| Index: Lesiones | /Spanish/lesiones/index.html | Index |
+
+**Seguros (Insurance) - 6 pages:**
+| Page | URL | Write/Respond |
+|------|-----|---------------|
+| Reclamación Negada | /Spanish/seguros/reclamacion-negada.html | Write |
+| Mala Fe del Seguro | /Spanish/seguros/mala-fe.html | Write |
+| Subvaloración de Daños | /Spanish/seguros/subvaloracion.html | Write |
+| Demora en Pago | /Spanish/seguros/demora-pago.html | Write |
+| Accidente sin Seguro | /Spanish/seguros/sin-seguro.html | Write |
+| Index: Seguros | /Spanish/seguros/index.html | Index |
+
+**Negocios (Business) - 6 pages:**
+| Page | URL | Write/Respond |
+|------|-----|---------------|
+| Factura No Pagada | /Spanish/negocios/factura-no-pagada.html | Write |
+| Incumplimiento de Contrato | /Spanish/negocios/incumplimiento-contrato.html | Write |
+| Disputa de Proveedor | /Spanish/negocios/disputa-proveedor.html | Write |
+| Violación de NDA | /Spanish/negocios/violacion-nda.html | Write |
+| Disputa de Socio | /Spanish/negocios/disputa-socio.html | Write |
+| Index: Negocios | /Spanish/negocios/index.html | Index |
+
+**Main Index Pages:**
+| Page | URL |
+|------|-----|
+| Spanish Hub | /Spanish/index.html |
+| Category Landing | /Spanish/categorias.html |
+
+#### Build Priority Order:
+1. **Batch 4.1**: Inquilino (Tenant) - 7 write pages + 1 index
+2. **Batch 4.2**: Empleo (Employment) - 9 write pages + 1 index
+3. **Batch 4.3**: Consumidor (Consumer) - 9 write pages + 1 index
+4. **Batch 4.4**: Lesiones (Personal Injury) - 7 write pages + 1 index
+5. **Batch 4.5**: Propietario (Landlord responses) + Seguros + Negocios
+
+**SEO Notes:**
+- All pages bilingual meta tags (hreflang)
+- Target keywords: "carta de demanda [topic]", "como escribir carta de demanda"
+- Link back to English equivalents where they exist
 
 ### PHASE 5: State Expansion (AZ, NV, OR)
 **Goal**: Adapt top 30 CA pages for each neighboring state
