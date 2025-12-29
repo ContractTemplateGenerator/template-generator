@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NDA Generator | Create Custom Non-Disclosure Agreements | Terms.Law</title>
+    <meta name="description" content="Generate professional, attorney-drafted NDAs customized for your specific situation. Mutual, unilateral, employee, contractor, and investor NDAs with modern AI clauses.">
+    <link rel="canonical" href="https://terms.law/NDA/generator.html">
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-901N2Y3CDZ"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-901N2Y3CDZ');
+    </script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- React and Babel -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- DOCX generation -->
+    <script src="https://unpkg.com/docx@8.2.2/build/index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            min-height: 100vh;
+            color: var(--gray-800);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .site-header {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 52px;
+        }
+        .header-nav { display: flex; align-items: center; gap: 0.5rem; }
+        .nav-link {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .nav-link:hover { color: white; background: rgba(255,255,255,0.1); }
+        .nav-link.home-logo { font-size: 1.1rem; font-weight: 800; }
+        .logo-text {
+            background: linear-gradient(135deg, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .help-link {
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: #a5b4fc;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .help-link:hover {
+            background: rgba(99, 102, 241, 0.3);
+            border-color: rgba(99, 102, 241, 0.5);
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 2rem 1rem 1rem;
+            color: white;
+        }
+        .hero h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #fff 0%, #c7d2fe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero p { color: #94a3b8; font-size: 1rem; }
+
+        /* Scenario Selector */
+        .scenario-bar {
+            max-width: 1200px;
+            margin: 0 auto 1rem;
+            padding: 0 1rem;
+        }
+        .scenario-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+        .scenario-pill {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .scenario-pill:hover, .scenario-pill.active {
+            background: rgba(99, 102, 241, 0.3);
+            border-color: rgba(99, 102, 241, 0.5);
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            align-items: start;
+        }
+        @media (max-width: 1000px) {
+            .main-container { grid-template-columns: 1fr; }
+        }
+
+        /* Form Panel */
+        .form-panel {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+        }
+
+        /* Step Indicator */
+        .step-indicator {
+            display: flex;
+            background: var(--gray-50);
+            padding: 1rem;
+            gap: 0.25rem;
+            overflow-x: auto;
+        }
+        .step-dot {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--gray-400);
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .step-dot:hover { background: var(--gray-200); color: var(--gray-600); }
+        .step-dot.active { background: var(--primary); color: white; }
+        .step-dot.complete { background: var(--success); color: white; }
+
+        /* Form Content */
+        .form-content { padding: 1.5rem; }
+        .form-section { margin-bottom: 1.5rem; }
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--gray-800);
+            margin-bottom: 1rem;
+        }
+
+        /* Form Fields */
+        .field-group { margin-bottom: 1rem; }
+        .field-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 0.4rem;
+        }
+        input[type="text"], input[type="date"], input[type="number"], select, textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        /* Option Cards */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+        .option-card {
+            padding: 1rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .option-card:hover { border-color: var(--gray-300); background: var(--gray-50); }
+        .option-card.selected { border-color: var(--primary); background: #eef2ff; }
+        .option-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .option-title { font-weight: 600; font-size: 0.9rem; }
+        .option-desc { font-size: 0.75rem; color: var(--gray-500); margin-top: 0.25rem; }
+
+        /* Navigation Buttons */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--gray-200);
+            background: var(--gray-50);
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+        .btn-back { background: var(--gray-200); color: var(--gray-700); }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: var(--success); color: white; }
+
+        /* Preview Panel */
+        .preview-panel {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            position: sticky;
+            top: 70px;
+            max-height: calc(100vh - 90px);
+            display: flex;
+            flex-direction: column;
+        }
+        .preview-header {
+            background: var(--gray-800);
+            color: white;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .preview-title { font-weight: 700; }
+        .preview-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            background: var(--primary);
+            color: white;
+        }
+        .preview-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+            font-size: 0.9rem;
+            line-height: 1.8;
+            background: #fffdf7;
+            font-family: 'Times New Roman', serif;
+        }
+
+        /* Related Tools */
+        .related-tools {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        .related-title {
+            color: white;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        .related-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .related-card:hover {
+            background: rgba(255,255,255,0.15);
+        }
+        .related-card-title {
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .related-card-desc {
+            color: #94a3b8;
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Footer */
+        .site-footer {
+            background: rgba(15, 23, 42, 0.95);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding: 2rem 1rem;
+            margin-top: 3rem;
+        }
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .footer-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .footer-links a:hover { color: white; }
+        .footer-bottom {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.85rem;
+        }
+        .footer-bottom a { color: #94a3b8; }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-content">
+            <nav class="header-nav">
+                <a href="/" class="nav-link home-logo"><span class="logo-text">Terms.Law</span></a>
+                <a href="/NDA/" class="nav-link">NDA Studio</a>
+                <a href="/NDA/clause-library/" class="nav-link">Clause Library</a>
+                <a href="/NDA/tools/risk-analyzer.html" class="nav-link">Analyzer</a>
+            </nav>
+            <a href="/NDA/which-nda.html" class="help-link">Need help choosing?</a>
+        </div>
+    </header>
+
+    <div class="hero">
+        <h1>NDA Generator</h1>
+        <p>Create a custom NDA in minutes</p>
+    </div>
+
+    <!-- Scenario Quick Select -->
+    <div class="scenario-bar">
+        <div class="scenario-pills">
+            <span class="scenario-pill" data-scenario="mutual">Mutual NDA</span>
+            <span class="scenario-pill" data-scenario="unilateral">Unilateral</span>
+            <a href="/NDA/scenarios/employee-hiring/" class="scenario-pill">Employee</a>
+            <a href="/NDA/scenarios/contractor/" class="scenario-pill">Contractor</a>
+            <a href="/NDA/scenarios/investor-pitch/" class="scenario-pill">Investor</a>
+            <a href="/NDA/scenarios/merger-acquisition/" class="scenario-pill">M&A</a>
+        </div>
+    </div>
+
+    <div id="root"></div>
+
+    <!-- Related Tools Section -->
+    <div class="main-container" style="grid-template-columns: 1fr;">
+        <div class="related-tools">
+            <div class="related-title">Related Tools</div>
+            <div class="related-grid">
+                <a href="/NDA/tools/risk-analyzer.html" class="related-card">
+                    <div class="related-card-title">Risk Analyzer</div>
+                    <div class="related-card-desc">Analyze an NDA you received</div>
+                </a>
+                <a href="/NDA/tools/negotiation-playbook.html" class="related-card">
+                    <div class="related-card-title">Negotiation Playbook</div>
+                    <div class="related-card-desc">Learn how to negotiate terms</div>
+                </a>
+                <a href="/NDA/clause-library/" class="related-card">
+                    <div class="related-card-title">Clause Library</div>
+                    <div class="related-card-desc">Explore clause options</div>
+                </a>
+                <a href="/NDA/tools/compare.html" class="related-card">
+                    <div class="related-card-title">Compare NDAs</div>
+                    <div class="related-card-desc">Side-by-side comparison</div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="/NDA/">NDA Studio Home</a>
+                <a href="/NDA/generator.html">Generator</a>
+                <a href="/NDA/tools/risk-analyzer.html">Risk Analyzer</a>
+                <a href="/NDA/clause-library/">Clause Library</a>
+                <a href="/NDA/scenarios/business-deal/">Scenarios</a>
+                <a href="mailto:owner@terms.law">Consultation</a>
+            </div>
+            <div class="footer-bottom">
+                <p>Created by <a href="mailto:owner@terms.law">Sergei Tokmakov</a>, California Attorney (CA Bar #279869)</p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
+
+        // Get scenario from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const initialScenario = urlParams.get('scenario') || 'mutual';
+        const initialType = urlParams.get('type') || 'mutual';
+
+        const App = () => {
+            const [step, setStep] = useState(1);
+            const [formData, setFormData] = useState({
+                ndaType: initialType,
+                disclosingPartyName: '',
+                receivingPartyName: '',
+                governingState: 'California',
+                termLength: '2',
+                termUnit: 'years',
+                includeAIRestriction: true,
+                effectiveDate: new Date().toISOString().split('T')[0]
+            });
+
+            const updateField = (field, value) => {
+                setFormData(prev => ({ ...prev, [field]: value }));
+            };
+
+            // Simplified NDA preview
+            const ndaPreview = useMemo(() => {
+                const d = formData;
+                const isMutual = d.ndaType === 'mutual';
+                return `
+                    <h2 style="text-align:center;">${isMutual ? 'MUTUAL ' : ''}NON-DISCLOSURE AGREEMENT</h2>
+                    <p>This Agreement is entered into as of <strong>${d.effectiveDate}</strong></p>
+                    <p><strong>Party A:</strong> ${d.disclosingPartyName || '[Your Name]'}</p>
+                    <p><strong>Party B:</strong> ${d.receivingPartyName || '[Counterparty Name]'}</p>
+                    <p style="margin-top: 1rem;">Governing Law: ${d.governingState}</p>
+                    <p>Term: ${d.termLength} ${d.termUnit}</p>
+                    ${d.includeAIRestriction ? '<p style="color: #059669;">AI Restriction Clause Included</p>' : ''}
+                    <p style="margin-top: 2rem; color: #6b7280; font-size: 0.85rem;">Complete all steps to generate the full NDA document...</p>
+                `;
+            }, [formData]);
+
+            return (
+                <div className="main-container">
+                    <div className="form-panel">
+                        <div className="step-indicator">
+                            {['Type', 'Parties', 'Terms', 'Provisions', 'Review'].map((label, i) => (
+                                <div
+                                    key={i}
+                                    className={`step-dot ${step === i + 1 ? 'active' : ''} ${step > i + 1 ? 'complete' : ''}`}
+                                    onClick={() => setStep(i + 1)}
+                                >
+                                    {label}
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="form-content">
+                            {step === 1 && (
+                                <div className="form-section">
+                                    <div className="section-title">Select NDA Type</div>
+                                    <div className="options-grid">
+                                        {[
+                                            { id: 'mutual', icon: '!', title: 'Mutual NDA', desc: 'Both parties share info' },
+                                            { id: 'unilateral', icon: '>', title: 'Unilateral', desc: 'One-way disclosure' }
+                                        ].map(type => (
+                                            <div
+                                                key={type.id}
+                                                className={`option-card ${formData.ndaType === type.id ? 'selected' : ''}`}
+                                                onClick={() => updateField('ndaType', type.id)}
+                                            >
+                                                <div className="option-icon">{type.icon}</div>
+                                                <div className="option-title">{type.title}</div>
+                                                <div className="option-desc">{type.desc}</div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <p style={{ marginTop: '1rem', fontSize: '0.9rem', color: 'var(--gray-500)' }}>
+                                        Not sure which type? <a href="/NDA/which-nda.html" style={{ color: 'var(--primary)' }}>Take our quick quiz</a>
+                                    </p>
+                                </div>
+                            )}
+
+                            {step === 2 && (
+                                <div className="form-section">
+                                    <div className="section-title">Party Information</div>
+                                    <div className="field-group">
+                                        <label className="field-label">Your Name / Company</label>
+                                        <input
+                                            type="text"
+                                            value={formData.disclosingPartyName}
+                                            onChange={e => updateField('disclosingPartyName', e.target.value)}
+                                            placeholder="Acme Corporation"
+                                        />
+                                    </div>
+                                    <div className="field-group">
+                                        <label className="field-label">Counterparty Name</label>
+                                        <input
+                                            type="text"
+                                            value={formData.receivingPartyName}
+                                            onChange={e => updateField('receivingPartyName', e.target.value)}
+                                            placeholder="Beta Inc."
+                                        />
+                                    </div>
+                                </div>
+                            )}
+
+                            {step === 3 && (
+                                <div className="form-section">
+                                    <div className="section-title">Agreement Terms</div>
+                                    <div className="field-group">
+                                        <label className="field-label">Effective Date</label>
+                                        <input
+                                            type="date"
+                                            value={formData.effectiveDate}
+                                            onChange={e => updateField('effectiveDate', e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="field-group">
+                                        <label className="field-label">Term Length</label>
+                                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                            <input
+                                                type="number"
+                                                value={formData.termLength}
+                                                onChange={e => updateField('termLength', e.target.value)}
+                                                min="1"
+                                                style={{ flex: 1 }}
+                                            />
+                                            <select
+                                                value={formData.termUnit}
+                                                onChange={e => updateField('termUnit', e.target.value)}
+                                                style={{ flex: 1 }}
+                                            >
+                                                <option value="months">Months</option>
+                                                <option value="years">Years</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div className="field-group">
+                                        <label className="field-label">Governing State</label>
+                                        <select
+                                            value={formData.governingState}
+                                            onChange={e => updateField('governingState', e.target.value)}
+                                        >
+                                            <option value="California">California</option>
+                                            <option value="Delaware">Delaware</option>
+                                            <option value="New York">New York</option>
+                                            <option value="Texas">Texas</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            )}
+
+                            {step === 4 && (
+                                <div className="form-section">
+                                    <div className="section-title">Special Provisions</div>
+                                    <div
+                                        className={`option-card ${formData.includeAIRestriction ? 'selected' : ''}`}
+                                        onClick={() => updateField('includeAIRestriction', !formData.includeAIRestriction)}
+                                        style={{ marginBottom: '1rem' }}
+                                    >
+                                        <div className="option-title">AI/ML Restrictions</div>
+                                        <div className="option-desc">Prevent use of confidential info in AI systems</div>
+                                    </div>
+                                    <p style={{ fontSize: '0.9rem', color: 'var(--gray-500)' }}>
+                                        Learn more about this clause: <a href="/NDA/clause-library/ai-restrictions.html" style={{ color: 'var(--primary)' }}>AI Restrictions Clause</a>
+                                    </p>
+                                </div>
+                            )}
+
+                            {step === 5 && (
+                                <div className="form-section">
+                                    <div className="section-title">Review & Download</div>
+                                    <p style={{ marginBottom: '1rem', color: 'var(--gray-600)' }}>
+                                        Your NDA is ready! Review the preview and download.
+                                    </p>
+                                    <button
+                                        className="btn btn-success"
+                                        style={{ width: '100%', marginBottom: '0.5rem' }}
+                                        onClick={() => alert('Download functionality - connect to Ultimate NDA Generator')}
+                                    >
+                                        Download as Word
+                                    </button>
+                                    <p style={{ fontSize: '0.85rem', color: 'var(--gray-500)', marginTop: '1rem' }}>
+                                        For advanced options, use our <a href="/Ultimate-NDA-Generator/" style={{ color: 'var(--primary)' }}>Ultimate NDA Generator</a>
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="nav-buttons">
+                            {step > 1 && <button className="btn btn-back" onClick={() => setStep(step - 1)}>Back</button>}
+                            {step < 5 && <button className="btn btn-primary" onClick={() => setStep(step + 1)}>Continue</button>}
+                        </div>
+                    </div>
+
+                    <div className="preview-panel">
+                        <div className="preview-header">
+                            <div className="preview-title">Live Preview</div>
+                            <button className="preview-btn">Download</button>
+                        </div>
+                        <div className="preview-content" dangerouslySetInnerHTML={{ __html: ndaPreview }} />
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>
