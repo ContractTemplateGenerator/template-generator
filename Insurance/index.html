@@ -744,9 +744,598 @@
     </style>
 </head>
 <body>
-    <!-- Sitewide Header -->
-    <div id="site-header"></div>
-    <script src="/shared/header-loader.js"></script>
+    <!-- ========================================
+         SITEWIDE HEADER
+         ======================================== -->
+    <style>
+    /* Sitewide Header Styles */
+    .site-header {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        position: sticky;
+        top: 0;
+        z-index: 9999;
+        box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+    }
+    .header-content {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 24px;
+        height: 60px;
+    }
+    .site-logo {
+        font-size: 1.2rem;
+        font-weight: 800;
+        text-decoration: none;
+        background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        flex-shrink: 0;
+    }
+    .site-nav {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 0;
+        flex-wrap: nowrap;
+    }
+    .nav-item {
+        position: relative;
+        flex-shrink: 0;
+    }
+    .nav-link {
+        color: #94a3b8;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        padding: 20px 14px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        transition: color 0.2s;
+        white-space: nowrap;
+    }
+    .nav-link:hover { color: #fff; }
+    .nav-link .arrow {
+        font-size: 10px;
+        transition: transform 0.2s;
+    }
+    .nav-item:hover .arrow { transform: rotate(180deg); }
+    .nav-cta {
+        background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+        color: #fff !important;
+        padding: 10px 20px !important;
+        border-radius: 8px;
+        margin-left: 12px;
+        font-weight: 600;
+    }
+    .nav-cta:hover { opacity: 0.9; }
+
+    /* Dropdown Menus */
+    .dropdown, .mega-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background: #1e293b;
+        border-radius: 12px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(10px);
+        transition: all 0.2s;
+        min-width: 220px;
+        padding: 12px 0;
+        z-index: 10000;
+    }
+    .nav-item:hover .dropdown,
+    .nav-item:hover .mega-menu {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+    .dropdown a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 20px;
+        color: #cbd5e1;
+        text-decoration: none;
+        font-size: 14px;
+        transition: all 0.2s;
+    }
+    .dropdown a:hover {
+        background: #334155;
+        color: #fff;
+    }
+    .dropdown .icon { font-size: 16px; }
+
+    /* Mega Menu */
+    .mega-menu {
+        left: 50%;
+        transform: translateX(-50%) translateY(10px);
+        padding: 0;
+        min-width: 500px;
+    }
+    .mega-menu.wide { min-width: 800px; }
+    .mega-menu.medium { min-width: 550px; }
+    .nav-item:hover .mega-menu {
+        transform: translateX(-50%) translateY(0);
+    }
+    .mega-menu-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 24px;
+        border-bottom: 1px solid #334155;
+    }
+    .mega-menu-title {
+        font-weight: 700;
+        color: #fff;
+        font-size: 15px;
+    }
+    .mega-menu-viewall {
+        color: #60a5fa;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 500;
+    }
+    .mega-menu-viewall:hover { text-decoration: underline; }
+    .mega-menu-grid {
+        display: grid;
+        gap: 0;
+        padding: 20px 24px;
+    }
+    .mega-menu-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+    .mega-menu-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+    .mega-menu-section {
+        padding: 0 16px;
+        border-right: 1px solid #334155;
+    }
+    .mega-menu-section:last-child,
+    .mega-menu-section.no-border { border-right: none; }
+    .mega-menu-section-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .mega-menu-section-title .icon { font-size: 14px; }
+    .mega-menu-links {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .mega-menu-links li a {
+        display: block;
+        padding: 8px 0;
+        color: #cbd5e1;
+        text-decoration: none;
+        font-size: 13px;
+        transition: color 0.2s;
+    }
+    .mega-menu-links li a:hover { color: #60a5fa; }
+    .mega-menu-more {
+        margin-top: 8px;
+        padding-top: 8px;
+        border-top: 1px solid #334155;
+    }
+    .mega-menu-more a {
+        color: #64748b;
+        text-decoration: none;
+        font-size: 12px;
+    }
+    .mega-menu-more a:hover { color: #60a5fa; }
+    .mega-menu-footer {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 16px 24px;
+        background: #0f172a;
+        border-radius: 0 0 12px 12px;
+    }
+    .mega-menu-footer a {
+        padding: 6px 12px;
+        background: #1e293b;
+        border-radius: 6px;
+        color: #94a3b8;
+        text-decoration: none;
+        font-size: 12px;
+        transition: all 0.2s;
+    }
+    .mega-menu-footer a:hover {
+        background: #334155;
+        color: #fff;
+    }
+
+    /* Mobile Menu Button */
+    .mobile-menu-btn {
+        display: none;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 8px;
+        z-index: 10001;
+    }
+    .mobile-menu-btn span {
+        display: block;
+        width: 24px;
+        height: 2px;
+        background: #94a3b8;
+        margin: 6px 0;
+        transition: all 0.3s;
+        border-radius: 2px;
+    }
+    .mobile-menu-btn.active span:nth-child(1) {
+        transform: rotate(45deg) translate(6px, 6px);
+        background: #fff;
+    }
+    .mobile-menu-btn.active span:nth-child(2) { opacity: 0; }
+    .mobile-menu-btn.active span:nth-child(3) {
+        transform: rotate(-45deg) translate(6px, -6px);
+        background: #fff;
+    }
+
+    /* Mobile Navigation Overlay */
+    .mobile-nav-overlay {
+        display: none;
+        position: fixed;
+        top: 60px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: #0f172a;
+        z-index: 9998;
+        overflow-y: auto;
+        padding: 20px;
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: all 0.3s;
+    }
+    .mobile-nav-overlay.active {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .mobile-nav-section { margin-bottom: 24px; }
+    .mobile-nav-section-title {
+        font-size: 12px;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 12px 16px;
+        border-bottom: 1px solid #1e293b;
+    }
+    .mobile-nav-links {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .mobile-nav-links a {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        color: #cbd5e1;
+        text-decoration: none;
+        font-size: 15px;
+        border-bottom: 1px solid #1e293b;
+        transition: all 0.2s;
+    }
+    .mobile-nav-links a:hover,
+    .mobile-nav-links a:active {
+        background: #1e293b;
+        color: #fff;
+    }
+    .mobile-nav-links .icon {
+        font-size: 18px;
+        width: 24px;
+        text-align: center;
+    }
+    .mobile-nav-cta {
+        display: block;
+        background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+        color: #fff;
+        text-align: center;
+        padding: 16px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 16px;
+        margin-top: 24px;
+    }
+
+    /* Header Responsive */
+    @media (max-width: 1200px) {
+        .nav-link {
+            padding: 20px 10px;
+            font-size: 13px;
+        }
+        .mega-menu.wide { min-width: 700px; }
+    }
+    @media (max-width: 1024px) {
+        .mega-menu.wide { min-width: 600px; }
+        .mega-menu-grid.cols-3 { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 900px) {
+        .site-nav { display: none; }
+        .mobile-menu-btn { display: block; }
+        .mobile-nav-overlay { display: block; }
+    }
+    @media (max-width: 480px) {
+        .header-content {
+            padding: 0 16px;
+            height: 56px;
+        }
+        .site-logo { font-size: 1.1rem; }
+        .mobile-nav-overlay {
+            top: 56px;
+            padding: 16px;
+        }
+        .mobile-nav-links a {
+            padding: 12px 14px;
+            font-size: 14px;
+        }
+    }
+    </style>
+
+    <header class="site-header">
+        <div class="header-content">
+            <a href="/" class="site-logo">Terms.Law</a>
+
+            <!-- Desktop Navigation -->
+            <nav class="site-nav">
+                <!-- Demands -->
+                <div class="nav-item">
+                    <a href="/Demand-Letters/" class="nav-link">Demands <span class="arrow">▼</span></a>
+                    <div class="mega-menu wide">
+                        <div class="mega-menu-header">
+                            <span class="mega-menu-title">Demand Letters</span>
+                            <a href="/Demand-Letters/" class="mega-menu-viewall">View All Guides →</a>
+                        </div>
+                        <div class="mega-menu-grid cols-3">
+                            <div class="mega-menu-section">
+                                <div class="mega-menu-section-title"><span class="icon">💼</span> Business</div>
+                                <ul class="mega-menu-links">
+                                    <li><a href="/Demand-Letters/Business/b2b-unpaid-service-invoice-demand-letters.html">Unpaid Invoices</a></li>
+                                    <li><a href="/Demand-Letters/Business/distribution-reseller-breach-demand-letters.html">Breach of Contract</a></li>
+                                    <li><a href="/Demand-Letters/Business/deadlock-non-responsive-partner-letters.html">Partnership Disputes</a></li>
+                                </ul>
+                                <div class="mega-menu-more"><a href="/Demand-Letters/Business/">+ 23 more</a></div>
+                            </div>
+                            <div class="mega-menu-section">
+                                <div class="mega-menu-section-title"><span class="icon">👷</span> Employment</div>
+                                <ul class="mega-menu-links">
+                                    <li><a href="/Demand-Letters/Employment/unpaid-wages-overtime-demand-letters-us-general.html">Wage & Hour Claims</a></li>
+                                    <li><a href="/Demand-Letters/Employment/california-wrongful-termination-demand.html">Wrongful Termination</a></li>
+                                    <li><a href="/Demand-Letters/Employment/workplace-harassment-discrimination-demand-letters.html">Discrimination</a></li>
+                                </ul>
+                                <div class="mega-menu-more"><a href="/Demand-Letters/Employment/">+ 20 more</a></div>
+                            </div>
+                            <div class="mega-menu-section">
+                                <div class="mega-menu-section-title"><span class="icon">🛒</span> Consumer</div>
+                                <ul class="mega-menu-links">
+                                    <li><a href="/Demand-Letters/Consumer/defective-consumer-product-demand-letters.html">Defective Products</a></li>
+                                    <li><a href="/Demand-Letters/Automotive/california-lemon-law-demand-letters.html">Lemon Law</a></li>
+                                    <li><a href="/Demand-Letters/Consumer/airline-refund-demand-letters.html">Refund Demands</a></li>
+                                </ul>
+                                <div class="mega-menu-more"><a href="/Demand-Letters/Consumer/">+ 23 more</a></div>
+                            </div>
+                            <div class="mega-menu-section">
+                                <div class="mega-menu-section-title"><span class="icon">🏠</span> Landlord-Tenant</div>
+                                <ul class="mega-menu-links">
+                                    <li><a href="/Demand-Letters/Landlord-Tenant/california-security-deposit-demand.html">Security Deposit</a></li>
+                                    <li><a href="/Demand-Letters/Landlord-Tenant/tenant-habitability-mold-repair-demand-letters.html">Habitability</a></li>
+                                </ul>
+                                <div class="mega-menu-more"><a href="/Demand-Letters/Landlord-Tenant/">+ 18 more</a></div>
+                            </div>
+                            <div class="mega-menu-section">
+                                <div class="mega-menu-section-title"><span class="icon">🛡️</span> Insurance</div>
+                                <ul class="mega-menu-links">
+                                    <li><a href="/Demand-Letters/Insurance/homeowners-insurance-claim-denial-demand-letters.html">Claim Denials</a></li>
+                                    <li><a href="/Demand-Letters/Insurance/bad-faith-claim-denial.html">Bad Faith Claims</a></li>
+                                </ul>
+                                <div class="mega-menu-more"><a href="/Demand-Letters/Insurance/">+ 18 more</a></div>
+                            </div>
+                            <div class="mega-menu-section no-border">
+                                <div class="mega-menu-section-title"><span class="icon">🏗️</span> Home Services</div>
+                                <ul class="mega-menu-links">
+                                    <li><a href="/Demand-Letters/Home-Services-Construction/california-contractor-defect-demand.html">Contractor Disputes</a></li>
+                                    <li><a href="/Demand-Letters/Home-Services-Construction/hvac-installation-repair-dispute-letters.html">HVAC Issues</a></li>
+                                </ul>
+                                <div class="mega-menu-more"><a href="/Demand-Letters/Home-Services-Construction/">+ 11 more</a></div>
+                            </div>
+                        </div>
+                        <div class="mega-menu-footer">
+                            <a href="/Demand-Letters/PI/">⚖️ Personal Injury</a>
+                            <a href="/Demand-Letters/Medical/">🏥 Medical</a>
+                            <a href="/Demand-Letters/respond/">📩 Respond</a>
+                            <a href="/Demand-Letters/Spanish/">🇪🇸 Español</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contracts -->
+                <div class="nav-item">
+                    <a href="/Templates/" class="nav-link">Contracts <span class="arrow">▼</span></a>
+                    <div class="mega-menu wide">
+                        <div class="mega-menu-header">
+                            <span class="mega-menu-title">Contract Templates (110+)</span>
+                            <a href="/Templates/" class="mega-menu-viewall">View Full Library →</a>
+                        </div>
+                        <div class="mega-menu-grid cols-3">
+                            <div class="mega-menu-section">
+                                <div class="mega-menu-section-title"><span class="icon">🤝</span> Business</div>
+                                <ul class="mega-menu-links">
+                                    <li><a href="/Templates/consulting-agreement-generator.html">Consulting Agreement</a></li>
+                                    <li><a href="/Templates/nda-mutual-confidentiality-agreement.html">NDA / Confidentiality</a></li>
+                                    <li><a href="/Templates/partnership-agreement-generator.html">Partnership Agreement</a></li>
+                                </ul>
+                                <div class="mega-menu-more"><a href="/Templates/">+ 50 more</a></div>
+                            </div>
+                            <div class="mega-menu-section">
+                                <div class="mega-menu-section-title"><span class="icon">💼</span> Employment</div>
+                                <ul class="mega-menu-links">
+                                    <li><a href="/Templates/employment-agreement-generator.html">Employment Agreement</a></li>
+                                    <li><a href="/Templates/independent-contractor-agreement-generator.html">Contractor Agreement</a></li>
+                                    <li><a href="/Templates/non-compete-agreement-generator.html">Non-Compete</a></li>
+                                </ul>
+                                <div class="mega-menu-more"><a href="/Templates/">+ 40 more</a></div>
+                            </div>
+                            <div class="mega-menu-section no-border">
+                                <div class="mega-menu-section-title"><span class="icon">🏠</span> Real Estate</div>
+                                <ul class="mega-menu-links">
+                                    <li><a href="/Templates/residential-lease-agreement-generator.html">Residential Lease</a></li>
+                                    <li><a href="/Templates/commercial-lease-agreement-generator.html">Commercial Lease</a></li>
+                                    <li><a href="/Templates/sublease-agreement-generator.html">Sublease Agreement</a></li>
+                                </ul>
+                                <div class="mega-menu-more"><a href="/Templates/">+ 10 more</a></div>
+                            </div>
+                        </div>
+                        <div class="mega-menu-footer">
+                            <a href="/NDA/">🔐 NDA Studio</a>
+                            <a href="/Templates/llc-operating-agreement-generator.html">📋 Operating Agreement</a>
+                            <a href="/Templates/residential-lease-agreement-generator.html">🏠 Lease Agreement</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Trading Legal -->
+                <div class="nav-item">
+                    <a href="/Trading-Legal/" class="nav-link">Trading <span class="arrow">▼</span></a>
+                    <div class="mega-menu medium">
+                        <div class="mega-menu-header">
+                            <span class="mega-menu-title">Trading & Investment Legal (95+)</span>
+                            <a href="/Trading-Legal/" class="mega-menu-viewall">View All →</a>
+                        </div>
+                        <div class="mega-menu-grid cols-2">
+                            <div class="mega-menu-section">
+                                <div class="mega-menu-section-title"><span class="icon">🏛️</span> Registration & Licensing</div>
+                                <ul class="mega-menu-links">
+                                    <li><a href="/Trading-Legal/guides/broker-dealer-vs-ria.html">Broker-Dealer vs RIA</a></li>
+                                    <li><a href="/Trading-Legal/guides/sec-examination-playbook.html">SEC Examination</a></li>
+                                    <li><a href="/Trading-Legal/guides/sec-ria-registration-kit.html">RIA Startup Kit</a></li>
+                                </ul>
+                            </div>
+                            <div class="mega-menu-section no-border">
+                                <div class="mega-menu-section-title"><span class="icon">💎</span> Crypto & Digital Assets</div>
+                                <ul class="mega-menu-links">
+                                    <li><a href="/Trading-Legal/guides/sec-crypto-enforcement.html">SEC Crypto Enforcement</a></li>
+                                    <li><a href="/Trading-Legal/guides/cryptocurrency-futures-cftc.html">Crypto Futures CFTC</a></li>
+                                    <li><a href="/Trading-Legal/guides/cross-border-token-offerings.html">Token Offerings</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="mega-menu-footer">
+                            <a href="/Trading-Legal/guides/">View All 95+ Guides →</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Read -->
+                <div class="nav-item">
+                    <a href="/Blog/" class="nav-link">Read <span class="arrow">▼</span></a>
+                    <div class="dropdown">
+                        <a href="/Blog/"><span class="icon">📰</span> Blog Posts</a>
+                        <a href="/FAQ/"><span class="icon">❓</span> FAQ (117 Topics)</a>
+                        <a href="/forum/"><span class="icon">💬</span> Forum</a>
+                        <a href="/Thai/"><span class="icon">🇹🇭</span> Thailand Hub</a>
+                        <a href="/INC/"><span class="icon">🏢</span> Formation (50 States)</a>
+                    </div>
+                </div>
+
+                <!-- Insurance Hub Link -->
+                <div class="nav-item">
+                    <a href="/Insurance/" class="nav-link" style="color: #fbbf24;">Insurance</a>
+                </div>
+
+                <!-- CTA -->
+                <a href="mailto:owner@terms.law" class="nav-link nav-cta">Contact</a>
+            </nav>
+
+            <!-- Mobile Menu Button -->
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile Navigation Overlay -->
+    <div class="mobile-nav-overlay" id="mobileNavOverlay">
+        <div class="mobile-nav-section">
+            <div class="mobile-nav-section-title">Main Sections</div>
+            <ul class="mobile-nav-links">
+                <li><a href="/Demand-Letters/"><span class="icon">📝</span> Demand Letters</a></li>
+                <li><a href="/Templates/"><span class="icon">📋</span> Contract Templates</a></li>
+                <li><a href="/Trading-Legal/"><span class="icon">📈</span> Trading Legal</a></li>
+                <li><a href="/Insurance/"><span class="icon">🛡️</span> Insurance Hub</a></li>
+            </ul>
+        </div>
+        <div class="mobile-nav-section">
+            <div class="mobile-nav-section-title">Popular</div>
+            <ul class="mobile-nav-links">
+                <li><a href="/NDA/"><span class="icon">🔐</span> NDA Studio</a></li>
+                <li><a href="/Templates/llc-operating-agreement-generator.html"><span class="icon">📄</span> LLC Operating Agreement</a></li>
+                <li><a href="/INC/DE-inc/"><span class="icon">🌴</span> Delaware LLC</a></li>
+            </ul>
+        </div>
+        <div class="mobile-nav-section">
+            <div class="mobile-nav-section-title">Resources</div>
+            <ul class="mobile-nav-links">
+                <li><a href="/Blog/"><span class="icon">📰</span> Blog</a></li>
+                <li><a href="/FAQ/"><span class="icon">❓</span> FAQ</a></li>
+                <li><a href="/forum/"><span class="icon">💬</span> Forum</a></li>
+            </ul>
+        </div>
+        <a href="mailto:owner@terms.law" class="mobile-nav-cta">Contact</a>
+    </div>
+
+    <script>
+    (function() {
+        const btn = document.getElementById('mobileMenuBtn');
+        const overlay = document.getElementById('mobileNavOverlay');
+
+        btn.addEventListener('click', function() {
+            const isActive = btn.classList.contains('active');
+            if (isActive) {
+                btn.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = '';
+            } else {
+                btn.classList.add('active');
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        });
+
+        // Close mobile menu when clicking a link
+        overlay.querySelectorAll('a').forEach(function(link) {
+            link.addEventListener('click', function() {
+                btn.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+        });
+
+        // Close on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                btn.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+    })();
+    </script>
 
     <!-- Hero -->
     <section class="hero">
