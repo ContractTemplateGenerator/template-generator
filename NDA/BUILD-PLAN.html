@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NDA Studio Napoleonic Expansion Plan | Terms.Law</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --dark: #0f172a;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-700: #334155;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-700);
+      line-height: 1.6;
+      padding: 2rem;
+    }
+    .container { max-width: 1400px; margin: 0 auto; }
+    h1 {
+      font-size: 2.5rem;
+      color: var(--dark);
+      margin-bottom: 0.5rem;
+    }
+    .subtitle {
+      color: #64748b;
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .stat {
+      background: white;
+      border-radius: 12px;
+      padding: 1.25rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+    }
+    .stat-value.done { color: var(--success); }
+    .stat-value.pending { color: var(--warning); }
+    .stat-value.total { color: var(--primary); }
+    .stat-label { color: #64748b; font-size: 0.85rem; }
+    .progress-bar {
+      background: var(--gray-200);
+      border-radius: 100px;
+      height: 24px;
+      margin-bottom: 2rem;
+      overflow: hidden;
+      position: relative;
+    }
+    .progress-fill {
+      background: linear-gradient(90deg, var(--success), #34d399);
+      height: 100%;
+      border-radius: 100px;
+      transition: width 0.5s;
+    }
+    .progress-text {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      font-weight: 600;
+      color: var(--dark);
+      font-size: 0.9rem;
+    }
+    .phase {
+      background: white;
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    .phase-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .phase-badge {
+      padding: 6px 14px;
+      border-radius: 100px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .phase-badge.complete { background: #dcfce7; color: #16a34a; }
+    .phase-badge.in-progress { background: #fef3c7; color: #d97706; }
+    .phase-badge.pending { background: var(--gray-100); color: #64748b; }
+    .phase-title { font-size: 1.5rem; font-weight: 700; color: var(--dark); }
+    .phase-count {
+      margin-left: auto;
+      font-size: 0.9rem;
+      color: #64748b;
+    }
+    .scenario-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .scenario-card {
+      background: var(--gray-50);
+      border: 2px solid var(--gray-200);
+      border-radius: 12px;
+      padding: 1.25rem;
+    }
+    .scenario-card.complete { border-color: var(--success); background: #f0fdf4; }
+    .scenario-card.partial { border-color: var(--warning); background: #fffbeb; }
+    .scenario-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .scenario-icon { font-size: 1.5rem; }
+    .scenario-name { font-weight: 600; color: var(--dark); }
+    .scenario-status {
+      margin-left: auto;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 100px;
+    }
+    .scenario-status.done { background: #dcfce7; color: #16a34a; }
+    .scenario-status.partial { background: #fef3c7; color: #d97706; }
+    .scenario-status.pending { background: var(--gray-100); color: #64748b; }
+    .scenario-pages {
+      font-size: 0.85rem;
+      color: #64748b;
+    }
+    .scenario-pages strong { color: var(--dark); }
+    .page-list {
+      margin-top: 10px;
+      font-size: 0.8rem;
+      color: #64748b;
+    }
+    .page-list .done { color: var(--success); }
+    .page-list .pending { color: #94a3b8; }
+    .tool-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .tool-card {
+      background: var(--gray-50);
+      border: 2px solid var(--gray-200);
+      border-radius: 12px;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .tool-card.complete { border-color: var(--success); background: #f0fdf4; }
+    .tool-icon { font-size: 1.5rem; }
+    .tool-name { font-weight: 600; color: var(--dark); font-size: 0.95rem; }
+    .tool-desc { font-size: 0.8rem; color: #64748b; }
+    .tool-status {
+      margin-left: auto;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 100px;
+    }
+    .tool-status.done { background: #dcfce7; color: #16a34a; }
+    .tool-status.pending { background: var(--gray-100); color: #64748b; }
+    .clause-progress {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 1rem;
+      padding: 1rem;
+      background: var(--gray-50);
+      border-radius: 12px;
+    }
+    .clause-bar {
+      flex: 1;
+      background: var(--gray-200);
+      height: 12px;
+      border-radius: 100px;
+      overflow: hidden;
+    }
+    .clause-fill {
+      background: var(--success);
+      height: 100%;
+      width: 10%;
+    }
+    .clause-text {
+      font-size: 0.9rem;
+      color: var(--dark);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .agent-batch {
+      background: linear-gradient(135deg, #1e293b, #334155);
+      color: white;
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+    .agent-batch h2 {
+      color: white;
+      margin-bottom: 1rem;
+    }
+    .agent-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+    }
+    .agent-card {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      padding: 1rem;
+    }
+    .agent-num {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .agent-name { font-weight: 600; color: white; margin-bottom: 6px; }
+    .agent-desc { font-size: 0.85rem; color: #94a3b8; }
+    .agent-pages {
+      margin-top: 8px;
+      font-size: 0.8rem;
+      color: #60a5fa;
+    }
+    .notes {
+      background: #eff6ff;
+      border-left: 4px solid var(--primary);
+      padding: 1rem 1.5rem;
+      border-radius: 0 8px 8px 0;
+      margin-top: 1.5rem;
+    }
+    .notes-title { font-weight: 600; color: var(--primary); margin-bottom: 8px; }
+    .updated { font-size: 0.75rem; color: #64748b; margin-top: 2rem; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>NDA Studio: Napoleonic Expansion</h1>
+    <p class="subtitle">The complete NDA platform domination plan | Based on MASTER-PLAN-NDA-STUDIO.md</p>
+
+    <!-- NEXT BATCH - WHAT STILL NEEDS TO BE DONE -->
+    <div class="agent-batch" style="background: linear-gradient(135deg, #dc2626, #ef4444); border: 4px solid #fca5a5;">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 1rem;">
+        <span class="phase-badge" style="background: #fef2f2; color: #dc2626; font-size: 1rem; padding: 8px 16px;">🚨 NEXT BATCH</span>
+        <h2 style="color: white; margin: 0;">Remaining Work from Phase 2 & 3 (~52 pages)</h2>
+      </div>
+      <p style="color: #fecaca; margin-bottom: 1.5rem;">Shells got stuck in compacting errors. These pages still need to be built:</p>
+
+      <div class="agent-grid">
+        <!-- PHASE 2 REMAINING -->
+        <div class="agent-card" style="border-color: #fca5a5; background: rgba(255,255,255,0.15);">
+          <div class="agent-num" style="color: #fca5a5;">Phase 2 - Agent 11</div>
+          <div class="agent-name">Relationship & Privacy Hub</div>
+          <div class="agent-desc" style="color: #fecaca;">Missing 6 pages: relationship-privacy-nda, bdsm-privacy-nda, intimate-media-nda, celebrity-dating-nda, what-these-ndas-can-and-cannot-do, negotiation-playbook, breach-response-urgent</div>
+          <div class="agent-pages" style="color: #f87171;">✅ Done: index.html, dating-privacy.html</div>
+        </div>
+
+        <div class="agent-card" style="border-color: #fca5a5; background: rgba(255,255,255,0.15);">
+          <div class="agent-num" style="color: #fca5a5;">Phase 2 - Agent 12</div>
+          <div class="agent-name">Professional Services Hub</div>
+          <div class="agent-desc" style="color: #fecaca;">Missing 5 pages: attorney-client-nda, consultant-nda, accountant-cpa-nda, agency-services-nda, negotiation-playbook</div>
+          <div class="agent-pages" style="color: #f87171;">✅ Done: index.html</div>
+        </div>
+
+        <div class="agent-card" style="border-color: #fca5a5; background: rgba(255,255,255,0.15);">
+          <div class="agent-num" style="color: #fca5a5;">Phase 2 - Agent 13</div>
+          <div class="agent-name">Employee Hub Expansion</div>
+          <div class="agent-desc" style="color: #fecaca;">Missing 7 pages: employee-confidentiality-agreement, nda-vs-invention-assignment, what-about-non-competes, pre-employment-nda, negotiation-playbook, whistleblower-carveouts, when-to-use-piia</div>
+          <div class="agent-pages" style="color: #f87171;">✅ Done: index.html only</div>
+        </div>
+
+        <div class="agent-card" style="border-color: #fca5a5; background: rgba(255,255,255,0.15);">
+          <div class="agent-num" style="color: #fca5a5;">Phase 2 - Agent 14</div>
+          <div class="agent-name">Contractor Hub Expansion</div>
+          <div class="agent-desc" style="color: #fecaca;">Missing 7 pages: freelancer-nda, agency-nda, developer-contractor-nda, nda-vs-work-for-hire, negotiation-playbook, evidence-checklist, breach-response</div>
+          <div class="agent-pages" style="color: #f87171;">✅ Done: index.html only</div>
+        </div>
+
+        <div class="agent-card" style="border-color: #fca5a5; background: rgba(255,255,255,0.15);">
+          <div class="agent-num" style="color: #fca5a5;">Phase 2 - Agent 15</div>
+          <div class="agent-name">Software Dev Hub Expansion</div>
+          <div class="agent-desc" style="color: #fecaca;">Missing 6 pages: source-code-nda, credential-access-nda, api-access-nda, security-requirements, negotiation-playbook, access-revocation-checklist, breach-response</div>
+          <div class="agent-pages" style="color: #f87171;">✅ Done: index.html, saas-vendor.html</div>
+        </div>
+
+        <div class="agent-card" style="border-color: #fca5a5; background: rgba(255,255,255,0.15);">
+          <div class="agent-num" style="color: #fca5a5;">Phase 2 - Agent 16</div>
+          <div class="agent-name">M&A Hub Expansion</div>
+          <div class="agent-desc" style="color: #fecaca;">Missing 7 pages: seller-side-nda, data-room-access, standstill-explained, clean-team-provisions, negotiation-playbook, breach-response, when-to-walk-away</div>
+          <div class="agent-pages" style="color: #f87171;">✅ Done: index.html, buyer-side.html</div>
+        </div>
+
+        <div class="agent-card" style="border-color: #fca5a5; background: rgba(255,255,255,0.15);">
+          <div class="agent-num" style="color: #fca5a5;">Phase 2 - Agent 17</div>
+          <div class="agent-name">"I Received an NDA" Hub</div>
+          <div class="agent-desc" style="color: #fecaca;">Missing 3 pages: what-to-do-first, counter-proposal-generator, when-to-walk-away</div>
+          <div class="agent-pages" style="color: #f87171;">✅ Done: index.html, red-flags.html</div>
+        </div>
+
+        <div class="agent-card" style="border-color: #22c55e; background: rgba(34,197,94,0.2);">
+          <div class="agent-num" style="color: #86efac;">Phase 2 - Agents 18-19</div>
+          <div class="agent-name">Tools: COMPLETE ✓</div>
+          <div class="agent-desc" style="color: #bbf7d0;">breach-response.html and evidence-checklist.html both exist in /tools/</div>
+        </div>
+
+        <!-- PHASE 3 REMAINING -->
+        <div class="agent-card" style="border-color: #6ee7b7; background: rgba(255,255,255,0.15);">
+          <div class="agent-num" style="color: #6ee7b7;">Phase 3 - Agent 23</div>
+          <div class="agent-name">🇷🇺🇺🇸 Russian-English Hub</div>
+          <div class="agent-desc" style="color: #a7f3d0;">Missing 5 pages: business-deal-nda, employment-nda, contractor-nda, negotiation-playbook-ru, clause-comparison</div>
+          <div class="agent-pages" style="color: #34d399;">✅ Done: index, mutual-nda-generator, one-way-generator</div>
+        </div>
+
+        <div class="agent-card" style="border-color: #6ee7b7; background: rgba(255,255,255,0.15);">
+          <div class="agent-num" style="color: #6ee7b7;">Phase 3 - Agent 24</div>
+          <div class="agent-name">🇪🇸🇺🇸 Spanish-English Hub</div>
+          <div class="agent-desc" style="color: #a7f3d0;">Missing 4 pages: employment-nda, contractor-nda, negotiation-playbook-es, clause-comparison</div>
+          <div class="agent-pages" style="color: #34d399;">✅ Done: index, mutual-nda-generator, one-way-generator, business-deal-nda</div>
+        </div>
+
+        <div class="agent-card" style="border-color: #22c55e; background: rgba(34,197,94,0.2);">
+          <div class="agent-num" style="color: #86efac;">Phase 3 - Agent 25</div>
+          <div class="agent-name">Language Selector Hub: COMPLETE ✓</div>
+          <div class="agent-desc" style="color: #bbf7d0;">All 3 pages done: index, preview, export-options</div>
+        </div>
+
+        <div class="agent-card" style="border-color: #6ee7b7; background: rgba(255,255,255,0.15);">
+          <div class="agent-num" style="color: #6ee7b7;">Phase 3 - Agent 26</div>
+          <div class="agent-name">Healthcare Industry Pack</div>
+          <div class="agent-desc" style="color: #a7f3d0;">Missing 3 pages: telemedicine-nda, patient-data-nda, compliance-checklist</div>
+          <div class="agent-pages" style="color: #34d399;">✅ Done: index, hipaa-compliant, medical-research, pharma-partnership</div>
+        </div>
+
+        <div class="agent-card" style="border-color: #22c55e; background: rgba(34,197,94,0.2);">
+          <div class="agent-num" style="color: #86efac;">Phase 3 - Agent 27</div>
+          <div class="agent-name">Finance Industry Pack: COMPLETE ✓</div>
+          <div class="agent-desc" style="color: #bbf7d0;">All 6 pages done: index, fintech, banking-partnership, investment-advisor, fund-to-fund, regulatory-compliance</div>
+        </div>
+
+        <div class="agent-card" style="border-color: #6ee7b7; background: rgba(255,255,255,0.15);">
+          <div class="agent-num" style="color: #6ee7b7;">Phase 3 - Agent 28</div>
+          <div class="agent-name">Entertainment Industry Pack</div>
+          <div class="agent-desc" style="color: #a7f3d0;">Missing 2 pages: streaming-deal-nda, reality-tv-nda</div>
+          <div class="agent-pages" style="color: #34d399;">✅ Done: index, talent, production-company, script-concept, music-licensing</div>
+        </div>
+
+        <div class="agent-card" style="border-color: #6ee7b7; background: rgba(255,255,255,0.15);">
+          <div class="agent-num" style="color: #6ee7b7;">Phase 3 - Agent 29</div>
+          <div class="agent-name">Real Estate Industry Pack</div>
+          <div class="agent-desc" style="color: #a7f3d0;">Missing 2 pages: tenant-screening-nda, investor-pitch-nda</div>
+          <div class="agent-pages" style="color: #34d399;">✅ Done: index, property-acquisition, development-deal, broker</div>
+        </div>
+      </div>
+
+      <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(0,0,0,0.3); border-radius: 12px;">
+        <div style="font-weight: 600; color: #fca5a5; margin-bottom: 8px;">📊 Summary</div>
+        <ul style="color: #fecaca; font-size: 0.9rem; margin-left: 1.5rem;">
+          <li><strong>Phase 2 remaining:</strong> ~41 pages across 7 scenario hubs</li>
+          <li><strong>Phase 3 remaining:</strong> ~16 pages across dual-language + industry packs</li>
+          <li><strong>Completed:</strong> Tools (2), Language Selector Hub (3), Finance Pack (6)</li>
+          <li><strong>Total remaining:</strong> ~52 pages to finish Phase 2 & 3</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Overall Progress -->
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-value done">83</div>
+        <div class="stat-label">Pages Built</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value pending">~52</div>
+        <div class="stat-label">Pages Remaining</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value total">135+</div>
+        <div class="stat-label">P2+P3 Target</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value done">4</div>
+        <div class="stat-label">Tools Built</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value pending">1</div>
+        <div class="stat-label">Tools Remaining</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value done">25</div>
+        <div class="stat-label">Clauses Built</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value pending">180+</div>
+        <div class="stat-label">Clauses Remaining</div>
+      </div>
+    </div>
+
+    <div class="progress-bar">
+      <div class="progress-fill" style="width: 61%;"></div>
+      <div class="progress-text">83 / 135 pages (61% of Phase 2+3 target)</div>
+    </div>
+
+    <!-- PHASE 2: NEXT BATCH - AT TOP FOR VISIBILITY -->
+    <div class="agent-batch" style="background: linear-gradient(135deg, #7c3aed, #4f46e5); border: 3px solid #a78bfa;">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 1rem;">
+        <span class="phase-badge in-progress" style="background: #fef3c7; color: #d97706;">In Progress</span>
+        <h2 style="color: white; margin: 0;">Phase 2: Deploy 12 Parallel Agents (~90 pages)</h2>
+      </div>
+      <p style="color: #c4b5fd; margin-bottom: 1.5rem;">Each agent builds 5-8 related pages sharing same template/context for token efficiency</p>
+
+      <div class="agent-grid">
+        <!-- SCENARIO HUB AGENTS (6 agents, 5-8 pages each) -->
+        <div class="agent-card" style="border-color: #a78bfa;">
+          <div class="agent-num">Agent 11</div>
+          <div class="agent-name">Relationship & Privacy Hub</div>
+          <div class="agent-desc">8 pages: index, relationship-privacy-nda, bdsm-privacy-nda, intimate-media-nda, celebrity-dating-nda, what-these-ndas-can-and-cannot-do, negotiation-playbook, breach-response-urgent</div>
+          <div class="agent-pages">+8 pages | "Ethical clickbait" lane</div>
+        </div>
+        <div class="agent-card" style="border-color: #a78bfa;">
+          <div class="agent-num">Agent 12</div>
+          <div class="agent-name">Professional Services Hub</div>
+          <div class="agent-desc">6 pages: index, attorney-client-nda, consultant-nda, accountant-cpa-nda, agency-services-nda, negotiation-playbook</div>
+          <div class="agent-pages">+6 pages</div>
+        </div>
+        <div class="agent-card" style="border-color: #a78bfa;">
+          <div class="agent-num">Agent 13</div>
+          <div class="agent-name">Employee Hub Expansion</div>
+          <div class="agent-desc">7 pages: employee-confidentiality-agreement, nda-vs-invention-assignment, what-about-non-competes, pre-employment-nda, negotiation-playbook, whistleblower-carveouts, when-to-use-piia</div>
+          <div class="agent-pages">+7 pages</div>
+        </div>
+        <div class="agent-card" style="border-color: #a78bfa;">
+          <div class="agent-num">Agent 14</div>
+          <div class="agent-name">Contractor Hub Expansion</div>
+          <div class="agent-desc">7 pages: freelancer-nda, agency-nda, developer-contractor-nda, nda-vs-work-for-hire, negotiation-playbook, evidence-checklist, breach-response</div>
+          <div class="agent-pages">+7 pages</div>
+        </div>
+        <div class="agent-card" style="border-color: #a78bfa;">
+          <div class="agent-num">Agent 15</div>
+          <div class="agent-name">Software Dev Hub Expansion</div>
+          <div class="agent-desc">7 pages: source-code-nda, credential-access-nda, api-access-nda, security-requirements, negotiation-playbook, access-revocation-checklist, breach-response</div>
+          <div class="agent-pages">+7 pages</div>
+        </div>
+        <div class="agent-card" style="border-color: #a78bfa;">
+          <div class="agent-num">Agent 16</div>
+          <div class="agent-name">M&A Hub Expansion</div>
+          <div class="agent-desc">8 pages: buyer-side-nda, seller-side-nda, data-room-access, standstill-explained, clean-team-provisions, negotiation-playbook, breach-response, when-to-walk-away</div>
+          <div class="agent-pages">+8 pages</div>
+        </div>
+
+        <!-- NEW HUB AGENT -->
+        <div class="agent-card" style="border-color: #60a5fa;">
+          <div class="agent-num">Agent 17</div>
+          <div class="agent-name">"I Received an NDA" Hub</div>
+          <div class="agent-desc">5 pages: index, what-to-do-first, red-flags-checklist, counter-proposal-generator, when-to-walk-away</div>
+          <div class="agent-pages">+5 pages | High-conversion pathway</div>
+        </div>
+
+        <!-- TOOL AGENTS (1 per complex tool) -->
+        <div class="agent-card" style="border-color: #f59e0b;">
+          <div class="agent-num">Agent 18</div>
+          <div class="agent-name">Breach Response Generator Tool</div>
+          <div class="agent-desc">1 complex tool: Evidence input → escalation ladder → preservation notice → cease & desist → demand letter templates</div>
+          <div class="agent-pages">+1 tool | Dedicated agent for complex logic</div>
+        </div>
+        <div class="agent-card" style="border-color: #f59e0b;">
+          <div class="agent-num">Agent 19</div>
+          <div class="agent-name">Evidence Checklist Builder Tool</div>
+          <div class="agent-desc">1 complex tool: Scenario picker → dynamic checklist → strength scoring → export</div>
+          <div class="agent-pages">+1 tool | Dedicated agent</div>
+        </div>
+
+        <!-- CLAUSE LIBRARY AGENTS -->
+        <div class="agent-card" style="border-color: #10b981;">
+          <div class="agent-num">Agent 20</div>
+          <div class="agent-name">Clause Library Batch 1</div>
+          <div class="agent-desc">15 new clause pages with 3 versions each (balanced, disclosing-friendly, receiving-friendly)</div>
+          <div class="agent-pages">+15 pages</div>
+        </div>
+        <div class="agent-card" style="border-color: #10b981;">
+          <div class="agent-num">Agent 21</div>
+          <div class="agent-name">Clause Library Batch 2</div>
+          <div class="agent-desc">15 more clause pages with 3 versions + negotiation email templates</div>
+          <div class="agent-pages">+15 pages</div>
+        </div>
+
+        <!-- QA AGENTS (run last) -->
+        <div class="agent-card" style="border-color: #ef4444;">
+          <div class="agent-num">Agent 22</div>
+          <div class="agent-name">Blog Cross-Links & WP Posts</div>
+          <div class="agent-desc">Find all dated-URL NDA/contract posts, add NDA Studio links to each</div>
+          <div class="agent-pages">Update 10+ existing posts</div>
+        </div>
+      </div>
+
+      <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 12px;">
+        <div style="font-weight: 600; color: #a78bfa; margin-bottom: 8px;">Agent Strategy (Token Optimization)</div>
+        <ul style="color: #e2e8f0; font-size: 0.85rem; margin-left: 1.5rem;">
+          <li><strong>Content pages:</strong> 1 agent per 5-8 pages in same hub (shared template = efficient)</li>
+          <li><strong>Complex tools:</strong> 1 dedicated agent per tool (different logic, no context sharing benefit)</li>
+          <li><strong>Simple tools:</strong> Can batch 2-3 similar calculators with same UI pattern</li>
+          <li><strong>QA agents:</strong> Run after content is built, work across all pages</li>
+        </ul>
+      </div>
+
+      <p style="color: #60a5fa; margin-top: 1.5rem; font-weight: 600; font-size: 1.1rem;">Phase 2 Total: ~90 new pages + 2 tools</p>
+    </div>
+
+    <!-- PHASE 3: DUAL-LANGUAGE NDAs + INDUSTRY PACKS -->
+    <div class="agent-batch" style="background: linear-gradient(135deg, #059669, #10b981); border: 3px solid #6ee7b7;">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 1rem;">
+        <span class="phase-badge in-progress" style="background: #fef3c7; color: #d97706;">In Progress</span>
+        <h2 style="color: white; margin: 0;">Phase 3: Dual-Language NDAs + Industry Packs (~50 pages)</h2>
+      </div>
+      <p style="color: #a7f3d0; margin-bottom: 1.5rem;">Multi-language generators with parallel text output. Reference existing: /English-Spanish-NDA-Generator/ and /Demand-Letters/Russian/</p>
+
+      <div class="agent-grid">
+        <!-- DUAL-LANGUAGE AGENTS -->
+        <div class="agent-card" style="border-color: #6ee7b7;">
+          <div class="agent-num">Agent 23</div>
+          <div class="agent-name">🇷🇺🇺🇸 Russian-English NDA Hub</div>
+          <div class="agent-desc">8 pages: index, mutual-nda-generator, one-way-generator, business-deal-nda, employment-nda, contractor-nda, negotiation-playbook-ru, clause-comparison</div>
+          <div class="agent-pages">+8 pages | Parallel text output</div>
+        </div>
+        <div class="agent-card" style="border-color: #6ee7b7;">
+          <div class="agent-num">Agent 24</div>
+          <div class="agent-name">🇪🇸🇺🇸 Spanish-English NDA Hub</div>
+          <div class="agent-desc">8 pages: index, mutual-nda-generator, one-way-generator, business-deal-nda, employment-nda, contractor-nda, negotiation-playbook-es, clause-comparison</div>
+          <div class="agent-pages">+8 pages | Reference existing generator</div>
+        </div>
+        <div class="agent-card" style="border-color: #6ee7b7;">
+          <div class="agent-num">Agent 25</div>
+          <div class="agent-name">🌐 Language Selector Hub</div>
+          <div class="agent-desc">Landing page: /NDA/dual-language/index.html + language picker + side-by-side preview + export options (both languages in one PDF)</div>
+          <div class="agent-pages">+3 pages</div>
+        </div>
+
+        <!-- INDUSTRY PACK AGENTS -->
+        <div class="agent-card" style="border-color: #34d399;">
+          <div class="agent-num">Agent 26</div>
+          <div class="agent-name">Healthcare Industry Pack</div>
+          <div class="agent-desc">6 pages: HIPAA-compliant NDA, medical research NDA, pharma partnership NDA, telemedicine NDA, patient data NDA, compliance checklist</div>
+          <div class="agent-pages">+6 pages | HIPAA focus</div>
+        </div>
+        <div class="agent-card" style="border-color: #34d399;">
+          <div class="agent-num">Agent 27</div>
+          <div class="agent-name">Finance Industry Pack</div>
+          <div class="agent-desc">6 pages: fintech NDA, banking partnership NDA, investment advisor NDA, fund-to-fund NDA, regulatory-compliant NDA, SEC considerations</div>
+          <div class="agent-pages">+6 pages | SEC/FINRA focus</div>
+        </div>
+        <div class="agent-card" style="border-color: #34d399;">
+          <div class="agent-num">Agent 28</div>
+          <div class="agent-name">Entertainment Industry Pack</div>
+          <div class="agent-desc">6 pages: talent NDA, production company NDA, script/concept NDA, music licensing NDA, streaming deal NDA, reality TV NDA</div>
+          <div class="agent-pages">+6 pages | Hollywood/media focus</div>
+        </div>
+        <div class="agent-card" style="border-color: #34d399;">
+          <div class="agent-num">Agent 29</div>
+          <div class="agent-name">Real Estate Industry Pack</div>
+          <div class="agent-desc">5 pages: property acquisition NDA, development deal NDA, broker NDA, tenant screening NDA, investor pitch NDA</div>
+          <div class="agent-pages">+5 pages</div>
+        </div>
+      </div>
+
+      <p style="color: #6ee7b7; margin-top: 1.5rem; font-weight: 600; font-size: 1.1rem;">Phase 3 Total: ~50 new pages + dual-language generators</p>
+    </div>
+
+    <!-- PHASE 4+: REMAINING EXPANSION -->
+    <div class="agent-batch" style="background: linear-gradient(135deg, #475569, #64748b); border: 3px solid #94a3b8;">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 1rem;">
+        <span class="phase-badge pending" style="background: var(--gray-100); color: #64748b;">Future</span>
+        <h2 style="color: white; margin: 0;">Phase 4+: Remaining Expansion (~100+ pages)</h2>
+      </div>
+      <p style="color: #cbd5e1; margin-bottom: 1.5rem;">Additional industry packs, clause library expansion, remaining tools, and more dual-language NDAs</p>
+
+      <div class="agent-grid">
+        <!-- MORE INDUSTRY PACKS -->
+        <div class="agent-card" style="border-color: #94a3b8;">
+          <div class="agent-num">Agent 30</div>
+          <div class="agent-name">SaaS Industry Pack</div>
+          <div class="agent-desc">6 pages: API access NDA, data processing NDA, integration partner NDA, SaaS vendor NDA, cloud security NDA, compliance checklist</div>
+          <div class="agent-pages">+6 pages | API/Data focus</div>
+        </div>
+        <div class="agent-card" style="border-color: #94a3b8;">
+          <div class="agent-num">Agent 31</div>
+          <div class="agent-name">Manufacturing Industry Pack</div>
+          <div class="agent-desc">6 pages: prototype NDA, reverse engineering protection, supplier NDA, factory tour NDA, tooling/mold NDA, trade secret manufacturing</div>
+          <div class="agent-pages">+6 pages | IP protection focus</div>
+        </div>
+        <div class="agent-card" style="border-color: #94a3b8;">
+          <div class="agent-num">Agent 32</div>
+          <div class="agent-name">AI/ML Industry Pack</div>
+          <div class="agent-desc">6 pages: training data NDA, model weights NDA, AI partnership NDA, dataset licensing NDA, algorithm NDA, AI ethics provisions</div>
+          <div class="agent-pages">+6 pages | AI-specific terms</div>
+        </div>
+        <div class="agent-card" style="border-color: #94a3b8;">
+          <div class="agent-num">Agent 33</div>
+          <div class="agent-name">Crypto/Web3 Industry Pack</div>
+          <div class="agent-desc">6 pages: token economics NDA, smart contract NDA, DAO contributor NDA, crypto fund NDA, blockchain partnership NDA, DeFi protocol NDA</div>
+          <div class="agent-pages">+6 pages | Web3 focus</div>
+        </div>
+
+        <!-- MORE DUAL-LANGUAGE -->
+        <div class="agent-card" style="border-color: #60a5fa;">
+          <div class="agent-num">Agent 34</div>
+          <div class="agent-name">Chinese-English NDA Hub</div>
+          <div class="agent-desc">8 pages: index, mutual-nda, one-way, business-deal, employment, contractor, negotiation-playbook-zh, clause-comparison</div>
+          <div class="agent-pages">+8 pages | Mandarin parallel text</div>
+        </div>
+        <div class="agent-card" style="border-color: #60a5fa;">
+          <div class="agent-num">Agent 35</div>
+          <div class="agent-name">French-English NDA Hub</div>
+          <div class="agent-desc">8 pages: index, mutual-nda, one-way, business-deal, employment, contractor, negotiation-playbook-fr, clause-comparison</div>
+          <div class="agent-pages">+8 pages | French parallel text</div>
+        </div>
+        <div class="agent-card" style="border-color: #60a5fa;">
+          <div class="agent-num">Agent 36</div>
+          <div class="agent-name">German-English NDA Hub</div>
+          <div class="agent-desc">8 pages: index, mutual-nda, one-way, business-deal, employment, contractor, negotiation-playbook-de, clause-comparison</div>
+          <div class="agent-pages">+8 pages | German parallel text</div>
+        </div>
+
+        <!-- CLAUSE LIBRARY EXPANSION -->
+        <div class="agent-card" style="border-color: #10b981;">
+          <div class="agent-num">Agents 37-40</div>
+          <div class="agent-name">Clause Library Expansion</div>
+          <div class="agent-desc">60+ more clause pages with 3 versions each (balanced, disclosing-friendly, receiving-friendly) + negotiation templates + compatibility matrices</div>
+          <div class="agent-pages">+60 pages | Target: 200+ total clauses</div>
+        </div>
+
+        <!-- REMAINING TOOLS -->
+        <div class="agent-card" style="border-color: #f59e0b;">
+          <div class="agent-num">Agent 41</div>
+          <div class="agent-name">Preset Selector Tool</div>
+          <div class="agent-desc">1 complex tool: Scenario picker → auto-configures generator settings → explains why each setting was chosen</div>
+          <div class="agent-pages">+1 tool | UX enhancement</div>
+        </div>
+      </div>
+
+      <p style="color: #94a3b8; margin-top: 1.5rem; font-weight: 600; font-size: 1.1rem;">Phase 4+ Total: ~100+ new pages + 1 tool</p>
+    </div>
+
+    <!-- PHASE 1: COMPLETE -->
+    <div class="phase">
+      <div class="phase-header">
+        <span class="phase-badge complete">Complete</span>
+        <h2 class="phase-title">Phase 1: Foundation (Week 1, Days 1-2)</h2>
+        <span class="phase-count">38 pages built</span>
+      </div>
+
+      <div class="tool-grid">
+        <div class="tool-card complete">
+          <span class="tool-icon">🏠</span>
+          <div>
+            <div class="tool-name">NDA Studio Landing</div>
+            <div class="tool-desc">/NDA/index.html</div>
+          </div>
+          <span class="tool-status done">Done</span>
+        </div>
+        <div class="tool-card complete">
+          <span class="tool-icon">🔧</span>
+          <div>
+            <div class="tool-name">NDA Generator</div>
+            <div class="tool-desc">/NDA/generator.html</div>
+          </div>
+          <span class="tool-status done">Done</span>
+        </div>
+        <div class="tool-card complete">
+          <span class="tool-icon">🌳</span>
+          <div>
+            <div class="tool-name">Decision Tree</div>
+            <div class="tool-desc">/NDA/which-nda.html</div>
+          </div>
+          <span class="tool-status done">Done</span>
+        </div>
+        <div class="tool-card complete">
+          <span class="tool-icon">⚖️</span>
+          <div>
+            <div class="tool-name">Risk Analyzer</div>
+            <div class="tool-desc">/NDA/tools/risk-analyzer.html (client-side)</div>
+          </div>
+          <span class="tool-status done">Done</span>
+        </div>
+        <div class="tool-card complete">
+          <span class="tool-icon">🤝</span>
+          <div>
+            <div class="tool-name">Negotiation Mode</div>
+            <div class="tool-desc">/NDA/tools/negotiation-mode.html</div>
+          </div>
+          <span class="tool-status done">Done</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7 SCENARIO HUBS STATUS -->
+    <div class="phase">
+      <div class="phase-header">
+        <span class="phase-badge in-progress">In Progress</span>
+        <h2 class="phase-title">7 Scenario Hubs (56+ pages planned)</h2>
+      </div>
+
+      <div class="scenario-grid">
+        <!-- Scenario 1: Business Deal -->
+        <div class="scenario-card partial">
+          <div class="scenario-header">
+            <span class="scenario-icon">🤝</span>
+            <span class="scenario-name">Business Deal NDA</span>
+            <span class="scenario-status partial">5/8</span>
+          </div>
+          <div class="scenario-pages"><strong>Built:</strong> 5 pages | <strong>Need:</strong> 3 more</div>
+          <div class="page-list">
+            <span class="done">✓ index.html</span> |
+            <span class="done">✓ partnership-talks-nda.html</span> |
+            <span class="done">✓ vendor-evaluation-nda.html</span> |
+            <span class="done">✓ negotiation-playbook.html</span> |
+            <span class="done">✓ breach-response.html</span> |
+            <span class="pending">○ referral-arrangement-nda.html</span> |
+            <span class="pending">○ co-marketing-nda.html</span> |
+            <span class="pending">○ when-they-refuse-nda.html</span>
+          </div>
+        </div>
+
+        <!-- Scenario 2: Employee -->
+        <div class="scenario-card">
+          <div class="scenario-header">
+            <span class="scenario-icon">👔</span>
+            <span class="scenario-name">Employee Confidentiality</span>
+            <span class="scenario-status partial">1/8</span>
+          </div>
+          <div class="scenario-pages"><strong>Built:</strong> 1 page | <strong>Need:</strong> 7 more</div>
+          <div class="page-list">
+            <span class="done">✓ index.html (as employee-hiring)</span> |
+            <span class="pending">○ employee-confidentiality-agreement.html</span> |
+            <span class="pending">○ nda-vs-invention-assignment.html</span> |
+            <span class="pending">○ what-about-non-competes.html</span> |
+            <span class="pending">○ pre-employment-nda.html</span> |
+            <span class="pending">○ negotiation-playbook.html</span> |
+            <span class="pending">○ whistleblower-carveouts.html</span> |
+            <span class="pending">○ when-to-use-piia.html</span>
+          </div>
+        </div>
+
+        <!-- Scenario 3: Contractor -->
+        <div class="scenario-card">
+          <div class="scenario-header">
+            <span class="scenario-icon">🛠️</span>
+            <span class="scenario-name">Contractor NDA</span>
+            <span class="scenario-status partial">1/8</span>
+          </div>
+          <div class="scenario-pages"><strong>Built:</strong> 1 page | <strong>Need:</strong> 7 more</div>
+          <div class="page-list">
+            <span class="done">✓ index.html</span> |
+            <span class="pending">○ freelancer-nda.html</span> |
+            <span class="pending">○ agency-nda.html</span> |
+            <span class="pending">○ developer-contractor-nda.html</span> |
+            <span class="pending">○ nda-vs-work-for-hire.html</span> |
+            <span class="pending">○ negotiation-playbook.html</span> |
+            <span class="pending">○ evidence-checklist.html</span> |
+            <span class="pending">○ breach-response.html</span>
+          </div>
+        </div>
+
+        <!-- Scenario 4: Software Dev -->
+        <div class="scenario-card">
+          <div class="scenario-header">
+            <span class="scenario-icon">💻</span>
+            <span class="scenario-name">Software Dev NDA</span>
+            <span class="scenario-status partial">1/8</span>
+          </div>
+          <div class="scenario-pages"><strong>Built:</strong> 1 page (as tech-licensing) | <strong>Need:</strong> 7 more</div>
+          <div class="page-list">
+            <span class="done">✓ index.html</span> |
+            <span class="pending">○ source-code-nda.html</span> |
+            <span class="pending">○ credential-access-nda.html</span> |
+            <span class="pending">○ api-access-nda.html</span> |
+            <span class="pending">○ security-requirements.html</span> |
+            <span class="pending">○ negotiation-playbook.html</span> |
+            <span class="pending">○ access-revocation-checklist.html</span> |
+            <span class="pending">○ breach-response.html</span>
+          </div>
+        </div>
+
+        <!-- Scenario 5: M&A -->
+        <div class="scenario-card">
+          <div class="scenario-header">
+            <span class="scenario-icon">🏢</span>
+            <span class="scenario-name">M&A / Diligence NDA</span>
+            <span class="scenario-status partial">1/9</span>
+          </div>
+          <div class="scenario-pages"><strong>Built:</strong> 1 page | <strong>Need:</strong> 8 more</div>
+          <div class="page-list">
+            <span class="done">✓ index.html (as merger-acquisition)</span> |
+            <span class="pending">○ buyer-side-nda.html</span> |
+            <span class="pending">○ seller-side-nda.html</span> |
+            <span class="pending">○ data-room-access.html</span> |
+            <span class="pending">○ standstill-explained.html</span> |
+            <span class="pending">○ clean-team-provisions.html</span> |
+            <span class="pending">○ negotiation-playbook.html</span> |
+            <span class="pending">○ breach-response.html</span> |
+            <span class="pending">○ when-to-walk-away.html</span>
+          </div>
+        </div>
+
+        <!-- Scenario 6: Relationship & Privacy -->
+        <div class="scenario-card">
+          <div class="scenario-header">
+            <span class="scenario-icon">💜</span>
+            <span class="scenario-name">Relationship & Privacy</span>
+            <span class="scenario-status pending">0/8</span>
+          </div>
+          <div class="scenario-pages"><strong>Built:</strong> 0 pages | <strong>Need:</strong> 8 (ethical clickbait lane)</div>
+          <div class="page-list">
+            <span class="pending">○ index.html</span> |
+            <span class="pending">○ relationship-privacy-nda.html</span> |
+            <span class="pending">○ bdsm-privacy-nda.html</span> |
+            <span class="pending">○ intimate-media-nda.html</span> |
+            <span class="pending">○ celebrity-dating-nda.html</span> |
+            <span class="pending">○ what-these-ndas-can-and-cannot-do.html</span> |
+            <span class="pending">○ negotiation-playbook.html</span> |
+            <span class="pending">○ breach-response-urgent.html</span>
+          </div>
+        </div>
+
+        <!-- Scenario 7: Professional Services -->
+        <div class="scenario-card">
+          <div class="scenario-header">
+            <span class="scenario-icon">⚖️</span>
+            <span class="scenario-name">Professional Services</span>
+            <span class="scenario-status pending">0/6</span>
+          </div>
+          <div class="scenario-pages"><strong>Built:</strong> 0 pages | <strong>Need:</strong> 6</div>
+          <div class="page-list">
+            <span class="pending">○ index.html</span> |
+            <span class="pending">○ attorney-client-nda.html</span> |
+            <span class="pending">○ consultant-nda.html</span> |
+            <span class="pending">○ accountant-cpa-nda.html</span> |
+            <span class="pending">○ agency-services-nda.html</span> |
+            <span class="pending">○ negotiation-playbook.html</span>
+          </div>
+        </div>
+
+        <!-- Additional: Investor Pitch (built but not in original plan) -->
+        <div class="scenario-card complete">
+          <div class="scenario-header">
+            <span class="scenario-icon">💰</span>
+            <span class="scenario-name">Investor Pitch (Bonus)</span>
+            <span class="scenario-status done">1/1</span>
+          </div>
+          <div class="scenario-pages"><strong>Built:</strong> 1 page (not in original plan)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLAUSE LIBRARY -->
+    <div class="phase">
+      <div class="phase-header">
+        <span class="phase-badge in-progress">In Progress</span>
+        <h2 class="phase-title">Clause Library (200+ planned)</h2>
+      </div>
+
+      <div class="clause-progress">
+        <div class="clause-bar">
+          <div class="clause-fill" style="width: 10%;"></div>
+        </div>
+        <span class="clause-text">20 / 200+ clauses (10%)</span>
+      </div>
+
+      <p style="margin-top: 1rem; color: #64748b;">
+        <strong>Built (20):</strong> Definition of Confidential Information, Exclusions, Term & Duration, Survival Period, Permitted Disclosures, Standard of Care, Return/Destruction, Injunctive Relief, Indemnification, Limitation of Liability, Governing Law, Dispute Resolution, Non-Solicitation, Non-Circumvention, Residuals, Purpose Limitation, Marking Requirements, Assignment, Severability, Entire Agreement
+      </p>
+      <p style="margin-top: 0.5rem; color: #64748b;">
+        <strong>Remaining (180+):</strong> Need 3 versions each (balanced, disclosing-friendly, receiving-friendly) + negotiation templates + compatibility matrices
+      </p>
+    </div>
+
+    <!-- TOOLS STATUS -->
+    <div class="phase">
+      <div class="phase-header">
+        <span class="phase-badge in-progress">In Progress</span>
+        <h2 class="phase-title">Interactive Tools (5 planned)</h2>
+      </div>
+
+      <div class="tool-grid">
+        <div class="tool-card complete">
+          <span class="tool-icon">⚖️</span>
+          <div>
+            <div class="tool-name">NDA Risk Analyzer</div>
+            <div class="tool-desc">Upload/paste NDA → party-bias scoring</div>
+          </div>
+          <span class="tool-status done">Done</span>
+        </div>
+        <div class="tool-card complete">
+          <span class="tool-icon">🤝</span>
+          <div>
+            <div class="tool-name">Negotiation Mode Engine</div>
+            <div class="tool-desc">Clause → fallback → email templates</div>
+          </div>
+          <span class="tool-status done">Done</span>
+        </div>
+        <div class="tool-card">
+          <span class="tool-icon">🚨</span>
+          <div>
+            <div class="tool-name">Breach Response Generator</div>
+            <div class="tool-desc">Evidence → escalation → templates</div>
+          </div>
+          <span class="tool-status pending">Pending</span>
+        </div>
+        <div class="tool-card">
+          <span class="tool-icon">📋</span>
+          <div>
+            <div class="tool-name">Evidence Checklist Builder</div>
+            <div class="tool-desc">Scenario-specific evidence lists</div>
+          </div>
+          <span class="tool-status pending">Pending</span>
+        </div>
+        <div class="tool-card">
+          <span class="tool-icon">🎯</span>
+          <div>
+            <div class="tool-name">Preset Selector</div>
+            <div class="tool-desc">Scenario → generator settings</div>
+          </div>
+          <span class="tool-status pending">Pending</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- INDUSTRY PACKS -->
+    <div class="phase">
+      <div class="phase-header">
+        <span class="phase-badge pending">Not Started</span>
+        <h2 class="phase-title">Industry-Specific Packs (7 planned)</h2>
+      </div>
+
+      <div class="tool-grid">
+        <div class="tool-card">
+          <span class="tool-icon">☁️</span>
+          <div>
+            <div class="tool-name">SaaS</div>
+            <div class="tool-desc">API, data, integrations focus</div>
+          </div>
+          <span class="tool-status pending">Pending</span>
+        </div>
+        <div class="tool-card">
+          <span class="tool-icon">🏭</span>
+          <div>
+            <div class="tool-name">Manufacturing</div>
+            <div class="tool-desc">Prototype, reverse engineering</div>
+          </div>
+          <span class="tool-status pending">Pending</span>
+        </div>
+        <div class="tool-card">
+          <span class="tool-icon">🤖</span>
+          <div>
+            <div class="tool-name">AI/ML</div>
+            <div class="tool-desc">Training data, models</div>
+          </div>
+          <span class="tool-status pending">Pending</span>
+        </div>
+        <div class="tool-card">
+          <span class="tool-icon">🎬</span>
+          <div>
+            <div class="tool-name">Film/Media</div>
+            <div class="tool-desc">Project confidentiality, credits</div>
+          </div>
+          <span class="tool-status pending">Pending</span>
+        </div>
+        <div class="tool-card">
+          <span class="tool-icon">🏥</span>
+          <div>
+            <div class="tool-name">Healthcare</div>
+            <div class="tool-desc">PHI-adjacent, BAA triage</div>
+          </div>
+          <span class="tool-status pending">Pending</span>
+        </div>
+        <div class="tool-card">
+          <span class="tool-icon">💳</span>
+          <div>
+            <div class="tool-name">Fintech</div>
+            <div class="tool-desc">Compliance overlay</div>
+          </div>
+          <span class="tool-status pending">Pending</span>
+        </div>
+        <div class="tool-card">
+          <span class="tool-icon">🔗</span>
+          <div>
+            <div class="tool-name">Crypto/Web3</div>
+            <div class="tool-desc">Token economics, code</div>
+          </div>
+          <span class="tool-status pending">Pending</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- "RECEIVED AN NDA" HUB -->
+    <div class="phase">
+      <div class="phase-header">
+        <span class="phase-badge pending">Not Started</span>
+        <h2 class="phase-title">"I Received an NDA" Hub (5 pages)</h2>
+      </div>
+
+      <div class="page-list" style="font-size: 0.9rem; color: #64748b;">
+        <span class="pending">○ /NDA/received/index.html</span> |
+        <span class="pending">○ what-to-do-first.html</span> |
+        <span class="pending">○ red-flags-checklist.html</span> |
+        <span class="pending">○ counter-proposal-generator.html</span> |
+        <span class="pending">○ when-to-walk-away.html</span>
+      </div>
+    </div>
+
+    <!-- NEXT BATCH OF AGENTS -->
+    <div class="agent-batch">
+      <h2>Phase 2: Next Batch of 10 Parallel Agents</h2>
+      <p style="color: #94a3b8; margin-bottom: 1.5rem;">Ready to deploy when you give the green light</p>
+
+      <div class="agent-grid">
+        <div class="agent-card">
+          <div class="agent-num">Agent 11</div>
+          <div class="agent-name">Relationship & Privacy Hub</div>
+          <div class="agent-desc">Build all 8 pages for the "ethical clickbait" scenario</div>
+          <div class="agent-pages">+8 pages</div>
+        </div>
+        <div class="agent-card">
+          <div class="agent-num">Agent 12</div>
+          <div class="agent-name">Professional Services Hub</div>
+          <div class="agent-desc">Build all 6 pages (attorney, consultant, CPA NDAs)</div>
+          <div class="agent-pages">+6 pages</div>
+        </div>
+        <div class="agent-card">
+          <div class="agent-num">Agent 13</div>
+          <div class="agent-name">Employee Hub Expansion</div>
+          <div class="agent-desc">Add 7 missing pages to employee scenario</div>
+          <div class="agent-pages">+7 pages</div>
+        </div>
+        <div class="agent-card">
+          <div class="agent-num">Agent 14</div>
+          <div class="agent-name">Contractor Hub Expansion</div>
+          <div class="agent-desc">Add 7 missing pages to contractor scenario</div>
+          <div class="agent-pages">+7 pages</div>
+        </div>
+        <div class="agent-card">
+          <div class="agent-num">Agent 15</div>
+          <div class="agent-name">Software Dev Hub Expansion</div>
+          <div class="agent-desc">Add 7 missing pages to software dev scenario</div>
+          <div class="agent-pages">+7 pages</div>
+        </div>
+        <div class="agent-card">
+          <div class="agent-num">Agent 16</div>
+          <div class="agent-name">M&A Hub Expansion</div>
+          <div class="agent-desc">Add 8 missing pages to M&A scenario</div>
+          <div class="agent-pages">+8 pages</div>
+        </div>
+        <div class="agent-card">
+          <div class="agent-num">Agent 17</div>
+          <div class="agent-name">"Received an NDA" Hub</div>
+          <div class="agent-desc">Build the 5-page hub for people who received NDAs</div>
+          <div class="agent-pages">+5 pages</div>
+        </div>
+        <div class="agent-card">
+          <div class="agent-num">Agent 18</div>
+          <div class="agent-name">Clause Library Batch 1</div>
+          <div class="agent-desc">Add 30 more clause pages with 3 versions each</div>
+          <div class="agent-pages">+30 pages</div>
+        </div>
+        <div class="agent-card">
+          <div class="agent-num">Agent 19</div>
+          <div class="agent-name">Blog Cross-Links</div>
+          <div class="agent-desc">Link NDA Studio from all dated-URL NDA posts</div>
+          <div class="agent-pages">Update existing</div>
+        </div>
+        <div class="agent-card">
+          <div class="agent-num">Agent 20</div>
+          <div class="agent-name">QA & Navigation</div>
+          <div class="agent-desc">Fix breadcrumbs, 404s, sitemap, headers/footers</div>
+          <div class="agent-pages">Polish all</div>
+        </div>
+      </div>
+
+      <p style="color: #60a5fa; margin-top: 1.5rem; font-weight: 600;">Phase 2 Total: ~78 new pages</p>
+    </div>
+
+    <!-- FUTURE PHASES -->
+    <div class="phase">
+      <div class="phase-header">
+        <span class="phase-badge pending">Future</span>
+        <h2 class="phase-title">Phase 3+: Industry Packs & Clause Expansion</h2>
+      </div>
+
+      <ul style="margin-left: 1.5rem; color: #64748b;">
+        <li>7 Industry-Specific Packs (SaaS, Manufacturing, AI/ML, Film, Healthcare, Fintech, Crypto)</li>
+        <li>Expand Clause Library to 150+ clauses</li>
+        <li>Add Breach Response Generator tool</li>
+        <li>Add Evidence Checklist Builder tool</li>
+        <li>Add Preset Selector tool</li>
+      </ul>
+    </div>
+
+    <div class="notes">
+      <div class="notes-title">Risk Analyzer: No API Keys Needed</div>
+      <p>The NDA Risk Analyzer is 100% client-side JavaScript using regex pattern matching. It works offline with no API calls. If you want AI-powered Claude analysis in the future, that would require an Anthropic API key + serverless function.</p>
+    </div>
+
+    <p class="updated">Last updated: December 29, 2025 5:15 PM | Phase 2+3 partially complete - see NEXT BATCH at top | Source: /NDA/Napoleonic-Expansion/MASTER-PLAN-NDA-STUDIO.md</p>
+  </div>
+</body>
+</html>
