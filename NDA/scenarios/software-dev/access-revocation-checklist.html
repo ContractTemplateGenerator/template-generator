@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-901N2Y3CDZ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-901N2Y3CDZ');
+  </script>
+
+  <title>Access Revocation Checklist | Developer Offboarding | Terms.Law</title>
+  <meta name="description" content="Complete step-by-step checklist for revoking contractor access when engagement ends. Covers credentials, repositories, API keys, VPNs, cloud services, and more.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --accent: #8b5cf6;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --dark: #0f172a;
+      --dark-lighter: #1e293b;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
+      --gray-400: #94a3b8;
+      --gray-500: #64748b;
+      --gray-600: #475569;
+      --gray-700: #334155;
+      --gray-800: #1e293b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-700);
+      line-height: 1.6;
+    }
+
+    /* Header Styles */
+    .site-header {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .header-content {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        padding: 0 24px;
+        height: 60px;
+    }
+
+    .site-logo {
+        font-size: 1.15rem;
+        font-weight: 800;
+        text-decoration: none;
+        background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-right: 32px;
+    }
+
+    .site-nav {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        flex: 1;
+    }
+
+    .nav-item { position: relative; }
+
+    .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 18px 16px;
+        color: #94a3b8;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s;
+        border-bottom: 2px solid transparent;
+    }
+
+    .nav-link:hover { color: #fff; background: rgba(255,255,255,0.05); }
+    .nav-link:hover, .nav-link.active { border-bottom-color: var(--primary); }
+
+    .nav-cta {
+        margin-left: auto;
+        background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+        color: #fff !important;
+        padding: 10px 20px !important;
+        border-radius: 8px;
+        font-weight: 600 !important;
+        border-bottom: none !important;
+    }
+
+    .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4); }
+
+    /* Hub Sub-Navigation */
+    .hub-subnav {
+      background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .hub-subnav-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 48px;
+    }
+    .hub-subnav-title { color: #f59e0b; font-size: 0.9rem; font-weight: 700; text-decoration: none; }
+    .hub-subnav-title:hover { color: #fbbf24; }
+    .hub-subnav-tabs { display: flex; gap: 8px; }
+    .hub-tab { padding: 8px 16px; color: #94a3b8; text-decoration: none; font-size: 0.85rem; font-weight: 500; border-radius: 6px; transition: all 0.2s; }
+    .hub-tab:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    .hub-tab.active { background: rgba(37, 99, 235, 0.3); color: #60a5fa; }
+
+    /* Breadcrumbs */
+    .breadcrumbs { max-width: 1200px; margin: 0 auto; padding: 1rem 24px; font-size: 0.85rem; }
+    .breadcrumbs a { color: var(--gray-500); text-decoration: none; }
+    .breadcrumbs a:hover { color: var(--primary); }
+    .breadcrumbs span { color: var(--gray-400); margin: 0 8px; }
+    .breadcrumbs .current { color: var(--gray-700); font-weight: 600; }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+      color: white;
+      padding: 3rem 24px;
+    }
+    .hero-inner { max-width: 1200px; margin: 0 auto; }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #f87171;
+      margin-bottom: 1rem;
+    }
+    .hero h1 { font-size: 2.25rem; font-weight: 800; margin-bottom: 0.75rem; }
+    .hero h1 .grad { background: linear-gradient(135deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero-sub { font-size: 1.1rem; color: #94a3b8; margin-bottom: 0; max-width: 700px; }
+
+    /* Main Content */
+    .main { max-width: 1200px; margin: 0 auto; padding: 2rem 24px; }
+
+    /* Section Headers */
+    .sec-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+    .sec-head h2 { font-size: 1.25rem; font-weight: 700; display: flex; align-items: center; gap: 10px; color: var(--dark); }
+    .sec-head h2 i { color: var(--primary); }
+
+    /* Highlight Section */
+    .highlight-section {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      transition: all 0.3s ease;
+    }
+    .highlight-section:hover { border-color: var(--primary); box-shadow: 0 0 20px rgba(37, 99, 235, 0.15); }
+
+    /* Urgency Banner */
+    .urgency-banner {
+      background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+      border: 1px solid #ef4444;
+      border-radius: 10px;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 15px;
+    }
+    .urgency-banner i {
+      font-size: 1.5rem;
+      color: #dc2626;
+    }
+    .urgency-banner h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #b91c1c;
+      margin-bottom: 0.25rem;
+    }
+    .urgency-banner p {
+      font-size: 0.85rem;
+      color: #991b1b;
+    }
+
+    /* Timeline */
+    .timeline {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      overflow-x: auto;
+      padding-bottom: 10px;
+    }
+    .timeline-item {
+      flex: 1;
+      min-width: 200px;
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: 10px;
+      padding: 1rem;
+      text-align: center;
+      position: relative;
+    }
+    .timeline-item.critical { border-color: #ef4444; background: #fef2f2; }
+    .timeline-item.urgent { border-color: #f59e0b; background: #fffbeb; }
+    .timeline-item.normal { border-color: #10b981; background: #f0fdf4; }
+    .timeline-time {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.5rem;
+    }
+    .timeline-item.critical .timeline-time { color: #dc2626; }
+    .timeline-item.urgent .timeline-time { color: #d97706; }
+    .timeline-item.normal .timeline-time { color: #059669; }
+    .timeline-item h4 {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 0.25rem;
+    }
+    .timeline-item p {
+      font-size: 0.75rem;
+      color: var(--gray-600);
+    }
+
+    /* Checklist Category */
+    .checklist-category {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
+    .category-header {
+      padding: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--gray-100);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .category-header:hover { background: var(--gray-50); }
+    .category-header.critical { background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); }
+    .category-header.high { background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%); }
+    .category-header.medium { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); }
+    .category-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+    .category-icon.critical { background: #ef4444; color: white; }
+    .category-icon.high { background: #f59e0b; color: white; }
+    .category-icon.medium { background: #eab308; color: white; }
+    .category-icon.normal { background: #10b981; color: white; }
+    .category-info { flex: 1; }
+    .category-info h3 { font-size: 1rem; font-weight: 700; color: var(--dark); margin-bottom: 2px; }
+    .category-info p { font-size: 0.75rem; color: var(--gray-600); }
+    .category-progress {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--gray-500);
+    }
+    .category-body { padding: 1.25rem; }
+
+    /* Checklist Items */
+    .checklist-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      background: var(--gray-50);
+      transition: all 0.2s;
+    }
+    .checklist-item:hover { background: var(--gray-100); }
+    .checklist-item:last-child { margin-bottom: 0; }
+    .checklist-item input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      accent-color: var(--danger);
+      margin-top: 2px;
+      cursor: pointer;
+    }
+    .checklist-item.checked {
+      background: #f0fdf4;
+      opacity: 0.7;
+    }
+    .checklist-item.checked label {
+      text-decoration: line-through;
+      color: var(--gray-400);
+    }
+    .checklist-content { flex: 1; }
+    .checklist-content label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--dark);
+      cursor: pointer;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .checklist-content p {
+      font-size: 0.8rem;
+      color: var(--gray-600);
+      line-height: 1.5;
+    }
+    .checklist-content code {
+      background: var(--gray-200);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-family: 'Monaco', 'Consolas', monospace;
+    }
+    .checklist-priority {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+    .checklist-priority.critical { background: #fee2e2; color: #dc2626; }
+    .checklist-priority.high { background: #ffedd5; color: #c2410c; }
+    .checklist-priority.medium { background: #fef3c7; color: #92400e; }
+
+    /* Command Block */
+    .command-block {
+      background: var(--dark);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-top: 10px;
+      font-family: 'Monaco', 'Consolas', monospace;
+      font-size: 0.8rem;
+      color: #10b981;
+      overflow-x: auto;
+    }
+    .command-block .comment {
+      color: #64748b;
+    }
+
+    /* Platform Grid */
+    .platform-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .platform-card {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: 10px;
+      padding: 1.25rem;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .platform-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    .platform-card i {
+      font-size: 2rem;
+      margin-bottom: 0.75rem;
+    }
+    .platform-card i.github { color: #333; }
+    .platform-card i.gitlab { color: #fc6d26; }
+    .platform-card i.bitbucket { color: #2684ff; }
+    .platform-card i.aws { color: #ff9900; }
+    .platform-card i.gcp { color: #4285f4; }
+    .platform-card i.azure { color: #0078d4; }
+    .platform-card i.slack { color: #4a154b; }
+    .platform-card i.jira { color: #0052cc; }
+    .platform-card h4 {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 0.25rem;
+    }
+    .platform-card p {
+      font-size: 0.7rem;
+      color: var(--gray-500);
+    }
+
+    /* Documentation Box */
+    .documentation-box {
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      border: 1px solid #93c5fd;
+      border-radius: 10px;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    .documentation-box h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #1e40af;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .documentation-box ul {
+      list-style: none;
+      margin: 0;
+    }
+    .documentation-box li {
+      font-size: 0.85rem;
+      color: #1e40af;
+      padding: 6px 0;
+      padding-left: 20px;
+      position: relative;
+    }
+    .documentation-box li::before {
+      content: '\f00c';
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      position: absolute;
+      left: 0;
+      color: #3b82f6;
+      font-size: 0.7rem;
+    }
+
+    /* Related Links */
+    .related-links {
+      background: var(--dark);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .related-links h3 {
+      color: white;
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+    .related-links a {
+      display: block;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 0.85rem;
+      margin-bottom: 8px;
+      transition: all 0.2s;
+    }
+    .related-links a:hover {
+      background: rgba(255,255,255,0.1);
+      color: white;
+    }
+    .related-links a i {
+      margin-right: 8px;
+      color: var(--danger);
+    }
+
+    /* CTA Section */
+    .cta-section {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      border-radius: 16px;
+      padding: 2rem;
+      text-align: center;
+      color: white;
+      margin: 2rem 0;
+    }
+    .cta-section h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 0.75rem; }
+    .cta-section p { font-size: 1rem; opacity: 0.9; margin-bottom: 1.5rem; }
+    .cta-btn {
+      display: inline-block;
+      background: white;
+      color: #dc2626;
+      padding: 12px 28px;
+      border-radius: 8px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+
+    /* Print Button */
+    .print-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: var(--gray-100);
+      border: 1px solid var(--gray-300);
+      border-radius: 8px;
+      color: var(--gray-700);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .print-btn:hover {
+      background: var(--gray-200);
+      border-color: var(--gray-400);
+    }
+
+    /* Footer */
+    .footer { background: #0f172a; color: white; padding: 2rem 24px; margin-top: 2rem; }
+    .footer-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; }
+    .footer h5 { font-size: 0.7rem; text-transform: uppercase; color: #64748b; margin-bottom: 10px; letter-spacing: 0.5px; }
+    .footer a { display: block; font-size: 0.8rem; color: #94a3b8; text-decoration: none; padding: 3px 0; }
+    .footer a:hover { color: white; }
+    .footer-bottom { text-align: center; font-size: 0.75rem; color: #475569; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #1e293b; }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .platform-grid { grid-template-columns: repeat(2, 1fr); }
+      .footer-inner { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 1.75rem; }
+      .platform-grid { grid-template-columns: 1fr; }
+      .timeline { flex-direction: column; }
+      .footer-inner { grid-template-columns: 1fr; }
+      .site-nav { display: none; }
+    }
+
+    @media print {
+      .site-header, .hub-subnav, .breadcrumbs, .cta-section, .footer, .print-btn, .related-links { display: none; }
+      .hero { padding: 1rem 0; }
+      .main { padding: 1rem 0; }
+      .checklist-category { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="site-header">
+    <div class="header-content">
+        <a href="/" class="site-logo">Terms.Law</a>
+        <nav class="site-nav">
+            <div class="nav-item">
+                <a href="/Demand-Letters/" class="nav-link">Demands</a>
+            </div>
+            <div class="nav-item">
+                <a href="/Templates/" class="nav-link">Contracts</a>
+            </div>
+            <div class="nav-item">
+                <a href="/INC/" class="nav-link">Formation</a>
+            </div>
+            <div class="nav-item">
+                <a href="/Blog/" class="nav-link">Read</a>
+            </div>
+            <a href="mailto:owner@terms.law" class="nav-link nav-cta">Contact</a>
+        </nav>
+    </div>
+</header>
+
+<!-- NDA Studio Hub Sub-Navigation -->
+<nav class="hub-subnav">
+  <div class="hub-subnav-content">
+    <a href="/NDA/" class="hub-subnav-title"><i class="fas fa-file-contract"></i> NDA Studio</a>
+    <div class="hub-subnav-tabs">
+      <a href="/NDA/scenarios/" class="hub-tab active">Scenarios</a>
+      <a href="/NDA/clause-library/" class="hub-tab">Clauses</a>
+      <a href="/NDA/tools/" class="hub-tab">Tools</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs">
+  <a href="/">Terms.Law</a>
+  <span>&gt;</span>
+  <a href="/NDA/">NDA Studio</a>
+  <span>&gt;</span>
+  <a href="/NDA/scenarios/software-dev/">Software Dev</a>
+  <span>&gt;</span>
+  <span class="current">Access Revocation Checklist</span>
+</div>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge"><i class="fas fa-user-slash"></i> Security Checklist</div>
+    <h1>Access Revocation <span class="grad">Checklist</span></h1>
+    <p class="hero-sub">Complete step-by-step checklist for revoking contractor and vendor access when an engagement ends. Covers credentials, repositories, API keys, VPNs, cloud services, and documentation requirements.</p>
+  </div>
+</section>
+
+<div class="main">
+  <!-- Urgency Banner -->
+  <div class="urgency-banner">
+    <i class="fas fa-exclamation-triangle"></i>
+    <div>
+      <h4>Time-Sensitive Security Operation</h4>
+      <p>Access revocation should begin immediately upon engagement termination. Every hour of delay increases the risk of unauthorized data access or exfiltration. Critical credentials (cloud admin, database, production SSH) must be revoked within 1 hour.</p>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div style="display: flex; gap: 12px; margin-bottom: 1.5rem;">
+    <button class="print-btn" onclick="window.print()">
+      <i class="fas fa-print"></i> Print Checklist
+    </button>
+    <button class="print-btn" onclick="resetChecklist()">
+      <i class="fas fa-redo"></i> Reset All
+    </button>
+  </div>
+
+  <!-- Timeline -->
+  <div class="highlight-section">
+    <div class="sec-head">
+      <h2><i class="fas fa-clock"></i> Revocation Timeline</h2>
+    </div>
+    <div class="timeline">
+      <div class="timeline-item critical">
+        <div class="timeline-time">Within 1 Hour</div>
+        <h4>Critical Access</h4>
+        <p>Cloud admin, database, production SSH, payment systems</p>
+      </div>
+      <div class="timeline-item critical">
+        <div class="timeline-time">Within 4 Hours</div>
+        <h4>Code & Repos</h4>
+        <p>GitHub/GitLab access, CI/CD pipelines, package registries</p>
+      </div>
+      <div class="timeline-item urgent">
+        <div class="timeline-time">Within 24 Hours</div>
+        <h4>Communications</h4>
+        <p>Slack, email, project management tools, documentation</p>
+      </div>
+      <div class="timeline-item normal">
+        <div class="timeline-time">Within 48 Hours</div>
+        <h4>Verification</h4>
+        <p>Audit logs review, confirmation collection, documentation</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Common Platforms -->
+  <div class="highlight-section">
+    <div class="sec-head">
+      <h2><i class="fas fa-server"></i> Common Platforms to Check</h2>
+    </div>
+    <div class="platform-grid">
+      <div class="platform-card">
+        <i class="fab fa-github github"></i>
+        <h4>GitHub</h4>
+        <p>Repos, Actions, Packages</p>
+      </div>
+      <div class="platform-card">
+        <i class="fab fa-gitlab gitlab"></i>
+        <h4>GitLab</h4>
+        <p>Projects, CI/CD, Registry</p>
+      </div>
+      <div class="platform-card">
+        <i class="fab fa-aws aws"></i>
+        <h4>AWS</h4>
+        <p>IAM, Console, CLI</p>
+      </div>
+      <div class="platform-card">
+        <i class="fab fa-google gcp"></i>
+        <h4>Google Cloud</h4>
+        <p>IAM, Firebase, GKE</p>
+      </div>
+      <div class="platform-card">
+        <i class="fab fa-microsoft azure"></i>
+        <h4>Azure</h4>
+        <p>AD, DevOps, Portal</p>
+      </div>
+      <div class="platform-card">
+        <i class="fab fa-slack slack"></i>
+        <h4>Slack</h4>
+        <p>Workspace, Channels</p>
+      </div>
+      <div class="platform-card">
+        <i class="fab fa-jira jira"></i>
+        <h4>Jira/Confluence</h4>
+        <p>Projects, Docs, Boards</p>
+      </div>
+      <div class="platform-card">
+        <i class="fas fa-database" style="color: #336791;"></i>
+        <h4>Databases</h4>
+        <p>Direct access, Read replicas</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CRITICAL: Cloud & Infrastructure -->
+  <div class="checklist-category">
+    <div class="category-header critical">
+      <div class="category-icon critical"><i class="fas fa-cloud"></i></div>
+      <div class="category-info">
+        <h3>Cloud & Infrastructure Access</h3>
+        <p>AWS, GCP, Azure, DigitalOcean, Vercel, Heroku</p>
+      </div>
+      <div class="category-progress" id="progress-cloud">0/8</div>
+    </div>
+    <div class="category-body">
+      <div class="checklist-item" data-category="cloud">
+        <input type="checkbox" id="cloud-1" onchange="updateProgress('cloud')">
+        <div class="checklist-content">
+          <label for="cloud-1">Revoke AWS IAM user access</label>
+          <p>Delete IAM user or disable console/programmatic access. Rotate any access keys they may have copied.</p>
+          <div class="command-block">
+            <span class="comment"># Delete IAM user</span><br>
+            aws iam delete-user --user-name contractor-name<br><br>
+            <span class="comment"># Or disable access keys</span><br>
+            aws iam update-access-key --user-name contractor-name --access-key-id AKIA... --status Inactive
+          </div>
+        </div>
+        <span class="checklist-priority critical">Critical</span>
+      </div>
+
+      <div class="checklist-item" data-category="cloud">
+        <input type="checkbox" id="cloud-2" onchange="updateProgress('cloud')">
+        <div class="checklist-content">
+          <label for="cloud-2">Remove from GCP IAM roles</label>
+          <p>Remove all IAM bindings for the user across all projects they had access to.</p>
+          <div class="command-block">
+            gcloud projects remove-iam-policy-binding PROJECT_ID \<br>
+            &nbsp;&nbsp;--member="user:contractor@email.com" \<br>
+            &nbsp;&nbsp;--role="roles/editor"
+          </div>
+        </div>
+        <span class="checklist-priority critical">Critical</span>
+      </div>
+
+      <div class="checklist-item" data-category="cloud">
+        <input type="checkbox" id="cloud-3" onchange="updateProgress('cloud')">
+        <div class="checklist-content">
+          <label for="cloud-3">Remove from Azure Active Directory</label>
+          <p>Remove user from Azure AD and any role assignments in subscriptions.</p>
+        </div>
+        <span class="checklist-priority critical">Critical</span>
+      </div>
+
+      <div class="checklist-item" data-category="cloud">
+        <input type="checkbox" id="cloud-4" onchange="updateProgress('cloud')">
+        <div class="checklist-content">
+          <label for="cloud-4">Revoke Vercel/Netlify team access</label>
+          <p>Remove from team and revoke any personal access tokens created for deployments.</p>
+        </div>
+        <span class="checklist-priority high">High</span>
+      </div>
+
+      <div class="checklist-item" data-category="cloud">
+        <input type="checkbox" id="cloud-5" onchange="updateProgress('cloud')">
+        <div class="checklist-content">
+          <label for="cloud-5">Remove Heroku collaborator access</label>
+          <p>Remove from all apps and pipelines. Check for any API keys created.</p>
+        </div>
+        <span class="checklist-priority high">High</span>
+      </div>
+
+      <div class="checklist-item" data-category="cloud">
+        <input type="checkbox" id="cloud-6" onchange="updateProgress('cloud')">
+        <div class="checklist-content">
+          <label for="cloud-6">Revoke DigitalOcean team access</label>
+          <p>Remove from team and check for any API tokens or SSH keys added to droplets.</p>
+        </div>
+        <span class="checklist-priority high">High</span>
+      </div>
+
+      <div class="checklist-item" data-category="cloud">
+        <input type="checkbox" id="cloud-7" onchange="updateProgress('cloud')">
+        <div class="checklist-content">
+          <label for="cloud-7">Remove from Kubernetes clusters</label>
+          <p>Delete RBAC bindings, remove from kubeconfig, revoke service account tokens.</p>
+          <div class="command-block">
+            kubectl delete clusterrolebinding contractor-binding<br>
+            kubectl delete rolebinding contractor-binding -n namespace
+          </div>
+        </div>
+        <span class="checklist-priority critical">Critical</span>
+      </div>
+
+      <div class="checklist-item" data-category="cloud">
+        <input type="checkbox" id="cloud-8" onchange="updateProgress('cloud')">
+        <div class="checklist-content">
+          <label for="cloud-8">Rotate shared secrets in secret managers</label>
+          <p>Rotate any secrets in AWS Secrets Manager, GCP Secret Manager, or HashiCorp Vault that contractor had access to.</p>
+        </div>
+        <span class="checklist-priority critical">Critical</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Code Repositories -->
+  <div class="checklist-category">
+    <div class="category-header critical">
+      <div class="category-icon critical"><i class="fas fa-code-branch"></i></div>
+      <div class="category-info">
+        <h3>Code Repositories & CI/CD</h3>
+        <p>GitHub, GitLab, Bitbucket, CircleCI, Jenkins</p>
+      </div>
+      <div class="category-progress" id="progress-repos">0/7</div>
+    </div>
+    <div class="category-body">
+      <div class="checklist-item" data-category="repos">
+        <input type="checkbox" id="repos-1" onchange="updateProgress('repos')">
+        <div class="checklist-content">
+          <label for="repos-1">Remove from GitHub organization</label>
+          <p>Remove from org, all teams, and revoke any pending invitations. Check for deploy keys they may have added.</p>
+        </div>
+        <span class="checklist-priority critical">Critical</span>
+      </div>
+
+      <div class="checklist-item" data-category="repos">
+        <input type="checkbox" id="repos-2" onchange="updateProgress('repos')">
+        <div class="checklist-content">
+          <label for="repos-2">Remove from GitLab groups/projects</label>
+          <p>Remove from all groups and projects. Revoke personal access tokens if you have admin access.</p>
+        </div>
+        <span class="checklist-priority critical">Critical</span>
+      </div>
+
+      <div class="checklist-item" data-category="repos">
+        <input type="checkbox" id="repos-3" onchange="updateProgress('repos')">
+        <div class="checklist-content">
+          <label for="repos-3">Remove from Bitbucket workspaces</label>
+          <p>Remove from all workspaces and repository access groups.</p>
+        </div>
+        <span class="checklist-priority critical">Critical</span>
+      </div>
+
+      <div class="checklist-item" data-category="repos">
+        <input type="checkbox" id="repos-4" onchange="updateProgress('repos')">
+        <div class="checklist-content">
+          <label for="repos-4">Revoke CI/CD pipeline access</label>
+          <p>Remove from CircleCI, GitHub Actions, GitLab CI, Jenkins. Rotate any secrets stored in CI environment variables.</p>
+        </div>
+        <span class="checklist-priority critical">Critical</span>
+      </div>
+
+      <div class="checklist-item" data-category="repos">
+        <input type="checkbox" id="repos-5" onchange="updateProgress('repos')">
+        <div class="checklist-content">
+          <label for="repos-5">Remove deploy keys and webhooks</label>
+          <p>Audit all deploy keys and webhooks added during the engagement. Remove any that were created by the contractor.</p>
+        </div>
+        <span class="checklist-priority high">High</span>
+      </div>
+
+      <div class="checklist-item" data-category="repos">
+        <input type="checkbox" id="repos-6" onchange="updateProgress('repos')">
+        <div class="checklist-content">
+          <label for="repos-6">Revoke package registry access</label>
+          <p>Remove from npm org, PyPI, Docker Hub, or any private registries. Rotate publish tokens.</p>
+        </div>
+        <span class="checklist-priority high">High</span>
+      </div>
+
+      <div class="checklist-item" data-category="repos">
+        <input type="checkbox" id="repos-7" onchange="updateProgress('repos')">
+        <div class="checklist-content">
+          <label for="repos-7">Audit recent commits and PRs</label>
+          <p>Review recent activity for any suspicious commits, especially to CI configs or secret files.</p>
+        </div>
+        <span class="checklist-priority medium">Medium</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Database & Data Access -->
+  <div class="checklist-category">
+    <div class="category-header critical">
+      <div class="category-icon critical"><i class="fas fa-database"></i></div>
+      <div class="category-info">
+        <h3>Database & Data Access</h3>
+        <p>PostgreSQL, MySQL, MongoDB, Redis, Elasticsearch</p>
+      </div>
+      <div class="category-progress" id="progress-db">0/5</div>
+    </div>
+    <div class="category-body">
+      <div class="checklist-item" data-category="db">
+        <input type="checkbox" id="db-1" onchange="updateProgress('db')">
+        <div class="checklist-content">
+          <label for="db-1">Revoke database user credentials</label>
+          <p>Drop database users or revoke all privileges. Change passwords for any shared accounts.</p>
+          <div class="command-block">
+            <span class="comment">-- PostgreSQL</span><br>
+            DROP USER contractor_user;<br><br>
+            <span class="comment">-- MySQL</span><br>
+            DROP USER 'contractor'@'%';
+          </div>
+        </div>
+        <span class="checklist-priority critical">Critical</span>
+      </div>
+
+      <div class="checklist-item" data-category="db">
+        <input type="checkbox" id="db-2" onchange="updateProgress('db')">
+        <div class="checklist-content">
+          <label for="db-2">Rotate connection strings in applications</label>
+          <p>If contractor had access to connection strings, rotate database passwords and update all applications.</p>
+        </div>
+        <span class="checklist-priority critical">Critical</span>
+      </div>
+
+      <div class="checklist-item" data-category="db">
+        <input type="checkbox" id="db-3" onchange="updateProgress('db')">
+        <div class="checklist-content">
+          <label for="db-3">Revoke MongoDB/Redis access</label>
+          <p>Remove users from MongoDB, revoke Redis AUTH credentials, update ACL rules.</p>
+        </div>
+        <span class="checklist-priority critical">Critical</span>
+      </div>
+
+      <div class="checklist-item" data-category="db">
+        <input type="checkbox" id="db-4" onchange="updateProgress('db')">
+        <div class="checklist-content">
+          <label for="db-4">Remove from database admin tools</label>
+          <p>Remove access from tools like pgAdmin, DBeaver Cloud, MongoDB Atlas, or any shared database management platforms.</p>
+        </div>
+        <span class="checklist-priority high">High</span>
+      </div>
+
+      <div class="checklist-item" data-category="db">
+        <input type="checkbox" id="db-5" onchange="updateProgress('db')">
+        <div class="checklist-content">
+          <label for="db-5">Review database audit logs</label>
+          <p>Check for any unusual queries, bulk exports, or schema changes in the days before termination.</p>
+        </div>
+        <span class="checklist-priority medium">Medium</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SSH & Server Access -->
+  <div class="checklist-category">
+    <div class="category-header high">
+      <div class="category-icon high"><i class="fas fa-terminal"></i></div>
+      <div class="category-info">
+        <h3>SSH & Server Access</h3>
+        <p>SSH keys, VPN accounts, bastion hosts, jump servers</p>
+      </div>
+      <div class="category-progress" id="progress-ssh">0/5</div>
+    </div>
+    <div class="category-body">
+      <div class="checklist-item" data-category="ssh">
+        <input type="checkbox" id="ssh-1" onchange="updateProgress('ssh')">
+        <div class="checklist-content">
+          <label for="ssh-1">Remove SSH public keys from servers</label>
+          <p>Remove contractor's public key from <code>~/.ssh/authorized_keys</code> on all servers they had access to.</p>
+          <div class="command-block">
+            <span class="comment"># Remove specific key from authorized_keys</span><br>
+            grep -v "contractor@email.com" ~/.ssh/authorized_keys > temp && mv temp ~/.ssh/authorized_keys
+          </div>
+        </div>
+        <span class="checklist-priority critical">Critical</span>
+      </div>
+
+      <div class="checklist-item" data-category="ssh">
+        <input type="checkbox" id="ssh-2" onchange="updateProgress('ssh')">
+        <div class="checklist-content">
+          <label for="ssh-2">Revoke VPN access</label>
+          <p>Disable VPN account, revoke certificates, remove from VPN user groups (OpenVPN, WireGuard, Tailscale, etc.).</p>
+        </div>
+        <span class="checklist-priority critical">Critical</span>
+      </div>
+
+      <div class="checklist-item" data-category="ssh">
+        <input type="checkbox" id="ssh-3" onchange="updateProgress('ssh')">
+        <div class="checklist-content">
+          <label for="ssh-3">Remove from bastion/jump host access</label>
+          <p>Remove user account from bastion hosts. Update any shared jump host configurations.</p>
+        </div>
+        <span class="checklist-priority high">High</span>
+      </div>
+
+      <div class="checklist-item" data-category="ssh">
+        <input type="checkbox" id="ssh-4" onchange="updateProgress('ssh')">
+        <div class="checklist-content">
+          <label for="ssh-4">Rotate any shared SSH keys</label>
+          <p>If any shared/service SSH keys were accessible, rotate them and update all systems using them.</p>
+        </div>
+        <span class="checklist-priority high">High</span>
+      </div>
+
+      <div class="checklist-item" data-category="ssh">
+        <input type="checkbox" id="ssh-5" onchange="updateProgress('ssh')">
+        <div class="checklist-content">
+          <label for="ssh-5">Update IP allowlists and security groups</label>
+          <p>Remove contractor's IP addresses from firewall rules, AWS security groups, and any IP-based access controls.</p>
+        </div>
+        <span class="checklist-priority high">High</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- API Keys & Third-Party Services -->
+  <div class="checklist-category">
+    <div class="category-header high">
+      <div class="category-icon high"><i class="fas fa-key"></i></div>
+      <div class="category-info">
+        <h3>API Keys & Third-Party Services</h3>
+        <p>Stripe, SendGrid, Twilio, Auth0, Firebase</p>
+      </div>
+      <div class="category-progress" id="progress-api">0/6</div>
+    </div>
+    <div class="category-body">
+      <div class="checklist-item" data-category="api">
+        <input type="checkbox" id="api-1" onchange="updateProgress('api')">
+        <div class="checklist-content">
+          <label for="api-1">Rotate Stripe API keys</label>
+          <p>Roll API keys in Stripe dashboard. Update all applications using the old keys.</p>
+        </div>
+        <span class="checklist-priority critical">Critical</span>
+      </div>
+
+      <div class="checklist-item" data-category="api">
+        <input type="checkbox" id="api-2" onchange="updateProgress('api')">
+        <div class="checklist-content">
+          <label for="api-2">Rotate SendGrid/Mailgun API keys</label>
+          <p>Revoke old API keys and create new ones. Old keys could be used for phishing campaigns.</p>
+        </div>
+        <span class="checklist-priority high">High</span>
+      </div>
+
+      <div class="checklist-item" data-category="api">
+        <input type="checkbox" id="api-3" onchange="updateProgress('api')">
+        <div class="checklist-content">
+          <label for="api-3">Rotate Twilio credentials</label>
+          <p>Rotate API keys, remove from subaccounts. Compromised Twilio access can be expensive.</p>
+        </div>
+        <span class="checklist-priority high">High</span>
+      </div>
+
+      <div class="checklist-item" data-category="api">
+        <input type="checkbox" id="api-4" onchange="updateProgress('api')">
+        <div class="checklist-content">
+          <label for="api-4">Remove from Auth0/Okta tenant</label>
+          <p>Remove user from identity provider admin access. Revoke any machine-to-machine credentials they created.</p>
+        </div>
+        <span class="checklist-priority high">High</span>
+      </div>
+
+      <div class="checklist-item" data-category="api">
+        <input type="checkbox" id="api-5" onchange="updateProgress('api')">
+        <div class="checklist-content">
+          <label for="api-5">Remove from Firebase project</label>
+          <p>Remove from Firebase console access. Check for any service account keys created.</p>
+        </div>
+        <span class="checklist-priority high">High</span>
+      </div>
+
+      <div class="checklist-item" data-category="api">
+        <input type="checkbox" id="api-6" onchange="updateProgress('api')">
+        <div class="checklist-content">
+          <label for="api-6">Audit all third-party integrations</label>
+          <p>Review all OAuth connections and API integrations. Revoke any that were set up by contractor.</p>
+        </div>
+        <span class="checklist-priority medium">Medium</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Communication & Collaboration -->
+  <div class="checklist-category">
+    <div class="category-header medium">
+      <div class="category-icon medium"><i class="fas fa-comments"></i></div>
+      <div class="category-info">
+        <h3>Communication & Collaboration</h3>
+        <p>Slack, Email, Notion, Confluence, Figma</p>
+      </div>
+      <div class="category-progress" id="progress-comm">0/6</div>
+    </div>
+    <div class="category-body">
+      <div class="checklist-item" data-category="comm">
+        <input type="checkbox" id="comm-1" onchange="updateProgress('comm')">
+        <div class="checklist-content">
+          <label for="comm-1">Remove from Slack workspace</label>
+          <p>Deactivate account. Consider if you need to export their DMs for records before removal.</p>
+        </div>
+        <span class="checklist-priority high">High</span>
+      </div>
+
+      <div class="checklist-item" data-category="comm">
+        <input type="checkbox" id="comm-2" onchange="updateProgress('comm')">
+        <div class="checklist-content">
+          <label for="comm-2">Remove company email access</label>
+          <p>Disable email account if one was provisioned. Set up forwarding to manager if needed.</p>
+        </div>
+        <span class="checklist-priority high">High</span>
+      </div>
+
+      <div class="checklist-item" data-category="comm">
+        <input type="checkbox" id="comm-3" onchange="updateProgress('comm')">
+        <div class="checklist-content">
+          <label for="comm-3">Remove from Notion/Confluence</label>
+          <p>Remove from workspace. Check for any pages they own that need to be transferred.</p>
+        </div>
+        <span class="checklist-priority medium">Medium</span>
+      </div>
+
+      <div class="checklist-item" data-category="comm">
+        <input type="checkbox" id="comm-4" onchange="updateProgress('comm')">
+        <div class="checklist-content">
+          <label for="comm-4">Remove from Jira/Linear/Asana</label>
+          <p>Deactivate account. Reassign any open tickets assigned to them.</p>
+        </div>
+        <span class="checklist-priority medium">Medium</span>
+      </div>
+
+      <div class="checklist-item" data-category="comm">
+        <input type="checkbox" id="comm-5" onchange="updateProgress('comm')">
+        <div class="checklist-content">
+          <label for="comm-5">Remove from Figma/Design tools</label>
+          <p>Remove from team. Transfer ownership of any files they created.</p>
+        </div>
+        <span class="checklist-priority medium">Medium</span>
+      </div>
+
+      <div class="checklist-item" data-category="comm">
+        <input type="checkbox" id="comm-6" onchange="updateProgress('comm')">
+        <div class="checklist-content">
+          <label for="comm-6">Remove from shared Google Drive/Dropbox</label>
+          <p>Revoke access to shared folders. Check for any files they may have downloaded.</p>
+        </div>
+        <span class="checklist-priority medium">Medium</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Documentation Requirements -->
+  <div class="documentation-box">
+    <h4><i class="fas fa-file-alt"></i> Documentation Requirements</h4>
+    <ul>
+      <li>Record timestamp of each access revocation action</li>
+      <li>Screenshot confirmation of removal from each system</li>
+      <li>Export audit logs for 30 days before and after termination</li>
+      <li>Obtain written confirmation from contractor that all data has been deleted</li>
+      <li>Document any credentials that were rotated and notify affected teams</li>
+      <li>Update access control documentation with removal date</li>
+      <li>File all documentation with the original NDA for records retention</li>
+    </ul>
+  </div>
+
+  <!-- Related Links -->
+  <div class="related-links">
+    <h3>Related Resources</h3>
+    <a href="breach-response.html"><i class="fas fa-exclamation-circle"></i> Breach Response Guide</a>
+    <a href="credential-access-nda.html"><i class="fas fa-key"></i> Credential Access NDA</a>
+    <a href="source-code-nda.html"><i class="fas fa-code-branch"></i> Source Code NDA</a>
+    <a href="security-requirements.html"><i class="fas fa-shield-alt"></i> Security Requirements Guide</a>
+    <a href="negotiation-playbook.html"><i class="fas fa-handshake"></i> Negotiation Playbook</a>
+    <a href="/NDA/"><i class="fas fa-file-contract"></i> NDA Studio Home</a>
+  </div>
+
+  <!-- CTA Section -->
+  <div class="cta-section">
+    <h2>Need an NDA with Built-in Revocation Provisions?</h2>
+    <p>Generate a comprehensive software NDA that clearly defines access termination procedures and requirements.</p>
+    <a href="/NDA/generator.html" class="cta-btn"><i class="fas fa-rocket"></i> Start Free Generator</a>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div>
+      <h5>Software Dev NDAs</h5>
+      <a href="index.html">Overview</a>
+      <a href="saas-vendor.html">SaaS Vendor</a>
+      <a href="source-code-nda.html">Source Code</a>
+      <a href="credential-access-nda.html">Credentials</a>
+      <a href="api-access-nda.html">API Access</a>
+    </div>
+    <div>
+      <h5>Resources</h5>
+      <a href="security-requirements.html">Security Requirements</a>
+      <a href="negotiation-playbook.html">Negotiation Playbook</a>
+      <a href="access-revocation-checklist.html">Revocation Checklist</a>
+      <a href="breach-response.html">Breach Response</a>
+    </div>
+    <div>
+      <h5>Tools</h5>
+      <a href="/NDA/generator.html">NDA Generator</a>
+      <a href="/NDA/clause-library/">Clause Library</a>
+      <a href="/NDA/tools/risk-analyzer.html">Risk Analyzer</a>
+    </div>
+    <div>
+      <h5>Terms.Law</h5>
+      <a href="/Demand-Letters/">Demand Letters</a>
+      <a href="/Templates/">Contracts</a>
+      <a href="/INC/">Formation</a>
+      <a href="mailto:owner@terms.law">Hire Me</a>
+    </div>
+  </div>
+  <div class="footer-bottom">&copy; 2025 Terms.Law | Sergei Tokmakov, Esq. - CA Bar #279869 | Attorney advertising. Not legal advice.</div>
+</footer>
+
+<!-- Chat Widget -->
+<script src="/chat-widget/chat-widget.js"></script>
+
+<script>
+  // Checklist functionality
+  const categoryTotals = {
+    cloud: 8,
+    repos: 7,
+    db: 5,
+    ssh: 5,
+    api: 6,
+    comm: 6
+  };
+
+  function updateProgress(category) {
+    const checkboxes = document.querySelectorAll(`[data-category="${category}"] input[type="checkbox"]`);
+    const checked = Array.from(checkboxes).filter(cb => cb.checked).length;
+    const total = categoryTotals[category];
+    document.getElementById(`progress-${category}`).textContent = `${checked}/${total}`;
+
+    // Update visual state of checked items
+    checkboxes.forEach(cb => {
+      const item = cb.closest('.checklist-item');
+      if (cb.checked) {
+        item.classList.add('checked');
+      } else {
+        item.classList.remove('checked');
+      }
+    });
+
+    // Save to localStorage
+    saveChecklistState();
+  }
+
+  function saveChecklistState() {
+    const checkboxes = document.querySelectorAll('.checklist-item input[type="checkbox"]');
+    const state = {};
+    checkboxes.forEach(cb => {
+      state[cb.id] = cb.checked;
+    });
+    localStorage.setItem('accessRevocationChecklist', JSON.stringify(state));
+  }
+
+  function loadChecklistState() {
+    const saved = localStorage.getItem('accessRevocationChecklist');
+    if (saved) {
+      const state = JSON.parse(saved);
+      Object.keys(state).forEach(id => {
+        const checkbox = document.getElementById(id);
+        if (checkbox) {
+          checkbox.checked = state[id];
+        }
+      });
+      // Update all progress indicators
+      Object.keys(categoryTotals).forEach(category => {
+        updateProgress(category);
+      });
+    }
+  }
+
+  function resetChecklist() {
+    if (confirm('Are you sure you want to reset all checklist items?')) {
+      const checkboxes = document.querySelectorAll('.checklist-item input[type="checkbox"]');
+      checkboxes.forEach(cb => {
+        cb.checked = false;
+      });
+      localStorage.removeItem('accessRevocationChecklist');
+      Object.keys(categoryTotals).forEach(category => {
+        updateProgress(category);
+      });
+    }
+  }
+
+  // Load saved state on page load
+  document.addEventListener('DOMContentLoaded', loadChecklistState);
+</script>
+
+</body>
+</html>

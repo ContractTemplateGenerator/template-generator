@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-901N2Y3CDZ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-901N2Y3CDZ');
+  </script>
+
+  <title>Software Development NDA FAQ | Tech NDA Questions Answered | Terms.Law</title>
+  <meta name="description" content="Frequently asked questions about software development NDAs. Get answers about protecting source code, API documentation, open source considerations, and tech IP.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --accent: #8b5cf6;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --dark: #0f172a;
+      --dark-lighter: #1e293b;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
+      --gray-400: #94a3b8;
+      --gray-500: #64748b;
+      --gray-600: #475569;
+      --gray-700: #334155;
+      --gray-800: #1e293b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-700);
+      line-height: 1.6;
+    }
+
+    /* Header Styles */
+    .site-header {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .header-content {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        padding: 0 24px;
+        height: 60px;
+    }
+
+    .site-logo {
+        font-size: 1.15rem;
+        font-weight: 800;
+        text-decoration: none;
+        background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-right: 32px;
+    }
+
+    .site-nav {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        flex: 1;
+    }
+
+    .nav-item { position: relative; }
+
+    .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 18px 16px;
+        color: #94a3b8;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s;
+        border-bottom: 2px solid transparent;
+    }
+
+    .nav-link:hover { color: #fff; background: rgba(255,255,255,0.05); }
+    .nav-link:hover, .nav-link.active { border-bottom-color: var(--primary); }
+
+    .nav-cta {
+        margin-left: auto;
+        background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+        color: #fff !important;
+        padding: 10px 20px !important;
+        border-radius: 8px;
+        font-weight: 600 !important;
+        border-bottom: none !important;
+    }
+
+    .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4); }
+
+    /* Hub Sub-Navigation */
+    .hub-subnav {
+      background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .hub-subnav-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 48px;
+    }
+    .hub-subnav-title { color: #f59e0b; font-size: 0.9rem; font-weight: 700; text-decoration: none; }
+    .hub-subnav-title:hover { color: #fbbf24; }
+    .hub-subnav-tabs { display: flex; gap: 8px; }
+    .hub-tab { padding: 8px 16px; color: #94a3b8; text-decoration: none; font-size: 0.85rem; font-weight: 500; border-radius: 6px; transition: all 0.2s; }
+    .hub-tab:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    .hub-tab.active { background: rgba(37, 99, 235, 0.3); color: #60a5fa; }
+
+    /* Breadcrumbs */
+    .breadcrumbs { max-width: 1200px; margin: 0 auto; padding: 1rem 24px; font-size: 0.85rem; }
+    .breadcrumbs a { color: var(--gray-500); text-decoration: none; }
+    .breadcrumbs a:hover { color: var(--primary); }
+    .breadcrumbs span { color: var(--gray-400); margin: 0 8px; }
+    .breadcrumbs .current { color: var(--gray-700); font-weight: 600; }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+      color: white;
+      padding: 3rem 24px;
+    }
+    .hero-inner { max-width: 1200px; margin: 0 auto; }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #fbbf24;
+      margin-bottom: 1rem;
+    }
+    .hero h1 { font-size: 2.25rem; font-weight: 800; margin-bottom: 0.75rem; }
+    .hero h1 .grad { background: linear-gradient(135deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero-sub { font-size: 1.1rem; color: #94a3b8; margin-bottom: 0; max-width: 700px; }
+
+    /* Main Content */
+    .main { max-width: 1200px; margin: 0 auto; padding: 2rem 24px; }
+
+    /* Section Headers */
+    .sec-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+    .sec-head h2 { font-size: 1.25rem; font-weight: 700; display: flex; align-items: center; gap: 10px; color: var(--dark); }
+    .sec-head h2 i { color: var(--primary); }
+
+    /* FAQ Styles */
+    .faq-section {
+      margin-bottom: 2.5rem;
+    }
+    .faq-section h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .faq-section h3 i { color: var(--primary); }
+
+    .faq-item {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: 10px;
+      margin-bottom: 1rem;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    .faq-item:hover {
+      border-color: var(--primary);
+      box-shadow: 0 0 15px rgba(37, 99, 235, 0.1);
+    }
+    .faq-question {
+      padding: 1.25rem;
+      cursor: pointer;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-weight: 600;
+      color: var(--dark);
+      font-size: 0.95rem;
+    }
+    .faq-question:hover { background: var(--gray-50); }
+    .faq-question i {
+      color: var(--accent);
+      margin-top: 3px;
+      transition: transform 0.2s;
+    }
+    .faq-item.active .faq-question i { transform: rotate(180deg); }
+    .faq-answer {
+      padding: 0 1.25rem 1.25rem 2.75rem;
+      font-size: 0.9rem;
+      color: var(--gray-600);
+      line-height: 1.8;
+      display: none;
+    }
+    .faq-item.active .faq-answer { display: block; }
+    .faq-answer ul {
+      margin: 0.75rem 0;
+      padding-left: 1.25rem;
+    }
+    .faq-answer li { margin-bottom: 0.5rem; }
+    .faq-answer a { color: var(--primary); font-weight: 500; }
+    .faq-answer code {
+      background: var(--gray-100);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      color: var(--accent);
+    }
+
+    /* Sidebar */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 2rem;
+    }
+
+    /* Quick Jump */
+    .quick-jump {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: 12px;
+      padding: 1.5rem;
+      position: sticky;
+      top: 130px;
+    }
+    .quick-jump h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .quick-jump h3 i { color: var(--warning); }
+    .quick-jump a {
+      display: block;
+      padding: 8px 12px;
+      color: var(--gray-600);
+      text-decoration: none;
+      font-size: 0.85rem;
+      border-radius: 6px;
+      margin-bottom: 4px;
+      transition: all 0.2s;
+    }
+    .quick-jump a:hover {
+      background: var(--gray-50);
+      color: var(--primary);
+    }
+    .quick-jump a i { margin-right: 8px; }
+
+    /* Related Links */
+    .related-links {
+      background: var(--dark);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .related-links h3 {
+      color: white;
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+    .related-links a {
+      display: block;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 0.85rem;
+      margin-bottom: 8px;
+      transition: all 0.2s;
+    }
+    .related-links a:hover {
+      background: rgba(255,255,255,0.1);
+      color: white;
+    }
+    .related-links a i {
+      margin-right: 8px;
+      color: var(--primary);
+    }
+
+    /* CTA Section */
+    .cta-section {
+      background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+      border-radius: 16px;
+      padding: 2rem;
+      text-align: center;
+      color: white;
+      margin: 2rem 0;
+    }
+    .cta-section h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 0.75rem; }
+    .cta-section p { font-size: 1rem; opacity: 0.9; margin-bottom: 1.5rem; }
+    .cta-btn {
+      display: inline-block;
+      background: white;
+      color: var(--primary);
+      padding: 12px 28px;
+      border-radius: 8px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+
+    /* Footer */
+    .footer { background: #0f172a; color: white; padding: 2rem 24px; margin-top: 2rem; }
+    .footer-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; }
+    .footer h5 { font-size: 0.7rem; text-transform: uppercase; color: #64748b; margin-bottom: 10px; letter-spacing: 0.5px; }
+    .footer a { display: block; font-size: 0.8rem; color: #94a3b8; text-decoration: none; padding: 3px 0; }
+    .footer a:hover { color: white; }
+    .footer-bottom { text-align: center; font-size: 0.75rem; color: #475569; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #1e293b; }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .content-grid { grid-template-columns: 1fr; }
+      .quick-jump { position: static; }
+      .footer-inner { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 1.75rem; }
+      .footer-inner { grid-template-columns: 1fr; }
+      .site-nav { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="site-header">
+    <div class="header-content">
+        <a href="/" class="site-logo">Terms.Law</a>
+        <nav class="site-nav">
+            <div class="nav-item">
+                <a href="/Demand-Letters/" class="nav-link">Demands</a>
+            </div>
+            <div class="nav-item">
+                <a href="/Templates/" class="nav-link">Contracts</a>
+            </div>
+            <div class="nav-item">
+                <a href="/INC/" class="nav-link">Formation</a>
+            </div>
+            <div class="nav-item">
+                <a href="/Blog/" class="nav-link">Read</a>
+            </div>
+            <a href="mailto:owner@terms.law" class="nav-link nav-cta">Contact</a>
+        </nav>
+    </div>
+</header>
+
+<!-- NDA Studio Hub Sub-Navigation -->
+<nav class="hub-subnav">
+  <div class="hub-subnav-content">
+    <a href="/NDA/" class="hub-subnav-title"><i class="fas fa-file-contract"></i> NDA Studio</a>
+    <div class="hub-subnav-tabs">
+      <a href="/NDA/scenarios/" class="hub-tab active">Scenarios</a>
+      <a href="/NDA/clause-library/" class="hub-tab">Clauses</a>
+      <a href="/NDA/tools/" class="hub-tab">Tools</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs">
+  <a href="/">Terms.Law</a>
+  <span>&gt;</span>
+  <a href="/NDA/">NDA Studio</a>
+  <span>&gt;</span>
+  <a href="/NDA/scenarios/software-dev/">Software Dev</a>
+  <span>&gt;</span>
+  <span class="current">FAQ</span>
+</div>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge"><i class="fas fa-question-circle"></i> Knowledge Base</div>
+    <h1>Software Development <span class="grad">NDA FAQ</span></h1>
+    <p class="hero-sub">Answers to the most common questions about NDAs in software development, technology partnerships, and protecting your technical intellectual property.</p>
+  </div>
+</section>
+
+<div class="main">
+  <div class="content-grid">
+    <div>
+      <!-- Basics Section -->
+      <div class="faq-section" id="basics">
+        <h3><i class="fas fa-book"></i> NDA Basics for Software Development</h3>
+
+        <div class="faq-item active">
+          <div class="faq-question">
+            <i class="fas fa-chevron-down"></i>
+            What makes a software development NDA different from a standard business NDA?
+          </div>
+          <div class="faq-answer">
+            Software development NDAs address unique technical concerns that standard business NDAs often overlook:
+            <ul>
+              <li><strong>Source code protection:</strong> Specific definitions for code, algorithms, and architecture</li>
+              <li><strong>API and documentation:</strong> Protection for technical specifications and integration guides</li>
+              <li><strong>Residuals clause:</strong> Addresses what developers can retain in memory after the engagement</li>
+              <li><strong>Repository access controls:</strong> Technical provisions for SSH keys, access levels, and revocation</li>
+              <li><strong>Open source considerations:</strong> Carve-outs for open source components and contributions</li>
+              <li><strong>Reverse engineering prohibitions:</strong> Prevents decompilation or disassembly of compiled code</li>
+            </ul>
+            Standard business NDAs typically lack these technical nuances, which can leave significant gaps in protection for software companies.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <i class="fas fa-chevron-down"></i>
+            Do I need an NDA for every developer or contractor I hire?
+          </div>
+          <div class="faq-answer">
+            In most cases, yes. Anyone who will access your source code, API documentation, or technical architecture should sign an NDA before gaining access. This includes:
+            <ul>
+              <li>Full-time employees (often included in employment agreements)</li>
+              <li>Freelance developers and contractors</li>
+              <li>Development agencies and their staff</li>
+              <li>Security auditors and penetration testers</li>
+              <li>Technical due diligence teams</li>
+              <li>Beta testers with early access</li>
+            </ul>
+            The NDA should be signed <em>before</em> any confidential information is shared, not after. Consider using our <a href="email-templates.html">email templates</a> to request NDA signatures professionally.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <i class="fas fa-chevron-down"></i>
+            Should I use a mutual or one-way NDA for software projects?
+          </div>
+          <div class="faq-answer">
+            It depends on the relationship:
+            <ul>
+              <li><strong>One-way NDA (you disclosing):</strong> Use when hiring contractors, onboarding freelancers, or during investor due diligence where you're primarily sharing your confidential information.</li>
+              <li><strong>Mutual NDA:</strong> Use for integration partnerships, API collaborations, or joint ventures where both parties will share proprietary information.</li>
+            </ul>
+            Even in mutual NDAs, consider whether the obligations should be symmetric. If you're sharing source code and they're only sharing API documentation, you may want stronger protections on your side. See our <a href="negotiation-playbook.html">negotiation playbook</a> for guidance.
+          </div>
+        </div>
+      </div>
+
+      <!-- Source Code Section -->
+      <div class="faq-section" id="source-code">
+        <h3><i class="fas fa-code"></i> Source Code Protection</h3>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <i class="fas fa-chevron-down"></i>
+            What should be included in the definition of "source code" in an NDA?
+          </div>
+          <div class="faq-answer">
+            A comprehensive source code definition should include:
+            <ul>
+              <li>Human-readable code in any programming language</li>
+              <li>Scripts (build, deployment, automation)</li>
+              <li>Configuration files and environment variables</li>
+              <li>Database schemas and migration files</li>
+              <li>API specifications (OpenAPI, GraphQL schemas)</li>
+              <li>Infrastructure-as-code (Terraform, CloudFormation)</li>
+              <li>CI/CD pipeline configurations</li>
+              <li>Code comments and inline documentation</li>
+              <li>Version control history and commit messages</li>
+              <li>Test suites and test data</li>
+            </ul>
+            Our <a href="source-code-nda.html">source code NDA generator</a> includes comprehensive definitions tailored to modern development practices.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <i class="fas fa-chevron-down"></i>
+            What is a "residuals clause" and should I include one?
+          </div>
+          <div class="faq-answer">
+            A residuals clause permits developers to use general knowledge, skills, and techniques they've learned during an engagement, even after it ends. This addresses the practical reality that developers can't "un-learn" programming patterns or architectural approaches.
+            <br><br>
+            <strong>Why include one:</strong>
+            <ul>
+              <li>Makes your NDA enforceable (overly broad NDAs may be struck down)</li>
+              <li>Attracts better talent (developers may refuse NDAs without residuals protection)</li>
+              <li>Industry standard practice</li>
+            </ul>
+            <strong>Key limitations to include:</strong>
+            <ul>
+              <li>Must be retained in "unaided memory" (no notes or copies)</li>
+              <li>Cannot reproduce specific code, algorithms, or trade secrets</li>
+              <li>Cannot use information to create directly competing products</li>
+            </ul>
+            See our <a href="/NDA/clause-library/residuals.html">residuals clause guide</a> for sample language.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <i class="fas fa-chevron-down"></i>
+            How do I protect code that uses open source components?
+          </div>
+          <div class="faq-answer">
+            Your NDA should include an open source carve-out that:
+            <ul>
+              <li>Acknowledges that some components are governed by open source licenses</li>
+              <li>Clarifies that open source portions are not "confidential information"</li>
+              <li>Protects your proprietary modifications and integrations</li>
+              <li>Distinguishes between "using" open source and "contributing to" open source</li>
+            </ul>
+            Without this carve-out, you could inadvertently restrict developers from contributing to open source projects they use professionally. See our <a href="open-source-nda.html">open source NDA guide</a> for detailed considerations.
+          </div>
+        </div>
+      </div>
+
+      <!-- API & Integration Section -->
+      <div class="faq-section" id="api">
+        <h3><i class="fas fa-plug"></i> API & Integration NDAs</h3>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <i class="fas fa-chevron-down"></i>
+            What API information needs NDA protection?
+          </div>
+          <div class="faq-answer">
+            Protect any API information that reveals competitive advantages or security details:
+            <ul>
+              <li><strong>Endpoint structure:</strong> URLs, paths, and resource naming conventions</li>
+              <li><strong>Authentication:</strong> OAuth flows, API key formats, token structures</li>
+              <li><strong>Rate limits:</strong> Throttling policies reveal capacity and pricing strategy</li>
+              <li><strong>Data schemas:</strong> Request/response formats expose your data model</li>
+              <li><strong>Webhooks:</strong> Event types and payload structures</li>
+              <li><strong>Error codes:</strong> May reveal security mechanisms or business logic</li>
+              <li><strong>Undocumented features:</strong> Beta or internal endpoints</li>
+            </ul>
+            See our <a href="api-access-nda.html">API access NDA</a> for specific clause recommendations.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <i class="fas fa-chevron-down"></i>
+            Should I use separate NDAs for API documentation vs. API credentials?
+          </div>
+          <div class="faq-answer">
+            Yes, this is recommended practice. API documentation and credentials serve different purposes:
+            <ul>
+              <li><strong>API Documentation NDA:</strong> Protects technical specifications, which may be shared broadly with potential partners for evaluation</li>
+              <li><strong>Credential Access Agreement:</strong> Covers actual API keys, secrets, and production access with stricter security requirements</li>
+            </ul>
+            Having separate agreements allows you to share documentation more freely during partnership discussions while maintaining tight control over production credentials. See our <a href="credential-access-nda.html">credential access NDA</a> for specific provisions.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <i class="fas fa-chevron-down"></i>
+            What's the difference between an API NDA and API Terms of Service?
+          </div>
+          <div class="faq-answer">
+            These serve different purposes:
+            <ul>
+              <li><strong>API NDA:</strong> Protects confidential information during partnership discussions and integration development. Covers documentation, specifications, and preliminary access.</li>
+              <li><strong>API Terms of Service:</strong> Governs ongoing production use of the API. Covers usage limits, acceptable use, SLAs, and operational requirements.</li>
+            </ul>
+            Most partnerships require both: an NDA during evaluation and integration, then Terms of Service for production use. The NDA obligations typically survive even after signing the ToS.
+          </div>
+        </div>
+      </div>
+
+      <!-- SaaS & Partnerships Section -->
+      <div class="faq-section" id="saas">
+        <h3><i class="fas fa-cloud"></i> SaaS & Partnership NDAs</h3>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <i class="fas fa-chevron-down"></i>
+            What special considerations apply to SaaS integration NDAs?
+          </div>
+          <div class="faq-answer">
+            SaaS integrations involve unique considerations:
+            <ul>
+              <li><strong>Multi-tenant architecture:</strong> Partner access shouldn't expose other customers' data</li>
+              <li><strong>Uptime and availability:</strong> NDA may cover SLA information as confidential</li>
+              <li><strong>Pricing tiers:</strong> Rate limits tied to pricing are competitive intelligence</li>
+              <li><strong>Roadmap information:</strong> Future features shared during partnership discussions</li>
+              <li><strong>Customer data handling:</strong> May require DPA in addition to NDA</li>
+              <li><strong>Sandbox vs. production:</strong> Different access levels with different protections</li>
+            </ul>
+            See our <a href="saas-integration-nda.html">SaaS integration NDA guide</a> for comprehensive coverage.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <i class="fas fa-chevron-down"></i>
+            How do white-label NDAs differ from standard software NDAs?
+          </div>
+          <div class="faq-answer">
+            White-label arrangements require additional protections:
+            <ul>
+              <li><strong>Branding requirements:</strong> How your software can (and cannot) be presented</li>
+              <li><strong>Pricing confidentiality:</strong> Your wholesale pricing vs. their retail pricing</li>
+              <li><strong>Customer ownership:</strong> Who owns the end customer relationship</li>
+              <li><strong>Customization limits:</strong> What resellers can modify</li>
+              <li><strong>Support escalation:</strong> Confidential support procedures</li>
+              <li><strong>Competitive restrictions:</strong> Limits on reselling to your competitors</li>
+            </ul>
+            Our <a href="white-label-nda.html">white-label NDA guide</a> covers these scenarios in detail.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <i class="fas fa-chevron-down"></i>
+            What should an NDA cover for beta testing programs?
+          </div>
+          <div class="faq-answer">
+            Beta testing NDAs should address:
+            <ul>
+              <li><strong>Feature confidentiality:</strong> Unreleased features and UI designs</li>
+              <li><strong>Bug disclosure:</strong> Security vulnerabilities must not be published</li>
+              <li><strong>Feedback ownership:</strong> Who owns ideas and suggestions from testers</li>
+              <li><strong>Screenshot/recording restrictions:</strong> Prevent leaks on social media</li>
+              <li><strong>Timeline confidentiality:</strong> Launch dates and roadmap</li>
+              <li><strong>Comparison restrictions:</strong> Prevent benchmarking against competitors</li>
+            </ul>
+            The NDA should also specify what happens when the beta ends - typically, testers must delete all beta software and documentation.
+          </div>
+        </div>
+      </div>
+
+      <!-- Enforcement Section -->
+      <div class="faq-section" id="enforcement">
+        <h3><i class="fas fa-gavel"></i> Enforcement & Breaches</h3>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <i class="fas fa-chevron-down"></i>
+            How long should a software development NDA last?
+          </div>
+          <div class="faq-answer">
+            Duration depends on the information being protected:
+            <ul>
+              <li><strong>Source code and algorithms:</strong> 3-5 years, or until publicly released</li>
+              <li><strong>API documentation:</strong> 2-3 years, as APIs evolve rapidly</li>
+              <li><strong>Trade secrets:</strong> Indefinite (as long as they remain secret)</li>
+              <li><strong>Beta features:</strong> Until public launch</li>
+              <li><strong>Business information:</strong> 2-3 years is standard</li>
+            </ul>
+            Many software NDAs use a hybrid approach: general confidentiality obligations last 2-3 years, but trade secrets are protected indefinitely. Consider what makes sense for your specific technology and competitive landscape.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <i class="fas fa-chevron-down"></i>
+            What should I do if I suspect an NDA breach?
+          </div>
+          <div class="faq-answer">
+            Take immediate action:
+            <ol>
+              <li><strong>Document everything:</strong> Screenshot evidence, save communications, log suspicious activity</li>
+              <li><strong>Revoke access:</strong> Immediately disable repository access, API keys, and credentials</li>
+              <li><strong>Preserve logs:</strong> Export access logs, audit trails, and git history</li>
+              <li><strong>Send formal notice:</strong> Written notice of suspected breach per NDA requirements</li>
+              <li><strong>Consult counsel:</strong> Evaluate legal options and potential damages</li>
+              <li><strong>Consider injunctive relief:</strong> For ongoing breaches, court orders may be necessary</li>
+            </ol>
+            Our <a href="breach-response.html">breach response guide</a> provides a detailed playbook for handling NDA violations.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <i class="fas fa-chevron-down"></i>
+            Can an NDA prevent an employee from working for a competitor?
+          </div>
+          <div class="faq-answer">
+            NDAs and non-competes are different:
+            <ul>
+              <li><strong>NDAs</strong> prevent disclosure of confidential information but don't restrict employment</li>
+              <li><strong>Non-competes</strong> restrict where someone can work (and are unenforceable in many states like California)</li>
+            </ul>
+            However, a well-drafted NDA can effectively limit competitive harm by:
+            <ul>
+              <li>Requiring return/destruction of all confidential materials</li>
+              <li>Prohibiting use of trade secrets at new employer</li>
+              <li>Including non-solicitation provisions for customers/employees</li>
+            </ul>
+            If you need competitive protection beyond an NDA, consult employment counsel about what's enforceable in your jurisdiction.
+          </div>
+        </div>
+      </div>
+
+      <!-- CTA Section -->
+      <div class="cta-section">
+        <h2>Still Have Questions?</h2>
+        <p>Generate a customized software development NDA or schedule a consultation with an attorney.</p>
+        <a href="/NDA/generator.html" class="cta-btn"><i class="fas fa-rocket"></i> Generate Your NDA</a>
+      </div>
+    </div>
+
+    <div>
+      <!-- Quick Jump -->
+      <div class="quick-jump">
+        <h3><i class="fas fa-list"></i> Quick Navigation</h3>
+        <a href="#basics"><i class="fas fa-book"></i> NDA Basics</a>
+        <a href="#source-code"><i class="fas fa-code"></i> Source Code Protection</a>
+        <a href="#api"><i class="fas fa-plug"></i> API & Integrations</a>
+        <a href="#saas"><i class="fas fa-cloud"></i> SaaS & Partnerships</a>
+        <a href="#enforcement"><i class="fas fa-gavel"></i> Enforcement</a>
+      </div>
+
+      <!-- Related Links -->
+      <div class="related-links">
+        <h3>Related Resources</h3>
+        <a href="index.html"><i class="fas fa-home"></i> Software Dev NDA Hub</a>
+        <a href="source-code-nda.html"><i class="fas fa-code-branch"></i> Source Code NDA</a>
+        <a href="api-access-nda.html"><i class="fas fa-plug"></i> API Access NDA</a>
+        <a href="open-source-nda.html"><i class="fab fa-github"></i> Open Source NDAs</a>
+        <a href="email-templates.html"><i class="fas fa-envelope"></i> Email Templates</a>
+        <a href="case-studies.html"><i class="fas fa-folder-open"></i> Case Studies</a>
+        <a href="negotiation-playbook.html"><i class="fas fa-handshake"></i> Negotiation Playbook</a>
+        <a href="/NDA/"><i class="fas fa-arrow-left"></i> Back to NDA Studio</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div>
+      <h5>Software Dev NDAs</h5>
+      <a href="index.html">Overview</a>
+      <a href="source-code-nda.html">Source Code</a>
+      <a href="api-access-nda.html">API Access</a>
+      <a href="saas-integration-nda.html">SaaS Integration</a>
+      <a href="white-label-nda.html">White-Label</a>
+    </div>
+    <div>
+      <h5>Resources</h5>
+      <a href="faq.html">FAQ</a>
+      <a href="email-templates.html">Email Templates</a>
+      <a href="case-studies.html">Case Studies</a>
+      <a href="negotiation-playbook.html">Negotiation Playbook</a>
+    </div>
+    <div>
+      <h5>Tools</h5>
+      <a href="/NDA/generator.html">NDA Generator</a>
+      <a href="/NDA/clause-library/">Clause Library</a>
+      <a href="/NDA/tools/risk-analyzer.html">Risk Analyzer</a>
+    </div>
+    <div>
+      <h5>Terms.Law</h5>
+      <a href="/Demand-Letters/">Demand Letters</a>
+      <a href="/Templates/">Contracts</a>
+      <a href="/INC/">Formation</a>
+      <a href="mailto:owner@terms.law">Hire Me</a>
+    </div>
+  </div>
+  <div class="footer-bottom">&copy; 2025 Terms.Law | Sergei Tokmakov, Esq. - CA Bar #279869 | Attorney advertising. Not legal advice.</div>
+</footer>
+
+<!-- FAQ Toggle Script -->
+<script>
+  document.querySelectorAll('.faq-question').forEach(question => {
+    question.addEventListener('click', () => {
+      const item = question.parentElement;
+      item.classList.toggle('active');
+    });
+  });
+</script>
+
+<!-- Chat Widget -->
+<script src="/chat-widget/chat-widget.js"></script>
+
+</body>
+</html>

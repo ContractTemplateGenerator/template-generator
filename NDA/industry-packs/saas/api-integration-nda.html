@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Integration NDA Generator | Platform Partnerships | Terms.Law</title>
+  <meta name="description" content="Generate NDAs for API integrations and platform partnerships. Covers API documentation confidentiality, credential protection, rate limiting data, and integration architecture. Built for developer ecosystems.">
+  <link rel="canonical" href="https://terms.law/NDA/industry-packs/saas/api-integration-nda.html">
+
+  <!-- Breadcrumb Schema -->
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
+    {"@type":"ListItem","position":1,"name":"Terms.Law","item":"https://terms.law/"},
+    {"@type":"ListItem","position":2,"name":"NDA Studio","item":"https://terms.law/NDA/"},
+    {"@type":"ListItem","position":3,"name":"Industry Packs","item":"https://terms.law/NDA/industry-packs/"},
+    {"@type":"ListItem","position":4,"name":"SaaS/Cloud","item":"https://terms.law/NDA/industry-packs/saas/"},
+    {"@type":"ListItem","position":5,"name":"API Integration NDA","item":"https://terms.law/NDA/industry-packs/saas/api-integration-nda.html"}
+  ]}
+  </script>
+
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+  {"@type":"Question","name":"What should an API integration NDA protect?","acceptedAnswer":{"@type":"Answer","text":"API integration NDAs should protect: API documentation and specifications, authentication credentials and keys, rate limiting and usage policies, integration architecture details, sandbox and production environment information, performance benchmarks, and any proprietary protocols or data formats."}},
+  {"@type":"Question","name":"How should API credentials be handled in an NDA?","acceptedAnswer":{"@type":"Answer","text":"API credentials require specific protections including: secure storage requirements, prohibition on sharing or embedding in code repositories, key rotation procedures, revocation protocols upon termination, and incident response procedures if credentials are compromised."}},
+  {"@type":"Question","name":"Do I need an NDA before providing API documentation?","acceptedAnswer":{"@type":"Answer","text":"It depends on your API strategy. Public APIs with open documentation may not require NDAs. However, partner APIs, private integrations, and beta features should be protected by NDA before sharing documentation to prevent competitive disclosure and maintain control over your ecosystem."}},
+  {"@type":"Question","name":"What happens to API access when an NDA terminates?","acceptedAnswer":{"@type":"Answer","text":"Upon NDA termination, the integration partner should: immediately cease all API access, securely delete all credentials and tokens, remove any cached or stored confidential data, provide certification of deletion, and maintain ongoing confidentiality for any information already received."}}
+  ]}
+  </script>
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-901N2Y3CDZ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-901N2Y3CDZ');
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --accent: #8b5cf6;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --saas: #6366f1;
+      --saas-dark: #4f46e5;
+      --saas-light: #eef2ff;
+      --dark: #0f172a;
+      --dark-lighter: #1e293b;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
+      --gray-400: #94a3b8;
+      --gray-500: #64748b;
+      --gray-600: #475569;
+      --gray-700: #334155;
+      --gray-800: #1e293b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-700);
+      line-height: 1.6;
+    }
+
+    /* Header Styles */
+    .site-header {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .header-content {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        padding: 0 24px;
+        height: 60px;
+    }
+
+    .site-logo {
+        font-size: 1.15rem;
+        font-weight: 800;
+        text-decoration: none;
+        background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-right: 32px;
+    }
+
+    .site-nav {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        flex: 1;
+    }
+
+    .nav-item { position: relative; }
+
+    .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 18px 16px;
+        color: #94a3b8;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s;
+        border-bottom: 2px solid transparent;
+    }
+
+    .nav-link:hover {
+        color: #fff;
+        background: rgba(255,255,255,0.05);
+    }
+
+    .nav-cta {
+        margin-left: auto;
+        background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+        color: #fff !important;
+        padding: 10px 20px !important;
+        border-radius: 8px;
+        font-weight: 600 !important;
+        border-bottom: none !important;
+    }
+
+    /* Breadcrumb */
+    .breadcrumb {
+      background: var(--gray-100);
+      padding: 12px 24px;
+      font-size: 0.85rem;
+    }
+    .breadcrumb-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .breadcrumb a {
+      color: var(--gray-500);
+      text-decoration: none;
+    }
+    .breadcrumb a:hover {
+      color: var(--primary);
+    }
+    .breadcrumb span {
+      color: var(--gray-400);
+      margin: 0 8px;
+    }
+    .breadcrumb .current {
+      color: var(--gray-700);
+      font-weight: 500;
+    }
+
+    /* Hub Sub-Navigation */
+    .hub-subnav {
+      background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .hub-subnav-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 48px;
+    }
+    .hub-subnav-title {
+      color: #fff;
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .hub-subnav-tabs {
+      display: flex;
+      gap: 8px;
+    }
+    .hub-tab {
+      padding: 8px 16px;
+      color: rgba(255,255,255,0.8);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+    .hub-tab:hover {
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+    }
+    .hub-tab.active {
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+    }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(135deg, #4f46e5 0%, #6366f1 50%, #818cf8 100%);
+      padding: 3rem 2rem;
+      position: relative;
+    }
+    .hero-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      padding: 6px 16px;
+      border-radius: 100px;
+      font-size: 0.8rem;
+      color: #fff;
+      margin-bottom: 1.5rem;
+    }
+    .hero h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: white;
+      line-height: 1.1;
+      margin-bottom: 1rem;
+    }
+    .hero-sub {
+      font-size: 1.1rem;
+      color: rgba(255,255,255,0.9);
+      max-width: 650px;
+      margin: 0 auto;
+    }
+
+    /* Main Content */
+    .main-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+    }
+
+    /* API Protection Section */
+    .api-section {
+      margin-bottom: 3rem;
+    }
+    .api-section h2 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--dark);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Protection Grid */
+    .protection-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+    }
+    @media (max-width: 768px) { .protection-grid { grid-template-columns: 1fr; } }
+
+    .protection-card {
+      background: white;
+      border: 2px solid var(--gray-200);
+      border-radius: 16px;
+      padding: 2rem;
+    }
+    .protection-card.api-docs { border-color: var(--saas); }
+    .protection-card.credentials { border-color: var(--warning); }
+    .protection-card h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--dark);
+    }
+    .protection-card .subtitle {
+      font-size: 0.9rem;
+      color: var(--gray-500);
+      margin-bottom: 1rem;
+    }
+    .protection-list {
+      list-style: none;
+    }
+    .protection-list li {
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--gray-100);
+      font-size: 0.9rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .protection-list li:last-child { border-bottom: none; }
+    .protection-list li::before {
+      content: "\2713";
+      font-weight: 700;
+      color: var(--saas);
+      flex-shrink: 0;
+    }
+
+    /* Key Provisions */
+    .provisions-section {
+      margin-bottom: 3rem;
+    }
+    .provisions-section h2 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--dark);
+      margin-bottom: 1.5rem;
+    }
+    .provision-card {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .provision-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    .provision-icon {
+      width: 44px;
+      height: 44px;
+      background: var(--saas-light);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+    .provision-title h4 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 0.25rem;
+    }
+    .provision-title .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .tag-required { background: #fef2f2; color: #991b1b; }
+    .tag-recommended { background: #fef3c7; color: #92400e; }
+    .tag-optional { background: #f0fdf4; color: #166534; }
+    .provision-body {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--gray-100);
+    }
+    .provision-body p {
+      font-size: 0.9rem;
+      color: var(--gray-600);
+      margin-bottom: 1rem;
+    }
+    .sample-clause {
+      background: var(--gray-50);
+      border-left: 4px solid var(--saas);
+      padding: 1rem;
+      font-size: 0.85rem;
+      font-style: italic;
+      color: var(--gray-600);
+      border-radius: 0 8px 8px 0;
+    }
+
+    /* Credential Security Section */
+    .security-section {
+      background: #fef3c7;
+      border: 2px solid #f59e0b;
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 3rem;
+    }
+    .security-section h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #92400e;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .security-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 768px) { .security-grid { grid-template-columns: repeat(2, 1fr); } }
+    .security-item {
+      background: white;
+      border-radius: 10px;
+      padding: 1rem;
+      text-align: center;
+    }
+    .security-icon {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .security-item h4 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--dark);
+    }
+
+    /* Termination Flow */
+    .termination-section {
+      background: white;
+      border: 2px solid var(--gray-200);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 3rem;
+    }
+    .termination-section h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--dark);
+      margin-bottom: 1rem;
+    }
+    .termination-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin: 2rem 0;
+    }
+    .termination-step {
+      background: var(--saas-light);
+      border: 2px solid var(--saas);
+      border-radius: 10px;
+      padding: 1rem 1.5rem;
+      text-align: center;
+      min-width: 140px;
+    }
+    .termination-step h4 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--saas-dark);
+    }
+    .termination-step p {
+      font-size: 0.75rem;
+      color: var(--gray-600);
+      margin-top: 0.25rem;
+    }
+    .flow-arrow {
+      font-size: 1.5rem;
+      color: var(--gray-400);
+    }
+
+    /* Generator CTA */
+    .generator-cta {
+      background: linear-gradient(135deg, var(--saas) 0%, var(--saas-dark) 100%);
+      border-radius: 16px;
+      padding: 2.5rem;
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    .generator-cta h2 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: white;
+      margin-bottom: 0.5rem;
+    }
+    .generator-cta p {
+      color: rgba(255,255,255,0.9);
+      margin-bottom: 1.5rem;
+    }
+    .generator-cta .btn {
+      background: white;
+      color: var(--saas-dark);
+      padding: 1rem 2rem;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 1rem;
+      text-decoration: none;
+      display: inline-block;
+      transition: all 0.2s;
+    }
+    .generator-cta .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+
+    /* Related Templates */
+    .related-section {
+      margin-bottom: 3rem;
+    }
+    .related-section h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--dark);
+      margin-bottom: 1.5rem;
+    }
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+    @media (max-width: 768px) { .related-grid { grid-template-columns: 1fr; } }
+    .related-card {
+      background: white;
+      border: 2px solid var(--gray-200);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-decoration: none;
+      transition: all 0.3s;
+    }
+    .related-card:hover {
+      border-color: var(--saas);
+      transform: translateY(-2px);
+    }
+    .related-card h4 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 0.5rem;
+    }
+    .related-card p {
+      font-size: 0.85rem;
+      color: var(--gray-600);
+    }
+
+    /* Attorney Disclaimer */
+    .attorney-disclaimer {
+      background: #f0f9ff;
+      border: 2px solid #0ea5e9;
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    .attorney-disclaimer h4 {
+      color: #0369a1;
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .attorney-disclaimer p {
+      color: #0c4a6e;
+      font-size: 0.9rem;
+    }
+    .attorney-disclaimer a {
+      color: #0369a1;
+      font-weight: 600;
+    }
+
+    /* Footer */
+    .footer {
+      background: var(--dark);
+      padding: 3rem 2rem;
+      color: var(--gray-300);
+    }
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .footer-links { display: flex; gap: 2rem; }
+    .footer-links a {
+      color: var(--gray-300);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .footer-links a:hover { color: white; }
+
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 2rem; }
+      .footer-inner { flex-direction: column; gap: 1rem; text-align: center; }
+      .hub-subnav-tabs { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="site-header">
+    <div class="header-content">
+        <a href="/" class="site-logo">Terms.Law</a>
+        <nav class="site-nav">
+            <div class="nav-item">
+                <a href="/NDA/" class="nav-link">NDA Studio</a>
+            </div>
+            <div class="nav-item">
+                <a href="/NDA/industry-packs/" class="nav-link">Industry Packs</a>
+            </div>
+            <div class="nav-item">
+                <a href="/NDA/clause-library/" class="nav-link">Clause Library</a>
+            </div>
+            <a href="mailto:owner@terms.law" class="nav-link nav-cta">Contact</a>
+        </nav>
+    </div>
+</header>
+
+<!-- Breadcrumb -->
+<nav class="breadcrumb">
+  <div class="breadcrumb-inner">
+    <a href="/">Terms.Law</a>
+    <span>&rsaquo;</span>
+    <a href="/NDA/">NDA Studio</a>
+    <span>&rsaquo;</span>
+    <a href="/NDA/industry-packs/">Industry Packs</a>
+    <span>&rsaquo;</span>
+    <a href="./">SaaS/Cloud</a>
+    <span>&rsaquo;</span>
+    <span class="current">API Integration NDA</span>
+  </div>
+</nav>
+
+<!-- Hub Sub-Navigation -->
+<nav class="hub-subnav">
+  <div class="hub-subnav-content">
+    <a href="./" class="hub-subnav-title">&#9729;&#65039; SaaS/Cloud NDA Pack</a>
+    <div class="hub-subnav-tabs">
+      <a href="./" class="hub-tab">Overview</a>
+      <a href="api-integration-nda.html" class="hub-tab active">API Integration</a>
+      <a href="data-processing-nda.html" class="hub-tab">Data Processing</a>
+      <a href="cloud-vendor-nda.html" class="hub-tab">Cloud Vendor</a>
+      <a href="multi-tenant-nda.html" class="hub-tab">Multi-Tenant</a>
+      <a href="compliance-checklist.html" class="hub-tab">Checklist</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">
+      <span>&#128279;</span> Platform Partnerships
+    </div>
+    <h1>API Integration NDA</h1>
+    <p class="hero-sub">
+      Protect your API documentation, credentials, and integration architecture when partnering with developers, platforms, and technology partners.
+    </p>
+  </div>
+</section>
+
+<!-- Main Content -->
+<div class="main-content">
+
+  <!-- API Protection Categories -->
+  <section class="api-section">
+    <h2>&#128274; What API Integration NDAs Protect</h2>
+    <div class="protection-grid">
+      <div class="protection-card api-docs">
+        <h3>API Documentation & Specifications</h3>
+        <p class="subtitle">Technical information about your API</p>
+        <ul class="protection-list">
+          <li>API endpoint documentation and schemas</li>
+          <li>Authentication and authorization flows</li>
+          <li>Rate limiting policies and thresholds</li>
+          <li>Error codes and response formats</li>
+          <li>Webhook configurations and payloads</li>
+          <li>Beta features and unreleased endpoints</li>
+        </ul>
+      </div>
+      <div class="protection-card credentials">
+        <h3>Credentials & Access Controls</h3>
+        <p class="subtitle">Authentication and security information</p>
+        <ul class="protection-list">
+          <li>API keys and secret tokens</li>
+          <li>OAuth client IDs and secrets</li>
+          <li>JWT signing keys and certificates</li>
+          <li>Sandbox vs. production credentials</li>
+          <li>IP allowlists and access controls</li>
+          <li>Service account configurations</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Key Provisions -->
+  <section class="provisions-section">
+    <h2>Key API NDA Provisions</h2>
+
+    <div class="provision-card">
+      <div class="provision-header">
+        <div class="provision-icon">&#128221;</div>
+        <div class="provision-title">
+          <h4>API Documentation Confidentiality</h4>
+          <span class="tag tag-required">Required</span>
+        </div>
+      </div>
+      <div class="provision-body">
+        <p>Explicitly defines API documentation, specifications, and technical materials as confidential information with specific handling requirements.</p>
+        <div class="sample-clause">
+          "Confidential Information" includes, without limitation: (i) all API documentation, specifications, schemas, and technical materials; (ii) endpoint URLs, parameters, and response formats; (iii) rate limiting policies and usage thresholds; (iv) any features designated as beta, preview, or unreleased; and (v) performance benchmarks and system architecture details.
+        </div>
+      </div>
+    </div>
+
+    <div class="provision-card">
+      <div class="provision-header">
+        <div class="provision-icon">&#128273;</div>
+        <div class="provision-title">
+          <h4>Credential Protection Requirements</h4>
+          <span class="tag tag-required">Required</span>
+        </div>
+      </div>
+      <div class="provision-body">
+        <p>Establishes specific security requirements for API credentials including storage, transmission, and access controls.</p>
+        <div class="sample-clause">
+          Receiving Party shall: (i) store all API credentials using industry-standard encryption; (ii) never commit credentials to source code repositories or include in application logs; (iii) implement credential rotation as specified by Disclosing Party; (iv) immediately notify Disclosing Party of any suspected credential compromise; and (v) limit credential access to personnel with a need-to-know basis.
+        </div>
+      </div>
+    </div>
+
+    <div class="provision-card">
+      <div class="provision-header">
+        <div class="provision-icon">&#128202;</div>
+        <div class="provision-title">
+          <h4>Usage Data and Metrics</h4>
+          <span class="tag tag-recommended">Recommended</span>
+        </div>
+      </div>
+      <div class="provision-body">
+        <p>Protects information about API usage patterns, rate limits, and performance metrics that could reveal competitive information.</p>
+        <div class="sample-clause">
+          Receiving Party agrees that all information regarding API usage patterns, rate limit allocations, performance metrics, and quota adjustments constitutes Confidential Information. Receiving Party shall not disclose such information to third parties or use it to benchmark Disclosing Party's service against competitors.
+        </div>
+      </div>
+    </div>
+
+    <div class="provision-card">
+      <div class="provision-header">
+        <div class="provision-icon">&#127959;&#65039;</div>
+        <div class="provision-title">
+          <h4>Sandbox vs. Production Handling</h4>
+          <span class="tag tag-recommended">Recommended</span>
+        </div>
+      </div>
+      <div class="provision-body">
+        <p>Distinguishes between development/sandbox environments and production systems with appropriate handling requirements for each.</p>
+        <div class="sample-clause">
+          Receiving Party acknowledges that sandbox and production environments have different data sensitivity levels. Production API access shall only be granted after: (i) completion of security review; (ii) execution of this Agreement; and (iii) written approval from Disclosing Party. Sandbox data shall not be used in production, and production data shall not be copied to sandbox environments.
+        </div>
+      </div>
+    </div>
+
+    <div class="provision-card">
+      <div class="provision-header">
+        <div class="provision-icon">&#128679;</div>
+        <div class="provision-title">
+          <h4>Integration Architecture Protection</h4>
+          <span class="tag tag-optional">Optional</span>
+        </div>
+      </div>
+      <div class="provision-body">
+        <p>Protects details about how the API integration is architected, preventing disclosure of system design to competitors.</p>
+        <div class="sample-clause">
+          Receiving Party shall treat all information regarding the architecture, design patterns, and implementation details of the integration as Confidential Information. This includes data flow diagrams, sequence diagrams, and any documentation describing how systems interact through the API.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Credential Security -->
+  <section class="security-section">
+    <h2>&#128272; API Credential Security Requirements</h2>
+    <p style="color: #78350f; margin-bottom: 1.5rem;">API credentials require specific security controls beyond standard confidentiality provisions.</p>
+
+    <div class="security-grid">
+      <div class="security-item">
+        <div class="security-icon">&#128274;</div>
+        <h4>Encrypted Storage</h4>
+      </div>
+      <div class="security-item">
+        <div class="security-icon">&#128260;</div>
+        <h4>Key Rotation</h4>
+      </div>
+      <div class="security-item">
+        <div class="security-icon">&#128683;</div>
+        <h4>No Hardcoding</h4>
+      </div>
+      <div class="security-item">
+        <div class="security-icon">&#128680;</div>
+        <h4>Breach Response</h4>
+      </div>
+    </div>
+
+    <div class="sample-clause" style="background: white; border-left-color: #f59e0b;">
+      Upon any suspected or actual compromise of API credentials, Receiving Party shall: (i) immediately notify Disclosing Party via the designated security contact; (ii) cooperate fully in the investigation; (iii) implement any additional security measures requested by Disclosing Party; and (iv) bear the costs of credential rotation and any remediation activities necessitated by the compromise.
+    </div>
+  </section>
+
+  <!-- Termination Flow -->
+  <section class="termination-section">
+    <h2>Termination and API Access Revocation</h2>
+    <p>Upon termination of the NDA, specific procedures must be followed to ensure secure cessation of API access.</p>
+
+    <div class="termination-flow">
+      <div class="termination-step">
+        <h4>Terminate Access</h4>
+        <p>Revoke all API keys</p>
+      </div>
+      <div class="flow-arrow">&#8594;</div>
+      <div class="termination-step">
+        <h4>Delete Credentials</h4>
+        <p>Securely purge all tokens</p>
+      </div>
+      <div class="flow-arrow">&#8594;</div>
+      <div class="termination-step">
+        <h4>Remove Data</h4>
+        <p>Delete cached responses</p>
+      </div>
+      <div class="flow-arrow">&#8594;</div>
+      <div class="termination-step">
+        <h4>Certify</h4>
+        <p>Written confirmation</p>
+      </div>
+    </div>
+
+    <div class="sample-clause">
+      Upon termination or expiration of this Agreement, Receiving Party shall within five (5) business days: (i) cease all use of the API; (ii) securely delete all API credentials, tokens, and keys; (iii) remove any cached or stored data obtained through the API; (iv) provide written certification of compliance with these requirements; and (v) return or destroy all API documentation and related materials. Ongoing confidentiality obligations shall survive termination.
+    </div>
+  </section>
+
+  <!-- Generator CTA -->
+  <section class="generator-cta">
+    <h2>Generate Your API Integration NDA</h2>
+    <p>Customize provisions based on your API partnership type and security requirements.</p>
+    <a href="/NDA/generator.html?scenario=saas-api" class="btn">Generate API NDA &#8594;</a>
+  </section>
+
+  <!-- Related Templates -->
+  <section class="related-section">
+    <h2>Related SaaS Templates</h2>
+    <div class="related-grid">
+      <a href="data-processing-nda.html" class="related-card">
+        <h4>&#128451; Data Processing NDA</h4>
+        <p>For data processing arrangements with data residency and GDPR provisions.</p>
+      </a>
+      <a href="cloud-vendor-nda.html" class="related-card">
+        <h4>&#9729;&#65039; Cloud Vendor NDA</h4>
+        <p>For cloud service providers with infrastructure and SLA confidentiality.</p>
+      </a>
+      <a href="multi-tenant-nda.html" class="related-card">
+        <h4>&#127970; Multi-Tenant NDA</h4>
+        <p>For multi-tenant platforms with data isolation requirements.</p>
+      </a>
+    </div>
+  </section>
+
+  <!-- Attorney Disclaimer -->
+  <div class="attorney-disclaimer">
+    <h4>&#9878;&#65039; Consult a Technology Attorney</h4>
+    <p>API integration agreements involve complex technical and legal considerations. While our templates provide a strong foundation, we recommend having a technology attorney review agreements for enterprise integrations or sensitive data access. <a href="mailto:owner@terms.law">Request a consultation</a>.</p>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div>&copy; 2025 Terms.Law &mdash; Sergei Tokmakov, Esq. &bull; CA Bar #279869</div>
+    <div class="footer-links">
+      <a href="/NDA/">NDA Studio</a>
+      <a href="./">SaaS Pack</a>
+      <a href="mailto:owner@terms.law">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Chat Widget -->
+<script src="/chat-widget/chat-widget.js"></script>
+
+</body>
+</html>

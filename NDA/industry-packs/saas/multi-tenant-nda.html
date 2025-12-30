@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multi-Tenant NDA Generator | Data Isolation for SaaS | Terms.Law</title>
+  <meta name="description" content="Generate NDAs for multi-tenant SaaS platforms addressing data isolation, shared infrastructure confidentiality, cross-tenant protection, and tenant-specific encryption. Built for SaaS security requirements.">
+  <link rel="canonical" href="https://terms.law/NDA/industry-packs/saas/multi-tenant-nda.html">
+
+  <!-- Breadcrumb Schema -->
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
+    {"@type":"ListItem","position":1,"name":"Terms.Law","item":"https://terms.law/"},
+    {"@type":"ListItem","position":2,"name":"NDA Studio","item":"https://terms.law/NDA/"},
+    {"@type":"ListItem","position":3,"name":"Industry Packs","item":"https://terms.law/NDA/industry-packs/"},
+    {"@type":"ListItem","position":4,"name":"SaaS/Cloud","item":"https://terms.law/NDA/industry-packs/saas/"},
+    {"@type":"ListItem","position":5,"name":"Multi-Tenant NDA","item":"https://terms.law/NDA/industry-packs/saas/multi-tenant-nda.html"}
+  ]}
+  </script>
+
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+  {"@type":"Question","name":"What is multi-tenant data isolation?","acceptedAnswer":{"@type":"Answer","text":"Multi-tenant data isolation refers to the security measures that prevent one tenant's data from being accessed by or exposed to other tenants sharing the same SaaS platform. This can be achieved through logical isolation (database-level), encryption isolation (tenant-specific keys), or physical isolation (dedicated infrastructure)."}},
+  {"@type":"Question","name":"Why do multi-tenant platforms need special NDA provisions?","acceptedAnswer":{"@type":"Answer","text":"Multi-tenant architectures create unique confidentiality concerns: shared infrastructure means tenant data coexists, creating risks of cross-tenant data leakage; shared resources require careful capacity planning disclosure; and customers need assurance that their data remains isolated from other tenants."}},
+  {"@type":"Question","name":"What is tenant-specific encryption?","acceptedAnswer":{"@type":"Answer","text":"Tenant-specific encryption means each tenant's data is encrypted with unique encryption keys. Even if data isolation fails at other layers, the data remains unreadable without the tenant's specific key. This provides defense-in-depth and is often required for enterprise and regulated customers."}},
+  {"@type":"Question","name":"How should noisy neighbor issues be addressed in NDAs?","acceptedAnswer":{"@type":"Answer","text":"NDAs should protect information about noisy neighbor incidents (when one tenant's activity affects others' performance), resource allocation algorithms, and capacity planning. This prevents competitive intelligence gathering and protects the platform's reputation while ensuring transparency with affected tenants."}}
+  ]}
+  </script>
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-901N2Y3CDZ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-901N2Y3CDZ');
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --accent: #8b5cf6;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --saas: #6366f1;
+      --saas-dark: #4f46e5;
+      --saas-light: #eef2ff;
+      --dark: #0f172a;
+      --dark-lighter: #1e293b;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
+      --gray-400: #94a3b8;
+      --gray-500: #64748b;
+      --gray-600: #475569;
+      --gray-700: #334155;
+      --gray-800: #1e293b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-700);
+      line-height: 1.6;
+    }
+
+    /* Header */
+    .site-header {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    .header-content {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        padding: 0 24px;
+        height: 60px;
+    }
+    .site-logo {
+        font-size: 1.15rem;
+        font-weight: 800;
+        text-decoration: none;
+        background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-right: 32px;
+    }
+    .site-nav { display: flex; align-items: center; gap: 0; flex: 1; }
+    .nav-link {
+        padding: 18px 16px;
+        color: #94a3b8;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+    .nav-link:hover { color: #fff; }
+    .nav-cta {
+        margin-left: auto;
+        background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+        color: #fff !important;
+        padding: 10px 20px !important;
+        border-radius: 8px;
+        font-weight: 600 !important;
+    }
+
+    /* Breadcrumb */
+    .breadcrumb {
+      background: var(--gray-100);
+      padding: 12px 24px;
+      font-size: 0.85rem;
+    }
+    .breadcrumb-inner { max-width: 1400px; margin: 0 auto; }
+    .breadcrumb a { color: var(--gray-500); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--primary); }
+    .breadcrumb span { color: var(--gray-400); margin: 0 8px; }
+    .breadcrumb .current { color: var(--gray-700); font-weight: 500; }
+
+    /* Hub Sub-Navigation */
+    .hub-subnav {
+      background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+    }
+    .hub-subnav-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 48px;
+    }
+    .hub-subnav-title { color: #fff; font-size: 0.9rem; font-weight: 700; text-decoration: none; }
+    .hub-subnav-tabs { display: flex; gap: 8px; }
+    .hub-tab {
+      padding: 8px 16px;
+      color: rgba(255,255,255,0.8);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+    .hub-tab:hover { background: rgba(255,255,255,0.15); color: #fff; }
+    .hub-tab.active { background: rgba(255,255,255,0.2); color: #fff; }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(135deg, #4f46e5 0%, #6366f1 50%, #818cf8 100%);
+      padding: 3rem 2rem;
+    }
+    .hero-inner { max-width: 900px; margin: 0 auto; text-align: center; }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      padding: 6px 16px;
+      border-radius: 100px;
+      font-size: 0.8rem;
+      color: #fff;
+      margin-bottom: 1.5rem;
+    }
+    .hero h1 { font-size: 2.5rem; font-weight: 800; color: white; margin-bottom: 1rem; }
+    .hero-sub { font-size: 1.1rem; color: rgba(255,255,255,0.9); max-width: 650px; margin: 0 auto; }
+
+    /* Main Content */
+    .main-content { max-width: 1200px; margin: 0 auto; padding: 3rem 2rem; }
+    .section { margin-bottom: 3rem; }
+    .section h2 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--dark);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Isolation Types */
+    .isolation-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+    @media (max-width: 900px) { .isolation-grid { grid-template-columns: 1fr; } }
+    .isolation-card {
+      background: white;
+      border: 2px solid var(--gray-200);
+      border-radius: 16px;
+      padding: 2rem;
+      text-align: center;
+      transition: all 0.3s;
+    }
+    .isolation-card:hover { border-color: var(--saas); transform: translateY(-4px); }
+    .isolation-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+    .isolation-card h3 { font-size: 1.25rem; font-weight: 700; color: var(--dark); margin-bottom: 0.5rem; }
+    .isolation-card .level {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    .level-logical { background: #dbeafe; color: #1e40af; }
+    .level-encryption { background: #fef3c7; color: #92400e; }
+    .level-physical { background: #dcfce7; color: #166534; }
+    .isolation-card p { font-size: 0.9rem; color: var(--gray-600); margin-bottom: 1rem; }
+    .isolation-features { list-style: none; text-align: left; }
+    .isolation-features li {
+      font-size: 0.85rem;
+      color: var(--gray-500);
+      padding: 0.25rem 0;
+      padding-left: 1.25rem;
+      position: relative;
+    }
+    .isolation-features li::before {
+      content: "\2713";
+      color: var(--saas);
+      position: absolute;
+      left: 0;
+      font-weight: 700;
+    }
+
+    /* Data Flow Diagram */
+    .dataflow-section {
+      background: #dbeafe;
+      border: 2px solid #3b82f6;
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 3rem;
+    }
+    .dataflow-section h2 { color: #1e40af; }
+    .dataflow-diagram {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      margin-top: 1.5rem;
+    }
+    .tenant-row {
+      display: grid;
+      grid-template-columns: 120px 1fr 120px;
+      gap: 1rem;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .tenant-label {
+      background: var(--saas-light);
+      border: 2px solid var(--saas);
+      border-radius: 8px;
+      padding: 0.75rem;
+      text-align: center;
+      font-weight: 600;
+      color: var(--saas-dark);
+      font-size: 0.85rem;
+    }
+    .isolation-barrier {
+      height: 4px;
+      background: repeating-linear-gradient(90deg, var(--saas), var(--saas) 10px, transparent 10px, transparent 20px);
+      position: relative;
+    }
+    .isolation-barrier::before {
+      content: "ISOLATION BOUNDARY";
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      padding: 0 10px;
+      font-size: 0.7rem;
+      color: var(--saas);
+      font-weight: 700;
+    }
+    .shared-layer {
+      background: var(--gray-100);
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+      margin-top: 1.5rem;
+    }
+    .shared-layer h4 { font-size: 0.9rem; color: var(--gray-600); margin-bottom: 0.5rem; }
+    .shared-icons { display: flex; justify-content: center; gap: 2rem; }
+    .shared-icon { font-size: 1.5rem; }
+
+    /* Key Provisions */
+    .provision-card {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .provision-header { display: flex; align-items: flex-start; gap: 1rem; }
+    .provision-icon {
+      width: 44px;
+      height: 44px;
+      background: var(--saas-light);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+    .provision-title h4 { font-size: 1rem; font-weight: 700; color: var(--dark); margin-bottom: 0.25rem; }
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .tag-required { background: #fef2f2; color: #991b1b; }
+    .tag-enterprise { background: var(--saas-light); color: var(--saas-dark); }
+    .tag-recommended { background: #fef3c7; color: #92400e; }
+    .provision-body {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--gray-100);
+    }
+    .provision-body p { font-size: 0.9rem; color: var(--gray-600); margin-bottom: 1rem; }
+    .sample-clause {
+      background: var(--gray-50);
+      border-left: 4px solid var(--saas);
+      padding: 1rem;
+      font-size: 0.85rem;
+      font-style: italic;
+      color: var(--gray-600);
+      border-radius: 0 8px 8px 0;
+    }
+
+    /* Encryption Section */
+    .encryption-section {
+      background: #fef3c7;
+      border: 2px solid #f59e0b;
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 3rem;
+    }
+    .encryption-section h2 { color: #92400e; }
+    .encryption-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin: 1.5rem 0;
+    }
+    .encryption-box {
+      background: white;
+      border: 2px solid #f59e0b;
+      border-radius: 10px;
+      padding: 1rem 1.5rem;
+      text-align: center;
+    }
+    .encryption-box h4 { font-size: 0.9rem; font-weight: 600; color: #92400e; }
+    .encryption-box p { font-size: 0.75rem; color: var(--gray-600); }
+    .flow-arrow { font-size: 1.5rem; color: var(--gray-400); }
+
+    /* Noisy Neighbor */
+    .noisy-section {
+      background: #fef2f2;
+      border: 2px solid #fecaca;
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 3rem;
+    }
+    .noisy-section h2 { color: #991b1b; }
+    .noisy-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    @media (max-width: 600px) { .noisy-grid { grid-template-columns: 1fr; } }
+    .noisy-item {
+      background: white;
+      border-radius: 10px;
+      padding: 1.25rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    .noisy-icon { font-size: 1.5rem; flex-shrink: 0; }
+    .noisy-item h4 { font-size: 0.95rem; font-weight: 700; color: var(--dark); margin-bottom: 0.25rem; }
+    .noisy-item p { font-size: 0.85rem; color: var(--gray-600); }
+
+    /* Generator CTA */
+    .generator-cta {
+      background: linear-gradient(135deg, var(--saas) 0%, var(--saas-dark) 100%);
+      border-radius: 16px;
+      padding: 2.5rem;
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    .generator-cta h2 { font-size: 1.75rem; font-weight: 800; color: white; margin-bottom: 0.5rem; }
+    .generator-cta p { color: rgba(255,255,255,0.9); margin-bottom: 1.5rem; }
+    .generator-cta .btn {
+      background: white;
+      color: var(--saas-dark);
+      padding: 1rem 2rem;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 1rem;
+      text-decoration: none;
+      display: inline-block;
+      transition: all 0.2s;
+    }
+    .generator-cta .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+
+    /* Related */
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+    @media (max-width: 768px) { .related-grid { grid-template-columns: 1fr; } }
+    .related-card {
+      background: white;
+      border: 2px solid var(--gray-200);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-decoration: none;
+      transition: all 0.3s;
+    }
+    .related-card:hover { border-color: var(--saas); transform: translateY(-2px); }
+    .related-card h4 { font-size: 1rem; font-weight: 700; color: var(--dark); margin-bottom: 0.5rem; }
+    .related-card p { font-size: 0.85rem; color: var(--gray-600); }
+
+    /* Attorney Disclaimer */
+    .attorney-disclaimer {
+      background: #f0f9ff;
+      border: 2px solid #0ea5e9;
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    .attorney-disclaimer h4 { color: #0369a1; font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .attorney-disclaimer p { color: #0c4a6e; font-size: 0.9rem; }
+    .attorney-disclaimer a { color: #0369a1; font-weight: 600; }
+
+    /* Footer */
+    .footer {
+      background: var(--dark);
+      padding: 3rem 2rem;
+      color: var(--gray-300);
+    }
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .footer-links { display: flex; gap: 2rem; }
+    .footer-links a { color: var(--gray-300); text-decoration: none; font-size: 0.9rem; }
+    .footer-links a:hover { color: white; }
+
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 2rem; }
+      .footer-inner { flex-direction: column; gap: 1rem; text-align: center; }
+      .hub-subnav-tabs { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="site-header">
+    <div class="header-content">
+        <a href="/" class="site-logo">Terms.Law</a>
+        <nav class="site-nav">
+            <a href="/NDA/" class="nav-link">NDA Studio</a>
+            <a href="/NDA/industry-packs/" class="nav-link">Industry Packs</a>
+            <a href="/NDA/clause-library/" class="nav-link">Clause Library</a>
+            <a href="mailto:owner@terms.law" class="nav-link nav-cta">Contact</a>
+        </nav>
+    </div>
+</header>
+
+<!-- Breadcrumb -->
+<nav class="breadcrumb">
+  <div class="breadcrumb-inner">
+    <a href="/">Terms.Law</a>
+    <span>&rsaquo;</span>
+    <a href="/NDA/">NDA Studio</a>
+    <span>&rsaquo;</span>
+    <a href="/NDA/industry-packs/">Industry Packs</a>
+    <span>&rsaquo;</span>
+    <a href="./">SaaS/Cloud</a>
+    <span>&rsaquo;</span>
+    <span class="current">Multi-Tenant NDA</span>
+  </div>
+</nav>
+
+<!-- Hub Sub-Navigation -->
+<nav class="hub-subnav">
+  <div class="hub-subnav-content">
+    <a href="./" class="hub-subnav-title">&#9729;&#65039; SaaS/Cloud NDA Pack</a>
+    <div class="hub-subnav-tabs">
+      <a href="./" class="hub-tab">Overview</a>
+      <a href="api-integration-nda.html" class="hub-tab">API Integration</a>
+      <a href="data-processing-nda.html" class="hub-tab">Data Processing</a>
+      <a href="cloud-vendor-nda.html" class="hub-tab">Cloud Vendor</a>
+      <a href="multi-tenant-nda.html" class="hub-tab active">Multi-Tenant</a>
+      <a href="compliance-checklist.html" class="hub-tab">Checklist</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">
+      <span>&#127970;</span> Data Isolation
+    </div>
+    <h1>Multi-Tenant NDA</h1>
+    <p class="hero-sub">
+      Address data isolation concerns, shared infrastructure confidentiality, and tenant-specific protection requirements for multi-tenant SaaS platforms.
+    </p>
+  </div>
+</section>
+
+<!-- Main Content -->
+<div class="main-content">
+
+  <!-- Isolation Types -->
+  <section class="section">
+    <h2>&#128274; Data Isolation Models</h2>
+    <div class="isolation-grid">
+      <div class="isolation-card">
+        <div class="isolation-icon">&#128451;</div>
+        <h3>Logical Isolation</h3>
+        <span class="level level-logical">Standard</span>
+        <p>Database-level separation using tenant IDs and row-level security</p>
+        <ul class="isolation-features">
+          <li>Shared database, separate schemas</li>
+          <li>Row-level security policies</li>
+          <li>Tenant ID filtering</li>
+          <li>Cost-effective scaling</li>
+        </ul>
+      </div>
+      <div class="isolation-card">
+        <div class="isolation-icon">&#128272;</div>
+        <h3>Encryption Isolation</h3>
+        <span class="level level-encryption">Enhanced</span>
+        <p>Tenant-specific encryption keys for defense-in-depth</p>
+        <ul class="isolation-features">
+          <li>Per-tenant encryption keys</li>
+          <li>Customer-managed keys (BYOK)</li>
+          <li>Key rotation per tenant</li>
+          <li>Cryptographic separation</li>
+        </ul>
+      </div>
+      <div class="isolation-card">
+        <div class="isolation-icon">&#128421;</div>
+        <h3>Physical Isolation</h3>
+        <span class="level level-physical">Enterprise</span>
+        <p>Dedicated infrastructure for maximum isolation</p>
+        <ul class="isolation-features">
+          <li>Dedicated database instances</li>
+          <li>Isolated compute resources</li>
+          <li>Separate network segments</li>
+          <li>Compliance requirements</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Data Flow Diagram -->
+  <section class="dataflow-section">
+    <h2>&#128202; Multi-Tenant Architecture</h2>
+    <p style="color: #1e3a8a;">Understanding how tenant data is isolated in shared infrastructure.</p>
+
+    <div class="dataflow-diagram">
+      <div class="tenant-row">
+        <div class="tenant-label">Tenant A</div>
+        <div style="background: #dbeafe; height: 40px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; color: #1e40af;">Tenant A Data (Encrypted with Key A)</div>
+        <div class="tenant-label">Key A</div>
+      </div>
+      <div class="isolation-barrier"></div>
+      <div class="tenant-row">
+        <div class="tenant-label">Tenant B</div>
+        <div style="background: #dcfce7; height: 40px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; color: #166534;">Tenant B Data (Encrypted with Key B)</div>
+        <div class="tenant-label">Key B</div>
+      </div>
+      <div class="isolation-barrier"></div>
+      <div class="tenant-row">
+        <div class="tenant-label">Tenant C</div>
+        <div style="background: #fef3c7; height: 40px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; color: #92400e;">Tenant C Data (Encrypted with Key C)</div>
+        <div class="tenant-label">Key C</div>
+      </div>
+
+      <div class="shared-layer">
+        <h4>Shared Infrastructure (Confidential)</h4>
+        <div class="shared-icons">
+          <span class="shared-icon">&#128421;</span>
+          <span class="shared-icon">&#128268;</span>
+          <span class="shared-icon">&#127760;</span>
+          <span class="shared-icon">&#128274;</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Key Provisions -->
+  <section class="section">
+    <h2>Key Multi-Tenant NDA Provisions</h2>
+
+    <div class="provision-card">
+      <div class="provision-header">
+        <div class="provision-icon">&#128274;</div>
+        <div class="provision-title">
+          <h4>Data Isolation Guarantees</h4>
+          <span class="tag tag-required">Required</span>
+        </div>
+      </div>
+      <div class="provision-body">
+        <p>Explicit commitments to prevent cross-tenant data access through logical, encryption, or physical isolation mechanisms.</p>
+        <div class="sample-clause">
+          Provider guarantees that Tenant Data shall be logically and cryptographically isolated from other tenants. Provider shall implement: (i) row-level security policies preventing cross-tenant queries; (ii) tenant-specific encryption keys for data at rest; (iii) network segmentation preventing cross-tenant traffic; and (iv) access controls ensuring personnel cannot access other tenant data without authorization.
+        </div>
+      </div>
+    </div>
+
+    <div class="provision-card">
+      <div class="provision-header">
+        <div class="provision-icon">&#128273;</div>
+        <div class="provision-title">
+          <h4>Tenant-Specific Encryption</h4>
+          <span class="tag tag-enterprise">Enterprise</span>
+        </div>
+      </div>
+      <div class="provision-body">
+        <p>Requirements for per-tenant encryption keys, key management, and optional customer-managed key (BYOK) support.</p>
+        <div class="sample-clause">
+          Provider shall encrypt Tenant Data using AES-256 encryption with tenant-specific keys. Upon request, Provider shall support Customer-Managed Keys (BYOK) allowing Tenant to control encryption key lifecycle. Tenant-specific keys shall be: (i) stored separately from encrypted data; (ii) rotated according to Tenant's requirements; and (iii) destroyed upon contract termination.
+        </div>
+      </div>
+    </div>
+
+    <div class="provision-card">
+      <div class="provision-header">
+        <div class="provision-icon">&#127959;&#65039;</div>
+        <div class="provision-title">
+          <h4>Shared Infrastructure Confidentiality</h4>
+          <span class="tag tag-required">Required</span>
+        </div>
+      </div>
+      <div class="provision-body">
+        <p>Protection for information about the shared platform architecture, capacity, and resource allocation.</p>
+        <div class="sample-clause">
+          Both parties agree that information about the shared platform architecture, including compute capacity, storage systems, network topology, and resource allocation algorithms, constitutes Confidential Information. Neither party shall disclose such information to third parties or use it to gain competitive advantage.
+        </div>
+      </div>
+    </div>
+
+    <div class="provision-card">
+      <div class="provision-header">
+        <div class="provision-icon">&#128680;</div>
+        <div class="provision-title">
+          <h4>Cross-Tenant Incident Response</h4>
+          <span class="tag tag-recommended">Recommended</span>
+        </div>
+      </div>
+      <div class="provision-body">
+        <p>Procedures for handling security incidents that may affect multiple tenants while maintaining isolation.</p>
+        <div class="sample-clause">
+          In the event of a security incident potentially affecting multiple tenants, Provider shall: (i) immediately isolate affected systems; (ii) notify each affected tenant individually without disclosing other tenants' identities or data; (iii) conduct investigation without exposing any tenant's data to another; and (iv) provide tenant-specific incident reports preserving confidentiality of other tenants.
+        </div>
+      </div>
+    </div>
+
+    <div class="provision-card">
+      <div class="provision-header">
+        <div class="provision-icon">&#128101;</div>
+        <div class="provision-title">
+          <h4>Tenant List Confidentiality</h4>
+          <span class="tag tag-recommended">Recommended</span>
+        </div>
+      </div>
+      <div class="provision-body">
+        <p>Protection for the identity of other tenants on the shared platform.</p>
+        <div class="sample-clause">
+          The identity of other tenants using the Platform shall be treated as Confidential Information. Provider shall not disclose tenant lists, customer logos, or case studies involving other tenants without their explicit consent. Tenant agrees not to attempt to identify other tenants through system probing or other means.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Encryption Flow -->
+  <section class="encryption-section">
+    <h2>&#128273; Tenant-Specific Encryption Architecture</h2>
+    <p style="color: #78350f;">Per-tenant encryption provides cryptographic isolation even if other isolation layers are compromised.</p>
+
+    <div class="encryption-flow">
+      <div class="encryption-box">
+        <h4>Master Key</h4>
+        <p>HSM-protected</p>
+      </div>
+      <div class="flow-arrow">&#8594;</div>
+      <div class="encryption-box">
+        <h4>Tenant Key</h4>
+        <p>Derived per tenant</p>
+      </div>
+      <div class="flow-arrow">&#8594;</div>
+      <div class="encryption-box">
+        <h4>Data Key</h4>
+        <p>Rotated regularly</p>
+      </div>
+      <div class="flow-arrow">&#8594;</div>
+      <div class="encryption-box">
+        <h4>Encrypted Data</h4>
+        <p>AES-256-GCM</p>
+      </div>
+    </div>
+
+    <div class="sample-clause" style="background: white; border-left-color: #f59e0b;">
+      Provider shall implement a hierarchical key management system where: (i) master keys are stored in FIPS 140-2 Level 3 certified HSMs; (ii) tenant-specific keys are derived and cannot be used to access other tenants' data; (iii) data encryption keys are rotated at least annually or upon tenant request; and (iv) all key operations are logged and auditable.
+    </div>
+  </section>
+
+  <!-- Noisy Neighbor -->
+  <section class="noisy-section">
+    <h2>&#128680; Noisy Neighbor Considerations</h2>
+    <p style="color: #7f1d1d;">Multi-tenant platforms must address resource contention and performance isolation concerns.</p>
+
+    <div class="noisy-grid">
+      <div class="noisy-item">
+        <div class="noisy-icon">&#128202;</div>
+        <div>
+          <h4>Resource Allocation Data</h4>
+          <p>Information about CPU, memory, and I/O allocation between tenants is confidential</p>
+        </div>
+      </div>
+      <div class="noisy-item">
+        <div class="noisy-icon">&#128200;</div>
+        <div>
+          <h4>Performance Metrics</h4>
+          <p>Tenant-specific performance data should not reveal other tenants' usage patterns</p>
+        </div>
+      </div>
+      <div class="noisy-item">
+        <div class="noisy-icon">&#128679;</div>
+        <div>
+          <h4>Capacity Planning</h4>
+          <p>Platform capacity and scaling decisions should not expose tenant growth data</p>
+        </div>
+      </div>
+      <div class="noisy-item">
+        <div class="noisy-icon">&#9888;&#65039;</div>
+        <div>
+          <h4>Incident Attribution</h4>
+          <p>If one tenant causes issues, their identity should not be disclosed to affected tenants</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="sample-clause" style="background: white; border-left-color: #dc2626; margin-top: 1.5rem;">
+      In the event of resource contention or performance degradation affecting Tenant, Provider shall: (i) notify Tenant of the issue without identifying other tenants; (ii) implement resource isolation measures; (iii) provide Tenant-specific remediation without exposing platform-wide capacity constraints; and (iv) treat all capacity planning and resource allocation information as Confidential.
+    </div>
+  </section>
+
+  <!-- Generator CTA -->
+  <section class="generator-cta">
+    <h2>Generate Your Multi-Tenant NDA</h2>
+    <p>Customize provisions based on your isolation requirements and enterprise security needs.</p>
+    <a href="/NDA/generator.html?scenario=saas-multi-tenant" class="btn">Generate Multi-Tenant NDA &#8594;</a>
+  </section>
+
+  <!-- Related -->
+  <section class="section">
+    <h2>Related SaaS Templates</h2>
+    <div class="related-grid">
+      <a href="api-integration-nda.html" class="related-card">
+        <h4>&#128279; API Integration NDA</h4>
+        <p>For API partnerships with credential protection.</p>
+      </a>
+      <a href="data-processing-nda.html" class="related-card">
+        <h4>&#128451; Data Processing NDA</h4>
+        <p>For data processing with GDPR provisions.</p>
+      </a>
+      <a href="cloud-vendor-nda.html" class="related-card">
+        <h4>&#9729;&#65039; Cloud Vendor NDA</h4>
+        <p>For cloud providers with infrastructure protection.</p>
+      </a>
+    </div>
+  </section>
+
+  <!-- Attorney Disclaimer -->
+  <div class="attorney-disclaimer">
+    <h4>&#9878;&#65039; Consult a Technology Attorney</h4>
+    <p>Multi-tenant architecture involves complex security and liability considerations. We recommend legal review for enterprise deployments or platforms handling sensitive data. <a href="mailto:owner@terms.law">Request a consultation</a>.</p>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div>&copy; 2025 Terms.Law &mdash; Sergei Tokmakov, Esq. &bull; CA Bar #279869</div>
+    <div class="footer-links">
+      <a href="/NDA/">NDA Studio</a>
+      <a href="./">SaaS Pack</a>
+      <a href="mailto:owner@terms.law">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Chat Widget -->
+<script src="/chat-widget/chat-widget.js"></script>
+
+</body>
+</html>

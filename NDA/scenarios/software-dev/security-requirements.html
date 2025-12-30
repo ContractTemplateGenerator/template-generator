@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-901N2Y3CDZ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-901N2Y3CDZ');
+  </script>
+
+  <title>Security Requirements in Software NDAs | Compliance Standards | Terms.Law</title>
+  <meta name="description" content="Learn how to incorporate SOC 2, ISO 27001, GDPR, HIPAA, and PCI-DSS requirements into software development NDAs. Complete security standards guide.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --accent: #8b5cf6;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --dark: #0f172a;
+      --dark-lighter: #1e293b;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
+      --gray-400: #94a3b8;
+      --gray-500: #64748b;
+      --gray-600: #475569;
+      --gray-700: #334155;
+      --gray-800: #1e293b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-700);
+      line-height: 1.6;
+    }
+
+    /* Header Styles */
+    .site-header {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .header-content {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        padding: 0 24px;
+        height: 60px;
+    }
+
+    .site-logo {
+        font-size: 1.15rem;
+        font-weight: 800;
+        text-decoration: none;
+        background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-right: 32px;
+    }
+
+    .site-nav {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        flex: 1;
+    }
+
+    .nav-item { position: relative; }
+
+    .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 18px 16px;
+        color: #94a3b8;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s;
+        border-bottom: 2px solid transparent;
+    }
+
+    .nav-link:hover { color: #fff; background: rgba(255,255,255,0.05); }
+    .nav-link:hover, .nav-link.active { border-bottom-color: var(--primary); }
+
+    .nav-cta {
+        margin-left: auto;
+        background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+        color: #fff !important;
+        padding: 10px 20px !important;
+        border-radius: 8px;
+        font-weight: 600 !important;
+        border-bottom: none !important;
+    }
+
+    .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4); }
+
+    /* Hub Sub-Navigation */
+    .hub-subnav {
+      background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .hub-subnav-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 48px;
+    }
+    .hub-subnav-title { color: #f59e0b; font-size: 0.9rem; font-weight: 700; text-decoration: none; }
+    .hub-subnav-title:hover { color: #fbbf24; }
+    .hub-subnav-tabs { display: flex; gap: 8px; }
+    .hub-tab { padding: 8px 16px; color: #94a3b8; text-decoration: none; font-size: 0.85rem; font-weight: 500; border-radius: 6px; transition: all 0.2s; }
+    .hub-tab:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    .hub-tab.active { background: rgba(37, 99, 235, 0.3); color: #60a5fa; }
+
+    /* Breadcrumbs */
+    .breadcrumbs { max-width: 1200px; margin: 0 auto; padding: 1rem 24px; font-size: 0.85rem; }
+    .breadcrumbs a { color: var(--gray-500); text-decoration: none; }
+    .breadcrumbs a:hover { color: var(--primary); }
+    .breadcrumbs span { color: var(--gray-400); margin: 0 8px; }
+    .breadcrumbs .current { color: var(--gray-700); font-weight: 600; }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+      color: white;
+      padding: 3rem 24px;
+    }
+    .hero-inner { max-width: 1200px; margin: 0 auto; }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #f87171;
+      margin-bottom: 1rem;
+    }
+    .hero h1 { font-size: 2.25rem; font-weight: 800; margin-bottom: 0.75rem; }
+    .hero h1 .grad { background: linear-gradient(135deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero-sub { font-size: 1.1rem; color: #94a3b8; margin-bottom: 0; max-width: 700px; }
+
+    /* Main Content */
+    .main { max-width: 1200px; margin: 0 auto; padding: 2rem 24px; }
+
+    /* Section Headers */
+    .sec-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+    .sec-head h2 { font-size: 1.25rem; font-weight: 700; display: flex; align-items: center; gap: 10px; color: var(--dark); }
+    .sec-head h2 i { color: var(--primary); }
+
+    /* Highlight Section */
+    .highlight-section {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      transition: all 0.3s ease;
+    }
+    .highlight-section:hover { border-color: var(--primary); box-shadow: 0 0 20px rgba(37, 99, 235, 0.15); }
+
+    /* Standards Grid */
+    .standards-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+    }
+    .standard-card {
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.2s;
+    }
+    .standard-card:hover {
+      border-color: var(--primary);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    .standard-header {
+      padding: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .standard-header.soc2 { background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%); }
+    .standard-header.iso { background: linear-gradient(135deg, #dcfce7 0%, #d1fae5 100%); }
+    .standard-header.gdpr { background: linear-gradient(135deg, #e0e7ff 0%, #ede9fe 100%); }
+    .standard-header.hipaa { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); }
+    .standard-header.pci { background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); }
+    .standard-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+    }
+    .standard-icon.soc2 { background: #2563eb; color: white; }
+    .standard-icon.iso { background: #10b981; color: white; }
+    .standard-icon.gdpr { background: #8b5cf6; color: white; }
+    .standard-icon.hipaa { background: #f59e0b; color: white; }
+    .standard-icon.pci { background: #ef4444; color: white; }
+    .standard-info h3 { font-size: 1rem; font-weight: 700; color: var(--dark); margin-bottom: 2px; }
+    .standard-info p { font-size: 0.75rem; color: var(--gray-600); }
+    .standard-body { padding: 1.25rem; }
+    .standard-body h4 {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 0.75rem;
+    }
+    .standard-body ul {
+      list-style: none;
+      margin-bottom: 1rem;
+    }
+    .standard-body li {
+      font-size: 0.8rem;
+      color: var(--gray-600);
+      padding: 6px 0;
+      padding-left: 20px;
+      position: relative;
+    }
+    .standard-body li::before {
+      content: '\f00c';
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      position: absolute;
+      left: 0;
+      color: var(--success);
+      font-size: 0.7rem;
+    }
+    .sample-clause {
+      background: var(--gray-50);
+      border-left: 3px solid var(--primary);
+      padding: 0.75rem;
+      font-size: 0.8rem;
+      color: var(--gray-700);
+      font-style: italic;
+      border-radius: 0 6px 6px 0;
+    }
+
+    /* Comparison Table */
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    .comparison-table th, .comparison-table td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--gray-200);
+      font-size: 0.85rem;
+    }
+    .comparison-table th {
+      background: var(--gray-50);
+      font-weight: 700;
+      color: var(--dark);
+    }
+    .comparison-table td {
+      color: var(--gray-600);
+    }
+    .comparison-table tr:hover {
+      background: var(--gray-50);
+    }
+    .table-check { color: var(--success); }
+    .table-x { color: var(--danger); }
+    .table-partial { color: var(--warning); }
+
+    /* Decision Tree */
+    .decision-tree {
+      background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+      border: 1px solid var(--gray-200);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .decision-tree h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .decision-tree h3 i { color: var(--accent); }
+    .decision-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px;
+      background: white;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      border: 1px solid var(--gray-100);
+    }
+    .decision-item i {
+      font-size: 1.25rem;
+      margin-top: 2px;
+    }
+    .decision-item i.fa-building-columns { color: #3b82f6; }
+    .decision-item i.fa-hospital { color: #10b981; }
+    .decision-item i.fa-credit-card { color: #ef4444; }
+    .decision-item i.fa-globe-europe { color: #8b5cf6; }
+    .decision-item i.fa-cloud { color: #f59e0b; }
+    .decision-content h4 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 4px;
+    }
+    .decision-content p {
+      font-size: 0.8rem;
+      color: var(--gray-600);
+    }
+    .decision-content .standards {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+    .decision-content .standard-tag {
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .standard-tag.soc2 { background: #dbeafe; color: #1e40af; }
+    .standard-tag.iso { background: #dcfce7; color: #166534; }
+    .standard-tag.gdpr { background: #e0e7ff; color: #5b21b6; }
+    .standard-tag.hipaa { background: #fef3c7; color: #92400e; }
+    .standard-tag.pci { background: #fee2e2; color: #dc2626; }
+
+    /* Related Links */
+    .related-links {
+      background: var(--dark);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .related-links h3 {
+      color: white;
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+    .related-links a {
+      display: block;
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 0.85rem;
+      margin-bottom: 8px;
+      transition: all 0.2s;
+    }
+    .related-links a:hover {
+      background: rgba(255,255,255,0.1);
+      color: white;
+    }
+    .related-links a i {
+      margin-right: 8px;
+      color: var(--danger);
+    }
+
+    /* CTA Section */
+    .cta-section {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      border-radius: 16px;
+      padding: 2rem;
+      text-align: center;
+      color: white;
+      margin: 2rem 0;
+    }
+    .cta-section h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 0.75rem; }
+    .cta-section p { font-size: 1rem; opacity: 0.9; margin-bottom: 1.5rem; }
+    .cta-btn {
+      display: inline-block;
+      background: white;
+      color: #dc2626;
+      padding: 12px 28px;
+      border-radius: 8px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+
+    /* Footer */
+    .footer { background: #0f172a; color: white; padding: 2rem 24px; margin-top: 2rem; }
+    .footer-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; }
+    .footer h5 { font-size: 0.7rem; text-transform: uppercase; color: #64748b; margin-bottom: 10px; letter-spacing: 0.5px; }
+    .footer a { display: block; font-size: 0.8rem; color: #94a3b8; text-decoration: none; padding: 3px 0; }
+    .footer a:hover { color: white; }
+    .footer-bottom { text-align: center; font-size: 0.75rem; color: #475569; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #1e293b; }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .standards-grid { grid-template-columns: 1fr; }
+      .footer-inner { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 1.75rem; }
+      .footer-inner { grid-template-columns: 1fr; }
+      .site-nav { display: none; }
+      .comparison-table { font-size: 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="site-header">
+    <div class="header-content">
+        <a href="/" class="site-logo">Terms.Law</a>
+        <nav class="site-nav">
+            <div class="nav-item">
+                <a href="/Demand-Letters/" class="nav-link">Demands</a>
+            </div>
+            <div class="nav-item">
+                <a href="/Templates/" class="nav-link">Contracts</a>
+            </div>
+            <div class="nav-item">
+                <a href="/INC/" class="nav-link">Formation</a>
+            </div>
+            <div class="nav-item">
+                <a href="/Blog/" class="nav-link">Read</a>
+            </div>
+            <a href="mailto:owner@terms.law" class="nav-link nav-cta">Contact</a>
+        </nav>
+    </div>
+</header>
+
+<!-- NDA Studio Hub Sub-Navigation -->
+<nav class="hub-subnav">
+  <div class="hub-subnav-content">
+    <a href="/NDA/" class="hub-subnav-title"><i class="fas fa-file-contract"></i> NDA Studio</a>
+    <div class="hub-subnav-tabs">
+      <a href="/NDA/scenarios/" class="hub-tab active">Scenarios</a>
+      <a href="/NDA/clause-library/" class="hub-tab">Clauses</a>
+      <a href="/NDA/tools/" class="hub-tab">Tools</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs">
+  <a href="/NDA/">NDA Studio</a>
+  <span>&gt;</span>
+  <a href="/NDA/scenarios/">Scenarios</a>
+  <span>&gt;</span>
+  <a href="/NDA/scenarios/software-dev/">Software Dev</a>
+  <span>&gt;</span>
+  <span class="current">Security Requirements</span>
+</div>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge"><i class="fas fa-shield-alt"></i> Compliance Guide</div>
+    <h1>Security Requirements in <span class="grad">Software NDAs</span></h1>
+    <p class="hero-sub">How to incorporate SOC 2, ISO 27001, GDPR, HIPAA, and PCI-DSS requirements into your software development NDAs for comprehensive protection.</p>
+  </div>
+</section>
+
+<div class="main">
+  <!-- Overview -->
+  <div class="highlight-section">
+    <div class="sec-head">
+      <h2><i class="fas fa-lock"></i> Why Security Standards Matter in NDAs</h2>
+    </div>
+    <p style="font-size: 0.95rem; color: var(--gray-600); line-height: 1.8; margin-bottom: 1rem;">
+      A confidentiality agreement is only as strong as the security practices that protect the information. By incorporating specific security standards into your NDA, you create legally enforceable obligations that go beyond simple "keep it secret" language. This is especially critical when sharing source code, credentials, or customer data.
+    </p>
+    <p style="font-size: 0.95rem; color: var(--gray-600); line-height: 1.8;">
+      The right security requirements depend on your industry, the type of data being shared, and your counterparty's capabilities. Below, we break down the major security frameworks and how to reference them in your NDAs.
+    </p>
+  </div>
+
+  <!-- Decision Tree -->
+  <div class="decision-tree">
+    <h3><i class="fas fa-sitemap"></i> Which Standards Apply to Your Situation?</h3>
+
+    <div class="decision-item">
+      <i class="fas fa-building-columns"></i>
+      <div class="decision-content">
+        <h4>Financial Services / Banks</h4>
+        <p>If you're working with banks, insurance companies, or financial institutions</p>
+        <div class="standards">
+          <span class="standard-tag soc2">SOC 2 Required</span>
+          <span class="standard-tag iso">ISO 27001 Often</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="decision-item">
+      <i class="fas fa-hospital"></i>
+      <div class="decision-content">
+        <h4>Healthcare / Medical Data</h4>
+        <p>If you're handling protected health information (PHI) for US healthcare entities</p>
+        <div class="standards">
+          <span class="standard-tag hipaa">HIPAA Required</span>
+          <span class="standard-tag soc2">SOC 2 Common</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="decision-item">
+      <i class="fas fa-credit-card"></i>
+      <div class="decision-content">
+        <h4>Payment Processing</h4>
+        <p>If you're handling credit card numbers or payment credentials</p>
+        <div class="standards">
+          <span class="standard-tag pci">PCI-DSS Required</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="decision-item">
+      <i class="fas fa-globe-europe"></i>
+      <div class="decision-content">
+        <h4>EU Data / European Users</h4>
+        <p>If you're handling personal data of EU/EEA residents</p>
+        <div class="standards">
+          <span class="standard-tag gdpr">GDPR Required</span>
+          <span class="standard-tag iso">ISO 27001 Helpful</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="decision-item">
+      <i class="fas fa-cloud"></i>
+      <div class="decision-content">
+        <h4>SaaS / Enterprise Software</h4>
+        <p>General enterprise software development without specific regulated data</p>
+        <div class="standards">
+          <span class="standard-tag soc2">SOC 2 Standard</span>
+          <span class="standard-tag iso">ISO 27001 Optional</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Standards Cards -->
+  <div class="standards-grid">
+    <!-- SOC 2 -->
+    <div class="standard-card">
+      <div class="standard-header soc2">
+        <div class="standard-icon soc2"><i class="fas fa-certificate"></i></div>
+        <div class="standard-info">
+          <h3>SOC 2 Type II</h3>
+          <p>Service Organization Control</p>
+        </div>
+      </div>
+      <div class="standard-body">
+        <h4>When to Require</h4>
+        <ul>
+          <li>Sharing with any enterprise SaaS vendor</li>
+          <li>Contractors with ongoing system access</li>
+          <li>Third parties handling customer data</li>
+          <li>Cloud infrastructure providers</li>
+        </ul>
+        <h4>Key NDA Provisions</h4>
+        <ul>
+          <li>Maintain SOC 2 Type II certification</li>
+          <li>Provide annual audit reports upon request</li>
+          <li>Notify of any audit findings that affect security</li>
+          <li>Implement all five Trust Service Criteria</li>
+        </ul>
+        <div class="sample-clause">
+          Receiving Party represents that it maintains SOC 2 Type II certification and shall provide its most recent audit report within 5 business days of request. Any material findings affecting security controls shall be reported within 24 hours.
+        </div>
+      </div>
+    </div>
+
+    <!-- ISO 27001 -->
+    <div class="standard-card">
+      <div class="standard-header iso">
+        <div class="standard-icon iso"><i class="fas fa-globe"></i></div>
+        <div class="standard-info">
+          <h3>ISO 27001</h3>
+          <p>Information Security Management</p>
+        </div>
+      </div>
+      <div class="standard-body">
+        <h4>When to Require</h4>
+        <ul>
+          <li>International or global partnerships</li>
+          <li>Enterprise vendors outside the US</li>
+          <li>Organizations in regulated industries</li>
+          <li>Large-scale data processing operations</li>
+        </ul>
+        <h4>Key NDA Provisions</h4>
+        <ul>
+          <li>Maintain ISO 27001 certification from accredited body</li>
+          <li>Apply ISMS controls to all Confidential Information</li>
+          <li>Conduct annual internal audits</li>
+          <li>Document and remediate non-conformities</li>
+        </ul>
+        <div class="sample-clause">
+          Receiving Party shall maintain ISO/IEC 27001 certification from an accredited certification body. All Confidential Information shall be handled in accordance with Receiving Party's certified Information Security Management System (ISMS).
+        </div>
+      </div>
+    </div>
+
+    <!-- GDPR -->
+    <div class="standard-card">
+      <div class="standard-header gdpr">
+        <div class="standard-icon gdpr"><i class="fas fa-user-shield"></i></div>
+        <div class="standard-info">
+          <h3>GDPR</h3>
+          <p>General Data Protection Regulation</p>
+        </div>
+      </div>
+      <div class="standard-body">
+        <h4>When to Require</h4>
+        <ul>
+          <li>Processing personal data of EU/EEA residents</li>
+          <li>Any subprocessor accessing EU personal data</li>
+          <li>Cross-border data transfers from EU</li>
+          <li>Joint controller arrangements</li>
+        </ul>
+        <h4>Key NDA Provisions</h4>
+        <ul>
+          <li>Process data only as instructed by controller</li>
+          <li>Implement appropriate technical measures</li>
+          <li>Assist with data subject rights requests</li>
+          <li>Delete or return data upon termination</li>
+        </ul>
+        <div class="sample-clause">
+          Receiving Party shall process Personal Data only in accordance with GDPR Article 28 and the attached Data Processing Addendum. Standard Contractual Clauses shall apply to any transfer of Personal Data outside the EEA.
+        </div>
+      </div>
+    </div>
+
+    <!-- HIPAA -->
+    <div class="standard-card">
+      <div class="standard-header hipaa">
+        <div class="standard-icon hipaa"><i class="fas fa-heartbeat"></i></div>
+        <div class="standard-info">
+          <h3>HIPAA</h3>
+          <p>Health Insurance Portability & Accountability</p>
+        </div>
+      </div>
+      <div class="standard-body">
+        <h4>When to Require</h4>
+        <ul>
+          <li>Healthcare providers sharing patient data</li>
+          <li>Health tech vendors accessing PHI</li>
+          <li>Insurance claims processors</li>
+          <li>Any business associate handling PHI</li>
+        </ul>
+        <h4>Key NDA Provisions</h4>
+        <ul>
+          <li>Execute a Business Associate Agreement (BAA)</li>
+          <li>Implement administrative, physical, and technical safeguards</li>
+          <li>Report breaches within 60 days</li>
+          <li>Ensure subcontractor compliance</li>
+        </ul>
+        <div class="sample-clause">
+          This Agreement incorporates the attached Business Associate Agreement. Receiving Party shall comply with HIPAA Security Rule (45 CFR Part 164) and shall report any Breach of Unsecured PHI within 24 hours of discovery.
+        </div>
+      </div>
+    </div>
+
+    <!-- PCI-DSS -->
+    <div class="standard-card">
+      <div class="standard-header pci">
+        <div class="standard-icon pci"><i class="fas fa-credit-card"></i></div>
+        <div class="standard-info">
+          <h3>PCI-DSS</h3>
+          <p>Payment Card Industry Data Security</p>
+        </div>
+      </div>
+      <div class="standard-body">
+        <h4>When to Require</h4>
+        <ul>
+          <li>Any access to cardholder data</li>
+          <li>Payment processing integrations</li>
+          <li>E-commerce platform development</li>
+          <li>Point-of-sale system access</li>
+        </ul>
+        <h4>Key NDA Provisions</h4>
+        <ul>
+          <li>Maintain PCI-DSS compliance at appropriate level</li>
+          <li>Provide Attestation of Compliance (AOC)</li>
+          <li>Never store CVV, PIN, or magnetic stripe data</li>
+          <li>Use encryption for all cardholder data</li>
+        </ul>
+        <div class="sample-clause">
+          Receiving Party shall maintain PCI-DSS Level 1 compliance and provide current Attestation of Compliance upon request. Under no circumstances shall Receiving Party store CVV/CVC codes, PIN blocks, or full magnetic stripe data.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Comparison Table -->
+  <div class="highlight-section">
+    <div class="sec-head">
+      <h2><i class="fas fa-table"></i> Standards Comparison Matrix</h2>
+    </div>
+
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th>Requirement</th>
+          <th>SOC 2</th>
+          <th>ISO 27001</th>
+          <th>GDPR</th>
+          <th>HIPAA</th>
+          <th>PCI-DSS</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Third-Party Audit Required</td>
+          <td><i class="fas fa-check table-check"></i></td>
+          <td><i class="fas fa-check table-check"></i></td>
+          <td><i class="fas fa-minus table-partial"></i></td>
+          <td><i class="fas fa-minus table-partial"></i></td>
+          <td><i class="fas fa-check table-check"></i></td>
+        </tr>
+        <tr>
+          <td>Encryption at Rest Required</td>
+          <td><i class="fas fa-check table-check"></i></td>
+          <td><i class="fas fa-check table-check"></i></td>
+          <td><i class="fas fa-minus table-partial"></i></td>
+          <td><i class="fas fa-check table-check"></i></td>
+          <td><i class="fas fa-check table-check"></i></td>
+        </tr>
+        <tr>
+          <td>Breach Notification Timeline</td>
+          <td>Varies</td>
+          <td>72 hours</td>
+          <td>72 hours</td>
+          <td>60 days</td>
+          <td>Immediate</td>
+        </tr>
+        <tr>
+          <td>Data Deletion Requirements</td>
+          <td><i class="fas fa-minus table-partial"></i></td>
+          <td><i class="fas fa-check table-check"></i></td>
+          <td><i class="fas fa-check table-check"></i></td>
+          <td><i class="fas fa-check table-check"></i></td>
+          <td><i class="fas fa-check table-check"></i></td>
+        </tr>
+        <tr>
+          <td>Access Logging Required</td>
+          <td><i class="fas fa-check table-check"></i></td>
+          <td><i class="fas fa-check table-check"></i></td>
+          <td><i class="fas fa-minus table-partial"></i></td>
+          <td><i class="fas fa-check table-check"></i></td>
+          <td><i class="fas fa-check table-check"></i></td>
+        </tr>
+        <tr>
+          <td>Subcontractor Requirements</td>
+          <td><i class="fas fa-check table-check"></i></td>
+          <td><i class="fas fa-check table-check"></i></td>
+          <td><i class="fas fa-check table-check"></i></td>
+          <td><i class="fas fa-check table-check"></i></td>
+          <td><i class="fas fa-check table-check"></i></td>
+        </tr>
+        <tr>
+          <td>Penalties for Non-Compliance</td>
+          <td>Contractual</td>
+          <td>Contractual</td>
+          <td>Up to 4% revenue</td>
+          <td>Up to $1.5M/year</td>
+          <td>$5K-$100K/month</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="font-size: 0.8rem; color: var(--gray-500); margin-top: 0.75rem;">
+      <i class="fas fa-check table-check"></i> = Required | <i class="fas fa-minus table-partial"></i> = Recommended but not mandated | Empty = Not applicable
+    </p>
+  </div>
+
+  <!-- Related Links -->
+  <div class="related-links">
+    <h3>Related Resources</h3>
+    <a href="source-code-nda.html"><i class="fas fa-code-branch"></i> Source Code NDA</a>
+    <a href="credential-access-nda.html"><i class="fas fa-key"></i> Credential Access NDA</a>
+    <a href="api-access-nda.html"><i class="fas fa-plug"></i> API Access NDA</a>
+    <a href="access-revocation-checklist.html"><i class="fas fa-user-slash"></i> Access Revocation Checklist</a>
+    <a href="breach-response.html"><i class="fas fa-exclamation-circle"></i> Breach Response Guide</a>
+    <a href="negotiation-playbook.html"><i class="fas fa-handshake"></i> Negotiation Playbook</a>
+  </div>
+
+  <!-- CTA Section -->
+  <div class="cta-section">
+    <h2>Build a Security-First NDA</h2>
+    <p>Generate an NDA with the appropriate security standards for your industry and data types.</p>
+    <a href="/NDA/generator.html" class="cta-btn"><i class="fas fa-rocket"></i> Start Free Generator</a>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div>
+      <h5>Software Dev NDAs</h5>
+      <a href="index.html">Overview</a>
+      <a href="saas-vendor.html">SaaS Vendor</a>
+      <a href="source-code-nda.html">Source Code</a>
+      <a href="credential-access-nda.html">Credentials</a>
+      <a href="api-access-nda.html">API Access</a>
+    </div>
+    <div>
+      <h5>Resources</h5>
+      <a href="security-requirements.html">Security Requirements</a>
+      <a href="negotiation-playbook.html">Negotiation Playbook</a>
+      <a href="access-revocation-checklist.html">Revocation Checklist</a>
+      <a href="breach-response.html">Breach Response</a>
+    </div>
+    <div>
+      <h5>Tools</h5>
+      <a href="/NDA/generator.html">NDA Generator</a>
+      <a href="/NDA/clause-library/">Clause Library</a>
+      <a href="/NDA/tools/risk-analyzer.html">Risk Analyzer</a>
+    </div>
+    <div>
+      <h5>Terms.Law</h5>
+      <a href="/Demand-Letters/">Demand Letters</a>
+      <a href="/Templates/">Contracts</a>
+      <a href="/INC/">Formation</a>
+      <a href="mailto:owner@terms.law">Hire Me</a>
+    </div>
+  </div>
+  <div class="footer-bottom">&copy; 2025 Terms.Law | Sergei Tokmakov, Esq. - CA Bar #279869 | Attorney advertising. Not legal advice.</div>
+</footer>
+
+<!-- Chat Widget -->
+<script src="/chat-widget/chat-widget.js"></script>
+
+</body>
+</html>
