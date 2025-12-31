@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>План Разработки | Адвокат Черенков - Владивосток</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e40af;
+            --primary-light: #3b82f6;
+            --accent: #dc2626;
+            --gold: #b8860b;
+            --bg: #f1f5f9;
+            --surface: #ffffff;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0c1929 0%, #1e3a5f 50%, #7f1d1d 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #fff 33%, #3b82f6 33%, #3b82f6 66%, #dc2626 66%);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .header .subtitle {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            margin-bottom: 1rem;
+        }
+
+        .header .meta {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .russian-flag {
+            display: inline-flex;
+            gap: 0;
+            margin: 1rem auto;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .russian-flag span {
+            width: 60px;
+            height: 20px;
+        }
+
+        .flag-white { background: #fff; }
+        .flag-blue { background: #0039a6; }
+        .flag-red { background: #d52b1e; }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .section {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-title .icon {
+            font-size: 1.75rem;
+        }
+
+        /* Navigation Preview */
+        .nav-preview {
+            background: linear-gradient(135deg, #0c1929 0%, #1e3a5f 100%);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-logo {
+            font-weight: 800;
+            font-size: 1.1rem;
+            background: linear-gradient(135deg, #60a5fa, #f87171);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            white-space: nowrap;
+        }
+
+        .nav-items {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .nav-item {
+            padding: 0.5rem 1rem;
+            color: #94a3b8;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .nav-item .arrow {
+            font-size: 10px;
+        }
+
+        .nav-cta {
+            margin-left: auto;
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            color: white !important;
+            padding: 0.5rem 1.25rem;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        /* Agent Cards Grid */
+        .agents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .agent-card {
+            background: linear-gradient(135deg, #f8fafc 0%, #fff 100%);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .agent-header {
+            background: linear-gradient(135deg, var(--primary) 0%, #1e3a8a 100%);
+            color: white;
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .agent-number {
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .agent-title {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .agent-pages {
+            padding: 1rem 1.25rem;
+        }
+
+        .page-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .page-item:last-child {
+            border-bottom: none;
+        }
+
+        .page-number {
+            width: 24px;
+            height: 24px;
+            background: var(--primary-light);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .page-info h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.25rem;
+        }
+
+        .page-info p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .page-file {
+            font-size: 0.7rem;
+            color: var(--primary-light);
+            font-family: monospace;
+            background: #eff6ff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-top: 0.25rem;
+            display: inline-block;
+        }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        /* Dropdown Menu Structure */
+        .dropdown-structure {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .dropdown-category {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .dropdown-header {
+            background: var(--primary);
+            color: white;
+            padding: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .dropdown-items {
+            padding: 0.75rem;
+        }
+
+        .dropdown-item {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.85rem;
+            color: var(--text);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .dropdown-item:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .dropdown-item .count {
+            margin-left: auto;
+            font-size: 0.7rem;
+            background: rgba(0,0,0,0.1);
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        /* Color Palette */
+        .palette {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .color-swatch {
+            width: 80px;
+            text-align: center;
+        }
+
+        .swatch-box {
+            width: 80px;
+            height: 50px;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .swatch-name {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .swatch-hex {
+            font-size: 0.65rem;
+            font-family: monospace;
+            color: var(--text);
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--accent) 100%);
+            border-radius: 3px;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 1.5rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2rem;
+            top: 0.25rem;
+            width: 12px;
+            height: 12px;
+            background: white;
+            border: 3px solid var(--primary);
+            border-radius: 50%;
+            transform: translateX(-4.5px);
+        }
+
+        .timeline-title {
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.25rem;
+        }
+
+        .timeline-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Disclaimer */
+        .disclaimer {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .disclaimer h4 {
+            color: #92400e;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .disclaimer p {
+            font-size: 0.85rem;
+            color: #78350f;
+        }
+
+        /* Footer */
+        .plan-footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 { font-size: 1.75rem; }
+            .agents-grid { grid-template-columns: 1fr; }
+            .nav-preview { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="russian-flag">
+            <span class="flag-white"></span>
+            <span class="flag-blue"></span>
+            <span class="flag-red"></span>
+        </div>
+        <h1>Адвокат Черенков М.А.</h1>
+        <p class="subtitle">Юридические услуги во Владивостоке</p>
+        <p class="meta">План разработки сайта | 23 страницы | B2B фокус | 4 языка</p>
+    </header>
+
+    <div class="container">
+        <!-- Stats Overview -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">23</div>
+                <div class="stat-label">Всего страниц</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">4</div>
+                <div class="stat-label">Landing pages</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">4</div>
+                <div class="stat-label">Языка (RU/EN/ZH/JA)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">B2B</div>
+                <div class="stat-label">Фокус на бизнес</div>
+            </div>
+        </div>
+
+        <!-- Scope Note -->
+        <section class="section" style="background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); border: 1px solid #10b981;">
+            <h2 class="section-title" style="color: #047857; border-bottom-color: #10b981;"><span class="icon">&#10003;</span> Безопасный объём проекта</h2>
+            <p style="color: #065f46; margin-bottom: 1rem;">
+                Проект сокращён до 20 страниц с <strong>только статическим, вечнозелёным контентом</strong>.
+                Исключены элементы, требующие актуализации:
+            </p>
+            <ul style="color: #065f46; margin-left: 1.5rem; line-height: 2;">
+                <li><s>Калькуляторы</s> (требуют актуальных ставок ЦБ и НК РФ)</li>
+                <li><s>Генераторы документов</s> (формы должны соответствовать текущим требованиям)</li>
+                <li><s>Административное право</s> (частые изменения КоАП)</li>
+                <li><s>Новости/Блог</s> (требуют регулярного обновления)</li>
+            </ul>
+        </section>
+
+        <!-- Navigation Preview -->
+        <section class="section">
+            <h2 class="section-title"><span class="icon">&#128736;</span> Структура навигации (Единый хедер)</h2>
+
+            <div class="nav-preview">
+                <span class="nav-logo">Адвокат Черенков</span>
+                <div class="nav-items">
+                    <div class="nav-item">Услуги <span class="arrow">&#9660;</span></div>
+                    <div class="nav-item">Статьи <span class="arrow">&#9660;</span></div>
+                </div>
+                <div class="nav-item nav-cta">Написать</div>
+            </div>
+
+            <h3 style="margin: 1.5rem 0 1rem; font-size: 1.1rem; color: var(--text-muted);">Структура выпадающих меню:</h3>
+
+            <div class="dropdown-structure">
+                <div class="dropdown-category">
+                    <div class="dropdown-header">&#9878; Услуги</div>
+                    <div class="dropdown-items">
+                        <div class="dropdown-item">&#127970; Корпоративное право</div>
+                        <div class="dropdown-item">&#128187; IT-право</div>
+                        <div class="dropdown-item">&#128161; Интеллектуальная собственность</div>
+                        <div class="dropdown-item">&#128203; Договорное право</div>
+                        <div class="dropdown-item">&#9878; Судебное представительство</div>
+                        <div class="dropdown-item">&#128737; Уголовный процесс</div>
+                    </div>
+                </div>
+
+                <div class="dropdown-category">
+                    <div class="dropdown-header">&#128218; Статьи</div>
+                    <div class="dropdown-items">
+                        <div class="dropdown-item">&#128218; Юридические статьи</div>
+                        <div class="dropdown-item">&#10067; Частые вопросы (FAQ)</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Page Distribution -->
+        <section class="section">
+            <h2 class="section-title"><span class="icon">&#128196;</span> Распределение страниц</h2>
+
+            <div class="agents-grid">
+                <!-- Core Pages -->
+                <div class="agent-card">
+                    <div class="agent-header" style="background: linear-gradient(135deg, #059669 0%, #047857 100%);">
+                        <div class="agent-number">&#9733;</div>
+                        <div class="agent-title">Базовые страницы</div>
+                    </div>
+                    <div class="agent-pages">
+                        <div class="page-item">
+                            <div class="page-number">1</div>
+                            <div class="page-info">
+                                <h4>Главная страница</h4>
+                                <p>Landing page, информация об адвокате</p>
+                                <span class="page-file">/index.html</span>
+                            </div>
+                        </div>
+                        <div class="page-item">
+                            <div class="page-number">2</div>
+                            <div class="page-info">
+                                <h4>Каталог услуг</h4>
+                                <p>Все юридические услуги</p>
+                                <span class="page-file">/uslugi/index.html</span>
+                            </div>
+                        </div>
+                        <div class="page-item">
+                            <div class="page-number">3</div>
+                            <div class="page-info">
+                                <h4>Статьи</h4>
+                                <p>Юридические материалы</p>
+                                <span class="page-file">/stati/index.html</span>
+                            </div>
+                        </div>
+                        <div class="page-item">
+                            <div class="page-number">4</div>
+                            <div class="page-info">
+                                <h4>Частые вопросы</h4>
+                                <p>FAQ по услугам</p>
+                                <span class="page-file">/faq/index.html</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Business & IT Services -->
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-number">B2B</div>
+                        <div class="agent-title">Услуги для бизнеса</div>
+                    </div>
+                    <div class="agent-pages">
+                        <div class="page-item">
+                            <div class="page-number">5</div>
+                            <div class="page-info">
+                                <h4>Корпоративное право</h4>
+                                <p>Регистрация, споры, сделки с долями</p>
+                                <span class="page-file">/uslugi/korporativnoe-pravo/</span>
+                            </div>
+                        </div>
+                        <div class="page-item">
+                            <div class="page-number">6</div>
+                            <div class="page-info">
+                                <h4>IT-право</h4>
+                                <p>IT-компании, договоры с разработчиками</p>
+                                <span class="page-file">/uslugi/it-pravo/</span>
+                            </div>
+                        </div>
+                        <div class="page-item">
+                            <div class="page-number">7</div>
+                            <div class="page-info">
+                                <h4>Интеллектуальная собственность</h4>
+                                <p>Товарные знаки, патенты, авторское право</p>
+                                <span class="page-file">/uslugi/intellektualnaya-sobstvennost/</span>
+                            </div>
+                        </div>
+                        <div class="page-item">
+                            <div class="page-number">8</div>
+                            <div class="page-info">
+                                <h4>Договорное право</h4>
+                                <p>Разработка и анализ договоров</p>
+                                <span class="page-file">/uslugi/dogovornoe-pravo/</span>
+                            </div>
+                        </div>
+                        <div class="page-item">
+                            <div class="page-number">9</div>
+                            <div class="page-info">
+                                <h4>Судебное представительство</h4>
+                                <p>Гражданские, арбитражные дела</p>
+                                <span class="page-file">/uslugi/sudebnoe-predstavitelstvo/</span>
+                            </div>
+                        </div>
+                        <div class="page-item">
+                            <div class="page-number">10</div>
+                            <div class="page-info">
+                                <h4>Уголовный процесс</h4>
+                                <p>Защита интересов</p>
+                                <span class="page-file">/uslugi/ugolovnyj-process/</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Articles -->
+                <div class="agent-card">
+                    <div class="agent-header" style="background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);">
+                        <div class="agent-number">&#128218;</div>
+                        <div class="agent-title">Статьи</div>
+                    </div>
+                    <div class="agent-pages">
+                        <div class="page-item">
+                            <div class="page-number">11</div>
+                            <div class="page-info">
+                                <h4>Как зарегистрировать ООО</h4>
+                                <p>Пошаговая инструкция</p>
+                                <span class="page-file">/stati/registraciya-ooo/</span>
+                            </div>
+                        </div>
+                        <div class="page-item">
+                            <div class="page-number">12</div>
+                            <div class="page-info">
+                                <h4>Защита товарного знака</h4>
+                                <p>Регистрация и споры</p>
+                                <span class="page-file">/stati/tovarnyj-znak/</span>
+                            </div>
+                        </div>
+                        <div class="page-item">
+                            <div class="page-number">13</div>
+                            <div class="page-info">
+                                <h4>Договор с IT-подрядчиком</h4>
+                                <p>На что обратить внимание</p>
+                                <span class="page-file">/stati/dogovor-it/</span>
+                            </div>
+                        </div>
+                        <div class="page-item">
+                            <div class="page-number">14</div>
+                            <div class="page-info">
+                                <h4>Корпоративные споры</h4>
+                                <p>Виды и способы разрешения</p>
+                                <span class="page-file">/stati/korporativnye-spory/</span>
+                            </div>
+                        </div>
+                        <div class="page-item">
+                            <div class="page-number">15</div>
+                            <div class="page-info">
+                                <h4>Авторские права на ПО</h4>
+                                <p>Защита программного обеспечения</p>
+                                <span class="page-file">/stati/avtorskie-prava-po/</span>
+                            </div>
+                        </div>
+                        <div class="page-item">
+                            <div class="page-number">16</div>
+                            <div class="page-info">
+                                <h4>Арбитражный суд: подготовка</h4>
+                                <p>Документы и процедура</p>
+                                <span class="page-file">/stati/arbitrazh-podgotovka/</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ -->
+                <div class="agent-card">
+                    <div class="agent-header" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                        <div class="agent-number">&#10067;</div>
+                        <div class="agent-title">FAQ по категориям</div>
+                    </div>
+                    <div class="agent-pages">
+                        <div class="page-item">
+                            <div class="page-number">17</div>
+                            <div class="page-info">
+                                <h4>FAQ: Корпоративное право</h4>
+                                <p>Вопросы о регистрации и спорах</p>
+                                <span class="page-file">/faq/korporativnoe/</span>
+                            </div>
+                        </div>
+                        <div class="page-item">
+                            <div class="page-number">18</div>
+                            <div class="page-info">
+                                <h4>FAQ: IT и интернет</h4>
+                                <p>Вопросы об IT-праве</p>
+                                <span class="page-file">/faq/it-pravo/</span>
+                            </div>
+                        </div>
+                        <div class="page-item">
+                            <div class="page-number">19</div>
+                            <div class="page-info">
+                                <h4>FAQ: Интеллектуальная собственность</h4>
+                                <p>Товарные знаки, патенты</p>
+                                <span class="page-file">/faq/intellektualnaya-sobstvennost/</span>
+                            </div>
+                        </div>
+                        <div class="page-item">
+                            <div class="page-number">20</div>
+                            <div class="page-info">
+                                <h4>FAQ: Судебные дела</h4>
+                                <p>Процедура, сроки, стоимость</p>
+                                <span class="page-file">/faq/sudebnye-dela/</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Translated Landing Pages -->
+                <div class="agent-card">
+                    <div class="agent-header" style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);">
+                        <div class="agent-number">&#127760;</div>
+                        <div class="agent-title">Переводы лендинга</div>
+                    </div>
+                    <div class="agent-pages">
+                        <div class="page-item">
+                            <div class="page-number">21</div>
+                            <div class="page-info">
+                                <h4>English Landing Page</h4>
+                                <p>For international clients</p>
+                                <span class="page-file">/en/index.html</span>
+                            </div>
+                        </div>
+                        <div class="page-item">
+                            <div class="page-number">22</div>
+                            <div class="page-info">
+                                <h4>Chinese Landing Page</h4>
+                                <p>For Chinese clients</p>
+                                <span class="page-file">/zh/index.html</span>
+                            </div>
+                        </div>
+                        <div class="page-item">
+                            <div class="page-number">23</div>
+                            <div class="page-info">
+                                <h4>Japanese Landing Page</h4>
+                                <p>For Japanese clients</p>
+                                <span class="page-file">/ja/index.html</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Color Palette -->
+        <section class="section">
+            <h2 class="section-title"><span class="icon">&#127912;</span> Цветовая палитра</h2>
+
+            <div class="palette">
+                <div class="color-swatch">
+                    <div class="swatch-box" style="background: #0c1929;"></div>
+                    <div class="swatch-name">Тёмный фон</div>
+                    <div class="swatch-hex">#0c1929</div>
+                </div>
+                <div class="color-swatch">
+                    <div class="swatch-box" style="background: #1e40af;"></div>
+                    <div class="swatch-name">Основной</div>
+                    <div class="swatch-hex">#1e40af</div>
+                </div>
+                <div class="color-swatch">
+                    <div class="swatch-box" style="background: #3b82f6;"></div>
+                    <div class="swatch-name">Акцент синий</div>
+                    <div class="swatch-hex">#3b82f6</div>
+                </div>
+                <div class="color-swatch">
+                    <div class="swatch-box" style="background: #dc2626;"></div>
+                    <div class="swatch-name">Акцент красный</div>
+                    <div class="swatch-hex">#dc2626</div>
+                </div>
+                <div class="color-swatch">
+                    <div class="swatch-box" style="background: #b8860b;"></div>
+                    <div class="swatch-name">Золотой</div>
+                    <div class="swatch-hex">#b8860b</div>
+                </div>
+                <div class="color-swatch">
+                    <div class="swatch-box" style="background: #ffffff; border: 1px solid #e5e7eb;"></div>
+                    <div class="swatch-name">Белый</div>
+                    <div class="swatch-hex">#ffffff</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Landing Page Structure -->
+        <section class="section">
+            <h2 class="section-title"><span class="icon">&#127968;</span> Главная страница (Landing Page)</h2>
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-title">1. Единый хедер с мега-меню</div>
+                    <div class="timeline-desc">Навигация с B2B-услугами</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-title">2. Герой-секция</div>
+                    <div class="timeline-desc">Фото адвоката (tie.png), имя, реестр 25/2400, стаж 20+ лет</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-title">3. Верифицированные данные</div>
+                    <div class="timeline-desc">ОГРНИП, ИНН, Адвокатская палата Приморского края, Коллегия "Наше дело"</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-title">4. Направления работы</div>
+                    <div class="timeline-desc">6 B2B-услуг: Корпоративное, IT-право, ИС, Договоры, Суд, Уголовный процесс</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-title">5. Преимущества</div>
+                    <div class="timeline-desc">20+ лет практики, официальный статус, весь Приморский край</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-title">6. Форма обратной связи</div>
+                    <div class="timeline-desc">Имя, email, описание вопроса (без телефона)</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-title">7. Футер с дисклеймером</div>
+                    <div class="timeline-desc">Контакт: m@cherenkov.pro, адрес офиса, отказ от ответственности</div>
+                </div>
+            </div>
+
+            <div class="disclaimer">
+                <h4>&#9888; Обязательный дисклеймер</h4>
+                <p>
+                    Каждая страница должна содержать: "Информация на сайте носит ознакомительный характер
+                    и не является юридической консультацией. Результат зависит от конкретных обстоятельств дела."
+                </p>
+            </div>
+        </section>
+
+        <!-- File Structure -->
+        <section class="section">
+            <h2 class="section-title"><span class="icon">&#128193;</span> Структура файлов</h2>
+
+            <pre style="background: #1e293b; color: #e2e8f0; padding: 1.5rem; border-radius: 12px; overflow-x: auto; font-size: 0.85rem; line-height: 1.8;">
+advokat-cherenkov/
+&#9500;&#9472;&#9472; index.html                    <span style="color: #94a3b8;"># Главная страница (RU)</span>
+&#9500;&#9472;&#9472; tie.png                       <span style="color: #94a3b8;"># Фото адвоката</span>
+&#9500;&#9472;&#9472; en/
+&#9474;   &#9492;&#9472;&#9472; index.html               <span style="color: #4ade80;"># English landing page</span>
+&#9500;&#9472;&#9472; zh/
+&#9474;   &#9492;&#9472;&#9472; index.html               <span style="color: #4ade80;"># Chinese landing page</span>
+&#9500;&#9472;&#9472; ja/
+&#9474;   &#9492;&#9472;&#9472; index.html               <span style="color: #4ade80;"># Japanese landing page</span>
+&#9500;&#9472;&#9472; shared/
+&#9474;   &#9500;&#9472;&#9472; header.js                <span style="color: #94a3b8;"># Единый хедер (JS-инъекция)</span>
+&#9474;   &#9492;&#9472;&#9472; styles.css               <span style="color: #94a3b8;"># Общие стили</span>
+&#9500;&#9472;&#9472; uslugi/
+&#9474;   &#9500;&#9472;&#9472; index.html               <span style="color: #94a3b8;"># Каталог услуг</span>
+&#9474;   &#9500;&#9472;&#9472; korporativnoe-pravo/     <span style="color: #94a3b8;"># Корпоративное право</span>
+&#9474;   &#9500;&#9472;&#9472; it-pravo/                <span style="color: #94a3b8;"># IT-право</span>
+&#9474;   &#9500;&#9472;&#9472; intellektualnaya-sobstvennost/  <span style="color: #94a3b8;"># ИС</span>
+&#9474;   &#9500;&#9472;&#9472; dogovornoe-pravo/        <span style="color: #94a3b8;"># Договорное право</span>
+&#9474;   &#9500;&#9472;&#9472; sudebnoe-predstavitelstvo/  <span style="color: #94a3b8;"># Суд</span>
+&#9474;   &#9492;&#9472;&#9472; ugolovnyj-process/       <span style="color: #94a3b8;"># Уголовный процесс</span>
+&#9500;&#9472;&#9472; stati/
+&#9474;   &#9500;&#9472;&#9472; index.html               <span style="color: #94a3b8;"># Каталог статей</span>
+&#9474;   &#9500;&#9472;&#9472; registraciya-ooo/        <span style="color: #94a3b8;"># Как зарегистрировать ООО</span>
+&#9474;   &#9500;&#9472;&#9472; tovarnyj-znak/           <span style="color: #94a3b8;"># Защита товарного знака</span>
+&#9474;   &#9500;&#9472;&#9472; dogovor-it/              <span style="color: #94a3b8;"># Договор с IT-подрядчиком</span>
+&#9474;   &#9500;&#9472;&#9472; korporativnye-spory/     <span style="color: #94a3b8;"># Корпоративные споры</span>
+&#9474;   &#9500;&#9472;&#9472; avtorskie-prava-po/      <span style="color: #94a3b8;"># Авторские права на ПО</span>
+&#9474;   &#9492;&#9472;&#9472; arbitrazh-podgotovka/    <span style="color: #94a3b8;"># Арбитражный суд</span>
+&#9492;&#9472;&#9472; faq/
+    &#9500;&#9472;&#9472; index.html               <span style="color: #94a3b8;"># Общий FAQ</span>
+    &#9500;&#9472;&#9472; korporativnoe/           <span style="color: #94a3b8;"># FAQ: Корпоративное</span>
+    &#9500;&#9472;&#9472; it-pravo/                <span style="color: #94a3b8;"># FAQ: IT</span>
+    &#9500;&#9472;&#9472; intellektualnaya-sobstvennost/  <span style="color: #94a3b8;"># FAQ: ИС</span>
+    &#9492;&#9472;&#9472; sudebnye-dela/           <span style="color: #94a3b8;"># FAQ: Суд</span>
+            </pre>
+        </section>
+
+        <!-- Verified Info -->
+        <section class="section" style="background: linear-gradient(135deg, #1e40af 0%, #7f1d1d 100%); color: white;">
+            <h2 class="section-title" style="color: white; border-bottom-color: rgba(255,255,255,0.3);"><span class="icon">&#9989;</span> Верифицированные данные адвоката</h2>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+                <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 1.25rem;">
+                    <h4 style="margin-bottom: 0.5rem;">ФИО</h4>
+                    <p style="opacity: 0.9;">Черенков Максим Александрович</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 1.25rem;">
+                    <h4 style="margin-bottom: 0.5rem;">Реестровый номер</h4>
+                    <p style="opacity: 0.9;">25/2400 (Действующий)</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 1.25rem;">
+                    <h4 style="margin-bottom: 0.5rem;">Палата</h4>
+                    <p style="opacity: 0.9;">Адвокатская палата Приморского края</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 1.25rem;">
+                    <h4 style="margin-bottom: 0.5rem;">Образование</h4>
+                    <p style="opacity: 0.9;">ДВГУ, юрфак, 2002</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 1.25rem;">
+                    <h4 style="margin-bottom: 0.5rem;">Офис</h4>
+                    <p style="opacity: 0.9;">КА "Наше дело", Океанский пр-кт, 87, Владивосток</p>
+                </div>
+                <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 1.25rem;">
+                    <h4 style="margin-bottom: 0.5rem;">Email</h4>
+                    <p style="opacity: 0.9;">m@cherenkov.pro</p>
+                </div>
+            </div>
+
+            <p style="margin-top: 1.5rem; font-size: 0.85rem; opacity: 0.7;">
+                Источники: ap-prim.fparf.ru, pravoved.ru, profi.ru, companies.rbc.ru
+            </p>
+        </section>
+    </div>
+
+    <footer class="plan-footer">
+        <p>План разработки | Адвокат Черенков | Владивосток, Россия</p>
+    </footer>
+</body>
+</html>
