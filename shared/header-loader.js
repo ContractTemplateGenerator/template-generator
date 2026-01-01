@@ -1,6 +1,6 @@
 // Shared header loader with caching
 (function() {
-  const CACHE_KEY = 'terms-law-header-v4';
+  const CACHE_KEY = 'terms-law-header-v5';
   const CACHE_TTL = 3600000; // 1 hour in ms
   const headerEl = document.getElementById('site-header');
 
