@@ -63,6 +63,14 @@
             margin: 0 auto;
             font-size: 0.875rem;
             color: var(--gray-500);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .breadcrumbs-nav {
+            display: flex;
+            align-items: center;
         }
 
         .breadcrumbs a {
@@ -77,6 +85,24 @@
         .breadcrumbs span {
             margin: 0 8px;
             color: var(--gray-400);
+        }
+
+        /* Language Selector */
+        .lang-selector {
+            display: flex;
+            gap: 8px;
+        }
+
+        .lang-flag {
+            font-size: 1.4rem;
+            text-decoration: none;
+            opacity: 0.5;
+            transition: opacity 0.2s;
+        }
+
+        .lang-flag:hover,
+        .lang-flag.active {
+            opacity: 1;
         }
 
         /* Hero */
@@ -127,81 +153,135 @@
             max-width: 700px;
         }
 
-        /* Main Layout */
-        .main-layout {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 260px 1fr;
-            gap: 40px;
-            padding: 40px 24px;
+        /* Page-Wide Sidebar Layout */
+        .page-wrapper {
+            display: flex;
+            min-height: calc(100vh - 60px);
         }
 
-        /* Sidebar Navigation */
         .sidebar {
-            position: sticky;
-            top: 100px;
-            height: fit-content;
-        }
-
-        .sidebar-nav {
+            width: 260px;
             background: white;
-            border-radius: 12px;
-            border: 1px solid var(--gray-200);
-            overflow: hidden;
+            border-right: 1px solid var(--gray-200);
+            position: sticky;
+            top: 60px;
+            height: calc(100vh - 60px);
+            overflow-y: auto;
+            flex-shrink: 0;
         }
 
         .sidebar-header {
-            background: var(--thai-blue);
-            color: white;
-            padding: 16px 20px;
-            font-weight: 700;
-            font-size: 0.9rem;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+            background: linear-gradient(135deg, rgba(239, 51, 64, 0.1) 0%, rgba(0, 32, 91, 0.1) 100%);
         }
 
-        .sidebar-link {
-            display: block;
-            padding: 14px 20px;
-            color: var(--gray-700);
+        .sidebar-header h2 {
+            font-size: 1rem;
+            color: var(--thai-red);
+            margin-bottom: 0.25rem;
+        }
+
+        .sidebar-header p {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: var(--gray-600);
             text-decoration: none;
             font-size: 0.9rem;
-            border-bottom: 1px solid var(--gray-100);
+            border-left: 3px solid transparent;
             transition: all 0.2s;
         }
 
-        .sidebar-link:hover {
+        .nav-item:hover {
             background: var(--gray-50);
             color: var(--thai-blue);
         }
 
-        .sidebar-link.active {
-            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(0, 32, 91, 0.05) 0%, rgba(0, 32, 91, 0.1) 100%);
             color: var(--thai-blue);
-            font-weight: 600;
-            border-left: 3px solid var(--thai-blue);
-        }
-
-        .sidebar-link:last-child {
-            border-bottom: none;
-        }
-
-        .sidebar-badge {
-            display: inline-block;
-            font-size: 0.65rem;
-            padding: 2px 6px;
-            border-radius: 4px;
-            margin-left: 6px;
+            border-left-color: var(--thai-blue);
             font-weight: 600;
         }
 
-        .sidebar-badge.key {
-            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-            color: var(--thai-red);
-        }
-
-        /* Main Content */
-        .main-content {
+        .main-area {
+            flex: 1;
             min-width: 0;
+        }
+
+        /* Mobile Nav Toggle */
+        .mobile-nav-toggle {
+            display: none;
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--thai-blue);
+            color: white;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 32, 91, 0.3);
+            z-index: 1000;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 998;
+        }
+
+        .overlay.show {
+            display: block;
+        }
+
+        @media (max-width: 900px) {
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                top: 0;
+                height: 100vh;
+                z-index: 999;
+                transition: left 0.3s ease;
+            }
+
+            .sidebar.open {
+                left: 0;
+            }
+
+            .mobile-nav-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .page-wrapper {
+                flex-direction: column;
+            }
+        }
+
+        /* Main Content Area */
+        .main-layout {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 24px;
         }
 
         /* Summary Box */
@@ -628,14 +708,6 @@
 
         /* Responsive */
         @media (max-width: 900px) {
-            .main-layout {
-                grid-template-columns: 1fr;
-            }
-
-            .sidebar {
-                position: static;
-            }
-
             .hero h1 {
                 font-size: 2rem;
             }
@@ -651,6 +723,7 @@
     </style>
 </head>
 <body>
+<script src="/Thai/shared/lang-switcher.js"></script>
     <!-- Sitewide Header -->
     <div id="site-header"></div>
     <script src="/shared/header-loader.js"></script>
@@ -658,13 +731,19 @@
     <!-- Breadcrumbs -->
     <nav class="breadcrumbs">
         <div class="breadcrumbs-content">
-            <a href="/">Home</a>
-            <span>></span>
-            <a href="/Thai/">Thai Legal Hub</a>
-            <span>></span>
-            <a href="/Thai/property/">Property</a>
-            <span>></span>
-            Section 96 bis Exception
+            <div class="breadcrumbs-nav">
+                <a href="/">Home</a>
+                <span>></span>
+                <a href="/Thai/">Thai Legal Hub</a>
+                <span>></span>
+                <a href="/Thai/property/">Property</a>
+                <span>></span>
+                Section 96 bis Exception
+            </div>
+            <div class="lang-selector">
+                <a href="/Thai/property/section-96-bis.html" class="lang-flag active" title="English">&#127482;&#127480;</a>
+                <a href="/Thai/ru/property/section-96-bis.html" class="lang-flag" title="Russian">&#127479;&#127482;</a>
+            </div>
         </div>
     </nav>
 
@@ -680,424 +759,430 @@
         </div>
     </section>
 
-    <!-- Main Layout -->
-    <div class="main-layout">
+    <!-- Page Wrapper with Sidebar -->
+    <div class="page-wrapper">
         <!-- Sidebar Navigation -->
         <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Page Navigation</h2>
+                <p>Jump to section</p>
+            </div>
             <nav class="sidebar-nav">
-                <div class="sidebar-header">Property Guides</div>
-                <a href="/Thai/property/" class="sidebar-link">Overview</a>
-                <a href="/Thai/property/land-ownership-foreigners.html" class="sidebar-link">
-                    Can Foreigners Own Land? <span class="sidebar-badge key">Key</span>
-                </a>
-                <a href="/Thai/property/section-96-bis.html" class="sidebar-link active">
-                    Section 96 bis Exception
-                </a>
-                <a href="/Thai/property/leasehold-structures.html" class="sidebar-link">
-                    30-Year Leasehold
-                </a>
+                <a href="#understanding" class="nav-item active" onclick="return scrollToSection('understanding')">Understanding Section 96 bis</a>
+                <a href="#investment" class="nav-item" onclick="return scrollToSection('investment')">Qualifying Investments</a>
+                <a href="#process" class="nav-item" onclick="return scrollToSection('process')">Application Process</a>
+                <a href="#success" class="nav-item" onclick="return scrollToSection('success')">Success Rates</a>
+                <a href="#restrictions" class="nav-item" onclick="return scrollToSection('restrictions')">Land Restrictions</a>
+                <a href="#comparison" class="nav-item" onclick="return scrollToSection('comparison')">Comparison with Options</a>
+                <a href="#questions" class="nav-item" onclick="return scrollToSection('questions')">Common Questions</a>
             </nav>
         </aside>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Summary Box -->
-            <div class="summary-box">
-                <h2>Key Requirements at a Glance</h2>
-                <div class="summary-grid">
-                    <div class="summary-item">
-                        <div class="label">Investment Required</div>
-                        <div class="value">40,000,000 THB</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="label">Maximum Land Area</div>
-                        <div class="value">1 Rai (1,600 sqm)</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="label">Purpose</div>
-                        <div class="value">Residence Only</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="label">Approval Required</div>
-                        <div class="value">Minister of Interior</div>
+        <!-- Main Content Area -->
+        <div class="main-area">
+            <div class="main-layout">
+                <!-- Summary Box -->
+                <div class="summary-box">
+                    <h2>Key Requirements at a Glance</h2>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <div class="label">Investment Required</div>
+                            <div class="value">40,000,000 THB</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="label">Maximum Land Area</div>
+                            <div class="value">1 Rai (1,600 sqm)</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="label">Purpose</div>
+                            <div class="value">Residence Only</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="label">Approval Required</div>
+                            <div class="value">Minister of Interior</div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="article-content">
-                <h2>Understanding Section 96 bis</h2>
-                <p>
-                    While Thailand's Land Code Section 86 prohibits foreigners from owning land, Section 96 bis
-                    creates a narrow exception for foreigners who make substantial qualifying investments in
-                    Thailand. This provision, added to the Land Code in 1999, was designed to attract high-net-worth
-                    individuals while maintaining tight controls on foreign land ownership.
-                </p>
-                <p>
-                    It is crucial to understand that this exception is rarely used and rarely approved. The requirements
-                    are stringent, the approval process is discretionary, and the permitted use is strictly limited
-                    to residential purposes. Most foreigners seeking property in Thailand use leasehold structures
-                    instead, as covered in our
-                    <a href="/Thai/property/leasehold-structures.html" style="color: var(--thai-blue); font-weight: 600;">30-Year Leasehold Guide</a>.
-                </p>
+                <div class="article-content">
+                    <h2 id="understanding">Understanding Section 96 bis</h2>
+                    <p>
+                        While Thailand's Land Code Section 86 prohibits foreigners from owning land, Section 96 bis
+                        creates a narrow exception for foreigners who make substantial qualifying investments in
+                        Thailand. This provision, added to the Land Code in 1999, was designed to attract high-net-worth
+                        individuals while maintaining tight controls on foreign land ownership.
+                    </p>
+                    <p>
+                        It is crucial to understand that this exception is rarely used and rarely approved. The requirements
+                        are stringent, the approval process is discretionary, and the permitted use is strictly limited
+                        to residential purposes. Most foreigners seeking property in Thailand use leasehold structures
+                        instead, as covered in our
+                        <a href="/Thai/property/leasehold-structures.html" style="color: var(--thai-blue); font-weight: 600;">30-Year Leasehold Guide</a>.
+                    </p>
 
-                <div class="statute-card">
-                    <div class="statute-card-header">
-                        <span class="icon">&#9878;</span>
-                        <h4>Land Code Section 96 bis - Full Text (Official Translation)</h4>
+                    <div class="statute-card">
+                        <div class="statute-card-header">
+                            <span class="icon">&#9878;</span>
+                            <h4>Land Code Section 96 bis - Full Text (Official Translation)</h4>
+                        </div>
+                        <div class="statute-text">
+                            "An alien who brings into the Kingdom foreign currency not less than forty million Baht or its
+                            equivalent to invest in prescribed categories of business that are beneficial to Thailand's
+                            economy and society may apply for permission to acquire land for residential purpose, which
+                            shall not exceed one rai."
+                            <br><br>
+                            "The permission under paragraph one shall be granted by the Minister with approval of the Cabinet."
+                            <br><br>
+                            "The categories of business, period of investment, conditions, and procedures for applying
+                            under paragraph one shall be prescribed in the Ministerial Regulation."
+                        </div>
+                        <div class="plain-english">
+                            <div class="plain-english-label">Plain English Explanation</div>
+                            <p>
+                                A foreigner who brings at least 40 million THB (~USD 1.1 million) into Thailand and invests
+                                it in government-approved business categories may apply to purchase up to 1 rai (1,600 square
+                                meters) of land for residential purposes. The Minister of Interior must approve each application,
+                                with Cabinet endorsement. This is not an automatic right - it is a discretionary privilege.
+                            </p>
+                        </div>
                     </div>
-                    <div class="statute-text">
-                        "An alien who brings into the Kingdom foreign currency not less than forty million Baht or its
-                        equivalent to invest in prescribed categories of business that are beneficial to Thailand's
-                        economy and society may apply for permission to acquire land for residential purpose, which
-                        shall not exceed one rai."
-                        <br><br>
-                        "The permission under paragraph one shall be granted by the Minister with approval of the Cabinet."
-                        <br><br>
-                        "The categories of business, period of investment, conditions, and procedures for applying
-                        under paragraph one shall be prescribed in the Ministerial Regulation."
+
+                    <h2 id="investment">Qualifying Investment Categories</h2>
+                    <p>
+                        The Ministerial Regulation under Section 96 bis specifies which types of investments qualify.
+                        The investment must be in one or more of the following categories and must be maintained for
+                        at least 5 years after receiving land ownership approval:
+                    </p>
+
+                    <div class="requirements-box">
+                        <h4>Approved Investment Categories</h4>
+                        <div class="requirement-item">
+                            <div class="requirement-check">1</div>
+                            <div class="requirement-text">
+                                <strong>Thai Government Bonds</strong> - Bonds issued by the Thai government or
+                                state enterprises guaranteed by the Ministry of Finance
+                            </div>
+                        </div>
+                        <div class="requirement-item">
+                            <div class="requirement-check">2</div>
+                            <div class="requirement-text">
+                                <strong>BOI-Promoted Companies</strong> - Investment in companies that have received
+                                promotion from the Board of Investment (BOI)
+                            </div>
+                        </div>
+                        <div class="requirement-item">
+                            <div class="requirement-check">3</div>
+                            <div class="requirement-text">
+                                <strong>SET-Listed Equities</strong> - Investment in companies listed on the
+                                Stock Exchange of Thailand (SET)
+                            </div>
+                        </div>
+                        <div class="requirement-item">
+                            <div class="requirement-check">4</div>
+                            <div class="requirement-text">
+                                <strong>Real Estate Investment Trusts</strong> - Investment in registered Thai REITs
+                            </div>
+                        </div>
+                        <div class="requirement-item">
+                            <div class="requirement-check">5</div>
+                            <div class="requirement-text">
+                                <strong>Capital of Thai Companies</strong> - Investment in the paid-up capital of
+                                private Thai limited companies engaged in beneficial activities
+                            </div>
+                        </div>
                     </div>
-                    <div class="plain-english">
-                        <div class="plain-english-label">Plain English Explanation</div>
+
+                    <div class="warning-box">
+                        <h4>Investment Must Be Maintained</h4>
                         <p>
-                            A foreigner who brings at least 40 million THB (~USD 1.1 million) into Thailand and invests
-                            it in government-approved business categories may apply to purchase up to 1 rai (1,600 square
-                            meters) of land for residential purposes. The Minister of Interior must approve each application,
-                            with Cabinet endorsement. This is not an automatic right - it is a discretionary privilege.
+                            The qualifying investment must be maintained for at least 5 years after land ownership
+                            is granted. If the foreigner disposes of the investment or fails to maintain the minimum
+                            threshold during this period, the Land Department may require the land to be sold within
+                            180 days to 1 year. The investment is not a one-time payment for land - it is an ongoing
+                            commitment to investing in the Thai economy.
                         </p>
                     </div>
-                </div>
 
-                <h2>Qualifying Investment Categories</h2>
-                <p>
-                    The Ministerial Regulation under Section 96 bis specifies which types of investments qualify.
-                    The investment must be in one or more of the following categories and must be maintained for
-                    at least 5 years after receiving land ownership approval:
-                </p>
-
-                <div class="requirements-box">
-                    <h4>Approved Investment Categories</h4>
-                    <div class="requirement-item">
-                        <div class="requirement-check">1</div>
-                        <div class="requirement-text">
-                            <strong>Thai Government Bonds</strong> - Bonds issued by the Thai government or
-                            state enterprises guaranteed by the Ministry of Finance
-                        </div>
-                    </div>
-                    <div class="requirement-item">
-                        <div class="requirement-check">2</div>
-                        <div class="requirement-text">
-                            <strong>BOI-Promoted Companies</strong> - Investment in companies that have received
-                            promotion from the Board of Investment (BOI)
-                        </div>
-                    </div>
-                    <div class="requirement-item">
-                        <div class="requirement-check">3</div>
-                        <div class="requirement-text">
-                            <strong>SET-Listed Equities</strong> - Investment in companies listed on the
-                            Stock Exchange of Thailand (SET)
-                        </div>
-                    </div>
-                    <div class="requirement-item">
-                        <div class="requirement-check">4</div>
-                        <div class="requirement-text">
-                            <strong>Real Estate Investment Trusts</strong> - Investment in registered Thai REITs
-                        </div>
-                    </div>
-                    <div class="requirement-item">
-                        <div class="requirement-check">5</div>
-                        <div class="requirement-text">
-                            <strong>Capital of Thai Companies</strong> - Investment in the paid-up capital of
-                            private Thai limited companies engaged in beneficial activities
-                        </div>
-                    </div>
-                </div>
-
-                <div class="warning-box">
-                    <h4>Investment Must Be Maintained</h4>
+                    <h2 id="process">Step-by-Step Application Process</h2>
                     <p>
-                        The qualifying investment must be maintained for at least 5 years after land ownership
-                        is granted. If the foreigner disposes of the investment or fails to maintain the minimum
-                        threshold during this period, the Land Department may require the land to be sold within
-                        180 days to 1 year. The investment is not a one-time payment for land - it is an ongoing
-                        commitment to investing in the Thai economy.
+                        Applying for land ownership under Section 96 bis is a multi-stage process involving multiple
+                        government agencies. Expect significant documentation requirements and a lengthy timeline.
                     </p>
-                </div>
 
-                <h2>Step-by-Step Application Process</h2>
-                <p>
-                    Applying for land ownership under Section 96 bis is a multi-stage process involving multiple
-                    government agencies. Expect significant documentation requirements and a lengthy timeline.
-                </p>
+                    <div class="process-steps">
+                        <div class="process-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>Bring Qualifying Funds into Thailand</h4>
+                                <p>
+                                    Transfer at least 40 million THB (or equivalent in foreign currency) through a
+                                    licensed Thai bank. Obtain a Foreign Exchange Transaction Form (FETF) as proof
+                                    of the international transfer. The funds must be converted to Thai Baht.
+                                </p>
+                            </div>
+                        </div>
 
-                <div class="process-steps">
-                    <div class="process-step">
-                        <div class="step-number">1</div>
-                        <div class="step-content">
-                            <h4>Bring Qualifying Funds into Thailand</h4>
-                            <p>
-                                Transfer at least 40 million THB (or equivalent in foreign currency) through a
-                                licensed Thai bank. Obtain a Foreign Exchange Transaction Form (FETF) as proof
-                                of the international transfer. The funds must be converted to Thai Baht.
-                            </p>
+                        <div class="process-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>Make Qualifying Investments</h4>
+                                <p>
+                                    Invest the 40 million THB in one or more of the approved categories (government
+                                    bonds, BOI companies, SET stocks, etc.). Obtain documentation proving the investments
+                                    including certificates, confirmations, and account statements.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="process-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>Prepare Application Documents</h4>
+                                <p>
+                                    Compile required documents including: passport copies, FETF, investment certificates,
+                                    land survey documents (Chanote) for the target property, proof the land is within
+                                    permitted residential zones, and a statement of intended residential use.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="process-step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h4>Submit to Provincial Land Office</h4>
+                                <p>
+                                    File the application at the Provincial Land Office where the target property is
+                                    located. The Land Office will conduct initial review and forward qualifying
+                                    applications to Bangkok.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="process-step">
+                            <div class="step-number">5</div>
+                            <div class="step-content">
+                                <h4>Department of Lands Review</h4>
+                                <p>
+                                    The central Department of Lands reviews the application for completeness and
+                                    compliance with requirements. They may request additional documentation or
+                                    clarification.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="process-step">
+                            <div class="step-number">6</div>
+                            <div class="step-content">
+                                <h4>Ministerial Review and Cabinet Approval</h4>
+                                <p>
+                                    If the Department recommends approval, the application goes to the Minister of
+                                    Interior, who then seeks Cabinet endorsement. This is a discretionary decision -
+                                    meeting the requirements does not guarantee approval.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="process-step">
+                            <div class="step-number">7</div>
+                            <div class="step-content">
+                                <h4>Land Transfer Registration</h4>
+                                <p>
+                                    Upon approval, the foreigner can complete the land purchase and register ownership
+                                    at the Land Office. Standard transfer fees and taxes apply (approximately 6-7% of
+                                    appraised value).
+                                </p>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="process-step">
-                        <div class="step-number">2</div>
-                        <div class="step-content">
-                            <h4>Make Qualifying Investments</h4>
-                            <p>
-                                Invest the 40 million THB in one or more of the approved categories (government
-                                bonds, BOI companies, SET stocks, etc.). Obtain documentation proving the investments
-                                including certificates, confirmations, and account statements.
-                            </p>
+                    <h2 id="success">Success Rates and Expectations</h2>
+                    <p>
+                        Section 96 bis applications are uncommon, and public statistics on approval rates are limited.
+                        Based on available information and legal practitioner reports, the following observations apply:
+                    </p>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="value">Low</div>
+                            <div class="label">Application Volume</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="value">12-24</div>
+                            <div class="label">Months Timeline</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="value">5+</div>
+                            <div class="label">Years Investment Lock</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="value">Discretionary</div>
+                            <div class="label">Approval Decision</div>
                         </div>
                     </div>
 
-                    <div class="process-step">
-                        <div class="step-number">3</div>
-                        <div class="step-content">
-                            <h4>Prepare Application Documents</h4>
-                            <p>
-                                Compile required documents including: passport copies, FETF, investment certificates,
-                                land survey documents (Chanote) for the target property, proof the land is within
-                                permitted residential zones, and a statement of intended residential use.
-                            </p>
+                    <p>
+                        Most Thai legal practitioners advise clients that Section 96 bis is theoretically available but
+                        practically difficult. The combination of the high investment threshold, discretionary approval
+                        process, residential-only limitation, and 5-year lock-up period makes it unattractive compared
+                        to leasehold alternatives for most foreigners.
+                    </p>
+
+                    <div class="timeline-box">
+                        <h4>Expected Timeline</h4>
+                        <div class="timeline-item">
+                            <div class="timeline-phase">1-2 months</div>
+                            <div class="timeline-desc">Fund transfer and investment placement</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-phase">2-3 months</div>
+                            <div class="timeline-desc">Document preparation and legal review</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-phase">3-6 months</div>
+                            <div class="timeline-desc">Provincial Land Office and DOL review</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-phase">6-12 months</div>
+                            <div class="timeline-desc">Ministerial and Cabinet consideration</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-phase">1-2 months</div>
+                            <div class="timeline-desc">Land purchase and registration (if approved)</div>
                         </div>
                     </div>
 
-                    <div class="process-step">
-                        <div class="step-number">4</div>
-                        <div class="step-content">
-                            <h4>Submit to Provincial Land Office</h4>
-                            <p>
-                                File the application at the Provincial Land Office where the target property is
-                                located. The Land Office will conduct initial review and forward qualifying
-                                applications to Bangkok.
-                            </p>
+                    <h2 id="restrictions">Restrictions on the Land</h2>
+                    <p>
+                        Even if approval is granted, the land ownership comes with significant restrictions:
+                    </p>
+
+                    <ul>
+                        <li><strong>Residential Use Only:</strong> The land must be used for the foreigner's personal
+                            residence. Commercial use, development for sale, or rental operations are not permitted.</li>
+                        <li><strong>Maximum 1 Rai:</strong> A foreigner cannot accumulate more than 1 rai total under
+                            this provision, even if they make multiple 40M THB investments.</li>
+                        <li><strong>Location Restrictions:</strong> The land must be in a zone designated for residential
+                            use. Agricultural land, forest reserves, and certain other categories are excluded.</li>
+                        <li><strong>Disposal Requirement:</strong> If the foreigner no longer meets the requirements
+                            (e.g., sells the investments, loses permanent residence status), they may be required to
+                            dispose of the land within a specified period.</li>
+                    </ul>
+
+                    <h2 id="comparison">Comparison with Other Options</h2>
+                    <p>
+                        Given the difficulty and restrictions of Section 96 bis, most foreigners choose alternative
+                        structures. Here is a comparison:
+                    </p>
+
+                    <table style="width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 0.9rem;">
+                        <thead>
+                            <tr style="background: var(--thai-blue); color: white;">
+                                <th style="padding: 14px 16px; text-align: left;">Factor</th>
+                                <th style="padding: 14px 16px; text-align: left;">Section 96 bis</th>
+                                <th style="padding: 14px 16px; text-align: left;">30-Year Leasehold</th>
+                                <th style="padding: 14px 16px; text-align: left;">Condo Ownership</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid var(--gray-200);">
+                                <td style="padding: 14px 16px;"><strong>Ownership Type</strong></td>
+                                <td style="padding: 14px 16px;">Freehold</td>
+                                <td style="padding: 14px 16px;">Leasehold</td>
+                                <td style="padding: 14px 16px;">Freehold</td>
+                            </tr>
+                            <tr style="background: var(--gray-50); border-bottom: 1px solid var(--gray-200);">
+                                <td style="padding: 14px 16px;"><strong>Capital Requirement</strong></td>
+                                <td style="padding: 14px 16px;">40M THB + land cost</td>
+                                <td style="padding: 14px 16px;">Lease cost only</td>
+                                <td style="padding: 14px 16px;">Unit cost only</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--gray-200);">
+                                <td style="padding: 14px 16px;"><strong>Approval Process</strong></td>
+                                <td style="padding: 14px 16px;">Ministerial + Cabinet</td>
+                                <td style="padding: 14px 16px;">Land Office registration</td>
+                                <td style="padding: 14px 16px;">49% quota check</td>
+                            </tr>
+                            <tr style="background: var(--gray-50); border-bottom: 1px solid var(--gray-200);">
+                                <td style="padding: 14px 16px;"><strong>Timeline</strong></td>
+                                <td style="padding: 14px 16px;">12-24 months</td>
+                                <td style="padding: 14px 16px;">1-2 weeks</td>
+                                <td style="padding: 14px 16px;">1-2 weeks</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--gray-200);">
+                                <td style="padding: 14px 16px;"><strong>Duration</strong></td>
+                                <td style="padding: 14px 16px;">Permanent (if conditions met)</td>
+                                <td style="padding: 14px 16px;">30 years maximum</td>
+                                <td style="padding: 14px 16px;">Permanent</td>
+                            </tr>
+                            <tr style="background: var(--gray-50);">
+                                <td style="padding: 14px 16px;"><strong>Use Restrictions</strong></td>
+                                <td style="padding: 14px 16px;">Residential only</td>
+                                <td style="padding: 14px 16px;">Per lease terms</td>
+                                <td style="padding: 14px 16px;">Per condo rules</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h2 id="questions">Common Questions</h2>
+
+                    <h3>Can I use Section 96 bis for a holiday home?</h3>
+                    <p>
+                        Technically, the land must be for your "residence." There is no explicit requirement that it
+                        be your primary residence, but using the provision for an occasional-use property may raise
+                        questions about whether you are meeting the spirit of the law. Consult a Thai attorney about
+                        your specific situation.
+                    </p>
+
+                    <h3>What happens if my investments decline in value?</h3>
+                    <p>
+                        The requirement is to invest 40 million THB; there is no explicit requirement that the value
+                        remain at 40 million THB after market fluctuations. However, if you dispose of the investments
+                        (sell them), you would fail to meet the requirement. Seek legal advice on portfolio management
+                        during the 5-year holding period.
+                    </p>
+
+                    <h3>Can my spouse or children inherit the land?</h3>
+                    <p>
+                        Inheritance follows Section 86 of the Land Code. If your heir is a foreigner who is a "statutory
+                        heir," they may inherit the land but must comply with the limits in Section 87 and may need
+                        to dispose of excess land. A Thai spouse could potentially inherit under normal Thai inheritance
+                        rules.
+                    </p>
+
+                    <!-- Cross Links -->
+                    <div class="cross-links">
+                        <h4>Related Guides</h4>
+                        <div class="cross-links-grid">
+                            <a href="/Thai/property/land-ownership-foreigners.html" class="cross-link">
+                                <h5>Can Foreigners Own Land?</h5>
+                                <p>The fundamental prohibition under Land Code Section 86</p>
+                            </a>
+                            <a href="/Thai/property/leasehold-structures.html" class="cross-link">
+                                <h5>30-Year Leasehold Structures</h5>
+                                <p>The practical alternative used by most foreigners</p>
+                            </a>
+                            <a href="/Thai/business/boi-promotion-pathways.html" class="cross-link">
+                                <h5>BOI Promotion Pathways</h5>
+                                <p>BOI-promoted companies can own land for operations</p>
+                            </a>
+                            <a href="/Thai/business/treaty-of-amity-us.html" class="cross-link">
+                                <h5>Treaty of Amity</h5>
+                                <p>US citizens business ownership (land still prohibited)</p>
+                            </a>
+                            <a href="/Thai/" class="cross-link">
+                                <h5>Thai Legal Hub</h5>
+                                <p>Complete guide to Thai law for foreigners</p>
+                            </a>
                         </div>
-                    </div>
-
-                    <div class="process-step">
-                        <div class="step-number">5</div>
-                        <div class="step-content">
-                            <h4>Department of Lands Review</h4>
-                            <p>
-                                The central Department of Lands reviews the application for completeness and
-                                compliance with requirements. They may request additional documentation or
-                                clarification.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="process-step">
-                        <div class="step-number">6</div>
-                        <div class="step-content">
-                            <h4>Ministerial Review and Cabinet Approval</h4>
-                            <p>
-                                If the Department recommends approval, the application goes to the Minister of
-                                Interior, who then seeks Cabinet endorsement. This is a discretionary decision -
-                                meeting the requirements does not guarantee approval.
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="process-step">
-                        <div class="step-number">7</div>
-                        <div class="step-content">
-                            <h4>Land Transfer Registration</h4>
-                            <p>
-                                Upon approval, the foreigner can complete the land purchase and register ownership
-                                at the Land Office. Standard transfer fees and taxes apply (approximately 6-7% of
-                                appraised value).
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <h2>Success Rates and Expectations</h2>
-                <p>
-                    Section 96 bis applications are uncommon, and public statistics on approval rates are limited.
-                    Based on available information and legal practitioner reports, the following observations apply:
-                </p>
-
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="value">Low</div>
-                        <div class="label">Application Volume</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="value">12-24</div>
-                        <div class="label">Months Timeline</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="value">5+</div>
-                        <div class="label">Years Investment Lock</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="value">Discretionary</div>
-                        <div class="label">Approval Decision</div>
-                    </div>
-                </div>
-
-                <p>
-                    Most Thai legal practitioners advise clients that Section 96 bis is theoretically available but
-                    practically difficult. The combination of the high investment threshold, discretionary approval
-                    process, residential-only limitation, and 5-year lock-up period makes it unattractive compared
-                    to leasehold alternatives for most foreigners.
-                </p>
-
-                <div class="timeline-box">
-                    <h4>Expected Timeline</h4>
-                    <div class="timeline-item">
-                        <div class="timeline-phase">1-2 months</div>
-                        <div class="timeline-desc">Fund transfer and investment placement</div>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="timeline-phase">2-3 months</div>
-                        <div class="timeline-desc">Document preparation and legal review</div>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="timeline-phase">3-6 months</div>
-                        <div class="timeline-desc">Provincial Land Office and DOL review</div>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="timeline-phase">6-12 months</div>
-                        <div class="timeline-desc">Ministerial and Cabinet consideration</div>
-                    </div>
-                    <div class="timeline-item">
-                        <div class="timeline-phase">1-2 months</div>
-                        <div class="timeline-desc">Land purchase and registration (if approved)</div>
-                    </div>
-                </div>
-
-                <h2>Restrictions on the Land</h2>
-                <p>
-                    Even if approval is granted, the land ownership comes with significant restrictions:
-                </p>
-
-                <ul>
-                    <li><strong>Residential Use Only:</strong> The land must be used for the foreigner's personal
-                        residence. Commercial use, development for sale, or rental operations are not permitted.</li>
-                    <li><strong>Maximum 1 Rai:</strong> A foreigner cannot accumulate more than 1 rai total under
-                        this provision, even if they make multiple 40M THB investments.</li>
-                    <li><strong>Location Restrictions:</strong> The land must be in a zone designated for residential
-                        use. Agricultural land, forest reserves, and certain other categories are excluded.</li>
-                    <li><strong>Disposal Requirement:</strong> If the foreigner no longer meets the requirements
-                        (e.g., sells the investments, loses permanent residence status), they may be required to
-                        dispose of the land within a specified period.</li>
-                </ul>
-
-                <h2>Comparison with Other Options</h2>
-                <p>
-                    Given the difficulty and restrictions of Section 96 bis, most foreigners choose alternative
-                    structures. Here is a comparison:
-                </p>
-
-                <table style="width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 0.9rem;">
-                    <thead>
-                        <tr style="background: var(--thai-blue); color: white;">
-                            <th style="padding: 14px 16px; text-align: left;">Factor</th>
-                            <th style="padding: 14px 16px; text-align: left;">Section 96 bis</th>
-                            <th style="padding: 14px 16px; text-align: left;">30-Year Leasehold</th>
-                            <th style="padding: 14px 16px; text-align: left;">Condo Ownership</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr style="border-bottom: 1px solid var(--gray-200);">
-                            <td style="padding: 14px 16px;"><strong>Ownership Type</strong></td>
-                            <td style="padding: 14px 16px;">Freehold</td>
-                            <td style="padding: 14px 16px;">Leasehold</td>
-                            <td style="padding: 14px 16px;">Freehold</td>
-                        </tr>
-                        <tr style="background: var(--gray-50); border-bottom: 1px solid var(--gray-200);">
-                            <td style="padding: 14px 16px;"><strong>Capital Requirement</strong></td>
-                            <td style="padding: 14px 16px;">40M THB + land cost</td>
-                            <td style="padding: 14px 16px;">Lease cost only</td>
-                            <td style="padding: 14px 16px;">Unit cost only</td>
-                        </tr>
-                        <tr style="border-bottom: 1px solid var(--gray-200);">
-                            <td style="padding: 14px 16px;"><strong>Approval Process</strong></td>
-                            <td style="padding: 14px 16px;">Ministerial + Cabinet</td>
-                            <td style="padding: 14px 16px;">Land Office registration</td>
-                            <td style="padding: 14px 16px;">49% quota check</td>
-                        </tr>
-                        <tr style="background: var(--gray-50); border-bottom: 1px solid var(--gray-200);">
-                            <td style="padding: 14px 16px;"><strong>Timeline</strong></td>
-                            <td style="padding: 14px 16px;">12-24 months</td>
-                            <td style="padding: 14px 16px;">1-2 weeks</td>
-                            <td style="padding: 14px 16px;">1-2 weeks</td>
-                        </tr>
-                        <tr style="border-bottom: 1px solid var(--gray-200);">
-                            <td style="padding: 14px 16px;"><strong>Duration</strong></td>
-                            <td style="padding: 14px 16px;">Permanent (if conditions met)</td>
-                            <td style="padding: 14px 16px;">30 years maximum</td>
-                            <td style="padding: 14px 16px;">Permanent</td>
-                        </tr>
-                        <tr style="background: var(--gray-50);">
-                            <td style="padding: 14px 16px;"><strong>Use Restrictions</strong></td>
-                            <td style="padding: 14px 16px;">Residential only</td>
-                            <td style="padding: 14px 16px;">Per lease terms</td>
-                            <td style="padding: 14px 16px;">Per condo rules</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <h2>Common Questions</h2>
-
-                <h3>Can I use Section 96 bis for a holiday home?</h3>
-                <p>
-                    Technically, the land must be for your "residence." There is no explicit requirement that it
-                    be your primary residence, but using the provision for an occasional-use property may raise
-                    questions about whether you are meeting the spirit of the law. Consult a Thai attorney about
-                    your specific situation.
-                </p>
-
-                <h3>What happens if my investments decline in value?</h3>
-                <p>
-                    The requirement is to invest 40 million THB; there is no explicit requirement that the value
-                    remain at 40 million THB after market fluctuations. However, if you dispose of the investments
-                    (sell them), you would fail to meet the requirement. Seek legal advice on portfolio management
-                    during the 5-year holding period.
-                </p>
-
-                <h3>Can my spouse or children inherit the land?</h3>
-                <p>
-                    Inheritance follows Section 86 of the Land Code. If your heir is a foreigner who is a "statutory
-                    heir," they may inherit the land but must comply with the limits in Section 87 and may need
-                    to dispose of excess land. A Thai spouse could potentially inherit under normal Thai inheritance
-                    rules.
-                </p>
-
-                <!-- Cross Links -->
-                <div class="cross-links">
-                    <h4>Related Guides</h4>
-                    <div class="cross-links-grid">
-                        <a href="/Thai/property/land-ownership-foreigners.html" class="cross-link">
-                            <h5>Can Foreigners Own Land?</h5>
-                            <p>The fundamental prohibition under Land Code Section 86</p>
-                        </a>
-                        <a href="/Thai/property/leasehold-structures.html" class="cross-link">
-                            <h5>30-Year Leasehold Structures</h5>
-                            <p>The practical alternative used by most foreigners</p>
-                        </a>
-                        <a href="/Thai/business/boi-promotion-pathways.html" class="cross-link">
-                            <h5>BOI Promotion Pathways</h5>
-                            <p>BOI-promoted companies can own land for operations</p>
-                        </a>
-                        <a href="/Thai/business/treaty-of-amity-us.html" class="cross-link">
-                            <h5>Treaty of Amity</h5>
-                            <p>US citizens business ownership (land still prohibited)</p>
-                        </a>
-                        <a href="/Thai/" class="cross-link">
-                            <h5>Thai Legal Hub</h5>
-                            <p>Complete guide to Thai law for foreigners</p>
-                        </a>
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
     </div>
+
+    <!-- Mobile Navigation Toggle -->
+    <button class="mobile-nav-toggle" onclick="toggleSidebar()">&#9776;</button>
+    <div class="overlay" onclick="toggleSidebar()"></div>
 
     <!-- Footer -->
     <footer class="footer">
@@ -1118,5 +1203,26 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                const yOffset = -80;
+                const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                window.scrollTo({top: y, behavior: 'smooth'});
+                document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+                document.querySelector('.nav-item[href="#' + sectionId + '"]').classList.add('active');
+                document.querySelector('.sidebar').classList.remove('open');
+                document.querySelector('.overlay').classList.remove('show');
+            }
+            return false;
+        }
+
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('open');
+            document.querySelector('.overlay').classList.toggle('show');
+        }
+    </script>
 </body>
 </html>

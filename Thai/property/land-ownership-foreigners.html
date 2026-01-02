@@ -61,6 +61,14 @@
             margin: 0 auto;
             font-size: 0.875rem;
             color: var(--gray-500);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .breadcrumbs-nav {
+            display: flex;
+            align-items: center;
         }
 
         .breadcrumbs a {
@@ -75,6 +83,24 @@
         .breadcrumbs span {
             margin: 0 8px;
             color: var(--gray-400);
+        }
+
+        /* Language Selector */
+        .lang-selector {
+            display: flex;
+            gap: 8px;
+        }
+
+        .lang-flag {
+            font-size: 1.4rem;
+            text-decoration: none;
+            opacity: 0.5;
+            transition: opacity 0.2s;
+        }
+
+        .lang-flag:hover,
+        .lang-flag.active {
+            opacity: 1;
         }
 
         /* Hero */
@@ -125,81 +151,135 @@
             max-width: 700px;
         }
 
-        /* Main Layout */
-        .main-layout {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 260px 1fr;
-            gap: 40px;
-            padding: 40px 24px;
+        /* Page-Wide Sidebar Layout */
+        .page-wrapper {
+            display: flex;
+            min-height: calc(100vh - 60px);
         }
 
-        /* Sidebar Navigation */
         .sidebar {
-            position: sticky;
-            top: 100px;
-            height: fit-content;
-        }
-
-        .sidebar-nav {
+            width: 260px;
             background: white;
-            border-radius: 12px;
-            border: 1px solid var(--gray-200);
-            overflow: hidden;
+            border-right: 1px solid var(--gray-200);
+            position: sticky;
+            top: 60px;
+            height: calc(100vh - 60px);
+            overflow-y: auto;
+            flex-shrink: 0;
         }
 
         .sidebar-header {
-            background: var(--thai-blue);
-            color: white;
-            padding: 16px 20px;
-            font-weight: 700;
-            font-size: 0.9rem;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+            background: linear-gradient(135deg, rgba(239, 51, 64, 0.1) 0%, rgba(0, 32, 91, 0.1) 100%);
         }
 
-        .sidebar-link {
-            display: block;
-            padding: 14px 20px;
-            color: var(--gray-700);
+        .sidebar-header h2 {
+            font-size: 1rem;
+            color: var(--thai-red);
+            margin-bottom: 0.25rem;
+        }
+
+        .sidebar-header p {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: var(--gray-600);
             text-decoration: none;
             font-size: 0.9rem;
-            border-bottom: 1px solid var(--gray-100);
+            border-left: 3px solid transparent;
             transition: all 0.2s;
         }
 
-        .sidebar-link:hover {
+        .nav-item:hover {
             background: var(--gray-50);
             color: var(--thai-blue);
         }
 
-        .sidebar-link.active {
-            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(0, 32, 91, 0.05) 0%, rgba(0, 32, 91, 0.1) 100%);
             color: var(--thai-blue);
-            font-weight: 600;
-            border-left: 3px solid var(--thai-blue);
-        }
-
-        .sidebar-link:last-child {
-            border-bottom: none;
-        }
-
-        .sidebar-badge {
-            display: inline-block;
-            font-size: 0.65rem;
-            padding: 2px 6px;
-            border-radius: 4px;
-            margin-left: 6px;
+            border-left-color: var(--thai-blue);
             font-weight: 600;
         }
 
-        .sidebar-badge.key {
-            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-            color: var(--thai-red);
-        }
-
-        /* Main Content */
-        .main-content {
+        .main-area {
+            flex: 1;
             min-width: 0;
+        }
+
+        /* Mobile Nav Toggle */
+        .mobile-nav-toggle {
+            display: none;
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--thai-blue);
+            color: white;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 32, 91, 0.3);
+            z-index: 1000;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 998;
+        }
+
+        .overlay.show {
+            display: block;
+        }
+
+        @media (max-width: 900px) {
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                top: 0;
+                height: 100vh;
+                z-index: 999;
+                transition: left 0.3s ease;
+            }
+
+            .sidebar.open {
+                left: 0;
+            }
+
+            .mobile-nav-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .page-wrapper {
+                flex-direction: column;
+            }
+        }
+
+        /* Main Content Area */
+        .main-layout {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 24px;
         }
 
         /* Answer Box - Large prominent answer */
@@ -564,14 +644,6 @@
 
         /* Responsive */
         @media (max-width: 900px) {
-            .main-layout {
-                grid-template-columns: 1fr;
-            }
-
-            .sidebar {
-                position: static;
-            }
-
             .hero h1 {
                 font-size: 2rem;
             }
@@ -591,6 +663,7 @@
     </style>
 </head>
 <body>
+<script src="/Thai/shared/lang-switcher.js"></script>
     <!-- Sitewide Header -->
     <div id="site-header"></div>
     <script src="/shared/header-loader.js"></script>
@@ -598,13 +671,19 @@
     <!-- Breadcrumbs -->
     <nav class="breadcrumbs">
         <div class="breadcrumbs-content">
-            <a href="/">Home</a>
-            <span>></span>
-            <a href="/Thai/">Thai Legal Hub</a>
-            <span>></span>
-            <a href="/Thai/property/">Property</a>
-            <span>></span>
-            Can Foreigners Own Land?
+            <div class="breadcrumbs-nav">
+                <a href="/">Home</a>
+                <span>></span>
+                <a href="/Thai/">Thai Legal Hub</a>
+                <span>></span>
+                <a href="/Thai/property/">Property</a>
+                <span>></span>
+                Can Foreigners Own Land?
+            </div>
+            <div class="lang-selector">
+                <a href="/Thai/property/land-ownership-foreigners.html" class="lang-flag active" title="English">&#127482;&#127480;</a>
+                <a href="/Thai/ru/property/land-ownership-foreigners.html" class="lang-flag" title="Russian">&#127479;&#127482;</a>
+            </div>
         </div>
     </nav>
 
@@ -620,367 +699,373 @@
         </div>
     </section>
 
-    <!-- Main Layout -->
-    <div class="main-layout">
+    <!-- Page Wrapper with Sidebar -->
+    <div class="page-wrapper">
         <!-- Sidebar Navigation -->
         <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Page Navigation</h2>
+                <p>Jump to section</p>
+            </div>
             <nav class="sidebar-nav">
-                <div class="sidebar-header">Property Guides</div>
-                <a href="/Thai/property/" class="sidebar-link">Overview</a>
-                <a href="/Thai/property/land-ownership-foreigners.html" class="sidebar-link active">
-                    Can Foreigners Own Land? <span class="sidebar-badge key">Key</span>
-                </a>
-                <a href="/Thai/property/section-96-bis.html" class="sidebar-link">
-                    Section 96 bis Exception
-                </a>
-                <a href="/Thai/property/leasehold-structures.html" class="sidebar-link">
-                    30-Year Leasehold
-                </a>
+                <a href="#prohibition" class="nav-item active" onclick="return scrollToSection('prohibition')">The Fundamental Prohibition</a>
+                <a href="#history" class="nav-item" onclick="return scrollToSection('history')">Historical Context</a>
+                <a href="#treaty" class="nav-item" onclick="return scrollToSection('treaty')">Treaty Exception</a>
+                <a href="#companies" class="nav-item" onclick="return scrollToSection('companies')">Thai Companies</a>
+                <a href="#comparison" class="nav-item" onclick="return scrollToSection('comparison')">ASEAN Comparison</a>
+                <a href="#alternatives" class="nav-item" onclick="return scrollToSection('alternatives')">Legal Alternatives</a>
+                <a href="#faq" class="nav-item" onclick="return scrollToSection('faq')">Common Questions</a>
             </nav>
         </aside>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- The Answer -->
-            <div class="answer-box">
-                <div class="answer">NO</div>
-                <p class="basis">
-                    Foreigners generally cannot own land in Thailand.<br>
-                    <strong>Statutory Basis: Land Code Section 86</strong>
-                </p>
-            </div>
+        <!-- Main Content Area -->
+        <div class="main-area">
+            <div class="main-layout">
+                <!-- The Answer -->
+                <div class="answer-box">
+                    <div class="answer">NO</div>
+                    <p class="basis">
+                        Foreigners generally cannot own land in Thailand.<br>
+                        <strong>Statutory Basis: Land Code Section 86</strong>
+                    </p>
+                </div>
 
-            <div class="article-content">
-                <h2>The Fundamental Prohibition</h2>
-                <p>
-                    Thailand maintains one of the strictest land ownership regimes in Southeast Asia for foreigners.
-                    Unlike some neighboring countries that have loosened restrictions to attract foreign investment,
-                    Thailand has consistently upheld its prohibition on alien land ownership for over a century.
-                </p>
-                <p>
-                    The prohibition is not a regulation, administrative guideline, or policy preference. It is a
-                    fundamental provision of the Land Code (B.E. 2497 / 1954), Thailand's primary legislation governing
-                    land rights. This means it can only be changed by an act of the National Assembly - not by
-                    ministerial decree or administrative action.
-                </p>
+                <div class="article-content">
+                    <h2 id="prohibition">The Fundamental Prohibition</h2>
+                    <p>
+                        Thailand maintains one of the strictest land ownership regimes in Southeast Asia for foreigners.
+                        Unlike some neighboring countries that have loosened restrictions to attract foreign investment,
+                        Thailand has consistently upheld its prohibition on alien land ownership for over a century.
+                    </p>
+                    <p>
+                        The prohibition is not a regulation, administrative guideline, or policy preference. It is a
+                        fundamental provision of the Land Code (B.E. 2497 / 1954), Thailand's primary legislation governing
+                        land rights. This means it can only be changed by an act of the National Assembly - not by
+                        ministerial decree or administrative action.
+                    </p>
 
-                <div class="statute-card">
-                    <div class="statute-card-header">
-                        <span class="icon">&#9878;</span>
-                        <h4>Land Code Section 86 - Full Text (Official Translation)</h4>
+                    <div class="statute-card">
+                        <div class="statute-card-header">
+                            <span class="icon">&#9878;</span>
+                            <h4>Land Code Section 86 - Full Text (Official Translation)</h4>
+                        </div>
+                        <div class="statute-text">
+                            "Aliens shall not acquire land except by virtue of the provisions of a treaty giving the right to
+                            own immovable properties, and subject to the provisions of this Code."
+                            <br><br>
+                            "Subject to Section 84, an alien who acquires land as a statutory heir may own such land, but
+                            the total area of land owned by such alien including the land already owned, if any, in that
+                            sub-district (tambon) must not exceed the limit provided in Section 87."
+                            <br><br>
+                            "If an alien acquires land in excess of the limit in paragraph two, he shall dispose of the land
+                            in excess of the limit within the period prescribed in Section 94. If he fails to comply
+                            therewith, the Director-General shall have power to dispose of the land as provided in Section 94."
+                        </div>
+                        <div class="plain-english">
+                            <div class="plain-english-label">Plain English Explanation</div>
+                            <p>
+                                <strong>Paragraph 1:</strong> Foreigners cannot acquire land unless there is a specific treaty
+                                between Thailand and their home country that grants this right. Currently, no such active
+                                treaties exist for land ownership purposes.
+                                <br><br>
+                                <strong>Paragraph 2:</strong> The only exception is inheritance. If a foreigner inherits land
+                                from a Thai relative (as a "statutory heir"), they may own that land - but only up to the
+                                limits specified in Section 87 for residential purposes.
+                                <br><br>
+                                <strong>Paragraph 3:</strong> If a foreigner ends up with more land than allowed (through
+                                inheritance), they must sell the excess within the timeframe set by Section 94, or the
+                                government will sell it for them.
+                            </p>
+                        </div>
                     </div>
-                    <div class="statute-text">
-                        "Aliens shall not acquire land except by virtue of the provisions of a treaty giving the right to
-                        own immovable properties, and subject to the provisions of this Code."
-                        <br><br>
-                        "Subject to Section 84, an alien who acquires land as a statutory heir may own such land, but
-                        the total area of land owned by such alien including the land already owned, if any, in that
-                        sub-district (tambon) must not exceed the limit provided in Section 87."
-                        <br><br>
-                        "If an alien acquires land in excess of the limit in paragraph two, he shall dispose of the land
-                        in excess of the limit within the period prescribed in Section 94. If he fails to comply
-                        therewith, the Director-General shall have power to dispose of the land as provided in Section 94."
-                    </div>
-                    <div class="plain-english">
-                        <div class="plain-english-label">Plain English Explanation</div>
+
+                    <h2 id="history">Historical Context: Why Thailand Prohibits Foreign Land Ownership</h2>
+                    <p>
+                        Thailand's restriction on foreign land ownership has deep historical roots tied to the country's
+                        unique position as the only Southeast Asian nation never colonized by a Western power.
+                    </p>
+
+                    <h3>The Colonial Era Concern (1850s-1940s)</h3>
+                    <p>
+                        During the height of European colonialism in Southeast Asia, Thai monarchs observed neighboring
+                        countries losing sovereignty partly through foreign economic control of land and resources. The
+                        British controlled Burma and Malaya; the French controlled Indochina (Vietnam, Laos, Cambodia).
+                        Thailand's rulers strategically maintained land in Thai hands to preserve economic independence.
+                    </p>
+
+                    <h3>Post-WWII Consolidation (1954)</h3>
+                    <p>
+                        The current Land Code was enacted in 1954 (B.E. 2497), codifying restrictions that had developed
+                        over decades. The legislative intent was clear: ensure that Thailand's agricultural and residential
+                        land remains under Thai control and ownership.
+                    </p>
+
+                    <h3>Modern Economic Pressures</h3>
+                    <p>
+                        Despite periodic proposals to allow foreign land ownership to boost foreign investment - particularly
+                        in tourism and retirement sectors - successive Thai governments have maintained the prohibition.
+                        The concern remains that allowing foreign ownership would price Thai citizens out of their own
+                        land market, particularly in desirable coastal and urban areas.
+                    </p>
+
+                    <h2 id="treaty">The Treaty Exception: Does It Help Any Foreigners?</h2>
+                    <p>
+                        Section 86 mentions "the provisions of a treaty giving the right to own immovable properties."
+                        This refers to historical treaties, primarily with Western powers, that existed during the
+                        colonial era. However, these treaties have effectively become dormant for practical purposes.
+                    </p>
+
+                    <div class="info-box">
+                        <h4>Current Treaty Status</h4>
                         <p>
-                            <strong>Paragraph 1:</strong> Foreigners cannot acquire land unless there is a specific treaty
-                            between Thailand and their home country that grants this right. Currently, no such active
-                            treaties exist for land ownership purposes.
-                            <br><br>
-                            <strong>Paragraph 2:</strong> The only exception is inheritance. If a foreigner inherits land
-                            from a Thai relative (as a "statutory heir"), they may own that land - but only up to the
-                            limits specified in Section 87 for residential purposes.
-                            <br><br>
-                            <strong>Paragraph 3:</strong> If a foreigner ends up with more land than allowed (through
-                            inheritance), they must sell the excess within the timeframe set by Section 94, or the
-                            government will sell it for them.
+                            While certain historical treaties technically remain on the books, the Land Department does
+                            not currently process foreign land ownership applications based on treaty rights. U.S. citizens
+                            sometimes inquire about the Treaty of Amity (1966), but this treaty applies to <strong>business
+                            operations</strong> under the Foreign Business Act - not to land ownership under the Land Code.
+                            The Treaty of Amity does not grant Americans the right to own land.
                         </p>
                     </div>
-                </div>
 
-                <h2>Historical Context: Why Thailand Prohibits Foreign Land Ownership</h2>
-                <p>
-                    Thailand's restriction on foreign land ownership has deep historical roots tied to the country's
-                    unique position as the only Southeast Asian nation never colonized by a Western power.
-                </p>
-
-                <h3>The Colonial Era Concern (1850s-1940s)</h3>
-                <p>
-                    During the height of European colonialism in Southeast Asia, Thai monarchs observed neighboring
-                    countries losing sovereignty partly through foreign economic control of land and resources. The
-                    British controlled Burma and Malaya; the French controlled Indochina (Vietnam, Laos, Cambodia).
-                    Thailand's rulers strategically maintained land in Thai hands to preserve economic independence.
-                </p>
-
-                <h3>Post-WWII Consolidation (1954)</h3>
-                <p>
-                    The current Land Code was enacted in 1954 (B.E. 2497), codifying restrictions that had developed
-                    over decades. The legislative intent was clear: ensure that Thailand's agricultural and residential
-                    land remains under Thai control and ownership.
-                </p>
-
-                <h3>Modern Economic Pressures</h3>
-                <p>
-                    Despite periodic proposals to allow foreign land ownership to boost foreign investment - particularly
-                    in tourism and retirement sectors - successive Thai governments have maintained the prohibition.
-                    The concern remains that allowing foreign ownership would price Thai citizens out of their own
-                    land market, particularly in desirable coastal and urban areas.
-                </p>
-
-                <h2>The Treaty Exception: Does It Help Any Foreigners?</h2>
-                <p>
-                    Section 86 mentions "the provisions of a treaty giving the right to own immovable properties."
-                    This refers to historical treaties, primarily with Western powers, that existed during the
-                    colonial era. However, these treaties have effectively become dormant for practical purposes.
-                </p>
-
-                <div class="info-box">
-                    <h4>Current Treaty Status</h4>
+                    <h2 id="companies">What About Thai Companies with Foreign Shareholders?</h2>
                     <p>
-                        While certain historical treaties technically remain on the books, the Land Department does
-                        not currently process foreign land ownership applications based on treaty rights. U.S. citizens
-                        sometimes inquire about the Treaty of Amity (1966), but this treaty applies to <strong>business
-                        operations</strong> under the Foreign Business Act - not to land ownership under the Land Code.
-                        The Treaty of Amity does not grant Americans the right to own land.
+                        A common misconception - and illegal workaround - involves foreigners forming Thai limited companies
+                        with Thai "nominee" shareholders to purchase land. This structure is explicitly illegal under
+                        multiple Thai laws:
                     </p>
-                </div>
 
-                <h2>What About Thai Companies with Foreign Shareholders?</h2>
-                <p>
-                    A common misconception - and illegal workaround - involves foreigners forming Thai limited companies
-                    with Thai "nominee" shareholders to purchase land. This structure is explicitly illegal under
-                    multiple Thai laws:
-                </p>
+                    <div class="warning-box">
+                        <h4>Criminal Penalties for Nominee Structures</h4>
+                        <p>
+                            <strong>Land Code Section 111:</strong> Acquiring land as an agent for an alien is punishable by
+                            up to 2 years imprisonment and/or fines up to 20,000 THB.<br><br>
+                            <strong>Land Code Section 113:</strong> Thai persons who allow their name to be used for aliens
+                            to acquire land face the same penalties.<br><br>
+                            <strong>Foreign Business Act Section 36:</strong> Nominees helping foreigners circumvent FBA
+                            restrictions face up to 3 years imprisonment and fines up to 1,000,000 THB.<br><br>
+                            <strong>2024-2025 Enforcement:</strong> Thai authorities have conducted major crackdowns in
+                            Phuket, Pattaya, Koh Samui, and other areas, with 23 convictions in a single September 2024
+                            case, 231 arrests in the May 2024 "Operation Nominee Sweep," and ongoing prosecution of
+                            over 860 cases with estimated damages exceeding 15 billion THB.
+                        </p>
+                    </div>
 
-                <div class="warning-box">
-                    <h4>Criminal Penalties for Nominee Structures</h4>
+                    <h2 id="comparison">ASEAN Country Comparison: Foreign Land Ownership Rules</h2>
                     <p>
-                        <strong>Land Code Section 111:</strong> Acquiring land as an agent for an alien is punishable by
-                        up to 2 years imprisonment and/or fines up to 20,000 THB.<br><br>
-                        <strong>Land Code Section 113:</strong> Thai persons who allow their name to be used for aliens
-                        to acquire land face the same penalties.<br><br>
-                        <strong>Foreign Business Act Section 36:</strong> Nominees helping foreigners circumvent FBA
-                        restrictions face up to 3 years imprisonment and fines up to 1,000,000 THB.<br><br>
-                        <strong>2024-2025 Enforcement:</strong> Thai authorities have conducted major crackdowns in
-                        Phuket, Pattaya, Koh Samui, and other areas, with 23 convictions in a single September 2024
-                        case, 231 arrests in the May 2024 "Operation Nominee Sweep," and ongoing prosecution of
-                        over 860 cases with estimated damages exceeding 15 billion THB.
+                        Thailand's restrictions are among the strictest in the region, though not unique. Here is how
+                        other ASEAN countries handle foreign land ownership:
                     </p>
-                </div>
 
-                <h2>ASEAN Country Comparison: Foreign Land Ownership Rules</h2>
-                <p>
-                    Thailand's restrictions are among the strictest in the region, though not unique. Here is how
-                    other ASEAN countries handle foreign land ownership:
-                </p>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Country</th>
+                                <th>Freehold Land</th>
+                                <th>Condominium</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Thailand</strong></td>
+                                <td class="status-no">No (general rule)</td>
+                                <td class="status-yes">Yes (49% quota)</td>
+                                <td>Section 96 bis allows 1 rai with 40M THB investment</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Vietnam</strong></td>
+                                <td class="status-no">No</td>
+                                <td class="status-limited">Limited</td>
+                                <td>50-year leasehold for apartments; land cannot be owned</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Indonesia</strong></td>
+                                <td class="status-no">No</td>
+                                <td class="status-limited">Limited</td>
+                                <td>Hak Pakai (right to use) up to 80 years; no freehold</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Philippines</strong></td>
+                                <td class="status-no">No</td>
+                                <td class="status-yes">Yes (40% quota)</td>
+                                <td>Former Filipino citizens may own up to 1,000 sqm residential</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Malaysia</strong></td>
+                                <td class="status-limited">Limited</td>
+                                <td class="status-yes">Yes</td>
+                                <td>Minimum price thresholds; state approval required</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Cambodia</strong></td>
+                                <td class="status-no">No</td>
+                                <td class="status-yes">Yes (70% quota, 2nd floor+)</td>
+                                <td>99-year leasehold available; strata title for condos</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Singapore</strong></td>
+                                <td class="status-limited">Limited</td>
+                                <td class="status-yes">Yes</td>
+                                <td>Restricted property requires approval; condos generally open</td>
+                            </tr>
+                        </tbody>
+                    </table>
 
-                <table class="comparison-table">
-                    <thead>
-                        <tr>
-                            <th>Country</th>
-                            <th>Freehold Land</th>
-                            <th>Condominium</th>
-                            <th>Notes</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>Thailand</strong></td>
-                            <td class="status-no">No (general rule)</td>
-                            <td class="status-yes">Yes (49% quota)</td>
-                            <td>Section 96 bis allows 1 rai with 40M THB investment</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Vietnam</strong></td>
-                            <td class="status-no">No</td>
-                            <td class="status-limited">Limited</td>
-                            <td>50-year leasehold for apartments; land cannot be owned</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Indonesia</strong></td>
-                            <td class="status-no">No</td>
-                            <td class="status-limited">Limited</td>
-                            <td>Hak Pakai (right to use) up to 80 years; no freehold</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Philippines</strong></td>
-                            <td class="status-no">No</td>
-                            <td class="status-yes">Yes (40% quota)</td>
-                            <td>Former Filipino citizens may own up to 1,000 sqm residential</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Malaysia</strong></td>
-                            <td class="status-limited">Limited</td>
-                            <td class="status-yes">Yes</td>
-                            <td>Minimum price thresholds; state approval required</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Cambodia</strong></td>
-                            <td class="status-no">No</td>
-                            <td class="status-yes">Yes (70% quota, 2nd floor+)</td>
-                            <td>99-year leasehold available; strata title for condos</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Singapore</strong></td>
-                            <td class="status-limited">Limited</td>
-                            <td class="status-yes">Yes</td>
-                            <td>Restricted property requires approval; condos generally open</td>
-                        </tr>
-                    </tbody>
-                </table>
+                    <h2 id="alternatives">Legal Alternatives for Foreigners</h2>
+                    <p>
+                        While freehold land ownership is prohibited, Thai law provides several legitimate structures
+                        for foreigners to secure long-term property rights:
+                    </p>
 
-                <h2>Legal Alternatives for Foreigners</h2>
-                <p>
-                    While freehold land ownership is prohibited, Thai law provides several legitimate structures
-                    for foreigners to secure long-term property rights:
-                </p>
+                    <h3>1. Registered Leasehold (30 Years Maximum)</h3>
+                    <p>
+                        Under Civil and Commercial Code Sections 538 and 540, foreigners can register a lease for up
+                        to 30 years at the Land Office. When properly registered, the lease is enforceable against
+                        future owners of the land. This is the most common structure for foreign property control.
+                    </p>
+                    <p>
+                        <a href="/Thai/property/leasehold-structures.html" style="color: var(--thai-blue); font-weight: 600;">
+                            Read our complete guide to 30-Year Leasehold Structures &rarr;
+                        </a>
+                    </p>
 
-                <h3>1. Registered Leasehold (30 Years Maximum)</h3>
-                <p>
-                    Under Civil and Commercial Code Sections 538 and 540, foreigners can register a lease for up
-                    to 30 years at the Land Office. When properly registered, the lease is enforceable against
-                    future owners of the land. This is the most common structure for foreign property control.
-                </p>
-                <p>
-                    <a href="/Thai/property/leasehold-structures.html" style="color: var(--thai-blue); font-weight: 600;">
-                        Read our complete guide to 30-Year Leasehold Structures &rarr;
-                    </a>
-                </p>
+                    <h3>2. Superficies (Building Ownership on Leased Land)</h3>
+                    <p>
+                        Civil and Commercial Code Sections 1410-1416 allow foreigners to own buildings or structures
+                        on land they do not own. Combined with a registered lease of the underlying land, this provides
+                        robust protection for the building investment.
+                    </p>
 
-                <h3>2. Superficies (Building Ownership on Leased Land)</h3>
-                <p>
-                    Civil and Commercial Code Sections 1410-1416 allow foreigners to own buildings or structures
-                    on land they do not own. Combined with a registered lease of the underlying land, this provides
-                    robust protection for the building investment.
-                </p>
+                    <h3>3. Condominium Ownership (49% Foreign Quota)</h3>
+                    <p>
+                        The Condominium Act allows foreigners to own condominium units freehold, but the total foreign
+                        ownership in any single condominium project cannot exceed 49% of the total sellable area.
+                        This is the only true freehold property ownership available to most foreigners.
+                    </p>
 
-                <h3>3. Condominium Ownership (49% Foreign Quota)</h3>
-                <p>
-                    The Condominium Act allows foreigners to own condominium units freehold, but the total foreign
-                    ownership in any single condominium project cannot exceed 49% of the total sellable area.
-                    This is the only true freehold property ownership available to most foreigners.
-                </p>
+                    <h3>4. Section 96 bis Investment Exception</h3>
+                    <p>
+                        Foreigners who invest at least 40 million THB in qualifying Thai assets can apply for permission
+                        to purchase up to 1 rai (1,600 square meters) of residential land. This requires ministerial
+                        approval and is rarely granted.
+                    </p>
+                    <p>
+                        <a href="/Thai/property/section-96-bis.html" style="color: var(--thai-blue); font-weight: 600;">
+                            Read our complete guide to the Section 96 bis Exception &rarr;
+                        </a>
+                    </p>
 
-                <h3>4. Section 96 bis Investment Exception</h3>
-                <p>
-                    Foreigners who invest at least 40 million THB in qualifying Thai assets can apply for permission
-                    to purchase up to 1 rai (1,600 square meters) of residential land. This requires ministerial
-                    approval and is rarely granted.
-                </p>
-                <p>
-                    <a href="/Thai/property/section-96-bis.html" style="color: var(--thai-blue); font-weight: 600;">
-                        Read our complete guide to the Section 96 bis Exception &rarr;
-                    </a>
-                </p>
+                    <h3>5. Usufruct Rights</h3>
+                    <p>
+                        A usufruct grants the right to use property and collect its fruits (income) for a period or
+                        for life. While the foreigner does not own the land, they have protected rights to occupy
+                        and benefit from it.
+                    </p>
 
-                <h3>5. Usufruct Rights</h3>
-                <p>
-                    A usufruct grants the right to use property and collect its fruits (income) for a period or
-                    for life. While the foreigner does not own the land, they have protected rights to occupy
-                    and benefit from it.
-                </p>
-
-                <!-- Quick Reference Card -->
-                <div class="quick-reference">
-                    <h3>Quick Reference Card: Foreign Land Ownership in Thailand</h3>
-                    <div class="quick-reference-grid">
-                        <div class="qr-item">
-                            <div class="label">Primary Prohibition</div>
-                            <div class="value">Land Code §86</div>
-                        </div>
-                        <div class="qr-item">
-                            <div class="label">Can Foreigners Own Land?</div>
-                            <div class="value red">No (General Rule)</div>
-                        </div>
-                        <div class="qr-item">
-                            <div class="label">Criminal Penalty (Nominee)</div>
-                            <div class="value red">Up to 2 Years Prison</div>
-                        </div>
-                        <div class="qr-item">
-                            <div class="label">Exception Route</div>
-                            <div class="value">§96 bis (40M THB)</div>
-                        </div>
-                        <div class="qr-item">
-                            <div class="label">Maximum Leasehold</div>
-                            <div class="value">30 Years (CCC §540)</div>
-                        </div>
-                        <div class="qr-item">
-                            <div class="label">Condo Foreign Quota</div>
-                            <div class="value">49% of Total Area</div>
-                        </div>
-                        <div class="qr-item">
-                            <div class="label">Inheritance Exception</div>
-                            <div class="value">§86 Para 2 (Limited)</div>
-                        </div>
-                        <div class="qr-item">
-                            <div class="label">Enforcement Status</div>
-                            <div class="value red">Active (2024-2025)</div>
+                    <!-- Quick Reference Card -->
+                    <div class="quick-reference">
+                        <h3>Quick Reference Card: Foreign Land Ownership in Thailand</h3>
+                        <div class="quick-reference-grid">
+                            <div class="qr-item">
+                                <div class="label">Primary Prohibition</div>
+                                <div class="value">Land Code Section 86</div>
+                            </div>
+                            <div class="qr-item">
+                                <div class="label">Can Foreigners Own Land?</div>
+                                <div class="value red">No (General Rule)</div>
+                            </div>
+                            <div class="qr-item">
+                                <div class="label">Criminal Penalty (Nominee)</div>
+                                <div class="value red">Up to 2 Years Prison</div>
+                            </div>
+                            <div class="qr-item">
+                                <div class="label">Exception Route</div>
+                                <div class="value">Section 96 bis (40M THB)</div>
+                            </div>
+                            <div class="qr-item">
+                                <div class="label">Maximum Leasehold</div>
+                                <div class="value">30 Years (CCC Section 540)</div>
+                            </div>
+                            <div class="qr-item">
+                                <div class="label">Condo Foreign Quota</div>
+                                <div class="value">49% of Total Area</div>
+                            </div>
+                            <div class="qr-item">
+                                <div class="label">Inheritance Exception</div>
+                                <div class="value">Section 86 Para 2 (Limited)</div>
+                            </div>
+                            <div class="qr-item">
+                                <div class="label">Enforcement Status</div>
+                                <div class="value red">Active (2024-2025)</div>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <h2>Frequently Misunderstood Points</h2>
+                    <h2 id="faq">Frequently Misunderstood Points</h2>
 
-                <h3>"I'm married to a Thai citizen - can I own land?"</h3>
-                <p>
-                    No. Marriage to a Thai citizen does not grant a foreigner the right to own land. When a
-                    Thai spouse purchases land using marital funds, the foreigner must sign a declaration
-                    confirming they have no claim to the land. The land is registered solely in the Thai
-                    spouse's name.
-                </p>
+                    <h3>"I'm married to a Thai citizen - can I own land?"</h3>
+                    <p>
+                        No. Marriage to a Thai citizen does not grant a foreigner the right to own land. When a
+                        Thai spouse purchases land using marital funds, the foreigner must sign a declaration
+                        confirming they have no claim to the land. The land is registered solely in the Thai
+                        spouse's name.
+                    </p>
 
-                <h3>"Can I own land through a Thai company?"</h3>
-                <p>
-                    A Thai company with majority Thai shareholders can own land. However, if the Thai shareholders
-                    are "nominees" who do not genuinely own and control their shares, and the structure is designed
-                    to allow a foreigner to control land, this is illegal. The 2024-2025 enforcement actions have
-                    specifically targeted these structures with criminal prosecutions.
-                </p>
+                    <h3>"Can I own land through a Thai company?"</h3>
+                    <p>
+                        A Thai company with majority Thai shareholders can own land. However, if the Thai shareholders
+                        are "nominees" who do not genuinely own and control their shares, and the structure is designed
+                        to allow a foreigner to control land, this is illegal. The 2024-2025 enforcement actions have
+                        specifically targeted these structures with criminal prosecutions.
+                    </p>
 
-                <h3>"What about long-term residence permits?"</h3>
-                <p>
-                    Permanent residency, Thai Elite membership, LTR (Long-Term Resident) visas, and other immigration
-                    statuses do not grant land ownership rights. Land ownership is governed by the Land Code, not
-                    immigration law. These are separate legal frameworks.
-                </p>
+                    <h3>"What about long-term residence permits?"</h3>
+                    <p>
+                        Permanent residency, Thai Elite membership, LTR (Long-Term Resident) visas, and other immigration
+                        statuses do not grant land ownership rights. Land ownership is governed by the Land Code, not
+                        immigration law. These are separate legal frameworks.
+                    </p>
 
-                <h3>"Can I inherit land from my Thai spouse?"</h3>
-                <p>
-                    Section 86 paragraph 2 allows a foreigner who is a "statutory heir" to inherit land, but only
-                    within strict limits. The foreigner must dispose of any land exceeding the permitted area
-                    within one year. Most inheritance situations result in the foreigner having to sell the land.
-                </p>
+                    <h3>"Can I inherit land from my Thai spouse?"</h3>
+                    <p>
+                        Section 86 paragraph 2 allows a foreigner who is a "statutory heir" to inherit land, but only
+                        within strict limits. The foreigner must dispose of any land exceeding the permitted area
+                        within one year. Most inheritance situations result in the foreigner having to sell the land.
+                    </p>
 
-                <!-- Cross Links -->
-                <div class="cross-links">
-                    <h4>Related Guides</h4>
-                    <div class="cross-links-grid">
-                        <a href="/Thai/property/section-96-bis.html" class="cross-link">
-                            <h5>Section 96 bis: The 40M THB Exception</h5>
-                            <p>How to qualify for the investment-based land ownership exception</p>
-                        </a>
-                        <a href="/Thai/property/leasehold-structures.html" class="cross-link">
-                            <h5>30-Year Leasehold Structures</h5>
-                            <p>The standard legal structure for foreign property control</p>
-                        </a>
-                        <a href="/Thai/business/nominee-structures-risks.html" class="cross-link">
-                            <h5>Nominee Structure Risks</h5>
-                            <p>Why nominee arrangements are illegal and prosecuted</p>
-                        </a>
-                        <a href="/Thai/business/enforcement-tracker.html" class="cross-link">
-                            <h5>Enforcement Tracker</h5>
-                            <p>2024-2025 nominee crackdown updates</p>
-                        </a>
-                        <a href="/Thai/" class="cross-link">
-                            <h5>Thai Legal Hub</h5>
-                            <p>Complete guide to Thai law for foreigners</p>
-                        </a>
+                    <!-- Cross Links -->
+                    <div class="cross-links">
+                        <h4>Related Guides</h4>
+                        <div class="cross-links-grid">
+                            <a href="/Thai/property/section-96-bis.html" class="cross-link">
+                                <h5>Section 96 bis: The 40M THB Exception</h5>
+                                <p>How to qualify for the investment-based land ownership exception</p>
+                            </a>
+                            <a href="/Thai/property/leasehold-structures.html" class="cross-link">
+                                <h5>30-Year Leasehold Structures</h5>
+                                <p>The standard legal structure for foreign property control</p>
+                            </a>
+                            <a href="/Thai/business/nominee-structures-risks.html" class="cross-link">
+                                <h5>Nominee Structure Risks</h5>
+                                <p>Why nominee arrangements are illegal and prosecuted</p>
+                            </a>
+                            <a href="/Thai/business/enforcement-tracker.html" class="cross-link">
+                                <h5>Enforcement Tracker</h5>
+                                <p>2024-2025 nominee crackdown updates</p>
+                            </a>
+                            <a href="/Thai/" class="cross-link">
+                                <h5>Thai Legal Hub</h5>
+                                <p>Complete guide to Thai law for foreigners</p>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
     </div>
+
+    <!-- Mobile Navigation Toggle -->
+    <button class="mobile-nav-toggle" onclick="toggleSidebar()">&#9776;</button>
+    <div class="overlay" onclick="toggleSidebar()"></div>
 
     <!-- Footer -->
     <footer class="footer">
@@ -1001,5 +1086,26 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                const yOffset = -80;
+                const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                window.scrollTo({top: y, behavior: 'smooth'});
+                document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+                document.querySelector('.nav-item[href="#' + sectionId + '"]').classList.add('active');
+                document.querySelector('.sidebar').classList.remove('open');
+                document.querySelector('.overlay').classList.remove('show');
+            }
+            return false;
+        }
+
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('open');
+            document.querySelector('.overlay').classList.toggle('show');
+        }
+    </script>
 </body>
 </html>

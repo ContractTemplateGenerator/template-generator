@@ -485,23 +485,51 @@
             .article-header h1 { font-size: 1.8rem; }
             .conditions-grid { grid-template-columns: 1fr; }
         }
+
+        /* Page-Wide Sidebar Layout */
+        .page-wrapper { display: flex; min-height: calc(100vh - 60px); }
+        .sidebar { width: 260px; background: white; border-right: 1px solid var(--gray-200); position: sticky; top: 60px; height: calc(100vh - 60px); overflow-y: auto; flex-shrink: 0; }
+        .sidebar-header { padding: 1.5rem; border-bottom: 1px solid var(--gray-200); background: linear-gradient(135deg, rgba(239, 51, 64, 0.1) 0%, rgba(0, 32, 91, 0.1) 100%); }
+        .sidebar-header h2 { font-size: 1rem; color: var(--thai-red); margin-bottom: 0.25rem; }
+        .sidebar-header p { font-size: 0.75rem; color: var(--gray-500); }
+        .sidebar-nav { padding: 1rem 0; }
+        .nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.7rem 1.5rem; color: var(--gray-600); font-size: 0.9rem; cursor: pointer; transition: all 0.15s; border-left: 3px solid transparent; text-decoration: none; }
+        .nav-item:hover { background: var(--gray-100); color: var(--gray-800); }
+        .nav-item.active { background: rgba(239, 51, 64, 0.1); color: var(--thai-red); border-left-color: var(--thai-red); font-weight: 600; }
+        .nav-item .icon { font-size: 1.1rem; }
+        .main-area { flex: 1; max-width: 1000px; }
+        .page-wrapper .main-content { padding: 32px 40px; max-width: none; }
+        .mobile-nav-toggle { display: none; position: fixed; bottom: 1.5rem; right: 1.5rem; width: 56px; height: 56px; background: linear-gradient(135deg, var(--thai-red), var(--thai-blue)); border: none; border-radius: 50%; color: white; font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 15px rgba(239, 51, 64, 0.4); z-index: 999; }
+        .overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 1000; }
+        .overlay.show { display: block; }
+        @media (max-width: 900px) { .sidebar { position: fixed; left: -100%; top: 0; height: 100vh; z-index: 1001; transition: left 0.3s; } .sidebar.open { left: 0; } .mobile-nav-toggle { display: flex; align-items: center; justify-content: center; } .page-wrapper { display: block; } .page-wrapper .main-content { padding: 24px; } }
+        .lang-selector { display: flex; gap: 0.5rem; align-items: center; margin-left: auto; padding-right: 1rem; }
+        .lang-flag { font-size: 1.4rem; opacity: 0.5; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+        .lang-flag:hover, .lang-flag.active { opacity: 1; transform: scale(1.15); }
     </style>
 </head>
 <body>
+<script src="/Thai/shared/lang-switcher.js"></script>
     <!-- Sitewide Header -->
     <div id="site-header"></div>
     <script src="/shared/header-loader.js"></script>
 
     <!-- Breadcrumb -->
     <nav class="breadcrumb">
-        <div class="breadcrumb-content">
-            <a href="/">Home</a>
-            <span>></span>
-            <a href="/Thai/">Thai Legal Hub</a>
-            <span>></span>
-            <a href="/Thai/cannabis/">Cannabis & CBD</a>
-            <span>></span>
-            <span class="current">Medical Cannabis Access</span>
+        <div class="breadcrumb-content" style="display: flex; align-items: center;">
+            <div>
+                <a href="/">Home</a>
+                <span>></span>
+                <a href="/Thai/">Thai Legal Hub</a>
+                <span>></span>
+                <a href="/Thai/cannabis/">Cannabis & CBD</a>
+                <span>></span>
+                <span class="current">Medical Cannabis Access</span>
+            </div>
+            <div class="lang-selector">
+                <a href="/Thai/cannabis/medical-cannabis-access.html" class="lang-flag active" title="English">&#127482;&#127480;</a>
+                <a href="/Thai/ru/cannabis/medical-cannabis-access.html" class="lang-flag" title="Russian">&#127479;&#127482;</a>
+            </div>
         </div>
     </nav>
 
@@ -519,6 +547,36 @@
             </div>
         </div>
     </header>
+
+    <!-- Page Wrapper with Sidebar -->
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Cannabis & CBD</h2>
+                <p>Thailand Legal Hub</p>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/Thai/cannabis/" class="nav-item">
+                    <span class="icon">&#127807;</span> Cannabis Hub
+                </a>
+                <a href="/Thai/cannabis/cannabis-2025-status.html" class="nav-item">
+                    <span class="icon">&#9878;</span> 2025 Legal Status
+                </a>
+                <a href="/Thai/cannabis/medical-cannabis-access.html" class="nav-item active">
+                    <span class="icon">&#127973;</span> Medical Access
+                </a>
+                <a href="/Thai/cannabis/cbd-products-rules.html" class="nav-item">
+                    <span class="icon">&#128218;</span> CBD Rules
+                </a>
+                <a href="/Thai/cannabis/cannabis-business-licensing.html" class="nav-item">
+                    <span class="icon">&#128188;</span> Business Licensing
+                </a>
+                <a href="/Thai/" class="nav-item">
+                    <span class="icon">&#127969;</span> Thai Legal Hub
+                </a>
+            </nav>
+        </aside>
+        <div class="main-area">
 
     <!-- Main Content -->
     <article class="article-container">
@@ -870,6 +928,29 @@
 
         </div>
     </article>
+
+        </div><!-- end main-area -->
+    </div><!-- end page-wrapper -->
+
+    <!-- Mobile Navigation -->
+    <button class="mobile-nav-toggle" aria-label="Toggle navigation">&#9776;</button>
+    <div class="overlay"></div>
+
+    <script>
+        const sidebar = document.querySelector('.sidebar');
+        const mobileToggle = document.querySelector('.mobile-nav-toggle');
+        const overlay = document.querySelector('.overlay');
+
+        mobileToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('show');
+        });
+
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('show');
+        });
+    </script>
 
     <!-- Footer -->
     <footer class="footer">

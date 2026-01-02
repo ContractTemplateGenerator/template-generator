@@ -64,6 +64,14 @@
             margin: 0 auto;
             font-size: 0.875rem;
             color: var(--gray-500);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .breadcrumbs-nav {
+            display: flex;
+            align-items: center;
         }
 
         .breadcrumbs a {
@@ -78,6 +86,24 @@
         .breadcrumbs span {
             margin: 0 8px;
             color: var(--gray-400);
+        }
+
+        /* Language Selector */
+        .lang-selector {
+            display: flex;
+            gap: 8px;
+        }
+
+        .lang-flag {
+            font-size: 1.4rem;
+            text-decoration: none;
+            opacity: 0.5;
+            transition: opacity 0.2s;
+        }
+
+        .lang-flag:hover,
+        .lang-flag.active {
+            opacity: 1;
         }
 
         /* Hero */
@@ -128,81 +154,135 @@
             max-width: 700px;
         }
 
-        /* Main Layout */
-        .main-layout {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 260px 1fr;
-            gap: 40px;
-            padding: 40px 24px;
+        /* Page-Wide Sidebar Layout */
+        .page-wrapper {
+            display: flex;
+            min-height: calc(100vh - 60px);
         }
 
-        /* Sidebar Navigation */
         .sidebar {
-            position: sticky;
-            top: 100px;
-            height: fit-content;
-        }
-
-        .sidebar-nav {
+            width: 260px;
             background: white;
-            border-radius: 12px;
-            border: 1px solid var(--gray-200);
-            overflow: hidden;
+            border-right: 1px solid var(--gray-200);
+            position: sticky;
+            top: 60px;
+            height: calc(100vh - 60px);
+            overflow-y: auto;
+            flex-shrink: 0;
         }
 
         .sidebar-header {
-            background: var(--thai-blue);
-            color: white;
-            padding: 16px 20px;
-            font-weight: 700;
-            font-size: 0.9rem;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+            background: linear-gradient(135deg, rgba(239, 51, 64, 0.1) 0%, rgba(0, 32, 91, 0.1) 100%);
         }
 
-        .sidebar-link {
-            display: block;
-            padding: 14px 20px;
-            color: var(--gray-700);
+        .sidebar-header h2 {
+            font-size: 1rem;
+            color: var(--thai-red);
+            margin-bottom: 0.25rem;
+        }
+
+        .sidebar-header p {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: var(--gray-600);
             text-decoration: none;
             font-size: 0.9rem;
-            border-bottom: 1px solid var(--gray-100);
+            border-left: 3px solid transparent;
             transition: all 0.2s;
         }
 
-        .sidebar-link:hover {
+        .nav-item:hover {
             background: var(--gray-50);
             color: var(--thai-blue);
         }
 
-        .sidebar-link.active {
-            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(0, 32, 91, 0.05) 0%, rgba(0, 32, 91, 0.1) 100%);
             color: var(--thai-blue);
-            font-weight: 600;
-            border-left: 3px solid var(--thai-blue);
-        }
-
-        .sidebar-link:last-child {
-            border-bottom: none;
-        }
-
-        .sidebar-badge {
-            display: inline-block;
-            font-size: 0.65rem;
-            padding: 2px 6px;
-            border-radius: 4px;
-            margin-left: 6px;
+            border-left-color: var(--thai-blue);
             font-weight: 600;
         }
 
-        .sidebar-badge.key {
-            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-            color: var(--thai-red);
-        }
-
-        /* Main Content */
-        .main-content {
+        .main-area {
+            flex: 1;
             min-width: 0;
+        }
+
+        /* Mobile Nav Toggle */
+        .mobile-nav-toggle {
+            display: none;
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--thai-blue);
+            color: white;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 32, 91, 0.3);
+            z-index: 1000;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 998;
+        }
+
+        .overlay.show {
+            display: block;
+        }
+
+        @media (max-width: 900px) {
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                top: 0;
+                height: 100vh;
+                z-index: 999;
+                transition: left 0.3s ease;
+            }
+
+            .sidebar.open {
+                left: 0;
+            }
+
+            .mobile-nav-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .page-wrapper {
+                flex-direction: column;
+            }
+        }
+
+        /* Main Content Area */
+        .main-layout {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 24px;
         }
 
         /* Key Points Box */
@@ -670,14 +750,6 @@
 
         /* Responsive */
         @media (max-width: 900px) {
-            .main-layout {
-                grid-template-columns: 1fr;
-            }
-
-            .sidebar {
-                position: static;
-            }
-
             .hero h1 {
                 font-size: 2rem;
             }
@@ -697,6 +769,7 @@
     </style>
 </head>
 <body>
+<script src="/Thai/shared/lang-switcher.js"></script>
     <!-- Sitewide Header -->
     <div id="site-header"></div>
     <script src="/shared/header-loader.js"></script>
@@ -704,13 +777,19 @@
     <!-- Breadcrumbs -->
     <nav class="breadcrumbs">
         <div class="breadcrumbs-content">
-            <a href="/">Home</a>
-            <span>></span>
-            <a href="/Thai/">Thai Legal Hub</a>
-            <span>></span>
-            <a href="/Thai/property/">Property</a>
-            <span>></span>
-            30-Year Leasehold
+            <div class="breadcrumbs-nav">
+                <a href="/">Home</a>
+                <span>></span>
+                <a href="/Thai/">Thai Legal Hub</a>
+                <span>></span>
+                <a href="/Thai/property/">Property</a>
+                <span>></span>
+                30-Year Leasehold
+            </div>
+            <div class="lang-selector">
+                <a href="/Thai/property/leasehold-structures.html" class="lang-flag active" title="English">&#127482;&#127480;</a>
+                <a href="/Thai/ru/property/leasehold-structures.html" class="lang-flag" title="Russian">&#127479;&#127482;</a>
+            </div>
         </div>
     </nav>
 
@@ -726,445 +805,453 @@
         </div>
     </section>
 
-    <!-- Main Layout -->
-    <div class="main-layout">
+    <!-- Page Wrapper with Sidebar -->
+    <div class="page-wrapper">
         <!-- Sidebar Navigation -->
         <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Page Navigation</h2>
+                <p>Jump to section</p>
+            </div>
             <nav class="sidebar-nav">
-                <div class="sidebar-header">Property Guides</div>
-                <a href="/Thai/property/" class="sidebar-link">Overview</a>
-                <a href="/Thai/property/land-ownership-foreigners.html" class="sidebar-link">
-                    Can Foreigners Own Land? <span class="sidebar-badge key">Key</span>
-                </a>
-                <a href="/Thai/property/section-96-bis.html" class="sidebar-link">
-                    Section 96 bis Exception
-                </a>
-                <a href="/Thai/property/leasehold-structures.html" class="sidebar-link active">
-                    30-Year Leasehold
-                </a>
+                <a href="#why-leasehold" class="nav-item active" onclick="return scrollToSection('why-leasehold')">Why Leasehold?</a>
+                <a href="#30-year-max" class="nav-item" onclick="return scrollToSection('30-year-max')">30-Year Maximum</a>
+                <a href="#registration" class="nav-item" onclick="return scrollToSection('registration')">Registration Requirements</a>
+                <a href="#renewal-myths" class="nav-item" onclick="return scrollToSection('renewal-myths')">Renewal Myths</a>
+                <a href="#land-office" class="nav-item" onclick="return scrollToSection('land-office')">Land Office Process</a>
+                <a href="#prepayment" class="nav-item" onclick="return scrollToSection('prepayment')">Rent Prepayment</a>
+                <a href="#superficies" class="nav-item" onclick="return scrollToSection('superficies')">Combining with Superficies</a>
+                <a href="#end-of-lease" class="nav-item" onclick="return scrollToSection('end-of-lease')">End of Lease</a>
+                <a href="#comparison" class="nav-item" onclick="return scrollToSection('comparison')">Leasehold vs Others</a>
             </nav>
         </aside>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Key Points Box -->
-            <div class="key-points-box">
-                <h2>Key Statutory Limits</h2>
-                <div class="key-points-grid">
-                    <div class="key-point">
-                        <div class="label">Maximum Term</div>
-                        <div class="value">30 Years (CCC Section 540)</div>
+        <!-- Main Content Area -->
+        <div class="main-area">
+            <div class="main-layout">
+                <!-- Key Points Box -->
+                <div class="key-points-box">
+                    <h2>Key Statutory Limits</h2>
+                    <div class="key-points-grid">
+                        <div class="key-point">
+                            <div class="label">Maximum Term</div>
+                            <div class="value">30 Years (CCC Section 540)</div>
+                        </div>
+                        <div class="key-point">
+                            <div class="label">Registration Required</div>
+                            <div class="value">Over 3 Years (CCC Section 538)</div>
+                        </div>
+                        <div class="key-point">
+                            <div class="label">Renewal Guarantee</div>
+                            <div class="value">Not Automatic</div>
+                        </div>
+                        <div class="key-point">
+                            <div class="label">Transferable</div>
+                            <div class="value">If Lease Permits</div>
+                        </div>
                     </div>
-                    <div class="key-point">
-                        <div class="label">Registration Required</div>
-                        <div class="value">Over 3 Years (CCC Section 538)</div>
+                </div>
+
+                <div class="article-content">
+                    <h2 id="why-leasehold">Why Leasehold Is the Standard Foreign Structure</h2>
+                    <p>
+                        Since foreigners cannot own land in Thailand (see
+                        <a href="/Thai/property/land-ownership-foreigners.html" style="color: var(--thai-blue); font-weight: 600;">Land Code Section 86</a>),
+                        the registered leasehold has become the practical alternative used by most expats, retirees,
+                        and foreign investors. A properly structured and registered lease provides enforceable rights
+                        that survive the sale of the underlying property to a new owner.
+                    </p>
+                    <p>
+                        The lease does not give you ownership of the land - the landowner retains title. What you
+                        acquire is a "real right" to use and occupy the land for the lease term, registered on the
+                        title deed (Chanote) at the Land Office.
+                    </p>
+
+                    <h2 id="30-year-max">The 30-Year Maximum: CCC Section 540</h2>
+                    <p>
+                        Thai law imposes a maximum lease term for immovable property (land and buildings) of 30 years.
+                        This is not negotiable or avoidable - any lease written for longer than 30 years will be
+                        automatically reduced to 30 years by operation of law.
+                    </p>
+
+                    <div class="statute-card">
+                        <div class="statute-card-header">
+                            <span class="icon">&#9878;</span>
+                            <h4>Civil and Commercial Code Section 540</h4>
+                        </div>
+                        <div class="statute-text">
+                            "The duration of a hire of immovable property cannot exceed thirty years. If it is made
+                            for a longer period, such period shall be reduced to thirty years."
+                            <br><br>
+                            "The aforesaid duration may be renewed, but it must not exceed thirty years from the
+                            time of renewal."
+                        </div>
+                        <div class="plain-english">
+                            <div class="plain-english-label">Plain English Explanation</div>
+                            <p>
+                                <strong>Paragraph 1:</strong> No lease of land or buildings can be for more than 30 years.
+                                If you sign a 50-year or 99-year lease, it is automatically treated as a 30-year lease.
+                                <br><br>
+                                <strong>Paragraph 2:</strong> After the initial term ends, you can renew for another
+                                period - but again, no more than 30 years. The statute allows renewal but provides no
+                                mechanism to guarantee it. Renewal requires a new agreement with the landowner.
+                            </p>
+                        </div>
                     </div>
-                    <div class="key-point">
-                        <div class="label">Renewal Guarantee</div>
-                        <div class="value">Not Automatic</div>
+
+                    <h2 id="registration">Registration Requirements: CCC Section 538</h2>
+                    <p>
+                        For a lease to be enforceable against third parties (such as a new owner if the property is
+                        sold), it must be registered at the Land Office if the term exceeds 3 years.
+                    </p>
+
+                    <div class="statute-card">
+                        <div class="statute-card-header">
+                            <span class="icon">&#9878;</span>
+                            <h4>Civil and Commercial Code Section 538</h4>
+                        </div>
+                        <div class="statute-text">
+                            "A hire of immovable property is not enforceable by action unless there be some written
+                            evidence signed by the party liable."
+                            <br><br>
+                            "A hire of immovable property for more than three years, or for the life of the lessor
+                            or of the lessee, is not enforceable by action unless it is made in writing and registered
+                            by the competent official."
+                        </div>
+                        <div class="plain-english">
+                            <div class="plain-english-label">Plain English Explanation</div>
+                            <p>
+                                <strong>Paragraph 1:</strong> Any lease must be in writing and signed to be enforceable
+                                in court.
+                                <br><br>
+                                <strong>Paragraph 2:</strong> If the lease is for more than 3 years (or for the lifetime
+                                of either party), it must be both in writing AND registered at the Land Office. An
+                                unregistered long-term lease is essentially worthless - you cannot enforce it in court
+                                and it will not bind a future owner.
+                            </p>
+                        </div>
                     </div>
-                    <div class="key-point">
-                        <div class="label">Transferable</div>
-                        <div class="value">If Lease Permits</div>
+
+                    <div class="warning-box">
+                        <h4>Critical: Always Register Your Lease</h4>
+                        <p>
+                            An unregistered 30-year lease is effectively unenforceable for most of its term. If the
+                            lessor sells the land, the new owner is not bound by an unregistered lease. Always register
+                            at the Land Office where the property is located. Registration fees are typically 1.1% of
+                            the stated rent (or assessed rental value, whichever is higher).
+                        </p>
+                    </div>
+
+                    <h2 id="renewal-myths">Renewal Clause Myths vs. Reality</h2>
+                    <p>
+                        One of the most common misunderstandings in Thai property involves lease renewal clauses.
+                        Many contracts include provisions stating the lease will be renewed for additional 30-year
+                        terms (often "30+30+30" or similar). Here is the truth:
+                    </p>
+
+                    <div class="myth-reality">
+                        <div class="myth-reality-item">
+                            <div class="myth-card">
+                                <div class="label">Myth</div>
+                                <p>"My lease says 30+30+30 years, so I have 90 years of guaranteed occupancy."</p>
+                            </div>
+                            <div class="reality-card">
+                                <div class="label">Reality</div>
+                                <p>Future renewals are promises, not enforceable real rights. Only the current 30-year
+                                term is registered and protected.</p>
+                            </div>
+                        </div>
+
+                        <div class="myth-reality-item">
+                            <div class="myth-card">
+                                <div class="label">Myth</div>
+                                <p>"The renewal clause is legally binding on the landowner's heirs and successors."</p>
+                            </div>
+                            <div class="reality-card">
+                                <div class="label">Reality</div>
+                                <p>Renewal promises are personal contractual obligations. If the landowner dies or sells,
+                                the new owner is generally not bound by unregistered renewal promises.</p>
+                            </div>
+                        </div>
+
+                        <div class="myth-reality-item">
+                            <div class="myth-card">
+                                <div class="label">Myth</div>
+                                <p>"I can sue for specific performance to force renewal."</p>
+                            </div>
+                            <div class="reality-card">
+                                <div class="label">Reality</div>
+                                <p>Thai courts have historically been reluctant to order specific performance for lease
+                                renewals. Damages may be available for breach, but getting the actual renewal may be difficult.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="caution-box">
+                        <h4>What Renewal Clauses Actually Provide</h4>
+                        <p>
+                            A well-drafted renewal clause creates a contractual obligation for the current landowner to
+                            renew at the end of the term. If they refuse, you may have a breach of contract claim for
+                            damages. However, you cannot register future renewals now - each renewal must be executed
+                            and registered separately when the time comes. The practical protection is that a reputable
+                            developer or lessor is likely to honor the promise, but the legal guarantee is limited.
+                        </p>
+                    </div>
+
+                    <h2 id="land-office">Land Office Registration Process</h2>
+                    <p>
+                        Registration happens at the Land Office (Samnak Ngan Ti Din) in the district where the property
+                        is located. Both the lessor (landowner) and lessee (foreigner) must appear in person or by
+                        authorized representative.
+                    </p>
+
+                    <div class="checklist">
+                        <h4>Documents Required for Lease Registration</h4>
+                        <div class="checklist-item">
+                            <div class="checklist-check">&#10003;</div>
+                            <div class="checklist-text">Original Chanote (land title deed) held by the landowner</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-check">&#10003;</div>
+                            <div class="checklist-text">Lease agreement (typically bilingual Thai/English) - 2 copies minimum</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-check">&#10003;</div>
+                            <div class="checklist-text">Passports of both parties (original + copies)</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-check">&#10003;</div>
+                            <div class="checklist-text">Thai ID card of Thai lessor (original + copies)</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-check">&#10003;</div>
+                            <div class="checklist-text">House registration book (tabien baan) of Thai lessor</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-check">&#10003;</div>
+                            <div class="checklist-text">Power of Attorney if either party is represented</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checklist-check">&#10003;</div>
+                            <div class="checklist-text">Company documents if either party is a company (affidavit, director list, etc.)</div>
+                        </div>
+                    </div>
+
+                    <h3>Registration Fees and Taxes</h3>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Fee Type</th>
+                                <th>Rate</th>
+                                <th>Basis</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Registration Fee</strong></td>
+                                <td>1.1%</td>
+                                <td>Total rent for the entire lease term</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Stamp Duty</strong></td>
+                                <td>0.1%</td>
+                                <td>Total rent (may overlap with registration)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Withholding Tax</strong></td>
+                                <td>5-35%</td>
+                                <td>Paid by lessor on rental income (if individual)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <p>
+                        The registration fee is calculated on the total rent stated in the lease. If you prepay 30 years
+                        of rent (a common structure), the fee is 1.1% of that prepaid amount. For a 10 million THB
+                        prepaid lease, expect approximately 110,000 THB in registration fees.
+                    </p>
+
+                    <h2 id="prepayment">Rent Prepayment Strategies</h2>
+                    <p>
+                        Many foreigners prepay the entire lease rent upfront. This is both common and strategically
+                        sensible, though it comes with considerations:
+                    </p>
+
+                    <div class="success-box">
+                        <h4>Benefits of Prepaying Rent</h4>
+                        <p>
+                            <strong>1. Inflation Protection:</strong> Your housing cost is locked in for 30 years, regardless
+                            of future price increases.<br><br>
+                            <strong>2. Reduced Counterparty Risk:</strong> You do not depend on the lessor accepting
+                            monthly payments over decades.<br><br>
+                            <strong>3. Negotiating Leverage:</strong> Prepayment often yields significant discounts
+                            compared to the cumulative monthly rate.<br><br>
+                            <strong>4. Simpler Administration:</strong> No ongoing payment tracking or currency exchange
+                            issues over 30 years.
+                        </p>
+                    </div>
+
+                    <div class="caution-box">
+                        <h4>Risks of Prepaying Rent</h4>
+                        <p>
+                            <strong>1. Capital at Risk:</strong> If the lessor becomes insolvent or the property has
+                            issues, recovering prepaid rent can be difficult.<br><br>
+                            <strong>2. No Refund on Early Termination:</strong> If you leave Thailand or want to exit
+                            the lease early, prepaid rent is typically not refundable.<br><br>
+                            <strong>3. Currency Risk:</strong> If you prepay in THB and the Baht strengthens significantly
+                            against your home currency, your effective cost increases.
+                        </p>
+                    </div>
+
+                    <h2 id="superficies">Combining Leasehold with Superficies</h2>
+                    <p>
+                        For foreigners building a house on leased land, the optimal structure often combines a
+                        registered leasehold (for the land) with registered superficies rights (for the building).
+                        Superficies, governed by Civil and Commercial Code Sections 1410-1416, grants the right to
+                        own buildings or structures on another person's land.
+                    </p>
+
+                    <div class="info-box">
+                        <h4>Superficies Rights Explained</h4>
+                        <p>
+                            Under Thai law, buildings generally belong to the landowner (the principle of "superficies
+                            solo cedit" - buildings follow the land). Superficies is the exception that allows you
+                            to own a building on land you do not own. Combined with a leasehold, you own the building
+                            and lease the land - a robust structure for villa ownership.
+                        </p>
+                        <p style="margin-top: 10px;">
+                            A detailed guide to superficies rights is coming soon to the Thai Legal Hub.
+                        </p>
+                    </div>
+
+                    <h2 id="end-of-lease">What Happens at the End of 30 Years?</h2>
+                    <p>
+                        This is the critical question every leaseholder must consider. At the end of the 30-year term:
+                    </p>
+
+                    <ul>
+                        <li><strong>Your registered lease expires.</strong> You no longer have a legal right to occupy
+                            the property.</li>
+                        <li><strong>Buildings may revert to the landowner.</strong> Unless you have registered superficies
+                            or a specific contractual arrangement, any structures on the land typically become the
+                            landowner's property.</li>
+                        <li><strong>Renewal requires new agreement.</strong> The landowner must agree to renew. Even
+                            with a renewal clause, you must negotiate and register a new lease.</li>
+                        <li><strong>New registration fees apply.</strong> Renewal means paying registration fees again
+                            on the new lease term.</li>
+                    </ul>
+
+                    <h3>Planning for End-of-Lease</h3>
+                    <p>
+                        Prudent leaseholders should start planning for renewal at least 2-3 years before the lease
+                        expires. Considerations include:
+                    </p>
+
+                    <ul>
+                        <li>Is the current landowner still alive and competent to enter into a new lease?</li>
+                        <li>Has the property been inherited or sold to new owners?</li>
+                        <li>Is the renewal clause in your original lease enforceable against current owners?</li>
+                        <li>What are current market rates for lease renewals in the area?</li>
+                        <li>Do you have alternative exit strategies if renewal is not possible?</li>
+                    </ul>
+
+                    <h2 id="comparison">Leasehold vs. Other Structures</h2>
+
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Factor</th>
+                                <th>Registered Leasehold</th>
+                                <th>Condo Freehold</th>
+                                <th>Company Ownership</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>What You Get</strong></td>
+                                <td>Right to use land/building</td>
+                                <td>Full unit ownership</td>
+                                <td>Shares in company that owns land</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Duration</strong></td>
+                                <td>30 years maximum</td>
+                                <td class="status-good">Permanent</td>
+                                <td>As long as company exists</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Legal Risk</strong></td>
+                                <td class="status-good">Low (if registered)</td>
+                                <td class="status-good">Low</td>
+                                <td class="status-bad">High (nominee risk)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Transfer</strong></td>
+                                <td>If lease permits</td>
+                                <td class="status-good">Freely transferable</td>
+                                <td>Share transfer</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Financing</strong></td>
+                                <td class="status-warning">Very difficult</td>
+                                <td>Possible (some banks)</td>
+                                <td class="status-warning">Very difficult</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Suitable For</strong></td>
+                                <td>Houses, villas, land</td>
+                                <td>Apartments only</td>
+                                <td class="status-bad">Not recommended</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="warning-box">
+                        <h4>Nominee Company Structures Are Illegal</h4>
+                        <p>
+                            Forming a Thai company with "nominee" Thai shareholders to hold land for a foreigner's
+                            benefit is illegal under both the Land Code and Foreign Business Act. The 2024-2025
+                            enforcement actions have resulted in criminal prosecutions, asset seizures, and company
+                            dissolutions. Do not use this structure. See
+                            <a href="/Thai/property/land-ownership-foreigners.html" style="color: var(--thai-red); font-weight: 600;">our Land Ownership Guide</a>
+                            for penalty details.
+                        </p>
+                    </div>
+
+                    <!-- Cross Links -->
+                    <div class="cross-links">
+                        <h4>Related Guides</h4>
+                        <div class="cross-links-grid">
+                            <a href="/Thai/property/land-ownership-foreigners.html" class="cross-link">
+                                <h5>Can Foreigners Own Land?</h5>
+                                <p>The fundamental prohibition and why leasehold exists</p>
+                            </a>
+                            <a href="/Thai/property/section-96-bis.html" class="cross-link">
+                                <h5>Section 96 bis Exception</h5>
+                                <p>The 40M THB investment path to land ownership</p>
+                            </a>
+                            <a href="/Thai/business/nominee-structures-risks.html" class="cross-link">
+                                <h5>Nominee Structure Risks</h5>
+                                <p>Why using Thai nominees is illegal and prosecuted</p>
+                            </a>
+                            <a href="/Thai/business/enforcement-tracker.html" class="cross-link">
+                                <h5>Enforcement Tracker</h5>
+                                <p>2024-2025 nominee crackdown updates</p>
+                            </a>
+                            <a href="/Thai/" class="cross-link">
+                                <h5>Thai Legal Hub</h5>
+                                <p>Complete guide to Thai law for foreigners</p>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
-
-            <div class="article-content">
-                <h2>Why Leasehold Is the Standard Foreign Structure</h2>
-                <p>
-                    Since foreigners cannot own land in Thailand (see
-                    <a href="/Thai/property/land-ownership-foreigners.html" style="color: var(--thai-blue); font-weight: 600;">Land Code Section 86</a>),
-                    the registered leasehold has become the practical alternative used by most expats, retirees,
-                    and foreign investors. A properly structured and registered lease provides enforceable rights
-                    that survive the sale of the underlying property to a new owner.
-                </p>
-                <p>
-                    The lease does not give you ownership of the land - the landowner retains title. What you
-                    acquire is a "real right" to use and occupy the land for the lease term, registered on the
-                    title deed (Chanote) at the Land Office.
-                </p>
-
-                <h2>The 30-Year Maximum: CCC Section 540</h2>
-                <p>
-                    Thai law imposes a maximum lease term for immovable property (land and buildings) of 30 years.
-                    This is not negotiable or avoidable - any lease written for longer than 30 years will be
-                    automatically reduced to 30 years by operation of law.
-                </p>
-
-                <div class="statute-card">
-                    <div class="statute-card-header">
-                        <span class="icon">&#9878;</span>
-                        <h4>Civil and Commercial Code Section 540</h4>
-                    </div>
-                    <div class="statute-text">
-                        "The duration of a hire of immovable property cannot exceed thirty years. If it is made
-                        for a longer period, such period shall be reduced to thirty years."
-                        <br><br>
-                        "The aforesaid duration may be renewed, but it must not exceed thirty years from the
-                        time of renewal."
-                    </div>
-                    <div class="plain-english">
-                        <div class="plain-english-label">Plain English Explanation</div>
-                        <p>
-                            <strong>Paragraph 1:</strong> No lease of land or buildings can be for more than 30 years.
-                            If you sign a 50-year or 99-year lease, it is automatically treated as a 30-year lease.
-                            <br><br>
-                            <strong>Paragraph 2:</strong> After the initial term ends, you can renew for another
-                            period - but again, no more than 30 years. The statute allows renewal but provides no
-                            mechanism to guarantee it. Renewal requires a new agreement with the landowner.
-                        </p>
-                    </div>
-                </div>
-
-                <h2>Registration Requirements: CCC Section 538</h2>
-                <p>
-                    For a lease to be enforceable against third parties (such as a new owner if the property is
-                    sold), it must be registered at the Land Office if the term exceeds 3 years.
-                </p>
-
-                <div class="statute-card">
-                    <div class="statute-card-header">
-                        <span class="icon">&#9878;</span>
-                        <h4>Civil and Commercial Code Section 538</h4>
-                    </div>
-                    <div class="statute-text">
-                        "A hire of immovable property is not enforceable by action unless there be some written
-                        evidence signed by the party liable."
-                        <br><br>
-                        "A hire of immovable property for more than three years, or for the life of the lessor
-                        or of the lessee, is not enforceable by action unless it is made in writing and registered
-                        by the competent official."
-                    </div>
-                    <div class="plain-english">
-                        <div class="plain-english-label">Plain English Explanation</div>
-                        <p>
-                            <strong>Paragraph 1:</strong> Any lease must be in writing and signed to be enforceable
-                            in court.
-                            <br><br>
-                            <strong>Paragraph 2:</strong> If the lease is for more than 3 years (or for the lifetime
-                            of either party), it must be both in writing AND registered at the Land Office. An
-                            unregistered long-term lease is essentially worthless - you cannot enforce it in court
-                            and it will not bind a future owner.
-                        </p>
-                    </div>
-                </div>
-
-                <div class="warning-box">
-                    <h4>Critical: Always Register Your Lease</h4>
-                    <p>
-                        An unregistered 30-year lease is effectively unenforceable for most of its term. If the
-                        lessor sells the land, the new owner is not bound by an unregistered lease. Always register
-                        at the Land Office where the property is located. Registration fees are typically 1.1% of
-                        the stated rent (or assessed rental value, whichever is higher).
-                    </p>
-                </div>
-
-                <h2>Renewal Clause Myths vs. Reality</h2>
-                <p>
-                    One of the most common misunderstandings in Thai property involves lease renewal clauses.
-                    Many contracts include provisions stating the lease will be renewed for additional 30-year
-                    terms (often "30+30+30" or similar). Here is the truth:
-                </p>
-
-                <div class="myth-reality">
-                    <div class="myth-reality-item">
-                        <div class="myth-card">
-                            <div class="label">Myth</div>
-                            <p>"My lease says 30+30+30 years, so I have 90 years of guaranteed occupancy."</p>
-                        </div>
-                        <div class="reality-card">
-                            <div class="label">Reality</div>
-                            <p>Future renewals are promises, not enforceable real rights. Only the current 30-year
-                            term is registered and protected.</p>
-                        </div>
-                    </div>
-
-                    <div class="myth-reality-item">
-                        <div class="myth-card">
-                            <div class="label">Myth</div>
-                            <p>"The renewal clause is legally binding on the landowner's heirs and successors."</p>
-                        </div>
-                        <div class="reality-card">
-                            <div class="label">Reality</div>
-                            <p>Renewal promises are personal contractual obligations. If the landowner dies or sells,
-                            the new owner is generally not bound by unregistered renewal promises.</p>
-                        </div>
-                    </div>
-
-                    <div class="myth-reality-item">
-                        <div class="myth-card">
-                            <div class="label">Myth</div>
-                            <p>"I can sue for specific performance to force renewal."</p>
-                        </div>
-                        <div class="reality-card">
-                            <div class="label">Reality</div>
-                            <p>Thai courts have historically been reluctant to order specific performance for lease
-                            renewals. Damages may be available for breach, but getting the actual renewal may be difficult.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="caution-box">
-                    <h4>What Renewal Clauses Actually Provide</h4>
-                    <p>
-                        A well-drafted renewal clause creates a contractual obligation for the current landowner to
-                        renew at the end of the term. If they refuse, you may have a breach of contract claim for
-                        damages. However, you cannot register future renewals now - each renewal must be executed
-                        and registered separately when the time comes. The practical protection is that a reputable
-                        developer or lessor is likely to honor the promise, but the legal guarantee is limited.
-                    </p>
-                </div>
-
-                <h2>Land Office Registration Process</h2>
-                <p>
-                    Registration happens at the Land Office (Samnak Ngan Ti Din) in the district where the property
-                    is located. Both the lessor (landowner) and lessee (foreigner) must appear in person or by
-                    authorized representative.
-                </p>
-
-                <div class="checklist">
-                    <h4>Documents Required for Lease Registration</h4>
-                    <div class="checklist-item">
-                        <div class="checklist-check">&#10003;</div>
-                        <div class="checklist-text">Original Chanote (land title deed) held by the landowner</div>
-                    </div>
-                    <div class="checklist-item">
-                        <div class="checklist-check">&#10003;</div>
-                        <div class="checklist-text">Lease agreement (typically bilingual Thai/English) - 2 copies minimum</div>
-                    </div>
-                    <div class="checklist-item">
-                        <div class="checklist-check">&#10003;</div>
-                        <div class="checklist-text">Passports of both parties (original + copies)</div>
-                    </div>
-                    <div class="checklist-item">
-                        <div class="checklist-check">&#10003;</div>
-                        <div class="checklist-text">Thai ID card of Thai lessor (original + copies)</div>
-                    </div>
-                    <div class="checklist-item">
-                        <div class="checklist-check">&#10003;</div>
-                        <div class="checklist-text">House registration book (tabien baan) of Thai lessor</div>
-                    </div>
-                    <div class="checklist-item">
-                        <div class="checklist-check">&#10003;</div>
-                        <div class="checklist-text">Power of Attorney if either party is represented</div>
-                    </div>
-                    <div class="checklist-item">
-                        <div class="checklist-check">&#10003;</div>
-                        <div class="checklist-text">Company documents if either party is a company (affidavit, director list, etc.)</div>
-                    </div>
-                </div>
-
-                <h3>Registration Fees and Taxes</h3>
-                <table class="comparison-table">
-                    <thead>
-                        <tr>
-                            <th>Fee Type</th>
-                            <th>Rate</th>
-                            <th>Basis</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>Registration Fee</strong></td>
-                            <td>1.1%</td>
-                            <td>Total rent for the entire lease term</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Stamp Duty</strong></td>
-                            <td>0.1%</td>
-                            <td>Total rent (may overlap with registration)</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Withholding Tax</strong></td>
-                            <td>5-35%</td>
-                            <td>Paid by lessor on rental income (if individual)</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <p>
-                    The registration fee is calculated on the total rent stated in the lease. If you prepay 30 years
-                    of rent (a common structure), the fee is 1.1% of that prepaid amount. For a 10 million THB
-                    prepaid lease, expect approximately 110,000 THB in registration fees.
-                </p>
-
-                <h2>Rent Prepayment Strategies</h2>
-                <p>
-                    Many foreigners prepay the entire lease rent upfront. This is both common and strategically
-                    sensible, though it comes with considerations:
-                </p>
-
-                <div class="success-box">
-                    <h4>Benefits of Prepaying Rent</h4>
-                    <p>
-                        <strong>1. Inflation Protection:</strong> Your housing cost is locked in for 30 years, regardless
-                        of future price increases.<br><br>
-                        <strong>2. Reduced Counterparty Risk:</strong> You do not depend on the lessor accepting
-                        monthly payments over decades.<br><br>
-                        <strong>3. Negotiating Leverage:</strong> Prepayment often yields significant discounts
-                        compared to the cumulative monthly rate.<br><br>
-                        <strong>4. Simpler Administration:</strong> No ongoing payment tracking or currency exchange
-                        issues over 30 years.
-                    </p>
-                </div>
-
-                <div class="caution-box">
-                    <h4>Risks of Prepaying Rent</h4>
-                    <p>
-                        <strong>1. Capital at Risk:</strong> If the lessor becomes insolvent or the property has
-                        issues, recovering prepaid rent can be difficult.<br><br>
-                        <strong>2. No Refund on Early Termination:</strong> If you leave Thailand or want to exit
-                        the lease early, prepaid rent is typically not refundable.<br><br>
-                        <strong>3. Currency Risk:</strong> If you prepay in THB and the Baht strengthens significantly
-                        against your home currency, your effective cost increases.
-                    </p>
-                </div>
-
-                <h2>Combining Leasehold with Superficies</h2>
-                <p>
-                    For foreigners building a house on leased land, the optimal structure often combines a
-                    registered leasehold (for the land) with registered superficies rights (for the building).
-                    Superficies, governed by Civil and Commercial Code Sections 1410-1416, grants the right to
-                    own buildings or structures on another person's land.
-                </p>
-
-                <div class="info-box">
-                    <h4>Superficies Rights Explained</h4>
-                    <p>
-                        Under Thai law, buildings generally belong to the landowner (the principle of "superficies
-                        solo cedit" - buildings follow the land). Superficies is the exception that allows you
-                        to own a building on land you do not own. Combined with a leasehold, you own the building
-                        and lease the land - a robust structure for villa ownership.
-                    </p>
-                    <p style="margin-top: 10px;">
-                        A detailed guide to superficies rights is coming soon to the Thai Legal Hub.
-                    </p>
-                </div>
-
-                <h2>What Happens at the End of 30 Years?</h2>
-                <p>
-                    This is the critical question every leaseholder must consider. At the end of the 30-year term:
-                </p>
-
-                <ul>
-                    <li><strong>Your registered lease expires.</strong> You no longer have a legal right to occupy
-                        the property.</li>
-                    <li><strong>Buildings may revert to the landowner.</strong> Unless you have registered superficies
-                        or a specific contractual arrangement, any structures on the land typically become the
-                        landowner's property.</li>
-                    <li><strong>Renewal requires new agreement.</strong> The landowner must agree to renew. Even
-                        with a renewal clause, you must negotiate and register a new lease.</li>
-                    <li><strong>New registration fees apply.</strong> Renewal means paying registration fees again
-                        on the new lease term.</li>
-                </ul>
-
-                <h3>Planning for End-of-Lease</h3>
-                <p>
-                    Prudent leaseholders should start planning for renewal at least 2-3 years before the lease
-                    expires. Considerations include:
-                </p>
-
-                <ul>
-                    <li>Is the current landowner still alive and competent to enter into a new lease?</li>
-                    <li>Has the property been inherited or sold to new owners?</li>
-                    <li>Is the renewal clause in your original lease enforceable against current owners?</li>
-                    <li>What are current market rates for lease renewals in the area?</li>
-                    <li>Do you have alternative exit strategies if renewal is not possible?</li>
-                </ul>
-
-                <h2>Leasehold vs. Other Structures</h2>
-
-                <table class="comparison-table">
-                    <thead>
-                        <tr>
-                            <th>Factor</th>
-                            <th>Registered Leasehold</th>
-                            <th>Condo Freehold</th>
-                            <th>Company Ownership</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>What You Get</strong></td>
-                            <td>Right to use land/building</td>
-                            <td>Full unit ownership</td>
-                            <td>Shares in company that owns land</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Duration</strong></td>
-                            <td>30 years maximum</td>
-                            <td class="status-good">Permanent</td>
-                            <td>As long as company exists</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Legal Risk</strong></td>
-                            <td class="status-good">Low (if registered)</td>
-                            <td class="status-good">Low</td>
-                            <td class="status-bad">High (nominee risk)</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Transfer</strong></td>
-                            <td>If lease permits</td>
-                            <td class="status-good">Freely transferable</td>
-                            <td>Share transfer</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Financing</strong></td>
-                            <td class="status-warning">Very difficult</td>
-                            <td>Possible (some banks)</td>
-                            <td class="status-warning">Very difficult</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Suitable For</strong></td>
-                            <td>Houses, villas, land</td>
-                            <td>Apartments only</td>
-                            <td class="status-bad">Not recommended</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <div class="warning-box">
-                    <h4>Nominee Company Structures Are Illegal</h4>
-                    <p>
-                        Forming a Thai company with "nominee" Thai shareholders to hold land for a foreigner's
-                        benefit is illegal under both the Land Code and Foreign Business Act. The 2024-2025
-                        enforcement actions have resulted in criminal prosecutions, asset seizures, and company
-                        dissolutions. Do not use this structure. See
-                        <a href="/Thai/property/land-ownership-foreigners.html" style="color: var(--thai-red); font-weight: 600;">our Land Ownership Guide</a>
-                        for penalty details.
-                    </p>
-                </div>
-
-                <!-- Cross Links -->
-                <div class="cross-links">
-                    <h4>Related Guides</h4>
-                    <div class="cross-links-grid">
-                        <a href="/Thai/property/land-ownership-foreigners.html" class="cross-link">
-                            <h5>Can Foreigners Own Land?</h5>
-                            <p>The fundamental prohibition and why leasehold exists</p>
-                        </a>
-                        <a href="/Thai/property/section-96-bis.html" class="cross-link">
-                            <h5>Section 96 bis Exception</h5>
-                            <p>The 40M THB investment path to land ownership</p>
-                        </a>
-                        <a href="/Thai/business/nominee-structures-risks.html" class="cross-link">
-                            <h5>Nominee Structure Risks</h5>
-                            <p>Why using Thai nominees is illegal and prosecuted</p>
-                        </a>
-                        <a href="/Thai/business/enforcement-tracker.html" class="cross-link">
-                            <h5>Enforcement Tracker</h5>
-                            <p>2024-2025 nominee crackdown updates</p>
-                        </a>
-                        <a href="/Thai/" class="cross-link">
-                            <h5>Thai Legal Hub</h5>
-                            <p>Complete guide to Thai law for foreigners</p>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </main>
+        </div>
     </div>
+
+    <!-- Mobile Navigation Toggle -->
+    <button class="mobile-nav-toggle" onclick="toggleSidebar()">&#9776;</button>
+    <div class="overlay" onclick="toggleSidebar()"></div>
 
     <!-- Footer -->
     <footer class="footer">
@@ -1185,5 +1272,26 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                const yOffset = -80;
+                const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                window.scrollTo({top: y, behavior: 'smooth'});
+                document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+                document.querySelector('.nav-item[href="#' + sectionId + '"]').classList.add('active');
+                document.querySelector('.sidebar').classList.remove('open');
+                document.querySelector('.overlay').classList.remove('show');
+            }
+            return false;
+        }
+
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('open');
+            document.querySelector('.overlay').classList.toggle('show');
+        }
+    </script>
 </body>
 </html>

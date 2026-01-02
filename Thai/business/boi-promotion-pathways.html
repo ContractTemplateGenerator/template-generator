@@ -487,28 +487,77 @@
                 padding: 10px 8px;
             }
         }
+
+        /* Page-Wide Sidebar Layout */
+        .page-wrapper { display: flex; min-height: calc(100vh - 60px); }
+        .sidebar { width: 260px; background: white; border-right: 1px solid var(--gray-200); position: sticky; top: 60px; height: calc(100vh - 60px); overflow-y: auto; flex-shrink: 0; }
+        .sidebar-header { padding: 1.5rem; border-bottom: 1px solid var(--gray-200); background: linear-gradient(135deg, rgba(239, 51, 64, 0.1) 0%, rgba(0, 32, 91, 0.1) 100%); }
+        .sidebar-header h2 { font-size: 1rem; color: var(--thai-red); margin-bottom: 0.25rem; }
+        .sidebar-header p { font-size: 0.75rem; color: var(--gray-500); }
+        .sidebar-nav { padding: 1rem 0; }
+        .nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.7rem 1.5rem; color: var(--gray-600); font-size: 0.9rem; cursor: pointer; transition: all 0.15s; border-left: 3px solid transparent; text-decoration: none; }
+        .nav-item:hover { background: var(--gray-100); color: var(--gray-800); }
+        .nav-item.active { background: rgba(239, 51, 64, 0.1); color: var(--thai-red); border-left-color: var(--thai-red); font-weight: 600; }
+        .nav-item .icon { font-size: 1.1rem; }
+        .main-area { flex: 1; max-width: 1000px; }
+        .page-wrapper .main-content { padding: 32px 40px; max-width: none; }
+        .mobile-nav-toggle { display: none; position: fixed; bottom: 1.5rem; right: 1.5rem; width: 56px; height: 56px; background: linear-gradient(135deg, var(--thai-red), var(--thai-blue)); border: none; border-radius: 50%; color: white; font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 15px rgba(239, 51, 64, 0.4); z-index: 999; }
+        .overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 1000; }
+        .overlay.show { display: block; }
+        @media (max-width: 900px) { .sidebar { position: fixed; left: -100%; top: 0; height: 100vh; z-index: 1001; transition: left 0.3s; } .sidebar.open { left: 0; } .mobile-nav-toggle { display: flex; align-items: center; justify-content: center; } .page-wrapper { display: block; } .page-wrapper .main-content { padding: 24px; } }
+        .lang-selector { display: flex; gap: 0.5rem; align-items: center; margin-left: auto; padding-right: 1rem; }
+        .lang-flag { font-size: 1.4rem; opacity: 0.5; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+        .lang-flag:hover, .lang-flag.active { opacity: 1; transform: scale(1.15); }
     </style>
 </head>
 <body>
+<script src="/Thai/shared/lang-switcher.js"></script>
     <!-- Sitewide Header -->
     <div id="site-header"></div>
     <script src="/shared/header-loader.js"></script>
 
     <!-- Breadcrumbs -->
     <nav class="breadcrumbs">
-        <div class="breadcrumbs-content">
-            <a href="/">Home</a>
-            <span>></span>
-            <a href="/Thai/">Thai Legal Hub</a>
-            <span>></span>
-            <a href="/Thai/business/">Business</a>
-            <span>></span>
-            BOI Promotion Pathways
+        <div class="breadcrumbs-content" style="display: flex; align-items: center;">
+            <div>
+                <a href="/">Home</a>
+                <span>></span>
+                <a href="/Thai/">Thai Legal Hub</a>
+                <span>></span>
+                <a href="/Thai/business/">Business</a>
+                <span>></span>
+                BOI Promotion Pathways
+            </div>
+            <div class="lang-selector">
+                <a href="/Thai/business/boi-promotion-pathways.html" class="lang-flag active" title="English">&#127482;&#127480;</a>
+                <a href="/Thai/ru/business/boi-promotion-pathways.html" class="lang-flag" title="Русский">&#127479;&#127482;</a>
+            </div>
         </div>
     </nav>
 
-    <!-- Article Container -->
-    <article class="article-container">
+    <!-- Page Wrapper with Sidebar -->
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>BOI Promotion</h2>
+                <p>Navigate this guide</p>
+            </div>
+            <nav class="sidebar-nav">
+                <a class="nav-item active" onclick="scrollToSection('what-is-boi')"><span class="icon">&#127970;</span> What Is BOI?</a>
+                <a class="nav-item" onclick="scrollToSection('eligible-activities')"><span class="icon">&#128203;</span> Eligible Activities</a>
+                <a class="nav-item" onclick="scrollToSection('tax-incentives')"><span class="icon">&#128176;</span> Tax Incentives</a>
+                <a class="nav-item" onclick="scrollToSection('non-tax-benefits')"><span class="icon">&#127919;</span> Non-Tax Benefits</a>
+                <a class="nav-item" onclick="scrollToSection('application-process')"><span class="icon">&#128221;</span> Application Process</a>
+                <a class="nav-item" onclick="scrollToSection('minimum-investment')"><span class="icon">&#128178;</span> Minimum Investment</a>
+                <a class="nav-item" onclick="scrollToSection('boi-vs-amity')"><span class="icon">&#9878;</span> BOI vs Treaty of Amity</a>
+                <a class="nav-item" onclick="scrollToSection('rejection-reasons')"><span class="icon">&#10060;</span> Rejection Reasons</a>
+                <a class="nav-item" onclick="scrollToSection('bottom-line')"><span class="icon">&#128161;</span> The Bottom Line</a>
+            </nav>
+        </aside>
+
+        <div class="main-area">
+            <!-- Article Container -->
+            <article class="article-container main-content">
         <!-- Hero -->
         <header class="article-hero">
             <div class="article-badge">LEGAL PATHWAY - FOREIGN OWNERSHIP</div>
@@ -526,7 +575,7 @@
                 Unlike illegal nominee arrangements that carry criminal penalties, BOI promotion is a government-sanctioned program designed to attract foreign investment in priority sectors. This guide explains what BOI promotion is, which activities qualify, the benefits available, and how the application process works.
             </p>
 
-            <h2>What Is BOI Promotion?</h2>
+            <h2 id="what-is-boi">What Is BOI Promotion?</h2>
 
             <p>
                 The Thailand Board of Investment is a government agency under the Office of the Prime Minister established by the Investment Promotion Act B.E. 2520 (1977). BOI promotion grants certified businesses a package of tax incentives, regulatory exemptions, and operational privileges designed to encourage investment in targeted industries.
@@ -552,7 +601,7 @@
                 This is not a loophole or gray area - it is a statutory exemption. When BOI grants promotion with foreign ownership rights, the company operates legally outside FBA restrictions for its promoted activities.
             </p>
 
-            <h2>Eligible Business Activities</h2>
+            <h2 id="eligible-activities">Eligible Business Activities</h2>
 
             <p>
                 BOI promotion is available for specific business activities that Thailand considers priority sectors. These are organized into eight main clusters:
@@ -625,7 +674,7 @@
                 </ul>
             </div>
 
-            <h2>Tax Incentives by Category</h2>
+            <h2 id="tax-incentives">Tax Incentives by Category</h2>
 
             <p>
                 BOI incentives are structured in tiers based on the priority level of the activity:
@@ -688,7 +737,7 @@
                 <li><strong>25% deduction</strong> of infrastructure installation/construction costs</li>
             </ul>
 
-            <h2>Non-Tax Benefits</h2>
+            <h2 id="non-tax-benefits">Non-Tax Benefits</h2>
 
             <h3>Foreign Ownership Rights</h3>
             <p>
@@ -727,7 +776,7 @@
                 </p>
             </div>
 
-            <h2>Application Process Overview</h2>
+            <h2 id="application-process">Application Process Overview</h2>
 
             <p>
                 The BOI application process is structured and generally takes 3-4 months for approval:
@@ -781,7 +830,7 @@
                 </tbody>
             </table>
 
-            <h2>Minimum Investment Requirements</h2>
+            <h2 id="minimum-investment">Minimum Investment Requirements</h2>
 
             <table class="data-table">
                 <thead>
@@ -816,7 +865,7 @@
                 <li><strong>Agriculture and electronics:</strong> 10% minimum value-added</li>
             </ul>
 
-            <h2>BOI vs. Treaty of Amity: Comparison</h2>
+            <h2 id="boi-vs-amity">BOI vs. Treaty of Amity: Comparison</h2>
 
             <p>
                 For US citizens, both BOI promotion and the Treaty of Amity offer paths to foreign ownership. Here is how they compare:
@@ -886,7 +935,7 @@
                 </ul>
             </div>
 
-            <h2>Common Rejection Reasons</h2>
+            <h2 id="rejection-reasons">Common Rejection Reasons</h2>
 
             <p>
                 BOI applications are not automatically approved. Common reasons for rejection include:
@@ -900,7 +949,7 @@
                 <li><strong>Weak market analysis:</strong> Inadequate demonstration of market viability</li>
             </ul>
 
-            <h2>The Bottom Line</h2>
+            <h2 id="bottom-line">The Bottom Line</h2>
 
             <p>
                 BOI promotion represents the primary legal pathway for foreigners seeking 100% ownership of Thai businesses in priority sectors. Unlike nominee structures that carry criminal penalties, BOI promotion is a government-sanctioned program with substantial benefits.
@@ -957,6 +1006,12 @@
             </div>
         </footer>
     </article>
+        </div><!-- end main-area -->
+    </div><!-- end page-wrapper -->
+
+    <!-- Mobile Nav Toggle -->
+    <button class="mobile-nav-toggle" onclick="toggleSidebar()">&#9776;</button>
+    <div class="overlay" onclick="toggleSidebar()"></div>
 
     <!-- Site Footer -->
     <footer class="footer">
@@ -974,5 +1029,33 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        function scrollToSection(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+                document.querySelector(`[onclick="scrollToSection('${id}')"]`)?.classList.add('active');
+                if (window.innerWidth <= 900) toggleSidebar();
+            }
+        }
+
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('open');
+            document.querySelector('.overlay').classList.toggle('show');
+        }
+
+        window.addEventListener('scroll', () => {
+            const sections = ['what-is-boi', 'eligible-activities', 'tax-incentives', 'non-tax-benefits', 'application-process', 'minimum-investment', 'boi-vs-amity', 'rejection-reasons', 'bottom-line'];
+            let current = sections[0];
+            for (const id of sections) {
+                const el = document.getElementById(id);
+                if (el && el.getBoundingClientRect().top <= 100) current = id;
+            }
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            document.querySelector(`[onclick="scrollToSection('${current}')"]`)?.classList.add('active');
+        });
+    </script>
 </body>
 </html>

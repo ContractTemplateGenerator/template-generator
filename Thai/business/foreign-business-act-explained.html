@@ -356,23 +356,51 @@
             .penalty-table { font-size: 0.9rem; }
             .penalty-table th, .penalty-table td { padding: 12px; }
         }
+
+        /* Page-Wide Sidebar Layout */
+        .page-wrapper { display: flex; min-height: calc(100vh - 60px); }
+        .sidebar { width: 260px; background: white; border-right: 1px solid var(--gray-200); position: sticky; top: 60px; height: calc(100vh - 60px); overflow-y: auto; flex-shrink: 0; }
+        .sidebar-header { padding: 1.5rem; border-bottom: 1px solid var(--gray-200); background: linear-gradient(135deg, rgba(239, 51, 64, 0.1) 0%, rgba(0, 32, 91, 0.1) 100%); }
+        .sidebar-header h2 { font-size: 1rem; color: var(--thai-red); margin-bottom: 0.25rem; }
+        .sidebar-header p { font-size: 0.75rem; color: var(--gray-500); }
+        .sidebar-nav { padding: 1rem 0; }
+        .nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.7rem 1.5rem; color: var(--gray-600); font-size: 0.9rem; cursor: pointer; transition: all 0.15s; border-left: 3px solid transparent; text-decoration: none; }
+        .nav-item:hover { background: var(--gray-100); color: var(--gray-800); }
+        .nav-item.active { background: rgba(239, 51, 64, 0.1); color: var(--thai-red); border-left-color: var(--thai-red); font-weight: 600; }
+        .nav-item .icon { font-size: 1.1rem; }
+        .main-area { flex: 1; max-width: 1000px; }
+        .page-wrapper .main-content { padding: 32px 40px; max-width: none; }
+        .mobile-nav-toggle { display: none; position: fixed; bottom: 1.5rem; right: 1.5rem; width: 56px; height: 56px; background: linear-gradient(135deg, var(--thai-red), var(--thai-blue)); border: none; border-radius: 50%; color: white; font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 15px rgba(239, 51, 64, 0.4); z-index: 999; }
+        .overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 1000; }
+        .overlay.show { display: block; }
+        @media (max-width: 900px) { .sidebar { position: fixed; left: -100%; top: 0; height: 100vh; z-index: 1001; transition: left 0.3s; } .sidebar.open { left: 0; } .mobile-nav-toggle { display: flex; align-items: center; justify-content: center; } .page-wrapper { display: block; } .page-wrapper .main-content { padding: 24px; } }
+        .lang-selector { display: flex; gap: 0.5rem; align-items: center; margin-left: auto; padding-right: 1rem; }
+        .lang-flag { font-size: 1.4rem; opacity: 0.5; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+        .lang-flag:hover, .lang-flag.active { opacity: 1; transform: scale(1.15); }
     </style>
 </head>
 <body>
+<script src="/Thai/shared/lang-switcher.js"></script>
     <!-- Sitewide Header -->
     <div id="site-header"></div>
     <script src="/shared/header-loader.js"></script>
 
     <!-- Breadcrumb -->
     <nav class="breadcrumb">
-        <div class="breadcrumb-content">
-            <a href="/">Home</a>
-            <span>&rsaquo;</span>
-            <a href="/Thai/">Thai Legal Hub</a>
-            <span>&rsaquo;</span>
-            <a href="/Thai/business/">Business</a>
-            <span>&rsaquo;</span>
-            <span class="current">Foreign Business Act</span>
+        <div class="breadcrumb-content" style="display: flex; align-items: center;">
+            <div>
+                <a href="/">Home</a>
+                <span>&rsaquo;</span>
+                <a href="/Thai/">Thai Legal Hub</a>
+                <span>&rsaquo;</span>
+                <a href="/Thai/business/">Business</a>
+                <span>&rsaquo;</span>
+                <span class="current">Foreign Business Act</span>
+            </div>
+            <div class="lang-selector">
+                <a href="/Thai/business/foreign-business-act-explained.html" class="lang-flag active" title="English">&#127482;&#127480;</a>
+                <a href="/Thai/ru/business/foreign-business-act-explained.html" class="lang-flag" title="Русский">&#127479;&#127482;</a>
+            </div>
         </div>
     </nav>
 
@@ -382,8 +410,28 @@
         <p class="hero-subtitle">Understanding FBA B.E. 2542 Lists 1, 2, and 3, legal exceptions, and criminal penalties for violations.</p>
     </section>
 
-    <!-- Main Content -->
-    <article class="content-wrapper">
+    <!-- Page Wrapper with Sidebar -->
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Foreign Business Act</h2>
+                <p>Navigate this guide</p>
+            </div>
+            <nav class="sidebar-nav">
+                <a class="nav-item active" onclick="scrollToSection('who-foreigner')"><span class="icon">&#128100;</span> Who Is a Foreigner?</a>
+                <a class="nav-item" onclick="scrollToSection('three-lists')"><span class="icon">&#128203;</span> The Three Lists</a>
+                <a class="nav-item" onclick="scrollToSection('legal-exceptions')"><span class="icon">&#9989;</span> Legal Exceptions</a>
+                <a class="nav-item" onclick="scrollToSection('penalties')"><span class="icon">&#9888;</span> Criminal Penalties</a>
+                <a class="nav-item" onclick="scrollToSection('enforcement')"><span class="icon">&#128275;</span> Real Enforcement</a>
+                <a class="nav-item" onclick="scrollToSection('detection')"><span class="icon">&#128269;</span> How They Detect</a>
+                <a class="nav-item" onclick="scrollToSection('reforms')"><span class="icon">&#128220;</span> Proposed Reforms</a>
+                <a class="nav-item" onclick="scrollToSection('what-to-do')"><span class="icon">&#128161;</span> What You Should Do</a>
+            </nav>
+        </aside>
+
+        <div class="main-area">
+            <!-- Main Content -->
+            <article class="content-wrapper main-content">
         <div class="warning-box">
             <h3>Criminal Penalties Are Real</h3>
             <p>Violating the Foreign Business Act carries penalties of up to <strong>3 years imprisonment</strong> and fines up to <strong>THB 1 million</strong>. Between September 2024 and May 2025, Thai authorities investigated 861 cases with estimated economic damages of THB 15.3 billion. This is not an obscure law that goes unenforced.</p>
@@ -394,7 +442,7 @@
 
             <p>This guide explains the three lists of restricted activities, the legal exceptions that allow foreign participation, and the severe penalties for violations including the increasingly common prosecution of nominee structures.</p>
 
-            <h2>Who Is a "Foreigner" Under the FBA?</h2>
+            <h2 id="who-foreigner">Who Is a "Foreigner" Under the FBA?</h2>
 
             <p>The FBA defines "foreigner" (or "alien") more broadly than you might expect. You are considered a foreigner if you are:</p>
 
@@ -407,7 +455,7 @@
 
             <p>This means a Thai company with 51% Thai shareholders and 49% foreign shareholders is treated as a Thai company under the FBA. However, authorities increasingly scrutinize whether those Thai shareholders are genuine investors or merely nominees.</p>
 
-            <h2>The Three Lists of Restricted Activities</h2>
+            <h2 id="three-lists">The Three Lists of Restricted Activities</h2>
 
             <p>The FBA organizes restricted business activities into three lists, each with different levels of restriction and different pathways (if any) for foreign participation.</p>
 
@@ -463,7 +511,7 @@
                 </ul>
             </div>
 
-            <h2>Legal Exceptions: How Foreigners CAN Operate</h2>
+            <h2 id="legal-exceptions">Legal Exceptions: How Foreigners CAN Operate</h2>
 
             <p>Despite the restrictions, there are legitimate legal pathways for foreigners to engage in many business activities. These are not loopholes; they are specific exemptions built into Thai law.</p>
 
@@ -503,7 +551,7 @@
                 <p style="margin-top: 12px;"><strong>Reality Check:</strong> FBL applications are often rejected, especially for retail, services, and activities where Thai companies already compete effectively.</p>
             </div>
 
-            <h2>Criminal Penalties for FBA Violations</h2>
+            <h2 id="penalties">Criminal Penalties for FBA Violations</h2>
 
             <p>The FBA contains severe criminal penalties for violations. These are not theoretical; Thai authorities actively prosecute violations, especially nominee arrangements.</p>
 
@@ -551,7 +599,7 @@
 
             <p>face the same criminal penalties as the foreigner illegally operating the business. This is why both the foreigner AND the Thai nominees are prosecuted in crackdown cases.</p>
 
-            <h2>Real Enforcement: 2024-2025 Cases</h2>
+            <h2 id="enforcement">Real Enforcement: 2024-2025 Cases</h2>
 
             <div class="case-study">
                 <h4>Phuket Law Firm Network - September 2024</h4>
@@ -573,7 +621,7 @@
                 <span class="outcome">46,918 Companies Targeted</span>
             </div>
 
-            <h2>How Authorities Detect Violations</h2>
+            <h2 id="detection">How Authorities Detect Violations</h2>
 
             <p>The Department of Business Development (DBD) and Department of Special Investigation (DSI) use multiple methods to identify illegal structures:</p>
 
@@ -604,7 +652,7 @@
                 <p>A persistent myth claims that having 2 Thai directors out of 3 total makes a company "Thai." This is false. The FBA looks at <strong>share ownership</strong>, not directorship. A company with 3 Thai directors but 51% foreign shareholding is still classified as a "foreign" company under the FBA. Directorship composition is irrelevant to FBA classification.</p>
             </div>
 
-            <h2>Proposed Legal Reforms</h2>
+            <h2 id="reforms">Proposed Legal Reforms</h2>
 
             <p>Thai lawmakers are considering reforms that would strengthen enforcement and increase penalties:</p>
 
@@ -624,7 +672,7 @@
                 <li>Close loopholes allowing indirect foreign ownership</li>
             </ul>
 
-            <h2>What You Should Do</h2>
+            <h2 id="what-to-do">What You Should Do</h2>
 
             <p>If you are considering starting or investing in a Thai business:</p>
 
@@ -647,6 +695,12 @@
             <a href="/Thai/">Back to Thailand Legal Hub</a>
         </div>
     </article>
+        </div><!-- end main-area -->
+    </div><!-- end page-wrapper -->
+
+    <!-- Mobile Nav Toggle -->
+    <button class="mobile-nav-toggle" onclick="toggleSidebar()">&#9776;</button>
+    <div class="overlay" onclick="toggleSidebar()"></div>
 
     <!-- Footer -->
     <footer class="footer">
@@ -667,5 +721,36 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        function scrollToSection(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // Update active nav item
+                document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+                document.querySelector(`[onclick="scrollToSection('${id}')"]`)?.classList.add('active');
+                // Close sidebar on mobile
+                if (window.innerWidth <= 900) toggleSidebar();
+            }
+        }
+
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('open');
+            document.querySelector('.overlay').classList.toggle('show');
+        }
+
+        // Update active nav on scroll
+        window.addEventListener('scroll', () => {
+            const sections = ['who-foreigner', 'three-lists', 'legal-exceptions', 'penalties', 'enforcement', 'detection', 'reforms', 'what-to-do'];
+            let current = sections[0];
+            for (const id of sections) {
+                const el = document.getElementById(id);
+                if (el && el.getBoundingClientRect().top <= 100) current = id;
+            }
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            document.querySelector(`[onclick="scrollToSection('${current}')"]`)?.classList.add('active');
+        });
+    </script>
 </body>
 </html>
