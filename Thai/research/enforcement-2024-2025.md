@@ -459,20 +459,61 @@ The DSI investigates four key streams:
 - CIB "Operation Nominee Sweep" Press Conference, May 31, 2024
 
 ### Legal Publications
-- Nishimura & Asahi: "2024 Thai Nominee Shareholding Investigation"
-- Nagashima Ohno & Tsunematsu: "The Latest Precedent Case Involving Investigation by the DSI into Nominee Offenses"
-- Silk Legal: "Nominee Land Ownership in Thailand"
-- AustCham Thailand: "Thailand's Unprecedented Crackdown on Illegal Nominee Structures"
-- FRANK Legal & Tax: "Thailand Continues Nominee Crackdown"
+- [Nagashima Ohno & Tsunematsu: "The Latest Precedent Case Involving Investigation by the DSI into Nominee Offenses"](https://www.noandt.com/en/publications/publication20241126-1/)
+- [Silk Legal: "Nominee Land Ownership in Thailand Can Follow You to the Grave"](https://silklegal.com/nominee-land-ownership-in-thailand-can-follow-you-to-the-grave/)
+- [SILQ Law: "Thailand Cracks Down on Systemic Nominee Business Structures in Koh Phangan"](https://silqlaw.com/2025/thailand-nominee-business-crackdown-koh-phangan/)
+- [AustCham Thailand: "Thailand's Unprecedented Crackdown on Illegal Nominee Structures"](https://www.austchamthailand.com/resources/news/thailands-unprecedented-crackdown-illegal-nominee-structures-compliance-options)
+- [DFDL: "Thailand: New Draft Amendment of Anti-Money Laundering Act"](https://www.dfdl.com/insights/legal-and-tax-updates/thailand-new-draft-amendment-of-anti-money-laundering-act-b-e-2542-1999/)
+- [Formichella & Sritawat: "Thailand Proposes Sweeping Amendments to Anti-Money Laundering Act"](https://fosrlaw.com/2025/thailand-proposes-sweeping-amendments-to-anti-money-laundering-act-key-reforms-and-implications/)
+- [Mahanakorn Partners: "Thailand Approves New Anti-Money Laundering Laws"](https://mahanakornpartners.com/thailand-approves-new-anti-money-laundering-laws/)
+- [Thai Law Online: "Recent Crackdowns on Nominees in Thailand: the Law and Court Cases"](https://thailawonline.com/recent-crackdowns-on-nominees-in-thailand-the-law-and-court-cases/)
+- [Lex Nova Partners: "Thailand Tightens Anti-Money Laundering Laws Against Nominees"](https://lexnovapartners.com/anti-money-laundering-laws/)
 
-### News Sources
-- Bangkok Post
-- Khaosod English
-- The Phuket Express
-- Pattaya Mail
-- Thai Examiner
-- Nation Thailand
-- The Thaiger
+### News Sources - Major Enforcement Actions
+
+#### Operation Nominee Sweep (Phuket, May 2024)
+- [Bangkok Post: "More than 200 arrested in Phuket nominee crackdown"](https://www.bangkokpost.com/thailand/general/2802954/more-than-200-arrested-in-phuket-nominee-crackdown)
+- [Nation Thailand: "231 arrests in Phuket in crackdown on foreigners using Thai nominees"](https://www.nationthailand.com/news/general/40038477)
+- [Khaosod English: "CIB Busts Russian Network, Seizes More Than $40M Assets"](https://www.khaosodenglish.com/news/2024/05/31/cib-busts-russian-network-seizes-more-than-40m-assets/)
+- [Thai Examiner: "Massive CIB-led Phuket crackdown sweeps away vast Russian business network"](https://www.thaiexaminer.com/thai-news-foreigners/2024/05/31/massive-cib-led-phuket-crackdown-sweeps-away-vast-russian-biz-network-with-1-5-billion-baht-seized/)
+- [Pattaya Mail: "Crackdown on Thai nominee network illegally helping Russians"](https://www.pattayamail.com/thailandnews/crackdown-on-thai-nominee-network-illegally-helping-russians-set-up-real-estate-companies-in-phuket-462189)
+- [The Thaiger: "Russian nominee business bust exposes 1.5 billion baht scandal"](https://thethaiger.com/news/national/russian-nominee-business-bust-exposes-1-5-billion-baht-scandal)
+
+#### Phuket Convictions (September 2024)
+- [The Phuket News: "23 people, companies in Phuket convicted for using nominees"](https://www.thephuketnews.com/23-people-companies-in-phuket-convicted-for-using-nominees-94090.php)
+- [The Thaiger: "Phuket nominee crackdown: 23 guilty, 60 firms busted"](https://thethaiger.com/news/phuket/phuket-nominee-crackdown-23-guilty-60-firms-busted)
+- [The Phuket News: "DBD confirms 23 found guilty in Phuket nominee charges"](https://www.thephuketnews.com/dbd-confirms-23-found-guilty-in-phuket-nominee-charges-96218.php)
+
+#### Koh Samui / Koh Phangan Crackdown (2024-2025)
+- [Bangkok Post: "Phangan nominee crackdown stepped up"](https://www.bangkokpost.com/business/general/3125352/phangan-nominee-crackdown-stepped-up)
+- [Bangkok Post: "Police step up nominee holding cases on Koh Samui, Koh Phangan"](https://www.bangkokpost.com/thailand/general/3119940/police-step-up-nominee-holding-cases-on-koh-samui-koh-phangan)
+- [Khaosod English: "Thai Authorities Target Nominee Businesses on Koh Samui and Koh Phangan"](https://www.khaosodenglish.com/news/2025/10/14/thai-authorities-target-nominee-businesses-on-koh-samui-and-koh-phangan/)
+- [Thai Examiner: "Crackdown to wipe out foreign business abuses on Koh Phangan & Koh Samui intensifies"](https://www.thaiexaminer.com/thai-news-foreigners/2025/10/21/crackdown-to-wipe-out-foreign-business-abuses-and-ownership-on-koh-phangan-and-koh-samui-intensifies/)
+- [Nation Thailand: "Over 7,000 suspected nominee businesses found on Samui and Phangan islands"](https://www.nationthailand.com/business/economy/40056825)
+- [Thailand Advisor: "Nominee Crackdown in Koh Phangan & Samui — The Foreign-Front Business Era Ends"](https://www.thethailandadvisor.com/nominee-crackdown-in-koh-phangan-samui-the-foreign-front-business-era-ends/)
+
+#### British Woman Bar Case (November 2025)
+- [Khaosod English: "British Woman Charged in Koh Samui Nominee Bar Case"](https://www.khaosodenglish.com/news/2025/11/26/british-woman-charged-in-koh-samui-nominee-bar-case/)
+- [Thai Examiner: "Busy beer bar run by British woman on Koh Samui probed"](https://www.thaiexaminer.com/thai-news-foreigners/2025/11/27/busy-beer-bar-run-by-british-woman-on-koh-samui-probed-with-the-owner-charged-and-facing-a-criminal-case/)
+
+#### French Businesswoman Estate Investigation (2024)
+- [Khaosod English: "French Woman's Thai Maid Loses Inheritance in Koh Samui Nominee Probe"](https://www.khaosodenglish.com/featured/2024/11/27/french-womans-thai-maid-loses-inheritance-in-koh-samui-nominee-probe/)
+- [Bangkok Post: "Legal issues threaten Koh Samui maid's claim to late employer's estate"](https://www.bangkokpost.com/thailand/general/2909242/legal-issues-threaten-koh-samui-maids-claim-to-late-employers-estate)
+- [Thai Examiner: "French woman's company assets may be seized by Ministry of Interior"](https://www.thaiexaminer.com/thai-news-foreigners/2024/05/09/french-woman-catherine-delacote-ko-samui-company-assets-could-be-seized-by-the-ministry/)
+
+#### Chinese Land Purchase / Agriculture Cases
+- [Bangkok Post: "Another illegal durian farm found in Chanthaburi"](https://www.bangkokpost.com/thailand/general/2972810/another-illegal-durian-farm-found-in-chanthaburi)
+- [Dialogue Earth: "Riding the durian Belt and Road: Risky times for Thai agriculture"](https://dialogue.earth/en/business/11055-riding-the-durian-belt-and-road-risky-times-for-thai-agriculture/)
+
+#### Russian Business Presence
+- [Al Jazeera: "'Russian-only' businesses in Thailand's Phuket spark backlash"](https://www.aljazeera.com/economy/2023/9/6/russian-only-businesses-in-thailands-phuket-spark-backlash)
+- [Radio Free Asia: "Thai police crack down on Russian investors on holiday island of Phuket"](https://www.rfa.org/english/news/china/phuket-russians-05312024225430.html)
+
+#### DBD Inspection Plans and Statistics
+- [Bangkok Post: "Thai officials revise nominee inspection strategy"](https://www.bangkokpost.com/business/general/3009916/agency-rejigs-nominee-inspection-strategy)
+- [The Thaiger: "Commerce Ministry targets foreign nominees in 6 sectors"](https://thethaiger.com/news/national/commerce-ministry-targets-foreign-nominees-in-6-sectors)
+- [Khaosod English: "Thailand Targets Nominee Businesses Causing $468M in Damages"](https://www.khaosodenglish.com/featured/2025/05/21/thailand-targets-nominee-businesses-causing-468m-in-damages/)
+- [Nation Thailand: "Thai nominee crackdown uncovers tourism, property chaos"](https://www.nationthailand.com/business/economy/40046694)
 
 ---
 
