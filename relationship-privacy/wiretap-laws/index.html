@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recording &amp; Wiretap Laws by State | Terms.Law</title>
+    <meta name="description" content="Look up your state's recording consent laws. Find out if you need one-party or two-party consent to record conversations, including criminal penalties and civil damages.">
+    <meta name="keywords" content="wiretap laws, recording consent, one-party consent, two-party consent, all-party consent, recording laws by state">
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://terms.law/relationship-privacy/wiretap-laws/">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Recording &amp; Wiretap Laws by State | Terms.Law">
+    <meta property="og:description" content="Look up your state's recording consent laws. One-party vs two-party consent states.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://terms.law/relationship-privacy/wiretap-laws/">
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-901N2Y3CDZ"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-901N2Y3CDZ');
+    </script>
+
+    <!-- Shared Styles -->
+    <link rel="stylesheet" href="/shared/styles.css">
+    <link rel="stylesheet" href="../hub-styles.css">
+
+    <style>
+        /* Tool-specific styles */
+        .tool-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .state-selector {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        .state-selector label {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .state-select {
+            flex: 1;
+            min-width: 200px;
+            max-width: 300px;
+            padding: 0.875rem 1rem;
+            background: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .state-select:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        .state-select option {
+            background: var(--bg-dark);
+            color: var(--text-primary);
+        }
+
+        /* Result Card */
+        .result-card {
+            display: none;
+            background: var(--bg-dark);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .result-card.show {
+            display: block;
+        }
+
+        .result-header {
+            padding: 1.5rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .result-header.one-party {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.1));
+            border-bottom: 2px solid var(--accent-green);
+        }
+
+        .result-header.two-party {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.1));
+            border-bottom: 2px solid var(--accent-red);
+        }
+
+        .result-state {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .consent-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .consent-badge.one-party {
+            background: var(--accent-green);
+            color: white;
+        }
+
+        .consent-badge.two-party {
+            background: var(--accent-red);
+            color: white;
+        }
+
+        .result-body {
+            padding: 2rem;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .result-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1.25rem;
+        }
+
+        .result-item-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .result-item-value {
+            font-size: 1rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .result-item-value a {
+            color: var(--accent-primary-light);
+        }
+
+        .result-summary {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1.5rem;
+        }
+
+        .result-summary h4 {
+            color: var(--accent-primary-light);
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+        }
+
+        .result-summary p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* Quick Reference Cards */
+        .quick-ref {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .quick-ref-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .quick-ref-card h3 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .quick-ref-card h3 .badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+        }
+
+        .quick-ref-card h3 .badge.green {
+            background: var(--accent-green);
+            color: white;
+        }
+
+        .quick-ref-card h3 .badge.red {
+            background: var(--accent-red);
+            color: white;
+        }
+
+        .state-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .state-tag {
+            background: var(--bg-dark);
+            padding: 0.35rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .state-tag:hover {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        /* Interstate Section */
+        .interstate-note {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(234, 179, 8, 0.1));
+            border: 1px solid var(--accent-orange);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .interstate-note h4 {
+            color: var(--accent-orange);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .interstate-note p {
+            color: var(--text-secondary);
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 768px) {
+            .quick-ref {
+                grid-template-columns: 1fr;
+            }
+
+            .result-header {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Shared Header -->
+    <div id="site-header"></div>
+    <script src="/shared/header-loader.js"></script>
+
+    <div class="overlay" onclick="toggleSidebar()"></div>
+
+    <div class="page-wrapper">
+        <!-- Left Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <!-- Sidebar loaded via JS -->
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Breadcrumb -->
+            <nav class="breadcrumb">
+                <a href="/">Home</a>
+                <span>/</span>
+                <a href="/relationship-privacy/">Relationship Privacy</a>
+                <span>/</span>
+                <span>Wiretap Laws Lookup</span>
+            </nav>
+
+            <!-- Page Header -->
+            <header class="page-header">
+                <h1>Recording &amp; Wiretap Laws</h1>
+                <p class="subtitle">Look up your state's consent requirements for recording conversations. Essential before recording intimate encounters or private discussions.</p>
+            </header>
+
+            <!-- Lookup Tool -->
+            <div class="tool-container">
+                <div class="state-selector">
+                    <label for="stateSelect">Select Your State:</label>
+                    <select id="stateSelect" class="state-select">
+                        <option value="">-- Choose a State --</option>
+                    </select>
+                </div>
+
+                <div id="resultCard" class="result-card">
+                    <!-- Results populated by JavaScript -->
+                </div>
+
+                <div id="loadingState" class="loading" style="display: none;">
+                    Loading state data...
+                </div>
+            </div>
+
+            <!-- Quick Reference -->
+            <section class="hub-section">
+                <h2 class="section-title">Quick Reference</h2>
+                <p class="section-description">Click any state to view its detailed recording laws.</p>
+
+                <div class="quick-ref">
+                    <div class="quick-ref-card">
+                        <h3>&#10003; One-Party Consent <span class="badge green">36 States</span></h3>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">You can record if YOU are part of the conversation (no need to inform the other party).</p>
+                        <div id="onePartyList" class="state-list">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <div class="quick-ref-card">
+                        <h3>&#9888; Two-Party Consent <span class="badge red">14 States</span></h3>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">ALL parties must consent to being recorded. Recording without consent is a crime.</p>
+                        <div id="twoPartyList" class="state-list">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="interstate-note">
+                    <h4>&#128205; Interstate Recording Rules</h4>
+                    <p>When recording across state lines, the stricter state's law generally applies. If you're in a one-party state calling someone in a two-party state (like California), you likely need their consent. Federal wiretap law (18 U.S.C. &#167; 2511) requires at least one-party consent and can impose criminal penalties up to 5 years imprisonment.</p>
+                </div>
+            </section>
+
+            <!-- CTA Section -->
+            <section class="cta-section">
+                <h2>Need to Document Consent?</h2>
+                <p>Generate a legally-sound photo and video consent form to protect yourself before recording intimate content.</p>
+                <a href="/relationship-privacy/photo-consent/" class="btn-cta">Photo Consent Form &#8594;</a>
+            </section>
+        </main>
+    </div>
+
+    <!-- Mobile Nav Toggle -->
+    <button class="mobile-nav-toggle" onclick="toggleSidebar()" aria-label="Toggle navigation">
+        <span class="hamburger-icon">&#9776;</span>
+    </button>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="/">Terms.Law</a>
+            <a href="/privacy-policy/">Privacy Policy</a>
+            <a href="/terms-of-service/">Terms of Service</a>
+            <a href="/Templates/">All Templates</a>
+        </div>
+        <p class="footer-copyright">&copy; 2026 Terms.Law. Legal information, not legal advice.</p>
+    </footer>
+
+    <!-- Load sidebar -->
+    <script>
+        fetch('../sidebar.html')
+            .then(r => r.text())
+            .then(html => {
+                document.getElementById('sidebar').innerHTML = html;
+                highlightCurrentPage();
+            });
+    </script>
+    <script src="../hub-scripts.js"></script>
+
+    <!-- Wiretap Laws Data & Logic -->
+    <script>
+        let wiretapData = null;
+
+        // Load wiretap laws JSON
+        fetch('../data/wiretap-laws.json')
+            .then(r => r.json())
+            .then(data => {
+                wiretapData = data;
+                initializeTool();
+            })
+            .catch(err => {
+                console.error('Error loading wiretap data:', err);
+                document.getElementById('loadingState').innerHTML = 'Error loading data. Please refresh the page.';
+                document.getElementById('loadingState').style.display = 'block';
+            });
+
+        function initializeTool() {
+            const select = document.getElementById('stateSelect');
+            const onePartyList = document.getElementById('onePartyList');
+            const twoPartyList = document.getElementById('twoPartyList');
+
+            // Populate dropdown
+            wiretapData.states.forEach(state => {
+                const option = document.createElement('option');
+                option.value = state.abbreviation;
+                option.textContent = state.name;
+                select.appendChild(option);
+            });
+
+            // Populate quick reference lists
+            wiretapData.onePartyStates.forEach(stateName => {
+                const state = wiretapData.states.find(s => s.name === stateName);
+                if (state) {
+                    const tag = document.createElement('span');
+                    tag.className = 'state-tag';
+                    tag.textContent = state.abbreviation;
+                    tag.onclick = () => {
+                        select.value = state.abbreviation;
+                        showStateResult(state.abbreviation);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    };
+                    onePartyList.appendChild(tag);
+                }
+            });
+
+            wiretapData.twoPartyStates.forEach(stateName => {
+                const state = wiretapData.states.find(s => s.name === stateName);
+                if (state) {
+                    const tag = document.createElement('span');
+                    tag.className = 'state-tag';
+                    tag.textContent = state.abbreviation;
+                    tag.onclick = () => {
+                        select.value = state.abbreviation;
+                        showStateResult(state.abbreviation);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    };
+                    twoPartyList.appendChild(tag);
+                }
+            });
+
+            // Handle dropdown change
+            select.addEventListener('change', function() {
+                if (this.value) {
+                    showStateResult(this.value);
+                } else {
+                    document.getElementById('resultCard').classList.remove('show');
+                }
+            });
+
+            // Check for URL hash
+            const hash = window.location.hash.replace('#', '').toUpperCase();
+            if (hash && wiretapData.states.find(s => s.abbreviation === hash)) {
+                select.value = hash;
+                showStateResult(hash);
+            }
+        }
+
+        function showStateResult(abbr) {
+            const state = wiretapData.states.find(s => s.abbreviation === abbr);
+            if (!state) return;
+
+            const isOneParty = state.consentType === 'one-party';
+            const resultCard = document.getElementById('resultCard');
+
+            resultCard.innerHTML = `
+                <div class="result-header ${isOneParty ? 'one-party' : 'two-party'}">
+                    <span class="result-state">${state.name}</span>
+                    <span class="consent-badge ${isOneParty ? 'one-party' : 'two-party'}">
+                        ${isOneParty ? 'One-Party Consent' : 'Two-Party Consent'}
+                    </span>
+                </div>
+                <div class="result-body">
+                    <div class="result-grid">
+                        <div class="result-item">
+                            <div class="result-item-label">Statute</div>
+                            <div class="result-item-value">${state.statute}</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-item-label">Criminal Penalty</div>
+                            <div class="result-item-value">${state.criminalPenalty}</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-item-label">Civil Damages</div>
+                            <div class="result-item-value">${state.civilDamages}</div>
+                        </div>
+                        ${state.videoDistinction ? `
+                        <div class="result-item">
+                            <div class="result-item-label">Video Recording</div>
+                            <div class="result-item-value">${state.videoDistinction}</div>
+                        </div>
+                        ` : ''}
+                    </div>
+                    <div class="result-summary">
+                        <h4>What This Means</h4>
+                        <p>${state.summary}</p>
+                    </div>
+                </div>
+            `;
+
+            resultCard.classList.add('show');
+
+            // Update URL hash
+            window.history.replaceState(null, null, '#' + abbr);
+        }
+    </script>
+
+    <!-- Schema.org Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Recording & Wiretap Laws Lookup",
+        "description": "Look up your state's recording consent laws. Find out if you need one-party or two-party consent.",
+        "url": "https://terms.law/relationship-privacy/wiretap-laws/",
+        "applicationCategory": "Legal",
+        "operatingSystem": "Any",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "author": {
+            "@type": "Organization",
+            "name": "Terms.Law"
+        }
+    }
+    </script>
+</body>
+</html>
