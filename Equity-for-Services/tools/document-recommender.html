@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Stack Recommender | Terms.Law</title>
+    <meta name="description" content="Get the exact list of documents you need for equity-for-services arrangements based on entity type, equity type, and relationship structure.">
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-901N2Y3CDZ"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-901N2Y3CDZ');
+    </script>
+
+    <style>
+        :root {
+            --bg-dark: #0a0f1a;
+            --bg-card: #111827;
+            --bg-card-hover: #1a2332;
+            --bg-input: #1f2937;
+            --accent-blue: #3b82f6;
+            --accent-blue-hover: #2563eb;
+            --accent-green: #10b981;
+            --accent-purple: #8b5cf6;
+            --accent-orange: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-cyan: #06b6d4;
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --border-color: #1f2937;
+            --border-focus: #3b82f6;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+
+        .logo span { color: var(--text-secondary); font-weight: 400; }
+
+        .breadcrumbs {
+            padding: 1rem 2rem;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .breadcrumbs-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .breadcrumbs a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .breadcrumbs a:hover { color: var(--accent-blue); }
+        .breadcrumbs span { color: var(--text-primary); }
+
+        .main-layout {
+            display: flex;
+            max-width: 1600px;
+            margin: 0 auto;
+            min-height: calc(100vh - 120px);
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border-color);
+            padding: 1.5rem;
+            position: sticky;
+            top: 120px;
+            height: calc(100vh - 120px);
+            overflow-y: auto;
+        }
+
+        .sidebar-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav li { margin-bottom: 0.25rem; }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .sidebar-nav a:hover {
+            background: var(--bg-input);
+            color: var(--text-primary);
+        }
+
+        .sidebar-nav a.active {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+        }
+
+        .sidebar-nav .icon { width: 20px; height: 20px; opacity: 0.7; }
+        .sidebar-divider { height: 1px; background: var(--border-color); margin: 1.5rem 0; }
+
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .page-header { margin-bottom: 2rem; }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle { color: var(--text-secondary); }
+
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .main-content { padding: 1rem; }
+        }
+
+        .wizard-container {
+            max-width: 800px;
+        }
+
+        .wizard-step {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .wizard-step.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--accent-orange);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .step-number.completed {
+            background: var(--accent-green);
+        }
+
+        .step-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .option-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .option-card {
+            background: var(--bg-input);
+            border: 2px solid transparent;
+            border-radius: 8px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .option-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-color);
+        }
+
+        .option-card.selected {
+            border-color: var(--accent-blue);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .option-icon {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto 0.75rem;
+            color: var(--accent-blue);
+        }
+
+        .option-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .option-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.875rem 1.5rem;
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            width: 100%;
+        }
+
+        .btn-primary:hover { background: var(--accent-blue-hover); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            background: var(--bg-input);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+        }
+
+        .output-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .output-section.visible { display: block; }
+
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .output-title { font-size: 1.25rem; font-weight: 600; }
+        .output-actions { display: flex; gap: 0.5rem; }
+
+        .decision-tree {
+            background: var(--bg-input);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .decision-path {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .decision-node {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--accent-blue);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .decision-arrow {
+            color: var(--text-muted);
+        }
+
+        .document-list {
+            margin-bottom: 1.5rem;
+        }
+
+        .document-category {
+            margin-bottom: 1.5rem;
+        }
+
+        .category-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .category-title.required { color: var(--accent-red); }
+        .category-title.recommended { color: var(--accent-orange); }
+        .category-title.optional { color: var(--accent-blue); }
+
+        .document-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            background: var(--bg-input);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .doc-icon {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .doc-icon.required { color: var(--accent-red); }
+        .doc-icon.recommended { color: var(--accent-orange); }
+        .doc-icon.optional { color: var(--accent-blue); }
+
+        .doc-content { flex: 1; }
+
+        .doc-name {
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .doc-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .summary-box {
+            background: var(--bg-input);
+            border-radius: 8px;
+            padding: 1.5rem;
+            border-left: 3px solid var(--accent-green);
+        }
+
+        .summary-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--accent-green);
+            margin-bottom: 1rem;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            text-align: center;
+        }
+
+        @media (max-width: 500px) {
+            .summary-stats { grid-template-columns: 1fr; }
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .checkbox-inline {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .checkbox-inline input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent-blue);
+        }
+
+        .checkbox-inline label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <a href="../../" class="logo">Terms<span>.Law</span></a>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs">
+        <div class="breadcrumbs-content">
+            <a href="../../">Home</a> &gt;
+            <a href="../">Equity for Services</a> &gt;
+            <a href="./">Tools</a> &gt;
+            <span>Document Recommender</span>
+        </div>
+    </nav>
+
+    <div class="main-layout">
+        <aside class="sidebar">
+            <h3 class="sidebar-title">Tools</h3>
+            <ul class="sidebar-nav">
+                <li>
+                    <a href="./deal-builder.html">
+                        <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        Deal Builder
+                    </a>
+                </li>
+                <li>
+                    <a href="./vesting-builder.html">
+                        <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Vesting Builder
+                    </a>
+                </li>
+                <li>
+                    <a href="./buyout-generator.html">
+                        <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Buyout Generator
+                    </a>
+                </li>
+                <li>
+                    <a href="./document-recommender.html" class="active">
+                        <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                        </svg>
+                        Document Recommender
+                    </a>
+                </li>
+                <li>
+                    <a href="./ip-addendum.html">
+                        <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                        IP Addendum
+                    </a>
+                </li>
+                <li>
+                    <a href="./cross-border-spotter.html">
+                        <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Cross-Border Spotter
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-divider"></div>
+
+            <h3 class="sidebar-title">Hub</h3>
+            <ul class="sidebar-nav">
+                <li>
+                    <a href="../">
+                        <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        </svg>
+                        Back to Hub
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">Document Stack Recommender</h1>
+                <p class="page-subtitle">Answer a few questions to get your complete document checklist</p>
+            </div>
+
+            <div class="wizard-container">
+                <div class="wizard-step" id="step1">
+                    <div class="step-header">
+                        <div class="step-number" id="step1-number">1</div>
+                        <h3 class="step-title">What type of entity is issuing equity?</h3>
+                    </div>
+                    <div class="option-grid">
+                        <div class="option-card" data-step="1" data-value="llc" onclick="selectOption(this)">
+                            <svg class="option-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z"/>
+                            </svg>
+                            <div class="option-title">LLC</div>
+                            <div class="option-desc">Limited Liability Company</div>
+                        </div>
+                        <div class="option-card" data-step="1" data-value="c-corp" onclick="selectOption(this)">
+                            <svg class="option-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"/>
+                            </svg>
+                            <div class="option-title">C Corporation</div>
+                            <div class="option-desc">Delaware or other state</div>
+                        </div>
+                        <div class="option-card" data-step="1" data-value="s-corp" onclick="selectOption(this)">
+                            <svg class="option-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75z"/>
+                            </svg>
+                            <div class="option-title">S Corporation</div>
+                            <div class="option-desc">Pass-through taxation</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wizard-step disabled" id="step2">
+                    <div class="step-header">
+                        <div class="step-number" id="step2-number">2</div>
+                        <h3 class="step-title">What type of equity is being granted?</h3>
+                    </div>
+                    <div class="option-grid" id="equityOptions">
+                        <!-- Options populated by JavaScript based on entity type -->
+                    </div>
+                </div>
+
+                <div class="wizard-step disabled" id="step3">
+                    <div class="step-header">
+                        <div class="step-number" id="step3-number">3</div>
+                        <h3 class="step-title">Who is receiving the equity?</h3>
+                    </div>
+                    <div class="option-grid">
+                        <div class="option-card" data-step="3" data-value="founder" onclick="selectOption(this)">
+                            <svg class="option-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
+                            </svg>
+                            <div class="option-title">Co-Founder</div>
+                            <div class="option-desc">Equity partner</div>
+                        </div>
+                        <div class="option-card" data-step="3" data-value="advisor" onclick="selectOption(this)">
+                            <svg class="option-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5"/>
+                            </svg>
+                            <div class="option-title">Advisor</div>
+                            <div class="option-desc">Strategic guidance</div>
+                        </div>
+                        <div class="option-card" data-step="3" data-value="contractor" onclick="selectOption(this)">
+                            <svg class="option-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0M12 12.75h.008v.008H12v-.008z"/>
+                            </svg>
+                            <div class="option-title">Contractor</div>
+                            <div class="option-desc">Independent service provider</div>
+                        </div>
+                        <div class="option-card" data-step="3" data-value="employee" onclick="selectOption(this)">
+                            <svg class="option-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/>
+                            </svg>
+                            <div class="option-title">Employee</div>
+                            <div class="option-desc">W-2 worker</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wizard-step disabled" id="step4">
+                    <div class="step-header">
+                        <div class="step-number" id="step4-number">4</div>
+                        <h3 class="step-title">Additional considerations</h3>
+                    </div>
+                    <div class="checkbox-inline">
+                        <input type="checkbox" id="crossBorder">
+                        <label for="crossBorder">Service provider is located outside the US</label>
+                    </div>
+                    <div class="checkbox-inline">
+                        <input type="checkbox" id="hasVesting">
+                        <label for="hasVesting">Equity will be subject to vesting</label>
+                    </div>
+                    <div class="checkbox-inline">
+                        <input type="checkbox" id="hasIP">
+                        <label for="hasIP">IP assignment is required</label>
+                    </div>
+                    <div class="checkbox-inline">
+                        <input type="checkbox" id="hasNonCompete">
+                        <label for="hasNonCompete">Non-compete/non-solicit required</label>
+                    </div>
+                </div>
+
+                <button class="btn-primary" id="generateBtn" onclick="generateRecommendation()" disabled>
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                    </svg>
+                    Generate Document List
+                </button>
+            </div>
+
+            <div id="outputSection" class="output-section">
+                <div class="output-header">
+                    <h2 class="output-title">Your Document Stack</h2>
+                    <div class="output-actions">
+                        <button class="btn-secondary" onclick="copyOutput()">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                            </svg>
+                            Copy
+                        </button>
+                        <button class="btn-secondary" onclick="downloadOutput()">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                            </svg>
+                            Download
+                        </button>
+                    </div>
+                </div>
+
+                <div id="decisionTree" class="decision-tree"></div>
+
+                <div id="documentList" class="document-list"></div>
+
+                <div id="summaryBox" class="summary-box"></div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const selections = {
+            entityType: null,
+            equityType: null,
+            recipientType: null
+        };
+
+        const equityOptions = {
+            'llc': [
+                { value: 'membership-units', title: 'Membership Units', desc: 'Ownership interest in LLC' },
+                { value: 'profits-interest', title: 'Profits Interest', desc: 'Share of future profits only' }
+            ],
+            'c-corp': [
+                { value: 'common-stock', title: 'Common Stock', desc: 'Standard ownership shares' },
+                { value: 'restricted-stock', title: 'Restricted Stock', desc: 'Stock with restrictions' },
+                { value: 'stock-options', title: 'Stock Options', desc: 'Right to purchase stock' },
+                { value: 'phantom', title: 'Phantom Equity', desc: 'Cash-settled equity' }
+            ],
+            's-corp': [
+                { value: 'common-stock', title: 'Common Stock', desc: 'Ownership shares' },
+                { value: 'restricted-stock', title: 'Restricted Stock', desc: 'Stock with restrictions' }
+            ]
+        };
+
+        function selectOption(element) {
+            const step = element.dataset.step;
+            const value = element.dataset.value;
+
+            // Remove selection from siblings
+            element.parentElement.querySelectorAll('.option-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+
+            // Add selection to clicked card
+            element.classList.add('selected');
+
+            // Store selection
+            if (step === '1') {
+                selections.entityType = value;
+                document.getElementById('step1-number').classList.add('completed');
+                enableStep(2);
+                populateEquityOptions(value);
+            } else if (step === '2') {
+                selections.equityType = value;
+                document.getElementById('step2-number').classList.add('completed');
+                enableStep(3);
+            } else if (step === '3') {
+                selections.recipientType = value;
+                document.getElementById('step3-number').classList.add('completed');
+                enableStep(4);
+                document.getElementById('generateBtn').disabled = false;
+            }
+        }
+
+        function enableStep(stepNum) {
+            document.getElementById(`step${stepNum}`).classList.remove('disabled');
+        }
+
+        function populateEquityOptions(entityType) {
+            const container = document.getElementById('equityOptions');
+            const options = equityOptions[entityType] || [];
+
+            container.innerHTML = options.map(opt => `
+                <div class="option-card" data-step="2" data-value="${opt.value}" onclick="selectOption(this)">
+                    <svg class="option-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <path d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"/>
+                    </svg>
+                    <div class="option-title">${opt.title}</div>
+                    <div class="option-desc">${opt.desc}</div>
+                </div>
+            `).join('');
+        }
+
+        function generateRecommendation() {
+            const crossBorder = document.getElementById('crossBorder').checked;
+            const hasVesting = document.getElementById('hasVesting').checked;
+            const hasIP = document.getElementById('hasIP').checked;
+            const hasNonCompete = document.getElementById('hasNonCompete').checked;
+
+            const entityNames = {
+                'llc': 'LLC',
+                'c-corp': 'C Corporation',
+                's-corp': 'S Corporation'
+            };
+
+            const equityNames = {
+                'membership-units': 'Membership Units',
+                'profits-interest': 'Profits Interest',
+                'common-stock': 'Common Stock',
+                'restricted-stock': 'Restricted Stock',
+                'stock-options': 'Stock Options',
+                'phantom': 'Phantom Equity'
+            };
+
+            const recipientNames = {
+                'founder': 'Co-Founder',
+                'advisor': 'Advisor',
+                'contractor': 'Contractor',
+                'employee': 'Employee'
+            };
+
+            // Decision tree
+            const decisionPath = [
+                entityNames[selections.entityType],
+                equityNames[selections.equityType],
+                recipientNames[selections.recipientType]
+            ];
+
+            if (crossBorder) decisionPath.push('Cross-Border');
+            if (hasVesting) decisionPath.push('Vesting');
+
+            document.getElementById('decisionTree').innerHTML = `
+                <div class="decision-path">
+                    ${decisionPath.map((node, i) => `
+                        <span class="decision-node">${node}</span>
+                        ${i < decisionPath.length - 1 ? '<span class="decision-arrow">→</span>' : ''}
+                    `).join('')}
+                </div>
+            `;
+
+            // Generate document list
+            const required = [];
+            const recommended = [];
+            const optional = [];
+
+            // Core documents based on entity type
+            if (selections.entityType === 'llc') {
+                required.push({
+                    name: 'Operating Agreement Amendment',
+                    desc: 'Amends the OA to reflect new member or profits interest holder'
+                });
+
+                if (selections.equityType === 'membership-units') {
+                    required.push({
+                        name: 'Membership Interest Purchase Agreement',
+                        desc: 'Documents the grant or purchase of membership units'
+                    });
+                } else if (selections.equityType === 'profits-interest') {
+                    required.push({
+                        name: 'Profits Interest Agreement',
+                        desc: 'Grants profits interest with vesting and other terms'
+                    });
+                    required.push({
+                        name: '83(b) Election Form',
+                        desc: 'Must be filed within 30 days of grant for tax purposes'
+                    });
+                }
+            } else {
+                // Corporation
+                required.push({
+                    name: 'Board Resolution',
+                    desc: 'Authorizes the equity grant or stock issuance'
+                });
+
+                if (selections.equityType === 'stock-options') {
+                    required.push({
+                        name: 'Equity Incentive Plan',
+                        desc: 'Umbrella plan document for all equity grants'
+                    });
+                    required.push({
+                        name: 'Stock Option Agreement',
+                        desc: 'Individual grant agreement specifying terms'
+                    });
+                    required.push({
+                        name: 'Exercise Notice Form',
+                        desc: 'Template for optionee to exercise options'
+                    });
+                } else if (selections.equityType === 'restricted-stock') {
+                    required.push({
+                        name: 'Restricted Stock Purchase Agreement',
+                        desc: 'Documents the restricted stock grant'
+                    });
+                    required.push({
+                        name: '83(b) Election Form',
+                        desc: 'Must be filed within 30 days of grant'
+                    });
+                } else if (selections.equityType === 'common-stock') {
+                    required.push({
+                        name: 'Stock Purchase Agreement',
+                        desc: 'Documents the stock purchase or grant'
+                    });
+                }
+            }
+
+            // Service agreement based on recipient type
+            if (selections.recipientType === 'advisor') {
+                required.push({
+                    name: 'Advisor Agreement',
+                    desc: 'Defines advisory services, compensation, and terms'
+                });
+            } else if (selections.recipientType === 'contractor') {
+                required.push({
+                    name: 'Independent Contractor Agreement',
+                    desc: 'Defines services, deliverables, and contractor relationship'
+                });
+            } else if (selections.recipientType === 'employee') {
+                required.push({
+                    name: 'Employment Agreement / Offer Letter',
+                    desc: 'Documents employment terms and equity compensation'
+                });
+            } else if (selections.recipientType === 'founder') {
+                required.push({
+                    name: 'Founders Agreement',
+                    desc: 'Defines roles, responsibilities, and equity splits'
+                });
+            }
+
+            // Vesting documents
+            if (hasVesting) {
+                recommended.push({
+                    name: 'Vesting Schedule Exhibit',
+                    desc: 'Detailed vesting schedule with milestones or time periods'
+                });
+            }
+
+            // IP documents
+            if (hasIP) {
+                required.push({
+                    name: 'IP Assignment Agreement',
+                    desc: 'Assigns all work product and IP to the company'
+                });
+                recommended.push({
+                    name: 'Background IP Schedule',
+                    desc: 'Lists pre-existing IP excluded from assignment'
+                });
+            }
+
+            // Always recommended
+            recommended.push({
+                name: 'Confidentiality / NDA',
+                desc: 'Protects company confidential information'
+            });
+
+            if (hasNonCompete) {
+                recommended.push({
+                    name: 'Non-Compete Agreement',
+                    desc: 'Restricts competitive activities (check enforceability by state)'
+                });
+                recommended.push({
+                    name: 'Non-Solicitation Agreement',
+                    desc: 'Prevents solicitation of employees and customers'
+                });
+            }
+
+            // Cross-border documents
+            if (crossBorder) {
+                recommended.push({
+                    name: 'W-8BEN / W-8BEN-E Form',
+                    desc: 'Tax form for foreign service providers'
+                });
+                recommended.push({
+                    name: 'Tax Equalization Memo',
+                    desc: 'Addresses tax treatment in both jurisdictions'
+                });
+                optional.push({
+                    name: 'Choice of Law / Jurisdiction Clause',
+                    desc: 'Strengthened provisions for cross-border enforceability'
+                });
+            }
+
+            // Optional documents
+            optional.push({
+                name: 'Stockholders / Members Agreement',
+                desc: 'Governs relationships between equity holders'
+            });
+            optional.push({
+                name: 'Right of First Refusal Agreement',
+                desc: 'Company right to purchase before third-party transfer'
+            });
+            optional.push({
+                name: 'Co-Sale Agreement',
+                desc: 'Tag-along rights for minority holders'
+            });
+
+            // Build HTML
+            let documentHTML = '';
+
+            if (required.length > 0) {
+                documentHTML += `
+                    <div class="document-category">
+                        <h3 class="category-title required">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                            Required Documents
+                        </h3>
+                        ${required.map(doc => `
+                            <div class="document-item">
+                                <svg class="doc-icon required" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <div class="doc-content">
+                                    <div class="doc-name">${doc.name}</div>
+                                    <div class="doc-desc">${doc.desc}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            if (recommended.length > 0) {
+                documentHTML += `
+                    <div class="document-category">
+                        <h3 class="category-title recommended">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                            </svg>
+                            Recommended Documents
+                        </h3>
+                        ${recommended.map(doc => `
+                            <div class="document-item">
+                                <svg class="doc-icon recommended" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <div class="doc-content">
+                                    <div class="doc-name">${doc.name}</div>
+                                    <div class="doc-desc">${doc.desc}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            if (optional.length > 0) {
+                documentHTML += `
+                    <div class="document-category">
+                        <h3 class="category-title optional">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Optional / Situational Documents
+                        </h3>
+                        ${optional.map(doc => `
+                            <div class="document-item">
+                                <svg class="doc-icon optional" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <div class="doc-content">
+                                    <div class="doc-name">${doc.name}</div>
+                                    <div class="doc-desc">${doc.desc}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            document.getElementById('documentList').innerHTML = documentHTML;
+
+            // Summary
+            document.getElementById('summaryBox').innerHTML = `
+                <h3 class="summary-title">Document Stack Summary</h3>
+                <div class="summary-stats">
+                    <div>
+                        <div class="stat-value">${required.length}</div>
+                        <div class="stat-label">Required Documents</div>
+                    </div>
+                    <div>
+                        <div class="stat-value">${recommended.length}</div>
+                        <div class="stat-label">Recommended</div>
+                    </div>
+                    <div>
+                        <div class="stat-value">${optional.length}</div>
+                        <div class="stat-label">Optional</div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('outputSection').classList.add('visible');
+            document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function copyOutput() {
+            const tree = document.getElementById('decisionTree').innerText;
+            const docs = document.getElementById('documentList').innerText;
+            const summary = document.getElementById('summaryBox').innerText;
+
+            const fullText = `DOCUMENT STACK RECOMMENDATION\n\n${tree}\n\n${docs}\n\n${summary}`;
+
+            navigator.clipboard.writeText(fullText).then(() => {
+                alert('Output copied to clipboard!');
+            });
+        }
+
+        function downloadOutput() {
+            const tree = document.getElementById('decisionTree').innerText;
+            const docs = document.getElementById('documentList').innerText;
+            const summary = document.getElementById('summaryBox').innerText;
+
+            const fullText = `DOCUMENT STACK RECOMMENDATION\n\n${tree}\n\n${docs}\n\n${summary}`;
+
+            const blob = new Blob([fullText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'document-stack-recommendation.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

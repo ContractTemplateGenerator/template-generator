@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vesting + Milestone Builder | Terms.Law</title>
+    <meta name="description" content="Create time-based, milestone-based, or hybrid vesting schedules with clear acceptance criteria and trigger events.">
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-901N2Y3CDZ"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-901N2Y3CDZ');
+    </script>
+
+    <style>
+        :root {
+            --bg-dark: #0a0f1a;
+            --bg-card: #111827;
+            --bg-card-hover: #1a2332;
+            --bg-input: #1f2937;
+            --accent-blue: #3b82f6;
+            --accent-blue-hover: #2563eb;
+            --accent-green: #10b981;
+            --accent-purple: #8b5cf6;
+            --accent-orange: #f59e0b;
+            --accent-red: #ef4444;
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --border-color: #1f2937;
+            --border-focus: #3b82f6;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+
+        .logo span { color: var(--text-secondary); font-weight: 400; }
+
+        .breadcrumbs {
+            padding: 1rem 2rem;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .breadcrumbs-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .breadcrumbs a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .breadcrumbs a:hover { color: var(--accent-blue); }
+        .breadcrumbs span { color: var(--text-primary); }
+
+        .main-layout {
+            display: flex;
+            max-width: 1600px;
+            margin: 0 auto;
+            min-height: calc(100vh - 120px);
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border-color);
+            padding: 1.5rem;
+            position: sticky;
+            top: 120px;
+            height: calc(100vh - 120px);
+            overflow-y: auto;
+        }
+
+        .sidebar-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-nav { list-style: none; }
+        .sidebar-nav li { margin-bottom: 0.25rem; }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .sidebar-nav a:hover {
+            background: var(--bg-input);
+            color: var(--text-primary);
+        }
+
+        .sidebar-nav a.active {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+        }
+
+        .sidebar-nav .icon { width: 20px; height: 20px; opacity: 0.7; }
+        .sidebar-divider { height: 1px; background: var(--border-color); margin: 1.5rem 0; }
+
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .page-header { margin-bottom: 2rem; }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle { color: var(--text-secondary); }
+
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .main-content { padding: 1rem; }
+        }
+
+        .form-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-card-title .icon { color: var(--accent-green); }
+
+        .form-group { margin-bottom: 1.25rem; }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--border-focus);
+        }
+
+        .form-select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1.25rem;
+            padding-right: 2.5rem;
+        }
+
+        .form-textarea { min-height: 80px; resize: vertical; }
+        .form-hint { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem; }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        @media (max-width: 600px) {
+            .form-row { grid-template-columns: 1fr; }
+        }
+
+        .milestone-list { margin-top: 1rem; }
+
+        .milestone-item {
+            background: var(--bg-input);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            position: relative;
+        }
+
+        .milestone-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .milestone-number {
+            font-weight: 600;
+            color: var(--accent-green);
+        }
+
+        .btn-remove {
+            background: transparent;
+            border: none;
+            color: var(--accent-red);
+            cursor: pointer;
+            padding: 0.25rem;
+        }
+
+        .btn-add {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            background: transparent;
+            color: var(--accent-blue);
+            border: 1px dashed var(--accent-blue);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-add:hover {
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.875rem 1.5rem;
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            width: 100%;
+        }
+
+        .btn-primary:hover { background: var(--accent-blue-hover); }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            background: var(--bg-input);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+        }
+
+        .output-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .output-section.visible { display: block; }
+
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .output-title { font-size: 1.25rem; font-weight: 600; }
+        .output-actions { display: flex; gap: 0.5rem; }
+
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+        }
+
+        .schedule-table th,
+        .schedule-table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .schedule-table th {
+            background: var(--bg-input);
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        .schedule-table td {
+            color: var(--text-primary);
+        }
+
+        .schedule-table tr:hover td {
+            background: var(--bg-input);
+        }
+
+        .trigger-section {
+            background: var(--bg-input);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .trigger-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--accent-orange);
+            margin-bottom: 1rem;
+        }
+
+        .trigger-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.5rem 0;
+        }
+
+        .trigger-icon {
+            width: 20px;
+            height: 20px;
+            color: var(--accent-orange);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .trigger-text { color: var(--text-secondary); }
+
+        .sample-language {
+            background: var(--bg-input);
+            border-radius: 8px;
+            padding: 1.5rem;
+            border-left: 3px solid var(--accent-purple);
+        }
+
+        .sample-language-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--accent-purple);
+            margin-bottom: 1rem;
+        }
+
+        .sample-language-text {
+            font-family: 'Georgia', serif;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            white-space: pre-wrap;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+        }
+
+        .checkbox-item input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent-blue);
+        }
+
+        .checkbox-item span {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <a href="../../" class="logo">Terms<span>.Law</span></a>
+        </div>
+    </header>
+
+    <nav class="breadcrumbs">
+        <div class="breadcrumbs-content">
+            <a href="../../">Home</a> &gt;
+            <a href="../">Equity for Services</a> &gt;
+            <a href="./">Tools</a> &gt;
+            <span>Vesting Builder</span>
+        </div>
+    </nav>
+
+    <div class="main-layout">
+        <aside class="sidebar">
+            <h3 class="sidebar-title">Tools</h3>
+            <ul class="sidebar-nav">
+                <li>
+                    <a href="./deal-builder.html">
+                        <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        Deal Builder
+                    </a>
+                </li>
+                <li>
+                    <a href="./vesting-builder.html" class="active">
+                        <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Vesting Builder
+                    </a>
+                </li>
+                <li>
+                    <a href="./buyout-generator.html">
+                        <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Buyout Generator
+                    </a>
+                </li>
+                <li>
+                    <a href="./document-recommender.html">
+                        <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                        </svg>
+                        Document Recommender
+                    </a>
+                </li>
+                <li>
+                    <a href="./ip-addendum.html">
+                        <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                        IP Addendum
+                    </a>
+                </li>
+                <li>
+                    <a href="./cross-border-spotter.html">
+                        <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Cross-Border Spotter
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-divider"></div>
+
+            <h3 class="sidebar-title">Hub</h3>
+            <ul class="sidebar-nav">
+                <li>
+                    <a href="../">
+                        <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        </svg>
+                        Back to Hub
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">Vesting + Milestone Builder</h1>
+                <p class="page-subtitle">Create time-based, milestone-based, or hybrid vesting schedules with clear acceptance criteria</p>
+            </div>
+
+            <div class="form-card">
+                <h2 class="form-card-title">
+                    <svg class="icon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Vesting Configuration
+                </h2>
+
+                <div class="form-group">
+                    <label class="form-label">Vesting Type</label>
+                    <select id="vestingType" class="form-select" onchange="toggleVestingFields()">
+                        <option value="">Select vesting type...</option>
+                        <option value="time">Time-Based Vesting</option>
+                        <option value="milestone">Milestone-Based Vesting</option>
+                        <option value="hybrid">Hybrid (Time + Milestone)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Total Equity Amount</label>
+                    <input type="text" id="totalEquity" class="form-input" placeholder="e.g., 10% or 100,000 units">
+                </div>
+
+                <div id="timeBasedFields" style="display: none;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Total Vesting Duration</label>
+                            <select id="vestingDuration" class="form-select">
+                                <option value="12">12 Months (1 Year)</option>
+                                <option value="24">24 Months (2 Years)</option>
+                                <option value="36">36 Months (3 Years)</option>
+                                <option value="48" selected>48 Months (4 Years)</option>
+                                <option value="60">60 Months (5 Years)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Cliff Period</label>
+                            <select id="cliffPeriod" class="form-select">
+                                <option value="0">No Cliff</option>
+                                <option value="3">3 Months</option>
+                                <option value="6">6 Months</option>
+                                <option value="12" selected>12 Months (1 Year)</option>
+                                <option value="18">18 Months</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Vesting Frequency</label>
+                            <select id="vestingFrequency" class="form-select">
+                                <option value="monthly" selected>Monthly</option>
+                                <option value="quarterly">Quarterly</option>
+                                <option value="annually">Annually</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Start Date</label>
+                            <input type="date" id="startDate" class="form-input">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="milestoneFields" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label">Milestones</label>
+                        <div id="milestoneList" class="milestone-list"></div>
+                        <button type="button" class="btn-add" onclick="addMilestone()">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path d="M12 4v16m8-8H4"/>
+                            </svg>
+                            Add Milestone
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Trigger Events</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="triggerCoc" checked>
+                            <span>Acceleration on Change of Control</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="triggerTermination">
+                            <span>Acceleration on Termination Without Cause</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="triggerIpo">
+                            <span>Acceleration on IPO</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="triggerDeath">
+                            <span>Acceleration on Death/Disability</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-primary" onclick="generateSchedule()">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+                Generate Vesting Schedule
+            </button>
+
+            <div id="outputSection" class="output-section">
+                <div class="output-header">
+                    <h2 class="output-title">Vesting Schedule</h2>
+                    <div class="output-actions">
+                        <button class="btn-secondary" onclick="copyOutput()">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                            </svg>
+                            Copy
+                        </button>
+                        <button class="btn-secondary" onclick="downloadOutput()">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                            </svg>
+                            Download
+                        </button>
+                    </div>
+                </div>
+
+                <div id="scheduleTable"></div>
+
+                <div id="triggerEvents" class="trigger-section"></div>
+
+                <div id="sampleLanguage" class="sample-language"></div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let milestoneCount = 0;
+
+        function toggleVestingFields() {
+            const vestingType = document.getElementById('vestingType').value;
+            const timeFields = document.getElementById('timeBasedFields');
+            const milestoneFields = document.getElementById('milestoneFields');
+
+            timeFields.style.display = (vestingType === 'time' || vestingType === 'hybrid') ? 'block' : 'none';
+            milestoneFields.style.display = (vestingType === 'milestone' || vestingType === 'hybrid') ? 'block' : 'none';
+
+            if ((vestingType === 'milestone' || vestingType === 'hybrid') && milestoneCount === 0) {
+                addMilestone();
+            }
+        }
+
+        function addMilestone() {
+            milestoneCount++;
+            const list = document.getElementById('milestoneList');
+            const item = document.createElement('div');
+            item.className = 'milestone-item';
+            item.id = `milestone-${milestoneCount}`;
+            item.innerHTML = `
+                <div class="milestone-header">
+                    <span class="milestone-number">Milestone ${milestoneCount}</span>
+                    <button type="button" class="btn-remove" onclick="removeMilestone(${milestoneCount})">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-input milestone-name" placeholder="Milestone name (e.g., MVP Launch)">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <input type="text" class="form-input milestone-percentage" placeholder="Equity % (e.g., 25%)">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-input milestone-deadline" placeholder="Target date or timeframe">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <textarea class="form-textarea milestone-criteria" placeholder="Acceptance criteria (what must be true for this milestone to be considered complete?)"></textarea>
+                </div>
+            `;
+            list.appendChild(item);
+        }
+
+        function removeMilestone(id) {
+            const item = document.getElementById(`milestone-${id}`);
+            if (item) item.remove();
+        }
+
+        function generateSchedule() {
+            const vestingType = document.getElementById('vestingType').value;
+            const totalEquity = document.getElementById('totalEquity').value;
+
+            if (!vestingType || !totalEquity) {
+                alert('Please select a vesting type and enter the total equity amount');
+                return;
+            }
+
+            let scheduleHTML = '';
+            let triggerHTML = '';
+            let languageHTML = '';
+
+            // Parse equity amount
+            const isPercentage = totalEquity.includes('%');
+            const equityValue = parseFloat(totalEquity.replace(/[^0-9.]/g, ''));
+
+            if (vestingType === 'time' || vestingType === 'hybrid') {
+                const duration = parseInt(document.getElementById('vestingDuration').value);
+                const cliff = parseInt(document.getElementById('cliffPeriod').value);
+                const frequency = document.getElementById('vestingFrequency').value;
+                const startDate = document.getElementById('startDate').value || new Date().toISOString().split('T')[0];
+
+                // Calculate vesting schedule
+                let periods = [];
+                const start = new Date(startDate);
+                let monthsPerPeriod = frequency === 'monthly' ? 1 : (frequency === 'quarterly' ? 3 : 12);
+                let totalPeriods = Math.floor(duration / monthsPerPeriod);
+                let cliffPeriods = Math.floor(cliff / monthsPerPeriod);
+                let equityPerPeriod = equityValue / totalPeriods;
+                let cliffEquity = equityPerPeriod * cliffPeriods;
+
+                let cumulativeEquity = 0;
+                for (let i = 1; i <= totalPeriods; i++) {
+                    let periodDate = new Date(start);
+                    periodDate.setMonth(periodDate.getMonth() + (i * monthsPerPeriod));
+
+                    let periodEquity = 0;
+                    if (i === cliffPeriods && cliff > 0) {
+                        periodEquity = cliffEquity;
+                    } else if (i > cliffPeriods || cliff === 0) {
+                        periodEquity = equityPerPeriod;
+                    }
+
+                    cumulativeEquity += periodEquity;
+
+                    periods.push({
+                        period: i,
+                        date: periodDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }),
+                        vested: periodEquity.toFixed(2),
+                        cumulative: cumulativeEquity.toFixed(2),
+                        isCliff: i === cliffPeriods && cliff > 0
+                    });
+                }
+
+                scheduleHTML = `
+                    <table class="schedule-table">
+                        <thead>
+                            <tr>
+                                <th>Period</th>
+                                <th>Date</th>
+                                <th>Vested This Period</th>
+                                <th>Cumulative Vested</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${periods.map(p => `
+                                <tr>
+                                    <td>${p.period}</td>
+                                    <td>${p.date}</td>
+                                    <td>${p.vested}${isPercentage ? '%' : ' units'}</td>
+                                    <td>${p.cumulative}${isPercentage ? '%' : ' units'}</td>
+                                    <td>${p.isCliff ? 'Cliff Vesting' : ''}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+
+                languageHTML = `
+                    <h3 class="sample-language-title">Sample Vesting Language</h3>
+                    <div class="sample-language-text">The Equity Interest shall vest as follows:
+
+(a) Vesting Period. Subject to the terms of this Agreement, ${totalEquity} of the Company shall vest over a period of ${duration} months from the Vesting Commencement Date (the "Vesting Period").
+
+${cliff > 0 ? `(b) Cliff. No portion of the Equity Interest shall vest until the ${cliff}-month anniversary of the Vesting Commencement Date (the "Cliff Date"). On the Cliff Date, ${cliffEquity.toFixed(2)}${isPercentage ? '%' : ' units'} of the Equity Interest shall vest, subject to the Service Provider's continued service through such date.` : ''}
+
+(c) Periodic Vesting. Following the Cliff Date, the remaining Equity Interest shall vest in equal ${frequency} installments over the balance of the Vesting Period, with ${equityPerPeriod.toFixed(2)}${isPercentage ? '%' : ' units'} vesting on each vesting date, subject to the Service Provider's continued service through each such date.
+
+(d) Vesting Commencement Date. For purposes of this Agreement, the "Vesting Commencement Date" shall be ${new Date(startDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}.</div>
+                `;
+            }
+
+            if (vestingType === 'milestone' || vestingType === 'hybrid') {
+                const milestones = [];
+                document.querySelectorAll('.milestone-item').forEach((item, index) => {
+                    const name = item.querySelector('.milestone-name').value;
+                    const percentage = item.querySelector('.milestone-percentage').value;
+                    const deadline = item.querySelector('.milestone-deadline').value;
+                    const criteria = item.querySelector('.milestone-criteria').value;
+                    if (name) {
+                        milestones.push({ num: index + 1, name, percentage, deadline, criteria });
+                    }
+                });
+
+                if (milestones.length > 0) {
+                    const milestoneTableHTML = `
+                        <table class="schedule-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Milestone</th>
+                                    <th>Equity</th>
+                                    <th>Target</th>
+                                    <th>Acceptance Criteria</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${milestones.map(m => `
+                                    <tr>
+                                        <td>${m.num}</td>
+                                        <td>${m.name}</td>
+                                        <td>${m.percentage || 'TBD'}</td>
+                                        <td>${m.deadline || 'TBD'}</td>
+                                        <td>${m.criteria || 'To be defined'}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    `;
+
+                    scheduleHTML = vestingType === 'hybrid'
+                        ? scheduleHTML + '<h3 style="margin: 2rem 0 1rem; color: var(--accent-green);">Milestone Vesting Component</h3>' + milestoneTableHTML
+                        : milestoneTableHTML;
+
+                    if (vestingType === 'milestone') {
+                        languageHTML = `
+                            <h3 class="sample-language-title">Sample Milestone Vesting Language</h3>
+                            <div class="sample-language-text">The Equity Interest shall vest upon the achievement of the following milestones:
+
+${milestones.map(m => `Milestone ${m.num}: "${m.name}"
+- Equity to Vest: ${m.percentage || '[PERCENTAGE]'}
+- Target Completion: ${m.deadline || '[DATE/TIMEFRAME]'}
+- Acceptance Criteria: ${m.criteria || '[CRITERIA TO BE DEFINED]'}
+`).join('\n')}
+Milestone Determination. The determination of whether a milestone has been achieved shall be made by the Company's Board of Directors (or designated committee) in its reasonable discretion, taking into account the acceptance criteria set forth above.
+
+Partial Completion. Unless otherwise specified, no partial vesting shall occur for partial completion of any milestone.</div>
+                        `;
+                    }
+                }
+            }
+
+            // Generate trigger events
+            const triggers = [];
+            if (document.getElementById('triggerCoc').checked) {
+                triggers.push({
+                    name: 'Change of Control Acceleration',
+                    desc: 'All unvested equity shall immediately vest upon a Change of Control event (merger, acquisition, or sale of substantially all assets).'
+                });
+            }
+            if (document.getElementById('triggerTermination').checked) {
+                triggers.push({
+                    name: 'Termination Without Cause',
+                    desc: 'If Service Provider is terminated without Cause, [50-100]% of unvested equity shall immediately vest.'
+                });
+            }
+            if (document.getElementById('triggerIpo').checked) {
+                triggers.push({
+                    name: 'IPO Acceleration',
+                    desc: 'Upon the Company\'s initial public offering, all unvested equity shall immediately vest.'
+                });
+            }
+            if (document.getElementById('triggerDeath').checked) {
+                triggers.push({
+                    name: 'Death or Disability',
+                    desc: 'In the event of Service Provider\'s death or permanent disability, all unvested equity shall immediately vest.'
+                });
+            }
+
+            if (triggers.length > 0) {
+                triggerHTML = `
+                    <h3 class="trigger-title">Acceleration Trigger Events</h3>
+                    ${triggers.map(t => `
+                        <div class="trigger-item">
+                            <svg class="trigger-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                            <div>
+                                <strong style="color: var(--text-primary);">${t.name}</strong>
+                                <div class="trigger-text">${t.desc}</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                `;
+            }
+
+            document.getElementById('scheduleTable').innerHTML = scheduleHTML;
+            document.getElementById('triggerEvents').innerHTML = triggerHTML;
+            document.getElementById('sampleLanguage').innerHTML = languageHTML;
+            document.getElementById('outputSection').classList.add('visible');
+            document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function copyOutput() {
+            const schedule = document.getElementById('scheduleTable').innerText;
+            const triggers = document.getElementById('triggerEvents').innerText;
+            const language = document.getElementById('sampleLanguage').innerText;
+
+            const fullText = `VESTING SCHEDULE\n\n${schedule}\n\n${triggers}\n\n${language}`;
+
+            navigator.clipboard.writeText(fullText).then(() => {
+                alert('Output copied to clipboard!');
+            });
+        }
+
+        function downloadOutput() {
+            const schedule = document.getElementById('scheduleTable').innerText;
+            const triggers = document.getElementById('triggerEvents').innerText;
+            const language = document.getElementById('sampleLanguage').innerText;
+
+            const fullText = `VESTING SCHEDULE\n\n${schedule}\n\n${triggers}\n\n${language}`;
+
+            const blob = new Blob([fullText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'vesting-schedule.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Set default start date to today
+        document.getElementById('startDate').value = new Date().toISOString().split('T')[0];
+    </script>
+</body>
+</html>
