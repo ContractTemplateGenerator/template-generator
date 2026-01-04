@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>IC vs Employee Cost Calculator | Terms.Law</title>
+  <meta name="description" content="Compare the true costs of independent contractor vs employee classification in California. Includes payroll taxes, benefits, and risk-adjusted analysis." />
+  <style>
+    :root{
+      --bg:#0b0f14; --card:#111824; --muted:#95a3b8; --text:#eaf0ff;
+      --line:#223049; --accent:#7dd3fc; --accent2:#a78bfa;
+      --good:#34d399; --warn:#fbbf24; --bad:#fb7185;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 16px; --max: 1100px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+    *{box-sizing:border-box}
+    body{margin:0; font-family:var(--sans); background:linear-gradient(180deg,#05070a 0%,#0b0f14 40%,#070a0f 100%); color:var(--text); min-height:100vh}
+    a{color:var(--accent); text-decoration:none}
+    .wrap{max-width:var(--max); margin:0 auto; padding:28px 18px 60px}
+    .top{padding:14px 16px; border:1px solid var(--line); border-radius:var(--radius); background:rgba(17,24,36,.7); box-shadow:var(--shadow); backdrop-filter:blur(10px); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px}
+    .brand b{display:block}
+    .brand span{color:var(--muted); font-size:13px}
+    .pill{display:inline-flex; padding:8px 12px; border-radius:999px; border:1px solid var(--line); background:rgba(10,14,20,.55); font-size:13px; color:var(--text)}
+    .hero{margin-top:14px; padding:20px; border:1px solid var(--line); border-radius:var(--radius); background:radial-gradient(600px 300px at 20% 10%, rgba(125,211,252,.18), transparent 60%), radial-gradient(600px 300px at 90% 40%, rgba(167,139,250,.16), transparent 60%), rgba(17,24,36,.65); box-shadow:var(--shadow)}
+    h1{margin:0 0 8px; font-size:26px}
+    .sub{margin:0; color:var(--muted); line-height:1.6; font-size:14px}
+    .grid{display:grid; grid-template-columns: 1fr 1.2fr; gap:14px; margin-top:14px}
+    @media(max-width:900px){.grid{grid-template-columns:1fr}}
+    .card{border:1px solid var(--line); border-radius:var(--radius); background:rgba(17,24,36,.62); box-shadow:var(--shadow); padding:18px}
+    .card h2{margin:0 0 10px; font-size:16px}
+    .meta{color:var(--muted); font-size:13px; line-height:1.6}
+    label{display:block; font-size:13px; color:var(--muted); margin:12px 0 5px}
+    input, select{width:100%; padding:10px; border-radius:10px; border:1px solid var(--line); background:rgba(8,11,16,.75); color:var(--text); font-size:14px}
+    .row{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+    .hr{height:1px; background:var(--line); margin:16px 0}
+    .compare{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+    .compare-col{padding:16px; border:1px solid var(--line); border-radius:12px; background:rgba(10,14,20,.55)}
+    .compare-col.ic{border-color:rgba(167,139,250,.4)}
+    .compare-col.emp{border-color:rgba(125,211,252,.4)}
+    .compare-col h3{margin:0 0 12px; font-size:15px; display:flex; align-items:center; gap:8px}
+    .compare-col h3 .icon{font-size:20px}
+    .line-item{display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(34,48,73,.5); font-size:13px}
+    .line-item:last-child{border-bottom:none}
+    .line-item .label{color:var(--muted)}
+    .line-item .value{font-weight:600; font-family:var(--mono)}
+    .total{margin-top:12px; padding:12px; background:rgba(10,14,20,.7); border-radius:10px; text-align:center}
+    .total .amount{font-size:28px; font-weight:700}
+    .total .per{font-size:12px; color:var(--muted)}
+    .ic .total .amount{color:var(--accent2)}
+    .emp .total .amount{color:var(--accent)}
+    .badge{display:inline-flex; padding:5px 10px; border-radius:999px; font-size:11px; font-weight:600}
+    .badge.good{border:1px solid rgba(52,211,153,.35); background:rgba(52,211,153,.10); color:var(--good)}
+    .badge.warn{border:1px solid rgba(251,191,36,.35); background:rgba(251,191,36,.10); color:var(--warn)}
+    .badge.bad{border:1px solid rgba(251,113,133,.35); background:rgba(251,113,133,.10); color:var(--bad)}
+    .insight{margin-top:14px; padding:14px; border:1px solid var(--line); border-radius:12px; background:rgba(10,14,20,.55)}
+    .insight h3{margin:0 0 8px; font-size:14px; color:var(--accent)}
+    .insight p{margin:0; font-size:13px; color:var(--muted); line-height:1.55}
+    .risk-section{margin-top:14px}
+    .risk-section h3{margin:0 0 10px; font-size:14px}
+    .risk-bar{height:8px; background:var(--line); border-radius:99px; overflow:hidden; margin:8px 0}
+    .risk-fill{height:100%; border-radius:99px; transition:width 0.3s}
+    .actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:16px}
+    .btn{display:inline-flex; align-items:center; justify-content:center; padding:10px 16px; border-radius:10px; border:1px solid var(--line); background:rgba(10,14,20,.6); color:var(--text); font-weight:600; font-size:13px; cursor:pointer; text-decoration:none}
+    .btn.primary{background:linear-gradient(90deg, rgba(125,211,252,.20), rgba(167,139,250,.18)); border-color:rgba(125,211,252,.35)}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">
+      <b>Terms.Law</b>
+      <span>IC vs Employee Cost Calculator</span>
+    </div>
+    <a class="pill" href="./index.html">Back to Hub</a>
+  </div>
+
+  <section class="hero">
+    <h1>IC vs Employee Cost Comparison</h1>
+    <p class="sub">Calculate the true cost difference between independent contractor and employee classification. Includes payroll burden, benefits, and risk-adjusted analysis.</p>
+  </section>
+
+  <div class="grid">
+    <section class="card">
+      <h2>Input Parameters</h2>
+      <div class="meta">Enter your scenario details:</div>
+      <div class="hr"></div>
+
+      <div class="row">
+        <div>
+          <label>Number of Workers</label>
+          <input type="number" id="workers" value="1" min="1" />
+        </div>
+        <div>
+          <label>Hourly Rate / Equivalent</label>
+          <input type="number" id="rate" value="50" min="1" step="0.5" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>Hours per Week</label>
+          <input type="number" id="hours" value="40" min="1" max="80" />
+        </div>
+        <div>
+          <label>Weeks per Year</label>
+          <input type="number" id="weeks" value="50" min="1" max="52" />
+        </div>
+      </div>
+
+      <label>Industry / Role Type</label>
+      <select id="industry">
+        <option value="tech">Tech / Software</option>
+        <option value="professional">Professional Services</option>
+        <option value="creative">Creative / Design</option>
+        <option value="field">Field Services / Mobile</option>
+        <option value="support">Support / Customer Service</option>
+        <option value="sales">Sales / Commission</option>
+      </select>
+
+      <label>California Location</label>
+      <select id="location">
+        <option value="ca">California (State min wage: $16.50)</option>
+        <option value="sf">San Francisco ($18.67)</option>
+        <option value="la">Los Angeles ($17.28)</option>
+        <option value="sj">San Jose ($17.55)</option>
+      </select>
+
+      <div class="hr"></div>
+
+      <label>Misclassification Risk Level</label>
+      <select id="riskLevel">
+        <option value="high">High (core service, high control)</option>
+        <option value="medium">Medium (mixed factors)</option>
+        <option value="low">Low (specialized, independent)</option>
+      </select>
+
+      <div class="row">
+        <div>
+          <label>Miles/Week (if mobile)</label>
+          <input type="number" id="miles" value="0" min="0" />
+        </div>
+        <div>
+          <label>IRS Mileage Rate</label>
+          <input type="number" id="mileageRate" value="0.67" min="0" step="0.01" />
+        </div>
+      </div>
+    </section>
+
+    <aside class="card">
+      <h2>Cost Comparison</h2>
+      <div class="meta">Annual cost breakdown per worker:</div>
+      <div class="hr"></div>
+
+      <div class="compare">
+        <div class="compare-col ic">
+          <h3><span class="icon">📋</span> Independent Contractor</h3>
+          <div class="line-item"><span class="label">Base Pay</span><span class="value" id="icBase">$0</span></div>
+          <div class="line-item"><span class="label">No Payroll Tax</span><span class="value">$0</span></div>
+          <div class="line-item"><span class="label">No Benefits</span><span class="value">$0</span></div>
+          <div class="line-item"><span class="label">No Workers Comp</span><span class="value">$0</span></div>
+          <div class="total">
+            <div class="amount" id="icTotal">$0</div>
+            <div class="per">per worker / year</div>
+          </div>
+        </div>
+
+        <div class="compare-col emp">
+          <h3><span class="icon">👤</span> W-2 Employee</h3>
+          <div class="line-item"><span class="label">Base Pay</span><span class="value" id="empBase">$0</span></div>
+          <div class="line-item"><span class="label">Payroll Taxes</span><span class="value" id="empTax">$0</span></div>
+          <div class="line-item"><span class="label">Benefits Est.</span><span class="value" id="empBenefits">$0</span></div>
+          <div class="line-item"><span class="label">Workers Comp</span><span class="value" id="empWC">$0</span></div>
+          <div class="line-item"><span class="label">Mileage Reimb.</span><span class="value" id="empMileage">$0</span></div>
+          <div class="total">
+            <div class="amount" id="empTotal">$0</div>
+            <div class="per">per worker / year</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="insight">
+        <h3>Direct Cost Difference</h3>
+        <p id="diffText">Employee classification costs approximately X% more than IC.</p>
+      </div>
+
+      <div class="risk-section">
+        <h3>Risk-Adjusted IC Cost</h3>
+        <p class="meta" style="margin-bottom:8px">Adding potential misclassification liability exposure:</p>
+        <div class="line-item"><span class="label">Base IC Cost</span><span class="value" id="riskBase">$0</span></div>
+        <div class="line-item"><span class="label">Back Wages Exposure</span><span class="value" id="riskBack">$0</span></div>
+        <div class="line-item"><span class="label">Penalties Exposure</span><span class="value" id="riskPenalty">$0</span></div>
+        <div class="line-item"><span class="label">Risk-Adjusted Total</span><span class="value" id="riskTotal" style="color:var(--warn)">$0</span></div>
+        <div class="risk-bar"><div class="risk-fill" id="riskBar" style="width:50%; background:var(--warn)"></div></div>
+        <p class="meta" id="riskInsight">At medium risk, the risk-adjusted IC cost may exceed employee cost.</p>
+      </div>
+
+      <div class="actions">
+        <button class="btn" onclick="copyResults()">Copy Results</button>
+        <a class="btn primary" href="./ab5-model-classifier.html">Full Classification</a>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+function money(n) {
+  return '$' + Math.round(n).toLocaleString();
+}
+
+function calculate() {
+  const workers = parseInt(document.getElementById('workers').value) || 1;
+  const rate = parseFloat(document.getElementById('rate').value) || 50;
+  const hours = parseFloat(document.getElementById('hours').value) || 40;
+  const weeks = parseFloat(document.getElementById('weeks').value) || 50;
+  const miles = parseFloat(document.getElementById('miles').value) || 0;
+  const mileageRate = parseFloat(document.getElementById('mileageRate').value) || 0.67;
+  const riskLevel = document.getElementById('riskLevel').value;
+  const industry = document.getElementById('industry').value;
+
+  const annualHours = hours * weeks;
+  const basePay = rate * annualHours;
+
+  // IC Cost (simple)
+  const icTotal = basePay;
+
+  // Employee Cost breakdown
+  const payrollTaxRate = 0.0765 + 0.034 + 0.006; // FICA employer + CA UI + ETT
+  const payrollTax = basePay * payrollTaxRate;
+
+  // Workers comp varies by industry
+  const wcRates = { tech: 0.01, professional: 0.012, creative: 0.01, field: 0.045, support: 0.01, sales: 0.015 };
+  const wcRate = wcRates[industry] || 0.02;
+  const workersComp = basePay * wcRate;
+
+  // Basic benefits estimate (sick leave, etc - not health insurance)
+  const benefitsRate = 0.03;
+  const benefits = basePay * benefitsRate;
+
+  // Mileage
+  const mileageAnnual = miles * weeks * mileageRate;
+
+  const empTotal = basePay + payrollTax + workersComp + benefits + mileageAnnual;
+
+  // Display
+  document.getElementById('icBase').textContent = money(basePay);
+  document.getElementById('icTotal').textContent = money(icTotal);
+
+  document.getElementById('empBase').textContent = money(basePay);
+  document.getElementById('empTax').textContent = money(payrollTax);
+  document.getElementById('empBenefits').textContent = money(benefits);
+  document.getElementById('empWC').textContent = money(workersComp);
+  document.getElementById('empMileage').textContent = money(mileageAnnual);
+  document.getElementById('empTotal').textContent = money(empTotal);
+
+  const diffPct = ((empTotal - icTotal) / icTotal * 100).toFixed(1);
+  document.getElementById('diffText').textContent = `Employee classification costs approximately ${diffPct}% more than IC (${money(empTotal - icTotal)}/year per worker).`;
+
+  // Risk-adjusted calculation
+  const riskMultipliers = { high: 0.35, medium: 0.15, low: 0.05 };
+  const riskMult = riskMultipliers[riskLevel];
+
+  // Back wages exposure: OT, breaks, reimbursement for 3 years
+  const otExposure = hours > 40 ? (hours - 40) * rate * 0.5 * weeks * 3 : 0;
+  const breakExposure = basePay * 0.05 * 3; // meal/rest premium estimate
+  const backWages = (otExposure + breakExposure) * riskMult;
+
+  // Penalties: PAGA, waiting time, etc
+  const penalties = basePay * 0.25 * riskMult;
+
+  const riskAdjustedTotal = icTotal + backWages + penalties;
+
+  document.getElementById('riskBase').textContent = money(icTotal);
+  document.getElementById('riskBack').textContent = money(backWages);
+  document.getElementById('riskPenalty').textContent = money(penalties);
+  document.getElementById('riskTotal').textContent = money(riskAdjustedTotal);
+
+  const riskPct = ((riskAdjustedTotal - icTotal) / icTotal * 100);
+  document.getElementById('riskBar').style.width = Math.min(riskPct * 2, 100) + '%';
+
+  if (riskLevel === 'high') {
+    document.getElementById('riskBar').style.background = 'var(--bad)';
+    document.getElementById('riskInsight').textContent = `At high risk, the risk-adjusted IC cost (${money(riskAdjustedTotal)}) significantly exceeds employee cost (${money(empTotal)}). Consider the employee path.`;
+  } else if (riskLevel === 'medium') {
+    document.getElementById('riskBar').style.background = 'var(--warn)';
+    document.getElementById('riskInsight').textContent = `At medium risk, liability exposure adds ${money(backWages + penalties)} to IC cost. Run full classification analysis to assess your specific situation.`;
+  } else {
+    document.getElementById('riskBar').style.background = 'var(--good)';
+    document.getElementById('riskInsight').textContent = `At lower risk, IC structure may be viable if properly documented. Ensure exemption applies and facts support independence.`;
+  }
+}
+
+function copyResults() {
+  const text = `IC vs Employee Cost Comparison
+
+Workers: ${document.getElementById('workers').value}
+Hourly Rate: $${document.getElementById('rate').value}
+Hours/Week: ${document.getElementById('hours').value}
+Weeks/Year: ${document.getElementById('weeks').value}
+
+IC Total: ${document.getElementById('icTotal').textContent}
+Employee Total: ${document.getElementById('empTotal').textContent}
+${document.getElementById('diffText').textContent}
+
+Risk-Adjusted Analysis (${document.getElementById('riskLevel').value} risk):
+Risk-Adjusted IC Total: ${document.getElementById('riskTotal').textContent}
+${document.getElementById('riskInsight').textContent}
+`;
+  navigator.clipboard.writeText(text);
+  alert('Results copied to clipboard!');
+}
+
+document.querySelectorAll('input, select').forEach(el => el.addEventListener('input', calculate));
+calculate();
+</script>
+</body>
+</html>

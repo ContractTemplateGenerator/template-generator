@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AB 5 Exemption Checker | Terms.Law</title>
+  <meta name="description" content="Check if an AB 5 exemption applies to your California contractor relationship. Identify applicable exemptions and replacement tests." />
+  <style>
+    :root{
+      --bg:#0b0f14; --card:#111824; --muted:#95a3b8; --text:#eaf0ff;
+      --line:#223049; --accent:#7dd3fc; --accent2:#a78bfa;
+      --good:#34d399; --warn:#fbbf24; --bad:#fb7185;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 16px; --max: 1000px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+    *{box-sizing:border-box}
+    body{margin:0; font-family:var(--sans); background:linear-gradient(180deg,#05070a 0%,#0b0f14 40%,#070a0f 100%); color:var(--text); min-height:100vh}
+    a{color:var(--accent); text-decoration:none}
+    a:hover{text-decoration:underline}
+    .wrap{max-width:var(--max); margin:0 auto; padding:28px 18px 60px}
+    .top{padding:14px 16px; border:1px solid var(--line); border-radius:var(--radius); background:rgba(17,24,36,.7); box-shadow:var(--shadow); backdrop-filter:blur(10px); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px}
+    .brand b{display:block}
+    .brand span{color:var(--muted); font-size:13px}
+    .pill{display:inline-flex; padding:8px 12px; border-radius:999px; border:1px solid var(--line); background:rgba(10,14,20,.55); font-size:13px; color:var(--text)}
+    .hero{margin-top:14px; padding:20px; border:1px solid var(--line); border-radius:var(--radius); background:radial-gradient(600px 300px at 20% 10%, rgba(125,211,252,.18), transparent 60%), radial-gradient(600px 300px at 90% 40%, rgba(167,139,250,.16), transparent 60%), rgba(17,24,36,.65); box-shadow:var(--shadow)}
+    h1{margin:0 0 10px; font-size:26px; line-height:1.14}
+    .sub{margin:0; color:var(--muted); line-height:1.6; font-size:14px}
+    .grid{display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-top:14px}
+    @media(max-width:800px){.grid{grid-template-columns:1fr}}
+    .card{border:1px solid var(--line); border-radius:var(--radius); background:rgba(17,24,36,.62); box-shadow:var(--shadow); padding:18px}
+    .card h2{margin:0 0 12px; font-size:16px}
+    .meta{color:var(--muted); font-size:13px; line-height:1.6}
+    label{display:block; font-size:13px; color:var(--muted); margin:12px 0 6px}
+    select{width:100%; padding:10px; border-radius:10px; border:1px solid var(--line); background:rgba(8,11,16,.75); color:var(--text); font-size:14px}
+    .hr{height:1px; background:var(--line); margin:16px 0}
+    .badge{display:inline-flex; padding:6px 12px; border-radius:999px; font-size:12px; font-weight:600}
+    .badge.good{border:1px solid rgba(52,211,153,.35); background:rgba(52,211,153,.10); color:var(--good)}
+    .badge.warn{border:1px solid rgba(251,191,36,.35); background:rgba(251,191,36,.10); color:var(--warn)}
+    .badge.bad{border:1px solid rgba(251,113,133,.35); background:rgba(251,113,133,.10); color:var(--bad)}
+    .result-box{padding:14px; border:1px solid var(--line); border-radius:12px; background:rgba(10,14,20,.55); margin-top:12px}
+    .result-box h3{margin:0 0 8px; font-size:14px; display:flex; align-items:center; gap:8px}
+    .result-box p{margin:0; font-size:13px; color:var(--muted); line-height:1.55}
+    .tag{font-family:var(--mono); font-size:11px; padding:3px 8px; border-radius:999px; border:1px solid var(--line); color:var(--muted)}
+    .checklist{margin:12px 0 0; padding:0; list-style:none}
+    .checklist li{padding:8px 0; border-bottom:1px solid var(--line); font-size:13px; display:flex; align-items:flex-start; gap:8px}
+    .checklist li:last-child{border-bottom:none}
+    .check{color:var(--good)}
+    .exemption-cards{display:grid; gap:10px; margin-top:12px}
+    .exemption-card{padding:12px; border:1px solid var(--line); border-radius:10px; background:rgba(10,14,20,.55)}
+    .exemption-card.likely{border-color:rgba(52,211,153,.4); background:rgba(52,211,153,.05)}
+    .exemption-card.possible{border-color:rgba(251,191,36,.4); background:rgba(251,191,36,.05)}
+    .exemption-card h4{margin:0 0 4px; font-size:13px; display:flex; justify-content:space-between; align-items:center}
+    .exemption-card p{margin:0; font-size:12px; color:var(--muted)}
+    .btn{display:inline-flex; align-items:center; justify-content:center; padding:10px 16px; border-radius:10px; border:1px solid var(--line); background:rgba(10,14,20,.6); color:var(--text); font-weight:600; font-size:13px; cursor:pointer; text-decoration:none}
+    .btn:hover{background:rgba(10,14,20,.8)}
+    .btn.primary{background:linear-gradient(90deg, rgba(125,211,252,.20), rgba(167,139,250,.18)); border-color:rgba(125,211,252,.35)}
+    .actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:16px}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">
+      <b>Terms.Law</b>
+      <span>AB 5 Exemption Checker</span>
+    </div>
+    <a class="pill" href="./index.html">Back to Hub</a>
+  </div>
+
+  <section class="hero">
+    <h1>AB 5 Exemption Checker</h1>
+    <p class="sub">Determine if a statutory exemption applies to your contractor relationship. If exempt, ABC test doesn't apply - but a different test (usually Borello) does.</p>
+  </section>
+
+  <div class="grid">
+    <section class="card">
+      <h2>Worker & Relationship Details</h2>
+      <div class="meta">Answer these questions to identify potential exemptions.</div>
+      <div class="hr"></div>
+
+      <label>Industry / Business Type</label>
+      <select id="industry">
+        <option value="tech">Tech / Software / SaaS</option>
+        <option value="agency">Agency (marketing, design, dev)</option>
+        <option value="consulting">Consulting / Professional Services</option>
+        <option value="marketplace">Marketplace / Platform</option>
+        <option value="cleaning">Cleaning / Home Services</option>
+        <option value="construction">Construction / Trades</option>
+        <option value="transport">Transportation / Delivery</option>
+        <option value="healthcare">Healthcare / Wellness</option>
+        <option value="media">Media / Content / Creative</option>
+        <option value="other">Other</option>
+      </select>
+
+      <label>Worker's Profession / Role</label>
+      <select id="profession">
+        <option value="developer">Software Developer / Engineer</option>
+        <option value="designer">Designer (graphic, UX, product)</option>
+        <option value="marketing">Marketing / Growth / SEO</option>
+        <option value="writer">Writer / Content Creator</option>
+        <option value="accountant">Accountant / Bookkeeper</option>
+        <option value="lawyer">Attorney / Legal</option>
+        <option value="realtor">Real Estate Agent</option>
+        <option value="insurance">Insurance Agent</option>
+        <option value="doctor">Physician / Healthcare Provider</option>
+        <option value="contractor">Licensed Contractor</option>
+        <option value="general">General / Non-specialized</option>
+      </select>
+
+      <label>Is the worker a separate business entity?</label>
+      <select id="entity">
+        <option value="no">No - Individual / Sole Proprietor only</option>
+        <option value="llc">Yes - LLC or Corporation</option>
+        <option value="partnership">Yes - Partnership</option>
+      </select>
+
+      <label>Does the worker have multiple clients?</label>
+      <select id="multiClient">
+        <option value="no">No - Works mainly for us</option>
+        <option value="some">Some other clients</option>
+        <option value="yes">Yes - Multiple clients, markets services</option>
+      </select>
+
+      <label>How is work structured?</label>
+      <select id="structure">
+        <option value="ongoing">Ongoing relationship (indefinite)</option>
+        <option value="project">Project-based with defined scope</option>
+        <option value="retainer">Retainer with defined hours/scope</option>
+      </select>
+
+      <label>Does worker hold a professional license?</label>
+      <select id="license">
+        <option value="no">No license required or held</option>
+        <option value="yes">Yes - State-issued professional license</option>
+        <option value="contractor">Yes - Contractor's license (CSLB)</option>
+      </select>
+    </section>
+
+    <aside class="card">
+      <h2>Exemption Analysis</h2>
+      <div class="meta">Potential exemptions based on your inputs:</div>
+      <div class="hr"></div>
+
+      <div id="exemptionResult">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px">
+          <span class="badge warn" id="statusBadge">Analyzing...</span>
+          <span class="tag" id="testTag">test: pending</span>
+        </div>
+        <p id="summaryText" class="meta"></p>
+
+        <div class="hr"></div>
+        <h3 style="margin:0 0 8px; font-size:14px">Potential Exemptions</h3>
+        <div class="exemption-cards" id="exemptionCards"></div>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="result-box">
+        <h3>Replacement Test</h3>
+        <p id="replacementTest">If an exemption applies, the classification analysis typically shifts to the Borello test or another multi-factor analysis instead of ABC.</p>
+      </div>
+
+      <div class="result-box">
+        <h3>Evidence Checklist</h3>
+        <ul class="checklist" id="evidenceList"></ul>
+      </div>
+
+      <div class="actions">
+        <button class="btn" id="copyBtn" onclick="copyResults()">Copy Results</button>
+        <a class="btn primary" href="./borello-analyzer.html">Borello Analysis</a>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+const exemptions = [
+  {
+    id: 'b2b',
+    name: 'Business-to-Business Exemption',
+    check: (s) => s.entity !== 'no' && s.multiClient !== 'no',
+    score: (s) => {
+      let p = 0;
+      if (s.entity === 'llc') p += 3;
+      if (s.entity === 'partnership') p += 2;
+      if (s.multiClient === 'yes') p += 3;
+      if (s.multiClient === 'some') p += 1;
+      if (s.structure === 'project') p += 2;
+      return p;
+    },
+    requirements: [
+      'Worker operates as a business entity (LLC, Corp, Partnership)',
+      'Worker has multiple clients or actively markets to others',
+      'Worker maintains a business location (can be home office)',
+      'Worker has ability to negotiate rates',
+      'Worker provides own tools/equipment',
+      'Worker can hire others to perform work'
+    ],
+    test: 'Borello multi-factor test'
+  },
+  {
+    id: 'professional',
+    name: 'Professional Services Exemption',
+    check: (s) => ['developer', 'designer', 'marketing', 'writer', 'accountant'].includes(s.profession),
+    score: (s) => {
+      let p = 0;
+      if (['developer', 'designer', 'marketing', 'writer'].includes(s.profession)) p += 3;
+      if (s.entity !== 'no') p += 2;
+      if (s.multiClient !== 'no') p += 2;
+      if (s.structure === 'project') p += 1;
+      return p;
+    },
+    requirements: [
+      'Work is primarily intellectual or creative',
+      'Worker exercises discretion and independent judgment',
+      'Worker sets own rates (or negotiates them)',
+      'Worker controls time and manner of work',
+      'Written contract specifying services and payment',
+      'Worker maintains business presence'
+    ],
+    test: 'Borello multi-factor test'
+  },
+  {
+    id: 'licensed',
+    name: 'Licensed Professional Exemption',
+    check: (s) => s.license !== 'no' || ['lawyer', 'realtor', 'insurance', 'doctor', 'accountant'].includes(s.profession),
+    score: (s) => {
+      let p = 0;
+      if (s.license === 'yes') p += 4;
+      if (['lawyer', 'realtor', 'insurance', 'doctor'].includes(s.profession)) p += 3;
+      if (s.entity !== 'no') p += 1;
+      return p;
+    },
+    requirements: [
+      'Worker holds required state professional license',
+      'License is active and in good standing',
+      'Work falls within licensed scope',
+      'Worker maintains professional liability coverage',
+      'Worker controls professional judgment'
+    ],
+    test: 'Profession-specific rules + Borello factors'
+  },
+  {
+    id: 'contractor',
+    name: 'Licensed Contractor Exemption',
+    check: (s) => s.license === 'contractor' || s.profession === 'contractor' || s.industry === 'construction',
+    score: (s) => {
+      let p = 0;
+      if (s.license === 'contractor') p += 4;
+      if (s.industry === 'construction') p += 2;
+      if (s.profession === 'contractor') p += 2;
+      if (s.entity !== 'no') p += 1;
+      return p;
+    },
+    requirements: [
+      'Worker holds valid CSLB contractor license',
+      'Work is within licensed classification',
+      'Worker has own workers comp coverage',
+      'Worker bids on projects (not assigned hourly)',
+      'Worker controls means and methods',
+      'Written contract with scope and bid'
+    ],
+    test: 'CSLB licensing rules + Borello factors'
+  },
+  {
+    id: 'referral',
+    name: 'Referral Agency Exemption',
+    check: (s) => s.industry === 'marketplace',
+    score: (s) => {
+      let p = 0;
+      if (s.industry === 'marketplace') p += 2;
+      if (s.multiClient === 'yes') p += 2;
+      if (s.structure === 'project') p += 1;
+      return p;
+    },
+    requirements: [
+      'Agency only refers clients, does not manage work',
+      'Worker sets own rates with clients',
+      'Worker controls all aspects of service delivery',
+      'Agency does not handle payments (or limited role)',
+      'No minimum hours or exclusive commitment',
+      'Worker can reject referrals'
+    ],
+    test: 'Fact-intensive analysis of agency role'
+  }
+];
+
+function getState() {
+  return {
+    industry: document.getElementById('industry').value,
+    profession: document.getElementById('profession').value,
+    entity: document.getElementById('entity').value,
+    multiClient: document.getElementById('multiClient').value,
+    structure: document.getElementById('structure').value,
+    license: document.getElementById('license').value
+  };
+}
+
+function analyze() {
+  const s = getState();
+
+  const results = exemptions
+    .filter(e => e.check(s))
+    .map(e => ({ ...e, points: e.score(s) }))
+    .sort((a, b) => b.points - a.points);
+
+  const badge = document.getElementById('statusBadge');
+  const testTag = document.getElementById('testTag');
+  const summary = document.getElementById('summaryText');
+  const cards = document.getElementById('exemptionCards');
+  const evidence = document.getElementById('evidenceList');
+
+  if (results.length === 0 || results[0].points < 3) {
+    badge.className = 'badge bad';
+    badge.textContent = 'No Clear Exemption';
+    testTag.textContent = 'test: ABC applies';
+    summary.textContent = 'Based on your inputs, no strong exemption pathway is apparent. The full ABC test likely applies, which presumes employment status unless all three prongs are satisfied.';
+    cards.innerHTML = '<div class="exemption-card"><h4>ABC Test Applies</h4><p>Focus on satisfying all three prongs of the ABC test, particularly Prong B (usual course of business).</p></div>';
+    evidence.innerHTML = `
+      <li><span class="check">□</span> Document that worker is free from control (Prong A)</li>
+      <li><span class="check">□</span> Establish work is outside usual course of business (Prong B)</li>
+      <li><span class="check">□</span> Verify worker has independent business (Prong C)</li>
+    `;
+  } else {
+    const top = results[0];
+    if (top.points >= 6) {
+      badge.className = 'badge good';
+      badge.textContent = 'Likely Exempt';
+    } else {
+      badge.className = 'badge warn';
+      badge.textContent = 'Possible Exemption';
+    }
+    testTag.textContent = 'test: ' + top.test;
+    summary.textContent = `The ${top.name} appears applicable. If this exemption qualifies, the ABC test does not apply. Instead, classification is analyzed under ${top.test}.`;
+
+    cards.innerHTML = results.slice(0, 3).map((r, i) => `
+      <div class="exemption-card ${r.points >= 6 ? 'likely' : r.points >= 3 ? 'possible' : ''}">
+        <h4>${r.name} <span class="tag">score: ${r.points}</span></h4>
+        <p>${r.requirements.slice(0, 2).join(' • ')}</p>
+      </div>
+    `).join('');
+
+    evidence.innerHTML = top.requirements.map(r =>
+      `<li><span class="check">□</span> ${r}</li>`
+    ).join('');
+  }
+}
+
+function copyResults() {
+  const s = getState();
+  const text = `AB 5 Exemption Analysis
+
+Industry: ${s.industry}
+Profession: ${s.profession}
+Entity Type: ${s.entity}
+Multiple Clients: ${s.multiClient}
+Work Structure: ${s.structure}
+License: ${s.license}
+
+Status: ${document.getElementById('statusBadge').textContent}
+Applicable Test: ${document.getElementById('testTag').textContent}
+
+Summary: ${document.getElementById('summaryText').textContent}
+
+Evidence Checklist:
+${Array.from(document.querySelectorAll('#evidenceList li')).map(li => '- ' + li.textContent.trim()).join('\n')}
+`;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy Results', 1500);
+  });
+}
+
+document.querySelectorAll('select').forEach(el => el.addEventListener('change', analyze));
+analyze();
+</script>
+</body>
+</html>
