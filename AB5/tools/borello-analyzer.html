@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Borello Factor Analyzer | Terms.Law</title>
+  <meta name="description" content="Analyze the 11 Borello factors for California worker classification when ABC test exemptions apply. Generate evidence documentation checklist." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#f8fafc; --card:#ffffff; --muted:#64748b; --text:#0f172a;
+      --line:#e2e8f0; --accent:#2563eb; --accent2:#8b5cf6;
+      --good:#10b981; --warn:#f59e0b; --bad:#ef4444;
+      --shadow: 0 4px 20px rgba(0,0,0,.08);
+      --radius: 16px; --max: 1000px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+    }
+    *{box-sizing:border-box}
+    body{margin:0; font-family:var(--sans); background:var(--bg); color:var(--text); min-height:100vh}
+    a{color:var(--accent); text-decoration:none}
+    a:hover{text-decoration:underline}
+    .wrap{max-width:var(--max); margin:0 auto; padding:28px 18px 60px}
+    .top{padding:14px 16px; border:1px solid var(--line); border-radius:var(--radius); background:var(--card); box-shadow:var(--shadow); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px}
+    .brand b{display:block; color:var(--text)}
+    .brand span{color:var(--muted); font-size:13px}
+    .pill{display:inline-flex; padding:8px 12px; border-radius:999px; border:1px solid var(--line); background:var(--bg); font-size:13px; color:var(--text); transition:all 0.2s}
+    .pill:hover{border-color:var(--accent); color:var(--accent); text-decoration:none}
+    .hero{margin-top:14px; padding:20px; border:1px solid var(--line); border-radius:var(--radius); background:linear-gradient(135deg, rgba(37,99,235,.06) 0%, rgba(139,92,246,.06) 100%); box-shadow:var(--shadow)}
+    h1{margin:0 0 8px; font-size:26px; color:var(--text)}
+    .sub{margin:0; color:var(--muted); line-height:1.6; font-size:14px}
+    .grid{display:grid; grid-template-columns: 1.1fr 0.9fr; gap:14px; margin-top:14px}
+    @media(max-width:900px){.grid{grid-template-columns:1fr}}
+    .card{border:1px solid var(--line); border-radius:var(--radius); background:var(--card); box-shadow:var(--shadow); padding:18px}
+    .card h2{margin:0 0 10px; font-size:16px; color:var(--text)}
+    .meta{color:var(--muted); font-size:13px; line-height:1.6}
+    .hr{height:1px; background:var(--line); margin:16px 0}
+    .factor{padding:14px; border:1px solid var(--line); border-radius:12px; background:var(--bg); margin-bottom:10px}
+    .factor:last-child{margin-bottom:0}
+    .factor-header{display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:10px}
+    .factor-num{width:28px; height:28px; background:rgba(37,99,235,.1); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:var(--accent); flex-shrink:0}
+    .factor-title{flex:1; font-size:14px; font-weight:600; color:var(--text)}
+    .factor-desc{font-size:12px; color:var(--muted); margin-bottom:10px; line-height:1.5}
+    .factor-options{display:flex; gap:8px; flex-wrap:wrap}
+    .factor-opt{padding:6px 12px; border:1px solid var(--line); border-radius:8px; font-size:12px; cursor:pointer; transition:all 0.2s; background:var(--card)}
+    .factor-opt:hover{background:#f1f5f9}
+    .factor-opt.ic{border-color:rgba(16,185,129,.4)}
+    .factor-opt.ic.selected{background:rgba(16,185,129,.1); border-color:var(--good); color:#059669}
+    .factor-opt.neutral{border-color:rgba(245,158,11,.4)}
+    .factor-opt.neutral.selected{background:rgba(245,158,11,.1); border-color:var(--warn); color:#d97706}
+    .factor-opt.emp{border-color:rgba(239,68,68,.4)}
+    .factor-opt.emp.selected{background:rgba(239,68,68,.1); border-color:var(--bad); color:#dc2626}
+    .score-section{text-align:center; padding:20px; border:1px solid var(--line); border-radius:12px; background:var(--bg)}
+    .score-circle{width:100px; height:100px; border-radius:50%; border:4px solid var(--line); display:flex; flex-direction:column; align-items:center; justify-content:center; margin:0 auto 12px}
+    .score-num{font-size:28px; font-weight:700; color:var(--text)}
+    .score-label{font-size:11px; color:var(--muted)}
+    .badge{display:inline-flex; padding:6px 12px; border-radius:999px; font-size:12px; font-weight:600; margin-top:10px}
+    .badge.good{border:1px solid rgba(16,185,129,.35); background:rgba(16,185,129,.10); color:#059669}
+    .badge.warn{border:1px solid rgba(245,158,11,.35); background:rgba(245,158,11,.10); color:#d97706}
+    .badge.bad{border:1px solid rgba(239,68,68,.35); background:rgba(239,68,68,.10); color:#dc2626}
+    .breakdown{margin-top:16px; text-align:left}
+    .breakdown-item{display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--line); font-size:13px; color:var(--text)}
+    .breakdown-item:last-child{border-bottom:none}
+    .breakdown-bar{height:6px; background:var(--line); border-radius:99px; margin-top:8px; display:flex; overflow:hidden}
+    .breakdown-bar .seg{height:100%}
+    .breakdown-bar .seg.ic{background:var(--good)}
+    .breakdown-bar .seg.neutral{background:var(--warn)}
+    .breakdown-bar .seg.emp{background:var(--bad)}
+    .insight{margin-top:16px; padding:14px; border:1px solid var(--line); border-radius:12px; background:var(--bg)}
+    .insight h3{margin:0 0 8px; font-size:14px; color:var(--accent)}
+    .insight p{margin:0; font-size:13px; color:var(--muted); line-height:1.55}
+    .checklist{margin:16px 0 0; padding:0; list-style:none}
+    .checklist li{padding:8px 0; border-bottom:1px solid var(--line); font-size:13px; display:flex; align-items:flex-start; gap:8px; color:var(--muted)}
+    .checklist li:last-child{border-bottom:none}
+    .actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:16px}
+    .btn{display:inline-flex; align-items:center; justify-content:center; padding:10px 16px; border-radius:10px; border:1px solid var(--line); background:var(--card); color:var(--text); font-weight:600; font-size:13px; cursor:pointer; text-decoration:none; transition:all 0.2s}
+    .btn:hover{background:var(--bg); text-decoration:none}
+    .btn.primary{background:var(--accent); border-color:var(--accent); color:#fff}
+    .btn.primary:hover{background:#1d4ed8}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">
+      <b>Terms.Law</b>
+      <span>Borello Factor Analyzer</span>
+    </div>
+    <a class="pill" href="./index.html">Back to Tools</a>
+  </div>
+
+  <section class="hero">
+    <h1>Borello Factor Analysis</h1>
+    <p class="sub">When an AB 5 exemption applies, classification shifts to the multi-factor Borello test. Analyze all 11 factors to assess your IC structure.</p>
+  </section>
+
+  <div class="grid">
+    <section class="card">
+      <h2>The 11 Borello Factors</h2>
+      <div class="meta">For each factor, select which direction the facts support:</div>
+      <div class="hr"></div>
+      <div id="factorList"></div>
+    </section>
+
+    <aside class="card">
+      <h2>Analysis Results</h2>
+
+      <div class="score-section" id="scoreSection">
+        <div class="score-circle" id="scoreCircle">
+          <div class="score-num" id="scoreNum">0</div>
+          <div class="score-label">of 11 factors</div>
+        </div>
+        <div class="meta">Factors supporting IC classification</div>
+        <span class="badge warn" id="overallBadge">Analyzing...</span>
+      </div>
+
+      <div class="breakdown">
+        <div class="breakdown-item"><span>Supports IC</span><span id="icCount" style="color:var(--good)">0</span></div>
+        <div class="breakdown-item"><span>Neutral</span><span id="neutralCount" style="color:var(--warn)">0</span></div>
+        <div class="breakdown-item"><span>Supports Employee</span><span id="empCount" style="color:var(--bad)">0</span></div>
+        <div class="breakdown-bar">
+          <div class="seg ic" id="barIc" style="width:33%"></div>
+          <div class="seg neutral" id="barNeutral" style="width:33%"></div>
+          <div class="seg emp" id="barEmp" style="width:33%"></div>
+        </div>
+      </div>
+
+      <div class="insight">
+        <h3>Assessment</h3>
+        <p id="assessmentText">Select options for each factor to see your analysis.</p>
+      </div>
+
+      <div class="hr"></div>
+
+      <h3 style="margin:0 0 10px; font-size:14px; color:var(--text)">Evidence Documentation Checklist</h3>
+      <ul class="checklist" id="checklist"></ul>
+
+      <div class="actions">
+        <button class="btn" onclick="copyResults()">Copy Results</button>
+        <a class="btn primary" href="./ic-agreement-generator.html">Generate IC Agreement</a>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+const factors = [
+  {
+    num: 1,
+    title: "Right to Control Work",
+    desc: "Does the hiring entity control the manner and means of accomplishing the work?",
+    icDesc: "Worker controls methods",
+    empDesc: "Company controls methods"
+  },
+  {
+    num: 2,
+    title: "Distinct Occupation/Business",
+    desc: "Is the worker engaged in a distinct occupation or business?",
+    icDesc: "Worker has own business",
+    empDesc: "No separate business"
+  },
+  {
+    num: 3,
+    title: "Customary Work Without Supervision",
+    desc: "Is this work usually done under direction, or by a specialist without supervision?",
+    icDesc: "Specialist, no supervision",
+    empDesc: "Requires supervision"
+  },
+  {
+    num: 4,
+    title: "Skill Required",
+    desc: "Does the work require specialized skill?",
+    icDesc: "Specialized skill",
+    empDesc: "General/trained skill"
+  },
+  {
+    num: 5,
+    title: "Tools and Equipment",
+    desc: "Who supplies the tools, equipment, and place of work?",
+    icDesc: "Worker supplies own",
+    empDesc: "Company provides"
+  },
+  {
+    num: 6,
+    title: "Length of Service",
+    desc: "Is the service for a specific project or indefinite?",
+    icDesc: "Project-based/defined term",
+    empDesc: "Indefinite/ongoing"
+  },
+  {
+    num: 7,
+    title: "Method of Payment",
+    desc: "Is payment by time (hourly/salary) or by the job/project?",
+    icDesc: "By project/deliverable",
+    empDesc: "By time (hourly/salary)"
+  },
+  {
+    num: 8,
+    title: "Part of Regular Business",
+    desc: "Is the work part of the hiring entity's regular business?",
+    icDesc: "Outside regular business",
+    empDesc: "Core business activity"
+  },
+  {
+    num: 9,
+    title: "Parties' Intent",
+    desc: "Do the parties believe they are creating an IC relationship?",
+    icDesc: "IC intent documented",
+    empDesc: "Unclear/employee-like"
+  },
+  {
+    num: 10,
+    title: "Principal is in Business",
+    desc: "Is the principal engaged in a business?",
+    icDesc: "Both are businesses",
+    empDesc: "Worker is individual"
+  },
+  {
+    num: 11,
+    title: "Profit or Loss",
+    desc: "Can the worker realize profit or suffer loss?",
+    icDesc: "Business risk/reward",
+    empDesc: "Fixed compensation only"
+  }
+];
+
+const state = {};
+
+function renderFactors() {
+  const container = document.getElementById('factorList');
+  container.innerHTML = factors.map(f => `
+    <div class="factor" data-factor="${f.num}">
+      <div class="factor-header">
+        <div class="factor-num">${f.num}</div>
+        <div class="factor-title">${f.title}</div>
+      </div>
+      <div class="factor-desc">${f.desc}</div>
+      <div class="factor-options">
+        <div class="factor-opt ic" data-value="ic" onclick="selectFactor(${f.num}, 'ic')">${f.icDesc}</div>
+        <div class="factor-opt neutral" data-value="neutral" onclick="selectFactor(${f.num}, 'neutral')">Mixed/Unclear</div>
+        <div class="factor-opt emp" data-value="emp" onclick="selectFactor(${f.num}, 'emp')">${f.empDesc}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function selectFactor(num, value) {
+  state[num] = value;
+  document.querySelectorAll(`.factor[data-factor="${num}"] .factor-opt`).forEach(el => {
+    el.classList.toggle('selected', el.dataset.value === value);
+  });
+  analyze();
+}
+
+function analyze() {
+  let ic = 0, neutral = 0, emp = 0;
+  Object.values(state).forEach(v => {
+    if (v === 'ic') ic++;
+    else if (v === 'neutral') neutral++;
+    else if (v === 'emp') emp++;
+  });
+
+  const total = ic + neutral + emp;
+  const answered = total;
+
+  document.getElementById('scoreNum').textContent = ic;
+  document.getElementById('icCount').textContent = ic;
+  document.getElementById('neutralCount').textContent = neutral;
+  document.getElementById('empCount').textContent = emp;
+
+  const icPct = total > 0 ? (ic / total * 100) : 0;
+  const neutralPct = total > 0 ? (neutral / total * 100) : 0;
+  const empPct = total > 0 ? (emp / total * 100) : 0;
+
+  document.getElementById('barIc').style.width = icPct + '%';
+  document.getElementById('barNeutral').style.width = neutralPct + '%';
+  document.getElementById('barEmp').style.width = empPct + '%';
+
+  const badge = document.getElementById('overallBadge');
+  const circle = document.getElementById('scoreCircle');
+  const assessment = document.getElementById('assessmentText');
+
+  if (answered < 5) {
+    badge.className = 'badge warn';
+    badge.textContent = 'Incomplete';
+    circle.style.borderColor = 'var(--warn)';
+    assessment.textContent = 'Complete more factors for a meaningful analysis.';
+  } else if (ic >= 7) {
+    badge.className = 'badge good';
+    badge.textContent = 'Strong IC Support';
+    circle.style.borderColor = 'var(--good)';
+    assessment.textContent = `With ${ic} of ${answered} factors supporting IC, your structure has strong indicators of an independent contractor relationship. Document these facts carefully and ensure operational practices match.`;
+  } else if (ic >= 5) {
+    badge.className = 'badge good';
+    badge.textContent = 'Moderate IC Support';
+    circle.style.borderColor = 'var(--good)';
+    assessment.textContent = `With ${ic} of ${answered} factors supporting IC, the balance tips toward contractor status. Address the weaker factors to strengthen your position.`;
+  } else if (emp >= 6) {
+    badge.className = 'badge bad';
+    badge.textContent = 'Employee Indicators';
+    circle.style.borderColor = 'var(--bad)';
+    assessment.textContent = `With ${emp} of ${answered} factors supporting employment, this relationship has significant employee characteristics. Consider restructuring or the employee path.`;
+  } else {
+    badge.className = 'badge warn';
+    badge.textContent = 'Mixed Indicators';
+    circle.style.borderColor = 'var(--warn)';
+    assessment.textContent = `The factors are evenly split (${ic} IC / ${emp} employee / ${neutral} neutral). This is a fact-intensive situation requiring careful analysis and documentation.`;
+  }
+
+  const checklist = [];
+  factors.forEach(f => {
+    if (state[f.num] === 'emp' || state[f.num] === 'neutral') {
+      checklist.push(`Document evidence for Factor ${f.num} (${f.title})`);
+    }
+  });
+  if (checklist.length === 0) {
+    checklist.push('Maintain written contract with IC terms');
+    checklist.push('Keep invoices and project documentation');
+    checklist.push("Document worker's other clients/business activities");
+  }
+  document.getElementById('checklist').innerHTML = checklist.map(c => `<li>☐ ${c}</li>`).join('');
+}
+
+function copyResults() {
+  let ic = 0, neutral = 0, emp = 0;
+  Object.values(state).forEach(v => {
+    if (v === 'ic') ic++;
+    else if (v === 'neutral') neutral++;
+    else if (v === 'emp') emp++;
+  });
+
+  const details = factors.map(f => {
+    const val = state[f.num] || 'not answered';
+    return `${f.num}. ${f.title}: ${val}`;
+  }).join('\n');
+
+  const text = `Borello Factor Analysis
+
+Summary:
+- Factors supporting IC: ${ic}
+- Factors neutral: ${neutral}
+- Factors supporting employee: ${emp}
+
+Status: ${document.getElementById('overallBadge').textContent}
+
+${document.getElementById('assessmentText').textContent}
+
+Factor Details:
+${details}
+
+Evidence Checklist:
+${Array.from(document.querySelectorAll('#checklist li')).map(li => '- ' + li.textContent).join('\n')}
+`;
+  navigator.clipboard.writeText(text);
+  alert('Results copied!');
+}
+
+renderFactors();
+analyze();
+</script>
+</body>
+</html>
