@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AB 5 Quick Risk Screener | Terms.Law</title>
+  <meta name="description" content="60-second California AB 5 misclassification risk assessment. Answer 5 questions to understand your contractor risk level." />
+  <style>
+    :root{
+      --bg:#0b0f14; --card:#111824; --muted:#95a3b8; --text:#eaf0ff;
+      --line:#223049; --accent:#7dd3fc; --accent2:#a78bfa;
+      --good:#34d399; --warn:#fbbf24; --bad:#fb7185;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 16px; --max: 800px;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+    *{box-sizing:border-box}
+    body{margin:0; font-family:var(--sans); background:linear-gradient(180deg,#05070a 0%,#0b0f14 40%,#070a0f 100%); color:var(--text); min-height:100vh}
+    a{color:var(--accent); text-decoration:none}
+    a:hover{text-decoration:underline}
+    .wrap{max-width:var(--max); margin:0 auto; padding:28px 18px 60px}
+    .top{padding:14px 16px; border:1px solid var(--line); border-radius:var(--radius); background:rgba(17,24,36,.7); box-shadow:var(--shadow); backdrop-filter:blur(10px); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px}
+    .brand b{display:block; letter-spacing:.2px}
+    .brand span{color:var(--muted); font-size:13px}
+    .pill{display:inline-flex; gap:8px; align-items:center; padding:8px 12px; border-radius:999px; border:1px solid var(--line); background:rgba(10,14,20,.55); font-size:13px; color:var(--text)}
+    .hero{margin-top:14px; padding:24px 20px; border:1px solid var(--line); border-radius:var(--radius); background:radial-gradient(600px 300px at 20% 10%, rgba(125,211,252,.18), transparent 60%), radial-gradient(600px 300px at 90% 40%, rgba(167,139,250,.16), transparent 60%), rgba(17,24,36,.65); box-shadow:var(--shadow)}
+    h1{margin:0 0 10px; font-size:28px; line-height:1.14}
+    .sub{margin:0; color:var(--muted); line-height:1.6}
+    .card{border:1px solid var(--line); border-radius:var(--radius); background:rgba(17,24,36,.62); box-shadow:var(--shadow); padding:20px; margin-top:14px}
+    .progress{height:6px; background:var(--line); border-radius:99px; margin-bottom:20px; overflow:hidden}
+    .progress-bar{height:100%; background:linear-gradient(90deg, var(--accent), var(--accent2)); border-radius:99px; transition:width 0.3s ease}
+    .question{font-size:18px; font-weight:600; margin-bottom:16px}
+    .options{display:grid; gap:10px}
+    .option{padding:14px 16px; border:1px solid var(--line); border-radius:12px; background:rgba(10,14,20,.55); cursor:pointer; transition:all 0.2s ease; display:flex; align-items:center; gap:12px}
+    .option:hover{background:rgba(10,14,20,.75); border-color:var(--accent)}
+    .option.selected{background:rgba(125,211,252,.1); border-color:var(--accent)}
+    .option-marker{width:20px; height:20px; border:2px solid var(--line); border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center}
+    .option.selected .option-marker{border-color:var(--accent); background:var(--accent)}
+    .option.selected .option-marker::after{content:''; width:8px; height:8px; background:#0b0f14; border-radius:50%}
+    .option-text{font-size:14px}
+    .btn{display:inline-flex; align-items:center; justify-content:center; gap:10px; padding:12px 20px; border-radius:12px; border:1px solid var(--line); background:rgba(10,14,20,.6); color:var(--text); font-weight:600; font-size:14px; cursor:pointer; transition:all 0.2s ease}
+    .btn:hover{transform:translateY(-1px)}
+    .btn.primary{background:linear-gradient(90deg, rgba(125,211,252,.20), rgba(167,139,250,.18)); border-color:rgba(125,211,252,.35)}
+    .btn:disabled{opacity:0.5; cursor:not-allowed; transform:none}
+    .nav-btns{display:flex; justify-content:space-between; gap:10px; margin-top:20px}
+    .result{display:none}
+    .result.show{display:block}
+    .quiz.hidden{display:none}
+    .badge{display:inline-flex; gap:8px; align-items:center; padding:8px 14px; border-radius:999px; font-size:14px; font-weight:600}
+    .badge.good{border:1px solid rgba(52,211,153,.35); background:rgba(52,211,153,.10); color:var(--good)}
+    .badge.warn{border:1px solid rgba(251,191,36,.35); background:rgba(251,191,36,.10); color:var(--warn)}
+    .badge.bad{border:1px solid rgba(251,113,133,.35); background:rgba(251,113,133,.10); color:var(--bad)}
+    .result-section{margin-top:20px; padding:16px; border:1px solid var(--line); border-radius:14px; background:rgba(10,14,20,.55)}
+    .result-section h3{margin:0 0 10px; font-size:15px; color:var(--accent)}
+    .result-section p{margin:0; font-size:14px; color:var(--muted); line-height:1.6}
+    .next-steps{display:grid; gap:10px; margin-top:20px}
+    .next-step{padding:14px 16px; border:1px solid var(--line); border-radius:12px; background:rgba(10,14,20,.55); display:flex; align-items:center; gap:12px; transition:all 0.2s ease}
+    .next-step:hover{background:rgba(10,14,20,.75); border-color:var(--accent)}
+    .step-icon{width:40px; height:40px; border-radius:10px; background:rgba(125,211,252,.1); display:flex; align-items:center; justify-content:center; font-size:18px}
+    .step-text h4{margin:0 0 4px; font-size:14px}
+    .step-text p{margin:0; font-size:12px; color:var(--muted)}
+    .hr{height:1px; background:var(--line); margin:20px 0}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">
+      <b>Terms.Law</b>
+      <span>AB 5 Quick Risk Screener</span>
+    </div>
+    <a class="pill" href="./index.html">Back to Hub</a>
+  </div>
+
+  <section class="hero">
+    <h1>60-Second Risk Check</h1>
+    <p class="sub">Answer 5 quick questions to assess your California contractor misclassification risk level and get pointed to the right next step.</p>
+  </section>
+
+  <div class="card quiz" id="quiz">
+    <div class="progress">
+      <div class="progress-bar" id="progressBar" style="width:20%"></div>
+    </div>
+    <div id="questionContainer"></div>
+    <div class="nav-btns">
+      <button class="btn" id="prevBtn" onclick="prevQuestion()" disabled>Back</button>
+      <button class="btn primary" id="nextBtn" onclick="nextQuestion()">Next</button>
+    </div>
+  </div>
+
+  <div class="card result" id="result">
+    <div style="text-align:center; margin-bottom:20px">
+      <span class="badge" id="riskBadge">Calculating...</span>
+      <h2 id="riskTitle" style="margin:14px 0 8px">Your Risk Assessment</h2>
+      <p id="riskSummary" class="sub"></p>
+    </div>
+
+    <div class="result-section">
+      <h3>Key Risk Factors</h3>
+      <p id="riskFactors"></p>
+    </div>
+
+    <div class="result-section">
+      <h3>What This Means</h3>
+      <p id="riskExplanation"></p>
+    </div>
+
+    <div class="hr"></div>
+
+    <h3 style="margin:0 0 12px">Recommended Next Steps</h3>
+    <div class="next-steps" id="nextSteps"></div>
+
+    <div class="nav-btns" style="margin-top:24px">
+      <button class="btn" onclick="restart()">Start Over</button>
+      <a class="btn primary" href="./ab5-model-classifier.html">Full Classification Analysis</a>
+    </div>
+  </div>
+</div>
+
+<script>
+const questions = [
+  {
+    q: "What's your business model?",
+    options: [
+      { text: "Direct service business (we employ/contract workers to deliver our service)", value: "direct", risk: 3 },
+      { text: "Tech platform/marketplace (we connect providers with customers)", value: "platform", risk: 2 },
+      { text: "Agency/consulting (we place specialists on client projects)", value: "agency", risk: 2 },
+      { text: "B2B vendor network (we subcontract to other businesses)", value: "b2b", risk: 1 }
+    ]
+  },
+  {
+    q: "What role do these workers play?",
+    options: [
+      { text: "They perform the core service we sell to customers", value: "core", risk: 4 },
+      { text: "Specialized project work (design, dev, consulting)", value: "specialist", risk: 1 },
+      { text: "Support/admin functions", value: "support", risk: 1 },
+      { text: "Sales, marketing, or lead generation", value: "sales", risk: 2 }
+    ]
+  },
+  {
+    q: "How much control do you exercise?",
+    options: [
+      { text: "High: We set schedules, methods, pricing, and enforce SOPs", value: "high", risk: 4 },
+      { text: "Medium: Some standards, but workers have discretion", value: "medium", risk: 2 },
+      { text: "Low: Workers control their methods and business decisions", value: "low", risk: 0 }
+    ]
+  },
+  {
+    q: "Do the workers have their own independent business?",
+    options: [
+      { text: "No - they work mainly or exclusively for us", value: "no", risk: 3 },
+      { text: "Some do, some don't", value: "some", risk: 2 },
+      { text: "Yes - they have their own entity, clients, and marketing", value: "yes", risk: 0 }
+    ]
+  },
+  {
+    q: "Where are these workers located?",
+    options: [
+      { text: "California (or work is performed in CA)", value: "ca", risk: 1 },
+      { text: "Mix of CA and other states", value: "mix", risk: 1 },
+      { text: "Outside California only", value: "other", risk: 0 }
+    ]
+  }
+];
+
+let currentQ = 0;
+let answers = [];
+
+function renderQuestion() {
+  const q = questions[currentQ];
+  document.getElementById('progressBar').style.width = ((currentQ + 1) / questions.length * 100) + '%';
+
+  let html = `<div class="question">${currentQ + 1}. ${q.q}</div><div class="options">`;
+  q.options.forEach((opt, i) => {
+    const selected = answers[currentQ] === i ? 'selected' : '';
+    html += `<div class="option ${selected}" onclick="selectOption(${i})">
+      <div class="option-marker"></div>
+      <div class="option-text">${opt.text}</div>
+    </div>`;
+  });
+  html += '</div>';
+  document.getElementById('questionContainer').innerHTML = html;
+
+  document.getElementById('prevBtn').disabled = currentQ === 0;
+  document.getElementById('nextBtn').textContent = currentQ === questions.length - 1 ? 'See Results' : 'Next';
+}
+
+function selectOption(i) {
+  answers[currentQ] = i;
+  renderQuestion();
+}
+
+function nextQuestion() {
+  if (answers[currentQ] === undefined) return;
+  if (currentQ < questions.length - 1) {
+    currentQ++;
+    renderQuestion();
+  } else {
+    showResults();
+  }
+}
+
+function prevQuestion() {
+  if (currentQ > 0) {
+    currentQ--;
+    renderQuestion();
+  }
+}
+
+function showResults() {
+  document.getElementById('quiz').classList.add('hidden');
+  document.getElementById('result').classList.add('show');
+
+  let totalRisk = 0;
+  let factors = [];
+
+  answers.forEach((a, i) => {
+    const opt = questions[i].options[a];
+    totalRisk += opt.risk;
+    if (opt.risk >= 3) factors.push(opt.text);
+  });
+
+  const badge = document.getElementById('riskBadge');
+  const title = document.getElementById('riskTitle');
+  const summary = document.getElementById('riskSummary');
+  const explanation = document.getElementById('riskExplanation');
+  const factorsEl = document.getElementById('riskFactors');
+  const stepsEl = document.getElementById('nextSteps');
+
+  let level, steps;
+
+  if (totalRisk >= 10) {
+    badge.className = 'badge bad';
+    badge.textContent = 'High Risk';
+    title.textContent = 'Significant Misclassification Risk';
+    summary.textContent = 'Your current model shows multiple red flags under California AB 5 and ABC test analysis.';
+    explanation.textContent = 'Workers performing your core service with high control and low independence are very difficult to classify as independent contractors under AB 5. The ABC test presumes employment, and your answers suggest you likely fail Prong B (usual course of business) and possibly Prong A (control).';
+    steps = [
+      { icon: '⚠️', title: 'Consider Employee Path', desc: 'Restructuring to W-2 employment may be the safest option', link: './employee-bundle-generator.html' },
+      { icon: '🔍', title: 'Get Full Analysis', desc: 'Run complete ABC test analysis to understand all factors', link: './ab5-model-classifier.html' },
+      { icon: '💰', title: 'Compare Costs', desc: 'See actual cost difference between IC and employee models', link: './ic-employee-calculator.html' },
+      { icon: '📞', title: 'Legal Consultation', desc: 'Discuss your specific situation with an attorney', link: 'https://calendly.com/terms-law' }
+    ];
+  } else if (totalRisk >= 6) {
+    badge.className = 'badge warn';
+    badge.textContent = 'Medium Risk';
+    title.textContent = 'Mixed Signals - Analysis Needed';
+    summary.textContent = 'Your model has some concerning elements but may have viable paths forward.';
+    explanation.textContent = 'You have a mix of employee-like and contractor-like factors. An exemption may apply, or operational changes could strengthen your position. A deeper analysis is needed to determine the best path.';
+    steps = [
+      { icon: '🔍', title: 'Full Classification Analysis', desc: 'Detailed ABC test scoring for your model', link: './ab5-model-classifier.html' },
+      { icon: '📋', title: 'Check Exemptions', desc: 'See if a statutory exemption applies to your situation', link: './ab5-exemption-checker.html' },
+      { icon: '💰', title: 'Cost Comparison', desc: 'Understand the financial implications of each path', link: './ic-employee-calculator.html' },
+      { icon: '📄', title: 'Review Agreements', desc: 'Ensure your contracts support your classification', link: './ic-agreement-generator.html' }
+    ];
+  } else {
+    badge.className = 'badge good';
+    badge.textContent = 'Lower Risk';
+    title.textContent = 'Potentially Viable IC Structure';
+    summary.textContent = 'Your model shows characteristics that can support independent contractor classification.';
+    explanation.textContent = 'Workers with independent businesses, performing specialized or non-core work, with meaningful autonomy are more defensible under AB 5. However, you should still ensure proper documentation and operational practices.';
+    steps = [
+      { icon: '📋', title: 'Verify Exemptions', desc: 'Confirm which exemption applies and what test replaces ABC', link: './ab5-exemption-checker.html' },
+      { icon: '📄', title: 'Strengthen Agreements', desc: 'Ensure your IC agreements reflect actual practices', link: './ic-agreement-generator.html' },
+      { icon: '✅', title: 'Borello Analysis', desc: 'If exempt from ABC, check Borello factors', link: './borello-analyzer.html' },
+      { icon: '🔍', title: 'Full Analysis', desc: 'Get complete classification scoring', link: './ab5-model-classifier.html' }
+    ];
+  }
+
+  factorsEl.textContent = factors.length > 0 ? factors.join(' • ') : 'No major individual risk factors identified, but overall pattern matters.';
+
+  stepsEl.innerHTML = steps.map(s => `
+    <a href="${s.link}" class="next-step">
+      <div class="step-icon">${s.icon}</div>
+      <div class="step-text">
+        <h4>${s.title}</h4>
+        <p>${s.desc}</p>
+      </div>
+    </a>
+  `).join('');
+}
+
+function restart() {
+  currentQ = 0;
+  answers = [];
+  document.getElementById('quiz').classList.remove('hidden');
+  document.getElementById('result').classList.remove('show');
+  renderQuestion();
+}
+
+renderQuestion();
+</script>
+</body>
+</html>

@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AB5 Business Model Classifier | Terms.Law</title>
+  <meta name="description" content="Interactive tool to analyze your business model under California's AB 5 and ABC test. Get risk scoring, Prong B analysis, exemption guidance, and compliance recommendations." />
+
+  <style>
+    :root{
+      --bg:#0b0f14; --card:#111824; --muted:#95a3b8; --text:#eaf0ff;
+      --line:#223049; --accent:#7dd3fc; --accent2:#a78bfa; --good:#34d399; --warn:#fbbf24; --bad:#fb7185;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 16px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+    *{box-sizing:border-box}
+    body{margin:0; padding:20px; font-family:var(--sans); background:linear-gradient(180deg, #05070a 0%, #0b0f14 40%, #070a0f 100%); color:var(--text); min-height:100vh}
+    .container{max-width:900px; margin:0 auto}
+    
+    .header{text-align:center; margin-bottom:30px}
+    .header h1{margin:0 0 8px; font-size:28px}
+    .header p{margin:0; color:var(--muted); font-size:14px}
+    
+    .card{
+      border:1px solid var(--line); border-radius:var(--radius); background:rgba(17,24,36,.62);
+      box-shadow:var(--shadow); padding:24px; margin-bottom:20px;
+    }
+    
+    .section{margin-bottom:24px}
+    .section h3{margin:0 0 12px; font-size:18px; color:var(--accent)}
+    .section p{margin:0 0 12px; color:var(--muted); font-size:14px; line-height:1.6}
+    
+    label{display:block; font-size:13px; font-weight:600; color:var(--text); margin:12px 0 6px}
+    select, input, textarea{
+      width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--line);
+      background:rgba(8,11,16,.75); color:var(--text); font-size:14px; font-family:var(--sans);
+    }
+    textarea{min-height:80px; resize:vertical}
+    select:focus, input:focus, textarea:focus{outline:none; border-color:var(--accent)}
+    
+    .radio-group{display:flex; flex-direction:column; gap:8px; margin-top:8px}
+    .radio-option{
+      display:flex; align-items:center; gap:10px; padding:10px 12px;
+      border:1px solid var(--line); border-radius:10px; background:rgba(8,11,16,.5);
+      cursor:pointer; transition: all 0.2s ease;
+    }
+    .radio-option:hover{background:rgba(8,11,16,.75); border-color:var(--accent)}
+    .radio-option input[type="radio"]{width:auto; margin:0}
+    .radio-option label{margin:0; cursor:pointer; font-weight:400}
+    
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:10px;
+      padding:12px 24px; border-radius:12px; border:1px solid var(--line);
+      background:linear-gradient(90deg, rgba(125,211,252,.20), rgba(167,139,250,.18));
+      border-color:rgba(125,211,252,.35); color:var(--text); font-weight:600;
+      font-size:15px; cursor:pointer; width:100%; margin-top:16px;
+      transition: all 0.2s ease;
+    }
+    .btn:hover{transform:translateY(-1px); box-shadow: 0 4px 12px rgba(125,211,252,.3)}
+    
+    .results{display:none; margin-top:20px}
+    .results.show{display:block}
+    
+    .score-card{
+      border:1px solid var(--line); border-radius:12px; padding:16px;
+      background:rgba(10,14,20,.55); margin-bottom:12px;
+    }
+    .score-header{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px}
+    .score-header h4{margin:0; font-size:16px}
+    .badge{
+      padding:6px 12px; border-radius:999px; font-size:12px; font-weight:600;
+      text-transform:uppercase; letter-spacing:.5px;
+    }
+    .badge.high{background:rgba(251,113,133,.15); color:#fb7185; border:1px solid rgba(251,113,133,.3)}
+    .badge.med{background:rgba(251,191,36,.15); color:#fbbf24; border:1px solid rgba(251,191,36,.3)}
+    .badge.low{background:rgba(52,211,153,.15); color:#34d399; border:1px solid rgba(52,211,153,.3)}
+    
+    .prong{
+      display:flex; gap:12px; padding:12px 0; border-top:1px solid var(--line);
+    }
+    .prong:first-child{border-top:none; padding-top:0}
+    .prong-letter{
+      width:40px; height:40px; border-radius:50%; display:flex; align-items:center;
+      justify-content:center; font-weight:700; font-size:18px; flex-shrink:0;
+    }
+    .prong-letter.pass{background:rgba(52,211,153,.2); color:var(--good)}
+    .prong-letter.fail{background:rgba(251,113,133,.2); color:var(--bad)}
+    .prong-letter.warn{background:rgba(251,191,36,.2); color:var(--warn)}
+    .prong-content h5{margin:0 0 4px; font-size:14px}
+    .prong-content p{margin:0; font-size:13px; color:var(--muted); line-height:1.5}
+    
+    .recommendation{
+      border:1px solid var(--line); border-radius:12px; padding:18px;
+      background:rgba(10,14,20,.55); margin-top:16px;
+    }
+    .recommendation h4{margin:0 0 10px; font-size:16px; color:var(--good)}
+    .recommendation p{margin:0 0 10px; font-size:14px; line-height:1.6}
+    .recommendation ul{margin:8px 0; padding-left:20px}
+    .recommendation li{margin-bottom:6px; font-size:13px; line-height:1.5}
+    
+    .export-btn{
+      background:rgba(52,211,153,.12); border-color:rgba(52,211,153,.35);
+      margin-top:12px;
+    }
+    
+    .hr{height:1px; background:var(--line); margin:16px 0}
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom:18px; font-size:13px; color:var(--muted)">
+      <a href="./ca-worker-classification-hub-pillar.html" style="color:var(--accent)">AB5 Hub</a>
+      <span>&gt;</span>
+      <span>ABC Test Classifier</span>
+    </div>
+    <div class="header">
+      <h1>AB5 Business Model Classifier</h1>
+      <p>Analyze your California worker classification risk across ABC test prongs</p>
+    </div>
+
+    <div class="card">
+      <div class="section">
+        <h3>Step 1: Business Model Type</h3>
+        <p>Select the model that best describes how you engage workers</p>
+        
+        <div class="radio-group">
+          <div class="radio-option">
+            <input type="radio" name="model" value="direct" id="model-direct">
+            <label for="model-direct">
+              <strong>Direct Service Provider</strong> - We receive customer requests and dispatch our workers to perform the service
+            </label>
+          </div>
+          
+          <div class="radio-option">
+            <input type="radio" name="model" value="marketplace" id="model-marketplace">
+            <label for="model-marketplace">
+              <strong>Marketplace/Platform</strong> - We connect independent providers with customers; they control pricing and methods
+            </label>
+          </div>
+          
+          <div class="radio-option">
+            <input type="radio" name="model" value="staffing" id="model-staffing">
+            <label for="model-staffing">
+              <strong>Staffing/Agency</strong> - We place workers at client sites; clients direct day-to-day work
+            </label>
+          </div>
+          
+          <div class="radio-option">
+            <input type="radio" name="model" value="referral" id="model-referral">
+            <label for="model-referral">
+              <strong>Referral/Lead-Gen</strong> - We connect customers to independent businesses; no dispatch or control
+            </label>
+          </div>
+          
+          <div class="radio-option">
+            <input type="radio" name="model" value="subcontractor" id="model-subcontractor">
+            <label for="model-subcontractor">
+              <strong>Subcontractor Network</strong> - We engage independent contractors for project-based work with their own businesses
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Step 2: Industry Context</h3>
+        <label for="industry">Industry (helps tailor examples)</label>
+        <select id="industry">
+          <option value="">Select industry...</option>
+          <option value="rideshare">Rideshare / Transportation</option>
+          <option value="delivery">Delivery / Courier</option>
+          <option value="cleaning">Cleaning / Janitorial</option>
+          <option value="home-services">Home Services (landscaping, HVAC, etc.)</option>
+          <option value="construction">Construction / Trades</option>
+          <option value="tech">Tech / Software Development</option>
+          <option value="creative">Creative Services (design, marketing)</option>
+          <option value="staffing">Staffing / Recruiting</option>
+          <option value="call-center">Call Center / Support</option>
+          <option value="sales">Sales / Business Development</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <div class="section">
+        <h3>Step 3: Worker Role</h3>
+        <label for="role">What do workers do?</label>
+        <select id="role">
+          <option value="core">Perform the core service we sell to customers</option>
+          <option value="specialist">Specialist/expert work (not our main business)</option>
+          <option value="support">Support/ancillary functions</option>
+          <option value="sales">Sales or business development</option>
+        </select>
+      </div>
+
+      <div class="section">
+        <h3>Step 4: Control Factors</h3>
+        <p>Check all that apply to how you work with these workers</p>
+        
+        <label style="margin-top:16px"><input type="checkbox" id="control-pricing"> We set the pricing customers pay</label>
+        <label><input type="checkbox" id="control-dispatch"> We assign jobs/tasks to workers</label>
+        <label><input type="checkbox" id="control-schedule"> We set worker schedules or require specific hours</label>
+        <label><input type="checkbox" id="control-methods"> We provide detailed instructions on how to perform work</label>
+        <label><input type="checkbox" id="control-tools"> We provide tools, equipment, or platform access</label>
+        <label><input type="checkbox" id="control-branding"> Workers wear our uniforms or use our branding</label>
+        <label><input type="checkbox" id="control-exclusive"> We require exclusivity or non-compete</label>
+        <label><input type="checkbox" id="control-customer"> We own the customer relationship (not the worker)</label>
+        <label><input type="checkbox" id="control-terminate"> We can terminate/deactivate workers unilaterally</label>
+      </div>
+
+      <div class="section">
+        <h3>Step 5: Independence Indicators</h3>
+        <p>Check all that apply to the workers</p>
+        
+        <label style="margin-top:16px"><input type="checkbox" id="indep-entity"> Workers have their own business entity (LLC, Corp)</label>
+        <label><input type="checkbox" id="indep-clients"> Workers have other clients besides us</label>
+        <label><input type="checkbox" id="indep-marketing"> Workers market their services independently</label>
+        <label><input type="checkbox" id="indep-pricing"> Workers set their own pricing</label>
+        <label><input type="checkbox" id="indep-investment"> Workers made significant capital investment in their business</label>
+        <label><input type="checkbox" id="indep-license"> Workers have professional licenses or certifications</label>
+        <label><input type="checkbox" id="indep-insurance"> Workers carry their own liability insurance</label>
+      </div>
+
+      <div class="section">
+        <h3>Step 6: Additional Context</h3>
+        <label for="notes">Describe your business model briefly (optional)</label>
+        <textarea id="notes" placeholder="E.g., 'We're a cleaning company that sends teams to residential customers. We handle scheduling, pricing, and customer service. Cleaners use our supplies and follow our checklists.'"></textarea>
+      </div>
+
+      <button class="btn" onclick="analyzeModel()">Analyze Classification Risk</button>
+    </div>
+
+    <div class="results" id="results">
+      <div class="card">
+        <h3 style="margin:0 0 16px; color:var(--accent)">Classification Analysis Results</h3>
+        
+        <div class="score-card">
+          <div class="score-header">
+            <h4>Overall Risk Assessment</h4>
+            <span class="badge" id="overall-badge">Medium Risk</span>
+          </div>
+          <p id="overall-text" style="margin:0; font-size:14px; color:var(--muted)"></p>
+        </div>
+
+        <div class="score-card">
+          <h4 style="margin:0 0 12px">ABC Test Analysis</h4>
+          
+          <div class="prong">
+            <div class="prong-letter" id="prong-a-badge">A</div>
+            <div class="prong-content">
+              <h5>Prong A: Control & Direction</h5>
+              <p id="prong-a-text"></p>
+            </div>
+          </div>
+
+          <div class="prong">
+            <div class="prong-letter" id="prong-b-badge">B</div>
+            <div class="prong-content">
+              <h5>Prong B: Usual Course of Business</h5>
+              <p id="prong-b-text"></p>
+            </div>
+          </div>
+
+          <div class="prong">
+            <div class="prong-letter" id="prong-c-badge">C</div>
+            <div class="prong-content">
+              <h5>Prong C: Independent Business</h5>
+              <p id="prong-c-text"></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="recommendation">
+          <h4>Recommended Path Forward</h4>
+          <p id="rec-main"></p>
+          <div id="rec-steps"></div>
+        </div>
+
+        <div class="recommendation">
+          <h4>Documents & Next Steps</h4>
+          <p id="docs-main"></p>
+          <ul id="docs-list"></ul>
+        </div>
+
+        <button class="btn export-btn" onclick="exportResults()">📄 Export Results as PDF</button>
+
+        <div class="hr"></div>
+        <h4 style="margin:16px 0 12px; color:var(--accent)">Related Tools</h4>
+        <div style="display:grid; gap:8px">
+          <a href="./ab5-cost-calculator.html" class="btn" style="text-decoration:none">IC vs Employee Cost Calculator</a>
+          <a href="./ab5-exemption-checker.html" class="btn" style="text-decoration:none">B2B Exemption Checker</a>
+          <a href="./ab5-borello-analyzer.html" class="btn" style="text-decoration:none">Borello Factor Analyzer</a>
+        </div>
+        <button class="btn" onclick="window.location.href='./ca-worker-classification-hub-pillar.html'">← Back to Hub</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function analyzeModel() {
+      // Get form values
+      const model = document.querySelector('input[name="model"]:checked')?.value;
+      const industry = document.getElementById('industry').value;
+      const role = document.getElementById('role').value;
+      
+      // Control factors
+      const controlFactors = {
+        pricing: document.getElementById('control-pricing').checked,
+        dispatch: document.getElementById('control-dispatch').checked,
+        schedule: document.getElementById('control-schedule').checked,
+        methods: document.getElementById('control-methods').checked,
+        tools: document.getElementById('control-tools').checked,
+        branding: document.getElementById('control-branding').checked,
+        exclusive: document.getElementById('control-exclusive').checked,
+        customer: document.getElementById('control-customer').checked,
+        terminate: document.getElementById('control-terminate').checked,
+      };
+      
+      // Independence indicators
+      const indepFactors = {
+        entity: document.getElementById('indep-entity').checked,
+        clients: document.getElementById('indep-clients').checked,
+        marketing: document.getElementById('indep-marketing').checked,
+        pricing: document.getElementById('indep-pricing').checked,
+        investment: document.getElementById('indep-investment').checked,
+        license: document.getElementById('indep-license').checked,
+        insurance: document.getElementById('indep-insurance').checked,
+      };
+
+      if (!model) {
+        alert('Please select a business model type');
+        return;
+      }
+
+      // Scoring logic
+      let prongA = 'pass', prongB = 'pass', prongC = 'pass';
+      let prongAtext, prongBtext, prongCtext;
+      let overallRisk = 'low';
+      let overallText, recMain, recSteps, docsMain, docsList;
+
+      // PRONG A: Control
+      const controlCount = Object.values(controlFactors).filter(v => v).length;
+      if (controlCount >= 6) {
+        prongA = 'fail';
+        prongAtext = `High control (${controlCount}/9 factors). You exercise significant control over how workers perform their tasks, including ${controlFactors.pricing ? 'pricing, ' : ''}${controlFactors.dispatch ? 'job assignment, ' : ''}${controlFactors.schedule ? 'scheduling, ' : ''} and methods. This indicates an employment relationship.`;
+      } else if (controlCount >= 3) {
+        prongA = 'warn';
+        prongAtext = `Moderate control (${controlCount}/9 factors). Some control indicators present, but may be defensible depending on industry standards and operational necessity. Consider reducing control where possible.`;
+      } else {
+        prongA = 'pass';
+        prongAtext = `Low control (${controlCount}/9 factors). Workers appear to have significant autonomy in how they perform work. This supports IC classification, but other prongs must also pass.`;
+      }
+
+      // PRONG B: Usual Course of Business (most critical)
+      if (role === 'core') {
+        if (model === 'direct') {
+          prongB = 'fail';
+          prongBtext = 'Workers perform the core service your business sells to customers in a direct service model. This is the classic Prong B failure - workers ARE your business. Unless an exemption applies, this requires employee classification.';
+        } else if (model === 'marketplace') {
+          prongB = 'warn';
+          prongBtext = 'Marketplace model with core services. This can work IF you truly operate as a neutral platform where providers control pricing and customer relationships. Review Dynamex and whether you meet "referral-only" standards.';
+        } else if (model === 'staffing') {
+          prongB = 'warn';
+          prongBtext = 'Staffing model placing workers in core service roles. Risk depends on whether this is true temp staffing (workers are YOUR employees placed at client sites) vs. attempted IC misclassification.';
+        } else {
+          prongB = 'pass';
+          prongBtext = 'Referral or subcontractor model may pass Prong B if structured properly. Ensure you are not actually performing the service through dispatched workers.';
+        }
+      } else if (role === 'specialist') {
+        prongB = 'pass';
+        prongBtext = 'Workers perform specialist work outside your main business. This supports Prong B passage, though you must ensure this is genuinely specialized work and not just a relabeling of core functions.';
+      } else {
+        prongB = 'pass';
+        prongBtext = 'Workers perform ancillary/support functions outside your core business. This supports Prong B passage.';
+      }
+
+      // PRONG C: Independent Business
+      const indepCount = Object.values(indepFactors).filter(v => v).length;
+      if (indepCount >= 4) {
+        prongC = 'pass';
+        prongCtext = `Strong independence (${indepCount}/7 factors). Workers show clear indicators of running independent businesses including ${indepFactors.entity ? 'business entity, ' : ''}${indepFactors.clients ? 'other clients, ' : ''}${indepFactors.marketing ? 'independent marketing, ' : ''} and other factors. This supports IC classification.`;
+      } else if (indepCount >= 2) {
+        prongC = 'warn';
+        prongCtext = `Weak independence (${indepCount}/7 factors). Some indicators present but not sufficient for Prong C passage. Workers need to demonstrate they operate as independent businesses in the same trade.`;
+      } else {
+        prongC = 'fail';
+        prongCtext = `No meaningful independence (${indepCount}/7 factors). Workers show minimal indicators of operating independent businesses. They appear to be economically dependent on your company.`;
+      }
+
+      // Overall risk calculation
+      const failures = [prongA, prongB, prongC].filter(p => p === 'fail').length;
+      const warnings = [prongA, prongB, prongC].filter(p => p === 'warn').length;
+
+      if (failures >= 2 || prongB === 'fail') {
+        overallRisk = 'high';
+        overallText = 'High misclassification risk. Your model likely fails the ABC test and requires either employee classification or significant structural redesign.';
+        recMain = 'Employee-Based Compliance Path';
+        recSteps = `<ul>
+          <li>Accept that workers are employees under AB 5</li>
+          <li>Implement wage & hour compliance (timekeeping, breaks, OT, reimbursements)</li>
+          <li>Register with EDD and obtain workers compensation coverage</li>
+          <li>Design compliant pay structure and onboarding documentation</li>
+          <li>Consider whether structural redesign is economically viable</li>
+        </ul>`;
+        docsMain = 'Priority documents for employee path:';
+        docsList = `<li>Employment offer letter (at-will, California-compliant)</li>
+          <li>Employee handbook with wage & hour policies</li>
+          <li>Timekeeping and break policies (especially for field workers)</li>
+          <li>IP assignment and confidentiality agreements</li>
+          <li>Consider arbitration agreement (optional)</li>`;
+      } else if (failures >= 1 || warnings >= 2) {
+        overallRisk = 'med';
+        overallText = 'Medium risk. Some ABC test issues present. You may have exemption pathways or need operational changes to support IC classification.';
+        recMain = 'Investigate Exemptions & Operational Changes';
+        recSteps = `<ul>
+          <li>Determine if statutory exemptions apply (business-to-business, professional services, etc.)</li>
+          <li>If exempt, apply replacement test (typically Borello) to evaluate IC status</li>
+          <li>Reduce control factors where operationally possible</li>
+          <li>Strengthen independence indicators (encourage multiple clients, separate business identity)</li>
+          <li>Document business-to-business relationship if applicable</li>
+        </ul>`;
+        docsMain = 'Documents depend on final path:';
+        docsList = `<li>If IC: Independent contractor agreement with Borello-aligned terms</li>
+          <li>If IC: Scope of work documents, separate invoicing</li>
+          <li>If employee: Offer letter + policies (see high-risk recommendations)</li>
+          <li>IP assignment and confidentiality (regardless of classification)</li>`;
+      } else {
+        overallRisk = 'low';
+        overallText = 'Lower risk for IC classification, though no model is zero-risk. Ensure exemptions apply if relying on them, and maintain proper documentation.';
+        recMain = 'IC Path with Strong Documentation';
+        recSteps = `<ul>
+          <li>Confirm applicable exemption or that ABC test is satisfied</li>
+          <li>Maintain evidence of independence (separate business, multiple clients, pricing autonomy)</li>
+          <li>Avoid increasing control over time (mission creep)</li>
+          <li>Regular compliance audits to ensure facts match contract</li>
+          <li>Monitor for changes in law or enforcement guidance</li>
+        </ul>`;
+        docsMain = 'Priority documents for IC path:';
+        docsList = `<li>Independent contractor agreement (B2B framed, project/SOW based)</li>
+          <li>Scope of work or master services agreement</li>
+          <li>IP assignment and confidentiality provisions</li>
+          <li>Evidence documentation (contractor's business license, insurance, etc.)</li>
+          <li>Invoicing and payment records showing business-to-business relationship</li>`;
+      }
+
+      // Update UI
+      document.getElementById('overall-badge').textContent = overallRisk === 'high' ? 'High Risk' : overallRisk === 'med' ? 'Medium Risk' : 'Lower Risk';
+      document.getElementById('overall-badge').className = 'badge ' + overallRisk;
+      document.getElementById('overall-text').textContent = overallText;
+
+      document.getElementById('prong-a-badge').className = 'prong-letter ' + prongA;
+      document.getElementById('prong-a-text').textContent = prongAtext;
+
+      document.getElementById('prong-b-badge').className = 'prong-letter ' + prongB;
+      document.getElementById('prong-b-text').textContent = prongBtext;
+
+      document.getElementById('prong-c-badge').className = 'prong-letter ' + prongC;
+      document.getElementById('prong-c-text').textContent = prongCtext;
+
+      document.getElementById('rec-main').innerHTML = `<strong>${recMain}</strong>`;
+      document.getElementById('rec-steps').innerHTML = recSteps;
+
+      document.getElementById('docs-main').textContent = docsMain;
+      document.getElementById('docs-list').innerHTML = docsList;
+
+      // Show results
+      document.getElementById('results').classList.add('show');
+      document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function exportResults() {
+      alert('PDF export functionality would be implemented here. For now, you can print this page (Cmd/Ctrl + P) and save as PDF.');
+      window.print();
+    }
+  </script>
+</body>
+</html>
